@@ -10,241 +10,216 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="site-header">
-    <a href="index.html" class="site-header-logo">AUC Atlas</a>
+  <header class="atlas-header">
+    <a href="index.html" class="atlas-brand" aria-label="AUC Atlas home">
+      <span>AUC</span>
+      <strong>Atlas</strong>
+    </a>
 
-    <nav class="site-header-nav" aria-label="Homepage navigation">
-      <a href="#atlas-map">Atlas Map</a>
-      <a href="#reviews">Reviews</a>
+    <nav class="atlas-nav" aria-label="Homepage navigation">
+      <a href="#coordinate-system">Coordinate System</a>
+      <a href="#student-path">Student Path</a>
       <a href="#materials">Materials</a>
     </nav>
 
-    <a href="#connected-context" class="site-header-pill">Course + Professor + Semester</a>
+    <a href="#coordinate-system" class="atlas-header-link">Course + Professor + Semester</a>
   </header>
 
-  <main class="atlas-page">
-    <section class="atlas-hero">
-      <div class="atlas-hero-inner">
-        <div class="atlas-hero-copy">
-          <p class="atlas-kicker">Academic navigation for AUC students</p>
-          <h1>AUC Atlas</h1>
-          <p class="atlas-tagline">Navigate AUC with confidence.</p>
-          <p class="atlas-intro">Find course materials and professor reviews with the context that matters: the course, professor, and semester they came from.</p>
-
-          <div class="atlas-hero-actions">
-            <a href="#atlas-map" class="atlas-primary-action">View the Atlas</a>
-            <a href="#connected-context" class="atlas-secondary-action">See the Connection</a>
-          </div>
-
-          <div class="atlas-hero-points">
-            <span>Courses</span>
-            <span>Professors</span>
-            <span>Semesters</span>
-          </div>
+  <main>
+    <section class="hero-section">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="section-label">Built around how AUC students actually choose classes</p>
+          <h1>Navigate AUC with confidence.</h1>
+          <p class="hero-intro">AUC Atlas connects professor reviews and course materials to the exact course, professor, and semester they came from.</p>
         </div>
 
-        <div class="atlas-hero-visual" aria-label="Course, professor, and semester connection map">
-          <div class="atlas-panel-top">
-            <span>AUC Atlas Map</span>
-            <strong>Student Context</strong>
+        <div class="coordinate-panel" aria-label="AUC Atlas coordinate example">
+          <div class="coordinate-panel-header">
+            <span>Academic Coordinate</span>
+            <strong>Example result</strong>
           </div>
 
-          <div class="atlas-map-field">
-            <div class="atlas-route atlas-route-one"></div>
-            <div class="atlas-route atlas-route-two"></div>
-            <div class="atlas-route atlas-route-three"></div>
-            <div class="atlas-route atlas-route-four"></div>
-
-            <article class="atlas-node atlas-node-course">
+          <div class="coordinate-list">
+            <div class="coordinate-item">
               <span>Course</span>
               <strong>RHET 1020</strong>
               <small>Research Writing</small>
-            </article>
+            </div>
 
-            <article class="atlas-node atlas-node-professor">
+            <div class="coordinate-item">
               <span>Professor</span>
-              <strong>Instructor Context</strong>
-              <small>Teaching style, grading, workload</small>
-            </article>
+              <strong>Instructor Review</strong>
+              <small>Specific to the class taken</small>
+            </div>
 
-            <article class="atlas-node atlas-node-semester">
+            <div class="coordinate-item">
               <span>Semester</span>
               <strong>Spring 2026</strong>
-              <small>Section timing and pace</small>
-            </article>
-
-            <article class="atlas-node atlas-node-review">
-              <span>Review</span>
-              <strong>Specific Experience</strong>
-              <small>Not a general rumor</small>
-            </article>
-
-            <article class="atlas-node atlas-node-material">
-              <span>Materials</span>
-              <strong>Notes, slides, exams</strong>
-              <small>Kept with their source class</small>
-            </article>
+              <small>The review keeps its original context</small>
+            </div>
           </div>
 
-          <div class="atlas-hero-card">
-            <span>Atlas Principle</span>
-            <h2>Reviews and materials stay attached to where they happened.</h2>
-            <p>A professor review from one course and semester should not be flattened into every other student experience.</p>
+          <div class="coordinate-result">
+            <span>Connected output</span>
+            <p>Reviews, notes, slides, and exams stay attached to the same academic coordinate.</p>
           </div>
+        </div>
+      </div>
+
+      <div class="hero-strip" aria-label="AUC Atlas focus areas">
+        <div>
+          <span>01</span>
+          <strong>Find the course</strong>
+        </div>
+        <div>
+          <span>02</span>
+          <strong>Choose the professor</strong>
+        </div>
+        <div>
+          <span>03</span>
+          <strong>Check the semester</strong>
+        </div>
+        <div>
+          <span>04</span>
+          <strong>Read with context</strong>
         </div>
       </div>
     </section>
 
-    <section class="atlas-section" id="connected-context">
-      <div class="atlas-section-inner">
-        <div class="atlas-section-head">
-          <p class="atlas-kicker">Connected academic context</p>
-          <h2>The same class can tell a different story each semester.</h2>
-        </div>
+    <section class="coordinate-section" id="coordinate-system">
+      <div class="section-heading">
+        <p class="section-label">The coordinate system</p>
+        <h2>One review should not speak for every class.</h2>
+      </div>
 
-        <div class="atlas-path-grid">
-          <article class="atlas-path-card">
-            <span>01</span>
-            <div>
-              <h3>Course</h3>
-              <p>Start from the class code, not a vague department search.</p>
-            </div>
-          </article>
+      <div class="coordinate-system">
+        <article>
+          <span>Course</span>
+          <h3>Start with the class.</h3>
+          <p>A review becomes useful when the course is clear from the beginning.</p>
+        </article>
 
-          <article class="atlas-path-card">
-            <span>02</span>
-            <div>
-              <h3>Professor</h3>
-              <p>Understand how that professor handled that exact course.</p>
-            </div>
-          </article>
+        <div class="connector-line" aria-hidden="true"></div>
 
-          <article class="atlas-path-card">
-            <span>03</span>
-            <div>
-              <h3>Semester</h3>
-              <p>Keep reviews tied to the timing, workload, and class version.</p>
-            </div>
-          </article>
+        <article>
+          <span>Professor</span>
+          <h3>Keep the instructor attached.</h3>
+          <p>The same professor can feel different across courses and class formats.</p>
+        </article>
 
-          <article class="atlas-path-card">
-            <span>04</span>
-            <div>
-              <h3>Materials</h3>
-              <p>Keep notes, slides, and past exams connected to their source.</p>
-            </div>
-          </article>
-        </div>
+        <div class="connector-line" aria-hidden="true"></div>
+
+        <article>
+          <span>Semester</span>
+          <h3>Preserve the time frame.</h3>
+          <p>Workload, pacing, and materials can change from one semester to another.</p>
+        </article>
       </div>
     </section>
 
-    <section class="atlas-map-section" id="atlas-map">
-      <div class="atlas-map-inner">
-        <div class="atlas-map-copy">
-          <p class="atlas-kicker">Atlas view</p>
-          <h2>Move through academic information like a map.</h2>
-          <p>Start at a course, choose a professor, narrow by semester, then compare what students actually experienced.</p>
+    <section class="student-path-section" id="student-path">
+      <div class="path-layout">
+        <div class="path-copy">
+          <p class="section-label">Student path</p>
+          <h2>A simple route through messy academic information.</h2>
+          <p>Instead of browsing disconnected comments and random files, students move through a clear academic path.</p>
         </div>
 
-        <div class="atlas-trace-list">
+        <div class="path-board">
           <article>
-            <span>Search Path</span>
-            <strong>Course + Professor + Semester</strong>
-            <p>The core coordinate system for AUC Atlas.</p>
+            <span>Search</span>
+            <strong>Course code or title</strong>
+            <p>Begin with the class you are planning to take.</p>
           </article>
 
           <article>
-            <span>Review Path</span>
-            <strong>Specific class experience</strong>
-            <p>Reviews stay grounded in the class where they were written.</p>
+            <span>Filter</span>
+            <strong>Professor and semester</strong>
+            <p>Narrow results to the exact experience you care about.</p>
           </article>
 
           <article>
-            <span>Material Path</span>
-            <strong>Source-aware uploads</strong>
-            <p>Materials remain connected to the professor, course, and semester they came from.</p>
+            <span>Compare</span>
+            <strong>Reviews and materials</strong>
+            <p>Read feedback beside the resources from the same context.</p>
+          </article>
+
+          <article>
+            <span>Decide</span>
+            <strong>Register with clarity</strong>
+            <p>Understand the class before you commit to it.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="atlas-review-section" id="reviews">
-      <div class="atlas-review-inner">
-        <div class="atlas-review-copy">
-          <p class="atlas-kicker">Professor reviews</p>
-          <h2>Less noise. More context.</h2>
-          <p>AUC Atlas is built around the idea that a review becomes more useful when students know exactly which course and semester shaped it.</p>
+    <section class="evidence-section">
+      <div class="section-heading">
+        <p class="section-label">What stays connected</p>
+        <h2>Two kinds of student knowledge, one shared context.</h2>
+      </div>
+
+      <div class="evidence-grid">
+        <article class="evidence-block evidence-review">
+          <span>Professor Reviews</span>
+          <h3>Specific, not generic.</h3>
+          <p>Reviews reflect the course and semester where the student actually took that professor.</p>
+        </article>
+
+        <article class="evidence-block evidence-material">
+          <span>Course Materials</span>
+          <h3>Organized by source.</h3>
+          <p>Uploaded materials remain tied to the professor, course, and semester they came from.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="materials-section" id="materials">
+      <div class="materials-intro">
+        <p class="section-label">Materials</p>
+        <h2>A place for resources that still remember their origin.</h2>
+      </div>
+
+      <div class="materials-ledger">
+        <div class="ledger-row">
+          <span>Notes</span>
+          <strong>Lecture notes</strong>
+          <p>Connected to class context.</p>
         </div>
 
-        <div class="atlas-review-sample">
-          <div class="atlas-review-record">
-            <span>Course</span>
-            <strong>ECON 2011</strong>
-          </div>
-          <div class="atlas-review-record">
-            <span>Professor</span>
-            <strong>Review tied to the class</strong>
-          </div>
-          <div class="atlas-review-record">
-            <span>Semester</span>
-            <strong>Fall 2025</strong>
-          </div>
-          <p>One professor can feel different across courses, sections, and semesters. The review should carry that context with it.</p>
+        <div class="ledger-row">
+          <span>Exams</span>
+          <strong>Past exams</strong>
+          <p>Sorted by semester source.</p>
+        </div>
+
+        <div class="ledger-row">
+          <span>Slides</span>
+          <strong>Class slides</strong>
+          <p>Kept with the professor and course.</p>
+        </div>
+
+        <div class="ledger-row">
+          <span>Guides</span>
+          <strong>Study guides</strong>
+          <p>Useful because the context is clear.</p>
         </div>
       </div>
     </section>
 
-    <section class="atlas-section" id="materials">
-      <div class="atlas-section-inner">
-        <div class="atlas-section-head atlas-section-head-row">
-          <div>
-            <p class="atlas-kicker">Course materials</p>
-            <h2>Materials that remember where they came from.</h2>
-          </div>
-        </div>
-
-        <div class="atlas-material-grid">
-          <article class="atlas-material-card">
-            <span>Notes</span>
-            <h3>Lecture Notes</h3>
-            <p>Organized by course, professor, and semester.</p>
-          </article>
-
-          <article class="atlas-material-card">
-            <span>Practice</span>
-            <h3>Past Exams</h3>
-            <p>Connected to the class context students need.</p>
-          </article>
-
-          <article class="atlas-material-card">
-            <span>Classroom</span>
-            <h3>Slides</h3>
-            <p>Kept close to the section they came from.</p>
-          </article>
-
-          <article class="atlas-material-card">
-            <span>Study</span>
-            <h3>Guides</h3>
-            <p>Useful only when the academic coordinates stay clear.</p>
-          </article>
-        </div>
+    <section class="closing-section">
+      <div>
+        <p class="section-label">AUC Atlas</p>
+        <h2>Academic decisions need coordinates.</h2>
       </div>
-    </section>
-
-    <section class="atlas-final">
-      <div class="atlas-final-panel">
-        <p class="atlas-kicker">First step</p>
-        <h2>A calmer map for messy course decisions.</h2>
-        <p>Start with the course. Keep the professor and semester attached.</p>
-      </div>
+      <p>Course + Professor + Semester is the foundation.</p>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="site-footer-inner">
-      <h2>AUC Atlas</h2>
-      <p>Navigate AUC with confidence.</p>
-    </div>
+  <footer class="atlas-footer">
+    <p>AUC Atlas</p>
+    <span>Navigate AUC with confidence.</span>
   </footer>
 </body>
 </html>
