@@ -1,0 +1,287 @@
+:root {
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --text: #18202f;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #2f6fed;
+  --accent-soft: #e8f0ff;
+  --success-soft: #edf8f1;
+  --radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.site-header {
+  padding: 56px 24px 32px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-header > div,
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+h1 {
+  max-width: 720px;
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.page {
+  padding: 24px;
+}
+
+.search-section {
+  margin-bottom: 24px;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 24px;
+  align-items: start;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.section-heading span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.course-list {
+  display: grid;
+  gap: 12px;
+}
+
+.course-card,
+.details-panel,
+.professor-card,
+.form-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.course-card {
+  width: 100%;
+  padding: 18px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.course-card:hover,
+.course-card.active {
+  border-color: var(--accent);
+}
+
+.course-code {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.course-title {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.course-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.details-panel {
+  position: sticky;
+  top: 16px;
+  padding: 20px;
+}
+
+.empty-state {
+  margin: 0;
+  color: var(--muted);
+}
+
+.details-title {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+}
+
+.details-subtitle {
+  margin: 0 0 20px;
+  color: var(--muted);
+}
+
+.professor-list {
+  display: grid;
+  gap: 12px;
+}
+
+.professor-card {
+  padding: 16px;
+}
+
+.professor-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 14px;
+}
+
+.professor-top h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.rating-pill {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--success-soft);
+  color: #237244;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.content-group {
+  margin-top: 14px;
+}
+
+.content-group h4 {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+}
+
+.item-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item-list li {
+  padding: 10px;
+  border-radius: var(--radius);
+  background: #f9fafc;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.item-list a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.form-box {
+  margin-top: 16px;
+  padding: 14px;
+  background: #fbfcff;
+}
+
+.form-box h4 {
+  margin: 0 0 10px;
+}
+
+.form-row {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.form-box input,
+.form-box select,
+.form-box textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.form-box textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+button.primary {
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius);
+  color: #ffffff;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.no-results {
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
+  background: var(--surface);
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .details-panel {
+    position: static;
+  }
+}
