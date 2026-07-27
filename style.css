@@ -61,21 +61,14 @@ button {
 .brand {
   position: relative;
   min-height: 44px;
-  padding: 6px 0 6px 18px;
+  padding: 6px 0;
   display: inline-flex;
   align-items: center;
   text-decoration: none;
 }
 
 .brand::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 7px;
-  bottom: 7px;
-  width: 3px;
-  border-radius: 999px;
-  background: var(--gold);
+  content: none;
 }
 
 .brand::after {
