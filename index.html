@@ -16,13 +16,14 @@
       <strong>Atlas</strong>
     </a>
 
-    <nav class="atlas-nav" aria-label="Homepage navigation">
-      <a href="#coordinate-system">Coordinate System</a>
-      <a href="#student-path">Student Path</a>
-      <a href="#materials">Materials</a>
+    <nav class="atlas-nav" aria-label="Site navigation">
+      <a href="courses/">Courses</a>
+      <a href="professors/">Professors</a>
+      <a href="materials/">Materials</a>
+      <a href="search/">Search</a>
     </nav>
 
-    <a href="#coordinate-system" class="atlas-header-link">Course + Professor + Semester</a>
+    <a href="courses/" class="atlas-header-link">Browse Classes</a>
   </header>
 
   <main>
@@ -32,6 +33,12 @@
           <p class="section-label">Built around how AUC students actually choose classes</p>
           <h1>Navigate AUC with confidence.</h1>
           <p class="hero-intro">AUC Atlas connects professor reviews and course materials to the exact course, professor, and semester they came from.</p>
+
+          <form class="atlas-search-form hero-search" action="search/index.html" method="get">
+            <label class="sr-only" for="home-search">Search AUC Atlas</label>
+            <input id="home-search" name="q" type="search" placeholder="Search courses, professors, or materials" />
+            <button type="submit">Search</button>
+          </form>
         </div>
 
         <div class="coordinate-panel" aria-label="AUC Atlas coordinate example">
@@ -43,20 +50,20 @@
           <div class="coordinate-list">
             <div class="coordinate-item">
               <span>Course</span>
-              <strong>RHET 1020</strong>
-              <small>Research Writing</small>
+              <strong>CSCE 2301</strong>
+              <small>Data Structures</small>
             </div>
 
             <div class="coordinate-item">
               <span>Professor</span>
-              <strong>Instructor Review</strong>
-              <small>Specific to the class taken</small>
+              <strong>Dr. Ahmed Hassan</strong>
+              <small>Rating is specific to this course</small>
             </div>
 
             <div class="coordinate-item">
               <span>Semester</span>
-              <strong>Spring 2026</strong>
-              <small>The review keeps its original context</small>
+              <strong>Fall 2026</strong>
+              <small>Reviews and materials keep this exact context</small>
             </div>
           </div>
 
