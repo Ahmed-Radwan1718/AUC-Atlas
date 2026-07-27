@@ -170,9 +170,9 @@ p {
 
 .hero-copy h1 {
   margin-bottom: 18px;
-  font-size: clamp(4rem, 12vw, 9.5rem);
+  font-size: clamp(2.8rem, 6vw, 5.4rem);
   font-weight: 800;
-  line-height: 0.82;
+  line-height: 0.96;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -403,8 +403,8 @@ p {
 
 .workspace-heading h2 {
   margin: 0;
-  font-size: clamp(2rem, 5vw, 4.6rem);
-  line-height: 0.95;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -562,8 +562,8 @@ p {
 .details-header h2 {
   margin: 0;
   max-width: 640px;
-  font-size: clamp(2rem, 4vw, 4.2rem);
-  line-height: 0.98;
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
+  line-height: 1.05;
   letter-spacing: 0;
   text-transform: uppercase;
 }
