@@ -27,10 +27,7 @@ body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   color: var(--ink);
-  background-color: var(--bg);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420' viewBox='0 0 420 420'%3E%3Cg fill='none' stroke='%238b1e3f' stroke-opacity='0.08' stroke-width='1.4'%3E%3Cpath d='M-42 88C18 52 68 50 122 80C178 111 212 104 262 76C314 47 360 55 462 105'/%3E%3Cpath d='M-32 154C30 120 86 118 144 151C198 182 246 177 298 144C344 115 382 120 452 160'/%3E%3Cpath d='M-46 250C28 213 82 217 138 250C196 284 248 283 304 248C354 217 386 219 462 258'/%3E%3Cpath d='M-28 330C42 296 92 300 152 333C210 365 262 360 318 326C362 300 392 304 452 340'/%3E%3C/g%3E%3Cg fill='none' stroke='%231d1f1f' stroke-opacity='0.045' stroke-width='1'%3E%3Cpath d='M72 -36C98 16 104 60 78 112C50 168 54 210 92 258C128 302 128 344 92 456'/%3E%3Cpath d='M244 -28C280 30 286 80 254 132C218 190 222 236 266 286C310 336 306 372 268 454'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 420px 420px;
-  background-attachment: fixed;
+  background: var(--bg);
 }
 
 a {
@@ -82,14 +79,7 @@ button {
 }
 
 .brand::after {
-  content: "";
-  position: absolute;
-  left: 18px;
-  right: -14px;
-  bottom: 3px;
-  height: 2px;
-  background: repeating-linear-gradient(90deg, var(--gold) 0 12px, transparent 12px 18px);
-  opacity: 0.6;
+  content: none;
 }
 
 .brand-word {
