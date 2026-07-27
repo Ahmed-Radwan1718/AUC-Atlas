@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AUC Atlas</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">AUC Atlas</p>
+      <h1>Find courses, professors, materials, and reviews.</h1>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="search-section">
+      <input id="searchInput" type="search" placeholder="Search courses, codes, professors, or materials" />
+    </section>
+
+    <section class="layout">
+      <div>
+        <div class="section-heading">
+          <h2>Browse Courses</h2>
+          <span id="courseCount"></span>
+        </div>
+        <div id="courseList" class="course-list"></div>
+      </div>
+
+      <aside id="courseDetails" class="details-panel">
+        <p class="empty-state">Select a course to view professors, materials, and reviews.</p>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
