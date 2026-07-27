@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Courses | AUC Atlas</title>
+  <meta name="description" content="Browse AUC Atlas courses by department, code, professor context, materials, and reviews." />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .courses-page {
+      padding: 70px 0 90px;
+    }
+
+    .courses-hero {
+      margin-bottom: 42px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.45fr);
+      gap: 34px;
+      align-items: end;
+    }
+
+    .courses-hero h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(3.8rem, 10vw, 8.5rem);
+      font-weight: 900;
+      line-height: 0.84;
+      text-transform: uppercase;
+    }
+
+    .courses-hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .courses-toolbar {
+      margin-bottom: 24px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.72);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .courses-toolbar span {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .atlas-course-card,
+    .atlas-course-card:visited {
+      min-height: 360px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      text-decoration: none;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .atlas-course-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 18px 48px rgba(29, 31, 31, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .course-card-visual {
+      min-height: 170px;
+      padding: 18px;
+      background:
+        linear-gradient(145deg, rgba(139, 30, 63, 0.92), rgba(29, 31, 31, 0.96));
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .course-card-visual span {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .course-card-visual strong {
+      font-size: clamp(2.3rem, 5vw, 3.7rem);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .course-card-body {
+      padding: 18px;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .course-card-body h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      line-height: 1.16;
+    }
+
+    .course-card-body p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .course-card-meta {
+      margin-top: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .course-card-meta span {
+      padding: 7px 9px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--ink-soft);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .site-footer {
+      margin-top: 0;
+    }
+
+    @media (max-width: 1080px) {
+      .courses-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 820px) {
+      .courses-hero,
+      .courses-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .courses-page {
+        padding-top: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="AUC Atlas home">
+      <span class="brand-word">
+        <span class="brand-campus">AUC</span>
+        <span class="brand-atlas">Atlas</span>
+      </span>
+    </a>
+
+    <nav class="top-nav" aria-label="Primary navigation">
+      <a href="courses.html" aria-current="page">Courses</a>
+      <a href="index.html#contribute">Contribute</a>
+    </nav>
+
+    <a class="header-action" href="index.html">Home</a>
+  </header>
+
+  <main class="courses-page">
+    <section class="courses-hero">
+      <div>
+        <p class="kicker">Course catalogue</p>
+        <h1>Browse Courses</h1>
+      </div>
+      <p>
+        Start with the class, then compare professors, materials, and course-specific reviews in the Atlas.
+      </p>
+    </section>
+
+    <section class="courses-toolbar" aria-label="Course departments">
+      <span>All</span>
+      <span>Science</span>
+      <span>Engineering</span>
+      <span>Business</span>
+      <span>Humanities</span>
+      <span>Core</span>
+    </section>
+
+    <section class="courses-grid" aria-label="AUC courses">
+      <a class="atlas-course-card" href="index.html#courses">
+        <div class="course-card-visual">
+          <span>Chemistry</span>
+          <strong>CHEM 1005</strong>
+        </div>
+        <div class="course-card-body">
+          <h2>General Chemistry</h2>
+          <p>Foundations of chemical principles, lab thinking, and problem solving.</p>
+          <div class="course-card-meta">
+            <span>3 professors</span>
+            <span>12 materials</span>
+            <span>28 reviews</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="atlas-course-card" href="index.html#courses">
+        <div class="course-card-visual">
+          <span>Computer Science</span>
+          <strong>CSCE 1101</strong>
+        </div>
+        <div class="course-card-body">
+          <h2>Introduction to Computer Science</h2>
+          <p>Programming fundamentals, logic, and the first step into computing.</p>
+          <div class="course-card-meta">
+            <span>2 professors</span>
+            <span>3 materials</span>
+            <span>3 reviews</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="atlas-course-card" href="index.html#courses">
+        <div class="course-card-visual">
+          <span>Rhetoric</span>
+          <strong>RHET 1020</strong>
+        </div>
+        <div class="course-card-body">
+          <h2>Research Writing</h2>
+          <p>Source evaluation, academic argument, and research paper structure.</p>
+          <div class="course-card-meta">
+            <span>4 professors</span>
+            <span>9 materials</span>
+            <span>21 reviews</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="atlas-course-card" href="index.html#courses">
+        <div class="course-card-visual">
+          <span>Economics</span>
+          <strong>ECON 2011</strong>
+        </div>
+        <div class="course-card-body">
+          <h2>Introduction to Macroeconomics</h2>
+          <p>GDP, inflation, fiscal policy, monetary policy, and economic indicators.</p>
+          <div class="course-card-meta">
+            <span>3 professors</span>
+            <span>7 materials</span>
+            <span>16 reviews</span>
+          </div>
+        </div>
+      </a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>AUC Atlas</span>
+    <span>Course-first academic browsing.</span>
+  </footer>
+</body>
+</html>
