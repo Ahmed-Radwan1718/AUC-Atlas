@@ -4,35 +4,130 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AUC Atlas</title>
+  <meta name="description" content="AUC Atlas helps students browse AUC courses, professors, course materials, and course-specific reviews." />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="site-header">
-    <div>
-      <p class="eyebrow">AUC Atlas</p>
-      <h1>Find courses, professors, materials, and reviews.</h1>
-    </div>
+    <a class="brand" href="#top" aria-label="AUC Atlas home">
+      <span class="brand-mark">AA</span>
+      <span>
+        <strong>AUC Atlas</strong>
+        <small>A Radwan project</small>
+      </span>
+    </a>
+
+    <nav class="top-nav" aria-label="Primary navigation">
+      <a href="#courses">Courses</a>
+      <a href="#contribute">Contribute</a>
+    </nav>
+
+    <a class="header-action" href="#courses">Browse Atlas</a>
   </header>
 
-  <main class="page">
-    <section class="search-section">
-      <input id="searchInput" type="search" placeholder="Search courses, codes, professors, or materials" />
-    </section>
+  <main id="top">
+    <section class="hero-section">
+      <div class="hero-copy">
+        <p class="kicker">Built for AUC students</p>
+        <h1>AUC Atlas</h1>
+        <p class="hero-intro">
+          Course intel, professor context, student-uploaded materials, and course-specific reviews in one clean academic map.
+        </p>
 
-    <section class="layout">
-      <div>
-        <div class="section-heading">
-          <h2>Browse Courses</h2>
-          <span id="courseCount"></span>
+        <div class="hero-search">
+          <label for="searchInput">Search the atlas</label>
+          <div class="search-box">
+            <input id="searchInput" type="search" placeholder="Search CSCE 1101, rhetoric, professor names, notes..." />
+            <button id="clearSearch" type="button" hidden>Clear</button>
+          </div>
         </div>
-        <div id="courseList" class="course-list"></div>
+
+        <div class="hero-points">
+          <span>Course-first</span>
+          <span>Professor-specific</span>
+          <span>Student-powered</span>
+        </div>
       </div>
 
-      <aside id="courseDetails" class="details-panel">
-        <p class="empty-state">Select a course to view professors, materials, and reviews.</p>
+      <aside class="atlas-preview" aria-label="Selected course preview">
+        <div class="preview-topline">
+          <span id="previewDepartment">Computer Science</span>
+          <strong id="previewCode">CSCE 1101</strong>
+        </div>
+
+        <div class="preview-main">
+          <p>Now viewing</p>
+          <h2 id="previewTitle">Introduction to Computer Science</h2>
+          <span id="previewMeta">2 professors - 3 materials - 3 reviews</span>
+        </div>
+
+        <div class="preview-map">
+          <div class="map-node active">Course</div>
+          <div class="map-line"></div>
+          <div class="map-node">Professor</div>
+          <div class="map-line"></div>
+          <div class="map-node">Materials</div>
+          <div class="map-line"></div>
+          <div class="map-node">Reviews</div>
+        </div>
       </aside>
     </section>
+
+    <section class="signal-strip" aria-label="Atlas highlights">
+      <div>
+        <span>01</span>
+        <strong>Start with the course</strong>
+        <p>Every professor, file, and review stays tied to the exact class.</p>
+      </div>
+      <div>
+        <span>02</span>
+        <strong>Compare the context</strong>
+        <p>See how each professor is reviewed for that course only.</p>
+      </div>
+      <div>
+        <span>03</span>
+        <strong>Use shared material</strong>
+        <p>Notes, slides, past exams, and guides are grouped where they belong.</p>
+      </div>
+    </section>
+
+    <section id="courses" class="atlas-workspace">
+      <div class="workspace-heading">
+        <div>
+          <p class="kicker">Course index</p>
+          <h2>Browse by course first.</h2>
+        </div>
+        <span id="courseCount">0 courses</span>
+      </div>
+
+      <div id="departmentFilter" class="department-filter" aria-label="Department filter"></div>
+
+      <div class="atlas-grid">
+        <section class="course-column" aria-label="Course list">
+          <div id="courseList" class="course-list"></div>
+        </section>
+
+        <section id="courseDetails" class="course-stage" aria-live="polite">
+          <p class="empty-state">Select a course to view professors, materials, and reviews.</p>
+        </section>
+      </div>
+    </section>
+
+    <section id="contribute" class="contribute-section">
+      <div>
+        <p class="kicker">Next layer</p>
+        <h2>Built around student contributions.</h2>
+      </div>
+      <p>
+        The first version maps the experience. The next version can connect uploads, accounts, moderation, and review submission.
+      </p>
+    </section>
   </main>
+
+  <footer class="site-footer">
+    <span>AUC Atlas</span>
+    <span>A Radwan project for clearer course decisions.</span>
+  </footer>
 
   <script src="script.js"></script>
 </body>
