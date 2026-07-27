@@ -55,7 +55,7 @@ button {
   backdrop-filter: blur(18px);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 24px;
 }
 
@@ -103,9 +103,13 @@ button {
 }
 
 .top-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 22px;
+  justify-content: center;
+  gap: 26px;
 }
 
 .top-nav a {
@@ -123,6 +127,7 @@ button {
 
 .header-action {
   min-height: 42px;
+  margin-left: auto;
   padding: 0 18px;
   border: 1px solid var(--ink);
   border-radius: 999px;
