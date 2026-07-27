@@ -1,0 +1,343 @@
+const courses = [
+  {
+    code: "CSCE 1101",
+    title: "Introduction to Computer Science",
+    department: "Computer Science",
+    level: "1000",
+    summary: "Programming fundamentals, problem solving, and the first serious step into computing at AUC.",
+    professors: [
+      {
+        id: "leila-hassan",
+        name: "Dr. Leila Hassan",
+        note: "Known for structured lectures, clear examples, and steady weekly practice.",
+        rating: 4.7,
+        materials: [
+          { title: "Python midterm review notes", type: "Notes", uploader: "Student upload", term: "Fall 2025" },
+          { title: "Practice problems set", type: "Practice", uploader: "Student upload", term: "Spring 2026" }
+        ],
+        reviews: [
+          { rating: 5, author: "Anonymous student", term: "Fall 2025", text: "Very clear explanations and exams that match the practice style." },
+          { rating: 4, author: "Anonymous student", term: "Spring 2026", text: "Assignments take time, but the course feels organized." }
+        ]
+      },
+      {
+        id: "omar-nassar",
+        name: "Dr. Omar Nassar",
+        note: "Fast-paced lectures with useful office hours and practical coding examples.",
+        rating: 4.2,
+        materials: [
+          { title: "Lecture slides collection", type: "Slides", uploader: "Student upload", term: "Fall 2025" }
+        ],
+        reviews: [
+          { rating: 4, author: "Anonymous student", term: "Fall 2025", text: "Good if you keep up every week. Office hours helped a lot." }
+        ]
+      }
+    ]
+  },
+  {
+    code: "RHET 1020",
+    title: "Research Writing",
+    department: "Rhetoric",
+    level: "1000",
+    summary: "Academic writing, source evaluation, argument building, and research paper structure.",
+    professors: [
+      {
+        id: "mariam-fahmy",
+        name: "Dr. Mariam Fahmy",
+        note: "Detailed feedback, organized milestones, and a calm writing workshop style.",
+        rating: 4.8,
+        materials: [
+          { title: "Research paper checklist", type: "Guide", uploader: "Student upload", term: "Spring 2026" },
+          { title: "Annotated bibliography template", type: "Template", uploader: "Student upload", term: "Fall 2025" }
+        ],
+        reviews: [
+          { rating: 5, author: "Anonymous student", term: "Spring 2026", text: "Feedback was specific and made the final paper much stronger." }
+        ]
+      }
+    ]
+  },
+  {
+    code: "ECON 2011",
+    title: "Introduction to Macroeconomics",
+    department: "Economics",
+    level: "2000",
+    summary: "GDP, inflation, monetary policy, fiscal policy, and the logic behind economic indicators.",
+    professors: [
+      {
+        id: "karim-adel",
+        name: "Dr. Karim Adel",
+        note: "Concept-heavy lectures with exams that reward practice and clean definitions.",
+        rating: 4.1,
+        materials: [
+          { title: "Final formula sheet", type: "Notes", uploader: "Student upload", term: "Fall 2025" }
+        ],
+        reviews: [
+          { rating: 4, author: "Anonymous student", term: "Fall 2025", text: "Exams were fair if you understood the graphs and practiced problems." }
+        ]
+      }
+    ]
+  },
+  {
+    code: "MATH 1110",
+    title: "Calculus I",
+    department: "Mathematics",
+    level: "1000",
+    summary: "Limits, derivatives, applications, and the mathematical foundation for science and engineering tracks.",
+    professors: [
+      {
+        id: "nadine-salem",
+        name: "Dr. Nadine Salem",
+        note: "Precise explanations, tough quizzes, and very useful review sessions.",
+        rating: 4.4,
+        materials: [
+          { title: "Derivative rules sheet", type: "Notes", uploader: "Student upload", term: "Spring 2026" },
+          { title: "Quiz review packet", type: "Practice", uploader: "Student upload", term: "Spring 2026" }
+        ],
+        reviews: [
+          { rating: 4, author: "Anonymous student", term: "Spring 2026", text: "The course is demanding, but the review sessions make a difference." },
+          { rating: 5, author: "Anonymous student", term: "Fall 2025", text: "Very fair grading and strong explanations." }
+        ]
+      }
+    ]
+  }
+];
+
+const state = {
+  query: "",
+  department: "All",
+  selectedCourseCode: courses[0].code,
+  selectedProfessorId: courses[0].professors[0].id
+};
+
+const searchInput = document.getElementById("searchInput");
+const clearSearch = document.getElementById("clearSearch");
+const departmentFilter = document.getElementById("departmentFilter");
+const courseList = document.getElementById("courseList");
+const courseCount = document.getElementById("courseCount");
+const courseDetails = document.getElementById("courseDetails");
+
+const previewDepartment = document.getElementById("previewDepartment");
+const previewCode = document.getElementById("previewCode");
+const previewTitle = document.getElementById("previewTitle");
+const previewMeta = document.getElementById("previewMeta");
+
+function getCourseStats(course) {
+  const materialCount = course.professors.reduce((total, professor) => total + professor.materials.length, 0);
+  const reviewCount = course.professors.reduce((total, professor) => total + professor.reviews.length, 0);
+
+  return {
+    professorCount: course.professors.length,
+    materialCount,
+    reviewCount
+  };
+}
+
+function getDepartments() {
+  return ["All", ...new Set(courses.map((course) => course.department))];
+}
+
+function courseMatchesSearch(course) {
+  const query = state.query.trim().toLowerCase();
+
+  if (!query) {
+    return true;
+  }
+
+  const professorNames = course.professors.map((professor) => professor.name).join(" ");
+  const materialTitles = course.professors
+    .flatMap((professor) => professor.materials)
+    .map((material) => material.title)
+    .join(" ");
+
+  return `${course.code} ${course.title} ${course.department} ${professorNames} ${materialTitles}`
+    .toLowerCase()
+    .includes(query);
+}
+
+function getFilteredCourses() {
+  return courses.filter((course) => {
+    const matchesDepartment = state.department === "All" || course.department === state.department;
+    return matchesDepartment && courseMatchesSearch(course);
+  });
+}
+
+function renderDepartmentFilters() {
+  departmentFilter.innerHTML = getDepartments()
+    .map((department) => `
+      <button class="filter-button ${department === state.department ? "active" : ""}" type="button" data-department="${department}">
+        ${department}
+      </button>
+    `)
+    .join("");
+
+  departmentFilter.querySelectorAll(".filter-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.department = button.dataset.department;
+      render();
+    });
+  });
+}
+
+function renderCourses(filteredCourses) {
+  courseCount.textContent = `${filteredCourses.length} course${filteredCourses.length === 1 ? "" : "s"}`;
+
+  if (!filteredCourses.length) {
+    courseList.innerHTML = '<p class="no-results">No courses match this search yet.</p>';
+    courseDetails.innerHTML = '<p class="empty-state">Try a different course, department, professor, or material keyword.</p>';
+    return;
+  }
+
+  if (!filteredCourses.some((course) => course.code === state.selectedCourseCode)) {
+    state.selectedCourseCode = filteredCourses[0].code;
+    state.selectedProfessorId = filteredCourses[0].professors[0].id;
+  }
+
+  courseList.innerHTML = filteredCourses
+    .map((course) => {
+      const stats = getCourseStats(course);
+
+      return `
+        <button class="course-card ${course.code === state.selectedCourseCode ? "active" : ""}" type="button" data-course-code="${course.code}">
+          <div class="course-card-top">
+            <div>
+              <p class="course-code">${course.code}</p>
+              <h3 class="course-title">${course.title}</h3>
+            </div>
+            <span class="course-department">${course.level}</span>
+          </div>
+
+          <p class="course-summary">${course.summary}</p>
+
+          <div class="course-meta">
+            <span>${stats.professorCount} professor${stats.professorCount === 1 ? "" : "s"}</span>
+            <span>${stats.materialCount} material${stats.materialCount === 1 ? "" : "s"}</span>
+            <span>${stats.reviewCount} review${stats.reviewCount === 1 ? "" : "s"}</span>
+          </div>
+        </button>
+      `;
+    })
+    .join("");
+
+  courseList.querySelectorAll(".course-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      const course = courses.find((item) => item.code === card.dataset.courseCode);
+
+      state.selectedCourseCode = course.code;
+      state.selectedProfessorId = course.professors[0].id;
+      render();
+    });
+  });
+}
+
+function renderCourseDetails() {
+  const course = courses.find((item) => item.code === state.selectedCourseCode);
+
+  if (!course) {
+    courseDetails.innerHTML = '<p class="empty-state">Select a course to view professors, materials, and reviews.</p>';
+    return;
+  }
+
+  if (!course.professors.some((professor) => professor.id === state.selectedProfessorId)) {
+    state.selectedProfessorId = course.professors[0].id;
+  }
+
+  const professor = course.professors.find((item) => item.id === state.selectedProfessorId);
+  const stats = getCourseStats(course);
+
+  previewDepartment.textContent = course.department;
+  previewCode.textContent = course.code;
+  previewTitle.textContent = course.title;
+  previewMeta.textContent = `${stats.professorCount} professors - ${stats.materialCount} materials - ${stats.reviewCount} reviews`;
+
+  courseDetails.innerHTML = `
+    <article class="course-details">
+      <div class="details-header">
+        <div class="details-header-row">
+          <div>
+            <p class="details-label">${course.code}</p>
+            <h2>${course.title}</h2>
+          </div>
+          <span class="course-department">${course.department}</span>
+        </div>
+        <p class="details-summary">${course.summary}</p>
+      </div>
+
+      <div class="professor-picker" aria-label="Professors for ${course.code}">
+        ${course.professors.map((item) => `
+          <button class="professor-tab ${item.id === professor.id ? "active" : ""}" type="button" data-professor-id="${item.id}">
+            ${item.name}
+          </button>
+        `).join("")}
+      </div>
+
+      <section class="professor-sheet">
+        <div class="professor-sheet-top">
+          <div>
+            <h3>${professor.name}</h3>
+            <p>${professor.note}</p>
+          </div>
+          <div class="rating-badge">
+            <strong>${professor.rating.toFixed(1)}</strong>
+            <span>In ${course.code}</span>
+          </div>
+        </div>
+
+        <div class="detail-columns">
+          <div class="detail-column">
+            <h4>Student materials</h4>
+            <ul class="material-list">
+              ${professor.materials.map((material) => `
+                <li>
+                  <strong>${material.title}</strong>
+                  <span>${material.type} - ${material.uploader} - ${material.term}</span>
+                </li>
+              `).join("")}
+            </ul>
+          </div>
+
+          <div class="detail-column">
+            <h4>Course-specific reviews</h4>
+            <ul class="review-list">
+              ${professor.reviews.map((review) => `
+                <li>
+                  <strong>${review.rating}/5 - ${review.term}</strong>
+                  <span>${review.text}</span>
+                </li>
+              `).join("")}
+            </ul>
+          </div>
+        </div>
+      </section>
+    </article>
+  `;
+
+  courseDetails.querySelectorAll(".professor-tab").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedProfessorId = button.dataset.professorId;
+      renderCourseDetails();
+    });
+  });
+}
+
+function render() {
+  clearSearch.hidden = state.query.length === 0;
+  renderDepartmentFilters();
+
+  const filteredCourses = getFilteredCourses();
+  renderCourses(filteredCourses);
+  renderCourseDetails();
+}
+
+searchInput.addEventListener("input", () => {
+  state.query = searchInput.value;
+  render();
+});
+
+clearSearch.addEventListener("click", () => {
+  state.query = "";
+  searchInput.value = "";
+  searchInput.focus();
+  render();
+});
+
+render();
