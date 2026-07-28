@@ -298,10 +298,7 @@
 
     const name = getById("account-name");
     const email = getById("account-email");
-    const verified = getById("account-verified");
-    const verifyButton = getById("account-send-verification");
     const logoutButton = getById("account-logout");
-    const accountMessage = getById("account-message");
     const securityButton = getById("account-send-security-code");
     const securityForm = getById("account-security-code-form");
     const securityCode = getById("account-security-code");
@@ -337,11 +334,6 @@
 
       name.textContent = data.user.fullName || data.user.displayName || data.user.firstName || "AUC Atlas user";
       email.textContent = data.user.email || "";
-      verified.textContent = data.user.emailVerified ? "Verified email" : "Email not verified";
-
-      if (verifyButton) {
-        verifyButton.hidden = Boolean(data.user.emailVerified);
-      }
     }
 
     sidebarButtons.forEach(function (button) {
@@ -352,24 +344,6 @@
           showAccountPanel(panelName);
         }
       });
-    });
-
-    verifyButton.addEventListener("click", async function () {
-      setButtonLoading(verifyButton, true, "Sending...", "Send verification email");
-      setMessage(accountMessage, "", "");
-
-      try {
-        const data = await requestJson("/api/send-email-verification", {
-          method: "POST",
-          body: {}
-        });
-
-        setMessage(accountMessage, data.alreadyVerified ? "Your email is already verified." : "Verification email sent.", "success");
-      } catch (error) {
-        setMessage(accountMessage, error.message || "Could not send verification email.", "error");
-      } finally {
-        setButtonLoading(verifyButton, false, "Sending...", "Send verification email");
-      }
     });
 
     securityButton.addEventListener("click", async function () {
