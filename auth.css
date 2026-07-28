@@ -243,16 +243,18 @@
   text-align: left;
   text-transform: uppercase;
   display: grid;
-  grid-template-columns: 12px minmax(0, 1fr);
+  grid-template-columns: 22px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
 }
 
-.account-sidebar-marker {
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--line-strong);
+.account-sidebar-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  object-fit: contain;
+  opacity: 0.62;
+  transition: opacity 0.2s ease;
 }
 
 .account-sidebar-link:hover,
@@ -261,9 +263,9 @@
   color: var(--gold);
 }
 
-.account-sidebar-link:hover .account-sidebar-marker,
-.account-sidebar-link.active .account-sidebar-marker {
-  background: var(--gold);
+.account-sidebar-link:hover .account-sidebar-icon,
+.account-sidebar-link.active .account-sidebar-icon {
+  opacity: 1;
 }
 
 .account-logout-link {
