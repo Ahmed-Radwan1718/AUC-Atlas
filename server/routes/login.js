@@ -6,7 +6,8 @@ const {
   createSiteSessionFromIdToken,
   createLoginChallenge,
   createLoginTwoFactorSession,
-  getCurrentTrustedDevice
+  getCurrentTrustedDevice,
+  requireVerifiedAucEmail
 } = require("../_lib/securityHelpers");
 
 const LOGIN_ATTEMPT_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -290,6 +291,13 @@ module.exports = async function handler(req, res) {
       return admin.firestore().collection("users").doc(uid).get();
     }, null);
     const userData = userDoc && userDoc.exists ? userDoc.data() || {} : {};
+    const currentUserRecord = await admin.auth().getUser(uid);
+
+    requireVerifiedAucEmail(
+      currentUserRecord.email || userRecord.email || email,
+      Boolean(currentUserRecord.emailVerified)
+    );
+
     const twoFactor = getSafeTwoFactorSettings(userData);
     const requiresTwoFactor = twoFactor.appEnabled || twoFactor.emailEnabled;
 
