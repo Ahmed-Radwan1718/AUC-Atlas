@@ -22,9 +22,9 @@
   </nav>
 
   <div class="site-header-actions">
-    <span class="site-header-user-icon">
-      <img src="user.png" alt="User">
-    </span>
+    <a href="account.html" class="site-header-user-icon" aria-label="Account">
+      <img src="user.png" alt="">
+    </a>
   </div>
 </header>
 `;
