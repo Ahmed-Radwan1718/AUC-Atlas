@@ -238,11 +238,11 @@
           }
         });
 
-        setMessage(message, data.message || "Account created. Check your inbox to verify your email.", "success");
+        setMessage(message, data.message || "Account created. Check your inbox to verify your AUC email.", "success");
 
         setTimeout(function () {
-          window.location.href = "account.html";
-        }, 800);
+          window.location.href = "login.html";
+        }, 1200);
       } catch (error) {
         setMessage(message, error.message || "Could not create account.", "error");
       } finally {
