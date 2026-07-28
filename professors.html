@@ -54,17 +54,39 @@
     }
 
     .professor-card-visual {
-      min-height: 150px;
+      position: relative;
+      min-height: 230px;
       padding: 18px;
-      background: linear-gradient(145deg, rgba(139, 30, 63, 0.92), rgba(29, 31, 31, 0.96));
+      background: var(--ink);
       color: white;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    .professor-card-visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, rgba(29, 31, 31, 0.08), rgba(29, 31, 31, 0.78));
+    }
+
+    .professor-card-photo {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
     }
 
     .professor-card-visual span {
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(255, 255, 255, 0.78);
       font-size: 11px;
       font-weight: 900;
       letter-spacing: 0.12em;
@@ -149,6 +171,7 @@
     <section class="professors-grid" aria-label="AUC professors">
       <article class="professor-card">
         <div class="professor-card-visual">
+          <img class="professor-card-photo" src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" alt="Eslam Badr">
           <span>Professor</span>
           <strong>Eslam Badr</strong>
         </div>
