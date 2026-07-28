@@ -56,7 +56,12 @@ return res.status(200).json({
 
     const fullName = userData.fullName || userRecord.displayName || "";
     const email = userRecord.email || userData.email || decodedUser.email || "";
+    const phone = userData.phone || "";
     const photoURL = userData.photoURL || userRecord.photoURL || "";
+    const authProvider = userData.authProvider || "";
+    const providerIds = (userRecord.providerData || [])
+      .map((provider) => provider && provider.providerId ? provider.providerId : "")
+      .filter(Boolean);
     const firstName = getFirstName(fullName, email);
 
 return res.status(200).json({
@@ -69,7 +74,15 @@ return res.status(200).json({
         emailVerified: Boolean(userRecord.emailVerified),
         displayName: fullName,
         fullName,
+        phone,
         photoURL,
+        authProvider,
+        providers: {
+          password: providerIds.includes("password") || authProvider === "password",
+          google: providerIds.includes("google.com") || authProvider === "google",
+          github: providerIds.includes("github.com") || authProvider === "github",
+          facebook: providerIds.includes("facebook.com") || authProvider === "facebook"
+        },
         firstName
       }
     });
