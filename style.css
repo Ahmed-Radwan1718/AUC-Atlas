@@ -215,15 +215,6 @@ main {
   margin: 0 auto;
 }
 
-.hero-section {
-  min-height: calc(100vh - 82px);
-  padding: 74px 0 38px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 460px);
-  gap: 56px;
-  align-items: center;
-}
-
 .kicker {
   margin: 0 0 16px;
   color: var(--gold);
@@ -239,97 +230,6 @@ h2,
 h3,
 p {
   margin-top: 0;
-}
-
-.hero-copy h1 {
-  margin-bottom: 22px;
-  font-size: clamp(2.75rem, 5vw, 4.75rem);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.hero-intro {
-  max-width: 560px;
-  margin-bottom: 34px;
-  color: var(--muted);
-  font-size: 18px;
-  line-height: 1.8;
-}
-
-.hero-search {
-  max-width: 720px;
-}
-
-.hero-search label {
-  display: block;
-  margin-bottom: 9px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.search-box {
-  min-height: 64px;
-  padding: 7px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
-}
-
-.search-box input {
-  width: 100%;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  padding: 0 18px;
-  background: transparent;
-  color: var(--ink);
-  font-size: 16px;
-}
-
-.search-box button {
-  min-height: 48px;
-  padding: 0 18px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface-soft);
-  color: var(--ink);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.search-box button[hidden] {
-  display: none;
-}
-
-.hero-points {
-  margin-top: 22px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.hero-points span {
-  padding: 9px 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.68);
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
 }
 
 .atlas-preview {
