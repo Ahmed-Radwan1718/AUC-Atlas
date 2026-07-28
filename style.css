@@ -762,8 +762,8 @@ p {
 
 .site-footer-inner {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) auto minmax(240px, 0.7fr);
-  gap: 42px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
   align-items: start;
 }
 
