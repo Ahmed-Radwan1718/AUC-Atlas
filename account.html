@@ -702,17 +702,56 @@
               <div class="account-panel-header">
                 <p class="account-panel-eyebrow">Profile</p>
                 <h2>Saved Details</h2>
-                <p>Your AUC Atlas identity and campus email are shown here.</p>
+                <p>Your profile photo, phone number, and connected account details are shown here.</p>
               </div>
 
-              <div class="account-profile-summary">
-                <span class="account-avatar">
-                  <img src="user.png" alt="">
-                </span>
+              <div class="auth-form" id="account-details-form">
+                <div class="account-profile-summary">
+                  <span class="account-avatar">
+                    <img src="user.png" alt="" id="account-photo-preview">
+                  </span>
 
-                <div>
-                  <h3 id="account-name">AUC Atlas user</h3>
-                  <p id="account-email"></p>
+                  <div>
+                    <h3>Profile Photo</h3>
+                    <p id="account-photo-note">Your account photo appears here when available.</p>
+                  </div>
+                </div>
+
+                <div class="auth-field">
+                  <label for="account-name">Display Name</label>
+                  <input type="text" id="account-name" autocomplete="name" readonly>
+                </div>
+
+                <div class="auth-field">
+                  <label for="account-email">Email Address</label>
+                  <input type="email" id="account-email" readonly>
+                </div>
+
+                <div class="auth-field">
+                  <label for="account-phone">Phone Number</label>
+                  <input type="tel" id="account-phone" autocomplete="tel" readonly>
+                </div>
+
+                <div class="auth-card-list" aria-label="Connected accounts">
+                  <article class="auth-status-card">
+                    <h3>Email & Password</h3>
+                    <p><span id="connected-password-status">Checking...</span> Use your email address and password to sign in.</p>
+                  </article>
+
+                  <article class="auth-status-card">
+                    <h3>Google</h3>
+                    <p><span id="connected-google-status">Checking...</span> Use your Google account to sign in faster.</p>
+                  </article>
+
+                  <article class="auth-status-card">
+                    <h3>GitHub</h3>
+                    <p><span id="connected-github-status">Checking...</span> Use your GitHub account to sign in faster.</p>
+                  </article>
+
+                  <article class="auth-status-card">
+                    <h3>Facebook</h3>
+                    <p><span id="connected-facebook-status">Checking...</span> Use your Facebook account to sign in faster.</p>
+                  </article>
                 </div>
               </div>
             </article>
@@ -821,6 +860,13 @@
 
         const name = getById("account-name");
         const email = getById("account-email");
+        const phone = getById("account-phone");
+        const photoPreview = getById("account-photo-preview");
+        const photoNote = getById("account-photo-note");
+        const connectedPasswordStatus = getById("connected-password-status");
+        const connectedGoogleStatus = getById("connected-google-status");
+        const connectedGithubStatus = getById("connected-github-status");
+        const connectedFacebookStatus = getById("connected-facebook-status");
         const logoutButton = getById("account-logout");
         const securityButton = getById("account-send-security-code");
         const securityForm = getById("account-security-code-form");
@@ -841,6 +887,34 @@
           });
         }
 
+        function setConnectedStatus(element, isConnected) {
+          if (!element) return;
+          element.textContent = isConnected ? "Connected." : "Not connected.";
+        }
+
+        function loadAccountDetails(user) {
+          const displayName = user.fullName || user.displayName || user.firstName || "AUC Atlas user";
+
+          name.value = displayName;
+          email.value = user.email || "";
+          phone.value = user.phone || "";
+
+          if (user.photoURL) {
+            photoPreview.src = user.photoURL;
+            photoNote.textContent = "Your saved account photo is shown here.";
+          } else {
+            photoPreview.src = "user.png";
+            photoNote.textContent = "Your account photo appears here when available.";
+          }
+
+          const providers = user.providers || {};
+
+          setConnectedStatus(connectedPasswordStatus, Boolean(providers.password));
+          setConnectedStatus(connectedGoogleStatus, Boolean(providers.google));
+          setConnectedStatus(connectedGithubStatus, Boolean(providers.github));
+          setConnectedStatus(connectedFacebookStatus, Boolean(providers.facebook));
+        }
+
         async function loadAccount() {
           const data = await requestJson("/api/me", {
             method: "GET"
@@ -854,9 +928,7 @@
 
           loading.hidden = true;
           showAccountPanel("details");
-
-          name.textContent = data.user.fullName || data.user.displayName || data.user.firstName || "AUC Atlas user";
-          email.textContent = data.user.email || "";
+          loadAccountDetails(data.user);
         }
 
         sidebarButtons.forEach(function (button) {
