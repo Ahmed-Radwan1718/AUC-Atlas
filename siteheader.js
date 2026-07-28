@@ -20,10 +20,6 @@
     <a href="professors.html"${activeAttribute("professors.html")}>Professors</a>
     <a href="index.html#contribute">Contribute</a>
   </nav>
-
-  <div class="site-header-actions">
-    <a href="index.html" class="site-header-action"${activeAttribute("index.html")}>Home</a>
-  </div>
 </header>
 `;
 })();
