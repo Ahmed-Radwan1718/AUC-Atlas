@@ -9,8 +9,8 @@
   --line-strong: #c9c2b5;
   --gold: #c09a5c;
   --gold-soft: rgba(192, 154, 92, 0.12);
-  --green: #0f5d50;
-  --green-soft: #e6f2ee;
+  --green: #c09a5c;
+  --green-soft: rgba(192, 154, 92, 0.12);
   --shadow: 0 22px 70px rgba(29, 31, 31, 0.09);
   --radius: 22px;
 }
