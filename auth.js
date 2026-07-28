@@ -286,11 +286,15 @@
   }
 
   function initAccount() {
-    const loading = getById("account-loading");
-    const guest = getById("account-guest");
-    const panel = getById("account-panel");
+    const accountPage = document.querySelector(".account-page");
 
-    if (!loading || !guest || !panel) return;
+    if (!accountPage) return;
+
+    const loading = getById("account-loading");
+    const panels = Array.prototype.slice.call(document.querySelectorAll("[data-account-section]"));
+    const sidebarButtons = Array.prototype.slice.call(document.querySelectorAll("[data-account-panel]"));
+
+    if (!loading || !panels.length) return;
 
     const name = getById("account-name");
     const email = getById("account-email");
@@ -305,14 +309,22 @@
     const securityMessage = getById("account-security-message");
     const securityStatus = getById("account-security-status");
 
+    function showAccountPanel(panelName) {
+      panels.forEach(function (panel) {
+        const isActive = panel.getAttribute("data-account-section") === panelName;
+        panel.hidden = !isActive;
+        panel.classList.toggle("active", isActive);
+      });
+
+      sidebarButtons.forEach(function (button) {
+        button.classList.toggle("active", button.getAttribute("data-account-panel") === panelName);
+      });
+    }
+
     async function loadAccount() {
       const data = await requestJson("/api/me", {
         method: "GET"
       });
-
-      loading.hidden = true;
-
-      loading.hidden = true;
 
       if (!data.loggedIn || !data.user) {
         localStorage.setItem(loginRedirectKey, "account.html");
@@ -320,13 +332,27 @@
         return;
       }
 
-      guest.hidden = true;
-      panel.hidden = false;
+      loading.hidden = true;
+      showAccountPanel("details");
 
       name.textContent = data.user.fullName || data.user.displayName || data.user.firstName || "AUC Atlas user";
       email.textContent = data.user.email || "";
       verified.textContent = data.user.emailVerified ? "Verified email" : "Email not verified";
+
+      if (verifyButton) {
+        verifyButton.hidden = Boolean(data.user.emailVerified);
+      }
     }
+
+    sidebarButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        const panelName = button.getAttribute("data-account-panel");
+
+        if (panelName) {
+          showAccountPanel(panelName);
+        }
+      });
+    });
 
     verifyButton.addEventListener("click", async function () {
       setButtonLoading(verifyButton, true, "Sending...", "Send verification email");
