@@ -109,14 +109,33 @@ button {
   justify-content: flex-end;
 }
 
+.site-header-account {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .site-header-user-icon {
   width: 42px;
   height: 42px;
+  padding: 0;
+  border: 0;
   border-radius: 999px;
   background: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.site-header-user-icon:hover {
+  opacity: 0.72;
+}
+
+.site-header-user-icon:active {
+  transform: translateY(1px);
 }
 
 .site-header-user-icon img {
@@ -124,6 +143,63 @@ button {
   height: 24px;
   display: block;
   object-fit: contain;
+}
+
+.site-header-user-icon img.has-profile-photo {
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.site-header-account-menu {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  min-width: 150px;
+  padding: 8px;
+  border: 1px solid rgba(29, 31, 31, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 22px 55px rgba(29, 31, 31, 0.13);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: grid;
+  gap: 4px;
+}
+
+.site-header-account-menu[hidden],
+.site-header-account-link[hidden] {
+  display: none;
+}
+
+.site-header-account-link,
+.site-header-account-link:visited {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.site-header-account-link:hover {
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.site-header-logout-button {
+  color: var(--gold);
 }
 
 .site-header .hamburger-toggle {
