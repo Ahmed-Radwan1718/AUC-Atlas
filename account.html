@@ -26,22 +26,17 @@
         <div class="account-layout">
           <aside class="account-sidebar" aria-label="Account sections">
             <button class="account-sidebar-link active" type="button" data-account-panel="details">
-              <span class="account-sidebar-marker" aria-hidden="true"></span>
+              <img class="account-sidebar-icon" src="user.png" alt="">
               <span>Account Details</span>
             </button>
 
-            <button class="account-sidebar-link" type="button" data-account-panel="email">
-              <span class="account-sidebar-marker" aria-hidden="true"></span>
-              <span>Email Status</span>
-            </button>
-
             <button class="account-sidebar-link" type="button" data-account-panel="security">
-              <span class="account-sidebar-marker" aria-hidden="true"></span>
+              <img class="account-sidebar-icon" src="security-icon.png" alt="">
               <span>Security</span>
             </button>
 
             <button class="account-sidebar-link account-logout-link" type="button" id="account-logout">
-              <span class="account-sidebar-marker" aria-hidden="true"></span>
+              <img class="account-sidebar-icon" src="logout-icon.png" alt="">
               <span>Log Out</span>
             </button>
           </aside>
@@ -66,24 +61,6 @@
                   <p id="account-email"></p>
                 </div>
               </div>
-            </article>
-
-            <article class="account-panel" id="account-panel-email" data-account-section="email" hidden>
-              <div class="account-panel-header">
-                <p class="account-panel-eyebrow">Verification</p>
-                <h2>Email Status</h2>
-                <p>Your account access depends on a verified AUC email address.</p>
-              </div>
-
-              <div class="auth-card-list">
-                <article class="auth-status-card">
-                  <h3>Email status</h3>
-                  <p id="account-verified">Checking email status...</p>
-                  <button class="auth-secondary-button" type="button" id="account-send-verification">Send verification email</button>
-                </article>
-              </div>
-
-              <p class="auth-message" id="account-message" aria-live="polite"></p>
             </article>
 
             <article class="account-panel" id="account-panel-security" data-account-section="security" hidden>
