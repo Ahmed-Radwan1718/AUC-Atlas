@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account | AUC Atlas</title>
+  <meta name="description" content="Manage your AUC Atlas account." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+  <div id="site-header-root"></div>
+  <script src="siteheader.js"></script>
+
+  <main class="auth-page">
+    <section class="auth-layout">
+      <div class="auth-copy">
+        <p class="kicker">My account</p>
+        <h1>Account</h1>
+        <p>Manage your Atlas session, email verification, and protected account access.</p>
+      </div>
+
+      <div class="auth-panel">
+        <p class="auth-message" id="account-loading">Loading account...</p>
+
+        <div id="account-guest" hidden>
+          <h2>Log in required</h2>
+          <p class="auth-panel-intro">Use your AUC Atlas account to continue.</p>
+          <div class="auth-guest-actions">
+            <a class="auth-button" href="login.html?redirect=account.html">Log in</a>
+            <a class="auth-secondary-button" href="signup.html">Create account</a>
+          </div>
+        </div>
+
+        <div id="account-panel" hidden>
+          <div class="account-panel-top">
+            <span class="account-avatar">
+              <img src="user.png" alt="">
+            </span>
+            <div>
+              <h2 id="account-name">AUC Atlas user</h2>
+              <p id="account-email"></p>
+            </div>
+          </div>
+
+          <div class="auth-card-list">
+            <article class="auth-status-card">
+              <h3>Email status</h3>
+              <p id="account-verified">Checking email status...</p>
+              <button class="auth-secondary-button" type="button" id="account-send-verification">Send verification email</button>
+            </article>
+
+            <article class="auth-status-card">
+              <h3>Security panel</h3>
+              <p id="account-security-status">Locked until verified.</p>
+
+              <div class="auth-actions">
+                <button class="auth-secondary-button" type="button" id="account-send-security-code">Unlock security panel</button>
+              </div>
+
+              <form class="auth-form" id="account-security-code-form" hidden>
+                <div class="auth-field">
+                  <label for="account-security-code">6-digit code</label>
+                  <input type="text" id="account-security-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+                </div>
+
+                <button class="auth-button" type="submit" id="account-security-submit">Verify code</button>
+              </form>
+
+              <p class="auth-message" id="account-security-message" aria-live="polite"></p>
+            </article>
+          </div>
+
+          <div class="auth-divider"></div>
+
+          <div class="auth-actions">
+            <button class="auth-button" type="button" id="account-logout">Log out</button>
+          </div>
+
+          <p class="auth-message" id="account-message" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer-root"></div>
+  <script src="footer.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>
