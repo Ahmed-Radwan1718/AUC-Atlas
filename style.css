@@ -109,25 +109,21 @@ button {
   justify-content: flex-end;
 }
 
-.site-header-action,
-.site-header-action:visited {
-  min-height: 42px;
-  padding: 0 18px;
+.site-header-user-icon {
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
-  background: var(--ink);
-  color: white;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-decoration: none;
-  text-transform: uppercase;
+  background: rgba(139, 30, 63, 0.08);
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.site-header-action:hover {
-  background: var(--ink-soft);
+.site-header-user-icon img {
+  width: 24px;
+  height: 24px;
+  display: block;
+  object-fit: contain;
 }
 
 .site-header .hamburger-toggle {
