@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Professors | AUC Atlas</title>
+  <meta name="description" content="Browse AUC Atlas professors, course context, materials, and course-specific reviews." />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .professors-page {
+      padding: 128px 0 90px;
+    }
+
+    .professors-hero {
+      margin-bottom: 42px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.45fr);
+      gap: 34px;
+      align-items: end;
+    }
+
+    .professors-hero h1 {
+      margin: 0;
+      max-width: 660px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .professors-hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .professors-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .professor-card {
+      min-height: 340px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .professor-card-visual {
+      min-height: 150px;
+      padding: 18px;
+      background: linear-gradient(145deg, rgba(139, 30, 63, 0.92), rgba(29, 31, 31, 0.96));
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .professor-card-visual span {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .professor-card-visual strong {
+      font-size: clamp(1.9rem, 3vw, 2.625rem);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .professor-card-body {
+      padding: 18px;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .professor-card-body h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      line-height: 1.16;
+    }
+
+    .professor-card-body p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .professor-card-meta {
+      margin-top: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .professor-card-meta span {
+      padding: 7px 9px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--ink-soft);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 1080px) {
+      .professors-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 820px) {
+      .professors-hero,
+      .professors-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .professors-page {
+        padding-top: 112px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="site-header-root"></div>
+  <script src="siteheader.js"></script>
+
+  <main class="professors-page">
+    <section class="professors-hero">
+      <div>
+        <p class="kicker">Professor index</p>
+        <h1>Browse Professors</h1>
+      </div>
+      <p>
+        Start with the professor, then connect their courses, materials, and course-specific reviews in the Atlas.
+      </p>
+    </section>
+
+    <section class="professors-grid" aria-label="AUC professors">
+      <article class="professor-card">
+        <div class="professor-card-visual">
+          <span>Professor</span>
+          <strong>Eslam Badr</strong>
+        </div>
+        <div class="professor-card-body">
+          <h2>Eslam Badr</h2>
+          <p>First professor profile in AUC Atlas. Course links, student materials, and reviews can connect here as the Atlas grows.</p>
+          <div class="professor-card-meta">
+            <span>Professor profile</span>
+            <span>Courses coming soon</span>
+            <span>Reviews coming soon</span>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="site-footer-root"></div>
+  <script src="footer.js"></script>
+</body>
+</html>
