@@ -53,9 +53,9 @@ button {
   min-height: 62px;
   padding: 0 14px 0 24px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  background: rgba(24, 25, 24, 0.88);
-  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(29, 31, 31, 0.08);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 22px 55px rgba(29, 31, 31, 0.1);
   backdrop-filter: blur(18px);
   transform: translateX(-50%);
   display: flex;
@@ -65,7 +65,7 @@ button {
 
 .site-header-logo,
 .site-header-logo:visited {
-  color: white;
+  color: var(--ink);
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -83,7 +83,7 @@ button {
 
 .site-header-nav > a,
 .site-header-nav > a:visited {
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(29, 31, 31, 0.58);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -94,7 +94,7 @@ button {
 
 .site-header-nav > a:hover,
 .site-header-nav > a[aria-current="page"] {
-  color: white;
+  color: var(--ink);
 }
 
 .site-header-actions {
@@ -109,7 +109,7 @@ button {
   min-height: 42px;
   padding: 0 18px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--ink);
   color: white;
   font-size: 12px;
   font-weight: 700;
@@ -122,7 +122,7 @@ button {
 }
 
 .site-header-action:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: var(--ink-soft);
 }
 
 .site-header .hamburger-toggle {
