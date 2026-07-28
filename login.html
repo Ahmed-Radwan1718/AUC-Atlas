@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In | AUC Atlas</title>
+  <meta name="description" content="Log in to your AUC Atlas account." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+  <div id="site-header-root"></div>
+  <script src="siteheader.js"></script>
+
+  <main class="auth-page">
+    <section class="auth-layout">
+      <div class="auth-copy">
+        <p class="kicker">Account access</p>
+        <h1>Log in</h1>
+        <p>Access your Atlas account, keep your academic context connected, and manage verification from one place.</p>
+      </div>
+
+      <div class="auth-panel">
+        <h2>Welcome back</h2>
+        <p class="auth-panel-intro">Use the email and password connected to your AUC Atlas account.</p>
+
+        <form class="auth-form" id="login-form">
+          <div class="auth-field">
+            <label for="login-email">Email address</label>
+            <input type="email" id="login-email" autocomplete="email" required>
+          </div>
+
+          <div class="auth-field">
+            <label for="login-password">Password</label>
+            <div class="auth-password-wrap">
+              <input type="password" id="login-password" autocomplete="current-password" required>
+              <button class="auth-password-toggle" type="button" data-password-toggle="login-password">Show</button>
+            </div>
+          </div>
+
+          <button class="auth-button" type="submit" id="login-submit">Log in</button>
+          <p class="auth-message" id="login-message" aria-live="polite"></p>
+        </form>
+
+        <form class="auth-form" id="login-two-factor-form" hidden>
+          <div>
+            <h2 id="login-two-factor-title">Verification code</h2>
+            <p class="auth-panel-intro">Finish signing in with your verification code.</p>
+          </div>
+
+          <div class="auth-field">
+            <label for="login-two-factor-code">6-digit code</label>
+            <input type="text" id="login-two-factor-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+          </div>
+
+          <label class="auth-note">
+            <input type="checkbox" id="login-trust-device">
+            Trust this device
+          </label>
+
+          <button class="auth-button" type="submit" id="login-two-factor-submit">Continue</button>
+          <p class="auth-message" id="login-two-factor-message" aria-live="polite"></p>
+        </form>
+
+        <div class="auth-panel-footer">
+          <span>Forgot your password?</span>
+          <a href="forgot-password.html">Reset password</a>
+        </div>
+
+        <div class="auth-panel-footer">
+          <span>New to AUC Atlas?</span>
+          <a href="signup.html">Create account</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer-root"></div>
+  <script src="footer.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>
