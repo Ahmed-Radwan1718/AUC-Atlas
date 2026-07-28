@@ -15,7 +15,7 @@
       </div>
 
       <div class="site-footer-bottom">
-        <span>AUC Atlas</span>
+        <span>&copy; 2026 AUC Atlas. All rights reserved.</span>
         <span>Built for clearer course decisions.</span>
       </div>
     </footer>
