@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account | AUC Atlas</title>
+  <meta name="description" content="Create your AUC Atlas account." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+  <div id="site-header-root"></div>
+  <script src="siteheader.js"></script>
+
+  <main class="auth-page">
+    <section class="auth-layout">
+      <div class="auth-copy">
+        <p class="kicker">Create account</p>
+        <h1>Join AUC Atlas</h1>
+        <p>Create an account with the same server-side Firebase flow used by the Computer Shop stack, styled for Atlas.</p>
+      </div>
+
+      <div class="auth-panel">
+        <h2>Account details</h2>
+        <p class="auth-panel-intro">Your account starts with verified email access and a protected server session.</p>
+
+        <form class="auth-form" id="signup-form">
+          <div class="auth-field">
+            <label for="signup-name">Full name</label>
+            <input type="text" id="signup-name" autocomplete="name" required>
+          </div>
+
+          <div class="auth-field">
+            <label for="signup-phone">Phone number</label>
+            <input type="tel" id="signup-phone" autocomplete="tel" inputmode="tel" required>
+          </div>
+
+          <div class="auth-field">
+            <label for="signup-email">Email address</label>
+            <input type="email" id="signup-email" autocomplete="email" required>
+          </div>
+
+          <div class="auth-field">
+            <label for="signup-password">Password</label>
+            <div class="auth-password-wrap">
+              <input type="password" id="signup-password" autocomplete="new-password" minlength="10" maxlength="48" required>
+              <button class="auth-password-toggle" type="button" data-password-toggle="signup-password">Show</button>
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <label for="signup-confirm-password">Confirm password</label>
+            <div class="auth-password-wrap">
+              <input type="password" id="signup-confirm-password" autocomplete="new-password" minlength="10" maxlength="48" required>
+              <button class="auth-password-toggle" type="button" data-password-toggle="signup-confirm-password">Show</button>
+            </div>
+          </div>
+
+          <p class="auth-note">Use 10 to 48 characters with uppercase, lowercase, number, and special character.</p>
+
+          <button class="auth-button" type="submit" id="signup-submit">Create account</button>
+          <p class="auth-message" id="signup-message" aria-live="polite"></p>
+        </form>
+
+        <div class="auth-panel-footer">
+          <span>Already have an account?</span>
+          <a href="login.html">Log in</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer-root"></div>
+  <script src="footer.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>
