@@ -113,7 +113,7 @@ button {
   width: 42px;
   height: 42px;
   border-radius: 999px;
-  background: rgba(139, 30, 63, 0.08);
+  background: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
