@@ -73,6 +73,11 @@ button {
   white-space: nowrap;
 }
 
+.site-header-logo-accent {
+  color: var(--gold);
+  font-size: 0.86em;
+}
+
 .site-header-nav {
   flex: 1;
   display: flex;
