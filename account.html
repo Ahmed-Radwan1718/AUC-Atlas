@@ -12,72 +12,110 @@
   <div id="site-header-root"></div>
   <script src="siteheader.js"></script>
 
-  <main class="auth-page">
-    <section class="auth-layout">
-      <div class="auth-copy">
-        <p class="kicker">My account</p>
-        <h1>Account</h1>
-        <p>Manage your Atlas session, email verification, and protected account access.</p>
-      </div>
-
-      <div class="auth-panel">
-        <p class="auth-message" id="account-loading">Loading account...</p>
-
-        <div id="account-guest" hidden>
-          <h2>Log in required</h2>
-          <p class="auth-panel-intro">Use your AUC Atlas account to continue.</p>
-          <div class="auth-guest-actions">
-            <a class="auth-button" href="login.html?redirect=account.html">Log in</a>
-            <a class="auth-secondary-button" href="signup.html">Create account</a>
+  <main class="account-page">
+    <section class="account-section">
+      <div class="account-section-inner">
+        <div class="account-header">
+          <div>
+            <p class="kicker">My account</p>
+            <h1>Account</h1>
           </div>
+          <p id="account-header-text">Manage your Atlas profile, email verification, and protected account access.</p>
         </div>
 
-        <div id="account-panel" hidden>
-          <div class="account-panel-top">
-            <span class="account-avatar">
-              <img src="user.png" alt="">
-            </span>
-            <div>
-              <h2 id="account-name">AUC Atlas user</h2>
-              <p id="account-email"></p>
-            </div>
-          </div>
+        <div class="account-layout">
+          <aside class="account-sidebar" aria-label="Account sections">
+            <button class="account-sidebar-link active" type="button" data-account-panel="details">
+              <span class="account-sidebar-marker" aria-hidden="true"></span>
+              <span>Account Details</span>
+            </button>
 
-          <div class="auth-card-list">
-            <article class="auth-status-card">
-              <h3>Email status</h3>
-              <p id="account-verified">Checking email status...</p>
-              <button class="auth-secondary-button" type="button" id="account-send-verification">Send verification email</button>
-            </article>
+            <button class="account-sidebar-link" type="button" data-account-panel="email">
+              <span class="account-sidebar-marker" aria-hidden="true"></span>
+              <span>Email Status</span>
+            </button>
 
-            <article class="auth-status-card">
-              <h3>Security panel</h3>
-              <p id="account-security-status">Locked until verified.</p>
+            <button class="account-sidebar-link" type="button" data-account-panel="security">
+              <span class="account-sidebar-marker" aria-hidden="true"></span>
+              <span>Security</span>
+            </button>
 
-              <div class="auth-actions">
-                <button class="auth-secondary-button" type="button" id="account-send-security-code">Unlock security panel</button>
+            <button class="account-sidebar-link account-logout-link" type="button" id="account-logout">
+              <span class="account-sidebar-marker" aria-hidden="true"></span>
+              <span>Log Out</span>
+            </button>
+          </aside>
+
+          <section class="account-content">
+            <p class="account-loading" id="account-loading">Loading account...</p>
+
+            <article class="account-panel active" id="account-panel-details" data-account-section="details" hidden>
+              <div class="account-panel-header">
+                <p class="account-panel-eyebrow">Profile</p>
+                <h2>Saved Details</h2>
+                <p>Your AUC Atlas identity and campus email are shown here.</p>
               </div>
 
-              <form class="auth-form" id="account-security-code-form" hidden>
-                <div class="auth-field">
-                  <label for="account-security-code">6-digit code</label>
-                  <input type="text" id="account-security-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+              <div class="account-profile-summary">
+                <span class="account-avatar">
+                  <img src="user.png" alt="">
+                </span>
+
+                <div>
+                  <h3 id="account-name">AUC Atlas user</h3>
+                  <p id="account-email"></p>
                 </div>
-
-                <button class="auth-button" type="submit" id="account-security-submit">Verify code</button>
-              </form>
-
-              <p class="auth-message" id="account-security-message" aria-live="polite"></p>
+              </div>
             </article>
-          </div>
 
-          <div class="auth-divider"></div>
+            <article class="account-panel" id="account-panel-email" data-account-section="email" hidden>
+              <div class="account-panel-header">
+                <p class="account-panel-eyebrow">Verification</p>
+                <h2>Email Status</h2>
+                <p>Your account access depends on a verified AUC email address.</p>
+              </div>
 
-          <div class="auth-actions">
-            <button class="auth-button" type="button" id="account-logout">Log out</button>
-          </div>
+              <div class="auth-card-list">
+                <article class="auth-status-card">
+                  <h3>Email status</h3>
+                  <p id="account-verified">Checking email status...</p>
+                  <button class="auth-secondary-button" type="button" id="account-send-verification">Send verification email</button>
+                </article>
+              </div>
 
-          <p class="auth-message" id="account-message" aria-live="polite"></p>
+              <p class="auth-message" id="account-message" aria-live="polite"></p>
+            </article>
+
+            <article class="account-panel" id="account-panel-security" data-account-section="security" hidden>
+              <div class="account-panel-header">
+                <p class="account-panel-eyebrow">Protected access</p>
+                <h2>Security</h2>
+                <p>Unlock the security panel before making protected account changes.</p>
+              </div>
+
+              <div class="auth-card-list">
+                <article class="auth-status-card">
+                  <h3>Security panel</h3>
+                  <p id="account-security-status">Locked until verified.</p>
+
+                  <div class="auth-actions">
+                    <button class="auth-secondary-button" type="button" id="account-send-security-code">Unlock security panel</button>
+                  </div>
+
+                  <form class="auth-form" id="account-security-code-form" hidden>
+                    <div class="auth-field">
+                      <label for="account-security-code">6-digit code</label>
+                      <input type="text" id="account-security-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+                    </div>
+
+                    <button class="auth-button" type="submit" id="account-security-submit">Verify code</button>
+                  </form>
+
+                  <p class="auth-message" id="account-security-message" aria-live="polite"></p>
+                </article>
+              </div>
+            </article>
+          </section>
         </div>
       </div>
     </section>
