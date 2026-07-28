@@ -66,7 +66,7 @@ button {
 .site-header-logo,
 .site-header-logo:visited {
   color: var(--ink);
-  font-size: 18px;
+  font-size: 22.5px;
   font-weight: 700;
   letter-spacing: -0.02em;
   text-decoration: none;
@@ -75,7 +75,7 @@ button {
 
 .site-header-logo-accent {
   color: var(--gold);
-  font-size: 0.78em;
+  font-size: 0.624em;
 }
 
 .site-header-nav {
