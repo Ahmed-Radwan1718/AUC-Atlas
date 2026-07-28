@@ -312,9 +312,11 @@
 
       loading.hidden = true;
 
+      loading.hidden = true;
+
       if (!data.loggedIn || !data.user) {
-        guest.hidden = false;
-        panel.hidden = true;
+        localStorage.setItem(loginRedirectKey, "account.html");
+        window.location.replace("login.html?redirect=account.html");
         return;
       }
 
@@ -409,8 +411,8 @@
 
     loadAccount().catch(function () {
       loading.hidden = true;
-      guest.hidden = false;
-      panel.hidden = true;
+      localStorage.setItem(loginRedirectKey, "account.html");
+      window.location.replace("login.html?redirect=account.html");
     });
   }
 
