@@ -3,7 +3,9 @@ const admin = require("../_lib/firebaseAdmin");
 const {
   createSiteSessionForUid,
   createSiteSessionFromIdToken,
-  signInWithCustomToken
+  signInWithCustomToken,
+  requireAucEmail,
+  requireVerifiedAucEmail
 } = require("../_lib/securityHelpers");
 
 const WINDOW_MS = 30 * 60 * 1000;
@@ -278,6 +280,13 @@ module.exports = async function handler(req, res) {
 
       const emailVerified = Boolean(userRecord.emailVerified || decodedToken.email_verified);
 
+      try {
+        requireVerifiedAucEmail(email, emailVerified);
+      } catch (error) {
+        await admin.auth().deleteUser(decodedToken.uid).catch(function () {});
+        throw error;
+      }
+
       await userRef.set({
         fullName: existingUser.fullName || fullName,
         phone: existingUser.phone || "",
@@ -312,6 +321,8 @@ module.exports = async function handler(req, res) {
     if (!fullName || !phone || !email || !password || !confirmPassword) {
       return res.status(400).json({ error: "Please complete all required fields." });
     }
+
+    requireAucEmail(email);
 
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "Passwords do not match." });
@@ -366,8 +377,6 @@ module.exports = async function handler(req, res) {
       await admin.auth().deleteUser(userRecord.uid).catch(function () {});
       throw error;
     }
-
-    await createCompatibleSiteSession(req, res, userRecord.uid);
 
     return res.status(200).json({
       success: true,
