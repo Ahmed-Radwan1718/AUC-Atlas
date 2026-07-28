@@ -13,7 +13,7 @@
 
   headerRoot.outerHTML = `
 <header class="site-header">
-  <a href="index.html" class="site-header-logo">AUC Atlas</a>
+  <a href="index.html" class="site-header-logo"><span class="site-header-logo-accent">AUC</span> Atlas</a>
 
   <nav class="site-header-nav" aria-label="Main navigation">
     <a href="courses.html"${activeAttribute("courses.html")}>Courses</a>
