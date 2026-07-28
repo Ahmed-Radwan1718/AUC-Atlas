@@ -51,6 +51,43 @@ function getFirebaseWebApiKey() {
   return process.env.FIREBASE_WEB_API_KEY;
 }
 
+const AUC_EMAIL_DOMAIN = "@aucegypt.edu";
+
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isAucEmail(email) {
+  return /^[^@\s]+@aucegypt\.edu$/.test(normalizeEmail(email));
+}
+
+function createAucEmailError(message) {
+  const error = new Error(message || "Use your @aucegypt.edu email address to create an AUC Atlas account.");
+  error.statusCode = 403;
+  error.code = "auc-email-required";
+  return error;
+}
+
+function requireAucEmail(email) {
+  const normalizedEmail = normalizeEmail(email);
+
+  if (!isAucEmail(normalizedEmail)) {
+    throw createAucEmailError();
+  }
+
+  return normalizedEmail;
+}
+
+function requireVerifiedAucEmail(email, emailVerified) {
+  const normalizedEmail = requireAucEmail(email);
+
+  if (!emailVerified) {
+    throw createAucEmailError("Please verify your @aucegypt.edu email before continuing.");
+  }
+
+  return normalizedEmail;
+}
+
 function getCodeHash(uid, code, salt) {
   return crypto
     .createHmac("sha256", getSecuritySecret())
@@ -838,7 +875,10 @@ async function createSiteSessionFromIdToken(firstArg, secondArg, thirdArg) {
   const idToken = args.value;
   const res = args.res;
   const req = args.req;
-  const decodedUid = decodeUidFromIdToken(idToken);
+  const decodedSessionUser = await admin.auth().verifyIdToken(idToken, false);
+  const sessionUserRecord = await admin.auth().getUser(decodedSessionUser.uid);
+  requireVerifiedAucEmail(sessionUserRecord.email || decodedSessionUser.email || "", Boolean(sessionUserRecord.emailVerified));
+  const decodedUid = decodedSessionUser.uid || decodeUidFromIdToken(idToken);
   const fallbackSessionPrefix = "idtoken.";
   let sessionCookie = "";
   let sessionMaxAgeSeconds = Math.floor(SITE_SESSION_EXPIRES_MS / 1000);
@@ -931,6 +971,9 @@ async function getSiteSessionUser(req, options) {
   const decodedUser = usesFallbackIdToken
     ? await admin.auth().verifyIdToken(cookieToken, false)
     : await admin.auth().verifySessionCookie(cookieToken, false);
+
+  const currentUserRecord = await admin.auth().getUser(decodedUser.uid);
+  requireVerifiedAucEmail(currentUserRecord.email || decodedUser.email || "", Boolean(currentUserRecord.emailVerified));
 
   try {
     await Promise.race([
@@ -1197,6 +1240,9 @@ async function getUserFromRequest(req, options) {
       Boolean(settings.checkRevoked)
     );
 
+    const currentUserRecord = await admin.auth().getUser(decodedUser.uid);
+    requireVerifiedAucEmail(currentUserRecord.email || decodedUser.email || "", Boolean(currentUserRecord.emailVerified));
+
     if (settings.requireCompletedTwoFactor) {
       const needsTwoFactor = await userRequiresTwoFactor(decodedUser.uid);
 
@@ -1340,6 +1386,9 @@ async function getAuthenticatorSecret(db, uid, userData) {
 }
 
 module.exports = {
+  isAucEmail,
+  requireAucEmail,
+  requireVerifiedAucEmail,
   getCodeHash,
   getSessionHash,
   createRandomCode,
