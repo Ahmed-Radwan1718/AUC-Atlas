@@ -5,8 +5,662 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Account | AUC Atlas</title>
   <meta name="description" content="Manage your AUC Atlas account." />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="auth.css" />
+  <style>
+    :root {
+      --bg: #f5f6f2;
+      --surface: #ffffff;
+      --surface-soft: #fafaf7;
+      --ink: #1d1f1f;
+      --ink-soft: #353a38;
+      --muted: #6f766f;
+      --line: #dedbd2;
+      --line-strong: #c9c2b5;
+      --gold: #8b1e3f;
+      --gold-soft: #f5e7ec;
+      --green: #0f5d50;
+      --green-soft: #e6f2ee;
+      --shadow: 0 22px 70px rgba(29, 31, 31, 0.09);
+      --radius: 22px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .site-header {
+      position: fixed;
+      top: 22px;
+      left: 50%;
+      z-index: 90;
+      width: min(1120px, calc(100% - 48px));
+      min-height: 62px;
+      padding: 0 14px 0 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(29, 31, 31, 0.08);
+      background: rgba(255, 255, 255, 0.84);
+      box-shadow: 0 22px 55px rgba(29, 31, 31, 0.1);
+      backdrop-filter: blur(18px);
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .site-header-logo,
+    .site-header-logo:visited {
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .site-header-logo-accent {
+      color: var(--gold);
+      font-size: 0.78em;
+    }
+
+    .site-header-nav {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
+    }
+
+    .site-header-nav > a,
+    .site-header-nav > a:visited {
+      color: rgba(29, 31, 31, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .site-header-nav > a:hover,
+    .site-header-nav > a[aria-current="page"] {
+      color: var(--ink);
+    }
+
+    .site-header-actions {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .site-header-account {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .site-header-user-icon {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .site-header-user-icon:hover {
+      opacity: 0.72;
+    }
+
+    .site-header-user-icon:active {
+      transform: translateY(1px);
+    }
+
+    .site-header-user-icon img {
+      width: 24px;
+      height: 24px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .site-header-user-icon img.has-profile-photo {
+      border-radius: 999px;
+      object-fit: cover;
+    }
+
+    .site-header-account-menu {
+      position: absolute;
+      top: 52px;
+      right: 0;
+      min-width: 150px;
+      padding: 8px;
+      border: 1px solid rgba(29, 31, 31, 0.08);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 22px 55px rgba(29, 31, 31, 0.13);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: grid;
+      gap: 4px;
+    }
+
+    .site-header-account-menu[hidden],
+    .site-header-account-link[hidden] {
+      display: none;
+    }
+
+    .site-header-account-link,
+    .site-header-account-link:visited {
+      width: 100%;
+      min-height: 38px;
+      padding: 0 13px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: left;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .site-header-account-link:hover {
+      background: var(--gold-soft);
+      color: var(--gold);
+    }
+
+    .site-header-logout-button {
+      color: var(--gold);
+    }
+
+    .site-header .hamburger-toggle,
+    .nav-menu-overlay {
+      display: none;
+    }
+
+    main {
+      width: min(1240px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .kicker {
+      margin: 0 0 16px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    .site-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+      padding: 46px 60px 30px;
+      box-shadow: 0 -22px 60px rgba(29, 31, 31, 0.05);
+    }
+
+    .site-footer-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .site-footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 0.8fr 0.8fr 0.8fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .site-footer-column h2,
+    .site-footer-column h3 {
+      color: var(--ink);
+    }
+
+    .site-footer-column h2 {
+      margin-bottom: 16px;
+      color: var(--ink);
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .site-footer-brand p {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.75;
+    }
+
+    .site-footer-bottom {
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .site-footer-bottom p {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 15px;
+    }
+
+    .auth-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .auth-field label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .auth-field input {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+      color: var(--ink);
+      padding: 0 13px;
+      outline: 0;
+    }
+
+    .auth-field input:focus {
+      border-color: var(--gold);
+      background: var(--surface);
+    }
+
+    .auth-button,
+    .auth-secondary-button {
+      min-height: 46px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .auth-button {
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: white;
+      padding: 0 18px;
+    }
+
+    .auth-button:hover {
+      border-color: var(--gold);
+      background: var(--gold);
+    }
+
+    .auth-secondary-button {
+      border: 1px solid var(--line);
+      background: var(--surface-soft);
+      color: var(--ink);
+      padding: 0 18px;
+    }
+
+    .auth-button:disabled,
+    .auth-secondary-button:disabled {
+      cursor: default;
+      opacity: 0.58;
+    }
+
+    .auth-message {
+      min-height: 20px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .auth-message.success {
+      color: var(--green);
+    }
+
+    .auth-message.error {
+      color: var(--gold);
+    }
+
+    .account-page {
+      padding: 128px 0 96px;
+      min-height: 100vh;
+    }
+
+    .account-section-inner {
+      width: 100%;
+    }
+
+    .account-header {
+      margin-bottom: 34px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .account-header h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 4vw, 4rem);
+      font-weight: 700;
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .account-header > p {
+      max-width: 420px;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.65;
+      text-align: right;
+    }
+
+    .account-layout {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .account-sidebar {
+      position: sticky;
+      top: 112px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-sidebar-link {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-align: left;
+      text-transform: uppercase;
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+    }
+
+    .account-sidebar-icon {
+      width: 20px;
+      height: 20px;
+      display: block;
+      object-fit: contain;
+      opacity: 0.62;
+      transition: opacity 0.2s ease;
+    }
+
+    .account-sidebar-link:hover,
+    .account-sidebar-link.active {
+      background: var(--gold-soft);
+      color: var(--gold);
+    }
+
+    .account-sidebar-link:hover .account-sidebar-icon,
+    .account-sidebar-link.active .account-sidebar-icon {
+      opacity: 1;
+    }
+
+    .account-logout-link {
+      margin-top: 8px;
+      color: var(--gold);
+    }
+
+    .account-content {
+      min-width: 0;
+    }
+
+    .account-loading {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .account-panel {
+      display: none;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .account-panel.active {
+      display: block;
+    }
+
+    .account-panel-header {
+      margin-bottom: 24px;
+    }
+
+    .account-panel-eyebrow {
+      margin: 0 0 10px;
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .account-panel-header h2 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .account-panel-header p {
+      max-width: 680px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .account-profile-summary {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .account-avatar {
+      width: 58px;
+      height: 58px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      display: grid;
+      place-items: center;
+    }
+
+    .account-avatar img {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+    }
+
+    .account-profile-summary h3 {
+      margin: 0 0 5px;
+      font-size: 20px;
+    }
+
+    .account-profile-summary p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .auth-card-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .auth-status-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+      padding: 16px;
+    }
+
+    .auth-status-card h3 {
+      margin: 0 0 7px;
+      font-size: 17px;
+    }
+
+    .auth-status-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .auth-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .site-footer {
+        padding: 38px 25px 24px;
+      }
+
+      .site-footer-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .site-footer-column h2 {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .site-header {
+        padding: 14px 20px;
+      }
+
+      main {
+        width: min(100% - 32px, 1240px);
+      }
+    }
+
+    @media (max-width: 860px) {
+      .account-page {
+        padding-top: 112px;
+      }
+
+      .account-header {
+        display: block;
+      }
+
+      .account-header h1 {
+        font-size: 34px;
+      }
+
+      .account-header > p {
+        max-width: none;
+        margin-top: 10px;
+        text-align: left;
+      }
+
+      .account-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .account-sidebar {
+        position: static;
+      }
+
+      .account-panel {
+        padding: 22px;
+      }
+
+      .account-panel-header h2 {
+        font-size: 26px;
+      }
+
+      .account-profile-summary {
+        align-items: flex-start;
+      }
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+  </style>
 </head>
 <body>
   <div id="site-header-root"></div>
@@ -100,6 +754,195 @@
 
   <div id="site-footer-root"></div>
   <script src="footer.js"></script>
-  <script src="auth.js"></script>
+  <script>
+    (function () {
+      const loginRedirectKey = "auc-atlas-login-redirect";
+
+      function getById(id) {
+        return document.getElementById(id);
+      }
+
+      function setMessage(element, message, type) {
+        if (!element) return;
+
+        element.textContent = message || "";
+        element.className = "auth-message";
+
+        if (type) {
+          element.classList.add(type);
+        }
+      }
+
+      function setButtonLoading(button, loading, loadingText, normalText) {
+        if (!button) return;
+
+        button.disabled = Boolean(loading);
+        button.textContent = loading ? loadingText : normalText;
+      }
+
+      async function requestJson(url, options) {
+        const settings = options || {};
+        const headers = Object.assign({
+          Accept: "application/json"
+        }, settings.headers || {});
+
+        if (settings.body && typeof settings.body !== "string") {
+          headers["Content-Type"] = "application/json";
+          settings.body = JSON.stringify(settings.body);
+        }
+
+        const response = await fetch(url, Object.assign({
+          credentials: "same-origin"
+        }, settings, {
+          headers
+        }));
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok) {
+          throw new Error(data.error || "Something went wrong. Please try again.");
+        }
+
+        return data;
+      }
+
+      function initAccount() {
+        const accountPage = document.querySelector(".account-page");
+
+        if (!accountPage) return;
+
+        const loading = getById("account-loading");
+        const panels = Array.prototype.slice.call(document.querySelectorAll("[data-account-section]"));
+        const sidebarButtons = Array.prototype.slice.call(document.querySelectorAll("[data-account-panel]"));
+
+        if (!loading || !panels.length) return;
+
+        const name = getById("account-name");
+        const email = getById("account-email");
+        const logoutButton = getById("account-logout");
+        const securityButton = getById("account-send-security-code");
+        const securityForm = getById("account-security-code-form");
+        const securityCode = getById("account-security-code");
+        const securitySubmit = getById("account-security-submit");
+        const securityMessage = getById("account-security-message");
+        const securityStatus = getById("account-security-status");
+
+        function showAccountPanel(panelName) {
+          panels.forEach(function (panel) {
+            const isActive = panel.getAttribute("data-account-section") === panelName;
+            panel.hidden = !isActive;
+            panel.classList.toggle("active", isActive);
+          });
+
+          sidebarButtons.forEach(function (button) {
+            button.classList.toggle("active", button.getAttribute("data-account-panel") === panelName);
+          });
+        }
+
+        async function loadAccount() {
+          const data = await requestJson("/api/me", {
+            method: "GET"
+          });
+
+          if (!data.loggedIn || !data.user) {
+            localStorage.setItem(loginRedirectKey, "account.html");
+            window.location.replace("login.html?redirect=account.html");
+            return;
+          }
+
+          loading.hidden = true;
+          showAccountPanel("details");
+
+          name.textContent = data.user.fullName || data.user.displayName || data.user.firstName || "AUC Atlas user";
+          email.textContent = data.user.email || "";
+        }
+
+        sidebarButtons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            const panelName = button.getAttribute("data-account-panel");
+
+            if (panelName) {
+              showAccountPanel(panelName);
+            }
+          });
+        });
+
+        securityButton.addEventListener("click", async function () {
+          setButtonLoading(securityButton, true, "Starting...", "Unlock security panel");
+          setMessage(securityMessage, "", "");
+
+          try {
+            const data = await requestJson("/api/send-security-code", {
+              method: "POST",
+              body: {
+                reason: "security-panel"
+              }
+            });
+
+            securityForm.hidden = false;
+            securityCode.value = "";
+            securityCode.focus();
+            securityStatus.textContent = data.method === "authenticator" ? "Enter your authenticator code." : "Enter the code sent to your email.";
+          } catch (error) {
+            setMessage(securityMessage, error.message || "Could not start security verification.", "error");
+          } finally {
+            setButtonLoading(securityButton, false, "Starting...", "Unlock security panel");
+          }
+        });
+
+        securityForm.addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const code = securityCode.value.trim().replace(/\D/g, "");
+
+          if (code.length !== 6) {
+            setMessage(securityMessage, "Please enter the 6-digit code.", "error");
+            return;
+          }
+
+          setButtonLoading(securitySubmit, true, "Verifying...", "Verify code");
+          setMessage(securityMessage, "", "");
+
+          try {
+            await requestJson("/api/verify-security-code", {
+              method: "POST",
+              body: {
+                code
+              }
+            });
+
+            securityForm.hidden = true;
+            securityStatus.textContent = "Security panel unlocked.";
+            setMessage(securityMessage, "Security panel unlocked.", "success");
+          } catch (error) {
+            setMessage(securityMessage, error.message || "Could not verify code.", "error");
+          } finally {
+            setButtonLoading(securitySubmit, false, "Verifying...", "Verify code");
+          }
+        });
+
+        logoutButton.addEventListener("click", async function () {
+          await requestJson("/api/logout", {
+            method: "POST",
+            body: {}
+          }).catch(function () {});
+
+          window.location.href = "login.html";
+        });
+
+        loadAccount().catch(function () {
+          loading.hidden = true;
+          localStorage.setItem(loginRedirectKey, "account.html");
+          window.location.replace("login.html?redirect=account.html");
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        initAccount();
+      });
+    })();
+  </script>
 </body>
 </html>
