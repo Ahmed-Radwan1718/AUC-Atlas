@@ -213,17 +213,22 @@ button {
 }
 
 .site-header-logout-button {
-  color: rgba(255, 156, 156, 0.95);
+  color: rgb(218, 58, 58);
+  gap: 12px;
+  letter-spacing: 0.08em;
 }
 
 .site-header-logout-button:hover {
-  background: rgba(255, 156, 156, 0.12);
-  color: rgba(255, 156, 156, 0.95);
+  background: rgba(218, 58, 58, 0.08);
+  color: rgb(218, 58, 58);
 }
 
 .site-header-logout-button .site-header-account-link-icon {
-  opacity: 0.95;
-  filter: brightness(0) saturate(100%) invert(82%) sepia(19%) saturate(933%) hue-rotate(306deg) brightness(102%) contrast(101%);
+  width: 19px;
+  height: 19px;
+  opacity: 1;
+  color: inherit;
+  filter: none;
 }
 
 .site-header .hamburger-toggle {
