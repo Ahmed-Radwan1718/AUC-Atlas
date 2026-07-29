@@ -916,10 +916,19 @@
     }
 
     .account-username-info-button {
+      width: 28px;
+      height: 28px;
       padding: 0;
-      border-color: rgba(29, 31, 31, 0.42);
+      border: 0;
       background: transparent;
       cursor: help;
+    }
+
+    .account-username-info-button img {
+      width: 22px;
+      height: 22px;
+      display: block;
+      object-fit: contain;
     }
 
     .account-username-tooltip {
@@ -956,16 +965,22 @@
     .account-username-edit-button {
       width: 50px;
       height: 50px;
+      padding: 0;
       border: 1px solid rgba(29, 31, 31, 0.22);
       border-radius: 14px;
       background: #d8d7d7;
       color: #111111;
-      font-size: 23px;
-      font-weight: 700;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+    }
+
+    .account-username-edit-button img {
+      width: 23px;
+      height: 23px;
+      display: block;
+      object-fit: contain;
     }
 
     .account-username-edit-button:hover {
@@ -1354,11 +1369,13 @@
                       <div class="account-username-input-wrap">
                         <input type="text" id="account-name" autocomplete="name" maxlength="60" readonly>
                         <span class="account-username-info-button" aria-label="Username information">
-                          <span aria-hidden="true">i</span>
+                          <img src="username-info-icon.png" alt="">
                           <span class="account-username-tooltip">You can change your username once every 14 days.</span>
                         </span>
                       </div>
-                      <button class="account-username-edit-button" type="button" id="account-username-edit-button" aria-label="Edit username">/</button>
+                      <button class="account-username-edit-button" type="button" id="account-username-edit-button" aria-label="Edit username">
+                        <img src="username-edit-icon.png" alt="">
+                      </button>
                     </div>
                     <p class="account-username-note" id="account-username-note"></p>
                   </div>
