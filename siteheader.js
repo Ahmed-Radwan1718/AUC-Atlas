@@ -30,7 +30,7 @@
       <div class="site-header-account-menu" id="site-header-account-menu" hidden>
         <a href="login.html" class="site-header-account-link" id="site-header-login-link">Login</a>
         <a href="account.html" class="site-header-account-link" id="site-header-account-link" hidden><img class="site-header-account-link-icon" src="user.png" alt="" aria-hidden="true"><span>Account</span></a>
-        <button class="site-header-account-link site-header-logout-button" id="site-header-logout-button" type="button" hidden><img class="site-header-account-link-icon" src="logout-icon.png" alt="" aria-hidden="true"><span>Log out</span></button>
+        <button class="site-header-account-link site-header-logout-button" id="site-header-logout-button" type="button" hidden><svg class="site-header-account-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Log out</span></button>
       </div>
     </div>
 
@@ -119,7 +119,7 @@
     }
 
     function setLogoutButtonLabel(label) {
-      logoutButton.innerHTML = '<img class="site-header-account-link-icon" src="logout-icon.png" alt="" aria-hidden="true"><span>' + label + '</span>';
+      logoutButton.innerHTML = '<svg class="site-header-account-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>' + label + '</span>';
     }
 
     function showLoggedOutAccountState() {
