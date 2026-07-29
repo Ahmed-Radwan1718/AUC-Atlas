@@ -346,25 +346,27 @@
           <p class="auth-message" id="login-message" aria-live="polite"></p>
         </form>
 
-        <form class="auth-form" id="login-two-factor-form" hidden>
-          <div>
-            <h2 id="login-two-factor-title">Verification code</h2>
-            <p class="auth-panel-intro">Finish signing in with your verification code.</p>
-          </div>
+        <div class="auth-two-factor-panel" id="login-two-factor-panel" hidden>
+          <form class="auth-form" id="login-two-factor-form">
+            <div>
+              <h2 id="login-two-factor-title">Verification code</h2>
+              <p class="auth-panel-intro">Finish signing in with your verification code.</p>
+            </div>
 
-          <div class="auth-field">
-            <label for="login-two-factor-code">6-digit code</label>
-            <input type="text" id="login-two-factor-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
-          </div>
+            <div class="auth-field">
+              <label for="login-two-factor-code">6-digit code</label>
+              <input type="text" id="login-two-factor-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+            </div>
 
-          <label class="auth-note">
-            <input type="checkbox" id="login-trust-device">
-            Trust this device
-          </label>
+            <label class="auth-note">
+              <input type="checkbox" id="login-trust-device">
+              Trust this device
+            </label>
 
-          <button class="auth-button" type="submit" id="login-two-factor-submit">Continue</button>
-          <p class="auth-message" id="login-two-factor-message" aria-live="polite"></p>
-        </form>
+            <button class="auth-button" type="submit" id="login-two-factor-submit">Continue</button>
+            <p class="auth-message" id="login-two-factor-message" aria-live="polite"></p>
+          </form>
+        </div>
 
         <div class="auth-panel-footer">
           <span>Forgot your password?</span>
