@@ -682,14 +682,45 @@
     }
 
     .account-two-factor-methods {
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
     }
 
     .account-two-factor-card {
       display: grid;
-      grid-template-columns: 52px minmax(0, 1fr);
-      gap: 14px;
+      grid-template-columns: 52px minmax(0, 1fr) auto;
+      gap: 14px 18px;
       align-items: start;
+    }
+
+    .account-two-factor-card .account-two-factor-icon {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+    }
+
+    .account-two-factor-card .account-two-factor-text {
+      grid-column: 2;
+      min-width: 0;
+    }
+
+    .account-two-factor-card .account-two-factor-button {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      align-self: center;
+      justify-self: end;
+      min-width: 132px;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+      .account-two-factor-card {
+        grid-template-columns: 52px minmax(0, 1fr);
+      }
+
+      .account-two-factor-card .account-two-factor-button {
+        grid-column: 2;
+        grid-row: auto;
+        justify-self: start;
+      }
     }
 
     .account-two-factor-icon {
