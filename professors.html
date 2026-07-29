@@ -496,5 +496,52 @@
 
   <div id="site-footer-root"></div>
   <script src="footer.js"></script>
+  <script>
+    const professorDepartments = {
+      "Eslam Badr": "MACT",
+      "Ehab El Sawy": "Chemistry",
+      "Nageh Allam": "Physics",
+      "Tamer Shoeib": "Chemistry",
+      "Ibrahim Abotaleb": "CENG",
+      "Hassan Azzazy": "Chemistry",
+      "Walid Fouad": "Biology",
+      "Arthur Bos": "Biology",
+      "Mohamed Badran": "MENG",
+      "Ahmed Abdellatif": "Biology",
+      "Wafik Lotfallah": "MACT",
+      "Laila El Serty": "RHET",
+      "Mariah Fairley": "English Language Instruction",
+      "Gretchen McCullough": "RHET",
+      "Kathleen Saville": "RHET",
+      "Fikry Boutros": "RHET",
+      "Iman Baza": "English Language Instruction",
+      "Alexander Lewko": "Academy of Liberal Arts",
+      "Mariam Osman": "English Language Instruction"
+    };
+
+    document.querySelectorAll(".professor-card").forEach(function (card) {
+      const name = card.querySelector(".professor-card-body h2");
+      const meta = card.querySelector(".professor-card-meta");
+
+      if (!name || !meta) {
+        return;
+      }
+
+      const chipTexts = [
+        professorDepartments[name.textContent.trim()] || "Department pending",
+        "Not rated yet",
+        "No reviews yet"
+      ];
+
+      meta.replaceChildren.apply(
+        meta,
+        chipTexts.map(function (text) {
+          const chip = document.createElement("span");
+          chip.textContent = text;
+          return chip;
+        })
+      );
+    });
+  </script>
 </body>
 </html>
