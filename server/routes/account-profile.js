@@ -4,6 +4,8 @@ const {
   getUserFromRequest
 } = require("../_lib/securityHelpers");
 
+const USERNAME_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
+
 function cleanString(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
 }
@@ -51,6 +53,36 @@ function getFirstName(fullName, email) {
   }
 
   return String(email || "").split("@")[0] || "there";
+}
+
+function serializeTimestamp(value) {
+  if (!value) {
+    return null;
+  }
+
+  if (typeof value.toDate === "function") {
+    return value.toDate().toISOString();
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function timestampToMillis(value) {
+  if (!value) {
+    return 0;
+  }
+
+  if (typeof value.toMillis === "function") {
+    return value.toMillis();
+  }
+
+  if (typeof value.toDate === "function") {
+    return value.toDate().getTime();
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
 }
 
 function snapshotHasDifferentUser(snapshot, uid) {
@@ -142,6 +174,7 @@ async function getAccountUser(uid, decodedUser) {
     displayName: fullName,
     fullName,
     phone: userData.phone || "",
+    usernameLastChangedAt: serializeTimestamp(userData.usernameLastChangedAt),
     photoURL: userData.photoURL || userRecord.photoURL || "",
     authProvider: userData.authProvider || "",
     providers: {
@@ -161,8 +194,26 @@ async function handlePatch(req, res, uid, decodedUser) {
   const userDoc = await userRef.get();
   const userData = userDoc.exists ? userDoc.data() || {} : {};
   const fullName = cleanString((req.body || {}).fullName, 80) || userData.fullName || userRecord.displayName || "";
+  const oldFullName = cleanString(userData.fullName || userRecord.displayName, 80);
+  const nameChanged = fullName !== oldFullName;
   const phone = cleanPhone((req.body || {}).phone);
   const phoneLookupKey = getPhoneLookupKey(phone);
+
+  if (!fullName) {
+    const error = new Error("Please enter your display name.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (nameChanged && userData.usernameLastChangedAt) {
+    const lastChangedMs = timestampToMillis(userData.usernameLastChangedAt);
+
+    if (lastChangedMs && Date.now() - lastChangedMs < USERNAME_COOLDOWN_MS) {
+      const error = new Error("You can change your username once every 14 days.");
+      error.statusCode = 429;
+      throw error;
+    }
+  }
 
   if (!phoneLookupKey) {
     throw createInvalidPhoneError();
@@ -174,14 +225,20 @@ async function handlePatch(req, res, uid, decodedUser) {
 
   await syncPhoneReservation(uid, oldPhoneLookupKey, phone, phoneLookupKey);
 
-  await userRef.set({
+  const updateData = {
     fullName,
     phone,
     phoneLookupKey,
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
+  };
 
-  if (fullName && fullName !== (userRecord.displayName || "")) {
+  if (nameChanged) {
+    updateData.usernameLastChangedAt = admin.firestore.FieldValue.serverTimestamp();
+  }
+
+  await userRef.set(updateData, { merge: true });
+
+  if (nameChanged) {
     await admin.auth().updateUser(uid, {
       displayName: fullName
     });
