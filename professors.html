@@ -571,7 +571,53 @@
       });
     }
 
+    const professorReviewsStorageKey = "auc-atlas-professor-reviews-v1";
+
+    function getStoredProfessorReviews(professorId) {
+      try {
+        const storedReviews = JSON.parse(localStorage.getItem(professorReviewsStorageKey) || "{}");
+        return Array.isArray(storedReviews[professorId]) ? storedReviews[professorId] : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveStoredProfessorReview(professorId, review) {
+      try {
+        const storedReviews = JSON.parse(localStorage.getItem(professorReviewsStorageKey) || "{}");
+        const existingReviews = Array.isArray(storedReviews[professorId]) ? storedReviews[professorId] : [];
+        storedReviews[professorId] = [review].concat(existingReviews);
+        localStorage.setItem(professorReviewsStorageKey, JSON.stringify(storedReviews));
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function getProfessorReviews(professor) {
+      const savedReviews = getStoredProfessorReviews(professor.id);
+      const baseReviews = Array.isArray(professor.reviews) ? professor.reviews : [];
+      return savedReviews.concat(baseReviews);
+    }
+
     function formatRating(professor) {
+      const ratings = getProfessorReviews(professor)
+        .map(function (review) {
+          return Number(review.rating);
+        })
+        .filter(function (rating) {
+          return Number.isFinite(rating);
+        });
+
+      if (ratings.length) {
+        const averageRating = ratings.reduce(function (sum, rating) {
+          return sum + rating;
+        }, 0) / ratings.length;
+        const roundedStars = Math.max(0, Math.min(5, Math.round(averageRating)));
+
+        return "★".repeat(roundedStars) + "☆".repeat(5 - roundedStars) + " " + averageRating.toFixed(1);
+      }
+
       if (typeof professor.rating !== "number") {
         return professor.ratingLabel || "Not rated yet";
       }
@@ -581,11 +627,13 @@
     }
 
     function formatReviews(professor) {
-      if (professor.reviewLabel) {
-        return professor.reviewLabel;
+      const reviewCount = getProfessorReviews(professor).length || Number(professor.reviewCount || 0);
+
+      if (reviewCount > 0) {
+        return reviewCount === 1 ? "1 review" : reviewCount + " reviews";
       }
 
-      return professor.reviewCount === 1 ? "1 review" : professor.reviewCount + " reviews";
+      return professor.reviewLabel || "No reviews yet";
     }
 
     function professorCard(professor) {
@@ -624,7 +672,7 @@
 
       document.title = professor.name + " | AUC Atlas";
 
-      const professorReviews = Array.isArray(professor.reviews) ? professor.reviews : [];
+      const professorReviews = getProfessorReviews(professor);
       const reviewItems = professorReviews.length
         ? professorReviews.map(function (review) {
             const rating = typeof review.rating === "number"
@@ -817,7 +865,37 @@
             return;
           }
 
-          reviewMessage.textContent = "Review submissions are coming soon.";
+          const formData = new FormData(reviewForm);
+          const review = {
+            course: String(formData.get("course") || "").trim(),
+            term: String(formData.get("term") || "").trim(),
+            rating: Number(formData.get("rating")),
+            text: String(formData.get("review") || "").trim(),
+            createdAt: new Date().toISOString()
+          };
+
+          if (!review.course || !review.term || !review.rating || !review.text) {
+            reviewMessage.textContent = "Fill out every field before submitting.";
+            return;
+          }
+
+          if (!saveStoredProfessorReview(professor.id, review)) {
+            reviewMessage.textContent = "Could not save this review in your browser.";
+            return;
+          }
+
+          renderProfessorDetail(professor);
+
+          const savedMessage = document.getElementById("professor-review-form-message");
+          const reviewsList = document.querySelector(".professor-review-list");
+
+          if (savedMessage) {
+            savedMessage.textContent = "Review submitted.";
+          }
+
+          if (reviewsList) {
+            reviewsList.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
         });
       }
     }
