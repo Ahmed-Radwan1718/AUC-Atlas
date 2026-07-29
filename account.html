@@ -1920,29 +1920,112 @@
               <div class="account-panel-header">
                 <p class="account-panel-eyebrow">Protected access</p>
                 <h2>Security</h2>
-                <p>Unlock the security panel before making protected account changes.</p>
+                <p>Manage your password, two-factor authentication, logged-in sessions, trusted devices, and protected account actions.</p>
               </div>
 
-              <div class="auth-card-list">
-                <article class="auth-status-card">
-                  <h3>Security panel</h3>
-                  <p id="account-security-status">Locked until verified.</p>
+              <div class="account-change-password-section">
+                <div class="account-panel-subheader">
+                  <h3>Change your password</h3>
+                  <p>Choose a unique password that you do not use for any other online account.</p>
+                </div>
 
-                  <div class="auth-actions">
-                    <button class="auth-secondary-button" type="button" id="account-send-security-code">Unlock security panel</button>
+                <div class="account-change-password-details">
+                  <button class="account-primary-button account-change-password-open-button" type="button" id="open-password-modal-button">Change password</button>
+
+                  <div class="account-password-last-changed-details">
+                    <p class="account-password-last-changed" id="password-last-changed">Last changed: Not available</p>
+                    <p class="account-password-session-note">After changing your password, all other sessions will be signed out.</p>
                   </div>
+                </div>
 
-                  <form class="auth-form" id="account-security-code-form" hidden>
-                    <div class="auth-field">
-                      <label for="account-security-code">6-digit code</label>
-                      <input type="text" id="account-security-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+                <p class="account-message" id="password-section-message" aria-live="polite"></p>
+              </div>
+
+              <div class="account-divider"></div>
+
+              <div class="account-two-factor-section">
+                <div class="account-panel-subheader">
+                  <h3>Two-Factor Authentication</h3>
+                  <p>Require a verification code after your password whenever you sign in. You can use an authenticator app, email, or both.</p>
+                </div>
+
+                <div class="account-two-factor-methods">
+                  <article class="account-two-factor-card">
+                    <div class="account-two-factor-icon">
+                      <img src="security-icon.png" alt="" loading="lazy" decoding="async">
                     </div>
 
-                    <button class="auth-button" type="submit" id="account-security-submit">Verify code</button>
-                  </form>
+                    <div class="account-two-factor-text">
+                      <h4>Authenticator App <span class="account-two-factor-status" id="two-factor-app-status">Off</span></h4>
+                      <p>Use a code from Google Authenticator, Microsoft Authenticator, Authy, or another authenticator app.</p>
+                    </div>
 
-                  <p class="auth-message" id="account-security-message" aria-live="polite"></p>
-                </article>
+                    <button class="account-two-factor-button" type="button" id="two-factor-app-button">Set up app</button>
+                  </article>
+
+                  <article class="account-two-factor-card">
+                    <div class="account-two-factor-icon">
+                      <img src="email-2fa-icon.png" alt="" loading="lazy" decoding="async">
+                    </div>
+
+                    <div class="account-two-factor-text">
+                      <h4>Email <span class="account-two-factor-status" id="two-factor-email-status">Off</span></h4>
+                      <p>Use a 6-digit code sent to the email address connected to your account.</p>
+                    </div>
+
+                    <button class="account-two-factor-button" type="button" id="two-factor-email-button">Enable email</button>
+                  </article>
+                </div>
+
+                <p class="account-message" id="two-factor-message" aria-live="polite"></p>
+              </div>
+
+              <div class="account-divider"></div>
+
+              <div class="account-login-sessions-section">
+                <div class="account-panel-subheader">
+                  <h3>Logged-In Sessions</h3>
+                  <p>Browsers and devices that are currently signed in to your account.</p>
+                </div>
+
+                <div class="account-login-sessions-list" id="account-login-sessions-list"></div>
+                <p class="account-login-sessions-empty" id="account-login-sessions-empty" hidden>No active sessions found yet.</p>
+              </div>
+
+              <div class="account-divider"></div>
+
+              <div class="account-trusted-devices-section">
+                <div class="account-panel-subheader">
+                  <h3>Trusted Devices</h3>
+                  <p>Devices you trust will not require a verification code every time you sign in.</p>
+                </div>
+
+                <div class="account-trusted-devices-grid" id="account-trusted-devices-list"></div>
+                <p class="account-trusted-devices-empty" id="account-trusted-devices-empty" hidden>No trusted devices found yet.</p>
+              </div>
+
+              <div class="account-divider"></div>
+
+              <div class="account-sign-out-everywhere-section">
+                <div class="account-panel-subheader">
+                  <h3>Sign Out Everywhere</h3>
+                  <p>This signs your account out from every device where it is currently logged in.</p>
+                </div>
+
+                <button class="account-danger-button" type="button" id="sign-out-everywhere-button">Sign out everywhere</button>
+                <p class="account-message" id="sign-out-everywhere-message" aria-live="polite"></p>
+              </div>
+
+              <div class="account-divider"></div>
+
+              <div class="account-delete-account-section">
+                <div class="account-panel-subheader">
+                  <h3>Delete Account</h3>
+                  <p>This permanently deletes your account, saved data, sessions, and trusted devices.</p>
+                </div>
+
+                <button class="account-danger-button" type="button" id="delete-account-button">Delete account</button>
+                <p class="account-message" id="delete-account-message" aria-live="polite"></p>
               </div>
             </article>
           </section>
