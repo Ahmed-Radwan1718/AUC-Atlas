@@ -599,26 +599,89 @@
       return null;
     }
 
-    const professorReviewsStorageKey = "auc-atlas-professor-reviews-v1";
+    const professorReviewsByProfessorId = Object.create(null);
+    const professorReviewsLoadingByProfessorId = Object.create(null);
 
     function getStoredProfessorReviews(professorId) {
-      try {
-        const storedReviews = JSON.parse(localStorage.getItem(professorReviewsStorageKey) || "{}");
-        return Array.isArray(storedReviews[professorId]) ? storedReviews[professorId] : [];
-      } catch (error) {
-        return [];
-      }
+      const reviews = professorReviewsByProfessorId[professorId];
+      return Array.isArray(reviews) ? reviews : [];
     }
 
-    function saveStoredProfessorReview(professorId, review) {
+    async function loadStoredProfessorReviews(professor) {
+      if (!professor || !professor.id) {
+        return [];
+      }
+
+      if (professorReviewsLoadingByProfessorId[professor.id]) {
+        return professorReviewsLoadingByProfessorId[professor.id];
+      }
+
+      professorReviewsLoadingByProfessorId[professor.id] = fetch("/api/professor-reviews?professorId=" + encodeURIComponent(professor.id), {
+        method: "GET",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: {
+          Accept: "application/json"
+        }
+      }).then(function (response) {
+        return response.json().then(function (data) {
+          if (!response.ok) {
+            throw new Error(data.error || "Could not load reviews.");
+          }
+
+          professorReviewsByProfessorId[professor.id] = Array.isArray(data.reviews) ? data.reviews : [];
+          return professorReviewsByProfessorId[professor.id];
+        });
+      }).catch(function () {
+        return getStoredProfessorReviews(professor.id);
+      }).finally(function () {
+        delete professorReviewsLoadingByProfessorId[professor.id];
+      });
+
+      return professorReviewsLoadingByProfessorId[professor.id];
+    }
+
+    async function saveStoredProfessorReview(professorId, review, professorName) {
       try {
-        const storedReviews = JSON.parse(localStorage.getItem(professorReviewsStorageKey) || "{}");
-        const existingReviews = Array.isArray(storedReviews[professorId]) ? storedReviews[professorId] : [];
-        storedReviews[professorId] = [review].concat(existingReviews);
-        localStorage.setItem(professorReviewsStorageKey, JSON.stringify(storedReviews));
-        return true;
+        const response = await fetch("/api/professor-reviews", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          },
+          body: JSON.stringify({
+            professorId,
+            professorName,
+            course: review.course,
+            term: review.term,
+            rating: review.rating,
+            text: review.text
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success || !data.review) {
+          return {
+            success: false,
+            error: data.error || "Could not save this review."
+          };
+        }
+
+        professorReviewsByProfessorId[professorId] = [data.review].concat(getStoredProfessorReviews(professorId));
+
+        return {
+          success: true,
+          review: data.review
+        };
       } catch (error) {
-        return false;
+        return {
+          success: false,
+          error: "Could not save this review."
+        };
       }
     }
 
@@ -929,8 +992,10 @@
             return;
           }
 
-          if (!saveStoredProfessorReview(professor.id, review)) {
-            reviewMessage.textContent = "Could not save this review in your browser.";
+          const saveResult = await saveStoredProfessorReview(professor.id, review, professor.name);
+
+          if (!saveResult.success) {
+            reviewMessage.textContent = saveResult.error || "Could not save this review.";
             return;
           }
 
@@ -957,6 +1022,9 @@
 
       if (professor) {
         renderProfessorDetail(professor);
+        loadStoredProfessorReviews(professor).then(function () {
+          renderProfessorDetail(professor);
+        });
       } else if (main) {
         main.innerHTML = '<section class="professor-detail"><a class="professor-back-link" href="professors.html">Back to professors</a><div class="professor-detail-panel"><h1>Professor not found</h1><p>This professor profile is not available yet.</p></div></section>';
       }
