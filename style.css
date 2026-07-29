@@ -189,8 +189,18 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  gap: 10px;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
+}
+
+.site-header-account-link-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  opacity: 0.62;
+  transition: opacity 0.2s ease, filter 0.2s ease;
 }
 
 .site-header-account-link:hover {
@@ -198,8 +208,22 @@ button {
   color: var(--gold);
 }
 
+.site-header-account-link:hover .site-header-account-link-icon {
+  opacity: 1;
+}
+
 .site-header-logout-button {
-  color: var(--gold);
+  color: rgba(255, 156, 156, 0.95);
+}
+
+.site-header-logout-button:hover {
+  background: rgba(255, 156, 156, 0.12);
+  color: rgba(255, 156, 156, 0.95);
+}
+
+.site-header-logout-button .site-header-account-link-icon {
+  opacity: 0.95;
+  filter: brightness(0) saturate(100%) invert(82%) sepia(19%) saturate(933%) hue-rotate(306deg) brightness(102%) contrast(101%);
 }
 
 .site-header .hamburger-toggle {
