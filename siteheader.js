@@ -33,8 +33,22 @@
         <button class="site-header-account-link site-header-logout-button" id="site-header-logout-button" type="button" hidden><img class="site-header-account-link-icon" src="logout-icon.png" alt="" aria-hidden="true"><span>Log out</span></button>
       </div>
     </div>
+
+    <button class="hamburger-toggle" id="site-mobile-nav-toggle" type="button" aria-label="Open menu" aria-controls="site-mobile-nav" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
 </header>
+
+<div class="nav-menu-overlay" id="site-mobile-nav" hidden>
+  <nav class="nav-menu-panel" aria-label="Mobile navigation">
+    <a href="courses.html"${activeAttribute("courses.html")}>Courses</a>
+    <a href="professors.html"${activeAttribute("professors.html")}>Professors</a>
+    <a href="index.html#contribute">Contribute</a>
+  </nav>
+</div>
 `;
 
   const accountWidget = document.getElementById("site-header-account");
@@ -44,6 +58,44 @@
   const loginLink = document.getElementById("site-header-login-link");
   const accountLink = document.getElementById("site-header-account-link");
   const logoutButton = document.getElementById("site-header-logout-button");
+  const mobileNavToggle = document.getElementById("site-mobile-nav-toggle");
+  const mobileNav = document.getElementById("site-mobile-nav");
+
+  if (mobileNavToggle && mobileNav) {
+    function setMobileNav(open) {
+      mobileNav.hidden = !open;
+      mobileNavToggle.setAttribute("aria-expanded", String(open));
+      mobileNavToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+
+      if (open && accountMenu && accountButton) {
+        accountMenu.hidden = true;
+        accountButton.setAttribute("aria-expanded", "false");
+      }
+    }
+
+    mobileNavToggle.addEventListener("click", function (event) {
+      event.stopPropagation();
+      setMobileNav(mobileNav.hidden);
+    });
+
+    mobileNav.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        setMobileNav(false);
+      });
+    });
+
+    document.addEventListener("click", function (event) {
+      if (!mobileNav.hidden && !mobileNav.contains(event.target) && !event.target.closest(".site-header")) {
+        setMobileNav(false);
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        setMobileNav(false);
+      }
+    });
+  }
 
   if (accountWidget && accountButton && accountPhoto && accountMenu && loginLink && accountLink && logoutButton) {
     function setAccountMenu(open) {
