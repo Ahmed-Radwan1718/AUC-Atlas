@@ -249,7 +249,7 @@ async function syncPhoneReservation(uid, oldPhoneLookupKey, phone, phoneLookupKe
 async function getAccountUser(uid, decodedUser, req) {
   const userRecord = await admin.auth().getUser(uid);
   const userDoc = await admin.firestore().collection("users").doc(uid).get();
-  const userData = userDoc.exists ? userDoc.data() || {};
+  const userData = userDoc.exists ? userDoc.data() || {} : {};
   const fullName = userData.fullName || userRecord.displayName || "";
   const email = userRecord.email || userData.email || decodedUser.email || "";
   const providerIds = (userRecord.providerData || [])
