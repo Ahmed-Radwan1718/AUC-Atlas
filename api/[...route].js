@@ -14,6 +14,7 @@ const routeLoaders = {
   "login-verify-email-code": function () { return securityActions.loginVerifyEmailCode; },
   "logout": function () { return require("../server/routes/logout"); },
   "me": function () { return require("../server/routes/me"); },
+  "professor-reviews": function () { return require("../server/routes/professor-reviews"); },
   "security-unlock-status": function () { return require("../server/routes/security-unlock-status"); },
   "send-email-verification": function () { return require("../server/routes/send-email-verification"); },
   "send-security-code": function () { return require("../server/routes/send-security-code"); },
