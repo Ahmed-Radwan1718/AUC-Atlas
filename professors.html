@@ -576,6 +576,29 @@
       });
     }
 
+    async function getCurrentReviewUser() {
+      try {
+        const response = await fetch("/api/me", {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (response.ok && (data.loggedIn || data.signedIn || data.authenticated) && data.user) {
+          return data.user;
+        }
+      } catch (error) {}
+
+      return null;
+    }
+
     const professorReviewsStorageKey = "auc-atlas-professor-reviews-v1";
 
     function getStoredProfessorReviews(professorId) {
@@ -763,16 +786,6 @@
 
               <form class="professor-review-form" id="professor-review-form">
                 <label>
-                  Your name
-                  <input type="text" name="reviewerName" placeholder="Your name" required>
-                </label>
-
-                <label>
-                  Profile photo URL
-                  <input type="url" name="reviewerPhoto" placeholder="Optional">
-                </label>
-
-                <label>
                   Course
                   <input type="text" name="course" placeholder="RHET 1020" required>
                 </label>
@@ -879,7 +892,7 @@
       }
 
       if (reviewForm && reviewMessage) {
-        reviewForm.addEventListener("submit", function (event) {
+        reviewForm.addEventListener("submit", async function (event) {
           event.preventDefault();
 
           if (ratingSelect && !ratingSelect.value) {
@@ -891,10 +904,19 @@
             return;
           }
 
+          const currentUser = await getCurrentReviewUser();
+
+          if (!currentUser) {
+            reviewMessage.innerHTML = '<a href="login.html">Log in</a> to submit a review with your account.';
+            return;
+          }
+
+          const reviewerName = currentUser.fullName || currentUser.displayName || currentUser.firstName || currentUser.email || "AUC student";
           const formData = new FormData(reviewForm);
           const review = {
-            reviewerName: String(formData.get("reviewerName") || "").trim(),
-            reviewerPhoto: String(formData.get("reviewerPhoto") || "").trim(),
+            reviewerUid: currentUser.uid || "",
+            reviewerName: String(reviewerName || "").trim(),
+            reviewerPhoto: String(currentUser.photoURL || "").trim(),
             course: String(formData.get("course") || "").trim(),
             term: String(formData.get("term") || "").trim(),
             rating: Number(formData.get("rating")),
@@ -902,7 +924,7 @@
             createdAt: new Date().toISOString()
           };
 
-          if (!review.reviewerName || !review.course || !review.term || !review.rating || !review.text) {
+          if (!review.course || !review.term || !review.rating || !review.text) {
             reviewMessage.textContent = "Fill out every field before submitting.";
             return;
           }
