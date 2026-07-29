@@ -2145,6 +2145,11 @@
       justify-content: center;
     }
 
+    .account-review-form {
+      display: grid;
+      gap: 16px;
+    }
+
     .account-review-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px;
@@ -3651,6 +3656,349 @@ EH|Western Sahara|+212
       document.addEventListener("DOMContentLoaded", function () {
         initAccount();
       });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      const professorReviewsStorageKey = "auc-atlas-professor-reviews-v1";
+      let currentUser = null;
+
+      function getById(id) {
+        return document.getElementById(id);
+      }
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value).replace(/[&<>"']/g, function (character) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "\"": "&quot;",
+            "'": "&#039;"
+          }[character];
+        });
+      }
+
+      function setPanelMessage(element, message, type) {
+        if (!element) return;
+        element.textContent = message || "";
+        element.className = "account-message";
+
+        if (type) {
+          element.classList.add(type);
+        }
+      }
+
+      function getReviewMap() {
+        try {
+          const reviewMap = JSON.parse(localStorage.getItem(professorReviewsStorageKey) || "{}");
+          return reviewMap && typeof reviewMap === "object" && !Array.isArray(reviewMap) ? reviewMap : {};
+        } catch (error) {
+          return {};
+        }
+      }
+
+      function saveReviewMap(reviewMap) {
+        try {
+          localStorage.setItem(professorReviewsStorageKey, JSON.stringify(reviewMap));
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function getProfessorById(professorId) {
+        if (window.getAucAtlasProfessorById) {
+          return window.getAucAtlasProfessorById(professorId);
+        }
+
+        return (window.AUC_ATLAS_PROFESSORS || []).find(function (professor) {
+          return professor.id === professorId;
+        }) || null;
+      }
+
+      function reviewBelongsToCurrentUser(review) {
+        if (!currentUser || !review) return false;
+
+        const uid = String(currentUser.uid || "").trim();
+        const email = String(currentUser.email || "").trim().toLowerCase();
+        const reviewerUid = String(review.reviewerUid || "").trim();
+        const reviewerEmail = String(review.reviewerEmail || "").trim().toLowerCase();
+
+        return Boolean(
+          uid && reviewerUid && uid === reviewerUid ||
+          email && reviewerEmail && email === reviewerEmail
+        );
+      }
+
+      function getAccountReviews() {
+        const reviewMap = getReviewMap();
+        const reviews = [];
+
+        Object.keys(reviewMap).forEach(function (professorId) {
+          const professorReviews = Array.isArray(reviewMap[professorId]) ? reviewMap[professorId] : [];
+
+          professorReviews.forEach(function (review, reviewIndex) {
+            if (reviewBelongsToCurrentUser(review)) {
+              reviews.push({
+                professorId,
+                reviewIndex,
+                professor: getProfessorById(professorId),
+                review
+              });
+            }
+          });
+        });
+
+        return reviews.sort(function (first, second) {
+          return new Date(second.review.updatedAt || second.review.createdAt || 0).getTime() - new Date(first.review.updatedAt || first.review.createdAt || 0).getTime();
+        });
+      }
+
+      function getReviewDateText(value) {
+        const date = new Date(value || "");
+
+        if (Number.isNaN(date.getTime())) {
+          return "Saved review";
+        }
+
+        return "Submitted " + date.toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        });
+      }
+
+      function getReviewerName(existingReview) {
+        return currentUser && (currentUser.fullName || currentUser.displayName || currentUser.firstName || currentUser.email) || existingReview.reviewerName || "AUC student";
+      }
+
+      function getReviewerPhoto(existingReview) {
+        return currentUser && currentUser.photoURL || existingReview.reviewerPhoto || "";
+      }
+
+      function renderAccountReviews() {
+        const reviewsCount = getById("account-reviews-count");
+        const reviewsAverage = getById("account-reviews-average");
+        const reviewsList = getById("account-reviews-list");
+        const reviewsEmpty = getById("account-reviews-empty");
+
+        if (!reviewsCount || !reviewsAverage || !reviewsList || !reviewsEmpty) return;
+
+        const reviews = getAccountReviews();
+        const ratings = reviews.map(function (item) {
+          return Number(item.review.rating);
+        }).filter(function (rating) {
+          return Number.isFinite(rating) && rating >= 1 && rating <= 5;
+        });
+
+        reviewsCount.textContent = String(reviews.length);
+        reviewsAverage.textContent = ratings.length ? (ratings.reduce(function (sum, rating) {
+          return sum + rating;
+        }, 0) / ratings.length).toFixed(1) + " / 5" : "Not rated yet";
+
+        reviewsEmpty.hidden = reviews.length > 0;
+
+        reviewsList.innerHTML = reviews.map(function (item) {
+          const professorName = item.professor && item.professor.name ? item.professor.name : "Professor";
+          const rating = Number(item.review.rating);
+          const ratingValue = Number.isFinite(rating) ? String(Math.max(1, Math.min(5, Math.round(rating)))) : "";
+
+          return `
+            <article class="account-review-card">
+              <div class="account-review-card-header">
+                <div>
+                  <span>${escapeHtml(getReviewDateText(item.review.createdAt))}</span>
+                  <h3>${escapeHtml(professorName)}</h3>
+                </div>
+                <a class="account-review-profile-link" href="professors.html?professor=${encodeURIComponent(item.professorId)}">View Profile</a>
+              </div>
+
+              <form class="account-review-form" data-account-review-form data-professor-id="${escapeHtml(item.professorId)}" data-review-index="${escapeHtml(item.reviewIndex)}">
+                <div class="account-review-grid">
+                  <label class="account-review-field">
+                    <span>Course</span>
+                    <input type="text" name="course" value="${escapeHtml(item.review.course || "")}" required>
+                  </label>
+
+                  <label class="account-review-field">
+                    <span>Term</span>
+                    <input type="text" name="term" value="${escapeHtml(item.review.term || "")}" required>
+                  </label>
+
+                  <label class="account-review-field">
+                    <span>Rating</span>
+                    <input type="number" name="rating" min="1" max="5" step="1" value="${escapeHtml(ratingValue)}" required>
+                  </label>
+                </div>
+
+                <label class="account-review-field">
+                  <span>Review</span>
+                  <textarea name="text" required>${escapeHtml(item.review.text || "")}</textarea>
+                </label>
+
+                <div class="account-review-actions">
+                  <button class="account-primary-button" type="submit">Save Review</button>
+                  <button class="account-danger-button" type="button" data-account-review-delete data-professor-id="${escapeHtml(item.professorId)}" data-review-index="${escapeHtml(item.reviewIndex)}">Delete Review</button>
+                </div>
+              </form>
+            </article>
+          `;
+        }).join("");
+      }
+
+      async function refreshCurrentUser() {
+        try {
+          const response = await fetch("/api/account-profile", {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              Accept: "application/json"
+            }
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (response.ok && data.success && data.user) {
+            currentUser = data.user;
+          }
+        } catch (error) {}
+
+        return currentUser;
+      }
+
+      function saveAccountReview(form) {
+        const message = getById("account-reviews-message");
+        const professorId = String(form.dataset.professorId || "");
+        const reviewIndex = Number(form.dataset.reviewIndex);
+        const reviewMap = getReviewMap();
+        const professorReviews = Array.isArray(reviewMap[professorId]) ? reviewMap[professorId] : [];
+        const existingReview = Number.isInteger(reviewIndex) ? professorReviews[reviewIndex] : null;
+
+        if (!existingReview || !reviewBelongsToCurrentUser(existingReview)) {
+          setPanelMessage(message, "This review could not be found for your account.", "error");
+          renderAccountReviews();
+          return;
+        }
+
+        const formData = new FormData(form);
+        const course = String(formData.get("course") || "").trim();
+        const term = String(formData.get("term") || "").trim();
+        const rating = Number(formData.get("rating"));
+        const text = String(formData.get("text") || "").trim();
+
+        if (!course || !term || !Number.isFinite(rating) || rating < 1 || rating > 5 || !text) {
+          setPanelMessage(message, "Fill out the course, term, rating, and review before saving.", "error");
+          return;
+        }
+
+        professorReviews[reviewIndex] = Object.assign({}, existingReview, {
+          reviewerUid: currentUser && currentUser.uid || existingReview.reviewerUid || "",
+          reviewerEmail: currentUser && currentUser.email || existingReview.reviewerEmail || "",
+          reviewerName: getReviewerName(existingReview),
+          reviewerPhoto: getReviewerPhoto(existingReview),
+          course,
+          term,
+          rating: Math.round(rating),
+          text,
+          updatedAt: new Date().toISOString()
+        });
+
+        reviewMap[professorId] = professorReviews;
+
+        if (!saveReviewMap(reviewMap)) {
+          setPanelMessage(message, "Could not save this review in your browser.", "error");
+          return;
+        }
+
+        renderAccountReviews();
+        setPanelMessage(message, "Review saved.", "success");
+      }
+
+      function deleteAccountReview(button) {
+        const message = getById("account-reviews-message");
+        const professorId = String(button.dataset.professorId || "");
+        const reviewIndex = Number(button.dataset.reviewIndex);
+        const reviewMap = getReviewMap();
+        const professorReviews = Array.isArray(reviewMap[professorId]) ? reviewMap[professorId] : [];
+        const existingReview = Number.isInteger(reviewIndex) ? professorReviews[reviewIndex] : null;
+
+        if (!existingReview || !reviewBelongsToCurrentUser(existingReview)) {
+          setPanelMessage(message, "This review could not be found for your account.", "error");
+          renderAccountReviews();
+          return;
+        }
+
+        if (!window.confirm("Delete this professor review?")) {
+          return;
+        }
+
+        professorReviews.splice(reviewIndex, 1);
+
+        if (professorReviews.length) {
+          reviewMap[professorId] = professorReviews;
+        } else {
+          delete reviewMap[professorId];
+        }
+
+        if (!saveReviewMap(reviewMap)) {
+          setPanelMessage(message, "Could not delete this review in your browser.", "error");
+          return;
+        }
+
+        renderAccountReviews();
+        setPanelMessage(message, "Review deleted.", "success");
+      }
+
+      function initReviewsPanel() {
+        const reviewsPanel = getById("account-panel-reviews");
+        const reviewsList = getById("account-reviews-list");
+
+        if (!reviewsPanel || !reviewsList) return;
+
+        refreshCurrentUser().then(renderAccountReviews).catch(renderAccountReviews);
+
+        document.addEventListener("click", function (event) {
+          const reviewsButton = event.target.closest("[data-account-panel='reviews']");
+
+          if (reviewsButton) {
+            refreshCurrentUser().then(renderAccountReviews).catch(renderAccountReviews);
+          }
+        });
+
+        reviewsList.addEventListener("submit", function (event) {
+          const form = event.target.closest("[data-account-review-form]");
+
+          if (!form) return;
+
+          event.preventDefault();
+          saveAccountReview(form);
+        });
+
+        reviewsList.addEventListener("click", function (event) {
+          const deleteButton = event.target.closest("[data-account-review-delete]");
+
+          if (deleteButton) {
+            deleteAccountReview(deleteButton);
+          }
+        });
+
+        window.addEventListener("storage", function (event) {
+          if (event.key === professorReviewsStorageKey) {
+            renderAccountReviews();
+          }
+        });
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initReviewsPanel);
+      } else {
+        initReviewsPanel();
+      }
     })();
   </script>
 </body>
