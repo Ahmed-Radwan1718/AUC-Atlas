@@ -144,7 +144,15 @@ function getProfilePhotoDataUrl(value) {
 }
 
 function getOpenAiApiKey() {
-  const apiKey = String(process.env.OPENAI_API_KEY || "").trim();
+  let apiKey = String(process.env.OPENAI_API_KEY || "").trim();
+
+  if (
+    apiKey.length >= 2 &&
+    (apiKey.startsWith("\"") && apiKey.endsWith("\"") ||
+    apiKey.startsWith("'") && apiKey.endsWith("'"))
+  ) {
+    apiKey = apiKey.slice(1, -1).trim();
+  }
 
   if (!apiKey) {
     const error = new Error("Profile photo moderation is not configured.");
@@ -180,7 +188,24 @@ async function moderateProfilePhoto(dataUrl) {
   });
 
   if (!response.ok) {
-    const error = new Error("Could not verify this profile photo. Please try again.");
+    const details = await response.json().catch(function () {
+      return {};
+    });
+    const apiMessage = details && details.error && details.error.message ? String(details.error.message) : "";
+
+    if (response.status === 401 || response.status === 403) {
+      const error = new Error("OpenAI API key for profile photo moderation was rejected.");
+      error.statusCode = 502;
+      throw error;
+    }
+
+    if (response.status === 429) {
+      const error = new Error("OpenAI API quota or billing is not active for profile photo moderation.");
+      error.statusCode = 502;
+      throw error;
+    }
+
+    const error = new Error(apiMessage || "Could not verify this profile photo. Please try again.");
     error.statusCode = 502;
     throw error;
   }
