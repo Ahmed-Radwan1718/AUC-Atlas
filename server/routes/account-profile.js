@@ -246,15 +246,18 @@ async function syncPhoneReservation(uid, oldPhoneLookupKey, phone, phoneLookupKe
   });
 }
 
-async function getAccountUser(uid, decodedUser) {
+async function getAccountUser(uid, decodedUser, req) {
   const userRecord = await admin.auth().getUser(uid);
   const userDoc = await admin.firestore().collection("users").doc(uid).get();
-  const userData = userDoc.exists ? userDoc.data() || {} : {};
+  const userData = userDoc.exists ? userDoc.data() || {};
   const fullName = userData.fullName || userRecord.displayName || "";
   const email = userRecord.email || userData.email || decodedUser.email || "";
   const providerIds = (userRecord.providerData || [])
     .map((provider) => provider && provider.providerId ? provider.providerId : "")
     .filter(Boolean);
+  const twoFactor = userData.twoFactor && typeof userData.twoFactor === "object" ? userData.twoFactor : {};
+  const sessions = req && typeof listAccountSessions === "function" ? await listAccountSessions(req, uid).catch(function () { return []; }) : [];
+  const trustedDevices = req && typeof listTrustedDevices === "function" ? await listTrustedDevices(req, uid).catch(function () { return []; }) : [];
 
   return {
     uid,
@@ -264,8 +267,17 @@ async function getAccountUser(uid, decodedUser) {
     fullName,
     phone: userData.phone || "",
     usernameLastChangedAt: serializeTimestamp(userData.usernameLastChangedAt),
+    passwordLastChangedAt: serializeTimestamp(userData.passwordLastChangedAt),
     photoURL: userData.photoURL || userRecord.photoURL || "",
     authProvider: userData.authProvider || "",
+    twoFactor: {
+      appEnabled: Boolean(twoFactor.appEnabled),
+      emailEnabled: Boolean(twoFactor.emailEnabled),
+      appUpdatedAt: serializeTimestamp(twoFactor.appUpdatedAt),
+      emailUpdatedAt: serializeTimestamp(twoFactor.emailUpdatedAt)
+    },
+    sessions,
+    trustedDevices,
     providers: {
       password: providerIds.includes("password") || userData.authProvider === "password",
       google: providerIds.includes("google.com") || userData.authProvider === "google",
@@ -363,7 +375,7 @@ async function handlePatch(req, res, uid, decodedUser) {
     await admin.auth().updateUser(uid, authUpdateData);
   }
 
-  const user = await getAccountUser(uid, decodedUser);
+  const user = await getAccountUser(uid, decodedUser, req);
 
   return res.status(200).json({
     success: true,
@@ -379,7 +391,7 @@ module.exports = async function handler(req, res) {
     });
 
     if (req.method === "GET") {
-      const user = await getAccountUser(decodedUser.uid, decodedUser);
+      const user = await getAccountUser(decodedUser.uid, decodedUser, req);
 
       return res.status(200).json({
         success: true,
