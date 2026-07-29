@@ -810,12 +810,71 @@
       color: #963e48;
     }
 
+    .account-session-action,
+    .account-trusted-device-remove {
+      white-space: nowrap;
+    }
+
     .account-login-session-card,
     .account-trusted-device-card {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      gap: 14px;
+      gap: 16px;
       align-items: center;
+      padding: 18px;
+      border-radius: 24px;
+      min-width: 0;
+    }
+
+    .account-login-session-card > div,
+    .account-trusted-device-card > div {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .account-login-session-card h4,
+    .account-trusted-device-card h4 {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+
+    .account-login-sessions-empty,
+    .account-trusted-devices-empty {
+      margin: 0;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--surface-soft);
+      color: rgba(29, 31, 31, 0.58);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .account-sign-out-everywhere-section .account-danger-button,
+    .account-delete-account-section .account-danger-button {
+      justify-self: start;
+      width: auto;
+      min-width: 240px;
+      max-width: 100%;
+    }
+
+    @media (max-width: 640px) {
+      .account-login-session-card,
+      .account-trusted-device-card {
+        grid-template-columns: 1fr;
+      }
+
+      .account-session-action,
+      .account-trusted-device-remove,
+      .account-sign-out-everywhere-section .account-danger-button,
+      .account-delete-account-section .account-danger-button {
+        width: 100%;
+        min-width: 0;
+      }
     }
 
     .account-security-modal[hidden],
