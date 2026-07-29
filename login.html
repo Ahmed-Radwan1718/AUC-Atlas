@@ -312,75 +312,344 @@
         text-align: center;
       }
     }
+
+    main.auth-page {
+      width: 100%;
+      max-width: none;
+      min-height: 100vh;
+      margin: 0;
+      padding-top: 104px;
+      background: #2a2b2a;
+    }
+
+    .auth-page .auth-section {
+      min-height: calc(100vh - 104px);
+      padding: 92px 44px 104px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-page .auth-section-inner {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .auth-page .auth-section-header {
+      margin-bottom: 34px;
+      text-align: left;
+    }
+
+    .auth-page .auth-section-title {
+      max-width: 620px;
+      margin-bottom: 22px;
+      color: white;
+      font-size: 52px;
+      font-weight: bold;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .auth-page .auth-section-intro {
+      max-width: 560px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.8;
+    }
+
+    .auth-page .auth-panel {
+      padding: 30px;
+      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background: rgba(24, 25, 24, 0.56);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.22);
+    }
+
+    .auth-page .auth-form,
+    .auth-two-factor-panel .auth-form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .auth-page .auth-field,
+    .auth-two-factor-panel .auth-field {
+      display: grid;
+      gap: 10px;
+    }
+
+    .auth-page .auth-field label,
+    .auth-two-factor-panel .auth-field label {
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .auth-page .auth-field input,
+    .auth-two-factor-panel .auth-field input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.065);
+      color: white;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+      transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .auth-page .auth-field input:focus,
+    .auth-two-factor-panel .auth-field input:focus {
+      background: rgba(255, 255, 255, 0.095);
+      border-color: rgba(255, 255, 255, 0.32);
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.055);
+    }
+
+    .auth-page .auth-password-input-wrap {
+      position: relative;
+    }
+
+    .auth-page .auth-password-input-wrap input {
+      padding-right: 54px;
+    }
+
+    .auth-page .auth-password-visibility-toggle {
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transform: translateY(-50%);
+      transition: opacity 0.2s ease;
+    }
+
+    .auth-page .auth-password-visibility-toggle:hover {
+      opacity: 0.72;
+    }
+
+    .auth-page .auth-password-visibility-toggle svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+      display: block;
+    }
+
+    .auth-page .auth-password-visibility-toggle::after {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: 12px;
+      width: 23px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: 0;
+      transform: rotate(-42deg);
+      transform-origin: center;
+      transition: opacity 0.18s ease;
+    }
+
+    .auth-page .auth-password-visibility-toggle.password-hidden::after {
+      opacity: 0.95;
+    }
+
+    .auth-page .auth-button,
+    .auth-two-factor-panel .auth-button {
+      width: 100%;
+      min-height: 52px;
+      margin-top: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+      background: #d8d7d7;
+      color: #111111;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .auth-page .auth-button:hover,
+    .auth-two-factor-panel .auth-button:hover {
+      background: #cfcfcf;
+      border-color: rgba(255, 255, 255, 0.22);
+      opacity: 1;
+    }
+
+    .auth-page .auth-message,
+    .auth-two-factor-panel .auth-message {
+      min-height: 22px;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .auth-page .auth-message.success,
+    .auth-two-factor-panel .auth-message.success {
+      color: rgba(185, 255, 202, 0.9);
+    }
+
+    .auth-page .auth-message.error,
+    .auth-two-factor-panel .auth-message.error {
+      color: rgba(255, 156, 156, 0.95);
+    }
+
+    .auth-page .auth-panel-footer {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.105);
+      color: rgba(255, 255, 255, 0.58);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .auth-page .auth-panel-footer + .auth-panel-footer {
+      margin-top: 0;
+      padding-top: 12px;
+      border-top: 0;
+    }
+
+    .auth-page .auth-panel-footer a,
+    .auth-page .auth-panel-footer a:visited {
+      color: white;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      text-decoration: none;
+    }
+
+    @media (max-width: 900px) {
+      main.auth-page {
+        padding-top: 88px;
+      }
+
+      .auth-page .auth-section {
+        min-height: calc(100vh - 88px);
+        padding: 54px 20px 72px;
+      }
+
+      .auth-page .auth-section-title {
+        font-size: 34px;
+      }
+
+      .auth-page .auth-section-intro {
+        font-size: 15px;
+      }
+
+      .auth-page .auth-panel {
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      .auth-page .auth-panel-footer {
+        justify-content: center;
+        text-align: center;
+      }
+    }
   </style>
 </head>
 <body>
   <div id="site-header-root"></div>
   <script src="siteheader.js"></script>
 
-  <main class="auth-page auth-entry-page">
-    <section class="auth-layout">
-      <div class="auth-copy">
-        <p class="kicker">Account access</p>
-        <h1>Log in</h1>
-        <p>Access your Atlas account, keep your academic context connected, and manage verification from one place.</p>
-      </div>
+  <main class="auth-page">
+    <section class="auth-section">
+      <div class="auth-section-inner">
+        <div class="auth-section-header">
+          <h1 class="auth-section-title">Log In</h1>
+          <p class="auth-section-intro">
+            Log in to manage your AUC Atlas account, verification, profile, and academic context.
+          </p>
+        </div>
 
-      <div class="auth-panel">
-        <h2>Welcome back</h2>
-        <p class="auth-panel-intro">Use the email and password connected to your AUC Atlas account.</p>
-
-        <form class="auth-form" id="login-form">
-          <div class="auth-field">
-            <label for="login-email">Email address</label>
-            <input type="email" id="login-email" autocomplete="email" required>
-          </div>
-
-          <div class="auth-field">
-            <label for="login-password">Password</label>
-            <div class="auth-password-wrap">
-              <input type="password" id="login-password" autocomplete="current-password" required>
-              <button class="auth-password-toggle" type="button" data-password-toggle="login-password">Show</button>
-            </div>
-          </div>
-
-          <button class="auth-button" type="submit" id="login-submit">Log in</button>
-          <p class="auth-message" id="login-message" aria-live="polite"></p>
-        </form>
-
-        <div class="auth-two-factor-panel" id="login-two-factor-panel" hidden>
-          <form class="auth-form" id="login-two-factor-form">
-            <div>
-              <h2 id="login-two-factor-title">Verification code</h2>
-              <p class="auth-panel-intro">Finish signing in with your verification code.</p>
-            </div>
-
+        <div class="auth-panel">
+          <form class="auth-form" id="login-form">
             <div class="auth-field">
-              <label for="login-two-factor-code">6-digit code</label>
-              <input type="text" id="login-two-factor-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+              <label for="login-email">Email Address</label>
+              <input type="email" id="login-email" autocomplete="email" required>
             </div>
 
-            <label class="auth-note">
-              <input type="checkbox" id="login-trust-device">
-              Trust this device
-            </label>
+            <div class="auth-field auth-password-field">
+              <label for="login-password">Password</label>
 
-            <button class="auth-button" type="submit" id="login-two-factor-submit">Continue</button>
-            <p class="auth-message" id="login-two-factor-message" aria-live="polite"></p>
+              <div class="auth-password-input-wrap">
+                <input type="password" id="login-password" autocomplete="current-password" required>
+
+                <button class="auth-password-visibility-toggle password-hidden" type="button" data-target="login-password" aria-label="Show password">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 5C6 5 2.1 9.6 1 12c1.1 2.4 5 7 11 7s9.9-4.6 11-7c-1.1-2.4-5-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <button class="auth-button" type="submit" id="login-submit">
+              Log In
+            </button>
+
+            <p class="auth-message" id="login-message" aria-live="polite"></p>
           </form>
-        </div>
 
-        <div class="auth-panel-footer">
-          <span>Forgot your password?</span>
-          <a href="forgot-password.html">Reset password</a>
-        </div>
+          <div class="auth-panel-footer">
+            <span>Forgot your password?</span>
+            <a href="forgot-password.html">Reset Password</a>
+          </div>
 
-        <div class="auth-panel-footer">
-          <span>New to AUC Atlas?</span>
-          <a href="signup.html">Create account</a>
+          <div class="auth-panel-footer">
+            <span>Do not have an account?</span>
+            <a href="signup.html">Create Account</a>
+          </div>
         </div>
       </div>
     </section>
   </main>
+
+  <script>
+    document.querySelectorAll(".auth-password-visibility-toggle").forEach(function (toggleButton) {
+      const targetInput = document.getElementById(toggleButton.getAttribute("data-target"));
+
+      if (!targetInput) {
+        return;
+      }
+
+      toggleButton.addEventListener("click", function () {
+        if (targetInput.type === "password") {
+          targetInput.type = "text";
+          toggleButton.classList.remove("password-hidden");
+          toggleButton.classList.add("password-visible");
+          toggleButton.setAttribute("aria-label", "Hide password");
+        } else {
+          targetInput.type = "password";
+          toggleButton.classList.add("password-hidden");
+          toggleButton.classList.remove("password-visible");
+          toggleButton.setAttribute("aria-label", "Show password");
+        }
+      });
+    });
+  </script>
 </body>
 </html>
