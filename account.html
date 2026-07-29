@@ -896,28 +896,9 @@
     .account-connected-provider-icon {
       width: 18px;
       height: 18px;
-      border-radius: 999px;
-      color: white;
-      font-size: 11px;
-      font-weight: 900;
-      display: inline-grid;
-      place-items: center;
-    }
-
-    .account-connected-provider-icon.email {
-      background: var(--gold);
-    }
-
-    .account-connected-provider-icon.google {
-      background: #4285f4;
-    }
-
-    .account-connected-provider-icon.github {
-      background: #1d1f1f;
-    }
-
-    .account-connected-provider-icon.facebook {
-      background: #1877f2;
+      object-fit: contain;
+      display: block;
+      flex: 0 0 auto;
     }
 
     .account-connected-main strong {
@@ -1090,7 +1071,7 @@
                   <article class="account-connected-card">
                     <div class="account-connected-main">
                       <div class="account-connected-title">
-                        <span class="account-connected-provider-icon email">M</span>
+                        <img class="account-connected-provider-icon" src="email-2fa-icon.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
                         <span>Email & Password</span>
                       </div>
                       <strong data-connected-text>Checking...</strong>
@@ -1105,7 +1086,7 @@
                   <article class="account-connected-card">
                     <div class="account-connected-main">
                       <div class="account-connected-title">
-                        <span class="account-connected-provider-icon google">G</span>
+                        <img class="account-connected-provider-icon" src="google-logo.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
                         <span>Google</span>
                       </div>
                       <strong data-connected-text>Checking...</strong>
@@ -1121,7 +1102,7 @@
                   <article class="account-connected-card">
                     <div class="account-connected-main">
                       <div class="account-connected-title">
-                        <span class="account-connected-provider-icon github">GH</span>
+                        <img class="account-connected-provider-icon" src="github-logo.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
                         <span>GitHub</span>
                       </div>
                       <strong data-connected-text>Checking...</strong>
@@ -1137,7 +1118,7 @@
                   <article class="account-connected-card">
                     <div class="account-connected-main">
                       <div class="account-connected-title">
-                        <span class="account-connected-provider-icon facebook">f</span>
+                        <img class="account-connected-provider-icon" src="facebook-logo.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
                         <span>Facebook</span>
                       </div>
                       <strong data-connected-text>Checking...</strong>
