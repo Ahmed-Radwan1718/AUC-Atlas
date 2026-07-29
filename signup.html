@@ -316,62 +316,103 @@
   <div id="site-header-root"></div>
   <script src="siteheader.js"></script>
 
-  <main class="auth-page auth-entry-page">
-    <section class="auth-layout">
-      <div class="auth-copy">
-        <p class="kicker">Create account</p>
-        <h1>Join AUC Atlas</h1>
-        <p>Create your Atlas account to manage your profile, verification, and academic context in one place.</p>
-      </div>
+  <main class="auth-page">
+    <section class="auth-section">
+      <div class="auth-section-inner">
+        <div class="auth-section-header">
+          <h1 class="auth-section-title">Create Account</h1>
+          <p class="auth-section-intro">
+            Create your Atlas account to manage your profile, verification, and academic context in one place.
+          </p>
+        </div>
 
-      <div class="auth-panel">
-        <h2>Account details</h2>
-        <p class="auth-panel-intro">Your account starts with verified email access and a protected server session.</p>
-
-        <form class="auth-form" id="signup-form">
-          <div class="auth-field">
-            <label for="signup-name">Full name</label>
-            <input type="text" id="signup-name" autocomplete="name" required>
-          </div>
-
-          <div class="auth-field">
-            <label for="signup-phone">Phone number</label>
-            <input type="tel" id="signup-phone" autocomplete="tel" inputmode="tel" required>
-          </div>
-
-          <div class="auth-field">
-            <label for="signup-email">AUC email address</label>
-            <input type="email" id="signup-email" autocomplete="email" pattern="^[^@\s]+@aucegypt\.edu$" title="Use your @aucegypt.edu email address." required>
-          </div>
-
-          <div class="auth-field">
-            <label for="signup-password">Password</label>
-            <div class="auth-password-wrap">
-              <input type="password" id="signup-password" autocomplete="new-password" minlength="8" maxlength="48" required>
-              <button class="auth-password-toggle" type="button" data-password-toggle="signup-password">Show</button>
+        <div class="auth-panel">
+          <form class="auth-form" id="signup-form">
+            <div class="auth-field">
+              <label for="signup-name">Full Name</label>
+              <input type="text" id="signup-name" autocomplete="name" required>
             </div>
-          </div>
 
-          <div class="auth-field">
-            <label for="signup-confirm-password">Confirm password</label>
-            <div class="auth-password-wrap">
-              <input type="password" id="signup-confirm-password" autocomplete="new-password" minlength="8" maxlength="48" required>
-              <button class="auth-password-toggle" type="button" data-password-toggle="signup-confirm-password">Show</button>
+            <div class="auth-field">
+              <label for="signup-phone">Phone Number</label>
+              <input type="tel" id="signup-phone" autocomplete="tel" inputmode="tel" pattern="^\+?[0-9][0-9\s().-]{7,28}$" title="Enter a valid phone number." required>
             </div>
+
+            <div class="auth-field">
+              <label for="signup-email">AUC Email Address</label>
+              <input type="email" id="signup-email" autocomplete="email" pattern="^[^@\s]+@aucegypt\.edu$" title="Use your @aucegypt.edu email address." required>
+            </div>
+
+            <div class="auth-field auth-password-field">
+              <label for="signup-password">Password</label>
+
+              <div class="auth-password-input-wrap">
+                <input type="password" id="signup-password" autocomplete="new-password" minlength="8" maxlength="48" pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9\s]).{8,48}" title="Use 8 to 48 characters with uppercase, lowercase, special, and numeric characters." required>
+
+                <button class="auth-password-visibility-toggle password-hidden" type="button" data-target="signup-password" aria-label="Show password">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 5C6 5 2.1 9.6 1 12c1.1 2.4 5 7 11 7s9.9-4.6 11-7c-1.1-2.4-5-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="auth-field auth-password-field">
+              <label for="signup-confirm-password">Confirm Password</label>
+
+              <div class="auth-password-input-wrap">
+                <input type="password" id="signup-confirm-password" autocomplete="new-password" minlength="8" maxlength="48" pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9\s]).{8,48}" title="Use 8 to 48 characters with uppercase, lowercase, special, and numeric characters." required>
+
+                <button class="auth-password-visibility-toggle password-hidden" type="button" data-target="signup-confirm-password" aria-label="Show confirm password">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 5C6 5 2.1 9.6 1 12c1.1 2.4 5 7 11 7s9.9-4.6 11-7c-1.1-2.4-5-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <p class="auth-small-note">
+              Use 8 to 48 characters with uppercase, lowercase, special, and numeric characters.
+            </p>
+
+            <button class="auth-button" type="submit" id="signup-submit">
+              Create Account
+            </button>
+
+            <p class="auth-message" id="signup-message" aria-live="polite"></p>
+          </form>
+
+          <div class="auth-panel-footer">
+            <span>Already have an account?</span>
+            <a href="login.html">Log in</a>
           </div>
-
-          <p class="auth-note">Use 8 to 48 characters with uppercase, lowercase, number, and special character.</p>
-
-          <button class="auth-button" type="submit" id="signup-submit">Create account</button>
-          <p class="auth-message" id="signup-message" aria-live="polite"></p>
-        </form>
-
-        <div class="auth-panel-footer">
-          <span>Already have an account?</span>
-          <a href="login.html">Log in</a>
         </div>
       </div>
     </section>
   </main>
+
+  <script>
+    document.querySelectorAll(".auth-password-visibility-toggle").forEach(function (toggleButton) {
+      const targetInput = document.getElementById(toggleButton.getAttribute("data-target"));
+
+      if (!targetInput) {
+        return;
+      }
+
+      toggleButton.addEventListener("click", function () {
+        if (targetInput.type === "password") {
+          targetInput.type = "text";
+          toggleButton.classList.remove("password-hidden");
+          toggleButton.classList.add("password-visible");
+          toggleButton.setAttribute("aria-label", "Hide password");
+        } else {
+          targetInput.type = "password";
+          toggleButton.classList.add("password-hidden");
+          toggleButton.classList.remove("password-visible");
+          toggleButton.setAttribute("aria-label", "Show password");
+        }
+      });
+    });
+  </script>
 </body>
 </html>
