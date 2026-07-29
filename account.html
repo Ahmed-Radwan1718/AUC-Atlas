@@ -2055,6 +2055,162 @@
       }
     }
 
+    #account-panel-reviews {
+      padding: 34px 30px 44px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.94);
+      border-color: rgba(29, 31, 31, 0.1);
+    }
+
+    .account-reviews-summary,
+    .account-reviews-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .account-reviews-summary {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .account-reviews-summary-card,
+    .account-review-card,
+    .account-reviews-empty {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--surface-soft);
+    }
+
+    .account-reviews-summary-card {
+      min-height: 92px;
+      padding: 18px;
+      display: grid;
+      align-content: center;
+      gap: 8px;
+    }
+
+    .account-reviews-summary-card span,
+    .account-review-card-header span,
+    .account-review-field span {
+      color: rgba(29, 31, 31, 0.56);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .account-reviews-summary-card strong {
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1.15;
+    }
+
+    .account-review-card {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .account-review-card-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .account-review-card-header h3 {
+      margin: 6px 0 0;
+      color: var(--ink);
+      font-size: 20px;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    .account-review-profile-link,
+    .account-review-profile-link:visited {
+      min-height: 36px;
+      padding: 0 14px;
+      border: 1px solid rgba(29, 31, 31, 0.16);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .account-review-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px;
+      gap: 12px;
+    }
+
+    .account-review-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-review-field input,
+    .account-review-field textarea {
+      width: 100%;
+      border: 1px solid rgba(29, 31, 31, 0.14);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      padding: 12px 13px;
+      outline: 0;
+    }
+
+    .account-review-field input {
+      min-height: 46px;
+    }
+
+    .account-review-field textarea {
+      min-height: 118px;
+      line-height: 1.55;
+      resize: vertical;
+    }
+
+    .account-review-field input:focus,
+    .account-review-field textarea:focus {
+      border-color: var(--gold);
+      background: #ffffff;
+    }
+
+    .account-review-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .account-review-actions .account-primary-button,
+    .account-review-actions .account-danger-button {
+      min-height: 44px;
+    }
+
+    .account-reviews-empty {
+      margin: 0;
+      padding: 18px;
+      color: rgba(29, 31, 31, 0.58);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    @media (max-width: 760px) {
+      .account-reviews-summary,
+      .account-review-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     [hidden] {
       display: none !important;
     }
@@ -2080,6 +2236,14 @@
             <button class="account-sidebar-link active" type="button" data-account-panel="details">
               <img class="account-sidebar-icon" src="user.png" alt="">
               <span>Account Details</span>
+            </button>
+
+            <button class="account-sidebar-link" type="button" data-account-panel="reviews">
+              <svg class="account-sidebar-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+                <path d="m9 10 2 2 4-4"></path>
+              </svg>
+              <span>My Reviews</span>
             </button>
 
             <button class="account-sidebar-link" type="button" data-account-panel="security">
@@ -2254,6 +2418,30 @@
                 <button class="account-primary-button" type="submit" id="account-details-submit">Save Changes</button>
                 <p class="auth-message" id="account-details-message" aria-live="polite"></p>
               </form>
+            </article>
+
+            <article class="account-panel" id="account-panel-reviews" data-account-section="reviews" hidden>
+              <div class="account-panel-header">
+                <p class="account-panel-eyebrow">Professor feedback</p>
+                <h2>My Reviews</h2>
+                <p>Manage the professor reviews connected to your account.</p>
+              </div>
+
+              <div class="account-reviews-summary">
+                <article class="account-reviews-summary-card">
+                  <span>Total reviews</span>
+                  <strong id="account-reviews-count">0</strong>
+                </article>
+
+                <article class="account-reviews-summary-card">
+                  <span>Average rating</span>
+                  <strong id="account-reviews-average">Not rated yet</strong>
+                </article>
+              </div>
+
+              <div class="account-reviews-list" id="account-reviews-list"></div>
+              <p class="account-reviews-empty" id="account-reviews-empty" hidden>No professor reviews found yet. Reviews submitted from professor profiles will appear here.</p>
+              <p class="account-message" id="account-reviews-message" aria-live="polite"></p>
             </article>
 
             <article class="account-panel" id="account-panel-security" data-account-section="security" hidden>
@@ -2603,6 +2791,7 @@
 
   <script src="account-profile-photo.js"></script>
   <script src="account-security.js"></script>
+  <script src="professors-data.js"></script>
 
   <script>
     (function () {
