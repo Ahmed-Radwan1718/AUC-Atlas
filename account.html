@@ -825,6 +825,251 @@
       background: rgba(150, 62, 72, 0.08);
     }
 
+    .account-profile-photo-button:disabled,
+    .account-photo-crop-use:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    body.account-photo-crop-modal-open {
+      overflow: hidden;
+    }
+
+    .account-photo-crop-modal[hidden] {
+      display: none;
+    }
+
+    .account-photo-crop-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .account-photo-crop-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(29, 31, 31, 0.62);
+    }
+
+    .account-photo-crop-card {
+      position: relative;
+      z-index: 1;
+      width: min(760px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: 28px;
+      border-radius: 28px;
+      border: 1px solid rgba(29, 31, 31, 0.12);
+      background: #fffdfa;
+      box-shadow: 0 30px 90px rgba(29, 31, 31, 0.22);
+      contain: layout paint;
+    }
+
+    .account-photo-crop-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(29, 31, 31, 0.14);
+      border-radius: 999px;
+      background: rgba(29, 31, 31, 0.04);
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .account-photo-crop-header {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .account-photo-crop-header .account-panel-eyebrow {
+      margin: 0;
+      color: rgba(150, 62, 72, 0.78);
+    }
+
+    .account-photo-crop-header h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .account-photo-crop-header p:last-child {
+      margin: 0;
+      max-width: 560px;
+      color: rgba(29, 31, 31, 0.66);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.65;
+    }
+
+    .account-photo-crop-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 168px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .account-photo-crop-stage {
+      position: relative;
+      height: 320px;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(29, 31, 31, 0.12);
+      background: rgba(29, 31, 31, 0.055);
+      cursor: grab;
+      touch-action: none;
+      contain: layout paint size;
+      isolation: isolate;
+      transform: translateZ(0);
+      will-change: transform;
+      backface-visibility: hidden;
+      user-select: none;
+    }
+
+    .account-photo-crop-stage:active,
+    .account-photo-crop-stage.is-interacting {
+      cursor: grabbing;
+    }
+
+    .account-photo-crop-stage img,
+    .account-photo-crop-preview img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: none;
+      max-height: none;
+      transform-origin: center center;
+      user-select: none;
+      pointer-events: none;
+      touch-action: none;
+      will-change: transform;
+      backface-visibility: hidden;
+      contain: layout paint size;
+      transition: none;
+    }
+
+    .account-photo-crop-frame {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(240px, calc(100% - 42px));
+      aspect-ratio: 1;
+      border: 2px solid rgba(255, 255, 255, 0.94);
+      border-radius: 999px;
+      box-shadow: 0 0 0 999px rgba(29, 31, 31, 0.36);
+      pointer-events: none;
+      transform: translate3d(-50%, -50%, 0);
+      transform-origin: center center;
+      user-select: none;
+      touch-action: none;
+      contain: layout paint size;
+    }
+
+    .account-photo-crop-preview-panel {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(29, 31, 31, 0.1);
+      background: rgba(29, 31, 31, 0.035);
+    }
+
+    .account-photo-crop-preview {
+      position: relative;
+      width: 118px;
+      height: 118px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(29, 31, 31, 0.07);
+      contain: layout paint size;
+      isolation: isolate;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .account-photo-crop-preview-label {
+      color: rgba(29, 31, 31, 0.62);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .account-photo-crop-note {
+      margin-top: 4px;
+      color: rgba(29, 31, 31, 0.58);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .account-photo-crop-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .account-photo-crop-cancel,
+    .account-photo-crop-use {
+      min-height: 52px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .account-photo-crop-cancel {
+      border: 1px solid rgba(29, 31, 31, 0.18);
+      background: rgba(29, 31, 31, 0.045);
+      color: var(--ink);
+    }
+
+    .account-photo-crop-use {
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--surface);
+    }
+
+    @media (max-width: 680px) {
+      .account-photo-crop-card {
+        padding: 24px 18px;
+      }
+
+      .account-photo-crop-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .account-photo-crop-stage {
+        height: 280px;
+      }
+
+      .account-photo-crop-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .account-form-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -1355,9 +1600,11 @@
                     <h3>Profile Photo</h3>
                     <p id="account-photo-note">Choose an image up to 4MB.</p>
 
+                    <input type="file" id="account-photo-input" accept="image/png,image/jpeg,image/webp" hidden>
+
                     <div class="account-profile-photo-button-row">
-                      <button class="account-profile-photo-button" type="button">Choose Photo</button>
-                      <button class="account-profile-photo-remove-button" type="button">Remove Photo</button>
+                      <button class="account-profile-photo-button" type="button" id="account-photo-choose-button">Choose Photo</button>
+                      <button class="account-profile-photo-remove-button" type="button" id="account-photo-remove-button" hidden>Remove Photo</button>
                     </div>
                   </div>
                 </div>
@@ -1527,6 +1774,51 @@
       </div>
     </section>
   </main>
+
+  <div class="account-photo-crop-modal" id="account-photo-crop-modal" hidden>
+    <div class="account-photo-crop-backdrop" id="account-photo-crop-backdrop"></div>
+
+    <div class="account-photo-crop-card" role="dialog" aria-modal="true" aria-labelledby="account-photo-crop-title">
+      <button class="account-photo-crop-close" type="button" id="account-photo-crop-close" aria-label="Close photo crop popup">×</button>
+
+      <div class="account-photo-crop-header">
+        <p class="account-panel-eyebrow">Profile Photo</p>
+        <h2 id="account-photo-crop-title">Adjust Profile Photo</h2>
+        <p>Crop and preview your profile photo before saving.</p>
+      </div>
+
+      <div class="account-photo-crop-layout">
+        <div>
+          <div class="account-photo-crop-stage" id="account-photo-crop-stage">
+            <img src="" alt="Selected profile photo" id="account-photo-crop-image">
+            <div class="account-photo-crop-frame"></div>
+          </div>
+        </div>
+
+        <div class="account-photo-crop-preview-panel">
+          <div class="account-photo-crop-preview">
+            <img src="" alt="Profile photo crop preview" id="account-photo-crop-preview-image">
+          </div>
+
+          <p class="account-photo-crop-preview-label">Preview</p>
+
+          <p class="account-photo-crop-note">
+            Supported formats: JPG, PNG, WEBP<br>
+            Maximum size: 4MB
+          </p>
+        </div>
+      </div>
+
+      <div class="account-photo-crop-actions">
+        <button class="account-photo-crop-cancel" type="button" id="account-photo-crop-cancel">Cancel</button>
+        <button class="account-photo-crop-use" type="button" id="account-photo-crop-use">Apply Photo</button>
+      </div>
+
+      <p class="auth-message" id="account-photo-crop-message" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <script src="account-profile-photo.js"></script>
 
   <script>
     (function () {
@@ -2222,19 +2514,22 @@ EH|Western Sahara|+212
         }
 
         function loadAccountDetails(user) {
-          const displayName = user.fullName || user.displayName || user.firstName || "AUC Atlas user";
+          const accountUser = user || {};
+          const displayName = accountUser.fullName || accountUser.displayName || accountUser.firstName || "AUC Atlas user";
 
           name.value = displayName;
           originalUsername = displayName;
           usernameEditMode = false;
-          usernameLastChangedAt = user.usernameLastChangedAt || null;
+          usernameLastChangedAt = accountUser.usernameLastChangedAt || null;
           updateUsernameLockState();
 
-          email.value = user.email || "";
-          hydrateAccountPhoneValue(user.phone || "");
+          email.value = accountUser.email || "";
+          hydrateAccountPhoneValue(accountUser.phone || "");
 
-          if (user.photoURL) {
-            photoPreview.src = user.photoURL;
+          if (window.aucAtlasAccountPhoto && typeof window.aucAtlasAccountPhoto.resetFromUser === "function") {
+            window.aucAtlasAccountPhoto.resetFromUser(accountUser);
+          } else if (accountUser.photoURL) {
+            photoPreview.src = accountUser.photoURL;
             photoPreview.classList.add("has-profile-photo");
             photoNote.textContent = "Choose an image up to 4MB.";
           } else {
@@ -2243,7 +2538,7 @@ EH|Western Sahara|+212
             photoNote.textContent = "Choose an image up to 4MB.";
           }
 
-          const providers = user.providers || {};
+          const providers = accountUser.providers || {};
 
           setConnectedStatus(connectedPasswordStatus, Boolean(providers.password));
           setConnectedStatus(connectedGoogleStatus, Boolean(providers.google));
@@ -2300,6 +2595,7 @@ EH|Western Sahara|+212
 
             const displayName = name ? name.value.trim() : "";
             const phoneValue = getAccountPhoneValueForSave();
+            const usernameChanged = displayName !== originalUsername;
 
             if (!displayName) {
               setMessage(detailsMessage, "Please enter your display name.", "error");
@@ -2311,7 +2607,7 @@ EH|Western Sahara|+212
               return;
             }
 
-            if (getUsernameDaysLeft() > 0 && displayName !== originalUsername) {
+            if (getUsernameDaysLeft() > 0 && usernameChanged) {
               setMessage(detailsMessage, "You can change your username again on " + getUsernameUnlockDateText() + ".", "error");
 
               if (name) {
@@ -2332,20 +2628,26 @@ EH|Western Sahara|+212
               return;
             }
 
+            const profilePayload = {
+              fullName: displayName,
+              phone: phoneValue
+            };
+
+            if (window.aucAtlasAccountPhoto && typeof window.aucAtlasAccountPhoto.getSavePayload === "function") {
+              Object.assign(profilePayload, window.aucAtlasAccountPhoto.getSavePayload());
+            }
+
             setButtonLoading(detailsSubmit, true, "Saving...", "Save Changes");
             setMessage(detailsMessage, "", "");
 
             try {
               const data = await requestJson("/api/account-profile", {
                 method: "PATCH",
-                body: {
-                  fullName: displayName,
-                  phone: phoneValue
-                }
+                body: profilePayload
               });
 
               loadAccountDetails(data.user || {});
-              setMessage(detailsMessage, "Saved changes.", "success");
+              setMessage(detailsMessage, usernameChanged ? "Saved changes. Username can be changed again on " + getUsernameUnlockDateText() + "." : "Saved changes.", "success");
             } catch (error) {
               setMessage(detailsMessage, error.message || "Could not save changes.", "error");
             } finally {
