@@ -918,7 +918,9 @@
     }
 
     .account-authenticator-modal-card {
-      width: min(720px, 100%);
+      width: min(760px, 100%);
+      padding: 34px;
+      background: rgba(255, 255, 255, 0.96);
     }
 
     body.account-security-modal-open {
@@ -971,9 +973,10 @@
     }
 
     .account-security-modal-eyebrow {
-      color: rgba(29, 31, 31, 0.56);
-      font-size: 11px;
-      font-weight: 800;
+      margin: 0;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 900;
       letter-spacing: 0.14em;
       text-transform: uppercase;
     }
@@ -1004,15 +1007,17 @@
 
     .account-authenticator-setup-grid {
       display: grid;
-      grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
-      gap: 18px;
-      align-items: center;
-      margin: 22px 0;
+      grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+      margin: 22px 0 24px;
     }
 
     .account-authenticator-qr-wrap {
-      min-height: 220px;
-      padding: 16px;
+      width: 100%;
+      aspect-ratio: 1;
+      min-height: 0;
+      padding: 18px;
       border: 1px solid var(--line);
       border-radius: 24px;
       background: #ffffff;
@@ -1022,25 +1027,25 @@
 
     .account-authenticator-qr-wrap img {
       width: 100%;
-      max-width: 190px;
+      max-width: 204px;
       height: auto;
       display: block;
     }
 
     .account-authenticator-manual {
       min-width: 0;
-      padding: 16px;
+      padding: 20px;
       border: 1px solid rgba(29, 31, 31, 0.12);
-      border-radius: 20px;
+      border-radius: 24px;
       background: var(--surface-soft);
       display: grid;
-      gap: 8px;
+      gap: 10px;
     }
 
     .account-authenticator-manual span {
-      color: rgba(29, 31, 31, 0.56);
+      color: var(--gold);
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
@@ -1051,6 +1056,74 @@
       font-size: 14px;
       line-height: 1.5;
       overflow-wrap: anywhere;
+    }
+
+    .account-authenticator-modal .account-form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .account-authenticator-modal .account-field input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 20px;
+      border: 1px solid rgba(29, 31, 31, 0.16);
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-align: center;
+      outline: 0;
+    }
+
+    .account-authenticator-modal .account-field input:focus {
+      border-color: var(--gold);
+      background: var(--surface);
+    }
+
+    .account-authenticator-modal .account-security-modal-actions {
+      margin-top: 4px;
+      gap: 12px;
+    }
+
+    .account-authenticator-modal .account-security-modal-cancel,
+    .account-authenticator-modal .account-security-modal-continue {
+      min-height: 48px;
+      padding: 0 22px;
+    }
+
+    .account-authenticator-modal .account-security-modal-continue {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--surface);
+    }
+
+    @media (max-width: 720px) {
+      .account-authenticator-modal-card {
+        padding: 26px 18px;
+      }
+
+      .account-authenticator-setup-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .account-authenticator-qr-wrap {
+        max-width: 260px;
+        justify-self: center;
+      }
+
+      .account-authenticator-modal .account-security-modal-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .account-authenticator-modal .account-security-modal-cancel,
+      .account-authenticator-modal .account-security-modal-continue {
+        width: 100%;
+      }
     }
 
     .account-password-rules {
