@@ -29,8 +29,8 @@
 
       <div class="site-header-account-menu" id="site-header-account-menu" hidden>
         <a href="login.html" class="site-header-account-link" id="site-header-login-link">Login</a>
-        <a href="account.html" class="site-header-account-link" id="site-header-account-link" hidden>Account</a>
-        <button class="site-header-account-link site-header-logout-button" id="site-header-logout-button" type="button" hidden>Log out</button>
+        <a href="account.html" class="site-header-account-link" id="site-header-account-link" hidden><img class="site-header-account-link-icon" src="user.png" alt="" aria-hidden="true"><span>Account</span></a>
+        <button class="site-header-account-link site-header-logout-button" id="site-header-logout-button" type="button" hidden><img class="site-header-account-link-icon" src="logout-icon.png" alt="" aria-hidden="true"><span>Log out</span></button>
       </div>
     </div>
   </div>
@@ -66,12 +66,16 @@
       accountPhoto.classList.remove("has-profile-photo");
     }
 
+    function setLogoutButtonLabel(label) {
+      logoutButton.innerHTML = '<img class="site-header-account-link-icon" src="logout-icon.png" alt="" aria-hidden="true"><span>' + label + '</span>';
+    }
+
     function showLoggedOutAccountState() {
       loginLink.hidden = false;
       accountLink.hidden = true;
       logoutButton.hidden = true;
       logoutButton.disabled = false;
-      logoutButton.textContent = "Log out";
+      setLogoutButtonLabel("Log out");
       setAccountPhoto("");
     }
 
@@ -80,7 +84,7 @@
       accountLink.hidden = false;
       logoutButton.hidden = false;
       logoutButton.disabled = false;
-      logoutButton.textContent = "Log out";
+      setLogoutButtonLabel("Log out");
       setAccountPhoto(user && user.photoURL ? user.photoURL : "");
     }
 
@@ -140,7 +144,7 @@
 
     logoutButton.addEventListener("click", async function () {
       logoutButton.disabled = true;
-      logoutButton.textContent = "Logging out...";
+      setLogoutButtonLabel("Logging out...");
 
       await logoutServerSession();
 
