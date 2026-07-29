@@ -807,6 +807,159 @@
       width: min(720px, 100%);
     }
 
+    body.account-security-modal-open {
+      overflow: hidden;
+    }
+
+    .account-security-modal-close,
+    .account-authenticator-modal-close,
+    .account-password-modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(29, 31, 31, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .account-security-modal-header,
+    .account-authenticator-modal-header,
+    .account-password-modal-header {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 22px;
+      padding-right: 42px;
+    }
+
+    .account-security-modal-header h2,
+    .account-authenticator-modal-header h2,
+    .account-password-modal-header h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .account-security-modal-header p,
+    .account-authenticator-modal-header p,
+    .account-password-modal-header p {
+      margin: 0;
+      color: rgba(29, 31, 31, 0.62);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .account-security-modal-eyebrow {
+      color: rgba(29, 31, 31, 0.56);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .account-security-modal-actions,
+    .account-password-modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .account-security-code-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .account-security-modal-continue:disabled,
+    .account-primary-button:disabled,
+    .account-two-factor-button:disabled,
+    .account-danger-button:disabled,
+    .account-session-action:disabled,
+    .account-trusted-device-remove:disabled {
+      opacity: 0.58;
+      cursor: not-allowed;
+    }
+
+    .account-authenticator-setup-grid {
+      display: grid;
+      grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      margin: 22px 0;
+    }
+
+    .account-authenticator-qr-wrap {
+      min-height: 220px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: #ffffff;
+      display: grid;
+      place-items: center;
+    }
+
+    .account-authenticator-qr-wrap img {
+      width: 100%;
+      max-width: 190px;
+      height: auto;
+      display: block;
+    }
+
+    .account-authenticator-manual {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(29, 31, 31, 0.12);
+      border-radius: 20px;
+      background: var(--surface-soft);
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-authenticator-manual span {
+      color: rgba(29, 31, 31, 0.56);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .account-authenticator-manual strong {
+      color: var(--ink);
+      font-family: "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .account-password-rules {
+      padding: 14px 16px;
+      border: 1px solid rgba(29, 31, 31, 0.1);
+      border-radius: 18px;
+      background: var(--surface-soft);
+      color: rgba(29, 31, 31, 0.68);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .account-password-rules strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .account-password-rules ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
     @media (max-width: 900px) {
       .site-footer {
         padding: 38px 25px 24px;
@@ -2026,6 +2179,190 @@
 
                 <button class="account-danger-button" type="button" id="delete-account-button">Delete account</button>
                 <p class="account-message" id="delete-account-message" aria-live="polite"></p>
+              </div>
+
+              <div class="account-security-modal" id="delete-account-modal" hidden>
+                <div class="account-security-modal-backdrop" id="delete-account-modal-backdrop"></div>
+
+                <div class="account-security-modal-card account-security-gate-card" role="dialog" aria-modal="true" aria-labelledby="delete-account-modal-title">
+                  <div class="account-security-modal-header">
+                    <h2 id="delete-account-modal-title">Delete account permanently?</h2>
+                    <p>This cannot be undone. Type DELETE to confirm permanent account deletion.</p>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="delete-account-confirm-text">Confirmation</label>
+                    <input type="text" id="delete-account-confirm-text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="6" placeholder="DELETE">
+                  </div>
+
+                  <div class="account-security-modal-actions">
+                    <button class="account-security-modal-cancel" type="button" id="delete-account-modal-cancel">Cancel</button>
+                    <button class="account-security-modal-continue account-security-modal-danger" type="button" id="delete-account-modal-confirm" disabled>Delete Account</button>
+                  </div>
+
+                  <p class="account-message" id="delete-account-modal-message" aria-live="polite"></p>
+                </div>
+              </div>
+
+              <div class="account-security-modal" id="sign-out-session-modal" hidden>
+                <div class="account-security-modal-backdrop" id="sign-out-session-modal-backdrop"></div>
+
+                <div class="account-security-modal-card account-security-gate-card" role="dialog" aria-modal="true" aria-labelledby="sign-out-session-modal-title">
+                  <div class="account-security-modal-header">
+                    <h2 id="sign-out-session-modal-title">Sign out this session?</h2>
+                    <p>This browser or device will need to log in again.</p>
+                  </div>
+
+                  <div class="account-security-modal-actions">
+                    <button class="account-security-modal-cancel" type="button" id="sign-out-session-modal-cancel">Cancel</button>
+                    <button class="account-security-modal-continue" type="button" id="sign-out-session-modal-confirm">Sign Out</button>
+                  </div>
+
+                  <p class="account-message" id="sign-out-session-message" aria-live="polite"></p>
+                </div>
+              </div>
+
+              <div class="account-security-modal" id="remove-trusted-device-modal" hidden>
+                <div class="account-security-modal-backdrop" id="remove-trusted-device-modal-backdrop"></div>
+
+                <div class="account-security-modal-card account-security-gate-card" role="dialog" aria-modal="true" aria-labelledby="remove-trusted-device-modal-title">
+                  <div class="account-security-modal-header">
+                    <h2 id="remove-trusted-device-modal-title">Remove trusted device?</h2>
+                    <p>This device will require two-factor verification the next time it signs in.</p>
+                  </div>
+
+                  <div class="account-security-modal-actions">
+                    <button class="account-security-modal-cancel" type="button" id="remove-trusted-device-modal-cancel">Cancel</button>
+                    <button class="account-security-modal-continue" type="button" id="remove-trusted-device-modal-confirm">Remove Trust</button>
+                  </div>
+
+                  <p class="account-message" id="remove-trusted-device-message" aria-live="polite"></p>
+                </div>
+              </div>
+
+              <div class="account-authenticator-modal" id="authenticator-setup-modal" hidden>
+                <div class="account-authenticator-modal-backdrop" id="authenticator-setup-modal-backdrop"></div>
+
+                <div class="account-authenticator-modal-card" role="dialog" aria-modal="true" aria-labelledby="authenticator-setup-modal-title">
+                  <button class="account-authenticator-modal-close" type="button" id="authenticator-setup-modal-close" aria-label="Close authenticator setup popup">×</button>
+
+                  <div class="account-authenticator-modal-header">
+                    <p class="account-security-modal-eyebrow">Authenticator App</p>
+                    <h2 id="authenticator-setup-modal-title">Set Up App Verification</h2>
+                    <p>Scan the QR code with your authenticator app, then enter the 6-digit code it gives you.</p>
+                  </div>
+
+                  <div class="account-authenticator-setup-grid">
+                    <div class="account-authenticator-qr-wrap">
+                      <img id="authenticator-qr-image" alt="Authenticator QR code">
+                    </div>
+
+                    <div class="account-authenticator-manual">
+                      <span>Manual setup key</span>
+                      <strong id="authenticator-secret-key"></strong>
+                    </div>
+                  </div>
+
+                  <form class="account-form" id="authenticator-setup-form">
+                    <div class="account-field">
+                      <label for="authenticator-setup-code">Authenticator Code</label>
+                      <input type="text" id="authenticator-setup-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+                    </div>
+
+                    <div class="account-security-modal-actions">
+                      <button class="account-security-modal-cancel" type="button" id="authenticator-setup-modal-cancel">Cancel</button>
+                      <button class="account-security-modal-continue" type="submit" id="authenticator-setup-confirm">Verify and enable</button>
+                    </div>
+
+                    <p class="account-message" id="authenticator-setup-message" aria-live="polite"></p>
+                  </form>
+                </div>
+              </div>
+
+              <div class="account-password-modal" id="password-change-modal" hidden>
+                <div class="account-password-modal-backdrop" id="password-change-modal-backdrop"></div>
+
+                <div class="account-password-modal-card" role="dialog" aria-modal="true" aria-labelledby="password-change-modal-title">
+                  <button class="account-password-modal-close" type="button" id="password-change-modal-close" aria-label="Close password popup">×</button>
+
+                  <div class="account-password-modal-header">
+                    <h2 id="password-change-modal-title">Change your password</h2>
+                    <p>For your security, we recommend choosing a unique password that you do not use elsewhere.</p>
+                  </div>
+
+                  <form class="account-form" id="change-password-form">
+                    <div class="account-field">
+                      <label for="current-password">Current password</label>
+                      <input type="password" id="current-password" autocomplete="current-password" required>
+                    </div>
+
+                    <div class="account-field">
+                      <label for="new-password">New password</label>
+                      <input type="password" id="new-password" autocomplete="new-password" minlength="10" maxlength="48" required>
+                    </div>
+
+                    <div class="account-password-rules">
+                      <strong>You must:</strong>
+                      <ul>
+                        <li>Use 10 to 48 characters</li>
+                        <li>Use at least 1 uppercase character</li>
+                        <li>Use at least 1 lowercase character</li>
+                        <li>Use at least 1 special character</li>
+                        <li>Use at least 1 numeric character</li>
+                      </ul>
+                    </div>
+
+                    <div class="account-password-modal-actions">
+                      <button class="account-password-modal-cancel" type="button" id="password-change-modal-cancel">Cancel</button>
+                      <button class="account-primary-button account-password-confirm-button" type="submit" id="change-password-button" disabled>Confirm</button>
+                    </div>
+
+                    <p class="account-message" id="password-message" aria-live="polite"></p>
+                  </form>
+                </div>
+              </div>
+
+              <div class="account-security-modal" id="security-gate-modal" hidden>
+                <div class="account-security-modal-backdrop" id="security-gate-modal-backdrop"></div>
+
+                <div class="account-security-modal-card account-security-gate-card" role="dialog" aria-modal="true" aria-labelledby="security-gate-modal-title">
+                  <button class="account-security-modal-close" type="button" id="security-gate-modal-close" aria-label="Close security verification popup">×</button>
+
+                  <div class="account-security-modal-header">
+                    <p class="account-security-modal-eyebrow">Security Verification</p>
+                    <h2 id="security-gate-modal-title">Verification Required</h2>
+                    <p>Confirm it is you with your authenticator app when available, or an email code.</p>
+                  </div>
+
+                  <div class="account-security-modal-actions">
+                    <button class="account-security-modal-cancel" type="button" id="security-gate-modal-cancel">Cancel</button>
+                    <button class="account-security-modal-continue" type="button" id="security-gate-modal-continue">Continue</button>
+                  </div>
+
+                  <p class="account-message" id="security-gate-message" aria-live="polite"></p>
+                </div>
+              </div>
+
+              <div class="account-security-modal" id="security-code-modal" hidden>
+                <div class="account-security-modal-backdrop" id="security-code-modal-backdrop"></div>
+
+                <div class="account-security-modal-card account-security-code-card" role="dialog" aria-modal="true" aria-labelledby="security-code-modal-title">
+                  <div class="account-security-modal-header">
+                    <h2 id="security-code-modal-title">Enter Verification Code</h2>
+                    <p id="security-code-modal-text">Enter the 6-digit security code.</p>
+                  </div>
+
+                  <form id="security-code-form" class="account-security-code-form">
+                    <div class="account-field">
+                      <label for="security-code-input">Security Code</label>
+                      <input type="text" id="security-code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+                    </div>
+
+                    <button class="account-security-modal-continue" type="submit" id="security-code-submit">Continue</button>
+                    <button class="account-security-modal-cancel" type="button" id="security-code-modal-cancel">Cancel</button>
+                    <p class="account-message" id="security-code-message" aria-live="polite"></p>
+                  </form>
+                </div>
               </div>
             </article>
           </section>
