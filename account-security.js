@@ -349,6 +349,10 @@
     return securityUnlockUntil > Date.now();
   }
 
+  function hasEnabledTwoFactorMethod() {
+    return Boolean(twoFactorSettings && (twoFactorSettings.appEnabled || twoFactorSettings.emailEnabled));
+  }
+
   async function refreshSecurityUnlockStatus() {
     try {
       const data = await requestJson("/api/security-unlock-status", {
@@ -366,6 +370,10 @@
   }
 
   async function ensureSecurityUnlocked() {
+    if (!hasEnabledTwoFactorMethod()) {
+      return true;
+    }
+
     if (isSecurityUnlocked()) {
       return true;
     }
