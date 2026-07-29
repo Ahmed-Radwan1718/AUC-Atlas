@@ -8,13 +8,6 @@ const {
 const USERNAME_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
 const PROFILE_PHOTO_MAX_BYTES = 4 * 1024 * 1024;
 const PROFILE_PHOTO_ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
-const PROFILE_PHOTO_MODERATION_MODEL = "omni-moderation-latest";
-const PROFILE_PHOTO_BLOCKED_MODERATION_CATEGORIES = new Set(["sexual", "sexual/minors", "violence/graphic"]);
-const PROFILE_PHOTO_MODERATION_SCORE_LIMITS = {
-  sexual: 0.35,
-  "sexual/minors": 0.01,
-  "violence/graphic": 0.45
-};
 
 function cleanString(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
@@ -141,91 +134,6 @@ function getProfilePhotoDataUrl(value) {
   }
 
   return "data:" + mimeType + ";base64," + base64Data;
-}
-
-function getOpenAiApiKey() {
-  let apiKey = String(process.env.OPENAI_API_KEY || "").trim();
-
-  if (
-    apiKey.length >= 2 &&
-    (apiKey.startsWith("\"") && apiKey.endsWith("\"") ||
-    apiKey.startsWith("'") && apiKey.endsWith("'"))
-  ) {
-    apiKey = apiKey.slice(1, -1).trim();
-  }
-
-  if (!apiKey) {
-    const error = new Error("Profile photo moderation is not configured.");
-    error.statusCode = 500;
-    throw error;
-  }
-
-  return apiKey;
-}
-
-async function moderateProfilePhoto(dataUrl) {
-  if (!dataUrl) {
-    return;
-  }
-
-  const response = await fetch("https://api.openai.com/v1/moderations", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + getOpenAiApiKey(),
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: PROFILE_PHOTO_MODERATION_MODEL,
-      input: [
-        {
-          type: "image_url",
-          image_url: {
-            url: dataUrl
-          }
-        }
-      ]
-    })
-  });
-
-  if (!response.ok) {
-    const details = await response.json().catch(function () {
-      return {};
-    });
-    const apiMessage = details && details.error && details.error.message ? String(details.error.message) : "";
-
-    if (response.status === 401 || response.status === 403) {
-      const error = new Error("OpenAI API key for profile photo moderation was rejected.");
-      error.statusCode = 502;
-      throw error;
-    }
-
-    if (response.status === 429) {
-      const error = new Error("OpenAI API quota or billing is not active for profile photo moderation.");
-      error.statusCode = 502;
-      throw error;
-    }
-
-    const error = new Error(apiMessage || "Could not verify this profile photo. Please try again.");
-    error.statusCode = 502;
-    throw error;
-  }
-
-  const moderation = await response.json();
-  const results = Array.isArray(moderation.results) ? moderation.results : [];
-  const blocked = results.some(function (result) {
-    const categories = result.categories || {};
-    const scores = result.category_scores || {};
-
-    return Array.from(PROFILE_PHOTO_BLOCKED_MODERATION_CATEGORIES).some(function (category) {
-      return Boolean(categories[category]) || Number(scores[category] || 0) >= PROFILE_PHOTO_MODERATION_SCORE_LIMITS[category];
-    });
-  });
-
-  if (blocked) {
-    const error = new Error("This profile photo cannot be used. Please choose a non-explicit image.");
-    error.statusCode = 400;
-    throw error;
-  }
 }
 
 async function uploadProfilePhoto(uid, dataUrl) {
@@ -406,7 +314,6 @@ async function handlePatch(req, res, uid, decodedUser) {
   let photoURL = userData.photoURL || userRecord.photoURL || "";
 
   if (profilePhotoDataUrl) {
-    await moderateProfilePhoto(profilePhotoDataUrl);
     photoURL = await uploadProfilePhoto(uid, profilePhotoDataUrl);
   } else if (removeProfilePhoto) {
     await deleteProfilePhoto(uid);
