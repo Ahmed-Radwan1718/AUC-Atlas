@@ -535,8 +535,23 @@
       ".professor-review-card span{color:var(--muted);font-size:12px;font-weight:800}",
       ".professor-review-form{display:grid;gap:12px}",
       ".professor-review-form label{display:grid;gap:7px;color:var(--muted);font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}",
-      ".professor-review-form input,.professor-review-form select,.professor-review-form textarea{width:100%;border:1px solid var(--line);border-radius:16px;background:var(--surface-soft);color:var(--ink);font:inherit;padding:12px 13px;outline:0}",
+      ".professor-review-form input,.professor-review-form textarea{width:100%;border:1px solid var(--line);border-radius:16px;background:var(--surface-soft);color:var(--ink);font:inherit;padding:12px 13px;outline:0}",
       ".professor-review-form textarea{min-height:120px;resize:vertical;line-height:1.55}",
+      ".custom-select-dropdown{position:relative;width:100%}",
+      ".custom-select-trigger{width:100%;min-height:54px;padding:0 18px;border:1px solid var(--line);border-radius:16px;background:var(--surface-soft);color:var(--ink);font-size:16px;font-weight:400;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;transition:background .22s ease,border-color .22s ease,box-shadow .22s ease}",
+      ".custom-select-value{color:rgba(29,31,31,.86);font-weight:400;display:inline-flex;align-items:center;gap:10px}",
+      ".custom-select-trigger:hover,.custom-select-dropdown.open .custom-select-trigger{background:var(--surface);border-color:var(--line-strong);box-shadow:0 18px 44px rgba(29,31,31,.08)}",
+      ".custom-select-dropdown.invalid .custom-select-trigger{border-color:rgba(192,154,92,.72)}",
+      ".chevron{width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .22s ease}",
+      ".custom-select-dropdown.open .chevron{transform:rotate(225deg)}",
+      ".custom-select-menu{position:absolute;left:0;right:0;top:calc(100% + 10px);z-index:80;padding:10px 8px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.98);box-shadow:0 22px 55px rgba(29,31,31,.13);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .24s ease,transform .24s ease,visibility .24s ease}",
+      ".custom-select-dropdown.open .custom-select-menu{opacity:1;visibility:visible;transform:translateY(0)}",
+      ".custom-select-option{position:relative;width:100%;margin-bottom:6px;padding:12px 14px 12px 24px;border:0;border-radius:14px;background:transparent;color:rgba(29,31,31,.62);font-size:15px;font-weight:400;line-height:1.4;text-align:left;cursor:pointer;overflow:hidden;display:flex;align-items:center;gap:10px;transition:color .24s ease,background .24s ease,transform .24s ease}",
+      ".custom-select-option:last-child{margin-bottom:0}",
+      ".custom-select-option::before{content:\"\";position:absolute;left:8px;top:12px;bottom:12px;width:2px;border-radius:999px;background:var(--gold);opacity:0;transform:scaleY(.35);transform-origin:center;transition:opacity .24s ease,transform .24s ease}",
+      ".custom-select-option:hover{color:var(--ink);background:var(--gold-soft);transform:translateX(2px)}",
+      ".custom-select-option.active{color:var(--ink);background:rgba(192,154,92,.14)}",
+      ".custom-select-option.active::before,.custom-select-option:hover::before{opacity:1;transform:scaleY(1)}",
       ".professor-review-submit{min-height:44px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:white;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}",
       ".professor-review-form-message{min-height:20px;color:var(--gold);font-size:13px;font-weight:800;line-height:1.5}",
       "@media(max-width:900px){.professor-detail-layout{grid-template-columns:1fr}.professor-detail-stats{grid-template-columns:1fr}}",
@@ -695,7 +710,7 @@
 
                 <label>
                   Overall rating
-                  <select name="rating" required>
+                  <select name="rating" id="professor-review-rating" hidden>
                     <option value="">Select rating</option>
                     <option value="5">★★★★★ 5</option>
                     <option value="4">★★★★☆ 4</option>
@@ -703,6 +718,22 @@
                     <option value="2">★★☆☆☆ 2</option>
                     <option value="1">★☆☆☆☆ 1</option>
                   </select>
+
+                  <div class="custom-select-dropdown professor-review-rating-dropdown" id="professor-review-rating-dropdown">
+                    <button class="custom-select-trigger" type="button" aria-expanded="false" aria-controls="professor-review-rating-menu">
+                      <span class="custom-select-value" id="professor-review-rating-value">Select rating</span>
+                      <span class="chevron"></span>
+                    </button>
+
+                    <div class="custom-select-menu" id="professor-review-rating-menu">
+                      <button class="custom-select-option active" type="button" data-value="">Select rating</button>
+                      <button class="custom-select-option" type="button" data-value="5">★★★★★ 5</button>
+                      <button class="custom-select-option" type="button" data-value="4">★★★★☆ 4</button>
+                      <button class="custom-select-option" type="button" data-value="3">★★★☆☆ 3</button>
+                      <button class="custom-select-option" type="button" data-value="2">★★☆☆☆ 2</button>
+                      <button class="custom-select-option" type="button" data-value="1">★☆☆☆☆ 1</button>
+                    </div>
+                  </div>
                 </label>
 
                 <label>
@@ -720,10 +751,72 @@
 
       const reviewForm = document.getElementById("professor-review-form");
       const reviewMessage = document.getElementById("professor-review-form-message");
+      const ratingSelect = document.getElementById("professor-review-rating");
+      const ratingDropdown = document.getElementById("professor-review-rating-dropdown");
+      const ratingTrigger = ratingDropdown ? ratingDropdown.querySelector(".custom-select-trigger") : null;
+      const ratingValue = document.getElementById("professor-review-rating-value");
+      const ratingOptions = ratingDropdown ? Array.from(ratingDropdown.querySelectorAll(".custom-select-option")) : [];
+
+      function setRatingDropdownOpen(open) {
+        if (!ratingDropdown || !ratingTrigger) {
+          return;
+        }
+
+        ratingDropdown.classList.toggle("open", Boolean(open));
+        ratingTrigger.setAttribute("aria-expanded", String(Boolean(open)));
+      }
+
+      if (ratingSelect && ratingDropdown && ratingTrigger && ratingValue) {
+        ratingTrigger.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          setRatingDropdownOpen(!ratingDropdown.classList.contains("open"));
+        });
+
+        ratingOptions.forEach(function (option) {
+          option.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            ratingSelect.value = option.dataset.value || "";
+            ratingValue.textContent = option.textContent.trim();
+
+            ratingOptions.forEach(function (item) {
+              item.classList.toggle("active", item === option);
+            });
+
+            ratingDropdown.classList.remove("invalid");
+            ratingSelect.dispatchEvent(new Event("change", { bubbles: true }));
+            setRatingDropdownOpen(false);
+          });
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!ratingDropdown.contains(event.target)) {
+            setRatingDropdownOpen(false);
+          }
+        });
+
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            setRatingDropdownOpen(false);
+          }
+        });
+      }
 
       if (reviewForm && reviewMessage) {
         reviewForm.addEventListener("submit", function (event) {
           event.preventDefault();
+
+          if (ratingSelect && !ratingSelect.value) {
+            if (ratingDropdown) {
+              ratingDropdown.classList.add("invalid");
+            }
+
+            reviewMessage.textContent = "Select a rating before submitting.";
+            return;
+          }
+
           reviewMessage.textContent = "Review submissions are coming soon.";
         });
       }
