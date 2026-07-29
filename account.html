@@ -845,8 +845,7 @@
       text-transform: uppercase;
     }
 
-    .account-field-action-row,
-    .account-phone-row {
+    .account-field-action-row {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 50px;
       gap: 10px;
@@ -859,7 +858,7 @@
 
     .account-input-wrap input,
     .account-phone-row input,
-    .account-phone-country-pill {
+    .account-phone-country-dropdown .custom-select-trigger {
       width: 100%;
       min-height: 50px;
       border: 1px solid rgba(29, 31, 31, 0.16);
@@ -871,14 +870,18 @@
       font-weight: 600;
     }
 
-    .account-input-wrap input,
-    .account-phone-row input {
+    .account-input-wrap input {
       padding: 0 48px 0 18px;
       outline: 0;
     }
 
-    .account-input-wrap input[readonly],
-    .account-phone-row input[readonly] {
+    .account-phone-row input {
+      min-width: 0;
+      padding: 0 18px;
+      outline: 0;
+    }
+
+    .account-input-wrap input[readonly] {
       opacity: 1;
       cursor: default;
     }
@@ -911,18 +914,144 @@
     }
 
     .account-phone-row {
-      grid-template-columns: 170px minmax(0, 1fr);
+      display: grid;
+      grid-template-columns: minmax(150px, 170px) minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
     }
 
-    .account-phone-country-pill {
-      padding: 0 16px;
+    .account-phone-country-dropdown {
+      position: relative;
+      z-index: 30;
+      width: min(170px, 100%);
+    }
+
+    .account-phone-country-dropdown.open {
+      z-index: 90;
+    }
+
+    .account-phone-country-dropdown .custom-select-trigger {
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .account-phone-country-dropdown .custom-select-value {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .account-phone-country-flag {
+      width: 20px;
+      height: 14px;
+      border-radius: 3px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      display: block;
+    }
+
+    .chevron {
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform 0.16s ease;
+    }
+
+    .account-phone-country-dropdown.open .chevron {
+      transform: rotate(225deg);
+    }
+
+    .account-phone-country-dropdown .custom-select-menu {
+      position: absolute;
+      left: 0;
+      top: calc(100% + 10px);
+      width: min(310px, calc(100vw - 48px));
+      max-height: 260px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.12s ease, visibility 0.12s ease;
+    }
+
+    .account-phone-country-dropdown.open .custom-select-menu {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+
+    .account-phone-country-search-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding-bottom: 8px;
+      background: var(--surface);
+    }
+
+    .account-phone-country-search {
+      width: 100%;
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(29, 31, 31, 0.14);
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .account-phone-country-search::placeholder {
+      color: rgba(29, 31, 31, 0.48);
+    }
+
+    .account-phone-country-options {
+      display: grid;
+      gap: 2px;
+    }
+
+    .account-phone-country-dropdown .custom-select-option {
+      width: 100%;
+      min-height: 38px;
+      padding: 0 11px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 10px;
+      text-align: left;
+      cursor: pointer;
     }
 
-    .account-phone-flag {
-      font-size: 18px;
+    .account-phone-country-dropdown .custom-select-option span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .account-phone-country-dropdown .custom-select-option:hover,
+    .account-phone-country-dropdown .custom-select-option.active {
+      background: var(--gold-soft);
     }
 
 
@@ -1165,11 +1294,27 @@
                   <div class="account-field">
                     <label for="account-phone">Phone Number</label>
                     <div class="account-phone-row">
-                      <div class="account-phone-country-pill">
-                        <span class="account-phone-flag" aria-label="Egypt flag">&#127466;&#127468;</span>
-                        <span>EG +20</span>
+                      <input type="hidden" id="account-phone-country" value="EG">
+
+                      <div class="custom-select-dropdown account-phone-country-dropdown" id="account-phone-country-dropdown">
+                        <button class="custom-select-trigger" type="button" aria-expanded="false">
+                          <span class="custom-select-value" id="account-phone-country-value">
+                            <img class="account-phone-country-flag" src="https://flagcdn.com/w20/eg.png" alt="" aria-hidden="true">
+                            <span>EG +20</span>
+                          </span>
+                          <span class="chevron"></span>
+                        </button>
+
+                        <div class="custom-select-menu" id="account-phone-country-menu">
+                          <div class="account-phone-country-search-wrap">
+                            <input class="account-phone-country-search" type="search" id="account-phone-country-search" name="auc-country-filter" placeholder="Search countries" autocomplete="new-password" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-form-type="other" aria-label="Search countries">
+                          </div>
+
+                          <div class="account-phone-country-options" id="account-phone-country-options"></div>
+                        </div>
                       </div>
-                      <input type="tel" id="account-phone" autocomplete="tel" readonly>
+
+                      <input type="tel" id="account-phone" autocomplete="tel" inputmode="tel" pattern="^\+?[0-9][0-9\s().-]{7,28}$" title="Enter a valid phone number." required>
                     </div>
                   </div>
                 </div>
@@ -1246,7 +1391,8 @@
                   </article>
                 </div>
 
-                <button class="account-primary-button" type="button">Save Changes</button>
+                <button class="account-primary-button" type="submit" id="account-details-submit">Save Changes</button>
+                <p class="auth-message" id="account-details-message" aria-live="polite"></p>
               </form>
             </article>
 
@@ -1350,8 +1496,17 @@
 
         if (!loading || !panels.length) return;
 
+        const detailsForm = getById("account-details-form");
+        const detailsSubmit = getById("account-details-submit");
+        const detailsMessage = getById("account-details-message");
         const name = getById("account-name");
         const email = getById("account-email");
+        const accountPhoneCountry = getById("account-phone-country");
+        const accountPhoneCountryDropdown = getById("account-phone-country-dropdown");
+        const accountPhoneCountryValue = getById("account-phone-country-value");
+        const accountPhoneCountryMenu = getById("account-phone-country-menu");
+        const accountPhoneCountrySearch = getById("account-phone-country-search");
+        const accountPhoneCountryOptions = getById("account-phone-country-options");
         const phone = getById("account-phone");
         const photoPreview = getById("account-photo-preview");
         const photoNote = getById("account-photo-note");
@@ -1399,12 +1554,482 @@
           }
         }
 
+        const ACCOUNT_PHONE_COUNTRY_ROWS = `
+AF|Afghanistan|+93
+AL|Albania|+355
+DZ|Algeria|+213
+AD|Andorra|+376
+AO|Angola|+244
+AG|Antigua and Barbuda|+1268
+AR|Argentina|+54
+AM|Armenia|+374
+AU|Australia|+61
+AT|Austria|+43
+AZ|Azerbaijan|+994
+BS|Bahamas|+1242
+BH|Bahrain|+973
+BD|Bangladesh|+880
+BB|Barbados|+1246
+BY|Belarus|+375
+BE|Belgium|+32
+BZ|Belize|+501
+BJ|Benin|+229
+BT|Bhutan|+975
+BO|Bolivia|+591
+BA|Bosnia and Herzegovina|+387
+BW|Botswana|+267
+BR|Brazil|+55
+BN|Brunei|+673
+BG|Bulgaria|+359
+BF|Burkina Faso|+226
+BI|Burundi|+257
+KH|Cambodia|+855
+CM|Cameroon|+237
+CA|Canada|+1
+CV|Cabo Verde|+238
+CF|Central African Republic|+236
+TD|Chad|+235
+CL|Chile|+56
+CN|China|+86
+CO|Colombia|+57
+KM|Comoros|+269
+CG|Congo|+242
+CR|Costa Rica|+506
+CI|Cote d'Ivoire|+225
+HR|Croatia|+385
+CU|Cuba|+53
+CY|Cyprus|+357
+CZ|Czechia|+420
+CD|Democratic Republic of the Congo|+243
+DK|Denmark|+45
+DJ|Djibouti|+253
+DM|Dominica|+1767
+DO|Dominican Republic|+1809
+EC|Ecuador|+593
+EG|Egypt|+20
+SV|El Salvador|+503
+GQ|Equatorial Guinea|+240
+ER|Eritrea|+291
+EE|Estonia|+372
+SZ|Eswatini|+268
+ET|Ethiopia|+251
+FJ|Fiji|+679
+FI|Finland|+358
+FR|France|+33
+GA|Gabon|+241
+GM|Gambia|+220
+GE|Georgia|+995
+DE|Germany|+49
+GH|Ghana|+233
+GR|Greece|+30
+GD|Grenada|+1473
+GT|Guatemala|+502
+GN|Guinea|+224
+GW|Guinea-Bissau|+245
+GY|Guyana|+592
+HT|Haiti|+509
+HN|Honduras|+504
+HU|Hungary|+36
+IS|Iceland|+354
+IN|India|+91
+ID|Indonesia|+62
+IR|Iran|+98
+IQ|Iraq|+964
+IE|Ireland|+353
+IL|Israel|+972
+IT|Italy|+39
+JM|Jamaica|+1876
+JP|Japan|+81
+JO|Jordan|+962
+KZ|Kazakhstan|+7
+KE|Kenya|+254
+KI|Kiribati|+686
+XK|Kosovo|+383
+KW|Kuwait|+965
+KG|Kyrgyzstan|+996
+LA|Laos|+856
+LV|Latvia|+371
+LB|Lebanon|+961
+LS|Lesotho|+266
+LR|Liberia|+231
+LY|Libya|+218
+LI|Liechtenstein|+423
+LT|Lithuania|+370
+LU|Luxembourg|+352
+MG|Madagascar|+261
+MW|Malawi|+265
+MY|Malaysia|+60
+MV|Maldives|+960
+ML|Mali|+223
+MT|Malta|+356
+MH|Marshall Islands|+692
+MR|Mauritania|+222
+MU|Mauritius|+230
+MX|Mexico|+52
+FM|Micronesia|+691
+MD|Moldova|+373
+MC|Monaco|+377
+MN|Mongolia|+976
+ME|Montenegro|+382
+MA|Morocco|+212
+MZ|Mozambique|+258
+MM|Myanmar|+95
+NA|Namibia|+264
+NR|Nauru|+674
+NP|Nepal|+977
+NL|Netherlands|+31
+NZ|New Zealand|+64
+NI|Nicaragua|+505
+NE|Niger|+227
+NG|Nigeria|+234
+KP|North Korea|+850
+MK|North Macedonia|+389
+NO|Norway|+47
+OM|Oman|+968
+PK|Pakistan|+92
+PW|Palau|+680
+PS|Palestine|+970
+PA|Panama|+507
+PG|Papua New Guinea|+675
+PY|Paraguay|+595
+PE|Peru|+51
+PH|Philippines|+63
+PL|Poland|+48
+PT|Portugal|+351
+QA|Qatar|+974
+RO|Romania|+40
+RU|Russia|+7
+RW|Rwanda|+250
+KN|Saint Kitts and Nevis|+1869
+LC|Saint Lucia|+1758
+VC|Saint Vincent and the Grenadines|+1784
+WS|Samoa|+685
+SM|San Marino|+378
+ST|Sao Tome and Principe|+239
+SA|Saudi Arabia|+966
+SN|Senegal|+221
+RS|Serbia|+381
+SC|Seychelles|+248
+SL|Sierra Leone|+232
+SG|Singapore|+65
+SK|Slovakia|+421
+SI|Slovenia|+386
+SB|Solomon Islands|+677
+SO|Somalia|+252
+ZA|South Africa|+27
+KR|South Korea|+82
+SS|South Sudan|+211
+ES|Spain|+34
+LK|Sri Lanka|+94
+SD|Sudan|+249
+SR|Suriname|+597
+SE|Sweden|+46
+CH|Switzerland|+41
+SY|Syria|+963
+TW|Taiwan|+886
+TJ|Tajikistan|+992
+TZ|Tanzania|+255
+TH|Thailand|+66
+TL|Timor-Leste|+670
+TG|Togo|+228
+TO|Tonga|+676
+TT|Trinidad and Tobago|+1868
+TN|Tunisia|+216
+TR|Turkiye|+90
+TM|Turkmenistan|+993
+TV|Tuvalu|+688
+UG|Uganda|+256
+UA|Ukraine|+380
+AE|United Arab Emirates|+971
+GB|United Kingdom|+44
+US|United States|+1
+UY|Uruguay|+598
+UZ|Uzbekistan|+998
+VU|Vanuatu|+678
+VA|Vatican City|+379
+VE|Venezuela|+58
+VN|Vietnam|+84
+YE|Yemen|+967
+ZM|Zambia|+260
+ZW|Zimbabwe|+263
+AS|American Samoa|+1684
+AI|Anguilla|+1264
+AW|Aruba|+297
+BM|Bermuda|+1441
+VG|British Virgin Islands|+1284
+KY|Cayman Islands|+1345
+CK|Cook Islands|+682
+CW|Curacao|+599
+FK|Falkland Islands|+500
+FO|Faroe Islands|+298
+GF|French Guiana|+594
+PF|French Polynesia|+689
+GI|Gibraltar|+350
+GL|Greenland|+299
+GP|Guadeloupe|+590
+GU|Guam|+1671
+HK|Hong Kong|+852
+MO|Macau|+853
+MQ|Martinique|+596
+YT|Mayotte|+262
+MS|Montserrat|+1664
+NC|New Caledonia|+687
+NU|Niue|+683
+MP|Northern Mariana Islands|+1670
+PR|Puerto Rico|+1787
+RE|Reunion|+262
+BL|Saint Barthelemy|+590
+SH|Saint Helena|+290
+MF|Saint Martin|+590
+PM|Saint Pierre and Miquelon|+508
+SX|Sint Maarten|+1721
+TC|Turks and Caicos Islands|+1649
+VI|U.S. Virgin Islands|+1340
+WF|Wallis and Futuna|+681
+EH|Western Sahara|+212
+`.trim().split("\n").map(function (row) {
+          const parts = row.split("|");
+
+          return {
+            iso: parts[0],
+            name: parts[1],
+            dial: parts[2]
+          };
+        });
+
+        const ACCOUNT_PHONE_DIAL_DEFAULTS = {
+          "+1": "US",
+          "+7": "RU",
+          "+44": "GB",
+          "+47": "NO",
+          "+61": "AU",
+          "+64": "NZ",
+          "+212": "MA",
+          "+262": "RE",
+          "+358": "FI",
+          "+590": "GP",
+          "+599": "CW"
+        };
+
+        function getAccountPhoneCountryByIso(iso) {
+          return ACCOUNT_PHONE_COUNTRY_ROWS.find(function (country) {
+            return country.iso === iso;
+          }) || ACCOUNT_PHONE_COUNTRY_ROWS.find(function (country) {
+            return country.iso === "EG";
+          });
+        }
+
+        function getAccountPhoneCountryByDial(dial) {
+          const defaultIso = ACCOUNT_PHONE_DIAL_DEFAULTS[dial];
+
+          if (defaultIso) {
+            return getAccountPhoneCountryByIso(defaultIso);
+          }
+
+          return ACCOUNT_PHONE_COUNTRY_ROWS.find(function (country) {
+            return country.dial === dial;
+          }) || getAccountPhoneCountryByIso("EG");
+        }
+
+        function getAccountPhoneCountryCodes() {
+          return Array.from(new Set(ACCOUNT_PHONE_COUNTRY_ROWS.map(function (country) {
+            return country.dial;
+          }))).sort(function (first, second) {
+            return second.length - first.length;
+          });
+        }
+
+        function getAccountPhoneCountryShortLabel(country) {
+          return country.iso + " " + country.dial;
+        }
+
+        function getAccountPhoneCountryFlagUrl(country) {
+          return "https://flagcdn.com/w20/" + country.iso.toLowerCase() + ".png";
+        }
+
+        function getAccountPhoneCountryValueMarkup(country) {
+          return `
+            <img class="account-phone-country-flag" src="${getAccountPhoneCountryFlagUrl(country)}" alt="" aria-hidden="true">
+            <span>${getAccountPhoneCountryShortLabel(country)}</span>
+          `;
+        }
+
+        function renderAccountPhoneCountryDropdownOptions() {
+          if (!accountPhoneCountryMenu || !accountPhoneCountryOptions || accountPhoneCountryOptions.children.length) {
+            return;
+          }
+
+          ACCOUNT_PHONE_COUNTRY_ROWS.forEach(function (country) {
+            const optionButton = document.createElement("button");
+            optionButton.className = "custom-select-option";
+            optionButton.type = "button";
+            optionButton.dataset.iso = country.iso;
+            optionButton.dataset.search = (country.name + " " + country.iso + " " + country.dial).toLowerCase();
+            optionButton.innerHTML = `
+              <img class="account-phone-country-flag" src="${getAccountPhoneCountryFlagUrl(country)}" alt="" aria-hidden="true">
+              <span>${country.name} ${country.dial}</span>
+            `;
+            accountPhoneCountryOptions.appendChild(optionButton);
+          });
+        }
+
+        function filterAccountPhoneCountryOptions(searchTerm) {
+          if (!accountPhoneCountryMenu) {
+            return;
+          }
+
+          const normalizedSearch = String(searchTerm || "").trim().toLowerCase();
+
+          accountPhoneCountryMenu.querySelectorAll(".custom-select-option").forEach(function (option) {
+            const shouldHide = Boolean(normalizedSearch) && (option.dataset.search || "").indexOf(normalizedSearch) === -1;
+            option.hidden = shouldHide;
+            option.style.display = shouldHide ? "none" : "";
+          });
+        }
+
+        function syncAccountPhoneCountryDropdown() {
+          if (!accountPhoneCountry || !accountPhoneCountryValue || !accountPhoneCountryMenu) {
+            return;
+          }
+
+          renderAccountPhoneCountryDropdownOptions();
+
+          const country = getAccountPhoneCountryByIso(accountPhoneCountry.value);
+          accountPhoneCountry.value = country.iso;
+          accountPhoneCountryValue.innerHTML = getAccountPhoneCountryValueMarkup(country);
+
+          accountPhoneCountryMenu.querySelectorAll(".custom-select-option").forEach(function (option) {
+            option.classList.toggle("active", option.dataset.iso === country.iso);
+          });
+
+          filterAccountPhoneCountryOptions(accountPhoneCountrySearch ? accountPhoneCountrySearch.value : "");
+        }
+
+        function splitAccountPhoneValue(value) {
+          const phoneText = String(value || "").trim();
+          const normalizedPhoneText = phoneText.replace(/^00/, "+");
+          const countryCodes = getAccountPhoneCountryCodes();
+
+          for (let index = 0; index < countryCodes.length; index += 1) {
+            const countryCode = countryCodes[index];
+
+            if (normalizedPhoneText === countryCode || normalizedPhoneText.indexOf(countryCode) === 0) {
+              return {
+                country: getAccountPhoneCountryByDial(countryCode).iso,
+                local: normalizedPhoneText.slice(countryCode.length).replace(/^[-\s]+/, "").trim()
+              };
+            }
+          }
+
+          return {
+            country: "EG",
+            local: phoneText
+          };
+        }
+
+        function hydrateAccountPhoneValue(value) {
+          const phoneParts = splitAccountPhoneValue(value);
+
+          if (accountPhoneCountry) {
+            accountPhoneCountry.value = phoneParts.country;
+          }
+
+          if (phone) {
+            phone.value = phoneParts.local;
+          }
+
+          syncAccountPhoneCountryDropdown();
+        }
+
+        function getAccountPhoneValueForSave() {
+          const localPhone = phone ? phone.value.trim().replace(/[^\d]/g, "").replace(/^0+/, "") : "";
+          const country = getAccountPhoneCountryByIso(accountPhoneCountry ? accountPhoneCountry.value : "EG");
+
+          if (!localPhone) {
+            return "";
+          }
+
+          return country.dial + localPhone;
+        }
+
+        function initializeAccountPhoneCountryDropdown() {
+          if (!accountPhoneCountryDropdown || !accountPhoneCountryMenu || !accountPhoneCountry) {
+            return;
+          }
+
+          const trigger = accountPhoneCountryDropdown.querySelector(".custom-select-trigger");
+
+          if (!trigger) {
+            return;
+          }
+
+          renderAccountPhoneCountryDropdownOptions();
+
+          trigger.addEventListener("click", function () {
+            const isOpen = accountPhoneCountryDropdown.classList.toggle("open");
+            trigger.setAttribute("aria-expanded", String(isOpen));
+
+            if (isOpen && accountPhoneCountrySearch) {
+              accountPhoneCountrySearch.focus();
+              accountPhoneCountrySearch.select();
+            }
+          });
+
+          if (accountPhoneCountrySearch) {
+            accountPhoneCountrySearch.addEventListener("input", function () {
+              filterAccountPhoneCountryOptions(accountPhoneCountrySearch.value);
+            });
+
+            accountPhoneCountrySearch.addEventListener("keydown", function (event) {
+              if (event.key === "Enter") {
+                event.preventDefault();
+              }
+
+              if (event.key === "Escape") {
+                accountPhoneCountryDropdown.classList.remove("open");
+                trigger.setAttribute("aria-expanded", "false");
+                trigger.focus();
+              }
+            });
+          }
+
+          accountPhoneCountryMenu.addEventListener("click", function (event) {
+            const option = event.target.closest(".custom-select-option");
+
+            if (!option) {
+              return;
+            }
+
+            accountPhoneCountry.value = option.dataset.iso || "EG";
+
+            if (accountPhoneCountrySearch) {
+              accountPhoneCountrySearch.value = "";
+              filterAccountPhoneCountryOptions("");
+            }
+
+            syncAccountPhoneCountryDropdown();
+            accountPhoneCountryDropdown.classList.remove("open");
+            trigger.setAttribute("aria-expanded", "false");
+          });
+
+          document.addEventListener("click", function (event) {
+            if (!accountPhoneCountryDropdown.contains(event.target)) {
+              accountPhoneCountryDropdown.classList.remove("open");
+              trigger.setAttribute("aria-expanded", "false");
+            }
+          });
+
+          syncAccountPhoneCountryDropdown();
+        }
+
+        initializeAccountPhoneCountryDropdown();
+
         function loadAccountDetails(user) {
           const displayName = user.fullName || user.displayName || user.firstName || "AUC Atlas user";
 
           name.value = displayName;
           email.value = user.email || "";
-          phone.value = user.phone || "";
+          hydrateAccountPhoneValue(user.phone || "");
 
           if (user.photoURL) {
             photoPreview.src = user.photoURL;
@@ -1449,6 +2074,44 @@
             }
           });
         });
+
+        if (detailsForm) {
+          detailsForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const phoneValue = getAccountPhoneValueForSave();
+
+            if (!phoneValue) {
+              setMessage(detailsMessage, "Please enter your phone number.", "error");
+
+              if (phone) {
+                phone.focus();
+              }
+
+              return;
+            }
+
+            setButtonLoading(detailsSubmit, true, "Saving...", "Save Changes");
+            setMessage(detailsMessage, "", "");
+
+            try {
+              const data = await requestJson("/api/account-profile", {
+                method: "PATCH",
+                body: {
+                  fullName: name.value.trim(),
+                  phone: phoneValue
+                }
+              });
+
+              loadAccountDetails(data.user || {});
+              setMessage(detailsMessage, "Saved changes.", "success");
+            } catch (error) {
+              setMessage(detailsMessage, error.message || "Could not save changes.", "error");
+            } finally {
+              setButtonLoading(detailsSubmit, false, "Saving...", "Save Changes");
+            }
+          });
+        }
 
         securityButton.addEventListener("click", async function () {
           setButtonLoading(securityButton, true, "Starting...", "Unlock security panel");
