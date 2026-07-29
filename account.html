@@ -640,6 +640,10 @@
       border-color: rgba(29, 31, 31, 0.1);
     }
 
+    #account-panel-security .account-divider {
+      margin: 8px 0;
+    }
+
     .account-change-password-section,
     .account-two-factor-section,
     .account-login-sessions-section,
@@ -647,7 +651,27 @@
     .account-sign-out-everywhere-section,
     .account-delete-account-section {
       display: grid;
+      gap: 18px;
+    }
+
+    .account-change-password-details {
+      display: grid;
       gap: 16px;
+      align-items: start;
+      justify-items: start;
+    }
+
+    .account-password-last-changed-details {
+      display: grid;
+      gap: 4px;
+    }
+
+    .account-password-last-changed,
+    .account-password-session-note {
+      margin: 0;
+      color: rgba(29, 31, 31, 0.66);
+      font-size: 14px;
+      line-height: 1.55;
     }
 
     .account-two-factor-methods,
