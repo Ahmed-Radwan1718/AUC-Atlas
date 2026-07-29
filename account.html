@@ -405,7 +405,7 @@
     .account-header > p {
       max-width: 380px;
       margin: 0 0 8px;
-      color: var(--muted);
+      color: rgba(29, 31, 31, 0.68);
       font-size: 16px;
       font-weight: 400;
       line-height: 1.6;
@@ -438,7 +438,7 @@
       border: 0;
       border-radius: 999px;
       background: transparent;
-      color: var(--muted);
+      color: rgba(29, 31, 31, 0.62);
       font-family: inherit;
       font-size: 12px;
       font-weight: 700;
@@ -454,8 +454,8 @@
     }
 
     .account-sidebar-icon {
-      width: 20px;
-      height: 20px;
+      width: 19px;
+      height: 19px;
       display: block;
       object-fit: contain;
       opacity: 0.62;
@@ -488,9 +488,9 @@
       border-radius: var(--radius);
       background: var(--surface);
       box-shadow: var(--shadow);
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
+      color: rgba(29, 31, 31, 0.68);
+      font-size: 15px;
+      font-weight: 700;
     }
 
     .account-panel {
@@ -512,7 +512,7 @@
 
     .account-panel-eyebrow {
       margin-bottom: 12px;
-      color: var(--muted);
+      color: rgba(29, 31, 31, 0.58);
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.12em;
@@ -530,7 +530,7 @@
 
     .account-panel-header p {
       max-width: 680px;
-      color: var(--muted);
+      color: rgba(29, 31, 31, 0.66);
       font-size: 15px;
       font-weight: 400;
       line-height: 1.75;
@@ -654,11 +654,11 @@
       }
 
       .account-panel {
-        padding: 22px;
+        padding: 24px;
       }
 
       .account-panel-header h2 {
-        font-size: 26px;
+        font-size: 27px;
       }
 
       .account-profile-summary {
@@ -744,7 +744,7 @@
     .account-profile-photo-actions p {
       margin: 0;
       max-width: 520px;
-      color: var(--muted);
+      color: rgba(29, 31, 31, 0.62);
       font-size: 13px;
       font-weight: 500;
       line-height: 1.6;
@@ -752,7 +752,7 @@
 
     .account-panel-subheader p {
       margin: 0;
-      color: var(--muted);
+      color: rgba(29, 31, 31, 0.58);
       font-size: 14px;
       font-weight: 400;
       line-height: 1.7;
@@ -806,7 +806,7 @@
     }
 
     .account-field label {
-      color: var(--ink-soft);
+      color: rgba(29, 31, 31, 0.72);
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.09em;
@@ -816,7 +816,7 @@
     .account-field-action-row,
     .account-phone-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 54px;
+      grid-template-columns: minmax(0, 1fr) 50px;
       gap: 10px;
       align-items: center;
     }
@@ -845,31 +845,37 @@
       outline: 0;
     }
 
+    .account-input-wrap input[readonly],
+    .account-phone-row input[readonly] {
+      opacity: 1;
+      cursor: default;
+    }
+
     .account-info-dot {
       position: absolute;
       top: 50%;
-      right: 18px;
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--muted);
+      right: 14px;
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(29, 31, 31, 0.62);
       border-radius: 999px;
-      color: var(--muted);
+      color: rgba(29, 31, 31, 0.62);
       font-size: 12px;
-      font-weight: 900;
-      line-height: 16px;
+      font-weight: 700;
+      line-height: 18px;
       text-align: center;
       transform: translateY(-50%);
     }
 
     .account-edit-button {
-      width: 54px;
+      width: 50px;
       height: 50px;
-      border: 0;
+      border: 1px solid rgba(29, 31, 31, 0.22);
       border-radius: 14px;
-      background: rgba(29, 31, 31, 0.08);
-      color: var(--ink);
-      font-size: 18px;
-      font-weight: 900;
+      background: #d8d7d7;
+      color: #111111;
+      font-size: 23px;
+      font-weight: 700;
     }
 
     .account-phone-row {
@@ -904,17 +910,17 @@
     }
 
     .account-connected-card {
-      min-height: 132px;
+      min-height: 118px;
       padding: 18px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      gap: 16px;
+      gap: 18px;
       align-items: start;
     }
 
     .account-connected-main {
       display: grid;
-      gap: 9px;
+      gap: 8px;
       min-width: 0;
     }
 
@@ -922,7 +928,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      color: var(--muted);
+      color: rgba(29, 31, 31, 0.42);
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.14em;
@@ -947,7 +953,7 @@
     .account-connected-main p {
       margin: 0;
       max-width: 360px;
-      color: var(--muted);
+      color: rgba(29, 31, 31, 0.58);
       font-size: 13px;
       line-height: 1.55;
     }
@@ -972,15 +978,15 @@
     }
 
     .account-connected-badge.connected {
-      border: 1px solid rgba(58, 132, 82, 0.32);
+      border: 1px solid rgba(58, 132, 82, 0.34);
       background: rgba(58, 132, 82, 0.1);
-      color: #3a8452;
+      color: rgba(58, 132, 82, 0.95);
     }
 
     .account-connected-badge.not-connected {
-      border: 1px solid rgba(150, 62, 72, 0.28);
-      background: rgba(150, 62, 72, 0.08);
-      color: #963e48;
+      border: 1px solid rgba(29, 31, 31, 0.14);
+      background: rgba(29, 31, 31, 0.055);
+      color: rgba(29, 31, 31, 0.58);
     }
 
     .account-connected-action-button {
@@ -988,21 +994,38 @@
       padding: 0 13px;
       font-size: 10px;
       font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: opacity 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
     }
 
     .account-primary-button {
       width: fit-content;
       min-height: 52px;
       padding: 0 24px;
-      border: 1px solid var(--ink);
+      border: 0;
       background: var(--ink);
       color: white;
       font-family: inherit;
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.09em;
+      text-transform: uppercase;
       cursor: pointer;
       transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .account-primary-button:hover {
+      opacity: 0.84;
+    }
+
+    .account-primary-button:active {
+      transform: translateY(1px);
+    }
+
+    .account-primary-button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
     }
 
     @media (max-width: 760px) {
