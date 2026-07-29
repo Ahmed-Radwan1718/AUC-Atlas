@@ -395,18 +395,20 @@
 
     .account-header h1 {
       margin: 0;
-      font-size: clamp(2.2rem, 4vw, 4rem);
+      color: var(--ink);
+      font-size: 46px;
       font-weight: 700;
-      line-height: 1.05;
+      line-height: 1.08;
       text-transform: uppercase;
     }
 
     .account-header > p {
-      max-width: 420px;
+      max-width: 380px;
       margin: 0 0 8px;
       color: var(--muted);
       font-size: 16px;
-      line-height: 1.65;
+      font-weight: 400;
+      line-height: 1.6;
       text-align: right;
     }
 
@@ -431,21 +433,24 @@
 
     .account-sidebar-link {
       width: 100%;
-      min-height: 46px;
-      padding: 0 14px;
+      min-height: 48px;
+      padding: 0 16px;
       border: 0;
-      border-radius: var(--radius);
+      border-radius: 999px;
       background: transparent;
       color: var(--muted);
+      font-family: inherit;
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-align: left;
       text-transform: uppercase;
+      cursor: pointer;
       display: grid;
       grid-template-columns: 22px minmax(0, 1fr);
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
     }
 
     .account-sidebar-icon {
@@ -502,21 +507,23 @@
     }
 
     .account-panel-header {
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
 
     .account-panel-eyebrow {
-      margin: 0 0 10px;
-      color: var(--gold);
-      font-size: 11px;
-      font-weight: 900;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
     .account-panel-header h2 {
-      margin: 0 0 10px;
-      font-size: 30px;
+      margin-bottom: 12px;
+      color: var(--ink);
+      font-size: 32px;
+      font-weight: 700;
       line-height: 1.12;
       text-transform: uppercase;
     }
@@ -524,7 +531,9 @@
     .account-panel-header p {
       max-width: 680px;
       color: var(--muted);
-      line-height: 1.7;
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.75;
     }
 
     .account-profile-summary {
@@ -665,16 +674,16 @@
     }
 
     #account-panel-details .account-panel-header {
-      margin-bottom: 30px;
+      margin-bottom: 28px;
     }
 
     #account-panel-details .account-panel-header h2 {
-      margin-bottom: 16px;
-      font-size: 34px;
+      margin-bottom: 12px;
+      font-size: 32px;
     }
 
     .account-details-form {
-      gap: 26px;
+      gap: 20px;
     }
 
     .account-profile-photo-section,
@@ -714,19 +723,39 @@
       opacity: 0.72;
     }
 
-    .account-profile-photo-actions h3,
-    .account-panel-subheader h3 {
+    .account-profile-photo-actions h3 {
       margin: 0 0 10px;
-      font-size: 20px;
-      line-height: 1.15;
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
       text-transform: uppercase;
     }
 
-    .account-profile-photo-actions p,
+    .account-panel-subheader h3 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+
+    .account-profile-photo-actions p {
+      margin: 0;
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.6;
+    }
+
     .account-panel-subheader p {
       margin: 0;
       color: var(--muted);
-      line-height: 1.55;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.7;
     }
 
     .account-profile-photo-button-row {
@@ -740,14 +769,16 @@
     .account-profile-photo-remove-button,
     .account-primary-button,
     .account-connected-action-button {
-      min-height: 42px;
-      padding: 0 18px;
+      min-height: 40px;
+      padding: 0 16px;
       border-radius: 999px;
       background: var(--surface);
+      font-family: inherit;
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+      cursor: pointer;
     }
 
     .account-profile-photo-button {
@@ -764,19 +795,21 @@
 
     .account-form-grid {
       display: grid;
-      gap: 24px;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      align-items: start;
     }
 
     .account-field {
       display: grid;
-      gap: 10px;
+      gap: 9px;
     }
 
     .account-field label {
       color: var(--ink-soft);
       font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 0.12em;
+      font-weight: 700;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
     }
 
@@ -801,7 +834,9 @@
       border-radius: 999px;
       background: var(--surface-soft);
       color: var(--ink);
-      font-weight: 800;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
     }
 
     .account-input-wrap input,
@@ -880,6 +915,7 @@
     .account-connected-main {
       display: grid;
       gap: 9px;
+      min-width: 0;
     }
 
     .account-connected-title {
@@ -888,8 +924,8 @@
       gap: 10px;
       color: var(--muted);
       font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.12em;
+      font-weight: 700;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
     }
 
@@ -903,31 +939,36 @@
 
     .account-connected-main strong {
       color: var(--ink);
-      font-size: 17px;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
     }
 
     .account-connected-main p {
       margin: 0;
+      max-width: 360px;
       color: var(--muted);
+      font-size: 13px;
       line-height: 1.55;
     }
 
     .account-connected-actions {
       display: grid;
-      gap: 10px;
+      gap: 8px;
       justify-items: end;
     }
 
     .account-connected-badge {
       min-height: 30px;
-      padding: 0 14px;
+      padding: 0 12px;
       border-radius: 999px;
-      font-size: 11px;
-      font-weight: 900;
+      font-size: 10px;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
     }
 
     .account-connected-badge.connected {
@@ -942,13 +983,26 @@
       color: #963e48;
     }
 
+    .account-connected-action-button {
+      min-height: 32px;
+      padding: 0 13px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
     .account-primary-button {
       width: fit-content;
-      min-height: 54px;
-      padding: 0 26px;
+      min-height: 52px;
+      padding: 0 24px;
       border: 1px solid var(--ink);
       background: var(--ink);
       color: white;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
     @media (max-width: 760px) {
