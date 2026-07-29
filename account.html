@@ -607,28 +607,204 @@
       gap: 12px;
     }
 
-    .auth-status-card {
+    .auth-status-card,
+    .account-two-factor-card,
+    .account-login-session-card,
+    .account-trusted-device-card {
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--surface-soft);
       padding: 16px;
     }
 
-    .auth-status-card h3 {
-      margin: 0 0 7px;
-      font-size: 17px;
+    .account-message {
+      min-height: 20px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
     }
 
-    .auth-status-card p {
-      margin: 0 0 14px;
-      color: var(--muted);
+    .account-message.success {
+      color: rgb(58, 132, 82);
+    }
+
+    .account-message.error {
+      color: #963e48;
+    }
+
+    #account-panel-security {
+      padding: 34px 30px 44px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.94);
+      border-color: rgba(29, 31, 31, 0.1);
+    }
+
+    .account-change-password-section,
+    .account-two-factor-section,
+    .account-login-sessions-section,
+    .account-trusted-devices-section,
+    .account-sign-out-everywhere-section,
+    .account-delete-account-section {
+      display: grid;
+      gap: 16px;
+    }
+
+    .account-two-factor-methods,
+    .account-login-sessions-list,
+    .account-trusted-devices-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .account-two-factor-methods {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    }
+
+    .account-two-factor-card {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .account-two-factor-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      border: 1px solid rgba(29, 31, 31, 0.1);
+      background: var(--surface);
+      display: grid;
+      place-items: center;
+    }
+
+    .account-two-factor-icon img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    .account-two-factor-text h4,
+    .account-login-session-card h4,
+    .account-trusted-device-card h4 {
+      margin: 0 0 6px;
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .account-two-factor-text p,
+    .account-login-session-card p,
+    .account-trusted-device-card p {
+      margin: 0;
+      color: rgba(29, 31, 31, 0.58);
+      font-size: 13px;
       line-height: 1.55;
     }
 
-    .auth-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .account-two-factor-status,
+    .account-current-badge {
+      min-height: 24px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(29, 31, 31, 0.14);
+      background: rgba(29, 31, 31, 0.055);
+      color: rgba(29, 31, 31, 0.58);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .account-two-factor-status.enabled,
+    .account-current-badge {
+      border-color: rgba(58, 132, 82, 0.34);
+      background: rgba(58, 132, 82, 0.1);
+      color: rgba(58, 132, 82, 0.95);
+    }
+
+    .account-two-factor-button,
+    .account-danger-button,
+    .account-security-modal-cancel,
+    .account-security-modal-continue,
+    .account-password-modal-cancel,
+    .account-session-action,
+    .account-trusted-device-remove {
+      min-height: 40px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(29, 31, 31, 0.16);
+      background: var(--surface);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .account-danger-button,
+    .account-two-factor-button.danger,
+    .account-security-modal-danger,
+    .account-session-action,
+    .account-trusted-device-remove {
+      border-color: rgba(150, 62, 72, 0.28);
+      background: rgba(150, 62, 72, 0.08);
+      color: #963e48;
+    }
+
+    .account-login-session-card,
+    .account-trusted-device-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .account-security-modal[hidden],
+    .account-authenticator-modal[hidden],
+    .account-password-modal[hidden] {
+      display: none;
+    }
+
+    .account-security-modal,
+    .account-authenticator-modal,
+    .account-password-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .account-security-modal-backdrop,
+    .account-authenticator-modal-backdrop,
+    .account-password-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(29, 31, 31, 0.62);
+    }
+
+    .account-security-modal-card,
+    .account-authenticator-modal-card,
+    .account-password-modal-card {
+      position: relative;
+      z-index: 1;
+      width: min(560px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow: auto;
+      padding: 28px;
+      border-radius: 28px;
+      border: 1px solid rgba(29, 31, 31, 0.12);
+      background: #fffdfa;
+      box-shadow: 0 30px 90px rgba(29, 31, 31, 0.22);
+    }
+
+    .account-authenticator-modal-card {
+      width: min(720px, 100%);
     }
 
     @media (max-width: 900px) {
@@ -1819,6 +1995,7 @@
   </div>
 
   <script src="account-profile-photo.js"></script>
+  <script src="account-security.js"></script>
 
   <script>
     (function () {
@@ -1906,12 +2083,7 @@
         const connectedGithubStatus = getById("connected-github-status");
         const connectedFacebookStatus = getById("connected-facebook-status");
         const logoutButton = getById("account-logout");
-        const securityButton = getById("account-send-security-code");
-        const securityForm = getById("account-security-code-form");
-        const securityCode = getById("account-security-code");
-        const securitySubmit = getById("account-security-submit");
-        const securityMessage = getById("account-security-message");
-        const securityStatus = getById("account-security-status");
+        const securityPanel = window.aucAtlasAccountSecurity || null;
         const usernameCooldownDays = 14;
         let originalUsername = "";
         let usernameEditMode = false;
@@ -2544,6 +2716,10 @@ EH|Western Sahara|+212
           setConnectedStatus(connectedGoogleStatus, Boolean(providers.google));
           setConnectedStatus(connectedGithubStatus, Boolean(providers.github));
           setConnectedStatus(connectedFacebookStatus, Boolean(providers.facebook));
+
+          if (securityPanel && typeof securityPanel.loadAccountUser === "function") {
+            securityPanel.loadAccountUser(accountUser);
+          }
         }
 
         async function loadAccount() {
@@ -2656,59 +2832,9 @@ EH|Western Sahara|+212
           });
         }
 
-        securityButton.addEventListener("click", async function () {
-          setButtonLoading(securityButton, true, "Starting...", "Unlock security panel");
-          setMessage(securityMessage, "", "");
-
-          try {
-            const data = await requestJson("/api/send-security-code", {
-              method: "POST",
-              body: {
-                reason: "security-panel"
-              }
-            });
-
-            securityForm.hidden = false;
-            securityCode.value = "";
-            securityCode.focus();
-            securityStatus.textContent = data.method === "authenticator" ? "Enter your authenticator code." : "Enter the code sent to your email.";
-          } catch (error) {
-            setMessage(securityMessage, error.message || "Could not start security verification.", "error");
-          } finally {
-            setButtonLoading(securityButton, false, "Starting...", "Unlock security panel");
-          }
-        });
-
-        securityForm.addEventListener("submit", async function (event) {
-          event.preventDefault();
-
-          const code = securityCode.value.trim().replace(/\D/g, "");
-
-          if (code.length !== 6) {
-            setMessage(securityMessage, "Please enter the 6-digit code.", "error");
-            return;
-          }
-
-          setButtonLoading(securitySubmit, true, "Verifying...", "Verify code");
-          setMessage(securityMessage, "", "");
-
-          try {
-            await requestJson("/api/verify-security-code", {
-              method: "POST",
-              body: {
-                code
-              }
-            });
-
-            securityForm.hidden = true;
-            securityStatus.textContent = "Security panel unlocked.";
-            setMessage(securityMessage, "Security panel unlocked.", "success");
-          } catch (error) {
-            setMessage(securityMessage, error.message || "Could not verify code.", "error");
-          } finally {
-            setButtonLoading(securitySubmit, false, "Verifying...", "Verify code");
-          }
-        });
+        if (securityPanel && typeof securityPanel.refreshSecurityUnlockStatus === "function") {
+          securityPanel.refreshSecurityUnlockStatus().catch(function () {});
+        }
 
         logoutButton.addEventListener("click", async function () {
           await requestJson("/api/logout", {
