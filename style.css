@@ -347,12 +347,12 @@ p {
 
 @media (max-width: 900px) {
   .site-footer {
-    padding: 38px 25px 24px;
+    padding: 34px 20px 24px;
   }
 
   .site-footer-grid {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 26px;
   }
 
   .site-footer-column h2 {
@@ -365,27 +365,142 @@ p {
 }
 
 @media (max-width: 980px) {
-  .site-header {
-    padding: 14px 20px;
+  body {
+    overflow-x: hidden;
   }
 
-  .top-nav {
+  .site-header {
+    top: 10px;
+    z-index: 100;
+    width: calc(100% - 20px);
+    min-height: 58px;
+    padding: 8px 10px 8px 16px;
+    border-radius: 999px;
+    gap: 12px;
+  }
+
+  .site-header-logo,
+  .site-header-logo:visited {
+    font-size: 20px;
+  }
+
+  .site-header-nav {
     display: none;
   }
 
+  .site-header-actions {
+    margin-left: auto;
+    gap: 8px;
+  }
+
+  .site-header-user-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .site-header .hamburger-toggle {
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(29, 31, 31, 0.12);
+    border-radius: 999px;
+    background: var(--surface-soft);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .site-header .hamburger-toggle span {
+    width: 16px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--ink);
+    display: block;
+  }
+
+  .nav-menu-overlay {
+    position: fixed;
+    top: 78px;
+    left: 10px;
+    right: 10px;
+    z-index: 95;
+    display: block;
+  }
+
+  .nav-menu-overlay[hidden] {
+    display: none;
+  }
+
+  .nav-menu-panel {
+    padding: 10px;
+    border: 1px solid rgba(29, 31, 31, 0.08);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 22px 55px rgba(29, 31, 31, 0.13);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    display: grid;
+    gap: 6px;
+  }
+
+  .nav-menu-panel a,
+  .nav-menu-panel a:visited {
+    min-height: 46px;
+    padding: 0 15px;
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-menu-panel a[aria-current="page"] {
+    background: var(--gold-soft);
+    color: var(--gold);
+  }
+
+  .site-header-account-menu {
+    top: 48px;
+    right: 0;
+  }
+
   main {
-    width: min(100% - 32px, 1240px);
+    width: min(100% - 24px, 1240px);
   }
 }
 
 @media (max-width: 620px) {
-  .header-action {
-    display: none;
+  .site-header {
+    width: calc(100% - 16px);
+    padding-left: 14px;
+    padding-right: 8px;
   }
 
-  .brand-mark {
-    width: 40px;
-    height: 40px;
+  .site-header-logo,
+  .site-header-logo:visited {
+    font-size: 19px;
+  }
+
+  .site-footer {
+    padding: 30px 18px 22px;
+  }
+
+  .site-footer-grid {
+    gap: 24px;
+  }
+
+  .site-footer-column h2 {
+    font-size: 22px;
+  }
+
+  .site-footer-links a,
+  .site-footer-links a:visited {
+    font-size: 14px;
   }
 }
 
