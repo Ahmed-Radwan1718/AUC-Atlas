@@ -845,18 +845,21 @@
       text-transform: uppercase;
     }
 
-    .account-field-action-row {
+    .account-field-action-row,
+    .account-username-row {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 50px;
       gap: 10px;
-      align-items: center;
+      align-items: start;
     }
 
-    .account-input-wrap {
+    .account-input-wrap,
+    .account-username-input-wrap {
       position: relative;
     }
 
     .account-input-wrap input,
+    .account-username-input-wrap input,
     .account-phone-row input,
     .account-phone-country-dropdown .custom-select-trigger {
       width: 100%;
@@ -875,18 +878,25 @@
       outline: 0;
     }
 
+    .account-username-input-wrap input {
+      padding: 0 54px 0 18px;
+      outline: 0;
+    }
+
     .account-phone-row input {
       min-width: 0;
       padding: 0 18px;
       outline: 0;
     }
 
-    .account-input-wrap input[readonly] {
+    .account-input-wrap input[readonly],
+    .account-username-input-wrap input[readonly] {
       opacity: 1;
       cursor: default;
     }
 
-    .account-info-dot {
+    .account-info-dot,
+    .account-username-info-button {
       position: absolute;
       top: 50%;
       right: 14px;
@@ -900,9 +910,50 @@
       line-height: 18px;
       text-align: center;
       transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .account-edit-button {
+    .account-username-info-button {
+      padding: 0;
+      border-color: rgba(29, 31, 31, 0.42);
+      background: transparent;
+      cursor: help;
+    }
+
+    .account-username-tooltip {
+      position: absolute;
+      right: -12px;
+      bottom: calc(100% + 12px);
+      width: 230px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      color: rgba(29, 31, 31, 0.68);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.55;
+      text-align: left;
+      text-transform: none;
+      letter-spacing: 0;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.18s ease, visibility 0.18s ease, transform 0.18s ease;
+      transform: translateY(4px);
+    }
+
+    .account-username-info-button:hover .account-username-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .account-edit-button,
+    .account-username-edit-button {
       width: 50px;
       height: 50px;
       border: 1px solid rgba(29, 31, 31, 0.22);
@@ -911,6 +962,31 @@
       color: #111111;
       font-size: 23px;
       font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+    }
+
+    .account-username-edit-button:hover {
+      background: #cfcfcf;
+    }
+
+    .account-username-edit-button:active {
+      transform: translateY(1px);
+    }
+
+    .account-username-edit-button:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+
+    .account-username-note {
+      margin: 0;
+      color: rgba(29, 31, 31, 0.58);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.6;
     }
 
     .account-phone-row {
@@ -1272,15 +1348,19 @@
                 </div>
 
                 <div class="account-form-grid">
-                  <div class="account-field">
+                  <div class="account-field account-username-field">
                     <label for="account-name">Display Name</label>
-                    <div class="account-field-action-row">
-                      <div class="account-input-wrap">
-                        <input type="text" id="account-name" autocomplete="name" readonly>
-                        <span class="account-info-dot" aria-label="Username information">i</span>
+                    <div class="account-username-row">
+                      <div class="account-username-input-wrap">
+                        <input type="text" id="account-name" autocomplete="name" maxlength="60" readonly>
+                        <span class="account-username-info-button" aria-label="Username information">
+                          <span aria-hidden="true">i</span>
+                          <span class="account-username-tooltip">You can change your username once every 14 days.</span>
+                        </span>
                       </div>
-                      <button class="account-edit-button" type="button" aria-label="Edit display name">/</button>
+                      <button class="account-username-edit-button" type="button" id="account-username-edit-button" aria-label="Edit username">/</button>
                     </div>
+                    <p class="account-username-note" id="account-username-note"></p>
                   </div>
 
                   <div class="account-field">
@@ -1500,6 +1580,8 @@
         const detailsSubmit = getById("account-details-submit");
         const detailsMessage = getById("account-details-message");
         const name = getById("account-name");
+        const usernameNote = getById("account-username-note");
+        const usernameEditButton = getById("account-username-edit-button");
         const email = getById("account-email");
         const accountPhoneCountry = getById("account-phone-country");
         const accountPhoneCountryDropdown = getById("account-phone-country-dropdown");
@@ -1521,6 +1603,10 @@
         const securitySubmit = getById("account-security-submit");
         const securityMessage = getById("account-security-message");
         const securityStatus = getById("account-security-status");
+        const usernameCooldownDays = 14;
+        let originalUsername = "";
+        let usernameEditMode = false;
+        let usernameLastChangedAt = null;
 
         function showAccountPanel(panelName) {
           panels.forEach(function (panel) {
@@ -2024,10 +2110,109 @@ EH|Western Sahara|+212
 
         initializeAccountPhoneCountryDropdown();
 
+        function getDateFromFirestoreValue(value) {
+          if (!value) {
+            return null;
+          }
+
+          if (value instanceof Date) {
+            return Number.isNaN(value.getTime()) ? null : value;
+          }
+
+          if (typeof value.toDate === "function") {
+            return value.toDate();
+          }
+
+          if (typeof value.seconds === "number") {
+            return new Date(value.seconds * 1000);
+          }
+
+          const date = new Date(value);
+          return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function getUsernameUnlockDate() {
+          const lastChangeDate = getDateFromFirestoreValue(usernameLastChangedAt);
+
+          if (!lastChangeDate) {
+            return null;
+          }
+
+          return new Date(lastChangeDate.getTime() + usernameCooldownDays * 24 * 60 * 60 * 1000);
+        }
+
+        function getUsernameDaysLeft() {
+          const unlockDate = getUsernameUnlockDate();
+
+          if (!unlockDate) {
+            return 0;
+          }
+
+          const millisecondsLeft = unlockDate.getTime() - Date.now();
+
+          if (millisecondsLeft <= 0) {
+            return 0;
+          }
+
+          return Math.ceil(millisecondsLeft / (24 * 60 * 60 * 1000));
+        }
+
+        function getUsernameUnlockDateText() {
+          const unlockDate = getUsernameUnlockDate();
+
+          if (!unlockDate) {
+            return "";
+          }
+
+          return unlockDate.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          });
+        }
+
+        function updateUsernameLockState() {
+          if (!name) {
+            return;
+          }
+
+          const daysLeft = getUsernameDaysLeft();
+
+          if (daysLeft > 0) {
+            usernameEditMode = false;
+            name.readOnly = true;
+
+            if (usernameEditButton) {
+              usernameEditButton.disabled = true;
+              usernameEditButton.setAttribute("aria-label", "Username locked");
+            }
+
+            if (usernameNote) {
+              usernameNote.textContent = "You can change your username again on " + getUsernameUnlockDateText() + ".";
+            }
+          } else {
+            name.readOnly = !usernameEditMode;
+
+            if (usernameEditButton) {
+              usernameEditButton.disabled = false;
+              usernameEditButton.setAttribute("aria-label", "Edit username");
+            }
+
+            if (usernameNote) {
+              usernameNote.textContent = "";
+            }
+          }
+        }
+
         function loadAccountDetails(user) {
           const displayName = user.fullName || user.displayName || user.firstName || "AUC Atlas user";
 
           name.value = displayName;
+          originalUsername = displayName;
+          usernameEditMode = false;
+          usernameLastChangedAt = user.usernameLastChangedAt || null;
+          updateUsernameLockState();
+
           email.value = user.email || "";
           hydrateAccountPhoneValue(user.phone || "");
 
@@ -2050,11 +2235,11 @@ EH|Western Sahara|+212
         }
 
         async function loadAccount() {
-          const data = await requestJson("/api/me", {
+          const data = await requestJson("/api/account-profile", {
             method: "GET"
           });
 
-          if (!data.loggedIn || !data.user) {
+          if (!data.success || !data.user) {
             localStorage.setItem(loginRedirectKey, "account.html");
             window.location.replace("login.html?redirect=account.html");
             return;
@@ -2075,11 +2260,50 @@ EH|Western Sahara|+212
           });
         });
 
+        if (usernameEditButton) {
+          usernameEditButton.addEventListener("click", function () {
+            if (getUsernameDaysLeft() > 0) {
+              updateUsernameLockState();
+              return;
+            }
+
+            usernameEditMode = true;
+            updateUsernameLockState();
+
+            if (name) {
+              name.focus();
+              name.select();
+            }
+          });
+        }
+
         if (detailsForm) {
           detailsForm.addEventListener("submit", async function (event) {
             event.preventDefault();
 
+            const displayName = name ? name.value.trim() : "";
             const phoneValue = getAccountPhoneValueForSave();
+
+            if (!displayName) {
+              setMessage(detailsMessage, "Please enter your display name.", "error");
+
+              if (name) {
+                name.focus();
+              }
+
+              return;
+            }
+
+            if (getUsernameDaysLeft() > 0 && displayName !== originalUsername) {
+              setMessage(detailsMessage, "You can change your username again on " + getUsernameUnlockDateText() + ".", "error");
+
+              if (name) {
+                name.value = originalUsername;
+              }
+
+              updateUsernameLockState();
+              return;
+            }
 
             if (!phoneValue) {
               setMessage(detailsMessage, "Please enter your phone number.", "error");
@@ -2098,7 +2322,7 @@ EH|Western Sahara|+212
               const data = await requestJson("/api/account-profile", {
                 method: "PATCH",
                 body: {
-                  fullName: name.value.trim(),
+                  fullName: displayName,
                   phone: phoneValue
                 }
               });
