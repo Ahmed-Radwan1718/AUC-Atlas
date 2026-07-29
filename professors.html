@@ -496,52 +496,124 @@
 
   <div id="site-footer-root"></div>
   <script src="footer.js"></script>
+  <script src="professors-data.js"></script>
   <script>
-    const professorDepartments = {
-      "Eslam Badr": "MACT",
-      "Ehab El Sawy": "Chemistry",
-      "Nageh Allam": "Physics",
-      "Tamer Shoeib": "Chemistry",
-      "Ibrahim Abotaleb": "CENG",
-      "Hassan Azzazy": "Chemistry",
-      "Walid Fouad": "Biology",
-      "Arthur Bos": "Biology",
-      "Mohamed Badran": "MENG",
-      "Ahmed Abdellatif": "Biology",
-      "Wafik Lotfallah": "MACT",
-      "Laila El Serty": "RHET",
-      "Mariah Fairley": "ELI",
-      "Gretchen McCullough": "RHET",
-      "Kathleen Saville": "RHET",
-      "Fikry Boutros": "RHET",
-      "Iman Baza": "ELI",
-      "Alexander Lewko": "ALA",
-      "Mariam Osman": "ELI"
-    };
+    const professors = window.AUC_ATLAS_PROFESSORS || [];
+    const main = document.querySelector(".professors-page");
+    const grid = document.querySelector(".professors-grid");
+    const selectedProfessorId = new URLSearchParams(window.location.search).get("professor");
 
-    document.querySelectorAll(".professor-card").forEach(function (card) {
-      const name = card.querySelector(".professor-card-body h2");
-      const meta = card.querySelector(".professor-card-meta");
+    const professorPageStyle = document.createElement("style");
+    professorPageStyle.textContent = ".professor-card{cursor:pointer;text-decoration:none;transition:transform .2s ease,box-shadow .2s ease}.professor-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}.professor-card:focus-visible{outline:3px solid var(--gold);outline-offset:4px}.professor-detail{padding:128px 0 90px}.professor-back-link{display:inline-flex;margin-bottom:28px;color:var(--muted);font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;text-decoration:none}.professor-detail-hero{display:grid;grid-template-columns:minmax(280px,.45fr) minmax(0,1fr);gap:34px;align-items:stretch}.professor-detail-photo-frame{min-height:520px;border:1px solid var(--line);border-radius:var(--radius);background:var(--ink);overflow:hidden}.professor-detail-photo-frame img{width:100%;height:100%;object-fit:cover;object-position:center 28%;display:block}.professor-detail-copy{padding:34px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);display:flex;flex-direction:column;justify-content:flex-end}.professor-detail-copy h1{margin:0 0 18px;font-size:clamp(2.25rem,5vw,4.5rem);line-height:1.04;text-transform:uppercase}.professor-detail-copy p{margin:0 0 22px;color:var(--muted);font-size:17px;line-height:1.75}.professor-detail-panel{margin-top:24px;padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}.professor-detail-panel h2{margin:0 0 10px;font-size:24px;text-transform:uppercase}.professor-detail-panel p{margin:0;color:var(--muted);line-height:1.7}@media(max-width:820px){.professor-detail,.professor-detail-hero{padding-top:112px;grid-template-columns:1fr}.professor-detail-photo-frame{min-height:360px}}";
+    document.head.appendChild(professorPageStyle);
 
-      if (!name || !meta) {
+    function escapeHtml(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, function (char) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[char];
+      });
+    }
+
+    function formatRating(professor) {
+      if (typeof professor.rating !== "number") {
+        return professor.ratingLabel || "Not rated yet";
+      }
+
+      const roundedStars = Math.max(0, Math.min(5, Math.round(professor.rating)));
+      return "★".repeat(roundedStars) + "☆".repeat(5 - roundedStars) + " " + professor.rating.toFixed(1);
+    }
+
+    function formatReviews(professor) {
+      if (professor.reviewLabel) {
+        return professor.reviewLabel;
+      }
+
+      return professor.reviewCount === 1 ? "1 review" : professor.reviewCount + " reviews";
+    }
+
+    function professorCard(professor) {
+      return `
+        <a class="professor-card" href="professors.html?professor=${encodeURIComponent(professor.id)}" aria-label="Open ${escapeHtml(professor.name)} profile">
+          <div class="professor-card-visual">
+            <img class="professor-card-photo" src="${escapeHtml(professor.image)}" alt="${escapeHtml(professor.name)}">
+            <span>Professor</span>
+            <strong>${escapeHtml(professor.name)}</strong>
+          </div>
+          <div class="professor-card-body">
+            <h2>${escapeHtml(professor.name)}</h2>
+            <p>${escapeHtml(professor.bio)}</p>
+            <div class="professor-card-meta">
+              <span>${escapeHtml(professor.department || "Department pending")}</span>
+              <span>${escapeHtml(formatRating(professor))}</span>
+              <span>${escapeHtml(formatReviews(professor))}</span>
+            </div>
+          </div>
+        </a>
+      `;
+    }
+
+    function renderProfessorList() {
+      if (!grid || !professors.length) {
         return;
       }
 
-      const chipTexts = [
-        professorDepartments[name.textContent.trim()] || "Department pending",
-        "Not rated yet",
-        "No reviews yet"
-      ];
+      grid.innerHTML = professors.map(professorCard).join("");
+    }
 
-      meta.replaceChildren.apply(
-        meta,
-        chipTexts.map(function (text) {
-          const chip = document.createElement("span");
-          chip.textContent = text;
-          return chip;
-        })
-      );
-    });
+    function renderProfessorDetail(professor) {
+      if (!main) {
+        return;
+      }
+
+      document.title = professor.name + " | AUC Atlas";
+
+      main.innerHTML = `
+        <section class="professor-detail">
+          <a class="professor-back-link" href="professors.html">Back to professors</a>
+
+          <div class="professor-detail-hero">
+            <div class="professor-detail-photo-frame">
+              <img src="${escapeHtml(professor.image)}" alt="${escapeHtml(professor.name)}">
+            </div>
+
+            <div class="professor-detail-copy">
+              <p class="kicker">${escapeHtml(professor.department || "Department pending")}</p>
+              <h1>${escapeHtml(professor.name)}</h1>
+              <p>${escapeHtml(professor.bio)}</p>
+              <div class="professor-card-meta">
+                <span>${escapeHtml(professor.department || "Department pending")}</span>
+                <span>${escapeHtml(formatRating(professor))}</span>
+                <span>${escapeHtml(formatReviews(professor))}</span>
+              </div>
+            </div>
+          </div>
+
+          <section class="professor-detail-panel">
+            <h2>Course-specific reviews</h2>
+            <p>No reviews yet. Reviews will appear here once students add course-specific feedback for this professor.</p>
+          </section>
+        </section>
+      `;
+    }
+
+    if (selectedProfessorId) {
+      const professor = window.getAucAtlasProfessorById
+        ? window.getAucAtlasProfessorById(selectedProfessorId)
+        : null;
+
+      if (professor) {
+        renderProfessorDetail(professor);
+      } else if (main) {
+        main.innerHTML = '<section class="professor-detail"><a class="professor-back-link" href="professors.html">Back to professors</a><div class="professor-detail-panel"><h1>Professor not found</h1><p>This professor profile is not available yet.</p></div></section>';
+      }
+    } else {
+      renderProfessorList();
+    }
   </script>
 </body>
 </html>
