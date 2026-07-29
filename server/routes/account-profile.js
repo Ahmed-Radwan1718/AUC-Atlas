@@ -2,7 +2,9 @@ const admin = require("../_lib/firebaseAdmin");
 const { v2: cloudinary } = require("cloudinary");
 
 const {
-  getUserFromRequest
+  getUserFromRequest,
+  listAccountSessions,
+  listTrustedDevices
 } = require("../_lib/securityHelpers");
 
 const USERNAME_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
