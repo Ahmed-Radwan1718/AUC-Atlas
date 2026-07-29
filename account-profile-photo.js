@@ -103,8 +103,24 @@
     }
   }
 
-  function validateProfilePhotoFile(file) {
+  function getProfilePhotoFileType(file) {
     const fileType = String(file && file.type ? file.type : "").toLowerCase();
+
+    if (fileType) {
+      return fileType === "image/jpg" ? "image/jpeg" : fileType;
+    }
+
+    const fileName = String(file && file.name ? file.name : "").toLowerCase();
+
+    if (/\.jpe?g$/.test(fileName)) return "image/jpeg";
+    if (/\.png$/.test(fileName)) return "image/png";
+    if (/\.webp$/.test(fileName)) return "image/webp";
+
+    return "";
+  }
+
+  function validateProfilePhotoFile(file) {
+    const fileType = getProfilePhotoFileType(file);
 
     if (!file || ALLOWED_TYPES.indexOf(fileType) === -1) {
       throw new Error("Please upload a JPG, PNG, or WEBP image.");
@@ -370,21 +386,28 @@
   }
 
   async function openCropModal(file) {
-    validateProfilePhotoFile(file);
-
     if (!cropModal || !cropImage || !cropStage || !cropFrame || !cropPreviewImage) {
       throw new Error("Photo cropper is not ready.");
     }
 
     closeCropModal();
-    cropObjectUrl = await createCropSourceUrl(file);
+
+    cropModal.hidden = false;
+    document.body.classList.add("account-photo-crop-modal-open");
+    setMessage(cropMessage, "Preparing photo...", "");
 
     if (cropUse) {
       cropUse.disabled = true;
     }
 
-    cropModal.hidden = false;
-    document.body.classList.add("account-photo-crop-modal-open");
+    try {
+      validateProfilePhotoFile(file);
+      cropObjectUrl = await createCropSourceUrl(file);
+    } catch (error) {
+      setMessage(cropMessage, error.message || "Could not prepare this photo. Please try another image.", "error");
+      throw error;
+    }
+
     setMessage(cropMessage, "", "");
 
     cropImage.onload = initializeCropImage;
