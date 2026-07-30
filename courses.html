@@ -482,6 +482,10 @@
       gap: 10px;
     }
 
+    .course-material-list {
+      margin-top: 12px;
+    }
+
     .course-professor-row,
     .course-material-row {
       padding: 14px;
@@ -495,6 +499,58 @@
       grid-template-columns: 52px minmax(0, 1fr) auto;
       gap: 12px;
       align-items: center;
+    }
+
+    .course-material-row {
+      display: grid;
+      gap: 10px;
+    }
+
+    .course-material-row[data-real-material] {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+    }
+
+    .course-material-main {
+      min-width: 0;
+    }
+
+    .course-material-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .course-material-meta,
+    .course-material-detail-line {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.55;
+    }
+
+    .course-material-description {
+      margin-top: 6px;
+    }
+
+    .course-material-filters {
+      margin: 14px 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .course-material-legacy-tag {
+      display: inline-flex;
+      margin-left: 6px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+      vertical-align: middle;
     }
 
     .course-professor-avatar {
@@ -543,7 +599,11 @@
     .course-professor-action,
     .course-professor-action:visited,
     .course-review-action,
-    .course-review-submit {
+    .course-review-submit,
+    .course-material-action,
+    .course-material-action:visited,
+    .course-material-submit,
+    .course-material-danger {
       min-height: 40px;
       padding: 0 14px;
       border: 1px solid var(--ink);
@@ -562,8 +622,17 @@
       white-space: nowrap;
     }
 
+    .course-material-danger {
+      border-color: rgba(218, 58, 58, 0.34);
+      background: rgba(218, 58, 58, 0.08);
+      color: rgb(178, 42, 42);
+    }
+
     .course-review-action:disabled,
-    .course-review-submit:disabled {
+    .course-review-submit:disabled,
+    .course-material-action:disabled,
+    .course-material-submit:disabled,
+    .course-material-danger:disabled {
       cursor: not-allowed;
       opacity: 0.54;
     }
@@ -796,17 +865,43 @@
       gap: 7px;
     }
 
+    .course-review-form input[type="text"],
+    .course-review-form input[type="file"],
     .course-review-form textarea {
       width: 100%;
-      min-height: 120px;
       padding: 12px 13px;
       border: 1px solid var(--line);
       border-radius: 16px;
       background: var(--surface-soft);
       color: var(--ink);
       font: inherit;
-      resize: vertical;
       outline: 0;
+    }
+
+    .course-review-form textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .course-review-form input[type="file"] {
+      min-height: 54px;
+    }
+
+    .course-review-confirmation {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+      line-height: 1.55;
+      text-transform: none;
+    }
+
+    .course-review-confirmation input {
+      margin-top: 3px;
     }
 
     .course-review-custom-dropdown {
@@ -947,6 +1042,8 @@
 
       .course-detail-header-top,
       .course-professor-row,
+      .course-material-row[data-real-material],
+      .course-material-filters,
       .course-review-section-header,
       .course-review-filters,
       .course-review-form-grid {
@@ -1086,6 +1183,28 @@
       const courseReviewStatusByCode = Object.create(null);
       const courseReviewErrorByCode = Object.create(null);
       const courseReviewFiltersByCode = Object.create(null);
+      const materialTypeOptions = [
+        { value: "lecture-notes", label: "Lecture notes" },
+        { value: "study-guide", label: "Study guide" },
+        { value: "summary", label: "Summary" },
+        { value: "practice-questions", label: "Practice questions" },
+        { value: "past-exam", label: "Past exam" },
+        { value: "past-quiz", label: "Past quiz" },
+        { value: "assignment", label: "Assignment" },
+        { value: "lab-material", label: "Lab material" },
+        { value: "formula-sheet", label: "Formula sheet" },
+        { value: "syllabus", label: "Syllabus" },
+        { value: "reading-notes", label: "Reading notes" },
+        { value: "project-example", label: "Project example" },
+        { value: "other", label: "Other" }
+      ];
+      const courseMaterialsByCode = Object.create(null);
+      const courseMaterialStatusByCode = Object.create(null);
+      const courseMaterialErrorByCode = Object.create(null);
+      const courseMaterialFiltersByCode = Object.create(null);
+      const courseMaterialNoticeByCode = Object.create(null);
+      const materialMaxUploadBytes = 10 * 1024 * 1024;
+      const materialAcceptedExtensions = ".pdf,.docx,.pptx,.xlsx,.txt,.png,.jpg,.jpeg";
 
       professorDirectory.forEach(function (professor) {
         professorsById[professor.id] = professor;
@@ -1203,7 +1322,7 @@
       function getCourseStats(course) {
         return {
           professorCount: getCourseProfessors(course).length,
-          materialCount: Array.isArray(course.materials) ? course.materials.length : 0
+          materialCount: getStaticCourseMaterials(course).length + getLoadedCourseMaterials(course).length
         };
       }
 
@@ -1335,11 +1454,56 @@
         }).join("");
       }
 
+      function getStaticCourseMaterials(course) {
+        return Array.isArray(course.materials) ? course.materials : [];
+      }
+
+      function getCourseMaterialKey(course) {
+        return normalizeCourseKey(course && course.code);
+      }
+
+      function getLoadedCourseMaterials(course) {
+        return Array.isArray(courseMaterialsByCode[getCourseMaterialKey(course)])
+          ? courseMaterialsByCode[getCourseMaterialKey(course)]
+          : [];
+      }
+
+      function getCourseMaterialFilters(course) {
+        const key = getCourseMaterialKey(course);
+
+        if (!courseMaterialFiltersByCode[key]) {
+          courseMaterialFiltersByCode[key] = {
+            professor: "all",
+            semester: "all",
+            type: "all",
+            sort: "newest"
+          };
+        }
+
+        return courseMaterialFiltersByCode[key];
+      }
+
+      function setCourseMaterialNotice(course, value) {
+        courseMaterialNoticeByCode[getCourseMaterialKey(course)] = value || "";
+      }
+
+      function getMaterialTypeOption(value) {
+        const requestedValue = String(value || "").trim().toLowerCase();
+
+        return materialTypeOptions.find(function (type) {
+          return type.value === requestedValue || type.label.toLowerCase() === requestedValue;
+        }) || null;
+      }
+
       function getMaterialTerm(material) {
-        return material.semester || material.term || material.semesterLabel || "";
+        return material.semesterLabel || material.semester || material.term || "";
       }
 
       function getMaterialUploader(material) {
+        if (material.uploaderDisplayLabel) {
+          return material.uploaderDisplayLabel;
+        }
+
         if (!material.uploader) {
           return material.uploaderName || "";
         }
@@ -1351,32 +1515,684 @@
         return material.uploader.name || material.uploader.displayName || "";
       }
 
-      function renderProfessorRows(course) {
+      function getMaterialProfessor(material) {
+        const professor = professorsById[material.professorId] || {};
+
+        return {
+          id: material.professorId || professor.id || "",
+          name: material.professorName || professor.name || "Professor not listed",
+          image: professor.image || "user.png",
+          department: professor.department || ""
+        };
+      }
+
+      function getMaterialCourseLabel(material, course) {
+        const code = material.courseCode || course.code;
+        const title = material.courseTitle || course.title;
+
+        return [code, title].filter(Boolean).join(" - ");
+      }
+
+      function getMaterialTypeLabel(material) {
+        return material.materialTypeLabel || material.type || "";
+      }
+
+      function formatFileSize(bytes) {
+        const size = Number(bytes || 0);
+
+        if (!Number.isFinite(size) || size <= 0) {
+          return "Size not listed";
+        }
+
+        if (size >= 1024 * 1024) {
+          return (size / (1024 * 1024)).toFixed(1) + " MB";
+        }
+
+        return Math.max(1, Math.round(size / 1024)) + " KB";
+      }
+
+      function getMaterialDateLabel(value) {
+        const date = new Date(value || "");
+
+        if (Number.isNaN(date.getTime())) {
+          return "Upload date not listed";
+        }
+
+        return date.toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        });
+      }
+
+      async function loadCourseMaterials(course) {
+        const key = getCourseMaterialKey(course);
+
+        if (!key || courseMaterialStatusByCode[key] === "loading") {
+          return;
+        }
+
+        courseMaterialStatusByCode[key] = "loading";
+        courseMaterialErrorByCode[key] = "";
+
+        try {
+          const response = await fetch("/api/course-materials?courseCode=" + encodeURIComponent(course.code), {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              Accept: "application/json"
+            }
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (response.status === 401 || response.status === 403) {
+            courseMaterialsByCode[key] = [];
+            courseMaterialStatusByCode[key] = "restricted";
+            courseMaterialErrorByCode[key] = "Log in with your verified AUC account to browse, upload, and download course materials.";
+          } else if (!response.ok || !data.success || !Array.isArray(data.materials)) {
+            throw new Error(data.error || "Could not load course materials.");
+          } else {
+            courseMaterialsByCode[key] = data.materials;
+            courseMaterialStatusByCode[key] = "loaded";
+          }
+        } catch (error) {
+          courseMaterialsByCode[key] = [];
+          courseMaterialStatusByCode[key] = "error";
+          courseMaterialErrorByCode[key] = error.message || "Could not load course materials.";
+        }
+
+        if (normalizeCourseKey(state.selectedCourseCode) === normalizeCourseKey(course.code)) {
+          render();
+        }
+      }
+
+      function getMaterialFilterValues(materials, getValue) {
+        const seen = Object.create(null);
+        const values = [];
+
+        materials.forEach(function (material) {
+          const value = String(getValue(material) || "").trim();
+          const lookup = value.toLowerCase();
+
+          if (value && !seen[lookup]) {
+            seen[lookup] = true;
+            values.push(value);
+          }
+        });
+
+        return values.sort(function (a, b) {
+          return a.localeCompare(b);
+        });
+      }
+
+      function getFilteredCourseMaterials(course, materials) {
+        const filters = getCourseMaterialFilters(course);
+
+        return materials.filter(function (material) {
+          const professor = getMaterialProfessor(material);
+          const semester = getMaterialTerm(material);
+          const type = getMaterialTypeLabel(material);
+
+          if (filters.professor !== "all" && professor.name !== filters.professor) {
+            return false;
+          }
+
+          if (filters.semester !== "all" && semester !== filters.semester) {
+            return false;
+          }
+
+          if (filters.type !== "all" && type !== filters.type) {
+            return false;
+          }
+
+          return true;
+        }).slice().sort(function (first, second) {
+          const firstTime = new Date(first.createdAt || 0).getTime() || 0;
+          const secondTime = new Date(second.createdAt || 0).getTime() || 0;
+
+          return filters.sort === "oldest" ? firstTime - secondTime : secondTime - firstTime;
+        });
+      }
+
+      function renderLegacyMaterialRows(course) {
+        const materials = getStaticCourseMaterials(course);
+
+        if (!materials.length) {
+          return "";
+        }
+
+        return `
+          <div class="course-material-list" aria-label="Legacy material entries">
+            ${materials.map(function (material) {
+              const metadata = [
+                material.type,
+                getMaterialTerm(material),
+                getMaterialUploader(material)
+              ].filter(Boolean).join(" - ");
+
+              return `
+                <article class="course-material-row">
+                  <h4>${escapeHtml(material.title || "Untitled material")}<span class="course-material-legacy-tag">Legacy informational entry</span></h4>
+                  <p>${escapeHtml(metadata || "Material metadata unavailable")}</p>
+                </article>
+              `;
+            }).join("")}
+          </div>
+        `;
+      }
+
+      function renderMaterialFilterOptions(values, selectedValue, fallbackLabel) {
+        return [`<button class="custom-select-option${selectedValue === "all" ? " active" : ""}" type="button" data-value="all">${escapeHtml(fallbackLabel)}</button>`].concat(values.map(function (value) {
+          return `<button class="custom-select-option${selectedValue === value ? " active" : ""}" type="button" data-value="${escapeHtml(value)}">${escapeHtml(value)}</button>`;
+        })).join("");
+      }
+
+      function renderUploadedMaterialRows(course, materials) {
+        if (!materials.length) {
+          return '<div class="course-empty-state">No uploaded materials match these filters.</div>';
+        }
+
+        return `<div class="course-material-list">` + materials.map(function (material) {
+          const professor = getMaterialProfessor(material);
+          const detailLine = [
+            (material.fileExtension || "").toUpperCase() || material.fileType,
+            formatFileSize(material.fileSize),
+            getMaterialDateLabel(material.createdAt),
+            getMaterialUploader(material) || "Anonymous AUC student"
+          ].filter(Boolean).join(" - ");
+
+          return `
+            <article class="course-material-row" data-real-material="true">
+              <div class="course-material-main">
+                <h4>${escapeHtml(material.title || "Untitled material")}</h4>
+                <div class="course-material-meta">
+                  ${escapeHtml(getMaterialCourseLabel(material, course))} - ${escapeHtml(professor.name)} - ${escapeHtml(getMaterialTerm(material) || "Semester not listed")} - ${escapeHtml(getMaterialTypeLabel(material) || "Material")}
+                </div>
+                <div class="course-material-detail-line">${escapeHtml(detailLine)}</div>
+                ${material.description ? `<p class="course-material-description">${escapeHtml(material.description)}</p>` : ""}
+              </div>
+
+              <div class="course-material-actions">
+                <button class="course-material-action" type="button" data-material-download="${escapeHtml(material.id)}">Download</button>
+                ${material.canDelete ? `<button class="course-material-danger" type="button" data-material-delete="${escapeHtml(material.id)}">Delete</button>` : ""}
+              </div>
+            </article>
+          `;
+        }).join("") + `</div>`;
+      }
+
+      function renderCourseMaterialModal(course) {
         const professors = getCourseProfessors(course);
 
         if (!professors.length) {
-          return '<div class="course-empty-state">No recorded professors are linked to this course yet.</div>';
+          return "";
         }
 
-        return `<div class="course-professor-list">` + professors.map(function (professor) {
-          const note = professor.courseNote ? `<p>${escapeHtml(professor.courseNote)}</p>` : "";
+        const professorOptions = ['<option value="">Select professor</option>'].concat(professors.map(function (professor) {
+          return `<option value="${escapeHtml(professor.id)}">${escapeHtml(professor.name)}</option>`;
+        })).join("");
 
-          return `
-            <a class="course-professor-row course-professor-link" href="professors.html?professor=${encodeURIComponent(professor.id)}">
-              <div class="course-professor-avatar">
-                <img src="${escapeHtml(professor.image || "user.png")}" alt="${escapeHtml(professor.name)}">
+        const professorDropdownOptions = ['<button class="custom-select-option active" type="button" data-value="">Select professor</button>'].concat(professors.map(function (professor) {
+          return `<button class="custom-select-option" type="button" data-value="${escapeHtml(professor.id)}">${escapeHtml(professor.name)}</button>`;
+        })).join("");
+
+        const semesterOptions = ['<option value="">Select semester</option>'].concat(reviewSemesterOptions.map(function (semester) {
+          return `<option value="${escapeHtml(semester.value)}">${escapeHtml(semester.label)}</option>`;
+        })).join("");
+
+        const semesterDropdownOptions = ['<button class="custom-select-option active" type="button" data-value="">Select semester</button>'].concat(reviewSemesterOptions.map(function (semester) {
+          return `<button class="custom-select-option" type="button" data-value="${escapeHtml(semester.value)}">${escapeHtml(semester.label)}</button>`;
+        })).join("");
+
+        const typeOptions = ['<option value="">Select material type</option>'].concat(materialTypeOptions.map(function (type) {
+          return `<option value="${escapeHtml(type.value)}">${escapeHtml(type.label)}</option>`;
+        })).join("");
+
+        const typeDropdownOptions = ['<button class="custom-select-option active" type="button" data-value="">Select material type</button>'].concat(materialTypeOptions.map(function (type) {
+          return `<button class="custom-select-option" type="button" data-value="${escapeHtml(type.value)}">${escapeHtml(type.label)}</button>`;
+        })).join("");
+
+        return `
+          <div class="course-review-modal" id="course-material-modal" hidden>
+            <button class="course-review-modal-backdrop" id="course-material-modal-backdrop" type="button" aria-label="Close material upload form"></button>
+
+            <aside class="course-review-modal-card" role="dialog" aria-modal="true" aria-labelledby="course-material-modal-title">
+              <button class="course-review-modal-close" id="course-material-modal-close" type="button" aria-label="Close material upload form">&times;</button>
+              <h3 id="course-material-modal-title">Upload Material</h3>
+              <p class="course-detail-note">${escapeHtml(course.code)} is locked for this upload. Select the recorded professor and semester connected to your material.</p>
+
+              <form class="course-review-form" id="course-material-form" enctype="multipart/form-data" novalidate>
+                <label>
+                  Professor
+                  <select name="materialProfessorId" hidden required>${professorOptions}</select>
+
+                  <div class="course-review-custom-dropdown" data-select-name="materialProfessorId">
+                    <button class="custom-select-trigger" type="button" aria-expanded="false">
+                      <span class="custom-select-value">Select professor</span>
+                      <span class="chevron"></span>
+                    </button>
+
+                    <div class="custom-select-menu">
+                      ${professorDropdownOptions}
+                    </div>
+                  </div>
+                </label>
+
+                <label>
+                  Semester
+                  <select name="materialSemester" hidden required>${semesterOptions}</select>
+
+                  <div class="course-review-custom-dropdown" data-select-name="materialSemester">
+                    <button class="custom-select-trigger" type="button" aria-expanded="false">
+                      <span class="custom-select-value">Select semester</span>
+                      <span class="chevron"></span>
+                    </button>
+
+                    <div class="custom-select-menu">
+                      ${semesterDropdownOptions}
+                    </div>
+                  </div>
+                </label>
+
+                <label>
+                  Material type
+                  <select name="materialType" hidden required>${typeOptions}</select>
+
+                  <div class="course-review-custom-dropdown" data-select-name="materialType">
+                    <button class="custom-select-trigger" type="button" aria-expanded="false">
+                      <span class="custom-select-value">Select material type</span>
+                      <span class="chevron"></span>
+                    </button>
+
+                    <div class="custom-select-menu">
+                      ${typeDropdownOptions}
+                    </div>
+                  </div>
+                </label>
+
+                <label>
+                  Material title
+                  <input name="title" type="text" maxlength="140" required>
+                </label>
+
+                <label>
+                  Optional description
+                  <textarea name="description" maxlength="500" placeholder="Briefly describe what this material contains."></textarea>
+                </label>
+
+                <label>
+                  File
+                  <input name="file" type="file" accept="${escapeHtml(materialAcceptedExtensions)}" required>
+                </label>
+
+                <label class="course-review-confirmation">
+                  <input name="confirmRights" type="checkbox" required>
+                  <span>I confirm I have the right or permission to share this material with verified AUC students, and that it does not contain private student information, active assessments, unauthorized answer keys, pirated textbooks, or material obtained through unauthorized access.</span>
+                </label>
+
+                <button class="course-material-submit" type="submit">Upload Material</button>
+                <p class="course-review-form-message" id="course-material-form-message" aria-live="polite"></p>
+              </form>
+            </aside>
+          </div>
+        `;
+      }
+
+      function renderCourseMaterialSection(course) {
+        const key = getCourseMaterialKey(course);
+        const professors = getCourseProfessors(course);
+        const legacyContent = renderLegacyMaterialRows(course);
+        let status = courseMaterialStatusByCode[key];
+
+        if (!status) {
+          loadCourseMaterials(course);
+          status = "loading";
+        }
+
+        const uploadedMaterials = getLoadedCourseMaterials(course);
+        const filters = getCourseMaterialFilters(course);
+        const filteredMaterials = getFilteredCourseMaterials(course, uploadedMaterials);
+        const professorValues = getMaterialFilterValues(uploadedMaterials, function (material) {
+          return getMaterialProfessor(material).name;
+        });
+        const semesterValues = getMaterialFilterValues(uploadedMaterials, getMaterialTerm);
+        const typeValues = getMaterialFilterValues(uploadedMaterials, getMaterialTypeLabel);
+        const notice = courseMaterialNoticeByCode[key] || "";
+        let content = "";
+
+        if (status === "loading") {
+          content = '<div class="course-empty-state">Loading uploaded course materials...</div>';
+        } else if (status === "restricted") {
+          content = `<div class="course-empty-state">${escapeHtml(courseMaterialErrorByCode[key])} <a href="login.html">Log in</a>.</div>`;
+        } else if (status === "error") {
+          content = `<div class="course-empty-state">${escapeHtml(courseMaterialErrorByCode[key] || "Could not load course materials. Course details and recorded professors are still available.")}</div>`;
+        } else {
+          const filtersMarkup = uploadedMaterials.length ? `
+            <div class="course-material-filters">
+              <label class="course-review-filter">
+                Professor
+                <select data-course-material-filter="professor" hidden></select>
+                <div class="course-review-custom-dropdown" data-material-filter-select="professor">
+                  <button class="custom-select-trigger" type="button" aria-expanded="false">
+                    <span class="custom-select-value">${escapeHtml(filters.professor === "all" ? "All professors" : filters.professor)}</span>
+                    <span class="chevron"></span>
+                  </button>
+                  <div class="custom-select-menu">${renderMaterialFilterOptions(professorValues, filters.professor, "All professors")}</div>
+                </div>
+              </label>
+
+              <label class="course-review-filter">
+                Semester
+                <select data-course-material-filter="semester" hidden></select>
+                <div class="course-review-custom-dropdown" data-material-filter-select="semester">
+                  <button class="custom-select-trigger" type="button" aria-expanded="false">
+                    <span class="custom-select-value">${escapeHtml(filters.semester === "all" ? "All semesters" : filters.semester)}</span>
+                    <span class="chevron"></span>
+                  </button>
+                  <div class="custom-select-menu">${renderMaterialFilterOptions(semesterValues, filters.semester, "All semesters")}</div>
+                </div>
+              </label>
+
+              <label class="course-review-filter">
+                Material type
+                <select data-course-material-filter="type" hidden></select>
+                <div class="course-review-custom-dropdown" data-material-filter-select="type">
+                  <button class="custom-select-trigger" type="button" aria-expanded="false">
+                    <span class="custom-select-value">${escapeHtml(filters.type === "all" ? "All types" : filters.type)}</span>
+                    <span class="chevron"></span>
+                  </button>
+                  <div class="custom-select-menu">${renderMaterialFilterOptions(typeValues, filters.type, "All types")}</div>
+                </div>
+              </label>
+
+              <label class="course-review-filter">
+                Sort
+                <select data-course-material-filter="sort" hidden></select>
+                <div class="course-review-custom-dropdown" data-material-filter-select="sort">
+                  <button class="custom-select-trigger" type="button" aria-expanded="false">
+                    <span class="custom-select-value">${escapeHtml(filters.sort === "oldest" ? "Oldest uploads" : "Newest uploads")}</span>
+                    <span class="chevron"></span>
+                  </button>
+                  <div class="custom-select-menu">
+                    <button class="custom-select-option${filters.sort === "newest" ? " active" : ""}" type="button" data-value="newest">Newest uploads</button>
+                    <button class="custom-select-option${filters.sort === "oldest" ? " active" : ""}" type="button" data-value="oldest">Oldest uploads</button>
+                  </div>
+                </div>
+              </label>
+            </div>
+          ` : "";
+
+          if (!uploadedMaterials.length && !legacyContent) {
+            content = '<div class="course-empty-state">No uploaded materials exist for this course yet. Verified AUC students can contribute lecture notes, study guides, summaries, practice questions, and other academic resources.</div>';
+          } else {
+            content = `
+              ${filtersMarkup}
+              ${uploadedMaterials.length ? renderUploadedMaterialRows(course, filteredMaterials) : ""}
+              ${legacyContent}
+            `;
+          }
+        }
+
+        return `
+          <section class="course-detail-section">
+            <div class="course-review-section-header">
+              <div>
+                <p class="course-section-label">Verified AUC materials</p>
+                <h3>Course Materials</h3>
+                <p class="course-detail-note">Uploaded files are available only to logged-in students with verified @aucegypt.edu accounts.</p>
               </div>
 
-              <div class="course-professor-meta">
-                <h4>${escapeHtml(professor.name)}</h4>
-                <p>${escapeHtml(professor.department || "Department unavailable")}</p>
-                ${note}
-              </div>
+              ${status === "restricted" ? '<a class="course-material-action" href="login.html">Log In</a>' : `<button class="course-material-action" id="course-material-upload-button" type="button"${professors.length && status === "loaded" ? "" : " disabled"}>Upload Material</button>`}
+            </div>
 
-              <span class="course-professor-action">Open Profile</span>
-            </a>
-          `;
-        }).join("") + `</div>`;
+            ${professors.length ? "" : '<div class="course-empty-state">Materials cannot be uploaded yet because no professor-course relationship has been recorded for this course.</div>'}
+            ${notice ? `<p class="course-review-form-message">${escapeHtml(notice)}</p>` : ""}
+            ${content}
+          </section>
+
+          ${renderCourseMaterialModal(course)}
+        `;
+      }
+
+      async function downloadCourseMaterial(course, materialId) {
+        setCourseMaterialNotice(course, "Preparing secure download...");
+
+        try {
+          const response = await fetch("/api/course-materials", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            },
+            body: JSON.stringify({
+              action: "download",
+              materialId
+            })
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (!response.ok || !data.success || !data.downloadUrl) {
+            throw new Error(data.error || "Could not prepare this download.");
+          }
+
+          setCourseMaterialNotice(course, "");
+          window.location.href = data.downloadUrl;
+        } catch (error) {
+          setCourseMaterialNotice(course, error.message || "Could not prepare this download.");
+          renderCourseDetail(course);
+        }
+      }
+
+      async function deleteCourseMaterial(course, materialId) {
+        const material = getLoadedCourseMaterials(course).find(function (item) {
+          return item.id === materialId;
+        });
+
+        if (!material || !window.confirm("Delete this material? This removes the uploaded file and cannot be undone.")) {
+          return;
+        }
+
+        setCourseMaterialNotice(course, "Deleting material...");
+
+        try {
+          const response = await fetch("/api/course-materials", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            },
+            body: JSON.stringify({
+              action: "delete",
+              materialId
+            })
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (!response.ok || !data.success) {
+            throw new Error(data.error || "Could not delete this material.");
+          }
+
+          const key = getCourseMaterialKey(course);
+          courseMaterialsByCode[key] = getLoadedCourseMaterials(course).filter(function (item) {
+            return item.id !== materialId;
+          });
+          setCourseMaterialNotice(course, "Material deleted.");
+          renderCourseDetail(course);
+        } catch (error) {
+          setCourseMaterialNotice(course, error.message || "Could not delete this material.");
+          renderCourseDetail(course);
+        }
+      }
+
+      async function submitCourseMaterialUpload(course, uploadForm, uploadMessage) {
+        if (uploadForm.dataset.submitting === "true") {
+          return;
+        }
+
+        const formData = new FormData(uploadForm);
+        const professors = getCourseProfessors(course);
+        const professorId = String(formData.get("materialProfessorId") || "").trim();
+        const professor = professors.find(function (item) {
+          return item.id === professorId;
+        }) || null;
+        const semester = getSemesterOption(formData.get("materialSemester"));
+        const materialType = getMaterialTypeOption(formData.get("materialType"));
+        const title = String(formData.get("title") || "").trim();
+        const description = String(formData.get("description") || "").trim();
+        const fileInput = uploadForm.querySelector('input[name="file"]');
+        const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+        const confirmedRights = Boolean(formData.get("confirmRights"));
+
+        if (!professor || !semester || !materialType || !title || !file || !confirmedRights) {
+          uploadMessage.textContent = "Select the professor, semester, type, title, file, and confirmation before uploading.";
+          return;
+        }
+
+        if (file.size > materialMaxUploadBytes) {
+          uploadMessage.textContent = "Material files must be 10MB or smaller.";
+          return;
+        }
+
+        const currentUser = await getCurrentReviewUser();
+
+        if (!currentUser) {
+          uploadMessage.innerHTML = '<a href="login.html">Log in</a> with your verified AUC account to upload materials.';
+          return;
+        }
+
+        const submitButton = uploadForm.querySelector(".course-material-submit");
+        const uploadData = new FormData();
+
+        uploadData.append("action", "create");
+        uploadData.append("courseCode", course.code);
+        uploadData.append("professorId", professor.id);
+        uploadData.append("professorName", professor.name);
+        uploadData.append("semester", semester.value);
+        uploadData.append("materialType", materialType.value);
+        uploadData.append("title", title);
+        uploadData.append("description", description);
+        uploadData.append("confirmRights", "true");
+        uploadData.append("file", file, file.name);
+
+        uploadForm.dataset.submitting = "true";
+
+        if (submitButton) {
+          submitButton.disabled = true;
+        }
+
+        uploadMessage.textContent = "Uploading material...";
+
+        const xhr = new XMLHttpRequest();
+
+        xhr.open("POST", "/api/course-materials");
+        xhr.withCredentials = true;
+        xhr.setRequestHeader("Accept", "application/json");
+
+        xhr.upload.addEventListener("progress", function (event) {
+          if (event.lengthComputable) {
+            uploadMessage.textContent = "Uploading material... " + Math.round((event.loaded / event.total) * 100) + "%";
+          }
+        });
+
+        xhr.addEventListener("load", function () {
+          uploadForm.dataset.submitting = "";
+
+          if (submitButton) {
+            submitButton.disabled = false;
+          }
+
+          let data = {};
+
+          try {
+            data = JSON.parse(xhr.responseText || "{}");
+          } catch (error) {}
+
+          if (xhr.status < 200 || xhr.status >= 300 || !data.success || !data.material) {
+            uploadMessage.textContent = data.error || "Could not upload this material.";
+            return;
+          }
+
+          const key = getCourseMaterialKey(course);
+          courseMaterialsByCode[key] = [data.material].concat(getLoadedCourseMaterials(course));
+          courseMaterialStatusByCode[key] = "loaded";
+          setCourseMaterialNotice(course, "Material uploaded.");
+          renderCourseDetail(course);
+        });
+
+        xhr.addEventListener("error", function () {
+          uploadForm.dataset.submitting = "";
+
+          if (submitButton) {
+            submitButton.disabled = false;
+          }
+
+          uploadMessage.textContent = "Could not upload this material.";
+        });
+
+        xhr.send(uploadData);
+      }
+
+      function initializeCourseMaterialUi(course) {
+        const uploadOpenButton = document.getElementById("course-material-upload-button");
+        const uploadModal = document.getElementById("course-material-modal");
+        const uploadBackdrop = document.getElementById("course-material-modal-backdrop");
+        const uploadClose = document.getElementById("course-material-modal-close");
+        const uploadForm = document.getElementById("course-material-form");
+        const uploadMessage = document.getElementById("course-material-form-message");
+
+        function setUploadModalOpen(open) {
+          if (!uploadModal) {
+            return;
+          }
+
+          uploadModal.hidden = !open;
+          document.body.style.overflow = open ? "hidden" : "";
+        }
+
+        courseDetailView.querySelectorAll("[data-material-download]").forEach(function (button) {
+          button.addEventListener("click", function () {
+            downloadCourseMaterial(course, button.getAttribute("data-material-download"));
+          });
+        });
+
+        courseDetailView.querySelectorAll("[data-material-delete]").forEach(function (button) {
+          button.addEventListener("click", function () {
+            deleteCourseMaterial(course, button.getAttribute("data-material-delete"));
+          });
+        });
+
+        if (uploadOpenButton && !uploadOpenButton.disabled) {
+          uploadOpenButton.addEventListener("click", function () {
+            setUploadModalOpen(true);
+          });
+        }
+
+        [uploadBackdrop, uploadClose].forEach(function (element) {
+          if (element) {
+            element.addEventListener("click", function () {
+              setUploadModalOpen(false);
+            });
+          }
+        });
+
+        if (uploadForm && uploadMessage) {
+          uploadForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            submitCourseMaterialUpload(course, uploadForm, uploadMessage);
+          });
+        }
       }
 
       function renderMaterialRows(course) {
@@ -2136,10 +2952,13 @@
 
         dropdowns.forEach(function (dropdown) {
           const selectName = dropdown.dataset.selectName || "";
-          const filterName = dropdown.dataset.filterSelect || "";
+          const reviewFilterName = dropdown.dataset.filterSelect || "";
+          const materialFilterName = dropdown.dataset.materialFilterSelect || "";
           const select = selectName
             ? courseDetailView.querySelector('select[name="' + selectName + '"]')
-            : courseDetailView.querySelector('select[data-course-review-filter="' + filterName + '"]');
+            : reviewFilterName
+              ? courseDetailView.querySelector('select[data-course-review-filter="' + reviewFilterName + '"]')
+              : courseDetailView.querySelector('select[data-course-material-filter="' + materialFilterName + '"]');
           const trigger = dropdown.querySelector(".custom-select-trigger");
           const value = dropdown.querySelector(".custom-select-value");
           const options = Array.from(dropdown.querySelectorAll(".custom-select-option"));
@@ -2174,9 +2993,15 @@
               dropdown.classList.remove("invalid");
               setCourseDropdownOpen(dropdown, false);
 
-              if (filterName) {
+              if (reviewFilterName) {
                 const filters = getCourseReviewFilters(course);
-                filters[filterName] = select.value || (filterName === "sort" ? "newest" : "all");
+                filters[reviewFilterName] = select.value || (reviewFilterName === "sort" ? "newest" : "all");
+                renderCourseDetail(course);
+              }
+
+              if (materialFilterName) {
+                const filters = getCourseMaterialFilters(course);
+                filters[materialFilterName] = select.value || (materialFilterName === "sort" ? "newest" : "all");
                 renderCourseDetail(course);
               }
             });
@@ -2397,10 +3222,7 @@
               ${renderProfessorRows(course)}
             </section>
 
-            <section class="course-detail-section">
-              <h3>Materials</h3>
-              ${renderMaterialRows(course)}
-            </section>
+            ${renderCourseMaterialSection(course)}
 
             ${renderCourseReviewSection(course)}
           </article>
@@ -2416,6 +3238,7 @@
         }
 
         initializeCourseReviewUi(course);
+        initializeCourseMaterialUi(course);
       }
 
       function render() {
