@@ -1,4 +1,6 @@
+const crypto = require("crypto");
 const admin = require("../_lib/firebaseAdmin");
+const courseDetailsByCode = require("../../courses-data.js");
 
 const {
   getUserFromRequest
@@ -13,6 +15,17 @@ const {
 
 const MAX_PUBLIC_REVIEWS = 200;
 const MAX_ADMIN_REVIEWS = 500;
+const SEMESTER_OPTIONS = [
+  { value: "fall-2024", label: "Fall 2024" },
+  { value: "spring-2025", label: "Spring 2025" },
+  { value: "summer-2025", label: "Summer 2025" },
+  { value: "fall-2025", label: "Fall 2025" },
+  { value: "spring-2026", label: "Spring 2026" },
+  { value: "summer-2026", label: "Summer 2026" },
+  { value: "fall-2026", label: "Fall 2026" },
+  { value: "spring-2027", label: "Spring 2027" },
+  { value: "summer-2027", label: "Summer 2027" }
+];
 
 function cleanString(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
@@ -75,6 +88,102 @@ function cleanRating(value) {
   return rating;
 }
 
+function normalizeCourseKey(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function cleanCourseCode(value) {
+  const compact = cleanString(value, 40).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const match = compact.match(/^([A-Z]{3,4})([0-9]{4}[A-Z]?)$/);
+
+  return match ? match[1] + " " + match[2] : "";
+}
+
+function getSemesterOption(value) {
+  const normalizedValue = cleanString(value, 80).toLowerCase();
+
+  return SEMESTER_OPTIONS.find(function (semester) {
+    return semester.value === normalizedValue || semester.label.toLowerCase() === normalizedValue;
+  }) || null;
+}
+
+function getRecordedCourseForProfessor(professorId, requestedCourseCode) {
+  const requestedKey = normalizeCourseKey(requestedCourseCode);
+
+  if (!professorId || !requestedKey) {
+    return null;
+  }
+
+  const courseCode = Object.keys(courseDetailsByCode || {}).find(function (code) {
+    const details = courseDetailsByCode[code] || {};
+    const professorsForCourse = Array.isArray(details.professors) ? details.professors : [];
+    const courseMatches = normalizeCourseKey(code) === requestedKey;
+    const professorMatches = professorsForCourse.some(function (entry) {
+      const professorEntry = typeof entry === "string" ? { id: entry } : entry || {};
+      return professorEntry.id === professorId;
+    });
+
+    return courseMatches && professorMatches;
+  });
+
+  if (!courseCode) {
+    return null;
+  }
+
+  const details = courseDetailsByCode[courseCode] || {};
+
+  return {
+    code: courseCode,
+    title: cleanString(details.title || courseCode, 140)
+  };
+}
+
+function getCourseDisplay(course) {
+  return [course.code, course.title].filter(Boolean).join(" - ");
+}
+
+function getStructuredReviewInput(body, professorId) {
+  const course = getRecordedCourseForProfessor(professorId, cleanCourseCode(body.courseCode));
+  const semester = getSemesterOption(body.semester);
+
+  if (!course || !semester) {
+    return null;
+  }
+
+  return {
+    courseCode: course.code,
+    courseTitle: course.title,
+    courseKey: normalizeCourseKey(course.code),
+    course: getCourseDisplay(course),
+    semester: semester.value,
+    semesterLabel: semester.label,
+    term: semester.label
+  };
+}
+
+function getLegacyReviewInput(body) {
+  return {
+    course: cleanString(body.course, 120),
+    term: cleanString(body.term, 120)
+  };
+}
+
+async function findDuplicateStructuredReview(db, reviewerUid, professorId, courseCode, semester, ignoreReviewId) {
+  const snapshot = await db.collection("professorReviews")
+    .where("reviewerUid", "==", reviewerUid)
+    .limit(MAX_ADMIN_REVIEWS)
+    .get();
+
+  return snapshot.docs.find(function (doc) {
+    const data = doc.data() || {};
+
+    return doc.id !== ignoreReviewId &&
+      data.professorId === professorId &&
+      normalizeCourseKey(data.courseCode) === normalizeCourseKey(courseCode) &&
+      data.semester === semester;
+  }) || null;
+}
+
 function timestampToMillis(value) {
   if (!value) return 0;
   if (typeof value.toMillis === "function") return value.toMillis();
@@ -99,7 +208,11 @@ function serializeReview(reviewDoc, options) {
     reviewerUid: data.reviewerUid || "",
     reviewerName: data.reviewerName || "AUC student",
     reviewerPhoto: data.reviewerPhoto || "",
+    courseCode: data.courseCode || "",
+    courseTitle: data.courseTitle || "",
     course: data.course || "",
+    semester: data.semester || "",
+    semesterLabel: data.semesterLabel || "",
     term: data.term || "",
     rating: Number(data.rating || 0),
     clarityRating: Number(data.clarityRating || 0),
@@ -108,7 +221,8 @@ function serializeReview(reviewDoc, options) {
     attendanceRating: Number(data.attendanceRating || 0),
     takeAgain: data.takeAgain || "",
     text: data.text || "",
-    createdAt: serializeTimestamp(data.createdAt)
+    createdAt: serializeTimestamp(data.createdAt),
+    updatedAt: serializeTimestamp(data.updatedAt)
   };
 
   if (settings.includePrivate) {
@@ -266,8 +380,7 @@ async function handleCreateReview(req, res) {
   const body = getRequestBody(req);
   const professorId = cleanProfessorId(body.professorId);
   const professorName = cleanString(body.professorName, 120);
-  const course = cleanString(body.course, 80);
-  const term = cleanString(body.term, 80);
+  const courseInput = getStructuredReviewInput(body, professorId);
   const rating = cleanRating(body.rating);
   const clarityRating = cleanRating(body.clarityRating);
   const gradingRating = cleanRating(body.gradingRating);
@@ -276,34 +389,28 @@ async function handleCreateReview(req, res) {
   const takeAgain = cleanString(body.takeAgain, 12).toLowerCase();
   const text = cleanString(body.text || body.review, 1600);
 
-  if (!professorId || !course || !term || !rating || !clarityRating || !gradingRating || !workloadRating || !attendanceRating || (takeAgain !== "yes" && takeAgain !== "no") || !text) {
-    return res.status(400).json({ error: "Please complete every review field." });
+  if (!professorId || !courseInput || !rating || !clarityRating || !gradingRating || !workloadRating || !attendanceRating || (takeAgain !== "yes" && takeAgain !== "no") || !text) {
+    return res.status(400).json({ error: "Choose a recorded course, a standard semester, and complete every review field." });
   }
 
   const decodedUser = await getSignedInUser(req);
   const db = admin.firestore();
-  const uidHash = require("crypto")
+  const duplicateReview = await findDuplicateStructuredReview(db, decodedUser.uid, professorId, courseInput.courseCode, courseInput.semester, "");
+
+  if (duplicateReview) {
+    return res.status(409).json({ error: "You already reviewed this professor for that course and semester." });
+  }
+
+  const uidHash = crypto
     .createHash("sha256")
     .update(decodedUser.uid)
     .digest("hex")
     .slice(0, 32);
-  const reviewRef = db.collection("professorReviews").doc(professorId + "_" + uidHash);
-  const previousUserReviews = await db.collection("professorReviews")
-    .where("reviewerUid", "==", decodedUser.uid)
-    .limit(MAX_ADMIN_REVIEWS)
-    .get();
-  const alreadyReviewedProfessor = previousUserReviews.docs.some(function (doc) {
-    const data = doc.data() || {};
-    return data.professorId === professorId;
-  });
-
-  if (alreadyReviewedProfessor) {
-    return res.status(409).json({ error: "You already reviewed this professor." });
-  }
+  const reviewRef = db.collection("professorReviews").doc(professorId + "_" + courseInput.courseKey + "_" + courseInput.semester + "_" + uidHash);
 
   await consumeRateLimit({
     bucket: "professor-review-submit",
-    keyParts: [decodedUser.uid, professorId, getClientIp(req)],
+    keyParts: [decodedUser.uid, professorId, courseInput.courseKey, courseInput.semester, getClientIp(req)],
     firstLimit: 5,
     secondLimit: 10,
     firstLockMs: THIRTY_MINUTES_MS,
@@ -317,7 +424,7 @@ async function handleCreateReview(req, res) {
     const existingReview = await transaction.get(reviewRef);
 
     if (existingReview.exists) {
-      const error = new Error("You already reviewed this professor.");
+      const error = new Error("You already reviewed this professor for that course and semester.");
       error.statusCode = 409;
       throw error;
     }
@@ -329,8 +436,12 @@ async function handleCreateReview(req, res) {
       reviewerName: reviewer.reviewerName,
       reviewerEmail: reviewer.reviewerEmail,
       reviewerPhoto: reviewer.reviewerPhoto,
-      course,
-      term,
+      courseCode: courseInput.courseCode,
+      courseTitle: courseInput.courseTitle,
+      course: courseInput.course,
+      semester: courseInput.semester,
+      semesterLabel: courseInput.semesterLabel,
+      term: courseInput.term,
       rating,
       clarityRating,
       gradingRating,
@@ -353,9 +464,12 @@ async function handleCreateReview(req, res) {
 async function handleUpdateReview(req, res) {
   const body = getRequestBody(req);
   const reviewId = cleanReviewId(body.reviewId);
-  const course = cleanString(body.course, 80);
-  const term = cleanString(body.term, 80);
   const rating = cleanRating(body.rating);
+  const clarityRating = cleanRating(body.clarityRating);
+  const gradingRating = cleanRating(body.gradingRating);
+  const workloadRating = cleanRating(body.workloadRating);
+  const attendanceRating = cleanRating(body.attendanceRating);
+  const takeAgain = cleanString(body.takeAgain, 12).toLowerCase();
   const text = cleanString(body.text || body.review, 1600);
   const decodedUser = await getSignedInUser(req);
 
@@ -363,8 +477,8 @@ async function handleUpdateReview(req, res) {
     return res.status(400).json({ error: "Missing review id." });
   }
 
-  if (!course || !term || !rating || !text) {
-    return res.status(400).json({ error: "Fill out the course, term, rating, and review before saving." });
+  if (!rating || !clarityRating || !gradingRating || !workloadRating || !attendanceRating || (takeAgain !== "yes" && takeAgain !== "no") || !text) {
+    return res.status(400).json({ error: "Fill out every rating, the take-again answer, and the review before saving." });
   }
 
   const db = admin.firestore();
@@ -381,13 +495,53 @@ async function handleUpdateReview(req, res) {
     return res.status(403).json({ error: "You can only edit your own reviews." });
   }
 
-  await reviewRef.update({
-    course,
-    term,
+  const wantsStructuredCourse = Boolean(cleanString(body.courseCode, 40) || cleanString(body.semester, 80));
+  const updateData = {
     rating,
+    clarityRating,
+    gradingRating,
+    workloadRating,
+    attendanceRating,
+    takeAgain,
     text,
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
-  });
+  };
+
+  if (wantsStructuredCourse) {
+    const courseInput = getStructuredReviewInput(body, cleanProfessorId(reviewData.professorId));
+
+    if (!courseInput) {
+      return res.status(400).json({ error: "Choose one of the recorded courses and a standard semester before saving." });
+    }
+
+    const duplicateReview = await findDuplicateStructuredReview(db, decodedUser.uid, reviewData.professorId, courseInput.courseCode, courseInput.semester, reviewId);
+
+    if (duplicateReview) {
+      return res.status(409).json({ error: "You already have a review for that professor, course, and semester." });
+    }
+
+    Object.assign(updateData, {
+      courseCode: courseInput.courseCode,
+      courseTitle: courseInput.courseTitle,
+      course: courseInput.course,
+      semester: courseInput.semester,
+      semesterLabel: courseInput.semesterLabel,
+      term: courseInput.term
+    });
+  } else {
+    const legacyInput = getLegacyReviewInput(body);
+
+    if (!legacyInput.course || !legacyInput.term) {
+      return res.status(400).json({ error: "This legacy review needs its original course and term before saving." });
+    }
+
+    Object.assign(updateData, {
+      course: legacyInput.course,
+      term: legacyInput.term
+    });
+  }
+
+  await reviewRef.update(updateData);
 
   const updatedReview = await reviewRef.get();
 
@@ -428,6 +582,8 @@ async function handleDeleteReview(req, res) {
     await db.collection("adminReviewDeletions").doc(reviewId).set({
       reviewId,
       professorId: reviewData.professorId || "",
+      courseCode: reviewData.courseCode || "",
+      semester: reviewData.semester || "",
       reviewerUid: reviewData.reviewerUid || "",
       deletedByUid: adminUser.uid,
       deletedByEmail: adminUser.email,
