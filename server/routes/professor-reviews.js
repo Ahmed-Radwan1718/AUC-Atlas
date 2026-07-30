@@ -102,6 +102,11 @@ function serializeReview(reviewDoc, options) {
     course: data.course || "",
     term: data.term || "",
     rating: Number(data.rating || 0),
+    clarityRating: Number(data.clarityRating || 0),
+    gradingRating: Number(data.gradingRating || 0),
+    workloadRating: Number(data.workloadRating || 0),
+    attendanceRating: Number(data.attendanceRating || 0),
+    takeAgain: data.takeAgain || "",
     text: data.text || "",
     createdAt: serializeTimestamp(data.createdAt)
   };
@@ -241,9 +246,14 @@ async function handleCreateReview(req, res) {
   const course = cleanString(body.course, 80);
   const term = cleanString(body.term, 80);
   const rating = cleanRating(body.rating);
+  const clarityRating = cleanRating(body.clarityRating);
+  const gradingRating = cleanRating(body.gradingRating);
+  const workloadRating = cleanRating(body.workloadRating);
+  const attendanceRating = cleanRating(body.attendanceRating);
+  const takeAgain = cleanString(body.takeAgain, 12).toLowerCase();
   const text = cleanString(body.text || body.review, 1600);
 
-  if (!professorId || !course || !term || !rating || !text) {
+  if (!professorId || !course || !term || !rating || !clarityRating || !gradingRating || !workloadRating || !attendanceRating || (takeAgain !== "yes" && takeAgain !== "no") || !text) {
     return res.status(400).json({ error: "Please complete every review field." });
   }
 
@@ -299,6 +309,11 @@ async function handleCreateReview(req, res) {
       course,
       term,
       rating,
+      clarityRating,
+      gradingRating,
+      workloadRating,
+      attendanceRating,
+      takeAgain,
       text,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
