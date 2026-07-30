@@ -5,6 +5,7 @@ const routeLoaders = {
   "change-email": function () { return require("../server/routes/change-email"); },
   "change-password": function () { return securityActions.changePassword; },
   "client-token": function () { return require("../server/routes/client-token"); },
+  "course-materials": function () { return require("../server/routes/course-materials"); },
   "delete-account": function () { return securityActions.deleteAccount; },
   "disable-authenticator": function () { return securityActions.disableAuthenticator; },
   "forgot-password": function () { return require("../server/routes/forgot-password"); },
