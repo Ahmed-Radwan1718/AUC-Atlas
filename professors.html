@@ -516,12 +516,31 @@
       ".professor-detail-copy{padding:34px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);display:flex;flex-direction:column;justify-content:center}",
       ".professor-detail-copy h1{margin:0 0 18px;font-size:clamp(2.25rem,5vw,4.5rem);line-height:1.04;text-transform:uppercase}",
       ".professor-detail-intro{margin:0 0 24px;color:var(--muted);font-size:17px;line-height:1.75}",
-      ".professor-detail-stats{margin:0 0 24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}",
+      ".professor-detail-stats{margin:0 0 24px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}",
       ".professor-detail-stat{min-height:86px;padding:14px;border:1px solid var(--line);border-radius:18px;background:var(--surface-soft);display:grid;align-content:center;gap:7px}",
       ".professor-detail-stat span{color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}",
       ".professor-detail-stat strong{color:var(--ink);font-size:15px;line-height:1.25}",
       ".professor-detail-actions{display:flex;flex-wrap:wrap;gap:10px}",
       ".professor-detail-action{min-height:44px;padding:0 17px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:white;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}",
+      ".professor-review-insights{margin-top:24px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(280px,.55fr);gap:16px}",
+      ".professor-review-summary,.professor-rating-breakdown{padding:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}",
+      ".professor-review-summary h2,.professor-rating-breakdown h2{margin:0 0 10px;font-size:20px;text-transform:uppercase}",
+      ".professor-review-summary p{margin:0;color:var(--muted);line-height:1.7}",
+      ".professor-breakdown-list{display:grid;gap:12px}",
+      ".professor-breakdown-row{display:grid;grid-template-columns:128px minmax(0,1fr) 54px;gap:10px;align-items:center}",
+      ".professor-breakdown-label{color:var(--muted);font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}",
+      ".professor-breakdown-track{height:8px;border-radius:999px;background:var(--surface-soft);overflow:hidden}",
+      ".professor-breakdown-fill{height:100%;border-radius:999px;background:var(--gold)}",
+      ".professor-breakdown-value{color:var(--ink);font-size:13px;font-weight:900;text-align:right}",
+      ".professor-course-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}",
+      ".professor-course-card{padding:14px;border:1px solid var(--line);border-radius:18px;background:var(--surface-soft);display:grid;gap:7px}",
+      ".professor-course-card span{color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}",
+      ".professor-course-card strong{color:var(--ink);font-size:17px;line-height:1.2}",
+      ".professor-review-filters{margin:0 0 16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}",
+      ".professor-review-filter{display:grid;gap:6px;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}",
+      ".professor-review-filter select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:14px;background:var(--surface-soft);color:var(--ink);font:inherit;font-size:13px;letter-spacing:0;text-transform:none;padding:0 12px;outline:0}",
+      ".professor-review-tags{margin:0 0 10px;display:flex;flex-wrap:wrap;gap:7px}",
+      ".professor-review-tags span{padding:6px 8px;border-radius:999px;background:var(--gold-soft);color:var(--ink-soft);font-size:10px;font-weight:900}",
       ".professor-review-modal{position:fixed;inset:0;z-index:220;padding:24px;display:flex;align-items:center;justify-content:center}",
       ".professor-review-modal[hidden]{display:none}",
       ".professor-review-modal-backdrop{position:absolute;inset:0;border:0;background:rgba(29,31,31,.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}",
@@ -549,7 +568,9 @@
       ".professor-review-form label{display:grid;gap:7px;color:var(--muted);font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}",
       ".professor-review-form input,.professor-review-form textarea{width:100%;border:1px solid var(--line);border-radius:16px;background:var(--surface-soft);color:var(--ink);font:inherit;padding:12px 13px;outline:0}",
       ".professor-review-form textarea{min-height:120px;resize:vertical;line-height:1.55}",
-      ".professor-review-field-message{min-height:18px;margin:-2px 0 0;color:#b42318;font-size:13px;font-weight:800;line-height:1.4;letter-spacing:0;text-transform:none}",
+      ".professor-review-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}",
+      ".professor-review-form select{width:100%;min-height:46px;border:1px solid var(--line);border-radius:16px;background:var(--surface-soft);color:var(--ink);font:inherit;font-size:14px;letter-spacing:0;text-transform:none;padding:0 12px;outline:0}",
+      ".professor-review-form .professor-review-field-message{min-height:18px;margin:-2px 0 0;color:#b42318;font-size:13px;font-weight:800;line-height:1.4;letter-spacing:0;text-transform:none}",
       ".custom-select-dropdown{position:relative;width:100%}",
       ".custom-select-trigger{width:100%;min-height:54px;padding:0 18px;border:1px solid var(--line);border-radius:16px;background:var(--surface-soft);color:var(--ink);font-size:16px;font-weight:400;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;transition:background .22s ease,border-color .22s ease,box-shadow .22s ease}",
       ".custom-select-value{color:rgba(29,31,31,.86);font-weight:400;display:inline-flex;align-items:center;gap:10px}",
@@ -567,8 +588,9 @@
       ".custom-select-option.active::before,.custom-select-option:hover::before{opacity:1;transform:scaleY(1)}",
       ".professor-review-submit{min-height:44px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:white;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}",
       ".professor-review-form-message{min-height:20px;color:var(--gold);font-size:13px;font-weight:800;line-height:1.5}",
-      "@media(max-width:900px){.professor-detail-layout{grid-template-columns:1fr}.professor-detail-stats{grid-template-columns:1fr}}",
-      "@media(max-width:820px){.professor-detail,.professor-detail-hero{padding-top:112px;grid-template-columns:1fr}.professor-detail-photo-frame{min-height:360px}}"
+      "@media(max-width:1080px){.professor-review-insights{grid-template-columns:1fr}.professor-detail-stats,.professor-review-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}",
+      "@media(max-width:900px){.professor-detail-layout{grid-template-columns:1fr}.professor-review-form-grid{grid-template-columns:1fr}}",
+      "@media(max-width:820px){.professor-detail,.professor-detail-hero{padding-top:112px;grid-template-columns:1fr}.professor-detail-photo-frame{min-height:360px}.professor-detail-stats,.professor-review-filters{grid-template-columns:1fr}.professor-breakdown-row{grid-template-columns:1fr}.professor-breakdown-value{text-align:left}}"
     ].join("");
     document.head.appendChild(professorPageStyle);
 
@@ -664,6 +686,11 @@
             course: review.course,
             term: review.term,
             rating: review.rating,
+            clarityRating: review.clarityRating,
+            gradingRating: review.gradingRating,
+            workloadRating: review.workloadRating,
+            attendanceRating: review.attendanceRating,
+            takeAgain: review.takeAgain,
             text: review.text
           })
         });
@@ -772,18 +799,301 @@
       document.title = professor.name + " | AUC Atlas";
 
       const professorReviews = getProfessorReviews(professor);
-      const reviewItems = professorReviews.length
-        ? professorReviews.map(function (review) {
-            const rating = typeof review.rating === "number"
-              ? "★".repeat(Math.round(review.rating)) + "☆".repeat(5 - Math.round(review.rating)) + " " + review.rating.toFixed(1)
-              : "Not rated";
+      const filterStore = window.__aucAtlasProfessorReviewFilters || (window.__aucAtlasProfessorReviewFilters = Object.create(null));
+      const reviewFilters = filterStore[professor.id] || (filterStore[professor.id] = {
+        course: "all",
+        term: "all",
+        rating: "all",
+        sort: "newest"
+      });
 
+      function getReviewRating(review, key) {
+        const rating = Number(review[key]);
+
+        if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+          return null;
+        }
+
+        return rating;
+      }
+
+      function getAverageReviewMetric(reviews, key) {
+        const ratings = reviews
+          .map(function (review) {
+            return getReviewRating(review, key);
+          })
+          .filter(function (rating) {
+            return rating !== null;
+          });
+
+        if (!ratings.length) {
+          return null;
+        }
+
+        return ratings.reduce(function (sum, rating) {
+          return sum + rating;
+        }, 0) / ratings.length;
+      }
+
+      function formatRatingFromValue(value) {
+        const rating = Number(value);
+
+        if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+          return "Not rated";
+        }
+
+        const roundedStars = Math.max(0, Math.min(5, Math.round(rating)));
+        return "★".repeat(roundedStars) + "☆".repeat(5 - roundedStars) + " " + rating.toFixed(1);
+      }
+
+      function getReviewTimeValue(review) {
+        const date = new Date(review.createdAt || 0);
+        return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+      }
+
+      function getUniqueReviewValues(reviews, key) {
+        const values = [];
+        const seen = Object.create(null);
+
+        reviews.forEach(function (review) {
+          const value = String(review[key] || "").trim();
+          const lookup = value.toLowerCase();
+
+          if (value && !seen[lookup]) {
+            seen[lookup] = true;
+            values.push(value);
+          }
+        });
+
+        return values.sort(function (a, b) {
+          return a.localeCompare(b);
+        });
+      }
+
+      function renderFilterOptions(values, selectedValue, fallbackLabel) {
+        return [`<option value="all"${selectedValue === "all" ? " selected" : ""}>${escapeHtml(fallbackLabel)}</option>`]
+          .concat(values.map(function (value) {
+            return `<option value="${escapeHtml(value)}"${selectedValue === value ? " selected" : ""}>${escapeHtml(value)}</option>`;
+          }))
+          .join("");
+      }
+
+      function getFilteredReviews(reviews) {
+        return reviews.filter(function (review) {
+          const course = String(review.course || "").trim();
+          const term = String(review.term || "").trim();
+          const rating = getReviewRating(review, "rating");
+
+          if (reviewFilters.course !== "all" && course !== reviewFilters.course) {
+            return false;
+          }
+
+          if (reviewFilters.term !== "all" && term !== reviewFilters.term) {
+            return false;
+          }
+
+          if (reviewFilters.rating !== "all" && String(Math.round(rating || 0)) !== reviewFilters.rating) {
+            return false;
+          }
+
+          return true;
+        }).slice().sort(function (a, b) {
+          if (reviewFilters.sort === "rating-high") {
+            return (getReviewRating(b, "rating") || 0) - (getReviewRating(a, "rating") || 0);
+          }
+
+          if (reviewFilters.sort === "rating-low") {
+            return (getReviewRating(a, "rating") || 0) - (getReviewRating(b, "rating") || 0);
+          }
+
+          if (reviewFilters.sort === "oldest") {
+            return getReviewTimeValue(a) - getReviewTimeValue(b);
+          }
+
+          return getReviewTimeValue(b) - getReviewTimeValue(a);
+        });
+      }
+
+      function formatReviewCount(count) {
+        return count === 1 ? "1 review" : count + " reviews";
+      }
+
+      function formatWouldTakeAgain(reviews) {
+        const responses = reviews
+          .map(function (review) {
+            return String(review.takeAgain || "").trim().toLowerCase();
+          })
+          .filter(function (value) {
+            return value === "yes" || value === "no";
+          });
+
+        if (!responses.length) {
+          return "Not enough data";
+        }
+
+        const yesCount = responses.filter(function (value) {
+          return value === "yes";
+        }).length;
+
+        return Math.round((yesCount / responses.length) * 100) + "%";
+      }
+
+      function getTopReviewedCourse(reviews) {
+        const courses = Object.create(null);
+
+        reviews.forEach(function (review) {
+          const course = String(review.course || "").trim();
+
+          if (!course) {
+            return;
+          }
+
+          courses[course] = (courses[course] || 0) + 1;
+        });
+
+        return Object.keys(courses).sort(function (a, b) {
+          return courses[b] - courses[a] || a.localeCompare(b);
+        })[0] || "";
+      }
+
+      function getReviewSummary() {
+        if (!professorReviews.length) {
+          return "Student review patterns will appear here after students share feedback.";
+        }
+
+        const averageRating = getAverageReviewMetric(professorReviews, "rating");
+        const summaryParts = [];
+        const reviewCount = formatReviewCount(professorReviews.length);
+
+        if (averageRating === null) {
+          summaryParts.push("Based on " + reviewCount + ", students are still building the rating picture for " + professor.name + ".");
+        } else {
+          summaryParts.push("Based on " + reviewCount + ", students rate " + professor.name + " " + averageRating.toFixed(1) + " out of 5 overall.");
+        }
+
+        const takeAgain = formatWouldTakeAgain(professorReviews);
+        const topCourse = getTopReviewedCourse(professorReviews);
+
+        if (takeAgain !== "Not enough data") {
+          summaryParts.push(takeAgain + " would take this professor again.");
+        }
+
+        if (topCourse) {
+          summaryParts.push("Most feedback so far is tied to " + topCourse + ".");
+        }
+
+        return summaryParts.join(" ");
+      }
+
+      function renderBreakdownRows() {
+        return [
+          { key: "rating", label: "Overall" },
+          { key: "clarityRating", label: "Clarity" },
+          { key: "gradingRating", label: "Grading" },
+          { key: "workloadRating", label: "Workload" },
+          { key: "attendanceRating", label: "Attendance" }
+        ].map(function (metric) {
+          const average = getAverageReviewMetric(professorReviews, metric.key);
+          const width = average === null ? 0 : Math.max(0, Math.min(100, (average / 5) * 100));
+          const value = average === null ? "No data" : average.toFixed(1);
+
+          return `
+            <div class="professor-breakdown-row">
+              <span class="professor-breakdown-label">${escapeHtml(metric.label)}</span>
+              <div class="professor-breakdown-track">
+                <div class="professor-breakdown-fill" style="width:${width}%"></div>
+              </div>
+              <strong class="professor-breakdown-value">${escapeHtml(value)}</strong>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function renderCourseCards() {
+        const courses = Object.create(null);
+
+        professorReviews.forEach(function (review) {
+          const course = String(review.course || "").trim();
+
+          if (!course) {
+            return;
+          }
+
+          courses[course] = courses[course] || {
+            count: 0,
+            ratings: []
+          };
+
+          courses[course].count += 1;
+
+          const rating = getReviewRating(review, "rating");
+
+          if (rating !== null) {
+            courses[course].ratings.push(rating);
+          }
+        });
+
+        const courseNames = Object.keys(courses).sort(function (a, b) {
+          return courses[b].count - courses[a].count || a.localeCompare(b);
+        });
+
+        if (!courseNames.length) {
+          return `<div class="professor-review-empty">Courses will appear after students leave reviews.</div>`;
+        }
+
+        return `<div class="professor-course-list">` + courseNames.map(function (course) {
+          const entry = courses[course];
+          const average = entry.ratings.length
+            ? entry.ratings.reduce(function (sum, rating) { return sum + rating; }, 0) / entry.ratings.length
+            : null;
+
+          return `
+            <div class="professor-course-card">
+              <span>${escapeHtml(formatReviewCount(entry.count))}</span>
+              <strong>${escapeHtml(course)}</strong>
+              <span>${escapeHtml(average === null ? "No rating yet" : average.toFixed(1) + " average")}</span>
+            </div>
+          `;
+        }).join("") + `</div>`;
+      }
+
+      function renderReviewTags(review) {
+        const tags = [
+          { key: "clarityRating", label: "Clarity" },
+          { key: "gradingRating", label: "Grading" },
+          { key: "workloadRating", label: "Workload" },
+          { key: "attendanceRating", label: "Attendance" }
+        ].map(function (metric) {
+          const rating = getReviewRating(review, metric.key);
+          return rating === null ? "" : metric.label + " " + rating + "/5";
+        }).filter(Boolean);
+
+        const takeAgain = String(review.takeAgain || "").trim().toLowerCase();
+
+        if (takeAgain === "yes") {
+          tags.push("Would take again");
+        } else if (takeAgain === "no") {
+          tags.push("Would not take again");
+        }
+
+        return tags.map(function (tag) {
+          return `<span>${escapeHtml(tag)}</span>`;
+        }).join("");
+      }
+
+      const courseOptions = getUniqueReviewValues(professorReviews, "course");
+      const termOptions = getUniqueReviewValues(professorReviews, "term");
+      const filteredProfessorReviews = getFilteredReviews(professorReviews);
+      const reviewItems = filteredProfessorReviews.length
+        ? filteredProfessorReviews.map(function (review) {
+            const rating = formatRatingFromValue(review.rating);
             const reviewerName = review.reviewerName || "Anonymous student";
             const reviewerInitial = reviewerName.trim().charAt(0).toUpperCase() || "A";
             const reviewerPhoto = String(review.reviewerPhoto || "").trim();
             const avatarMarkup = reviewerPhoto
               ? `<img src="${escapeHtml(reviewerPhoto)}" alt="${escapeHtml(reviewerName)}">`
               : `<span>${escapeHtml(reviewerInitial)}</span>`;
+            const reviewTags = renderReviewTags(review);
 
             return `
               <article class="professor-review-card">
@@ -795,11 +1105,12 @@
                   </div>
                 </div>
                 <div class="professor-review-rating-line">${escapeHtml(rating)}</div>
+                ${reviewTags ? `<div class="professor-review-tags">${reviewTags}</div>` : ""}
                 <p>${escapeHtml(review.text || "")}</p>
               </article>
             `;
           }).join("")
-        : `<div class="professor-review-empty">No reviews yet. Be the first to leave course-specific feedback for ${escapeHtml(professor.name)}.</div>`;
+        : `<div class="professor-review-empty">${professorReviews.length ? "No reviews match these filters." : "No reviews yet. Be the first to leave course-specific feedback for " + escapeHtml(professor.name) + "."}</div>`;
 
       main.innerHTML = `
         <section class="professor-detail">
@@ -825,6 +1136,10 @@
                   <strong>${escapeHtml(formatRating(professor))}</strong>
                 </div>
                 <div class="professor-detail-stat">
+                  <span>Would take again</span>
+                  <strong>${escapeHtml(formatWouldTakeAgain(professorReviews))}</strong>
+                </div>
+                <div class="professor-detail-stat">
                   <span>Reviews</span>
                   <strong>${escapeHtml(formatReviews(professor))}</strong>
                 </div>
@@ -836,10 +1151,67 @@
             </div>
           </div>
 
+          <div class="professor-review-insights">
+            <section class="professor-review-summary">
+              <h2>Review summary</h2>
+              <p>${escapeHtml(getReviewSummary())}</p>
+            </section>
+
+            <section class="professor-rating-breakdown">
+              <h2>Rating breakdown</h2>
+              <div class="professor-breakdown-list">
+                ${renderBreakdownRows()}
+              </div>
+            </section>
+          </div>
+
           <div class="professor-detail-layout">
             <div>
               <section class="professor-detail-panel">
+                <h2>Courses taught</h2>
+                ${renderCourseCards()}
+              </section>
+
+              <section class="professor-detail-panel">
                 <h2>Student reviews</h2>
+                <div class="professor-review-filters">
+                  <label class="professor-review-filter">
+                    Course
+                    <select id="professor-review-filter-course">
+                      ${renderFilterOptions(courseOptions, reviewFilters.course, "All courses")}
+                    </select>
+                  </label>
+
+                  <label class="professor-review-filter">
+                    Term
+                    <select id="professor-review-filter-term">
+                      ${renderFilterOptions(termOptions, reviewFilters.term, "All terms")}
+                    </select>
+                  </label>
+
+                  <label class="professor-review-filter">
+                    Rating
+                    <select id="professor-review-filter-rating">
+                      <option value="all"${reviewFilters.rating === "all" ? " selected" : ""}>All ratings</option>
+                      <option value="5"${reviewFilters.rating === "5" ? " selected" : ""}>5 stars</option>
+                      <option value="4"${reviewFilters.rating === "4" ? " selected" : ""}>4 stars</option>
+                      <option value="3"${reviewFilters.rating === "3" ? " selected" : ""}>3 stars</option>
+                      <option value="2"${reviewFilters.rating === "2" ? " selected" : ""}>2 stars</option>
+                      <option value="1"${reviewFilters.rating === "1" ? " selected" : ""}>1 star</option>
+                    </select>
+                  </label>
+
+                  <label class="professor-review-filter">
+                    Sort
+                    <select id="professor-review-filter-sort">
+                      <option value="newest"${reviewFilters.sort === "newest" ? " selected" : ""}>Newest first</option>
+                      <option value="oldest"${reviewFilters.sort === "oldest" ? " selected" : ""}>Oldest first</option>
+                      <option value="rating-high"${reviewFilters.sort === "rating-high" ? " selected" : ""}>Highest rated</option>
+                      <option value="rating-low"${reviewFilters.sort === "rating-low" ? " selected" : ""}>Lowest rated</option>
+                    </select>
+                  </label>
+                </div>
+
                 <div class="professor-review-list">
                   ${reviewItems}
                 </div>
@@ -895,6 +1267,65 @@
                   </div>
                 </label>
 
+                <div class="professor-review-form-grid">
+                  <label>
+                    Clarity
+                    <select name="clarityRating" required>
+                      <option value="">Select clarity</option>
+                      <option value="5">5 - Very clear</option>
+                      <option value="4">4 - Clear</option>
+                      <option value="3">3 - Average</option>
+                      <option value="2">2 - Unclear</option>
+                      <option value="1">1 - Very unclear</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Grading fairness
+                    <select name="gradingRating" required>
+                      <option value="">Select grading</option>
+                      <option value="5">5 - Very fair</option>
+                      <option value="4">4 - Fair</option>
+                      <option value="3">3 - Average</option>
+                      <option value="2">2 - Tough</option>
+                      <option value="1">1 - Very tough</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Workload
+                    <select name="workloadRating" required>
+                      <option value="">Select workload</option>
+                      <option value="5">5 - Very heavy</option>
+                      <option value="4">4 - Heavy</option>
+                      <option value="3">3 - Moderate</option>
+                      <option value="2">2 - Light</option>
+                      <option value="1">1 - Very light</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Attendance strictness
+                    <select name="attendanceRating" required>
+                      <option value="">Select attendance</option>
+                      <option value="5">5 - Very strict</option>
+                      <option value="4">4 - Strict</option>
+                      <option value="3">3 - Average</option>
+                      <option value="2">2 - Flexible</option>
+                      <option value="1">1 - Very flexible</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Would take again
+                    <select name="takeAgain" required>
+                      <option value="">Select answer</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                  </label>
+                </div>
+
                 <label>
                   Review
                   <textarea name="review" id="professor-review-text" placeholder="What should other students know?" required aria-describedby="professor-review-text-message"></textarea>
@@ -922,6 +1353,10 @@
       const ratingTrigger = ratingDropdown ? ratingDropdown.querySelector(".custom-select-trigger") : null;
       const ratingValue = document.getElementById("professor-review-rating-value");
       const ratingOptions = ratingDropdown ? Array.from(ratingDropdown.querySelectorAll(".custom-select-option")) : [];
+      const courseFilter = document.getElementById("professor-review-filter-course");
+      const termFilter = document.getElementById("professor-review-filter-term");
+      const ratingFilter = document.getElementById("professor-review-filter-rating");
+      const sortFilter = document.getElementById("professor-review-filter-sort");
 
       function setReviewModalOpen(open) {
         if (!reviewModal) {
@@ -999,6 +1434,22 @@
         });
       }
 
+      [
+        { element: courseFilter, key: "course" },
+        { element: termFilter, key: "term" },
+        { element: ratingFilter, key: "rating" },
+        { element: sortFilter, key: "sort" }
+      ].forEach(function (filter) {
+        if (!filter.element) {
+          return;
+        }
+
+        filter.element.addEventListener("change", function () {
+          reviewFilters[filter.key] = filter.element.value || (filter.key === "sort" ? "newest" : "all");
+          renderProfessorDetail(professor);
+        });
+      });
+
       if (reviewTextarea && reviewTextMessage) {
         reviewTextarea.addEventListener("input", function () {
           reviewTextMessage.textContent = "";
@@ -1056,19 +1507,17 @@
             course: String(formData.get("course") || "").trim(),
             term: String(formData.get("term") || "").trim(),
             rating: Number(formData.get("rating")),
+            clarityRating: Number(formData.get("clarityRating")),
+            gradingRating: Number(formData.get("gradingRating")),
+            workloadRating: Number(formData.get("workloadRating")),
+            attendanceRating: Number(formData.get("attendanceRating")),
+            takeAgain: String(formData.get("takeAgain") || "").trim().toLowerCase(),
             text: reviewText,
             createdAt: new Date().toISOString()
           };
 
-          if (!review.course || !review.term || !review.rating || !review.text) {
+          if (!review.course || !review.term || !review.rating || !review.clarityRating || !review.gradingRating || !review.workloadRating || !review.attendanceRating || (review.takeAgain !== "yes" && review.takeAgain !== "no") || !review.text) {
             reviewMessage.textContent = "Fill out every field before submitting.";
-            return;
-          }
-
-          const saveResult = await saveStoredProfessorReview(professor.id, review, professor.name);
-
-          if (!saveResult.success) {
-            reviewMessage.textContent = saveResult.error || "Could not save this review.";
             return;
           }
 
