@@ -3663,6 +3663,7 @@ EH|Western Sahara|+212
     (function () {
       const professorReviewsStorageKey = "auc-atlas-professor-reviews-v1";
       let currentUser = null;
+      let accountReviews = [];
 
       function getById(id) {
         return document.getElementById(id);
@@ -3733,22 +3734,15 @@ EH|Western Sahara|+212
       }
 
       function getAccountReviews() {
-        const reviewMap = getReviewMap();
-        const reviews = [];
+        const reviews = accountReviews.map(function (review, reviewIndex) {
+          const professorId = String(review.professorId || "").trim();
 
-        Object.keys(reviewMap).forEach(function (professorId) {
-          const professorReviews = Array.isArray(reviewMap[professorId]) ? reviewMap[professorId] : [];
-
-          professorReviews.forEach(function (review, reviewIndex) {
-            if (reviewBelongsToCurrentUser(review)) {
-              reviews.push({
-                professorId,
-                reviewIndex,
-                professor: getProfessorById(professorId),
-                review
-              });
-            }
-          });
+          return {
+            professorId,
+            reviewIndex,
+            professor: getProfessorById(professorId),
+            review
+          };
         });
 
         return reviews.sort(function (first, second) {
@@ -3849,6 +3843,8 @@ EH|Western Sahara|+212
       }
 
       async function refreshCurrentUser() {
+        const reviewsMessage = getById("account-reviews-message");
+
         try {
           const response = await fetch("/api/account-profile", {
             method: "GET",
@@ -3868,18 +3864,43 @@ EH|Western Sahara|+212
           }
         } catch (error) {}
 
+        try {
+          const response = await fetch("/api/professor-reviews?scope=mine", {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              Accept: "application/json"
+            }
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (!response.ok || !data.success || !Array.isArray(data.reviews)) {
+            accountReviews = [];
+            setPanelMessage(reviewsMessage, data.error || "Could not load your reviews.", "error");
+            return currentUser;
+          }
+
+          accountReviews = data.reviews;
+          setPanelMessage(reviewsMessage, "", "");
+        } catch (error) {
+          accountReviews = [];
+          setPanelMessage(reviewsMessage, "Could not load your reviews.", "error");
+        }
+
         return currentUser;
       }
 
-      function saveAccountReview(form) {
+      async function saveAccountReview(form) {
         const message = getById("account-reviews-message");
-        const professorId = String(form.dataset.professorId || "");
         const reviewIndex = Number(form.dataset.reviewIndex);
-        const reviewMap = getReviewMap();
-        const professorReviews = Array.isArray(reviewMap[professorId]) ? reviewMap[professorId] : [];
-        const existingReview = Number.isInteger(reviewIndex) ? professorReviews[reviewIndex] : null;
+        const existingReview = Number.isInteger(reviewIndex) ? accountReviews[reviewIndex] : null;
+        const reviewId = existingReview && existingReview.id ? String(existingReview.id) : "";
 
-        if (!existingReview || !reviewBelongsToCurrentUser(existingReview)) {
+        if (!existingReview || !reviewBelongsToCurrentUser(existingReview) || !reviewId) {
           setPanelMessage(message, "This review could not be found for your account.", "error");
           renderAccountReviews();
           return;
@@ -3896,38 +3917,50 @@ EH|Western Sahara|+212
           return;
         }
 
-        professorReviews[reviewIndex] = Object.assign({}, existingReview, {
-          reviewerUid: currentUser && currentUser.uid || existingReview.reviewerUid || "",
-          reviewerEmail: currentUser && currentUser.email || existingReview.reviewerEmail || "",
-          reviewerName: getReviewerName(existingReview),
-          reviewerPhoto: getReviewerPhoto(existingReview),
-          course,
-          term,
-          rating: Math.round(rating),
-          text,
-          updatedAt: new Date().toISOString()
-        });
+        setPanelMessage(message, "Saving review...", "");
 
-        reviewMap[professorId] = professorReviews;
+        try {
+          const response = await fetch("/api/professor-reviews", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            },
+            body: JSON.stringify({
+              action: "update",
+              reviewId,
+              course,
+              term,
+              rating: Math.round(rating),
+              text
+            })
+          });
 
-        if (!saveReviewMap(reviewMap)) {
-          setPanelMessage(message, "Could not save this review in your browser.", "error");
-          return;
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (!response.ok || !data.success || !data.review) {
+            setPanelMessage(message, data.error || "Could not save this review.", "error");
+            return;
+          }
+
+          accountReviews[reviewIndex] = data.review;
+          renderAccountReviews();
+          setPanelMessage(message, "Review saved.", "success");
+        } catch (error) {
+          setPanelMessage(message, "Could not save this review.", "error");
         }
-
-        renderAccountReviews();
-        setPanelMessage(message, "Review saved.", "success");
       }
 
-      function deleteAccountReview(button) {
+      async function deleteAccountReview(button) {
         const message = getById("account-reviews-message");
-        const professorId = String(button.dataset.professorId || "");
         const reviewIndex = Number(button.dataset.reviewIndex);
-        const reviewMap = getReviewMap();
-        const professorReviews = Array.isArray(reviewMap[professorId]) ? reviewMap[professorId] : [];
-        const existingReview = Number.isInteger(reviewIndex) ? professorReviews[reviewIndex] : null;
+        const existingReview = Number.isInteger(reviewIndex) ? accountReviews[reviewIndex] : null;
+        const reviewId = existingReview && existingReview.id ? String(existingReview.id) : "";
 
-        if (!existingReview || !reviewBelongsToCurrentUser(existingReview)) {
+        if (!existingReview || !reviewBelongsToCurrentUser(existingReview) || !reviewId) {
           setPanelMessage(message, "This review could not be found for your account.", "error");
           renderAccountReviews();
           return;
@@ -3937,21 +3970,37 @@ EH|Western Sahara|+212
           return;
         }
 
-        professorReviews.splice(reviewIndex, 1);
+        setPanelMessage(message, "Deleting review...", "");
 
-        if (professorReviews.length) {
-          reviewMap[professorId] = professorReviews;
-        } else {
-          delete reviewMap[professorId];
+        try {
+          const response = await fetch("/api/professor-reviews", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            },
+            body: JSON.stringify({
+              action: "delete",
+              reviewId
+            })
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (!response.ok || !data.success) {
+            setPanelMessage(message, data.error || "Could not delete this review.", "error");
+            return;
+          }
+
+          accountReviews.splice(reviewIndex, 1);
+          renderAccountReviews();
+          setPanelMessage(message, "Review deleted.", "success");
+        } catch (error) {
+          setPanelMessage(message, "Could not delete this review.", "error");
         }
-
-        if (!saveReviewMap(reviewMap)) {
-          setPanelMessage(message, "Could not delete this review in your browser.", "error");
-          return;
-        }
-
-        renderAccountReviews();
-        setPanelMessage(message, "Review deleted.", "success");
       }
 
       function initReviewsPanel() {
