@@ -566,10 +566,10 @@
       ".professor-review-rating-line{margin-bottom:10px;color:var(--ink);font-size:13px;font-weight:900}",
       ".professor-review-form{display:grid;gap:12px}",
       ".professor-review-form label{display:grid;gap:7px;color:var(--muted);font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}",
-      ".professor-review-form input,.professor-review-form textarea{width:100%;border:1px solid var(--line);border-radius:16px;background:var(--surface-soft);color:var(--ink);font:inherit;padding:12px 13px;outline:0}",
+      ".professor-review-form input,.professor-review-form textarea{width:100%;border:1px solid var(--line);border-radius:16px;background:var(--surface-soft);color:var(--ink);font:inherit;font-weight:400;letter-spacing:0;text-transform:none;padding:12px 13px;outline:0}",
       ".professor-review-form textarea{min-height:120px;resize:vertical;line-height:1.55}",
       ".professor-review-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}",
-      ".professor-review-form select{width:100%;min-height:46px;border:1px solid var(--line);border-radius:16px;background:var(--surface-soft);color:var(--ink);font:inherit;font-size:14px;letter-spacing:0;text-transform:none;padding:0 12px;outline:0}",
+      ".professor-review-form .custom-select-trigger{min-height:58px}",
       ".professor-review-form .professor-review-field-message{min-height:18px;margin:-2px 0 0;color:#b42318;font-size:13px;font-weight:800;line-height:1.4;letter-spacing:0;text-transform:none}",
       ".custom-select-dropdown{position:relative;width:100%}",
       ".custom-select-trigger{width:100%;min-height:54px;padding:0 18px;border:1px solid var(--line);border-radius:16px;background:var(--surface-soft);color:var(--ink);font-size:16px;font-weight:400;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;transition:background .22s ease,border-color .22s ease,box-shadow .22s ease}",
@@ -1253,6 +1253,9 @@
                   <div class="custom-select-dropdown professor-review-rating-dropdown" id="professor-review-rating-dropdown">
                     <button class="custom-select-trigger" type="button" aria-expanded="false" aria-controls="professor-review-rating-menu">
                       <span class="custom-select-value" id="professor-review-rating-value">Select rating</span>
+                  <div class="custom-select-dropdown professor-review-rating-dropdown professor-review-custom-dropdown" id="professor-review-rating-dropdown" data-select-id="professor-review-rating">
+                    <button class="custom-select-trigger" type="button" aria-expanded="false" aria-controls="professor-review-rating-menu">
+                      <span class="custom-select-value" id="professor-review-rating-value">Select rating</span>
                       <span class="chevron"></span>
                     </button>
 
@@ -1270,7 +1273,7 @@
                 <div class="professor-review-form-grid">
                   <label>
                     Clarity
-                    <select name="clarityRating" required>
+                    <select name="clarityRating" id="professor-review-clarity-rating" hidden required>
                       <option value="">Select clarity</option>
                       <option value="5">5 - Very clear</option>
                       <option value="4">4 - Clear</option>
@@ -1278,11 +1281,27 @@
                       <option value="2">2 - Unclear</option>
                       <option value="1">1 - Very unclear</option>
                     </select>
+
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" data-select-id="professor-review-clarity-rating">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">Select clarity</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        <button class="custom-select-option active" type="button" data-value="">Select clarity</button>
+                        <button class="custom-select-option" type="button" data-value="5">5 - Very clear</button>
+                        <button class="custom-select-option" type="button" data-value="4">4 - Clear</button>
+                        <button class="custom-select-option" type="button" data-value="3">3 - Average</button>
+                        <button class="custom-select-option" type="button" data-value="2">2 - Unclear</button>
+                        <button class="custom-select-option" type="button" data-value="1">1 - Very unclear</button>
+                      </div>
+                    </div>
                   </label>
 
                   <label>
                     Grading fairness
-                    <select name="gradingRating" required>
+                    <select name="gradingRating" id="professor-review-grading-rating" hidden required>
                       <option value="">Select grading</option>
                       <option value="5">5 - Very fair</option>
                       <option value="4">4 - Fair</option>
@@ -1290,11 +1309,27 @@
                       <option value="2">2 - Tough</option>
                       <option value="1">1 - Very tough</option>
                     </select>
+
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" data-select-id="professor-review-grading-rating">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">Select grading</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        <button class="custom-select-option active" type="button" data-value="">Select grading</button>
+                        <button class="custom-select-option" type="button" data-value="5">5 - Very fair</button>
+                        <button class="custom-select-option" type="button" data-value="4">4 - Fair</button>
+                        <button class="custom-select-option" type="button" data-value="3">3 - Average</button>
+                        <button class="custom-select-option" type="button" data-value="2">2 - Tough</button>
+                        <button class="custom-select-option" type="button" data-value="1">1 - Very tough</button>
+                      </div>
+                    </div>
                   </label>
 
                   <label>
                     Workload
-                    <select name="workloadRating" required>
+                    <select name="workloadRating" id="professor-review-workload-rating" hidden required>
                       <option value="">Select workload</option>
                       <option value="5">5 - Very heavy</option>
                       <option value="4">4 - Heavy</option>
@@ -1302,11 +1337,27 @@
                       <option value="2">2 - Light</option>
                       <option value="1">1 - Very light</option>
                     </select>
+
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" data-select-id="professor-review-workload-rating">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">Select workload</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        <button class="custom-select-option active" type="button" data-value="">Select workload</button>
+                        <button class="custom-select-option" type="button" data-value="5">5 - Very heavy</button>
+                        <button class="custom-select-option" type="button" data-value="4">4 - Heavy</button>
+                        <button class="custom-select-option" type="button" data-value="3">3 - Moderate</button>
+                        <button class="custom-select-option" type="button" data-value="2">2 - Light</button>
+                        <button class="custom-select-option" type="button" data-value="1">1 - Very light</button>
+                      </div>
+                    </div>
                   </label>
 
                   <label>
                     Attendance strictness
-                    <select name="attendanceRating" required>
+                    <select name="attendanceRating" id="professor-review-attendance-rating" hidden required>
                       <option value="">Select attendance</option>
                       <option value="5">5 - Very strict</option>
                       <option value="4">4 - Strict</option>
@@ -1314,15 +1365,44 @@
                       <option value="2">2 - Flexible</option>
                       <option value="1">1 - Very flexible</option>
                     </select>
+
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" data-select-id="professor-review-attendance-rating">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">Select attendance</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        <button class="custom-select-option active" type="button" data-value="">Select attendance</button>
+                        <button class="custom-select-option" type="button" data-value="5">5 - Very strict</button>
+                        <button class="custom-select-option" type="button" data-value="4">4 - Strict</button>
+                        <button class="custom-select-option" type="button" data-value="3">3 - Average</button>
+                        <button class="custom-select-option" type="button" data-value="2">2 - Flexible</button>
+                        <button class="custom-select-option" type="button" data-value="1">1 - Very flexible</button>
+                      </div>
+                    </div>
                   </label>
 
                   <label>
                     Would take again
-                    <select name="takeAgain" required>
+                    <select name="takeAgain" id="professor-review-take-again" hidden required>
                       <option value="">Select answer</option>
                       <option value="yes">Yes</option>
                       <option value="no">No</option>
                     </select>
+
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" data-select-id="professor-review-take-again">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">Select answer</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        <button class="custom-select-option active" type="button" data-value="">Select answer</button>
+                        <button class="custom-select-option" type="button" data-value="yes">Yes</button>
+                        <button class="custom-select-option" type="button" data-value="no">No</button>
+                      </div>
+                    </div>
                   </label>
                 </div>
 
@@ -1350,9 +1430,7 @@
       const reviewTextMessage = document.getElementById("professor-review-text-message");
       const ratingSelect = document.getElementById("professor-review-rating");
       const ratingDropdown = document.getElementById("professor-review-rating-dropdown");
-      const ratingTrigger = ratingDropdown ? ratingDropdown.querySelector(".custom-select-trigger") : null;
-      const ratingValue = document.getElementById("professor-review-rating-value");
-      const ratingOptions = ratingDropdown ? Array.from(ratingDropdown.querySelectorAll(".custom-select-option")) : [];
+      const customReviewDropdowns = Array.from(document.querySelectorAll(".professor-review-custom-dropdown"));
       const courseFilter = document.getElementById("professor-review-filter-course");
       const termFilter = document.getElementById("professor-review-filter-term");
       const ratingFilter = document.getElementById("professor-review-filter-rating");
@@ -1387,52 +1465,74 @@
         }
       });
 
-      function setRatingDropdownOpen(open) {
-        if (!ratingDropdown || !ratingTrigger) {
+      function setCustomDropdownOpen(dropdown, open) {
+        const trigger = dropdown ? dropdown.querySelector(".custom-select-trigger") : null;
+
+        if (!dropdown || !trigger) {
           return;
         }
 
-        ratingDropdown.classList.toggle("open", Boolean(open));
-        ratingTrigger.setAttribute("aria-expanded", String(Boolean(open)));
+        dropdown.classList.toggle("open", Boolean(open));
+        trigger.setAttribute("aria-expanded", String(Boolean(open)));
       }
 
-      if (ratingSelect && ratingDropdown && ratingTrigger && ratingValue) {
-        ratingTrigger.addEventListener("click", function (event) {
+      customReviewDropdowns.forEach(function (dropdown) {
+        const select = document.getElementById(dropdown.dataset.selectId || "");
+        const trigger = dropdown.querySelector(".custom-select-trigger");
+        const value = dropdown.querySelector(".custom-select-value");
+        const options = Array.from(dropdown.querySelectorAll(".custom-select-option"));
+
+        if (!select || !trigger || !value) {
+          return;
+        }
+
+        trigger.addEventListener("click", function (event) {
           event.preventDefault();
           event.stopPropagation();
-          setRatingDropdownOpen(!ratingDropdown.classList.contains("open"));
+
+          customReviewDropdowns.forEach(function (otherDropdown) {
+            if (otherDropdown !== dropdown) {
+              setCustomDropdownOpen(otherDropdown, false);
+            }
+          });
+
+          setCustomDropdownOpen(dropdown, !dropdown.classList.contains("open"));
         });
 
-        ratingOptions.forEach(function (option) {
+        options.forEach(function (option) {
           option.addEventListener("click", function (event) {
             event.preventDefault();
             event.stopPropagation();
 
-            ratingSelect.value = option.dataset.value || "";
-            ratingValue.textContent = option.textContent.trim();
+            select.value = option.dataset.value || "";
+            value.textContent = option.textContent.trim();
 
-            ratingOptions.forEach(function (item) {
+            options.forEach(function (item) {
               item.classList.toggle("active", item === option);
             });
 
-            ratingDropdown.classList.remove("invalid");
-            ratingSelect.dispatchEvent(new Event("change", { bubbles: true }));
-            setRatingDropdownOpen(false);
+            dropdown.classList.remove("invalid");
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+            setCustomDropdownOpen(dropdown, false);
           });
         });
+      });
 
-        document.addEventListener("click", function (event) {
-          if (!ratingDropdown.contains(event.target)) {
-            setRatingDropdownOpen(false);
+      document.addEventListener("click", function (event) {
+        customReviewDropdowns.forEach(function (dropdown) {
+          if (!dropdown.contains(event.target)) {
+            setCustomDropdownOpen(dropdown, false);
           }
         });
+      });
 
-        document.addEventListener("keydown", function (event) {
-          if (event.key === "Escape") {
-            setRatingDropdownOpen(false);
-          }
-        });
-      }
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          customReviewDropdowns.forEach(function (dropdown) {
+            setCustomDropdownOpen(dropdown, false);
+          });
+        }
+      });
 
       [
         { element: courseFilter, key: "course" },
