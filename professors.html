@@ -496,9 +496,22 @@
 
   <div id="site-footer-root"></div>
   <script src="footer.js"></script>
+  <script src="courses-data.js"></script>
   <script src="professors-data.js"></script>
   <script>
     const professors = window.AUC_ATLAS_PROFESSORS || [];
+    const courseDetailsByCode = window.AUC_ATLAS_COURSE_DETAILS || {};
+    const reviewSemesterOptions = [
+      { value: "fall-2024", label: "Fall 2024" },
+      { value: "spring-2025", label: "Spring 2025" },
+      { value: "summer-2025", label: "Summer 2025" },
+      { value: "fall-2025", label: "Fall 2025" },
+      { value: "spring-2026", label: "Spring 2026" },
+      { value: "summer-2026", label: "Summer 2026" },
+      { value: "fall-2026", label: "Fall 2026" },
+      { value: "spring-2027", label: "Spring 2027" },
+      { value: "summer-2027", label: "Summer 2027" }
+    ];
     const main = document.querySelector(".professors-page");
     const grid = document.querySelector(".professors-grid");
     const selectedProfessorId = new URLSearchParams(window.location.search).get("professor");
@@ -606,6 +619,80 @@
       });
     }
 
+    function normalizeCourseKey(value) {
+      return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+
+    function getCourseLabel(course) {
+      return [course.code, course.title].filter(Boolean).join(" - ");
+    }
+
+    function getProfessorRecordedCourses(professorId) {
+      return Object.keys(courseDetailsByCode).map(function (courseCode) {
+        const details = courseDetailsByCode[courseCode] || {};
+        const professorsForCourse = Array.isArray(details.professors) ? details.professors : [];
+        const hasProfessor = professorsForCourse.some(function (entry) {
+          const professorEntry = typeof entry === "string" ? { id: entry } : entry || {};
+          return professorEntry.id === professorId;
+        });
+
+        if (!hasProfessor) {
+          return null;
+        }
+
+        return {
+          code: courseCode,
+          title: details.title || courseCode
+        };
+      }).filter(Boolean).sort(function (first, second) {
+        return first.code.localeCompare(second.code);
+      });
+    }
+
+    function getReviewCourseLabel(review) {
+      if (review.courseCode) {
+        return [review.courseCode, review.courseTitle].filter(Boolean).join(" - ");
+      }
+
+      return String(review.course || "").trim();
+    }
+
+    function getReviewSemesterLabel(review) {
+      return String(review.semesterLabel || review.term || "").trim();
+    }
+
+    function getSemesterOption(value) {
+      const normalizedValue = String(value || "").trim().toLowerCase();
+
+      return reviewSemesterOptions.find(function (semester) {
+        return semester.value === normalizedValue || semester.label.toLowerCase() === normalizedValue;
+      }) || null;
+    }
+
+    function renderCourseSelectOptions(courses) {
+      return ['<option value="">Select course</option>'].concat(courses.map(function (course) {
+        return `<option value="${escapeHtml(course.code)}">${escapeHtml(getCourseLabel(course))}</option>`;
+      })).join("");
+    }
+
+    function renderCourseDropdownOptions(courses) {
+      return ['<button class="custom-select-option active" type="button" data-value="">Select course</button>'].concat(courses.map(function (course) {
+        return `<button class="custom-select-option" type="button" data-value="${escapeHtml(course.code)}">${escapeHtml(getCourseLabel(course))}</button>`;
+      })).join("");
+    }
+
+    function renderSemesterSelectOptions() {
+      return ['<option value="">Select semester</option>'].concat(reviewSemesterOptions.map(function (semester) {
+        return `<option value="${escapeHtml(semester.value)}">${escapeHtml(semester.label)}</option>`;
+      })).join("");
+    }
+
+    function renderSemesterDropdownOptions() {
+      return ['<button class="custom-select-option active" type="button" data-value="">Select semester</button>'].concat(reviewSemesterOptions.map(function (semester) {
+        return `<button class="custom-select-option" type="button" data-value="${escapeHtml(semester.value)}">${escapeHtml(semester.label)}</button>`;
+      })).join("");
+    }
+
     async function getCurrentReviewUser() {
       try {
         const response = await fetch("/api/me", {
@@ -683,7 +770,11 @@
           body: JSON.stringify({
             professorId,
             professorName,
+            courseCode: review.courseCode,
+            courseTitle: review.courseTitle,
             course: review.course,
+            semester: review.semester,
+            semesterLabel: review.semesterLabel,
             term: review.term,
             rating: review.rating,
             clarityRating: review.clarityRating,
@@ -806,6 +897,7 @@
         rating: "all",
         sort: "newest"
       });
+      const recordedCourses = getProfessorRecordedCourses(professor.id);
 
       function getReviewRating(review, key) {
         const rating = Number(review[key]);
@@ -851,12 +943,12 @@
         return Number.isNaN(date.getTime()) ? 0 : date.getTime();
       }
 
-      function getUniqueReviewValues(reviews, key) {
+      function getUniqueReviewValues(reviews, getValue) {
         const values = [];
         const seen = Object.create(null);
 
         reviews.forEach(function (review) {
-          const value = String(review[key] || "").trim();
+          const value = String(typeof getValue === "function" ? getValue(review) : review[getValue] || "").trim();
           const lookup = value.toLowerCase();
 
           if (value && !seen[lookup]) {
@@ -908,8 +1000,8 @@
 
       function getFilteredReviews(reviews) {
         return reviews.filter(function (review) {
-          const course = String(review.course || "").trim();
-          const term = String(review.term || "").trim();
+          const course = getReviewCourseLabel(review);
+          const term = getReviewSemesterLabel(review);
           const rating = getReviewRating(review, "rating");
 
           if (reviewFilters.course !== "all" && course !== reviewFilters.course) {
@@ -970,7 +1062,7 @@
         const courses = Object.create(null);
 
         reviews.forEach(function (review) {
-          const course = String(review.course || "").trim();
+          const course = getReviewCourseLabel(review);
 
           if (!course) {
             return;
@@ -1041,7 +1133,7 @@
         const courses = Object.create(null);
 
         professorReviews.forEach(function (review) {
-          const course = String(review.course || "").trim();
+          const course = getReviewCourseLabel(review);
 
           if (!course) {
             return;
@@ -1109,8 +1201,8 @@
         }).join("");
       }
 
-      const courseOptions = getUniqueReviewValues(professorReviews, "course");
-      const termOptions = getUniqueReviewValues(professorReviews, "term");
+      const courseOptions = getUniqueReviewValues(professorReviews, getReviewCourseLabel);
+      const termOptions = getUniqueReviewValues(professorReviews, getReviewSemesterLabel);
       const filteredProfessorReviews = getFilteredReviews(professorReviews);
       const reviewItems = filteredProfessorReviews.length
         ? filteredProfessorReviews.map(function (review) {
@@ -1129,7 +1221,7 @@
                   <div class="professor-review-avatar">${avatarMarkup}</div>
                   <div class="professor-review-author">
                     <strong>${escapeHtml(reviewerName)}</strong>
-                    <span>${escapeHtml(review.course || "Course not listed")} · ${escapeHtml(review.term || "Term not listed")}</span>
+                    <span>${escapeHtml(getReviewCourseLabel(review) || "Course not listed")} · ${escapeHtml(getReviewSemesterLabel(review) || "Semester not listed")}</span>
                   </div>
                 </div>
                 <div class="professor-review-rating-line">${escapeHtml(rating)}</div>
@@ -1309,15 +1401,45 @@
               <p>Share feedback tied to the course you took with ${escapeHtml(professor.name)}.</p>
 
               <form class="professor-review-form" id="professor-review-form" novalidate>
-                <label>
-                  Course
-                  <input type="text" name="course" placeholder="Example: Linear Algebra" required>
-                </label>
+                ${recordedCourses.length ? `
+                  <label>
+                    Course
+                    <select name="courseCode" id="professor-review-course" hidden required>
+                      ${renderCourseSelectOptions(recordedCourses)}
+                    </select>
 
-                <label>
-                  Term
-                  <input type="text" name="term" placeholder="Example: Spring 2025" required>
-                </label>
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" id="professor-review-course-dropdown" data-select-id="professor-review-course">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">Select course</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        ${renderCourseDropdownOptions(recordedCourses)}
+                      </div>
+                    </div>
+                  </label>
+
+                  <label>
+                    Semester
+                    <select name="semester" id="professor-review-semester" hidden required>
+                      ${renderSemesterSelectOptions()}
+                    </select>
+
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" id="professor-review-semester-dropdown" data-select-id="professor-review-semester">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">Select semester</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        ${renderSemesterDropdownOptions()}
+                      </div>
+                    </div>
+                  </label>
+                ` : `
+                  <div class="professor-review-empty">A review cannot yet be submitted because no course relationship has been recorded for this professor.</div>
+                `}
 
                 <label>
                   Overall rating
@@ -1505,6 +1627,10 @@
       const reviewMessage = document.getElementById("professor-review-form-message");
       const reviewTextarea = document.getElementById("professor-review-text");
       const reviewTextMessage = document.getElementById("professor-review-text-message");
+      const courseSelect = document.getElementById("professor-review-course");
+      const courseDropdown = document.getElementById("professor-review-course-dropdown");
+      const semesterSelect = document.getElementById("professor-review-semester");
+      const semesterDropdown = document.getElementById("professor-review-semester-dropdown");
       const ratingSelect = document.getElementById("professor-review-rating");
       const ratingDropdown = document.getElementById("professor-review-rating-dropdown");
       const customReviewDropdowns = Array.from(document.querySelectorAll(".professor-review-custom-dropdown"));
@@ -1654,6 +1780,34 @@
 
           const formData = new FormData(reviewForm);
           const reviewText = String(formData.get("review") || "").trim();
+          const selectedCourseCode = String(formData.get("courseCode") || "").trim();
+          const selectedCourse = recordedCourses.find(function (course) {
+            return course.code === selectedCourseCode;
+          }) || null;
+          const selectedSemester = getSemesterOption(formData.get("semester"));
+
+          if (!recordedCourses.length) {
+            reviewMessage.textContent = "A review cannot yet be submitted because no course relationship has been recorded for this professor.";
+            return;
+          }
+
+          if (!selectedCourse) {
+            if (courseDropdown) {
+              courseDropdown.classList.add("invalid");
+            }
+
+            reviewMessage.textContent = "Select one of the recorded courses before submitting.";
+            return;
+          }
+
+          if (!selectedSemester) {
+            if (semesterDropdown) {
+              semesterDropdown.classList.add("invalid");
+            }
+
+            reviewMessage.textContent = "Select a standard semester before submitting.";
+            return;
+          }
 
           if (!reviewText) {
             if (reviewTextMessage) {
@@ -1681,8 +1835,12 @@
             reviewerUid: currentUser.uid || "",
             reviewerName: String(reviewerName || "").trim(),
             reviewerPhoto: String(currentUser.photoURL || "").trim(),
-            course: String(formData.get("course") || "").trim(),
-            term: String(formData.get("term") || "").trim(),
+            courseCode: selectedCourse.code,
+            courseTitle: selectedCourse.title,
+            course: getCourseLabel(selectedCourse),
+            semester: selectedSemester.value,
+            semesterLabel: selectedSemester.label,
+            term: selectedSemester.label,
             rating: Number(formData.get("rating")),
             clarityRating: Number(formData.get("clarityRating")),
             gradingRating: Number(formData.get("gradingRating")),
@@ -1693,7 +1851,7 @@
             createdAt: new Date().toISOString()
           };
 
-          if (!review.course || !review.term || !review.rating || !review.clarityRating || !review.gradingRating || !review.workloadRating || !review.attendanceRating || (review.takeAgain !== "yes" && review.takeAgain !== "no") || !review.text) {
+          if (!review.courseCode || !review.semester || !review.rating || !review.clarityRating || !review.gradingRating || !review.workloadRating || !review.attendanceRating || (review.takeAgain !== "yes" && review.takeAgain !== "no") || !review.text) {
             reviewMessage.textContent = "Fill out every field before submitting.";
             return;
           }
