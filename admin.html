@@ -138,6 +138,10 @@
       line-height: 1.6;
     }
 
+    .admin-material-heading {
+      margin-top: 38px;
+    }
+
     .admin-empty-state {
       color: var(--muted);
       line-height: 1.7;
@@ -184,6 +188,21 @@
     <div class="admin-review-list" id="admin-review-list"></div>
     <div class="admin-empty-state" id="admin-empty-state" hidden>No reviews found.</div>
     <p class="admin-message" id="admin-message" aria-live="polite"></p>
+
+    <section class="admin-hero admin-material-heading">
+      <div>
+        <p class="kicker">Materials</p>
+        <h1>Material Dashboard</h1>
+        <p>Download or delete uploaded course materials stored for verified AUC students.</p>
+      </div>
+
+      <button class="admin-button" type="button" id="admin-material-refresh-button">Refresh Materials</button>
+    </section>
+
+    <div class="admin-loading" id="admin-material-loading">Loading materials...</div>
+    <div class="admin-review-list" id="admin-material-list"></div>
+    <div class="admin-empty-state" id="admin-material-empty-state" hidden>No materials found.</div>
+    <p class="admin-message" id="admin-material-message" aria-live="polite"></p>
   </main>
 
   <div id="site-footer-root"></div>
@@ -195,11 +214,17 @@
     const loadingState = document.getElementById("admin-loading");
     const emptyState = document.getElementById("admin-empty-state");
     const message = document.getElementById("admin-message");
+    const materialList = document.getElementById("admin-material-list");
+    const materialLoadingState = document.getElementById("admin-material-loading");
+    const materialEmptyState = document.getElementById("admin-material-empty-state");
+    const materialMessage = document.getElementById("admin-material-message");
     const searchInput = document.getElementById("admin-review-search");
     const refreshButton = document.getElementById("admin-refresh-button");
+    const materialRefreshButton = document.getElementById("admin-material-refresh-button");
     const clearSearchButton = document.getElementById("admin-clear-search");
     const professors = window.AUC_ATLAS_PROFESSORS || [];
     let reviews = [];
+    let materials = [];
 
     function escapeHtml(value) {
       return String(value == null ? "" : value).replace(/[&<>"']/g, function (char) {
@@ -253,8 +278,12 @@
       return review.semesterLabel || review.term || "";
     }
 
+    function getSearchQuery() {
+      return String(searchInput && searchInput.value ? searchInput.value : "").trim().toLowerCase();
+    }
+
     function getFilteredReviews() {
-      const query = String(searchInput && searchInput.value ? searchInput.value : "").trim().toLowerCase();
+      const query = getSearchQuery();
 
       if (!query) {
         return reviews;
@@ -271,6 +300,46 @@
           review.courseTitle,
           review.semester,
           review.text
+        ].join(" ").toLowerCase().includes(query);
+      });
+    }
+
+    function getMaterialCourseLabel(material) {
+      return [material.courseCode, material.courseTitle].filter(Boolean).join(" - ");
+    }
+
+    function formatFileSize(bytes) {
+      const size = Number(bytes || 0);
+
+      if (!Number.isFinite(size) || size <= 0) {
+        return "Size not listed";
+      }
+
+      if (size >= 1024 * 1024) {
+        return (size / (1024 * 1024)).toFixed(1) + " MB";
+      }
+
+      return Math.max(1, Math.round(size / 1024)) + " KB";
+    }
+
+    function getFilteredMaterials() {
+      const query = getSearchQuery();
+
+      if (!query) {
+        return materials;
+      }
+
+      return materials.filter(function (material) {
+        return [
+          material.title,
+          getMaterialCourseLabel(material),
+          material.professorName,
+          material.semesterLabel,
+          material.materialTypeLabel,
+          material.uploaderDisplayLabel,
+          material.uploaderEmail,
+          material.originalFilename,
+          material.description
         ].join(" ").toLowerCase().includes(query);
       });
     }
@@ -314,6 +383,51 @@
       });
     }
 
+    function renderMaterials() {
+      const filteredMaterials = getFilteredMaterials();
+
+      if (!materialList || !materialEmptyState) {
+        return;
+      }
+
+      materialEmptyState.hidden = filteredMaterials.length > 0;
+      materialList.innerHTML = filteredMaterials.map(function (material) {
+        return `
+          <article class="admin-review-card">
+            <div class="admin-review-top">
+              <div>
+                <h2>${escapeHtml(material.title || "Untitled material")}</h2>
+                <div class="admin-review-meta">
+                  ${escapeHtml(getMaterialCourseLabel(material) || "Course not listed")} · ${escapeHtml(material.professorName || "Professor not listed")} · ${escapeHtml(material.semesterLabel || "Semester not listed")}<br>
+                  ${escapeHtml(material.materialTypeLabel || "Material")} · ${escapeHtml((material.fileExtension || material.fileType || "File").toUpperCase())} · ${escapeHtml(formatFileSize(material.fileSize))}<br>
+                  ${escapeHtml(material.uploaderDisplayLabel || "Anonymous AUC student")} · ${escapeHtml(material.uploaderEmail || "Email not listed")} · ${escapeHtml(formatDate(material.createdAt))}
+                </div>
+              </div>
+
+              <div>
+                <button class="admin-button" type="button" data-download-material="${escapeHtml(material.id)}">Download</button>
+                <button class="admin-danger-button" type="button" data-delete-material="${escapeHtml(material.id)}">Delete</button>
+              </div>
+            </div>
+
+            <p>${escapeHtml(material.description || material.originalFilename || "")}</p>
+          </article>
+        `;
+      }).join("");
+
+      materialList.querySelectorAll("[data-download-material]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          downloadMaterial(button.getAttribute("data-download-material"));
+        });
+      });
+
+      materialList.querySelectorAll("[data-delete-material]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          deleteMaterial(button.getAttribute("data-delete-material"));
+        });
+      });
+    }
+
     async function loadReviews() {
       if (loadingState) {
         loadingState.hidden = false;
@@ -348,6 +462,49 @@
       } finally {
         if (loadingState) {
           loadingState.hidden = true;
+        }
+      }
+    }
+
+    async function loadMaterials() {
+      if (materialLoadingState) {
+        materialLoadingState.hidden = false;
+      }
+
+      if (materialMessage) {
+        materialMessage.textContent = "";
+      }
+
+      try {
+        const response = await fetch("/api/course-materials?scope=admin", {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not load materials.");
+        }
+
+        materials = Array.isArray(data.materials) ? data.materials : [];
+        renderMaterials();
+      } catch (error) {
+        materials = [];
+        renderMaterials();
+
+        if (materialMessage) {
+          materialMessage.textContent = error.message || "Could not load materials.";
+        }
+      } finally {
+        if (materialLoadingState) {
+          materialLoadingState.hidden = true;
         }
       }
     }
@@ -396,22 +553,124 @@
       }
     }
 
+    async function downloadMaterial(materialId) {
+      if (materialMessage) {
+        materialMessage.textContent = "Preparing secure download...";
+      }
+
+      try {
+        const response = await fetch("/api/course-materials", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          },
+          body: JSON.stringify({
+            action: "download",
+            materialId
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success || !data.downloadUrl) {
+          throw new Error(data.error || "Could not prepare download.");
+        }
+
+        if (materialMessage) {
+          materialMessage.textContent = "";
+        }
+
+        window.location.href = data.downloadUrl;
+      } catch (error) {
+        if (materialMessage) {
+          materialMessage.textContent = error.message || "Could not prepare download.";
+        }
+      }
+    }
+
+    async function deleteMaterial(materialId) {
+      const material = materials.find(function (item) {
+        return item.id === materialId;
+      });
+
+      if (!material || !window.confirm("Delete this material? This removes the uploaded file and cannot be undone.")) {
+        return;
+      }
+
+      if (materialMessage) {
+        materialMessage.textContent = "Deleting material...";
+      }
+
+      try {
+        const response = await fetch("/api/course-materials", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          },
+          body: JSON.stringify({
+            action: "delete",
+            materialId
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Could not delete material.");
+        }
+
+        materials = materials.filter(function (item) {
+          return item.id !== materialId;
+        });
+
+        renderMaterials();
+
+        if (materialMessage) {
+          materialMessage.textContent = "Material deleted.";
+        }
+      } catch (error) {
+        if (materialMessage) {
+          materialMessage.textContent = error.message || "Could not delete material.";
+        }
+      }
+    }
+
     if (searchInput) {
-      searchInput.addEventListener("input", renderReviews);
+      searchInput.addEventListener("input", function () {
+        renderReviews();
+        renderMaterials();
+      });
     }
 
     if (refreshButton) {
-      refreshButton.addEventListener("click", loadReviews);
+      refreshButton.addEventListener("click", function () {
+        loadReviews();
+        loadMaterials();
+      });
+    }
+
+    if (materialRefreshButton) {
+      materialRefreshButton.addEventListener("click", loadMaterials);
     }
 
     if (clearSearchButton && searchInput) {
       clearSearchButton.addEventListener("click", function () {
         searchInput.value = "";
         renderReviews();
+        renderMaterials();
       });
     }
 
     loadReviews();
+    loadMaterials();
   </script>
 </body>
 </html>
