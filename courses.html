@@ -110,10 +110,7 @@
     }
 
     .courses-layout {
-      display: grid;
-      grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr);
-      gap: 30px;
-      align-items: start;
+      display: block;
     }
 
     .courses-list-panel {
@@ -138,7 +135,7 @@
 
     .courses-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 14px;
     }
 
@@ -157,7 +154,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      cursor: pointer;
+      cursor: default;
       transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
     }
 
@@ -497,8 +494,6 @@
 
         <div id="coursesGrid" class="courses-grid"></div>
       </section>
-
-      <section id="courseDetailPanel" class="course-detail-panel" aria-live="polite"></section>
     </section>
 
     <script>
@@ -732,21 +727,14 @@
 
         if (!filteredCourses.length) {
           coursesGrid.innerHTML = '<div class="course-empty-state">No courses match this search yet.</div>';
-          courseDetailPanel.innerHTML = "";
           return;
-        }
-
-        if (!filteredCourses.some(function (course) {
-          return course.code === state.selectedCourseCode;
-        })) {
-          state.selectedCourseCode = filteredCourses[0].code;
         }
 
         coursesGrid.innerHTML = filteredCourses.map(function (course) {
           const stats = getCourseStats(course);
 
           return `
-            <button class="atlas-course-card ${course.code === state.selectedCourseCode ? "active" : ""}" type="button" data-course-code="${escapeHtml(course.code)}">
+            <article class="atlas-course-card">
               <div class="course-card-visual">
                 <span>${escapeHtml(course.department)}</span>
                 <strong>${escapeHtml(course.code)}</strong>
@@ -762,19 +750,9 @@
                   <span>${escapeHtml(formatCount(stats.reviewCount, "review"))}</span>
                 </div>
               </div>
-            </button>
+            </article>
           `;
         }).join("");
-
-        coursesGrid.querySelectorAll(".atlas-course-card").forEach(function (card) {
-          card.addEventListener("click", function () {
-            state.selectedCourseCode = card.dataset.courseCode;
-            const url = new URL(window.location.href);
-            url.searchParams.set("course", state.selectedCourseCode);
-            window.history.replaceState(null, "", url.pathname + url.search + url.hash);
-            render();
-          });
-        });
       }
 
       function getAverageRating(reviews) {
@@ -1036,7 +1014,6 @@
 
         const filteredCourses = getFilteredCourses();
         renderCourses(filteredCourses);
-        renderCourseDetail();
       }
 
       courseSearch.addEventListener("input", function () {
