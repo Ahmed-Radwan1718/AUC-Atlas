@@ -15,6 +15,17 @@ const {
 
 const MAX_PUBLIC_REVIEWS = 200;
 const MAX_ADMIN_REVIEWS = 500;
+const MAX_REPORT_EXPLANATION_LENGTH = 600;
+const REPORT_STATUS_OPEN = "open";
+const REVIEW_REPORT_REASONS = [
+  "Harassment or personal attack",
+  "Discriminatory or hateful content",
+  "False or misleading information",
+  "Contains private information",
+  "Spam or irrelevant content",
+  "Inappropriate language",
+  "Other"
+];
 const SEMESTER_OPTIONS = [
   { value: "fall-2024", label: "Fall 2024" },
   { value: "spring-2025", label: "Spring 2025" },
@@ -295,6 +306,162 @@ function serializeReview(reviewDoc, options) {
   }
 
   return review;
+}
+
+function cleanReportReason(value) {
+  const requestedReason = cleanString(value, 160).toLowerCase();
+
+  return REVIEW_REPORT_REASONS.find(function (reason) {
+    return reason.toLowerCase() === requestedReason;
+  }) || "";
+}
+
+function cleanReportExplanation(value) {
+  return cleanString(value, MAX_REPORT_EXPLANATION_LENGTH);
+}
+
+function getOpenReportKey(contentType, contentId, uid) {
+  const reporterHash = crypto.createHash("sha256").update(uid).digest("hex").slice(0, 32);
+  return contentType + "_" + contentId + "_" + reporterHash;
+}
+
+function createReviewReportSnapshot(reviewId, data) {
+  return {
+    reviewId,
+    professorId: data.professorId || "",
+    professorName: data.professorName || "",
+    courseCode: data.courseCode || "",
+    courseTitle: data.courseTitle || "",
+    course: data.course || "",
+    semester: data.semester || "",
+    semesterLabel: data.semesterLabel || "",
+    term: data.term || "",
+    rating: Number(data.rating || 0),
+    clarityRating: Number(data.clarityRating || 0),
+    gradingRating: Number(data.gradingRating || 0),
+    workloadRating: Number(data.workloadRating || 0),
+    attendanceRating: Number(data.attendanceRating || 0),
+    takeAgain: data.takeAgain || "",
+    textPreview: cleanString(data.text || "", 700),
+    createdAt: serializeTimestamp(data.createdAt),
+    updatedAt: serializeTimestamp(data.updatedAt)
+  };
+}
+
+async function handleCreateReviewReport(req, res) {
+  const body = getRequestBody(req);
+  const reviewId = cleanReviewId(body.reviewId);
+  const reason = cleanReportReason(body.reason);
+  const rawExplanation = String(body.explanation || "").trim();
+
+  if (!reviewId) {
+    return res.status(400).json({ error: "Missing review id." });
+  }
+
+  if (!reason) {
+    return res.status(400).json({ error: "Choose a report reason." });
+  }
+
+  if (rawExplanation.length > MAX_REPORT_EXPLANATION_LENGTH) {
+    return res.status(400).json({ error: "Keep the report explanation under 600 characters." });
+  }
+
+  const explanation = cleanReportExplanation(rawExplanation);
+
+  if (reason === "Other" && !explanation) {
+    return res.status(400).json({ error: "Write a brief explanation when choosing Other." });
+  }
+
+  const decodedUser = await getSignedInUser(req);
+
+  await consumeRateLimit({
+    bucket: "content-report-submit-user",
+    keyParts: [decodedUser.uid, getClientIp(req)],
+    firstLimit: 12,
+    secondLimit: 24,
+    firstLockMs: THIRTY_MINUTES_MS,
+    secondLockMs: ONE_HOUR_MS,
+    errorMessage: "Too many report submissions."
+  });
+
+  await consumeRateLimit({
+    bucket: "content-report-submit-item",
+    keyParts: [decodedUser.uid, "review", reviewId],
+    firstLimit: 2,
+    secondLimit: 4,
+    firstLockMs: THIRTY_MINUTES_MS,
+    secondLockMs: ONE_HOUR_MS,
+    errorMessage: "Too many report attempts for this item."
+  });
+
+  const db = admin.firestore();
+  const reviewRef = db.collection("professorReviews").doc(reviewId);
+  const reportRef = db.collection("contentReports").doc();
+  const duplicateRef = db.collection("openReportKeys").doc(getOpenReportKey("review", reviewId, decodedUser.uid));
+  const now = admin.firestore.FieldValue.serverTimestamp();
+  let reportSnapshot = null;
+
+  await db.runTransaction(async function (transaction) {
+    const duplicateDoc = await transaction.get(duplicateRef);
+
+    if (duplicateDoc.exists) {
+      const error = new Error("You already reported this item. It is still waiting for review.");
+      error.statusCode = 409;
+      throw error;
+    }
+
+    const reviewDoc = await transaction.get(reviewRef);
+
+    if (!reviewDoc.exists) {
+      const error = new Error("Review not found.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const reviewData = reviewDoc.data() || {};
+
+    if (reviewData.reviewerUid === decodedUser.uid) {
+      const error = new Error("You cannot report your own review.");
+      error.statusCode = 403;
+      throw error;
+    }
+
+    reportSnapshot = createReviewReportSnapshot(reviewId, reviewData);
+
+    transaction.set(reportRef, {
+      reportId: reportRef.id,
+      contentType: "review",
+      contentId: reviewId,
+      reporterUid: decodedUser.uid,
+      reason,
+      explanation,
+      status: REPORT_STATUS_OPEN,
+      statusLabel: "Open",
+      assignedAdminUid: "",
+      resolvingAdminUid: "",
+      resolvedAt: null,
+      resolutionAction: "",
+      resolutionReason: "",
+      contentSnapshot: reportSnapshot,
+      createdAt: now,
+      updatedAt: now
+    });
+
+    transaction.set(duplicateRef, {
+      reportId: reportRef.id,
+      contentType: "review",
+      contentId: reviewId,
+      reporterUid: decodedUser.uid,
+      createdAt: now,
+      updatedAt: now
+    });
+  });
+
+  return res.status(200).json({
+    success: true,
+    reportId: reportRef.id,
+    message: "Report submitted for review."
+  });
 }
 
 function getReviewTime(review) {
@@ -721,6 +888,10 @@ module.exports = async function handler(req, res) {
 
       if (action === "update") {
         return await handleUpdateReview(req, res);
+      }
+
+      if (action === "report") {
+        return await handleCreateReviewReport(req, res);
       }
 
       return await handleCreateReview(req, res);
