@@ -248,6 +248,25 @@ async function handleCreateReview(req, res) {
   }
 
   const decodedUser = await getSignedInUser(req);
+  const db = admin.firestore();
+  const uidHash = require("crypto")
+    .createHash("sha256")
+    .update(decodedUser.uid)
+    .digest("hex")
+    .slice(0, 32);
+  const reviewRef = db.collection("professorReviews").doc(professorId + "_" + uidHash);
+  const previousUserReviews = await db.collection("professorReviews")
+    .where("reviewerUid", "==", decodedUser.uid)
+    .limit(MAX_ADMIN_REVIEWS)
+    .get();
+  const alreadyReviewedProfessor = previousUserReviews.docs.some(function (doc) {
+    const data = doc.data() || {};
+    return data.professorId === professorId;
+  });
+
+  if (alreadyReviewedProfessor) {
+    return res.status(409).json({ error: "You already reviewed this professor." });
+  }
 
   await consumeRateLimit({
     bucket: "professor-review-submit",
@@ -260,20 +279,29 @@ async function handleCreateReview(req, res) {
   });
 
   const reviewer = await getReviewerProfile(decodedUser);
-  const reviewRef = admin.firestore().collection("professorReviews").doc();
 
-  await reviewRef.set({
-    professorId,
-    professorName,
-    reviewerUid: decodedUser.uid,
-    reviewerName: reviewer.reviewerName,
-    reviewerEmail: reviewer.reviewerEmail,
-    reviewerPhoto: reviewer.reviewerPhoto,
-    course,
-    term,
-    rating,
-    text,
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  await db.runTransaction(async function (transaction) {
+    const existingReview = await transaction.get(reviewRef);
+
+    if (existingReview.exists) {
+      const error = new Error("You already reviewed this professor.");
+      error.statusCode = 409;
+      throw error;
+    }
+
+    transaction.set(reviewRef, {
+      professorId,
+      professorName,
+      reviewerUid: decodedUser.uid,
+      reviewerName: reviewer.reviewerName,
+      reviewerEmail: reviewer.reviewerEmail,
+      reviewerPhoto: reviewer.reviewerPhoto,
+      course,
+      term,
+      rating,
+      text,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
   });
 
   const savedReview = await reviewRef.get();
