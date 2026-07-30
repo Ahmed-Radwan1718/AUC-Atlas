@@ -812,7 +812,7 @@
             <div class="professor-detail-copy">
               <p class="kicker">${escapeHtml(professor.department || "Department pending")}</p>
               <h1>${escapeHtml(professor.name)}</h1>
-              <p class="professor-detail-intro">Read student feedback, check the overall rating, and add your own course-specific review for this professor.</p>
+              <p class="professor-detail-intro">${professor.name === "Eslam Badr" ? "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points." : "Read student feedback, check the overall rating, and add your own course-specific review for this professor."}</p>
 
               <div class="professor-detail-stats">
                 <div class="professor-detail-stat">
