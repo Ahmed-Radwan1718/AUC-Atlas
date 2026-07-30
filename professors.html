@@ -522,7 +522,14 @@
       ".professor-detail-stat strong{color:var(--ink);font-size:15px;line-height:1.25}",
       ".professor-detail-actions{display:flex;flex-wrap:wrap;gap:10px}",
       ".professor-detail-action{min-height:44px;padding:0 17px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:white;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}",
-      ".professor-detail-layout{margin-top:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.36fr);gap:24px;align-items:start}",
+      ".professor-review-modal{position:fixed;inset:0;z-index:220;padding:24px;display:flex;align-items:center;justify-content:center}",
+      ".professor-review-modal[hidden]{display:none}",
+      ".professor-review-modal-backdrop{position:absolute;inset:0;border:0;background:rgba(29,31,31,.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}",
+      ".professor-review-modal-card{position:relative;z-index:1;width:min(460px,100%);max-height:min(760px,calc(100vh - 48px));overflow:auto;padding:30px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}",
+      ".professor-review-modal-card h2{margin:0 42px 12px 0;font-size:28px;line-height:1.08;text-transform:uppercase}",
+      ".professor-review-modal-card p{margin:0 0 18px;color:var(--muted);line-height:1.65}",
+      ".professor-review-modal-close{position:absolute;top:16px;right:16px;width:38px;height:38px;border:1px solid var(--line);border-radius:999px;background:var(--surface-soft);color:var(--ink);font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center}",
+      ".professor-detail-layout{margin-top:24px;display:block}",
       ".professor-detail-panel{padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}",
       ".professor-detail-panel + .professor-detail-panel{margin-top:24px}",
       ".professor-detail-panel h2{margin:0 0 10px;font-size:24px;text-transform:uppercase}",
@@ -823,7 +830,7 @@
               </div>
 
               <div class="professor-detail-actions">
-                <a class="professor-detail-action" href="#professor-review-form">Write a Review</a>
+                <button class="professor-detail-action" id="professor-review-open-button" type="button">Write a Review</button>
               </div>
             </div>
           </div>
@@ -843,8 +850,14 @@
               </section>
             </div>
 
-            <aside class="professor-detail-panel">
-              <h2>Review this professor</h2>
+          </div>
+
+          <div class="professor-review-modal" id="professor-review-modal" hidden>
+            <button class="professor-review-modal-backdrop" id="professor-review-modal-backdrop" type="button" aria-label="Close review form"></button>
+
+            <aside class="professor-review-modal-card" role="dialog" aria-modal="true" aria-labelledby="professor-review-modal-title">
+              <button class="professor-review-modal-close" id="professor-review-modal-close" type="button" aria-label="Close review form">&times;</button>
+              <h2 id="professor-review-modal-title">Review this professor</h2>
               <p>Share feedback tied to the course you took with ${escapeHtml(professor.name)}.</p>
 
               <form class="professor-review-form" id="professor-review-form">
@@ -899,6 +912,10 @@
         </section>
       `;
 
+      const reviewOpenButton = document.getElementById("professor-review-open-button");
+      const reviewModal = document.getElementById("professor-review-modal");
+      const reviewModalBackdrop = document.getElementById("professor-review-modal-backdrop");
+      const reviewModalClose = document.getElementById("professor-review-modal-close");
       const reviewForm = document.getElementById("professor-review-form");
       const reviewMessage = document.getElementById("professor-review-form-message");
       const ratingSelect = document.getElementById("professor-review-rating");
@@ -906,6 +923,35 @@
       const ratingTrigger = ratingDropdown ? ratingDropdown.querySelector(".custom-select-trigger") : null;
       const ratingValue = document.getElementById("professor-review-rating-value");
       const ratingOptions = ratingDropdown ? Array.from(ratingDropdown.querySelectorAll(".custom-select-option")) : [];
+
+      function setReviewModalOpen(open) {
+        if (!reviewModal) {
+          return;
+        }
+
+        reviewModal.hidden = !open;
+        document.body.style.overflow = open ? "hidden" : "";
+      }
+
+      if (reviewOpenButton) {
+        reviewOpenButton.addEventListener("click", function () {
+          setReviewModalOpen(true);
+        });
+      }
+
+      [reviewModalBackdrop, reviewModalClose].forEach(function (element) {
+        if (element) {
+          element.addEventListener("click", function () {
+            setReviewModalOpen(false);
+          });
+        }
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && reviewModal && !reviewModal.hidden) {
+          setReviewModalOpen(false);
+        }
+      });
 
       function setRatingDropdownOpen(open) {
         if (!ratingDropdown || !ratingTrigger) {
@@ -999,6 +1045,7 @@
             return;
           }
 
+          setReviewModalOpen(false);
           renderProfessorDetail(professor);
 
           const savedMessage = document.getElementById("professor-review-form-message");
