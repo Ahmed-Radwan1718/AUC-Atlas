@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Courses | AUC Atlas</title>
-  <meta name="description" content="Browse AUC Atlas courses by department, code, professor context, materials, and reviews." />
+  <meta name="description" content="Browse AUC Atlas courses by department, code, recorded professor context, and materials." />
   <link rel="stylesheet" href="style.css" />
 
   <style>
@@ -271,6 +271,16 @@
       gap: 14px;
     }
 
+    .courses-page.detail-mode .courses-hero,
+    .courses-page.detail-mode .courses-toolbar,
+    .courses-page.detail-mode .courses-layout {
+      display: none;
+    }
+
+    .course-detail-view[hidden] {
+      display: none;
+    }
+
     .atlas-course-card,
     .atlas-course-card:visited {
       width: 100%;
@@ -286,7 +296,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      cursor: default;
+      cursor: pointer;
       transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
     }
 
@@ -445,21 +455,35 @@
     }
 
     .course-detail-section h3 {
-      margin: 0 0 14px;
+      margin: 0 0 6px;
       font-size: 18px;
       text-transform: uppercase;
     }
 
+    .course-detail-note,
+    .course-section-label {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .course-section-label {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
     .course-professor-list,
-    .course-material-list,
-    .course-review-list {
+    .course-material-list {
       display: grid;
       gap: 10px;
     }
 
     .course-professor-row,
-    .course-material-row,
-    .course-review-row {
+    .course-material-row {
       padding: 14px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -490,8 +514,7 @@
     }
 
     .course-professor-meta h4,
-    .course-material-row h4,
-    .course-review-row h4 {
+    .course-material-row h4 {
       margin: 0 0 6px;
       color: var(--ink);
       font-size: 16px;
@@ -499,11 +522,22 @@
     }
 
     .course-professor-meta p,
-    .course-material-row p,
-    .course-review-row p {
+    .course-material-row p {
       margin: 0;
       color: var(--muted);
       line-height: 1.55;
+    }
+
+    .course-professor-link,
+    .course-professor-link:visited {
+      color: inherit;
+      text-decoration: none;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .course-professor-link:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
     }
 
     .course-professor-action,
@@ -609,7 +643,7 @@
         <h1>Browse Courses</h1>
       </div>
       <p>
-        Start with the class, then compare professors, materials, and course-specific reviews in the Atlas.
+        Start with the class, then open recorded professor context and any materials already attached in the Atlas.
       </p>
     </section>
 
@@ -643,6 +677,8 @@
         <div id="coursesGrid" class="courses-grid"></div>
       </section>
     </section>
+
+    <section id="courseDetailView" class="course-detail-view" aria-live="polite" hidden></section>
 
     <script>
       const coursesPageCourses = [
@@ -699,8 +735,6 @@
       const courseDetailsByCode = window.AUC_ATLAS_COURSE_DETAILS || {};
       const professorDirectory = window.AUC_ATLAS_PROFESSORS || [];
       const professorsById = Object.create(null);
-      const courseReviewsByCode = Object.create(null);
-      const courseReviewStatusByCode = Object.create(null);
 
       professorDirectory.forEach(function (professor) {
         professorsById[professor.id] = professor;
@@ -737,17 +771,19 @@
         });
       });
 
+      const coursesPage = document.querySelector(".courses-page");
       const coursesGrid = document.getElementById("coursesGrid");
       const coursesCount = document.getElementById("coursesCount");
       const courseSearch = document.getElementById("courseSearch");
       const departmentFilter = document.getElementById("courseDepartmentFilter");
       const courseLevelFilter = document.getElementById("courseLevelFilter");
-      const courseDetailPanel = document.getElementById("courseDetailPanel");
+      const courseDetailView = document.getElementById("courseDetailView");
 
       const state = {
         query: "",
         departments: [],
-        levels: []
+        levels: [],
+        selectedCourseCode: ""
       };
 
       function escapeHtml(value) {
@@ -764,24 +800,33 @@
 
       function getInitialCourseCode() {
         const requestedCourse = new URLSearchParams(window.location.search).get("course");
+        const course = getCourseByCode(requestedCourse);
 
-        if (requestedCourse && coursesPageCourses.some(function (course) {
-          return course[0] === requestedCourse;
-        })) {
-          return requestedCourse;
-        }
-
-        return courseDetailsByCode["RHET 1020"] ? "RHET 1020" : coursesPageCourses[0][0];
+        return course ? course.code : "";
       }
 
       function getCourseByCode(code) {
+        const requestedKey = normalizeCourseKey(code);
+
+        if (!requestedKey) {
+          return null;
+        }
+
         return courseRecords.find(function (course) {
-          return course.code === code;
+          return normalizeCourseKey(course.code) === requestedKey;
         }) || null;
       }
 
       function normalizeCourseKey(value) {
         return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      }
+
+      function getShareableCourseCode(course) {
+        return normalizeCourseKey(course.code).toUpperCase();
+      }
+
+      function getCourseUrl(course) {
+        return "courses.html?course=" + encodeURIComponent(getShareableCourseCode(course));
       }
 
       function formatCount(count, label) {
@@ -804,18 +849,10 @@
         });
       }
 
-      function getCourseReviews(course) {
-        const loadedReviews = courseReviewsByCode[course.code] || [];
-        const starterReviews = Array.isArray(course.reviews) ? course.reviews : [];
-
-        return loadedReviews.concat(starterReviews);
-      }
-
       function getCourseStats(course) {
         return {
           professorCount: getCourseProfessors(course).length,
-          materialCount: Array.isArray(course.materials) ? course.materials.length : 0,
-          reviewCount: getCourseReviews(course).length
+          materialCount: Array.isArray(course.materials) ? course.materials.length : 0
         };
       }
 
@@ -926,7 +963,7 @@
           const stats = getCourseStats(course);
 
           return `
-            <article class="atlas-course-card">
+            <a class="atlas-course-card" href="${escapeHtml(getCourseUrl(course))}" data-course-code="${escapeHtml(course.code)}">
               <div class="course-card-visual">
                 <span>${escapeHtml(course.department)}</span>
                 <strong>${escapeHtml(course.code)}</strong>
@@ -937,82 +974,56 @@
                 <p>${escapeHtml(course.summary)}</p>
 
                 <div class="course-card-meta">
+                  <span>${escapeHtml(course.level)}</span>
                   <span>${escapeHtml(formatCount(stats.professorCount, "professor"))}</span>
                   <span>${escapeHtml(formatCount(stats.materialCount, "material"))}</span>
-                  <span>${escapeHtml(formatCount(stats.reviewCount, "review"))}</span>
                 </div>
               </div>
-            </article>
+            </a>
           `;
         }).join("");
       }
 
-      function getAverageRating(reviews) {
-        const ratings = reviews.map(function (review) {
-          return Number(review.rating);
-        }).filter(function (rating) {
-          return Number.isFinite(rating) && rating >= 1 && rating <= 5;
-        });
-
-        if (!ratings.length) {
-          return null;
-        }
-
-        return ratings.reduce(function (sum, rating) {
-          return sum + rating;
-        }, 0) / ratings.length;
+      function getMaterialTerm(material) {
+        return material.semester || material.term || material.semesterLabel || "";
       }
 
-      function formatAverageRating(reviews) {
-        const average = getAverageRating(reviews);
-        return average === null ? "Not rated yet" : average.toFixed(1) + " out of 5";
-      }
-
-      function getTakeAgainLabel(reviews) {
-        const responses = reviews.map(function (review) {
-          return String(review.takeAgain || "").trim().toLowerCase();
-        }).filter(function (value) {
-          return value === "yes" || value === "no";
-        });
-
-        if (!responses.length) {
-          return "Not enough data";
+      function getMaterialUploader(material) {
+        if (!material.uploader) {
+          return material.uploaderName || "";
         }
 
-        const yesCount = responses.filter(function (value) {
-          return value === "yes";
-        }).length;
+        if (typeof material.uploader === "string") {
+          return material.uploader;
+        }
 
-        return Math.round((yesCount / responses.length) * 100) + "% would take again";
+        return material.uploader.name || material.uploader.displayName || "";
       }
 
       function renderProfessorRows(course) {
         const professors = getCourseProfessors(course);
-        const reviews = getCourseReviews(course);
 
         if (!professors.length) {
-          return '<div class="course-empty-state">No professors are linked to this course yet.</div>';
+          return '<div class="course-empty-state">No recorded professors are linked to this course yet.</div>';
         }
 
         return `<div class="course-professor-list">` + professors.map(function (professor) {
-          const professorReviews = reviews.filter(function (review) {
-            return review.professorId === professor.id;
-          });
+          const note = professor.courseNote ? `<p>${escapeHtml(professor.courseNote)}</p>` : "";
 
           return `
-            <article class="course-professor-row">
+            <a class="course-professor-row course-professor-link" href="professors.html?professor=${encodeURIComponent(professor.id)}">
               <div class="course-professor-avatar">
                 <img src="${escapeHtml(professor.image || "user.png")}" alt="${escapeHtml(professor.name)}">
               </div>
 
               <div class="course-professor-meta">
                 <h4>${escapeHtml(professor.name)}</h4>
-                <p>${escapeHtml(professor.courseNote || professor.bio || "Course-specific context will appear as reviews come in.")}</p>
-                <p>${escapeHtml(formatAverageRating(professorReviews))} - ${escapeHtml(getTakeAgainLabel(professorReviews))}</p>
+                <p>${escapeHtml(professor.department || "Department unavailable")}</p>
+                ${note}
               </div>
 
-              <a class="course-professor-action" href="professors.html?professor=${encodeURIComponent(professor.id)}">Open Profile</a>
-            </article>
+              <span class="course-professor-action">Open Profile</span>
+            </a>
           `;
         }).join("") + `</div>`;
       }
@@ -1021,76 +1032,66 @@
         const materials = Array.isArray(course.materials) ? course.materials : [];
 
         if (!materials.length) {
-          const requests = (course.materialRequests || []).map(function (request) {
-            return `<span class="course-material-request">${escapeHtml(request)}</span>`;
-          }).join("");
-
-          return `
-            <div class="course-empty-state">
-              No materials uploaded yet.
-              ${requests ? `<div class="material-request-list">${requests}</div>` : ""}
-            </div>
-          `;
+          return '<div class="course-empty-state">No materials are attached to this course yet.</div>';
         }
 
         return `<div class="course-material-list">` + materials.map(function (material) {
+          const metadata = [
+            material.type,
+            getMaterialTerm(material),
+            getMaterialUploader(material)
+          ].filter(Boolean).join(" - ");
+
           return `
             <article class="course-material-row">
-              <h4>${escapeHtml(material.title)}</h4>
-              <p>${escapeHtml([material.type, material.term, material.uploader].filter(Boolean).join(" - "))}</p>
+              <h4>${escapeHtml(material.title || "Untitled material")}</h4>
+              <p>${escapeHtml(metadata || "Material metadata unavailable")}</p>
             </article>
           `;
         }).join("") + `</div>`;
       }
 
-      function getProfessorDisplayName(professorId) {
-        return professorsById[professorId] && professorsById[professorId].name
-          ? professorsById[professorId].name
-          : "Professor";
+      function updateCourseHistory(course, replace) {
+        const url = course ? getCourseUrl(course) : "courses.html";
+        const method = replace ? "replaceState" : "pushState";
+
+        window.history[method]({
+          courseCode: course ? course.code : ""
+        }, "", url);
       }
 
-      function renderReviewRows(course) {
-        const reviews = getCourseReviews(course).slice().sort(function (a, b) {
-          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-        });
+      function showCatalogue(pushHistory) {
+        state.selectedCourseCode = "";
 
-        if (courseReviewStatusByCode[course.code] === "loading") {
-          return '<div class="course-empty-state">Loading course-specific reviews...</div>';
+        if (pushHistory) {
+          updateCourseHistory(null, false);
         }
 
-        if (!reviews.length) {
-          return '<div class="course-empty-state">No course-specific reviews yet.</div>';
-        }
-
-        return `<div class="course-review-list">` + reviews.slice(0, 12).map(function (review) {
-          const rating = Number(review.rating);
-          const ratingLabel = Number.isFinite(rating) ? Math.round(rating) + " out of 5" : "Not rated";
-
-          return `
-            <article class="course-review-row">
-              <h4>${escapeHtml(getProfessorDisplayName(review.professorId))} - ${escapeHtml(ratingLabel)}</h4>
-              <p>${escapeHtml(review.text || "")}</p>
-              <p>${escapeHtml([review.term, review.reviewerName || "AUC student"].filter(Boolean).join(" - "))}</p>
-            </article>
-          `;
-        }).join("") + `</div>`;
+        render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
-      function renderCourseDetail() {
-        const course = getCourseByCode(state.selectedCourseCode);
+      function openCourseDetail(courseCode, pushHistory) {
+        const course = getCourseByCode(courseCode);
 
         if (!course) {
-          courseDetailPanel.innerHTML = '<div class="course-empty-state">Select a course to view its hub.</div>';
           return;
         }
 
-        if (!courseReviewStatusByCode[course.code]) {
-          loadCourseReviews(course);
+        state.selectedCourseCode = course.code;
+
+        if (pushHistory) {
+          updateCourseHistory(course, false);
         }
 
+        render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function renderCourseDetail(course) {
         const stats = getCourseStats(course);
 
-        courseDetailPanel.innerHTML = `
+        courseDetailView.innerHTML = `
           <article class="course-detail-shell">
             <header class="course-detail-header">
               <div class="course-detail-header-top">
@@ -1098,110 +1099,70 @@
                   <p class="course-detail-code">${escapeHtml(course.code)}</p>
                   <h2>${escapeHtml(course.title)}</h2>
                 </div>
-                <span class="course-material-request">${escapeHtml(course.department)}</span>
+
+                <a id="courseCatalogueBack" class="course-professor-action" href="courses.html">Course Catalogue</a>
               </div>
 
               <p class="course-detail-summary">${escapeHtml(course.summary)}</p>
 
               <div class="course-detail-stats">
                 <div class="course-detail-stat">
-                  <span>Professors</span>
+                  <span>Department</span>
+                  <strong>${escapeHtml(course.department)}</strong>
+                </div>
+                <div class="course-detail-stat">
+                  <span>Course Level</span>
+                  <strong>${escapeHtml(course.level)}</strong>
+                </div>
+                <div class="course-detail-stat">
+                  <span>Recorded Professors</span>
                   <strong>${escapeHtml(String(stats.professorCount))}</strong>
                 </div>
                 <div class="course-detail-stat">
                   <span>Materials</span>
                   <strong>${escapeHtml(String(stats.materialCount))}</strong>
                 </div>
-                <div class="course-detail-stat">
-                  <span>Reviews</span>
-                  <strong>${escapeHtml(String(stats.reviewCount))}</strong>
-                </div>
               </div>
             </header>
 
             <section class="course-detail-section">
-              <h3>Professor Context</h3>
+              <p class="course-section-label">Professors recorded as having taught this course</p>
+              <h3>Recorded Professors</h3>
+              <p class="course-detail-note">This is historical, student-maintained information and does not indicate current or future course availability.</p>
               ${renderProfessorRows(course)}
             </section>
 
             <section class="course-detail-section">
-              <h3>Materials Hub</h3>
+              <h3>Materials</h3>
               ${renderMaterialRows(course)}
-            </section>
-
-            <section class="course-detail-section">
-              <h3>Course-Specific Reviews</h3>
-              ${renderReviewRows(course)}
             </section>
           </article>
         `;
-      }
 
-      function reviewMatchesCourse(review, course) {
-        const reviewCourse = normalizeCourseKey(review.course);
-        const courseCode = normalizeCourseKey(course.code);
-        const courseTitle = normalizeCourseKey(course.title);
+        const backLink = document.getElementById("courseCatalogueBack");
 
-        if (!reviewCourse) {
-          return false;
-        }
-
-        return reviewCourse === courseCode ||
-          reviewCourse === courseTitle ||
-          reviewCourse.includes(courseCode) ||
-          courseTitle.includes(reviewCourse);
-      }
-
-      async function fetchProfessorReviews(professorId) {
-        if (!professorId) {
-          return [];
-        }
-
-        try {
-          const response = await fetch("/api/professor-reviews?professorId=" + encodeURIComponent(professorId), {
-            method: "GET",
-            credentials: "same-origin",
-            cache: "no-store",
-            headers: {
-              Accept: "application/json"
-            }
+        if (backLink) {
+          backLink.addEventListener("click", function (event) {
+            event.preventDefault();
+            showCatalogue(true);
           });
-
-          const data = await response.json().catch(function () {
-            return {};
-          });
-
-          return response.ok && Array.isArray(data.reviews) ? data.reviews : [];
-        } catch (error) {
-          return [];
         }
-      }
-
-      async function loadCourseReviews(course) {
-        const professors = getCourseProfessors(course);
-
-        courseReviewStatusByCode[course.code] = "loading";
-
-        const reviewGroups = await Promise.all(professors.map(function (professor) {
-          return fetchProfessorReviews(professor.id);
-        }));
-
-        const reviews = [];
-
-        reviewGroups.forEach(function (group) {
-          group.forEach(function (review) {
-            if (reviewMatchesCourse(review, course)) {
-              reviews.push(review);
-            }
-          });
-        });
-
-        courseReviewsByCode[course.code] = reviews;
-        courseReviewStatusByCode[course.code] = "loaded";
-        render();
       }
 
       function render() {
+        const selectedCourse = getCourseByCode(state.selectedCourseCode);
+
+        coursesPage.classList.toggle("detail-mode", Boolean(selectedCourse));
+        courseDetailView.hidden = !selectedCourse;
+
+        if (selectedCourse) {
+          document.title = selectedCourse.code + " | AUC Atlas";
+          renderCourseDetail(selectedCourse);
+          return;
+        }
+
+        document.title = "Courses | AUC Atlas";
+        courseDetailView.innerHTML = "";
         renderDepartmentFilters();
         renderCourseLevelFilters();
 
@@ -1220,6 +1181,12 @@
         render();
       });
 
+      window.addEventListener("popstate", function () {
+        state.selectedCourseCode = getInitialCourseCode();
+        render();
+      });
+
+      state.selectedCourseCode = getInitialCourseCode();
       render();
     </script>
   </main>
