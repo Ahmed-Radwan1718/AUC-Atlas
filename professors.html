@@ -838,11 +838,6 @@
           <div class="professor-detail-layout">
             <div>
               <section class="professor-detail-panel">
-                <h2>Autobiography</h2>
-                <p>${escapeHtml(professor.bio)}</p>
-              </section>
-
-              <section class="professor-detail-panel">
                 <h2>Student reviews</h2>
                 <div class="professor-review-list">
                   ${reviewItems}
@@ -863,12 +858,12 @@
               <form class="professor-review-form" id="professor-review-form">
                 <label>
                   Course
-                  <input type="text" name="course" placeholder="RHET 1020" required>
+                  <input type="text" name="course" placeholder="Example: Linear Algebra" required>
                 </label>
 
                 <label>
                   Term
-                  <input type="text" name="term" placeholder="Spring 2026" required>
+                  <input type="text" name="term" placeholder="Example: Spring 2025" required>
                 </label>
 
                 <label>
