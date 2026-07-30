@@ -272,6 +272,200 @@
     return data;
   }
 
+  const reportReasonsByType = {
+    review: [
+      "Harassment or personal attack",
+      "Discriminatory or hateful content",
+      "False or misleading information",
+      "Contains private information",
+      "Spam or irrelevant content",
+      "Inappropriate language",
+      "Other"
+    ],
+    material: [
+      "Active assessment or unauthorized answer key",
+      "Copyrighted material shared without permission",
+      "Pirated textbook or paid content",
+      "Contains student names, IDs, grades or private information",
+      "File does not match its title or metadata",
+      "Malicious, unsafe or corrupted file",
+      "Spam or irrelevant content",
+      "Other"
+    ]
+  };
+
+  function escapeReportHtml(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (char) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char];
+    });
+  }
+
+  function ensureReportModal() {
+    if (document.getElementById("auc-report-modal")) {
+      return;
+    }
+
+    document.body.insertAdjacentHTML("beforeend", `
+      <div class="auc-report-modal" id="auc-report-modal" hidden>
+        <button class="auc-report-modal-backdrop" id="auc-report-modal-backdrop" type="button" aria-label="Close report form"></button>
+
+        <aside class="auc-report-modal-card" role="dialog" aria-modal="true" aria-labelledby="auc-report-modal-title">
+          <button class="auc-report-modal-close" id="auc-report-modal-close" type="button" aria-label="Close report form">&times;</button>
+          <h2 id="auc-report-modal-title">Report Content</h2>
+          <p id="auc-report-modal-copy">Choose a reason so an admin can review this content.</p>
+
+          <form class="auc-report-form" id="auc-report-form" novalidate>
+            <label>
+              Reason
+              <select name="reason" id="auc-report-reason" required></select>
+            </label>
+
+            <label>
+              Optional explanation
+              <textarea name="explanation" id="auc-report-explanation" maxlength="600" placeholder="Add brief context for the moderation team."></textarea>
+            </label>
+
+            <button class="auc-report-submit" id="auc-report-submit" type="submit">Submit Report</button>
+            <p class="auc-report-message" id="auc-report-message" aria-live="polite"></p>
+          </form>
+        </aside>
+      </div>
+    `);
+
+    document.getElementById("auc-report-modal-backdrop").addEventListener("click", closeReportModal);
+    document.getElementById("auc-report-modal-close").addEventListener("click", closeReportModal);
+    document.getElementById("auc-report-form").addEventListener("submit", submitReportForm);
+  }
+
+  function closeReportModal() {
+    const modal = document.getElementById("auc-report-modal");
+
+    if (!modal) {
+      return;
+    }
+
+    modal.hidden = true;
+    modal.dataset.contentType = "";
+    modal.dataset.contentId = "";
+    document.body.style.overflow = "";
+  }
+
+  function openReportModal(button) {
+    ensureReportModal();
+
+    const modal = document.getElementById("auc-report-modal");
+    const title = document.getElementById("auc-report-modal-title");
+    const copy = document.getElementById("auc-report-modal-copy");
+    const reasonSelect = document.getElementById("auc-report-reason");
+    const explanation = document.getElementById("auc-report-explanation");
+    const message = document.getElementById("auc-report-message");
+    const contentType = String(button.getAttribute("data-report-content-type") || "").trim();
+    const contentId = String(button.getAttribute("data-report-content-id") || "").trim();
+    const label = String(button.getAttribute("data-report-label") || "this content").trim();
+    const reasons = reportReasonsByType[contentType] || [];
+
+    if (!contentType || !contentId || !reasons.length) {
+      return;
+    }
+
+    modal.dataset.contentType = contentType;
+    modal.dataset.contentId = contentId;
+    title.textContent = contentType === "material" ? "Report Material" : "Report Review";
+    copy.textContent = "Choose a reason so an admin can review " + label + ".";
+    reasonSelect.innerHTML = '<option value="">Choose a reason</option>' + reasons.map(function (reason) {
+      return '<option value="' + escapeReportHtml(reason) + '">' + escapeReportHtml(reason) + '</option>';
+    }).join("");
+    reasonSelect.value = "";
+    explanation.value = "";
+    message.textContent = "";
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  async function submitReportForm(event) {
+    event.preventDefault();
+
+    const modal = document.getElementById("auc-report-modal");
+    const form = document.getElementById("auc-report-form");
+    const reasonSelect = document.getElementById("auc-report-reason");
+    const explanation = document.getElementById("auc-report-explanation");
+    const submit = document.getElementById("auc-report-submit");
+    const message = document.getElementById("auc-report-message");
+    const contentType = modal ? modal.dataset.contentType : "";
+    const contentId = modal ? modal.dataset.contentId : "";
+    const reason = reasonSelect ? reasonSelect.value : "";
+    const explanationText = explanation ? explanation.value.trim() : "";
+
+    if (!reason) {
+      message.textContent = "Choose a report reason.";
+      return;
+    }
+
+    if (reason === "Other" && !explanationText) {
+      message.textContent = "Write a brief explanation when choosing Other.";
+      return;
+    }
+
+    if (form.dataset.submitting === "true") {
+      return;
+    }
+
+    form.dataset.submitting = "true";
+    submit.disabled = true;
+    message.textContent = "Submitting report...";
+
+    try {
+      const payload = {
+        action: "report",
+        reason,
+        explanation: explanationText
+      };
+      const endpoint = contentType === "material" ? "/api/course-materials" : "/api/professor-reviews";
+
+      if (contentType === "material") {
+        payload.materialId = contentId;
+      } else {
+        payload.reviewId = contentId;
+      }
+
+      const data = await requestJson(endpoint, {
+        method: "POST",
+        body: payload
+      });
+
+      message.textContent = data.message || "Report submitted for review.";
+      setTimeout(closeReportModal, 900);
+    } catch (error) {
+      message.textContent = error.message || "Could not submit this report.";
+    } finally {
+      form.dataset.submitting = "";
+      submit.disabled = false;
+    }
+  }
+
+  document.addEventListener("click", function (event) {
+    const reportButton = event.target.closest("[data-report-content-type][data-report-content-id]");
+
+    if (reportButton) {
+      event.preventDefault();
+      openReportModal(reportButton);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    const modal = document.getElementById("auc-report-modal");
+
+    if (event.key === "Escape" && modal && !modal.hidden) {
+      closeReportModal();
+    }
+  });
+
   function getRedirectTarget() {
     const params = new URLSearchParams(window.location.search);
     const queryRedirect = params.get("redirect");
