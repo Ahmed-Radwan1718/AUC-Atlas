@@ -850,6 +850,145 @@ main.auth-page {
   font-weight: 800;
 }
 
+.auc-report-action {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auc-report-action:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.auc-report-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auc-report-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(29, 31, 31, 0.28);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.auc-report-modal-card {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: auto;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.auc-report-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.auc-report-modal-card h2 {
+  margin: 0 42px 12px 0;
+  font-size: 28px;
+  line-height: 1.08;
+  text-transform: uppercase;
+}
+
+.auc-report-modal-card p {
+  margin: 0 0 18px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.auc-report-form {
+  display: grid;
+  gap: 12px;
+}
+
+.auc-report-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auc-report-form select,
+.auc-report-form textarea {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font: inherit;
+  letter-spacing: 0;
+  text-transform: none;
+  outline: 0;
+}
+
+.auc-report-form textarea {
+  min-height: 112px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.auc-report-submit {
+  min-height: 44px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--ink);
+  color: white;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auc-report-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.54;
+}
+
+.auc-report-message {
+  min-height: 20px;
+  margin: 0;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
 [hidden] {
   display: none !important;
 }
