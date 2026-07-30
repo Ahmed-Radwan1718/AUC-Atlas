@@ -38,19 +38,23 @@
 
     .courses-toolbar {
       margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: minmax(260px, 0.78fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .course-search {
+      min-width: 0;
       padding: 14px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: rgba(255, 255, 255, 0.72);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      display: grid;
+      gap: 9px;
     }
 
-    .courses-toolbar span {
-      padding: 10px 13px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
+    .course-search span {
       color: var(--muted);
       font-size: 11px;
       font-weight: 900;
@@ -58,34 +62,118 @@
       text-transform: uppercase;
     }
 
+    .course-search input {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      outline: 0;
+    }
+
+    .course-search input:focus {
+      border-color: var(--gold);
+      background: var(--surface);
+    }
+
+    .course-filter {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.72);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      align-content: center;
+    }
+
+    .course-filter button {
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .course-filter button.active {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: white;
+    }
+
+    .courses-layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr);
+      gap: 30px;
+      align-items: start;
+    }
+
+    .courses-list-panel {
+      min-width: 0;
+    }
+
+    .courses-list-heading {
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .courses-list-heading span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
     .courses-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 22px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
     }
 
     .atlas-course-card,
     .atlas-course-card:visited {
-      min-height: 360px;
+      width: 100%;
+      min-height: 282px;
+      padding: 0;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--surface);
       color: var(--ink);
+      font: inherit;
+      text-align: left;
       text-decoration: none;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      cursor: pointer;
       transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
     }
 
-    .atlas-course-card:hover {
+    .atlas-course-card:hover,
+    .atlas-course-card.active {
       border-color: var(--gold);
       box-shadow: 0 18px 48px rgba(29, 31, 31, 0.1);
       transform: translateY(-3px);
     }
 
+    .atlas-course-card.active {
+      background: var(--surface);
+    }
+
     .course-card-visual {
-      min-height: 170px;
+      min-height: 132px;
       padding: 18px;
       background:
         linear-gradient(145deg, rgba(139, 30, 63, 0.92), rgba(29, 31, 31, 0.96));
@@ -104,7 +192,7 @@
     }
 
     .course-card-visual strong {
-      font-size: clamp(1.9rem, 3vw, 2.625rem);
+      font-size: clamp(1.55rem, 2.4vw, 2.2rem);
       font-weight: 700;
       line-height: 1.08;
       letter-spacing: 0;
@@ -120,7 +208,7 @@
 
     .course-card-body h2 {
       margin: 0 0 10px;
-      font-size: 20px;
+      font-size: 19px;
       line-height: 1.16;
     }
 
@@ -137,7 +225,9 @@
       gap: 8px;
     }
 
-    .course-card-meta span {
+    .course-card-meta span,
+    .course-detail-stat span,
+    .course-material-request {
       padding: 7px 9px;
       border-radius: 999px;
       background: var(--surface-soft);
@@ -146,11 +236,195 @@
       font-weight: 900;
     }
 
+    .course-detail-panel {
+      position: sticky;
+      top: 106px;
+      min-width: 0;
+    }
+
+    .course-detail-shell {
+      border-top: 1px solid var(--line-strong);
+      padding-top: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .course-detail-header {
+      display: grid;
+      gap: 14px;
+    }
+
+    .course-detail-header-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .course-detail-header h2 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1.04;
+      text-transform: uppercase;
+    }
+
+    .course-detail-code {
+      margin: 0 0 8px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .course-detail-summary {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .course-detail-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .course-detail-stat {
+      min-height: 78px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      display: grid;
+      align-content: center;
+      gap: 7px;
+    }
+
+    .course-detail-stat strong {
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .course-detail-section {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .course-detail-section h3 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+
+    .course-professor-list,
+    .course-material-list,
+    .course-review-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .course-professor-row,
+    .course-material-row,
+    .course-review-row {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+    }
+
+    .course-professor-row {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .course-professor-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .course-professor-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .course-professor-meta h4,
+    .course-material-row h4,
+    .course-review-row h4 {
+      margin: 0 0 6px;
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.22;
+    }
+
+    .course-professor-meta p,
+    .course-material-row p,
+    .course-review-row p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .course-professor-action,
+    .course-professor-action:visited {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      background: var(--ink);
+      color: white;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    .course-empty-state {
+      padding: 18px;
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.62);
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .material-request-list {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
     .site-footer {
       margin-top: 0;
     }
 
     @media (max-width: 1080px) {
+      .courses-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .course-detail-panel {
+        position: static;
+      }
+
       .courses-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
@@ -158,12 +432,33 @@
 
     @media (max-width: 820px) {
       .courses-hero,
-      .courses-grid {
+      .courses-toolbar,
+      .course-detail-stats {
         grid-template-columns: 1fr;
       }
 
       .courses-page {
         padding-top: 112px;
+      }
+
+      .courses-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .course-detail-header-top,
+      .course-professor-row {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .course-professor-action {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .courses-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -171,6 +466,8 @@
 <body>
   <div id="site-header-root"></div>
   <script src="siteheader.js"></script>
+  <script src="professors-data.js"></script>
+  <script src="courses-data.js"></script>
 
   <main class="courses-page">
     <section class="courses-hero">
@@ -183,16 +480,26 @@
       </p>
     </section>
 
-    <section class="courses-toolbar" aria-label="Course departments">
-      <span>All</span>
-      <span>Science</span>
-      <span>Engineering</span>
-      <span>Business</span>
-      <span>Humanities</span>
-      <span>Core</span>
+    <section class="courses-toolbar" aria-label="Course search and filters">
+      <label class="course-search" for="courseSearch">
+        <span>Search courses</span>
+        <input id="courseSearch" type="search" placeholder="Search RHET 1020, chemistry, professor, notes...">
+      </label>
+
+      <div id="courseDepartmentFilter" class="course-filter" aria-label="Department filter"></div>
     </section>
 
-    <section id="coursesGrid" class="courses-grid" aria-label="AUC courses"></section>
+    <section class="courses-layout">
+      <section class="courses-list-panel" aria-label="AUC courses">
+        <div class="courses-list-heading">
+          <span id="coursesCount">0 courses</span>
+        </div>
+
+        <div id="coursesGrid" class="courses-grid"></div>
+      </section>
+
+      <section id="courseDetailPanel" class="course-detail-panel" aria-live="polite"></section>
+    </section>
 
     <script>
       const coursesPageCourses = [
@@ -246,27 +553,498 @@
         }[subject] || "Course";
       }
 
-      document.getElementById("coursesGrid").innerHTML = coursesPageCourses.map(([code, title]) => {
-        const department = getCoursePageDepartment(code);
+      const courseDetailsByCode = window.AUC_ATLAS_COURSE_DETAILS || {};
+      const professorDirectory = window.AUC_ATLAS_PROFESSORS || [];
+      const professorsById = Object.create(null);
+      const courseReviewsByCode = Object.create(null);
+      const courseReviewStatusByCode = Object.create(null);
 
-        return `
-          <a class="atlas-course-card" href="index.html#courses">
-            <div class="course-card-visual">
-              <span>${department}</span>
-              <strong>${code}</strong>
-            </div>
-            <div class="course-card-body">
-              <h2>${title}</h2>
-              <p>${title} in the ${department} catalogue.</p>
-              <div class="course-card-meta">
-                <span>0 professors</span>
-                <span>0 materials</span>
-                <span>0 reviews</span>
+      professorDirectory.forEach(function (professor) {
+        professorsById[professor.id] = professor;
+      });
+
+      const courseRecords = coursesPageCourses.map(function (courseItem) {
+        const code = courseItem[0];
+        const title = courseItem[1];
+        const department = getCoursePageDepartment(code);
+        const details = courseDetailsByCode[code] || {};
+
+        return Object.assign({
+          code,
+          title,
+          department,
+          summary: title + " in the " + department + " catalogue.",
+          professors: [],
+          materials: [],
+          materialRequests: []
+        }, details, {
+          code,
+          title,
+          department: details.department || department
+        });
+      });
+
+      const coursesGrid = document.getElementById("coursesGrid");
+      const coursesCount = document.getElementById("coursesCount");
+      const courseSearch = document.getElementById("courseSearch");
+      const departmentFilter = document.getElementById("courseDepartmentFilter");
+      const courseDetailPanel = document.getElementById("courseDetailPanel");
+
+      const state = {
+        query: "",
+        department: "All",
+        selectedCourseCode: getInitialCourseCode()
+      };
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value).replace(/[&<>"']/g, function (character) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+          }[character];
+        });
+      }
+
+      function getInitialCourseCode() {
+        const requestedCourse = new URLSearchParams(window.location.search).get("course");
+
+        if (requestedCourse && coursesPageCourses.some(function (course) {
+          return course[0] === requestedCourse;
+        })) {
+          return requestedCourse;
+        }
+
+        return courseDetailsByCode["RHET 1020"] ? "RHET 1020" : coursesPageCourses[0][0];
+      }
+
+      function getCourseByCode(code) {
+        return courseRecords.find(function (course) {
+          return course.code === code;
+        }) || null;
+      }
+
+      function normalizeCourseKey(value) {
+        return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      }
+
+      function formatCount(count, label) {
+        return count + " " + label + (count === 1 ? "" : "s");
+      }
+
+      function getCourseProfessors(course) {
+        return (Array.isArray(course.professors) ? course.professors : []).map(function (entry) {
+          const professorEntry = typeof entry === "string" ? { id: entry } : entry || {};
+          const directoryProfessor = professorsById[professorEntry.id] || {};
+
+          return Object.assign({}, directoryProfessor, professorEntry, {
+            id: professorEntry.id || directoryProfessor.id || "",
+            name: professorEntry.name || directoryProfessor.name || "Professor profile",
+            image: professorEntry.image || directoryProfessor.image || "user.png",
+            department: professorEntry.department || directoryProfessor.department || course.department
+          });
+        }).filter(function (professor) {
+          return professor.id || professor.name;
+        });
+      }
+
+      function getCourseReviews(course) {
+        const loadedReviews = courseReviewsByCode[course.code] || [];
+        const starterReviews = Array.isArray(course.reviews) ? course.reviews : [];
+
+        return loadedReviews.concat(starterReviews);
+      }
+
+      function getCourseStats(course) {
+        return {
+          professorCount: getCourseProfessors(course).length,
+          materialCount: Array.isArray(course.materials) ? course.materials.length : 0,
+          reviewCount: getCourseReviews(course).length
+        };
+      }
+
+      function getDepartments() {
+        const departments = courseRecords.map(function (course) {
+          return course.department;
+        }).filter(Boolean);
+
+        return ["All"].concat(Array.from(new Set(departments)).sort(function (a, b) {
+          return a.localeCompare(b);
+        }));
+      }
+
+      function courseMatchesSearch(course) {
+        const query = state.query.trim().toLowerCase();
+
+        if (!query) {
+          return true;
+        }
+
+        const professorNames = getCourseProfessors(course).map(function (professor) {
+          return professor.name;
+        }).join(" ");
+
+        const materialNames = (course.materials || []).map(function (material) {
+          return material.title;
+        }).join(" ");
+
+        const requestedMaterials = (course.materialRequests || []).join(" ");
+
+        return [
+          course.code,
+          course.title,
+          course.department,
+          course.summary,
+          professorNames,
+          materialNames,
+          requestedMaterials
+        ].join(" ").toLowerCase().includes(query);
+      }
+
+      function getFilteredCourses() {
+        return courseRecords.filter(function (course) {
+          const matchesDepartment = state.department === "All" || course.department === state.department;
+          return matchesDepartment && courseMatchesSearch(course);
+        });
+      }
+
+      function renderDepartmentFilters() {
+        departmentFilter.innerHTML = getDepartments().map(function (department) {
+          return `
+            <button class="${department === state.department ? "active" : ""}" type="button" data-department="${escapeHtml(department)}">
+              ${escapeHtml(department)}
+            </button>
+          `;
+        }).join("");
+
+        departmentFilter.querySelectorAll("button").forEach(function (button) {
+          button.addEventListener("click", function () {
+            state.department = button.dataset.department || "All";
+            render();
+          });
+        });
+      }
+
+      function renderCourses(filteredCourses) {
+        coursesCount.textContent = formatCount(filteredCourses.length, "course");
+
+        if (!filteredCourses.length) {
+          coursesGrid.innerHTML = '<div class="course-empty-state">No courses match this search yet.</div>';
+          courseDetailPanel.innerHTML = "";
+          return;
+        }
+
+        if (!filteredCourses.some(function (course) {
+          return course.code === state.selectedCourseCode;
+        })) {
+          state.selectedCourseCode = filteredCourses[0].code;
+        }
+
+        coursesGrid.innerHTML = filteredCourses.map(function (course) {
+          const stats = getCourseStats(course);
+
+          return `
+            <button class="atlas-course-card ${course.code === state.selectedCourseCode ? "active" : ""}" type="button" data-course-code="${escapeHtml(course.code)}">
+              <div class="course-card-visual">
+                <span>${escapeHtml(course.department)}</span>
+                <strong>${escapeHtml(course.code)}</strong>
               </div>
+
+              <div class="course-card-body">
+                <h2>${escapeHtml(course.title)}</h2>
+                <p>${escapeHtml(course.summary)}</p>
+
+                <div class="course-card-meta">
+                  <span>${escapeHtml(formatCount(stats.professorCount, "professor"))}</span>
+                  <span>${escapeHtml(formatCount(stats.materialCount, "material"))}</span>
+                  <span>${escapeHtml(formatCount(stats.reviewCount, "review"))}</span>
+                </div>
+              </div>
+            </button>
+          `;
+        }).join("");
+
+        coursesGrid.querySelectorAll(".atlas-course-card").forEach(function (card) {
+          card.addEventListener("click", function () {
+            state.selectedCourseCode = card.dataset.courseCode;
+            const url = new URL(window.location.href);
+            url.searchParams.set("course", state.selectedCourseCode);
+            window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+            render();
+          });
+        });
+      }
+
+      function getAverageRating(reviews) {
+        const ratings = reviews.map(function (review) {
+          return Number(review.rating);
+        }).filter(function (rating) {
+          return Number.isFinite(rating) && rating >= 1 && rating <= 5;
+        });
+
+        if (!ratings.length) {
+          return null;
+        }
+
+        return ratings.reduce(function (sum, rating) {
+          return sum + rating;
+        }, 0) / ratings.length;
+      }
+
+      function formatAverageRating(reviews) {
+        const average = getAverageRating(reviews);
+        return average === null ? "Not rated yet" : average.toFixed(1) + " out of 5";
+      }
+
+      function getTakeAgainLabel(reviews) {
+        const responses = reviews.map(function (review) {
+          return String(review.takeAgain || "").trim().toLowerCase();
+        }).filter(function (value) {
+          return value === "yes" || value === "no";
+        });
+
+        if (!responses.length) {
+          return "Not enough data";
+        }
+
+        const yesCount = responses.filter(function (value) {
+          return value === "yes";
+        }).length;
+
+        return Math.round((yesCount / responses.length) * 100) + "% would take again";
+      }
+
+      function renderProfessorRows(course) {
+        const professors = getCourseProfessors(course);
+        const reviews = getCourseReviews(course);
+
+        if (!professors.length) {
+          return '<div class="course-empty-state">No professors are linked to this course yet.</div>';
+        }
+
+        return `<div class="course-professor-list">` + professors.map(function (professor) {
+          const professorReviews = reviews.filter(function (review) {
+            return review.professorId === professor.id;
+          });
+
+          return `
+            <article class="course-professor-row">
+              <div class="course-professor-avatar">
+                <img src="${escapeHtml(professor.image || "user.png")}" alt="${escapeHtml(professor.name)}">
+              </div>
+
+              <div class="course-professor-meta">
+                <h4>${escapeHtml(professor.name)}</h4>
+                <p>${escapeHtml(professor.courseNote || professor.bio || "Course-specific context will appear as reviews come in.")}</p>
+                <p>${escapeHtml(formatAverageRating(professorReviews))} - ${escapeHtml(getTakeAgainLabel(professorReviews))}</p>
+              </div>
+
+              <a class="course-professor-action" href="professors.html?professor=${encodeURIComponent(professor.id)}">Open Profile</a>
+            </article>
+          `;
+        }).join("") + `</div>`;
+      }
+
+      function renderMaterialRows(course) {
+        const materials = Array.isArray(course.materials) ? course.materials : [];
+
+        if (!materials.length) {
+          const requests = (course.materialRequests || []).map(function (request) {
+            return `<span class="course-material-request">${escapeHtml(request)}</span>`;
+          }).join("");
+
+          return `
+            <div class="course-empty-state">
+              No materials uploaded yet.
+              ${requests ? `<div class="material-request-list">${requests}</div>` : ""}
             </div>
-          </a>
+          `;
+        }
+
+        return `<div class="course-material-list">` + materials.map(function (material) {
+          return `
+            <article class="course-material-row">
+              <h4>${escapeHtml(material.title)}</h4>
+              <p>${escapeHtml([material.type, material.term, material.uploader].filter(Boolean).join(" - "))}</p>
+            </article>
+          `;
+        }).join("") + `</div>`;
+      }
+
+      function getProfessorDisplayName(professorId) {
+        return professorsById[professorId] && professorsById[professorId].name
+          ? professorsById[professorId].name
+          : "Professor";
+      }
+
+      function renderReviewRows(course) {
+        const reviews = getCourseReviews(course).slice().sort(function (a, b) {
+          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        });
+
+        if (courseReviewStatusByCode[course.code] === "loading") {
+          return '<div class="course-empty-state">Loading course-specific reviews...</div>';
+        }
+
+        if (!reviews.length) {
+          return '<div class="course-empty-state">No course-specific reviews yet.</div>';
+        }
+
+        return `<div class="course-review-list">` + reviews.slice(0, 12).map(function (review) {
+          const rating = Number(review.rating);
+          const ratingLabel = Number.isFinite(rating) ? Math.round(rating) + " out of 5" : "Not rated";
+
+          return `
+            <article class="course-review-row">
+              <h4>${escapeHtml(getProfessorDisplayName(review.professorId))} - ${escapeHtml(ratingLabel)}</h4>
+              <p>${escapeHtml(review.text || "")}</p>
+              <p>${escapeHtml([review.term, review.reviewerName || "AUC student"].filter(Boolean).join(" - "))}</p>
+            </article>
+          `;
+        }).join("") + `</div>`;
+      }
+
+      function renderCourseDetail() {
+        const course = getCourseByCode(state.selectedCourseCode);
+
+        if (!course) {
+          courseDetailPanel.innerHTML = '<div class="course-empty-state">Select a course to view its hub.</div>';
+          return;
+        }
+
+        if (!courseReviewStatusByCode[course.code]) {
+          loadCourseReviews(course);
+        }
+
+        const stats = getCourseStats(course);
+
+        courseDetailPanel.innerHTML = `
+          <article class="course-detail-shell">
+            <header class="course-detail-header">
+              <div class="course-detail-header-top">
+                <div>
+                  <p class="course-detail-code">${escapeHtml(course.code)}</p>
+                  <h2>${escapeHtml(course.title)}</h2>
+                </div>
+                <span class="course-material-request">${escapeHtml(course.department)}</span>
+              </div>
+
+              <p class="course-detail-summary">${escapeHtml(course.summary)}</p>
+
+              <div class="course-detail-stats">
+                <div class="course-detail-stat">
+                  <span>Professors</span>
+                  <strong>${escapeHtml(String(stats.professorCount))}</strong>
+                </div>
+                <div class="course-detail-stat">
+                  <span>Materials</span>
+                  <strong>${escapeHtml(String(stats.materialCount))}</strong>
+                </div>
+                <div class="course-detail-stat">
+                  <span>Reviews</span>
+                  <strong>${escapeHtml(String(stats.reviewCount))}</strong>
+                </div>
+              </div>
+            </header>
+
+            <section class="course-detail-section">
+              <h3>Professor Context</h3>
+              ${renderProfessorRows(course)}
+            </section>
+
+            <section class="course-detail-section">
+              <h3>Materials Hub</h3>
+              ${renderMaterialRows(course)}
+            </section>
+
+            <section class="course-detail-section">
+              <h3>Course-Specific Reviews</h3>
+              ${renderReviewRows(course)}
+            </section>
+          </article>
         `;
-      }).join("");
+      }
+
+      function reviewMatchesCourse(review, course) {
+        const reviewCourse = normalizeCourseKey(review.course);
+        const courseCode = normalizeCourseKey(course.code);
+        const courseTitle = normalizeCourseKey(course.title);
+
+        if (!reviewCourse) {
+          return false;
+        }
+
+        return reviewCourse === courseCode ||
+          reviewCourse === courseTitle ||
+          reviewCourse.includes(courseCode) ||
+          courseTitle.includes(reviewCourse);
+      }
+
+      async function fetchProfessorReviews(professorId) {
+        if (!professorId) {
+          return [];
+        }
+
+        try {
+          const response = await fetch("/api/professor-reviews?professorId=" + encodeURIComponent(professorId), {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              Accept: "application/json"
+            }
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          return response.ok && Array.isArray(data.reviews) ? data.reviews : [];
+        } catch (error) {
+          return [];
+        }
+      }
+
+      async function loadCourseReviews(course) {
+        const professors = getCourseProfessors(course);
+
+        courseReviewStatusByCode[course.code] = "loading";
+
+        const reviewGroups = await Promise.all(professors.map(function (professor) {
+          return fetchProfessorReviews(professor.id);
+        }));
+
+        const reviews = [];
+
+        reviewGroups.forEach(function (group) {
+          group.forEach(function (review) {
+            if (reviewMatchesCourse(review, course)) {
+              reviews.push(review);
+            }
+          });
+        });
+
+        courseReviewsByCode[course.code] = reviews;
+        courseReviewStatusByCode[course.code] = "loaded";
+        render();
+      }
+
+      function render() {
+        renderDepartmentFilters();
+
+        const filteredCourses = getFilteredCourses();
+        renderCourses(filteredCourses);
+        renderCourseDetail();
+      }
+
+      courseSearch.addEventListener("input", function () {
+        state.query = courseSearch.value;
+        render();
+      });
+
+      render();
     </script>
   </main>
 
