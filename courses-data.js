@@ -1,6 +1,7 @@
-(function () {
-  window.AUC_ATLAS_COURSE_DETAILS = {
+(function (root) {
+  const courseDetails = {
     "RHET 1020": {
+      title: "Research Writing",
       summary: "Research writing, source evaluation, argument building, and long-form academic papers.",
       professors: [
         { id: "laila-el-serty", courseNote: "Linked as Rhetoric faculty context for research writing sections." },
@@ -13,6 +14,7 @@
     },
 
     "CHEM 1005": {
+      title: "General Chemistry I",
       summary: "General chemistry foundations, atomic structure, bonding, reactions, and quantitative problem solving.",
       professors: [
         { id: "ehab-el-sawy", courseNote: "Linked as Chemistry faculty context." },
@@ -24,6 +26,7 @@
     },
 
     "CHEM 1006": {
+      title: "General Chemistry II",
       summary: "Second general chemistry course covering equilibrium, thermodynamics, kinetics, and applied problem solving.",
       professors: [
         { id: "ehab-el-sawy", courseNote: "Linked as Chemistry faculty context." },
@@ -35,6 +38,7 @@
     },
 
     "MACT 1121": {
+      title: "Calculus I",
       summary: "Calculus I foundations, limits, derivatives, and applications for science and engineering tracks.",
       professors: [
         { id: "eslam-badr", courseNote: "Linked as Mathematics faculty context." },
@@ -45,6 +49,7 @@
     },
 
     "PHYS 1011": {
+      title: "Physics 1: Classical Mechanics, Sound and Heat",
       summary: "Classical mechanics, sound, heat, and physics problem solving for science and engineering students.",
       professors: [
         { id: "nageh-allam", courseNote: "Linked as Physics faculty context." }
@@ -54,6 +59,7 @@
     },
 
     "MENG 3446": {
+      title: "Engineering and Project Management",
       summary: "Engineering and project management concepts for planning, execution, risk, and delivery.",
       professors: [
         { id: "ibrahim-abotaleb", courseNote: "Linked as engineering management faculty context." },
@@ -64,10 +70,19 @@
     },
 
     "CSCE 1101": {
+      title: "Introduction to Computer Science",
       summary: "Introductory computing, programming fundamentals, and structured problem solving.",
       professors: [],
       materials: [],
       materialRequests: ["Python notes", "Practice problems", "Lab walkthroughs", "Midterm reviews"]
     }
   };
-})();
+
+  if (root) {
+    root.AUC_ATLAS_COURSE_DETAILS = courseDetails;
+  }
+
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = courseDetails;
+  }
+})(typeof window !== "undefined" ? window : globalThis);
