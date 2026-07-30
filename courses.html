@@ -37,11 +37,9 @@
     }
 
     .courses-toolbar {
+      max-width: 720px;
       margin-bottom: 24px;
-      display: grid;
-      grid-template-columns: minmax(260px, 0.78fr) minmax(0, 1fr);
-      gap: 12px;
-      align-items: stretch;
+      display: block;
     }
 
     .course-search {
@@ -78,39 +76,78 @@
       background: var(--surface);
     }
 
-    .course-filter {
-      min-width: 0;
-      padding: 14px;
+    .courses-layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 26px;
+      align-items: start;
+    }
+
+    .course-filter-panel {
+      position: sticky;
+      top: 106px;
+      padding: 18px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.72);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-      align-content: center;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .course-filter-heading {
+      margin-bottom: 16px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .course-filter-group {
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      gap: 12px;
+    }
+
+    .course-filter-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .course-filter {
+      display: grid;
+      gap: 8px;
     }
 
     .course-filter button {
-      min-height: 38px;
-      padding: 0 13px;
+      width: 100%;
+      min-height: 42px;
+      padding: 0 14px;
       border: 1px solid var(--line);
-      border-radius: 999px;
+      border-radius: 14px;
       background: var(--surface-soft);
       color: var(--muted);
       font-size: 11px;
       font-weight: 900;
       letter-spacing: 0.08em;
+      text-align: left;
       text-transform: uppercase;
+      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .course-filter button:hover {
+      border-color: var(--gold);
+      color: var(--ink);
+      transform: translateX(2px);
     }
 
     .course-filter button.active {
-      border-color: var(--gold);
-      background: var(--gold);
+      border-color: var(--ink);
+      background: var(--ink);
       color: white;
-    }
-
-    .courses-layout {
-      display: block;
     }
 
     .courses-list-panel {
@@ -135,7 +172,7 @@
 
     .courses-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
     }
 
@@ -418,8 +455,13 @@
         grid-template-columns: 1fr;
       }
 
+      .course-filter-panel,
       .course-detail-panel {
         position: static;
+      }
+
+      .course-filter {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       .courses-grid {
@@ -429,13 +471,16 @@
 
     @media (max-width: 820px) {
       .courses-hero,
-      .courses-toolbar,
       .course-detail-stats {
         grid-template-columns: 1fr;
       }
 
       .courses-page {
         padding-top: 112px;
+      }
+
+      .course-filter {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .courses-grid {
@@ -477,16 +522,23 @@
       </p>
     </section>
 
-    <section class="courses-toolbar" aria-label="Course search and filters">
+    <section class="courses-toolbar" aria-label="Course search">
       <label class="course-search" for="courseSearch">
         <span>Search courses</span>
         <input id="courseSearch" type="search" placeholder="Search RHET 1020, chemistry, professor, notes...">
       </label>
-
-      <div id="courseDepartmentFilter" class="course-filter" aria-label="Department filter"></div>
     </section>
 
     <section class="courses-layout">
+      <aside class="course-filter-panel" aria-label="Course filters">
+        <div class="course-filter-heading">Filter Courses</div>
+
+        <div class="course-filter-group">
+          <div class="course-filter-label">Department</div>
+          <div id="courseDepartmentFilter" class="course-filter" aria-label="Department filter"></div>
+        </div>
+      </aside>
+
       <section class="courses-list-panel" aria-label="AUC courses">
         <div class="courses-list-heading">
           <span id="coursesCount">0 courses</span>
