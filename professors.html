@@ -1698,6 +1698,15 @@
             return;
           }
 
+          reviewMessage.textContent = "Submitting review...";
+
+          const saveResult = await saveStoredProfessorReview(professor.id, review, professor.name);
+
+          if (!saveResult.success) {
+            reviewMessage.textContent = saveResult.error || "Could not save this review.";
+            return;
+          }
+
           setReviewModalOpen(false);
           renderProfessorDetail(professor);
 
