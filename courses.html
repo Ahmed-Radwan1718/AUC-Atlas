@@ -541,13 +541,16 @@
     }
 
     .course-professor-action,
-    .course-professor-action:visited {
+    .course-professor-action:visited,
+    .course-review-action,
+    .course-review-submit {
       min-height: 40px;
       padding: 0 14px;
       border: 1px solid var(--ink);
       border-radius: 999px;
       background: var(--ink);
       color: white;
+      font-family: inherit;
       font-size: 11px;
       font-weight: 900;
       letter-spacing: 0.08em;
@@ -557,6 +560,336 @@
       align-items: center;
       justify-content: center;
       white-space: nowrap;
+    }
+
+    .course-review-action:disabled,
+    .course-review-submit:disabled {
+      cursor: not-allowed;
+      opacity: 0.54;
+    }
+
+    .course-review-section-header {
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .course-review-summary-grid,
+    .course-review-professor-grid,
+    .course-review-filters,
+    .course-review-form-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .course-review-summary-grid {
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      margin-bottom: 16px;
+    }
+
+    .course-review-summary-card,
+    .course-review-professor-card,
+    .course-review-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+    }
+
+    .course-review-summary-card {
+      display: grid;
+      gap: 7px;
+      align-content: center;
+    }
+
+    .course-review-summary-card span,
+    .course-review-filter,
+    .course-review-form label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .course-review-summary-card strong {
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .course-review-professor-grid {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-bottom: 16px;
+    }
+
+    .course-review-professor-card,
+    .course-review-professor-card:visited {
+      color: inherit;
+      text-decoration: none;
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .course-review-professor-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .course-review-professor-photo {
+      width: 52px;
+      height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .course-review-professor-photo img,
+    .course-review-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .course-review-professor-card h4,
+    .course-review-card h4 {
+      margin: 0 0 6px;
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .course-review-professor-card p,
+    .course-review-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .course-review-filters {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin: 16px 0;
+    }
+
+    .course-review-filter {
+      display: grid;
+      gap: 6px;
+    }
+
+    .course-review-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .course-review-card-header {
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .course-review-avatar {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--gold-soft);
+      color: var(--ink);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      font-weight: 900;
+    }
+
+    .course-review-tags {
+      margin: 0 0 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .course-review-tags span,
+    .course-review-legacy-tag {
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: var(--gold-soft);
+      color: var(--ink-soft);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .course-review-legacy-tag {
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    .course-review-modal[hidden] {
+      display: none;
+    }
+
+    .course-review-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 220;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .course-review-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: rgba(29, 31, 31, 0.28);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .course-review-modal-card {
+      position: relative;
+      z-index: 1;
+      width: min(540px, 100%);
+      max-height: min(760px, calc(100vh - 48px));
+      overflow: auto;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .course-review-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .course-review-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .course-review-form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .course-review-form label {
+      display: grid;
+      gap: 7px;
+    }
+
+    .course-review-form textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px 13px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      font: inherit;
+      resize: vertical;
+      outline: 0;
+    }
+
+    .course-review-custom-dropdown {
+      position: relative;
+      width: 100%;
+    }
+
+    .course-review-custom-dropdown .custom-select-trigger {
+      width: 100%;
+      min-height: 54px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      text-align: left;
+    }
+
+    .course-review-custom-dropdown.invalid .custom-select-trigger {
+      border-color: rgba(192, 154, 92, 0.72);
+    }
+
+    .course-review-custom-dropdown .custom-select-menu {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 10px);
+      z-index: 80;
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 10px 8px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 22px 55px rgba(29, 31, 31, 0.13);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: opacity 0.24s ease, transform 0.24s ease, visibility 0.24s ease;
+    }
+
+    .course-review-custom-dropdown.open .custom-select-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .course-review-custom-dropdown .custom-select-option {
+      position: relative;
+      width: 100%;
+      margin-bottom: 6px;
+      padding: 12px 14px 12px 24px;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: rgba(29, 31, 31, 0.62);
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.4;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .course-review-custom-dropdown .custom-select-option.active,
+    .course-review-custom-dropdown .custom-select-option:hover {
+      color: var(--ink);
+      background: rgba(192, 154, 92, 0.14);
+    }
+
+    .course-review-form-message {
+      min-height: 20px;
+      margin: 0;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.5;
     }
 
     .course-empty-state {
@@ -613,7 +946,10 @@
       }
 
       .course-detail-header-top,
-      .course-professor-row {
+      .course-professor-row,
+      .course-review-section-header,
+      .course-review-filters,
+      .course-review-form-grid {
         display: grid;
         grid-template-columns: 1fr;
       }
@@ -735,6 +1071,21 @@
       const courseDetailsByCode = window.AUC_ATLAS_COURSE_DETAILS || {};
       const professorDirectory = window.AUC_ATLAS_PROFESSORS || [];
       const professorsById = Object.create(null);
+      const reviewSemesterOptions = [
+        { value: "fall-2024", label: "Fall 2024" },
+        { value: "spring-2025", label: "Spring 2025" },
+        { value: "summer-2025", label: "Summer 2025" },
+        { value: "fall-2025", label: "Fall 2025" },
+        { value: "spring-2026", label: "Spring 2026" },
+        { value: "summer-2026", label: "Summer 2026" },
+        { value: "fall-2026", label: "Fall 2026" },
+        { value: "spring-2027", label: "Spring 2027" },
+        { value: "summer-2027", label: "Summer 2027" }
+      ];
+      const courseReviewsByCode = Object.create(null);
+      const courseReviewStatusByCode = Object.create(null);
+      const courseReviewErrorByCode = Object.create(null);
+      const courseReviewFiltersByCode = Object.create(null);
 
       professorDirectory.forEach(function (professor) {
         professorsById[professor.id] = professor;
@@ -1051,6 +1402,920 @@
         }).join("") + `</div>`;
       }
 
+      function getCourseLabel(course) {
+        return [course.code, course.title].filter(Boolean).join(" - ");
+      }
+
+      function getCourseReviewKey(course) {
+        return normalizeCourseKey(course && course.code);
+      }
+
+      function getSemesterOption(value) {
+        const normalizedValue = String(value || "").trim().toLowerCase();
+
+        return reviewSemesterOptions.find(function (semester) {
+          return semester.value === normalizedValue || semester.label.toLowerCase() === normalizedValue;
+        }) || null;
+      }
+
+      function getReviewRating(review, key) {
+        const rating = Number(review && review[key]);
+
+        return Number.isFinite(rating) && rating >= 1 && rating <= 5 ? rating : null;
+      }
+
+      function getAverageReviewMetric(reviews, key) {
+        const ratings = reviews.map(function (review) {
+          return getReviewRating(review, key);
+        }).filter(function (rating) {
+          return rating !== null;
+        });
+
+        if (!ratings.length) {
+          return null;
+        }
+
+        return ratings.reduce(function (sum, rating) {
+          return sum + rating;
+        }, 0) / ratings.length;
+      }
+
+      function formatAverageReviewMetric(reviews, key) {
+        const average = getAverageReviewMetric(reviews, key);
+        return average === null ? "No data" : average.toFixed(1) + " / 5";
+      }
+
+      function formatWouldTakeAgain(reviews) {
+        const responses = reviews.map(function (review) {
+          return String(review.takeAgain || "").trim().toLowerCase();
+        }).filter(function (value) {
+          return value === "yes" || value === "no";
+        });
+
+        if (!responses.length) {
+          return "Not enough data";
+        }
+
+        const yesCount = responses.filter(function (value) {
+          return value === "yes";
+        }).length;
+
+        return Math.round((yesCount / responses.length) * 100) + "%";
+      }
+
+      function getReviewCourseLabel(review) {
+        if (review.courseCode) {
+          return [review.courseCode, review.courseTitle].filter(Boolean).join(" - ");
+        }
+
+        return String(review.course || "").trim();
+      }
+
+      function getReviewSemesterLabel(review) {
+        return String(review.semesterLabel || review.term || "").trim();
+      }
+
+      function getReviewProfessor(review) {
+        return professorsById[review.professorId] || {
+          id: review.professorId || "",
+          name: review.professorName || "Professor",
+          image: "user.png",
+          department: ""
+        };
+      }
+
+      function getReviewDateLabel(value) {
+        const date = new Date(value || "");
+
+        if (Number.isNaN(date.getTime())) {
+          return "";
+        }
+
+        return date.toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        });
+      }
+
+      function legacyCourseMatchesExactly(reviewCourseText, course) {
+        const reviewCourse = String(reviewCourseText || "").trim().toLowerCase().replace(/\s+/g, " ");
+        const courseCode = String(course.code || "").trim().toLowerCase().replace(/\s+/g, " ");
+        const courseTitle = String(course.title || "").trim().toLowerCase().replace(/\s+/g, " ");
+
+        return Boolean(reviewCourse && (reviewCourse === courseCode || reviewCourse === courseTitle));
+      }
+
+      function reviewBelongsToCourse(review, course) {
+        if (review.courseCode) {
+          return normalizeCourseKey(review.courseCode) === normalizeCourseKey(course.code);
+        }
+
+        return legacyCourseMatchesExactly(review.course, course);
+      }
+
+      function dedupeReviews(reviews) {
+        const seen = Object.create(null);
+        const uniqueReviews = [];
+
+        reviews.forEach(function (review) {
+          const key = review.id || [
+            review.professorId,
+            review.reviewerUid,
+            review.courseCode || review.course,
+            review.semester || review.term,
+            review.createdAt
+          ].join("|");
+
+          if (!seen[key]) {
+            seen[key] = true;
+            uniqueReviews.push(review);
+          }
+        });
+
+        return uniqueReviews;
+      }
+
+      function getCourseReviewFilters(course) {
+        const key = getCourseReviewKey(course);
+
+        if (!courseReviewFiltersByCode[key]) {
+          courseReviewFiltersByCode[key] = {
+            professor: "all",
+            semester: "all",
+            rating: "all",
+            sort: "newest"
+          };
+        }
+
+        return courseReviewFiltersByCode[key];
+      }
+
+      function getLoadedCourseReviews(course) {
+        return Array.isArray(courseReviewsByCode[getCourseReviewKey(course)])
+          ? courseReviewsByCode[getCourseReviewKey(course)]
+          : [];
+      }
+
+      async function getCurrentReviewUser() {
+        try {
+          const response = await fetch("/api/me", {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              Accept: "application/json"
+            }
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (response.ok && (data.loggedIn || data.signedIn || data.authenticated) && data.user) {
+            return data.user;
+          }
+        } catch (error) {}
+
+        return null;
+      }
+
+      async function loadCourseReviews(course) {
+        const key = getCourseReviewKey(course);
+
+        if (!key || courseReviewStatusByCode[key] === "loading") {
+          return;
+        }
+
+        courseReviewStatusByCode[key] = "loading";
+        courseReviewErrorByCode[key] = "";
+
+        try {
+          const response = await fetch("/api/professor-reviews?courseCode=" + encodeURIComponent(course.code), {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              Accept: "application/json"
+            }
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (!response.ok || !data.success || !Array.isArray(data.reviews)) {
+            throw new Error(data.error || "Could not load course reviews.");
+          }
+
+          courseReviewsByCode[key] = dedupeReviews(data.reviews.filter(function (review) {
+            return reviewBelongsToCourse(review, course);
+          }));
+          courseReviewStatusByCode[key] = "loaded";
+        } catch (error) {
+          courseReviewsByCode[key] = [];
+          courseReviewStatusByCode[key] = "error";
+          courseReviewErrorByCode[key] = error.message || "Could not load course reviews.";
+        }
+
+        if (normalizeCourseKey(state.selectedCourseCode) === normalizeCourseKey(course.code)) {
+          render();
+        }
+      }
+
+      function renderCourseReviewSummary(reviews) {
+        if (!reviews.length) {
+          return '<div class="course-empty-state">No professor reviews have been recorded for this course yet.</div>';
+        }
+
+        const summaryItems = [
+          { label: "Overall average", value: formatAverageReviewMetric(reviews, "rating") },
+          { label: "Total reviews", value: formatCount(reviews.length, "review") },
+          { label: "Clarity", value: formatAverageReviewMetric(reviews, "clarityRating") },
+          { label: "Grading fairness", value: formatAverageReviewMetric(reviews, "gradingRating") },
+          { label: "Workload", value: formatAverageReviewMetric(reviews, "workloadRating") },
+          { label: "Attendance strictness", value: formatAverageReviewMetric(reviews, "attendanceRating") },
+          { label: "Would take again", value: formatWouldTakeAgain(reviews) }
+        ];
+
+        return `
+          <p class="course-detail-note">These numbers describe reviews for this course only, not each professor's complete teaching record.</p>
+          <div class="course-review-summary-grid">
+            ${summaryItems.map(function (item) {
+              return `
+                <article class="course-review-summary-card">
+                  <span>${escapeHtml(item.label)}</span>
+                  <strong>${escapeHtml(item.value)}</strong>
+                </article>
+              `;
+            }).join("")}
+          </div>
+        `;
+      }
+
+      function renderCourseProfessorBreakdown(course, reviews) {
+        const groups = Object.create(null);
+
+        reviews.forEach(function (review) {
+          const professor = getReviewProfessor(review);
+          const professorId = professor.id || review.professorId || "unknown-professor";
+
+          groups[professorId] = groups[professorId] || {
+            professor,
+            reviews: []
+          };
+
+          groups[professorId].reviews.push(review);
+        });
+
+        const professorGroups = Object.keys(groups).map(function (professorId) {
+          return groups[professorId];
+        }).sort(function (first, second) {
+          return first.professor.name.localeCompare(second.professor.name);
+        });
+
+        if (!professorGroups.length) {
+          return "";
+        }
+
+        return `
+          <div class="course-review-professor-grid">
+            ${professorGroups.map(function (group) {
+              const professor = group.professor;
+              const semesters = Array.from(new Set(group.reviews.map(getReviewSemesterLabel).filter(Boolean))).sort();
+
+              return `
+                <a class="course-review-professor-card" href="professors.html?professor=${encodeURIComponent(professor.id || "")}">
+                  <div class="course-review-professor-photo">
+                    <img src="${escapeHtml(professor.image || "user.png")}" alt="${escapeHtml(professor.name)}">
+                  </div>
+
+                  <div>
+                    <h4>${escapeHtml(professor.name)}</h4>
+                    <p>${escapeHtml(formatAverageReviewMetric(group.reviews, "rating"))} · ${escapeHtml(formatCount(group.reviews.length, "review"))}</p>
+                    <p>${escapeHtml(semesters.length ? semesters.join(", ") : "Semester not listed")}</p>
+                    <p>${escapeHtml(formatWouldTakeAgain(group.reviews))} would take again</p>
+                  </div>
+                </a>
+              `;
+            }).join("")}
+          </div>
+        `;
+      }
+
+      function getCourseReviewFilterValues(reviews, getValue) {
+        const seen = Object.create(null);
+        const values = [];
+
+        reviews.forEach(function (review) {
+          const value = String(getValue(review) || "").trim();
+          const lookup = value.toLowerCase();
+
+          if (value && !seen[lookup]) {
+            seen[lookup] = true;
+            values.push(value);
+          }
+        });
+
+        return values.sort(function (a, b) {
+          return a.localeCompare(b);
+        });
+      }
+
+      function renderReviewFilterOptions(values, selectedValue, fallbackLabel) {
+        return [`<option value="all"${selectedValue === "all" ? " selected" : ""}>${escapeHtml(fallbackLabel)}</option>`].concat(values.map(function (value) {
+          return `<option value="${escapeHtml(value)}"${selectedValue === value ? " selected" : ""}>${escapeHtml(value)}</option>`;
+        })).join("");
+      }
+
+      function renderCustomReviewFilterOptions(values, selectedValue, fallbackLabel) {
+        return [`<button class="custom-select-option${selectedValue === "all" ? " active" : ""}" type="button" data-value="all">${escapeHtml(fallbackLabel)}</button>`].concat(values.map(function (value) {
+          return `<button class="custom-select-option${selectedValue === value ? " active" : ""}" type="button" data-value="${escapeHtml(value)}">${escapeHtml(value)}</button>`;
+        })).join("");
+      }
+
+      function getFilteredCourseReviews(course, reviews) {
+        const filters = getCourseReviewFilters(course);
+
+        return reviews.filter(function (review) {
+          const professor = getReviewProfessor(review);
+          const professorName = professor.name || review.professorName || "Professor";
+          const semester = getReviewSemesterLabel(review);
+          const rating = getReviewRating(review, "rating");
+
+          if (filters.professor !== "all" && professorName !== filters.professor) {
+            return false;
+          }
+
+          if (filters.semester !== "all" && semester !== filters.semester) {
+            return false;
+          }
+
+          if (filters.rating !== "all" && String(Math.round(rating || 0)) !== filters.rating) {
+            return false;
+          }
+
+          return true;
+        }).slice().sort(function (first, second) {
+          const firstRating = getReviewRating(first, "rating") || 0;
+          const secondRating = getReviewRating(second, "rating") || 0;
+          const firstTime = new Date(first.createdAt || 0).getTime() || 0;
+          const secondTime = new Date(second.createdAt || 0).getTime() || 0;
+
+          if (filters.sort === "rating-high") {
+            return secondRating - firstRating;
+          }
+
+          if (filters.sort === "rating-low") {
+            return firstRating - secondRating;
+          }
+
+          return secondTime - firstTime;
+        });
+      }
+
+      function renderCourseReviewTags(review) {
+        const tags = [
+          { key: "clarityRating", label: "Clarity" },
+          { key: "gradingRating", label: "Grading" },
+          { key: "workloadRating", label: "Workload" },
+          { key: "attendanceRating", label: "Attendance" }
+        ].map(function (metric) {
+          const rating = getReviewRating(review, metric.key);
+          return rating === null ? "" : metric.label + " " + rating + "/5";
+        }).filter(Boolean);
+
+        const takeAgain = String(review.takeAgain || "").trim().toLowerCase();
+
+        if (takeAgain === "yes") {
+          tags.push("Would take again");
+        } else if (takeAgain === "no") {
+          tags.push("Would not take again");
+        }
+
+        return tags.map(function (tag) {
+          return `<span>${escapeHtml(tag)}</span>`;
+        }).join("");
+      }
+
+      function renderCourseReviewCards(course, reviews) {
+        if (!reviews.length) {
+          return '<div class="course-empty-state">No reviews match these filters.</div>';
+        }
+
+        return `<div class="course-review-list">` + reviews.map(function (review) {
+          const professor = getReviewProfessor(review);
+          const professorName = professor.name || review.professorName || "Professor";
+          const professorInitial = professorName.trim().charAt(0).toUpperCase() || "P";
+          const reviewTags = renderCourseReviewTags(review);
+          const dateLabel = getReviewDateLabel(review.createdAt);
+          const isLegacy = !review.courseCode || !review.semester;
+
+          return `
+            <article class="course-review-card">
+              <div class="course-review-card-header">
+                <a class="course-review-avatar" href="professors.html?professor=${encodeURIComponent(professor.id || review.professorId || "")}" aria-label="Open ${escapeHtml(professorName)} profile">
+                  ${professor.image ? `<img src="${escapeHtml(professor.image)}" alt="${escapeHtml(professorName)}">` : `<span>${escapeHtml(professorInitial)}</span>`}
+                </a>
+
+                <div>
+                  <h4>${escapeHtml(professorName)}</h4>
+                  <p>${escapeHtml(getReviewCourseLabel(review) || getCourseLabel(course))} · ${escapeHtml(getReviewSemesterLabel(review) || "Semester not listed")}</p>
+                </div>
+              </div>
+
+              <div class="course-review-tags">
+                <span>${escapeHtml(formatAverageReviewMetric([review], "rating"))}</span>
+                ${reviewTags}
+                ${dateLabel ? `<span>${escapeHtml(dateLabel)}</span>` : ""}
+                ${isLegacy ? '<span class="course-review-legacy-tag">Legacy review</span>' : ""}
+              </div>
+
+              <p>${escapeHtml(review.text || "")}</p>
+            </article>
+          `;
+        }).join("") + `</div>`;
+      }
+
+      function renderCourseReviewModal(course) {
+        const professors = getCourseProfessors(course);
+
+        if (!professors.length) {
+          return "";
+        }
+
+        const professorOptions = ['<option value="">Select professor</option>'].concat(professors.map(function (professor) {
+          return `<option value="${escapeHtml(professor.id)}">${escapeHtml(professor.name)}</option>`;
+        })).join("");
+
+        const professorDropdownOptions = ['<button class="custom-select-option active" type="button" data-value="">Select professor</button>'].concat(professors.map(function (professor) {
+          return `<button class="custom-select-option" type="button" data-value="${escapeHtml(professor.id)}">${escapeHtml(professor.name)}</button>`;
+        })).join("");
+
+        const semesterOptions = ['<option value="">Select semester</option>'].concat(reviewSemesterOptions.map(function (semester) {
+          return `<option value="${escapeHtml(semester.value)}">${escapeHtml(semester.label)}</option>`;
+        })).join("");
+
+        const semesterDropdownOptions = ['<button class="custom-select-option active" type="button" data-value="">Select semester</button>'].concat(reviewSemesterOptions.map(function (semester) {
+          return `<button class="custom-select-option" type="button" data-value="${escapeHtml(semester.value)}">${escapeHtml(semester.label)}</button>`;
+        })).join("");
+
+        function ratingSelect(name, label, options) {
+          return `
+            <label>
+              ${escapeHtml(label)}
+              <select name="${escapeHtml(name)}" hidden required>
+                <option value="">Select rating</option>
+                ${options}
+              </select>
+
+              <div class="course-review-custom-dropdown" data-select-name="${escapeHtml(name)}">
+                <button class="custom-select-trigger" type="button" aria-expanded="false">
+                  <span class="custom-select-value">Select rating</span>
+                  <span class="chevron"></span>
+                </button>
+
+                <div class="custom-select-menu">
+                  <button class="custom-select-option active" type="button" data-value="">Select rating</button>
+                  ${options.replace(/<option value="/g, '<button class="custom-select-option" type="button" data-value="').replace(/<\/option>/g, '</button>').replace(/">/g, '">')}
+                </div>
+              </div>
+            </label>
+          `;
+        }
+
+        const simpleRatingOptions = `
+          <option value="5">5</option>
+          <option value="4">4</option>
+          <option value="3">3</option>
+          <option value="2">2</option>
+          <option value="1">1</option>
+        `;
+
+        return `
+          <div class="course-review-modal" id="course-review-modal" hidden>
+            <button class="course-review-modal-backdrop" id="course-review-modal-backdrop" type="button" aria-label="Close review form"></button>
+
+            <aside class="course-review-modal-card" role="dialog" aria-modal="true" aria-labelledby="course-review-modal-title">
+              <button class="course-review-modal-close" id="course-review-modal-close" type="button" aria-label="Close review form">&times;</button>
+              <h3 id="course-review-modal-title">Review this course</h3>
+              <p class="course-detail-note">${escapeHtml(course.code)} is locked for this review. Select the recorded professor and semester you took it.</p>
+
+              <form class="course-review-form" id="course-review-form" novalidate>
+                <label>
+                  Professor
+                  <select name="professorId" hidden required>${professorOptions}</select>
+
+                  <div class="course-review-custom-dropdown" data-select-name="professorId">
+                    <button class="custom-select-trigger" type="button" aria-expanded="false">
+                      <span class="custom-select-value">Select professor</span>
+                      <span class="chevron"></span>
+                    </button>
+
+                    <div class="custom-select-menu">
+                      ${professorDropdownOptions}
+                    </div>
+                  </div>
+                </label>
+
+                <label>
+                  Semester
+                  <select name="semester" hidden required>${semesterOptions}</select>
+
+                  <div class="course-review-custom-dropdown" data-select-name="semester">
+                    <button class="custom-select-trigger" type="button" aria-expanded="false">
+                      <span class="custom-select-value">Select semester</span>
+                      <span class="chevron"></span>
+                    </button>
+
+                    <div class="custom-select-menu">
+                      ${semesterDropdownOptions}
+                    </div>
+                  </div>
+                </label>
+
+                <div class="course-review-form-grid">
+                  ${ratingSelect("rating", "Overall rating", simpleRatingOptions)}
+                  ${ratingSelect("clarityRating", "Clarity rating", simpleRatingOptions)}
+                  ${ratingSelect("gradingRating", "Grading fairness", simpleRatingOptions)}
+                  ${ratingSelect("workloadRating", "Workload", simpleRatingOptions)}
+                  ${ratingSelect("attendanceRating", "Attendance strictness", simpleRatingOptions)}
+
+                  <label>
+                    Would take again
+                    <select name="takeAgain" hidden required>
+                      <option value="">Select answer</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+
+                    <div class="course-review-custom-dropdown" data-select-name="takeAgain">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">Select answer</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        <button class="custom-select-option active" type="button" data-value="">Select answer</button>
+                        <button class="custom-select-option" type="button" data-value="yes">Yes</button>
+                        <button class="custom-select-option" type="button" data-value="no">No</button>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                <label>
+                  Written review
+                  <textarea name="review" placeholder="What should other students know about this course with this professor?" required></textarea>
+                </label>
+
+                <button class="course-review-submit" type="submit">Submit Review</button>
+                <p class="course-review-form-message" id="course-review-form-message" aria-live="polite"></p>
+              </form>
+            </aside>
+          </div>
+        `;
+      }
+
+      function renderCourseReviewSection(course) {
+        const key = getCourseReviewKey(course);
+        const professors = getCourseProfessors(course);
+        let status = courseReviewStatusByCode[key];
+
+        if (!status) {
+          loadCourseReviews(course);
+          status = "loading";
+        }
+
+        const allReviews = getLoadedCourseReviews(course);
+        const filters = getCourseReviewFilters(course);
+        const filteredReviews = getFilteredCourseReviews(course, allReviews);
+        const professorValues = getCourseReviewFilterValues(allReviews, function (review) {
+          return getReviewProfessor(review).name || review.professorName || "";
+        });
+        const semesterValues = getCourseReviewFilterValues(allReviews, getReviewSemesterLabel);
+
+        let content = "";
+
+        if (status === "loading") {
+          content = '<div class="course-empty-state">Loading course-specific professor reviews...</div>';
+        } else if (status === "error") {
+          content = `<div class="course-empty-state">${escapeHtml(courseReviewErrorByCode[key] || "Could not load course reviews. Course details and recorded professors are still available.")}</div>`;
+        } else if (!allReviews.length) {
+          content = renderCourseReviewSummary([]);
+        } else {
+          content = `
+            ${renderCourseReviewSummary(allReviews)}
+            ${renderCourseProfessorBreakdown(course, allReviews)}
+
+            <div class="course-review-filters">
+              <label class="course-review-filter">
+                Professor
+                <select data-course-review-filter="professor" hidden>
+                  ${renderReviewFilterOptions(professorValues, filters.professor, "All professors")}
+                </select>
+
+                <div class="course-review-custom-dropdown" data-filter-select="professor">
+                  <button class="custom-select-trigger" type="button" aria-expanded="false">
+                    <span class="custom-select-value">${escapeHtml(filters.professor === "all" ? "All professors" : filters.professor)}</span>
+                    <span class="chevron"></span>
+                  </button>
+
+                  <div class="custom-select-menu">
+                    ${renderCustomReviewFilterOptions(professorValues, filters.professor, "All professors")}
+                  </div>
+                </div>
+              </label>
+
+              <label class="course-review-filter">
+                Semester
+                <select data-course-review-filter="semester" hidden>
+                  ${renderReviewFilterOptions(semesterValues, filters.semester, "All semesters")}
+                </select>
+
+                <div class="course-review-custom-dropdown" data-filter-select="semester">
+                  <button class="custom-select-trigger" type="button" aria-expanded="false">
+                    <span class="custom-select-value">${escapeHtml(filters.semester === "all" ? "All semesters" : filters.semester)}</span>
+                    <span class="chevron"></span>
+                  </button>
+
+                  <div class="custom-select-menu">
+                    ${renderCustomReviewFilterOptions(semesterValues, filters.semester, "All semesters")}
+                  </div>
+                </div>
+              </label>
+
+              <label class="course-review-filter">
+                Rating
+                <select data-course-review-filter="rating" hidden>
+                  <option value="all"${filters.rating === "all" ? " selected" : ""}>All ratings</option>
+                  <option value="5"${filters.rating === "5" ? " selected" : ""}>5 stars</option>
+                  <option value="4"${filters.rating === "4" ? " selected" : ""}>4 stars</option>
+                  <option value="3"${filters.rating === "3" ? " selected" : ""}>3 stars</option>
+                  <option value="2"${filters.rating === "2" ? " selected" : ""}>2 stars</option>
+                  <option value="1"${filters.rating === "1" ? " selected" : ""}>1 star</option>
+                </select>
+
+                <div class="course-review-custom-dropdown" data-filter-select="rating">
+                  <button class="custom-select-trigger" type="button" aria-expanded="false">
+                    <span class="custom-select-value">${escapeHtml(filters.rating === "all" ? "All ratings" : filters.rating + " stars")}</span>
+                    <span class="chevron"></span>
+                  </button>
+
+                  <div class="custom-select-menu">
+                    <button class="custom-select-option${filters.rating === "all" ? " active" : ""}" type="button" data-value="all">All ratings</button>
+                    <button class="custom-select-option${filters.rating === "5" ? " active" : ""}" type="button" data-value="5">5 stars</button>
+                    <button class="custom-select-option${filters.rating === "4" ? " active" : ""}" type="button" data-value="4">4 stars</button>
+                    <button class="custom-select-option${filters.rating === "3" ? " active" : ""}" type="button" data-value="3">3 stars</button>
+                    <button class="custom-select-option${filters.rating === "2" ? " active" : ""}" type="button" data-value="2">2 stars</button>
+                    <button class="custom-select-option${filters.rating === "1" ? " active" : ""}" type="button" data-value="1">1 star</button>
+                  </div>
+                </div>
+              </label>
+
+              <label class="course-review-filter">
+                Sort
+                <select data-course-review-filter="sort" hidden>
+                  <option value="newest"${filters.sort === "newest" ? " selected" : ""}>Newest</option>
+                  <option value="rating-high"${filters.sort === "rating-high" ? " selected" : ""}>Highest rated</option>
+                  <option value="rating-low"${filters.sort === "rating-low" ? " selected" : ""}>Lowest rated</option>
+                </select>
+
+                <div class="course-review-custom-dropdown" data-filter-select="sort">
+                  <button class="custom-select-trigger" type="button" aria-expanded="false">
+                    <span class="custom-select-value">${escapeHtml(filters.sort === "rating-high" ? "Highest rated" : filters.sort === "rating-low" ? "Lowest rated" : "Newest")}</span>
+                    <span class="chevron"></span>
+                  </button>
+
+                  <div class="custom-select-menu">
+                    <button class="custom-select-option${filters.sort === "newest" ? " active" : ""}" type="button" data-value="newest">Newest</button>
+                    <button class="custom-select-option${filters.sort === "rating-high" ? " active" : ""}" type="button" data-value="rating-high">Highest rated</button>
+                    <button class="custom-select-option${filters.sort === "rating-low" ? " active" : ""}" type="button" data-value="rating-low">Lowest rated</button>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            ${renderCourseReviewCards(course, filteredReviews)}
+          `;
+        }
+
+        return `
+          <section class="course-detail-section">
+            <div class="course-review-section-header">
+              <div>
+                <p class="course-section-label">Course-specific feedback</p>
+                <h3>Professor Reviews</h3>
+                <p class="course-detail-note">Reviews shown here are tied to this course only and may reflect different recorded professors and semesters.</p>
+              </div>
+
+              <button class="course-review-action" id="course-review-open-button" type="button"${professors.length ? "" : " disabled"}>Review this course</button>
+            </div>
+
+            ${professors.length ? "" : '<div class="course-empty-state">A review cannot yet be submitted because no professor-course relationship has been recorded for this course.</div>'}
+            ${content}
+          </section>
+
+          ${renderCourseReviewModal(course)}
+        `;
+      }
+
+      function setCourseDropdownOpen(dropdown, open) {
+        const trigger = dropdown ? dropdown.querySelector(".custom-select-trigger") : null;
+
+        if (!dropdown || !trigger) {
+          return;
+        }
+
+        dropdown.classList.toggle("open", Boolean(open));
+        trigger.setAttribute("aria-expanded", String(Boolean(open)));
+      }
+
+      function initializeCourseDropdowns(course) {
+        const dropdowns = Array.from(courseDetailView.querySelectorAll(".course-review-custom-dropdown"));
+
+        dropdowns.forEach(function (dropdown) {
+          const selectName = dropdown.dataset.selectName || "";
+          const filterName = dropdown.dataset.filterSelect || "";
+          const select = selectName
+            ? courseDetailView.querySelector('select[name="' + selectName + '"]')
+            : courseDetailView.querySelector('select[data-course-review-filter="' + filterName + '"]');
+          const trigger = dropdown.querySelector(".custom-select-trigger");
+          const value = dropdown.querySelector(".custom-select-value");
+          const options = Array.from(dropdown.querySelectorAll(".custom-select-option"));
+
+          if (!select || !trigger || !value) {
+            return;
+          }
+
+          trigger.addEventListener("click", function (event) {
+            event.preventDefault();
+
+            dropdowns.forEach(function (otherDropdown) {
+              if (otherDropdown !== dropdown) {
+                setCourseDropdownOpen(otherDropdown, false);
+              }
+            });
+
+            setCourseDropdownOpen(dropdown, !dropdown.classList.contains("open"));
+          });
+
+          options.forEach(function (option) {
+            option.addEventListener("click", function (event) {
+              event.preventDefault();
+
+              select.value = option.dataset.value || "";
+              value.textContent = option.textContent.trim();
+
+              options.forEach(function (item) {
+                item.classList.toggle("active", item === option);
+              });
+
+              dropdown.classList.remove("invalid");
+              setCourseDropdownOpen(dropdown, false);
+
+              if (filterName) {
+                const filters = getCourseReviewFilters(course);
+                filters[filterName] = select.value || (filterName === "sort" ? "newest" : "all");
+                renderCourseDetail(course);
+              }
+            });
+          });
+        });
+      }
+
+      async function submitCourseReview(course, reviewForm, reviewMessage) {
+        const formData = new FormData(reviewForm);
+        const professors = getCourseProfessors(course);
+        const professorId = String(formData.get("professorId") || "").trim();
+        const professor = professors.find(function (item) {
+          return item.id === professorId;
+        }) || null;
+        const semester = getSemesterOption(formData.get("semester"));
+        const reviewText = String(formData.get("review") || "").trim();
+        const rating = Number(formData.get("rating"));
+        const clarityRating = Number(formData.get("clarityRating"));
+        const gradingRating = Number(formData.get("gradingRating"));
+        const workloadRating = Number(formData.get("workloadRating"));
+        const attendanceRating = Number(formData.get("attendanceRating"));
+        const takeAgain = String(formData.get("takeAgain") || "").trim().toLowerCase();
+
+        if (!professor) {
+          reviewMessage.textContent = "Select one of the recorded professors before submitting.";
+          return;
+        }
+
+        if (!semester) {
+          reviewMessage.textContent = "Select a standard semester before submitting.";
+          return;
+        }
+
+        if (!rating || !clarityRating || !gradingRating || !workloadRating || !attendanceRating || (takeAgain !== "yes" && takeAgain !== "no") || !reviewText) {
+          reviewMessage.textContent = "Fill out every field before submitting.";
+          return;
+        }
+
+        const currentUser = await getCurrentReviewUser();
+
+        if (!currentUser) {
+          reviewMessage.innerHTML = '<a href="login.html">Log in</a> with your verified AUC account to submit a review.';
+          return;
+        }
+
+        reviewMessage.textContent = "Submitting review...";
+
+        try {
+          const response = await fetch("/api/professor-reviews", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            },
+            body: JSON.stringify({
+              professorId: professor.id,
+              professorName: professor.name,
+              courseCode: course.code,
+              courseTitle: course.title,
+              course: getCourseLabel(course),
+              semester: semester.value,
+              semesterLabel: semester.label,
+              term: semester.label,
+              rating,
+              clarityRating,
+              gradingRating,
+              workloadRating,
+              attendanceRating,
+              takeAgain,
+              text: reviewText
+            })
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (!response.ok || !data.success || !data.review) {
+            reviewMessage.textContent = data.error || "Could not save this review.";
+            return;
+          }
+
+          const key = getCourseReviewKey(course);
+          courseReviewsByCode[key] = dedupeReviews([data.review].concat(getLoadedCourseReviews(course)));
+          courseReviewStatusByCode[key] = "loaded";
+          renderCourseDetail(course);
+
+          const reviewList = courseDetailView.querySelector(".course-review-list");
+
+          if (reviewList) {
+            reviewList.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        } catch (error) {
+          reviewMessage.textContent = "Could not save this review.";
+        }
+      }
+
+      function initializeCourseReviewUi(course) {
+        initializeCourseDropdowns(course);
+
+        const reviewOpenButton = document.getElementById("course-review-open-button");
+        const reviewModal = document.getElementById("course-review-modal");
+        const reviewBackdrop = document.getElementById("course-review-modal-backdrop");
+        const reviewClose = document.getElementById("course-review-modal-close");
+        const reviewForm = document.getElementById("course-review-form");
+        const reviewMessage = document.getElementById("course-review-form-message");
+
+        function setModalOpen(open) {
+          if (!reviewModal) {
+            return;
+          }
+
+          reviewModal.hidden = !open;
+          document.body.style.overflow = open ? "hidden" : "";
+        }
+
+        if (reviewOpenButton && !reviewOpenButton.disabled) {
+          reviewOpenButton.addEventListener("click", function () {
+            setModalOpen(true);
+          });
+        }
+
+        [reviewBackdrop, reviewClose].forEach(function (element) {
+          if (element) {
+            element.addEventListener("click", function () {
+              setModalOpen(false);
+            });
+          }
+        });
+
+        if (reviewForm && reviewMessage) {
+          reviewForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            submitCourseReview(course, reviewForm, reviewMessage);
+          });
+        }
+      }
+
       function updateCourseHistory(course, replace) {
         const url = course ? getCourseUrl(course) : "courses.html";
         const method = replace ? "replaceState" : "pushState";
@@ -1136,6 +2401,8 @@
               <h3>Materials</h3>
               ${renderMaterialRows(course)}
             </section>
+
+            ${renderCourseReviewSection(course)}
           </article>
         `;
 
@@ -1147,6 +2414,8 @@
             showCatalogue(true);
           });
         }
+
+        initializeCourseReviewUi(course);
       }
 
       function render() {
