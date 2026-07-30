@@ -142,6 +142,71 @@ function getCourseDisplay(course) {
   return [course.code, course.title].filter(Boolean).join(" - ");
 }
 
+function getCourseByCode(requestedCourseCode) {
+  const requestedKey = normalizeCourseKey(requestedCourseCode);
+
+  if (!requestedKey) {
+    return null;
+  }
+
+  const courseCode = Object.keys(courseDetailsByCode || {}).find(function (code) {
+    return normalizeCourseKey(code) === requestedKey;
+  });
+
+  if (!courseCode) {
+    return null;
+  }
+
+  const details = courseDetailsByCode[courseCode] || {};
+
+  return {
+    code: courseCode,
+    title: cleanString(details.title || courseCode, 140)
+  };
+}
+
+function normalizeLegacyCourseText(value) {
+  return cleanString(value, 180).toLowerCase().replace(/\s+/g, " ");
+}
+
+function legacyCourseMatchesExactly(reviewCourseText, course) {
+  const reviewCourse = normalizeLegacyCourseText(reviewCourseText);
+  const courseCode = normalizeLegacyCourseText(course.code);
+  const courseTitle = normalizeLegacyCourseText(course.title);
+
+  return Boolean(reviewCourse && (reviewCourse === courseCode || reviewCourse === courseTitle));
+}
+
+function serializedReviewMatchesCourse(review, course) {
+  if (review.courseCode) {
+    return normalizeCourseKey(review.courseCode) === normalizeCourseKey(course.code);
+  }
+
+  return legacyCourseMatchesExactly(review.course, course);
+}
+
+function dedupeSerializedReviews(reviews) {
+  const seen = Object.create(null);
+  const uniqueReviews = [];
+
+  reviews.forEach(function (review) {
+    const key = review.id || [
+      review.professorId,
+      review.reviewerUid,
+      review.courseCode || review.course,
+      review.semester || review.term,
+      review.createdAt
+    ].join("|");
+
+    if (!seen[key]) {
+      seen[key] = true;
+      uniqueReviews.push(review);
+    }
+  });
+
+  return uniqueReviews;
+}
+
 function getStructuredReviewInput(body, professorId) {
   const course = getRecordedCourseForProfessor(professorId, cleanCourseCode(body.courseCode));
   const semester = getSemesterOption(body.semester);
@@ -304,7 +369,36 @@ async function getReviewerProfile(decodedUser) {
 }
 
 async function handlePublicReviews(req, res) {
-  const professorId = cleanProfessorId((req.query || {}).professorId || (req.query || {}).professor);
+  const query = req.query || {};
+  const requestedCourse = getCourseByCode(query.courseCode || "");
+  const professorId = cleanProfessorId(query.professorId || query.professor);
+
+  if (requestedCourse) {
+    const db = admin.firestore();
+    const structuredSnapshot = await db.collection("professorReviews")
+      .where("courseCode", "==", requestedCourse.code)
+      .limit(MAX_PUBLIC_REVIEWS)
+      .get();
+
+    const legacySnapshot = await db.collection("professorReviews")
+      .limit(MAX_ADMIN_REVIEWS)
+      .get();
+
+    const reviews = dedupeSerializedReviews(
+      structuredSnapshot.docs.concat(legacySnapshot.docs).map(function (doc) {
+        return serializeReview(doc);
+      }).filter(function (review) {
+        return serializedReviewMatchesCourse(review, requestedCourse);
+      })
+    ).sort(function (a, b) {
+      return getReviewTime(b) - getReviewTime(a);
+    });
+
+    return res.status(200).json({
+      success: true,
+      reviews
+    });
+  }
 
   if (!professorId) {
     return res.status(400).json({ error: "Missing professor id." });
