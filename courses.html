@@ -91,10 +91,12 @@
       border-radius: var(--radius);
       background: var(--surface);
       box-shadow: var(--shadow);
+      display: grid;
+      gap: 10px;
     }
 
     .course-filter-heading {
-      margin-bottom: 16px;
+      padding: 0 2px 10px;
       color: var(--ink);
       font-size: 13px;
       font-weight: 900;
@@ -102,49 +104,86 @@
       text-transform: uppercase;
     }
 
-    .course-filter-group {
-      padding-top: 16px;
+    .filter-item {
       border-top: 1px solid var(--line);
-      display: grid;
-      gap: 12px;
     }
 
-    .course-filter-label {
-      color: var(--muted);
-      font-size: 11px;
+    .filter-toggle {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 2px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    .filter-toggle span:first-child {
+      font-size: 12px;
       font-weight: 900;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
-    .course-filter {
-      display: grid;
-      gap: 8px;
+    .chevron {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1;
+      transition: transform 0.2s ease;
     }
 
-    .course-filter button {
-      width: 100%;
-      min-height: 42px;
-      padding: 0 14px;
+    .filter-item.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .filter-content {
+      display: none;
+      gap: 9px;
+      padding: 0 0 14px;
+    }
+
+    .filter-item.open .filter-content {
+      display: grid;
+    }
+
+    .filter-content label {
+      min-height: 40px;
+      padding: 0 12px;
       border: 1px solid var(--line);
       border-radius: 14px;
       background: var(--surface-soft);
       color: var(--muted);
       font-size: 11px;
       font-weight: 900;
-      letter-spacing: 0.08em;
-      text-align: left;
+      letter-spacing: 0.06em;
+      line-height: 1.25;
       text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
       transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
 
-    .course-filter button:hover {
+    .filter-content label:hover {
       border-color: var(--gold);
       color: var(--ink);
       transform: translateX(2px);
     }
 
-    .course-filter button.active {
+    .filter-content input {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--gold);
+      flex: 0 0 auto;
+    }
+
+    .filter-content label:has(input:checked) {
       border-color: var(--ink);
       background: var(--ink);
       color: white;
@@ -460,7 +499,7 @@
         position: static;
       }
 
-      .course-filter {
+      .filter-item.open .filter-content {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
@@ -479,7 +518,7 @@
         padding-top: 112px;
       }
 
-      .course-filter {
+      .filter-item.open .filter-content {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
@@ -533,9 +572,14 @@
       <aside class="course-filter-panel" aria-label="Course filters">
         <div class="course-filter-heading">Filter Courses</div>
 
-        <div class="course-filter-group">
-          <div class="course-filter-label">Department</div>
-          <div id="courseDepartmentFilter" class="course-filter" aria-label="Department filter"></div>
+        <div class="filter-item open">
+          <button class="filter-toggle" type="button"><span>Department</span><span class="chevron">⌄</span></button>
+          <div id="courseDepartmentFilter" class="filter-content" aria-label="Department filter"></div>
+        </div>
+
+        <div class="filter-item open">
+          <button class="filter-toggle" type="button"><span>Course Level</span><span class="chevron">⌄</span></button>
+          <div id="courseLevelFilter" class="filter-content" aria-label="Course level filter"></div>
         </div>
       </aside>
 
@@ -610,16 +654,25 @@
         professorsById[professor.id] = professor;
       });
 
+      function getCourseLevel(code) {
+        const courseNumber = String(code || "").split(" ")[1] || "";
+        const firstDigit = courseNumber.charAt(0);
+
+        return firstDigit ? firstDigit + "000 Level" : "Level pending";
+      }
+
       const courseRecords = coursesPageCourses.map(function (courseItem) {
         const code = courseItem[0];
         const title = courseItem[1];
         const department = getCoursePageDepartment(code);
         const details = courseDetailsByCode[code] || {};
+        const level = getCourseLevel(code);
 
         return Object.assign({
           code,
           title,
           department,
+          level,
           summary: title + " in the " + department + " catalogue.",
           professors: [],
           materials: [],
@@ -627,7 +680,8 @@
         }, details, {
           code,
           title,
-          department: details.department || department
+          department: details.department || department,
+          level: details.level || level
         });
       });
 
@@ -635,12 +689,13 @@
       const coursesCount = document.getElementById("coursesCount");
       const courseSearch = document.getElementById("courseSearch");
       const departmentFilter = document.getElementById("courseDepartmentFilter");
+      const courseLevelFilter = document.getElementById("courseLevelFilter");
       const courseDetailPanel = document.getElementById("courseDetailPanel");
 
       const state = {
         query: "",
-        department: "All",
-        selectedCourseCode: getInitialCourseCode()
+        departments: [],
+        levels: []
       };
 
       function escapeHtml(value) {
@@ -750,27 +805,60 @@
         ].join(" ").toLowerCase().includes(query);
       }
 
+      function getCourseLevels() {
+        return Array.from(new Set(courseRecords.map(function (course) {
+          return course.level;
+        }).filter(Boolean))).sort(function (a, b) {
+          return a.localeCompare(b);
+        });
+      }
+
       function getFilteredCourses() {
         return courseRecords.filter(function (course) {
-          const matchesDepartment = state.department === "All" || course.department === state.department;
-          return matchesDepartment && courseMatchesSearch(course);
+          const matchesDepartment = !state.departments.length || state.departments.includes(course.department);
+          const matchesLevel = !state.levels.length || state.levels.includes(course.level);
+
+          return matchesDepartment && matchesLevel && courseMatchesSearch(course);
+        });
+      }
+
+      function renderFilterCheckboxes(container, values, selectedValues, onChange) {
+        container.innerHTML = values.map(function (value) {
+          return `
+            <label>
+              <input type="checkbox" value="${escapeHtml(value)}"${selectedValues.includes(value) ? " checked" : ""}>
+              ${escapeHtml(value)}
+            </label>
+          `;
+        }).join("");
+
+        container.querySelectorAll("input[type='checkbox']").forEach(function (checkbox) {
+          checkbox.addEventListener("change", function () {
+            onChange(checkbox.value, checkbox.checked);
+            render();
+          });
         });
       }
 
       function renderDepartmentFilters() {
-        departmentFilter.innerHTML = getDepartments().map(function (department) {
-          return `
-            <button class="${department === state.department ? "active" : ""}" type="button" data-department="${escapeHtml(department)}">
-              ${escapeHtml(department)}
-            </button>
-          `;
-        }).join("");
+        renderFilterCheckboxes(departmentFilter, getDepartments().filter(function (department) {
+          return department !== "All";
+        }), state.departments, function (department, checked) {
+          state.departments = checked
+            ? state.departments.concat(department)
+            : state.departments.filter(function (item) {
+                return item !== department;
+              });
+        });
+      }
 
-        departmentFilter.querySelectorAll("button").forEach(function (button) {
-          button.addEventListener("click", function () {
-            state.department = button.dataset.department || "All";
-            render();
-          });
+      function renderCourseLevelFilters() {
+        renderFilterCheckboxes(courseLevelFilter, getCourseLevels(), state.levels, function (level, checked) {
+          state.levels = checked
+            ? state.levels.concat(level)
+            : state.levels.filter(function (item) {
+                return item !== level;
+              });
         });
       }
 
@@ -1063,10 +1151,17 @@
 
       function render() {
         renderDepartmentFilters();
+        renderCourseLevelFilters();
 
         const filteredCourses = getFilteredCourses();
         renderCourses(filteredCourses);
       }
+
+      document.querySelectorAll(".filter-toggle").forEach(function (button) {
+        button.addEventListener("click", function () {
+          button.closest(".filter-item").classList.toggle("open");
+        });
+      });
 
       courseSearch.addEventListener("input", function () {
         state.query = courseSearch.value;
