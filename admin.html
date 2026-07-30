@@ -241,6 +241,18 @@
       return "★".repeat(cleanRating) + "☆".repeat(5 - cleanRating) + " " + cleanRating + ".0";
     }
 
+    function getReviewCourseLabel(review) {
+      if (review.courseCode) {
+        return [review.courseCode, review.courseTitle].filter(Boolean).join(" - ");
+      }
+
+      return review.course || "";
+    }
+
+    function getReviewSemesterLabel(review) {
+      return review.semesterLabel || review.term || "";
+    }
+
     function getFilteredReviews() {
       const query = String(searchInput && searchInput.value ? searchInput.value : "").trim().toLowerCase();
 
@@ -253,8 +265,11 @@
           getProfessorName(review),
           review.reviewerName,
           review.reviewerEmail,
-          review.course,
-          review.term,
+          getReviewCourseLabel(review),
+          getReviewSemesterLabel(review),
+          review.courseCode,
+          review.courseTitle,
+          review.semester,
           review.text
         ].join(" ").toLowerCase().includes(query);
       });
@@ -275,7 +290,7 @@
               <div>
                 <h2>${escapeHtml(getProfessorName(review))}</h2>
                 <div class="admin-review-meta">
-                  ${escapeHtml(review.course || "Course not listed")} · ${escapeHtml(review.term || "Term not listed")}<br>
+                  ${escapeHtml(getReviewCourseLabel(review) || "Course not listed")} · ${escapeHtml(getReviewSemesterLabel(review) || "Semester not listed")}<br>
                   ${escapeHtml(review.reviewerName || "AUC student")} · ${escapeHtml(review.reviewerEmail || "Email not listed")}<br>
                   ${escapeHtml(formatDate(review.createdAt))}
                 </div>
