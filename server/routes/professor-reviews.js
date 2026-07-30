@@ -239,6 +239,29 @@ async function handleAdminReviews(req, res) {
   });
 }
 
+async function handleMyReviews(req, res) {
+  const decodedUser = await getSignedInUser(req);
+
+  const snapshot = await admin.firestore()
+    .collection("professorReviews")
+    .where("reviewerUid", "==", decodedUser.uid)
+    .limit(MAX_PUBLIC_REVIEWS)
+    .get();
+
+  const reviews = snapshot.docs
+    .map(function (doc) {
+      return serializeReview(doc, { includePrivate: true });
+    })
+    .sort(function (a, b) {
+      return getReviewTime(b) - getReviewTime(a);
+    });
+
+  return res.status(200).json({
+    success: true,
+    reviews
+  });
+}
+
 async function handleCreateReview(req, res) {
   const body = getRequestBody(req);
   const professorId = cleanProfessorId(body.professorId);
@@ -327,11 +350,57 @@ async function handleCreateReview(req, res) {
   });
 }
 
+async function handleUpdateReview(req, res) {
+  const body = getRequestBody(req);
+  const reviewId = cleanReviewId(body.reviewId);
+  const course = cleanString(body.course, 80);
+  const term = cleanString(body.term, 80);
+  const rating = cleanRating(body.rating);
+  const text = cleanString(body.text || body.review, 1600);
+  const decodedUser = await getSignedInUser(req);
+
+  if (!reviewId) {
+    return res.status(400).json({ error: "Missing review id." });
+  }
+
+  if (!course || !term || !rating || !text) {
+    return res.status(400).json({ error: "Fill out the course, term, rating, and review before saving." });
+  }
+
+  const db = admin.firestore();
+  const reviewRef = db.collection("professorReviews").doc(reviewId);
+  const reviewDoc = await reviewRef.get();
+
+  if (!reviewDoc.exists) {
+    return res.status(404).json({ error: "Review not found." });
+  }
+
+  const reviewData = reviewDoc.data() || {};
+
+  if (reviewData.reviewerUid !== decodedUser.uid) {
+    return res.status(403).json({ error: "You can only edit your own reviews." });
+  }
+
+  await reviewRef.update({
+    course,
+    term,
+    rating,
+    text,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+
+  const updatedReview = await reviewRef.get();
+
+  return res.status(200).json({
+    success: true,
+    review: serializeReview(updatedReview, { includePrivate: true })
+  });
+}
+
 async function handleDeleteReview(req, res) {
   const body = getRequestBody(req);
   const reviewId = cleanReviewId(body.reviewId);
   const decodedUser = await getSignedInUser(req);
-  const adminUser = await requireAdmin(decodedUser);
 
   if (!reviewId) {
     return res.status(400).json({ error: "Missing review id." });
@@ -346,17 +415,25 @@ async function handleDeleteReview(req, res) {
   }
 
   const reviewData = reviewDoc.data() || {};
+  const isReviewOwner = reviewData.reviewerUid === decodedUser.uid;
+  let adminUser = null;
+
+  if (!isReviewOwner) {
+    adminUser = await requireAdmin(decodedUser);
+  }
 
   await reviewRef.delete();
 
-  await db.collection("adminReviewDeletions").doc(reviewId).set({
-    reviewId,
-    professorId: reviewData.professorId || "",
-    reviewerUid: reviewData.reviewerUid || "",
-    deletedByUid: adminUser.uid,
-    deletedByEmail: adminUser.email,
-    deletedAt: admin.firestore.FieldValue.serverTimestamp()
-  }).catch(function () {});
+  if (adminUser) {
+    await db.collection("adminReviewDeletions").doc(reviewId).set({
+      reviewId,
+      professorId: reviewData.professorId || "",
+      reviewerUid: reviewData.reviewerUid || "",
+      deletedByUid: adminUser.uid,
+      deletedByEmail: adminUser.email,
+      deletedAt: admin.firestore.FieldValue.serverTimestamp()
+    }).catch(function () {});
+  }
 
   return res.status(200).json({
     success: true,
@@ -371,9 +448,14 @@ module.exports = async function handler(req, res) {
     if (req.method === "GET") {
       const scope = cleanString((req.query || {}).scope || "", 40);
       const adminMode = scope === "admin" || String((req.query || {}).admin || "") === "1";
+      const myMode = scope === "mine" || scope === "me";
 
       if (adminMode) {
         return await handleAdminReviews(req, res);
+      }
+
+      if (myMode) {
+        return await handleMyReviews(req, res);
       }
 
       return await handlePublicReviews(req, res);
@@ -385,6 +467,10 @@ module.exports = async function handler(req, res) {
 
       if (action === "delete") {
         return await handleDeleteReview(req, res);
+      }
+
+      if (action === "update") {
+        return await handleUpdateReview(req, res);
       }
 
       return await handleCreateReview(req, res);
