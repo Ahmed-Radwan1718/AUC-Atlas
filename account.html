@@ -2162,6 +2162,7 @@
     }
 
     .account-review-field input,
+    .account-review-field select,
     .account-review-field textarea {
       width: 100%;
       border: 1px solid rgba(29, 31, 31, 0.14);
@@ -2174,7 +2175,8 @@
       outline: 0;
     }
 
-    .account-review-field input {
+    .account-review-field input,
+    .account-review-field select {
       min-height: 46px;
     }
 
@@ -2185,6 +2187,7 @@
     }
 
     .account-review-field input:focus,
+    .account-review-field select:focus,
     .account-review-field textarea:focus {
       border-color: var(--gold);
       background: #ffffff;
@@ -3659,9 +3662,24 @@ EH|Western Sahara|+212
     })();
   </script>
 
+  <script src="courses-data.js"></script>
+  <script src="professors-data.js"></script>
+
   <script>
     (function () {
       const professorReviewsStorageKey = "auc-atlas-professor-reviews-v1";
+      const courseDetailsByCode = window.AUC_ATLAS_COURSE_DETAILS || {};
+      const reviewSemesterOptions = [
+        { value: "fall-2024", label: "Fall 2024" },
+        { value: "spring-2025", label: "Spring 2025" },
+        { value: "summer-2025", label: "Summer 2025" },
+        { value: "fall-2025", label: "Fall 2025" },
+        { value: "spring-2026", label: "Spring 2026" },
+        { value: "summer-2026", label: "Summer 2026" },
+        { value: "fall-2026", label: "Fall 2026" },
+        { value: "spring-2027", label: "Spring 2027" },
+        { value: "summer-2027", label: "Summer 2027" }
+      ];
       let currentUser = null;
       let accountReviews = [];
 
@@ -3717,6 +3735,76 @@ EH|Western Sahara|+212
         return (window.AUC_ATLAS_PROFESSORS || []).find(function (professor) {
           return professor.id === professorId;
         }) || null;
+      }
+
+      function getProfessorRecordedCourses(professorId) {
+        return Object.keys(courseDetailsByCode).map(function (courseCode) {
+          const details = courseDetailsByCode[courseCode] || {};
+          const professorsForCourse = Array.isArray(details.professors) ? details.professors : [];
+          const hasProfessor = professorsForCourse.some(function (entry) {
+            const professorEntry = typeof entry === "string" ? { id: entry } : entry || {};
+            return professorEntry.id === professorId;
+          });
+
+          if (!hasProfessor) {
+            return null;
+          }
+
+          return {
+            code: courseCode,
+            title: details.title || courseCode
+          };
+        }).filter(Boolean).sort(function (first, second) {
+          return first.code.localeCompare(second.code);
+        });
+      }
+
+      function getCourseLabel(course) {
+        return [course.code, course.title].filter(Boolean).join(" - ");
+      }
+
+      function getReviewCourseLabel(review) {
+        if (review.courseCode) {
+          return [review.courseCode, review.courseTitle].filter(Boolean).join(" - ");
+        }
+
+        return String(review.course || "").trim();
+      }
+
+      function getReviewSemesterLabel(review) {
+        return String(review.semesterLabel || review.term || "").trim();
+      }
+
+      function getSemesterOption(value) {
+        const normalizedValue = String(value || "").trim().toLowerCase();
+
+        return reviewSemesterOptions.find(function (semester) {
+          return semester.value === normalizedValue || semester.label.toLowerCase() === normalizedValue;
+        }) || null;
+      }
+
+      function getReviewRatingValue(review, key) {
+        const rating = Number(review[key]);
+
+        return Number.isFinite(rating) && rating >= 1 && rating <= 5
+          ? String(Math.round(rating))
+          : "";
+      }
+
+      function renderRatingSelect(name, label, value) {
+        return `
+          <label class="account-review-field">
+            <span>${escapeHtml(label)}</span>
+            <select name="${escapeHtml(name)}" required>
+              <option value="">Select rating</option>
+              <option value="5"${value === "5" ? " selected" : ""}>5</option>
+              <option value="4"${value === "4" ? " selected" : ""}>4</option>
+              <option value="3"${value === "3" ? " selected" : ""}>3</option>
+              <option value="2"${value === "2" ? " selected" : ""}>2</option>
+              <option value="1"${value === "1" ? " selected" : ""}>1</option>
+            </select>
+          </label>
+        `;
       }
 
       function reviewBelongsToCurrentUser(review) {
@@ -3796,8 +3884,48 @@ EH|Western Sahara|+212
 
         reviewsList.innerHTML = reviews.map(function (item) {
           const professorName = item.professor && item.professor.name ? item.professor.name : "Professor";
-          const rating = Number(item.review.rating);
-          const ratingValue = Number.isFinite(rating) ? String(Math.max(1, Math.min(5, Math.round(rating)))) : "";
+          const recordedCourses = getProfessorRecordedCourses(item.professorId);
+          const selectedCourseCode = String(item.review.courseCode || "").trim();
+          const selectedSemester = String(item.review.semester || "").trim();
+          const legacyCourse = String(item.review.course || "").trim();
+          const legacyTerm = String(item.review.term || "").trim();
+          const takeAgain = String(item.review.takeAgain || "").trim().toLowerCase();
+
+          const courseField = recordedCourses.length ? `
+            <label class="account-review-field">
+              <span>Course</span>
+              <input type="hidden" name="course" value="${escapeHtml(legacyCourse)}">
+              <select name="courseCode">
+                <option value=""${selectedCourseCode ? "" : " selected"}>${escapeHtml(selectedCourseCode ? "Select course" : "Keep legacy course: " + (legacyCourse || "Course not listed"))}</option>
+                ${recordedCourses.map(function (course) {
+                  return `<option value="${escapeHtml(course.code)}"${course.code === selectedCourseCode ? " selected" : ""}>${escapeHtml(getCourseLabel(course))}</option>`;
+                }).join("")}
+              </select>
+            </label>
+          ` : `
+            <label class="account-review-field">
+              <span>Course</span>
+              <input type="text" name="course" value="${escapeHtml(legacyCourse)}" required>
+            </label>
+          `;
+
+          const semesterField = recordedCourses.length ? `
+            <label class="account-review-field">
+              <span>Semester</span>
+              <input type="hidden" name="term" value="${escapeHtml(legacyTerm)}">
+              <select name="semester">
+                <option value=""${selectedSemester ? "" : " selected"}>${escapeHtml(selectedSemester ? "Select semester" : "Keep legacy term: " + (legacyTerm || "Term not listed"))}</option>
+                ${reviewSemesterOptions.map(function (semester) {
+                  return `<option value="${escapeHtml(semester.value)}"${semester.value === selectedSemester ? " selected" : ""}>${escapeHtml(semester.label)}</option>`;
+                }).join("")}
+              </select>
+            </label>
+          ` : `
+            <label class="account-review-field">
+              <span>Term</span>
+              <input type="text" name="term" value="${escapeHtml(legacyTerm)}" required>
+            </label>
+          `;
 
           return `
             <article class="account-review-card">
@@ -3805,25 +3933,34 @@ EH|Western Sahara|+212
                 <div>
                   <span>${escapeHtml(getReviewDateText(item.review.createdAt))}</span>
                   <h3>${escapeHtml(professorName)}</h3>
+                  <p>${escapeHtml(getReviewCourseLabel(item.review) || "Course not listed")} · ${escapeHtml(getReviewSemesterLabel(item.review) || "Semester not listed")}</p>
                 </div>
                 <a class="account-review-profile-link" href="professors.html?professor=${encodeURIComponent(item.professorId)}">View Profile</a>
               </div>
 
               <form class="account-review-form" data-account-review-form data-professor-id="${escapeHtml(item.professorId)}" data-review-index="${escapeHtml(item.reviewIndex)}">
                 <div class="account-review-grid">
-                  <label class="account-review-field">
-                    <span>Course</span>
-                    <input type="text" name="course" value="${escapeHtml(item.review.course || "")}" required>
-                  </label>
+                  ${courseField}
+                  ${semesterField}
+                  ${renderRatingSelect("rating", "Overall", getReviewRatingValue(item.review, "rating"))}
+                </div>
+
+                <div class="account-review-grid">
+                  ${renderRatingSelect("clarityRating", "Clarity", getReviewRatingValue(item.review, "clarityRating"))}
+                  ${renderRatingSelect("gradingRating", "Grading fairness", getReviewRatingValue(item.review, "gradingRating"))}
+                  ${renderRatingSelect("workloadRating", "Workload", getReviewRatingValue(item.review, "workloadRating"))}
+                </div>
+
+                <div class="account-review-grid">
+                  ${renderRatingSelect("attendanceRating", "Attendance strictness", getReviewRatingValue(item.review, "attendanceRating"))}
 
                   <label class="account-review-field">
-                    <span>Term</span>
-                    <input type="text" name="term" value="${escapeHtml(item.review.term || "")}" required>
-                  </label>
-
-                  <label class="account-review-field">
-                    <span>Rating</span>
-                    <input type="number" name="rating" min="1" max="5" step="1" value="${escapeHtml(ratingValue)}" required>
+                    <span>Would take again</span>
+                    <select name="takeAgain" required>
+                      <option value="">Select answer</option>
+                      <option value="yes"${takeAgain === "yes" ? " selected" : ""}>Yes</option>
+                      <option value="no"${takeAgain === "no" ? " selected" : ""}>No</option>
+                    </select>
                   </label>
                 </div>
 
@@ -3909,11 +4046,32 @@ EH|Western Sahara|+212
         const formData = new FormData(form);
         const course = String(formData.get("course") || "").trim();
         const term = String(formData.get("term") || "").trim();
+        const courseCode = String(formData.get("courseCode") || "").trim();
+        const semester = String(formData.get("semester") || "").trim();
+        const selectedCourse = getProfessorRecordedCourses(existingReview.professorId).find(function (courseItem) {
+          return courseItem.code === courseCode;
+        }) || null;
+        const selectedSemester = getSemesterOption(semester);
         const rating = Number(formData.get("rating"));
+        const clarityRating = Number(formData.get("clarityRating"));
+        const gradingRating = Number(formData.get("gradingRating"));
+        const workloadRating = Number(formData.get("workloadRating"));
+        const attendanceRating = Number(formData.get("attendanceRating"));
+        const takeAgain = String(formData.get("takeAgain") || "").trim().toLowerCase();
         const text = String(formData.get("text") || "").trim();
 
-        if (!course || !term || !Number.isFinite(rating) || rating < 1 || rating > 5 || !text) {
-          setPanelMessage(message, "Fill out the course, term, rating, and review before saving.", "error");
+        if (courseCode || semester) {
+          if (!selectedCourse || !selectedSemester) {
+            setPanelMessage(message, "Choose both a recorded course and a standard semester before saving.", "error");
+            return;
+          }
+        } else if (!course || !term) {
+          setPanelMessage(message, "This legacy review needs its original course and term before saving.", "error");
+          return;
+        }
+
+        if (!Number.isFinite(rating) || rating < 1 || rating > 5 || !Number.isFinite(clarityRating) || clarityRating < 1 || clarityRating > 5 || !Number.isFinite(gradingRating) || gradingRating < 1 || gradingRating > 5 || !Number.isFinite(workloadRating) || workloadRating < 1 || workloadRating > 5 || !Number.isFinite(attendanceRating) || attendanceRating < 1 || attendanceRating > 5 || (takeAgain !== "yes" && takeAgain !== "no") || !text) {
+          setPanelMessage(message, "Fill out every rating, the take-again answer, and the review before saving.", "error");
           return;
         }
 
@@ -3930,9 +4088,18 @@ EH|Western Sahara|+212
             body: JSON.stringify({
               action: "update",
               reviewId,
-              course,
-              term,
+              courseCode,
+              courseTitle: selectedCourse ? selectedCourse.title : "",
+              course: selectedCourse ? getCourseLabel(selectedCourse) : course,
+              semester,
+              semesterLabel: selectedSemester ? selectedSemester.label : "",
+              term: selectedSemester ? selectedSemester.label : term,
               rating: Math.round(rating),
+              clarityRating: Math.round(clarityRating),
+              gradingRating: Math.round(gradingRating),
+              workloadRating: Math.round(workloadRating),
+              attendanceRating: Math.round(attendanceRating),
+              takeAgain,
               text
             })
           });
