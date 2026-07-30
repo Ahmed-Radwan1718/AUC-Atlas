@@ -878,6 +878,34 @@
           .join("");
       }
 
+      function renderCustomFilterOptions(values, selectedValue, fallbackLabel) {
+        return [`<button class="custom-select-option${selectedValue === "all" ? " active" : ""}" type="button" data-value="all">${escapeHtml(fallbackLabel)}</button>`]
+          .concat(values.map(function (value) {
+            return `<button class="custom-select-option${selectedValue === value ? " active" : ""}" type="button" data-value="${escapeHtml(value)}">${escapeHtml(value)}</button>`;
+          }))
+          .join("");
+      }
+
+      function getRatingFilterLabel(value) {
+        return {
+          all: "All ratings",
+          5: "5 stars",
+          4: "4 stars",
+          3: "3 stars",
+          2: "2 stars",
+          1: "1 star"
+        }[value] || "All ratings";
+      }
+
+      function getSortFilterLabel(value) {
+        return {
+          newest: "Newest first",
+          oldest: "Oldest first",
+          "rating-high": "Highest rated",
+          "rating-low": "Lowest rated"
+        }[value] || "Newest first";
+      }
+
       function getFilteredReviews(reviews) {
         return reviews.filter(function (review) {
           const course = String(review.course || "").trim();
@@ -1177,21 +1205,43 @@
                 <div class="professor-review-filters">
                   <label class="professor-review-filter">
                     Course
-                    <select id="professor-review-filter-course">
+                    <select id="professor-review-filter-course" hidden>
                       ${renderFilterOptions(courseOptions, reviewFilters.course, "All courses")}
                     </select>
+
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" data-select-id="professor-review-filter-course">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">${escapeHtml(reviewFilters.course === "all" ? "All courses" : reviewFilters.course)}</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        ${renderCustomFilterOptions(courseOptions, reviewFilters.course, "All courses")}
+                      </div>
+                    </div>
                   </label>
 
                   <label class="professor-review-filter">
                     Term
-                    <select id="professor-review-filter-term">
+                    <select id="professor-review-filter-term" hidden>
                       ${renderFilterOptions(termOptions, reviewFilters.term, "All terms")}
                     </select>
+
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" data-select-id="professor-review-filter-term">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">${escapeHtml(reviewFilters.term === "all" ? "All terms" : reviewFilters.term)}</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        ${renderCustomFilterOptions(termOptions, reviewFilters.term, "All terms")}
+                      </div>
+                    </div>
                   </label>
 
                   <label class="professor-review-filter">
                     Rating
-                    <select id="professor-review-filter-rating">
+                    <select id="professor-review-filter-rating" hidden>
                       <option value="all"${reviewFilters.rating === "all" ? " selected" : ""}>All ratings</option>
                       <option value="5"${reviewFilters.rating === "5" ? " selected" : ""}>5 stars</option>
                       <option value="4"${reviewFilters.rating === "4" ? " selected" : ""}>4 stars</option>
@@ -1199,16 +1249,46 @@
                       <option value="2"${reviewFilters.rating === "2" ? " selected" : ""}>2 stars</option>
                       <option value="1"${reviewFilters.rating === "1" ? " selected" : ""}>1 star</option>
                     </select>
+
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" data-select-id="professor-review-filter-rating">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">${escapeHtml(getRatingFilterLabel(reviewFilters.rating))}</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        <button class="custom-select-option${reviewFilters.rating === "all" ? " active" : ""}" type="button" data-value="all">All ratings</button>
+                        <button class="custom-select-option${reviewFilters.rating === "5" ? " active" : ""}" type="button" data-value="5">5 stars</button>
+                        <button class="custom-select-option${reviewFilters.rating === "4" ? " active" : ""}" type="button" data-value="4">4 stars</button>
+                        <button class="custom-select-option${reviewFilters.rating === "3" ? " active" : ""}" type="button" data-value="3">3 stars</button>
+                        <button class="custom-select-option${reviewFilters.rating === "2" ? " active" : ""}" type="button" data-value="2">2 stars</button>
+                        <button class="custom-select-option${reviewFilters.rating === "1" ? " active" : ""}" type="button" data-value="1">1 star</button>
+                      </div>
+                    </div>
                   </label>
 
                   <label class="professor-review-filter">
                     Sort
-                    <select id="professor-review-filter-sort">
+                    <select id="professor-review-filter-sort" hidden>
                       <option value="newest"${reviewFilters.sort === "newest" ? " selected" : ""}>Newest first</option>
                       <option value="oldest"${reviewFilters.sort === "oldest" ? " selected" : ""}>Oldest first</option>
                       <option value="rating-high"${reviewFilters.sort === "rating-high" ? " selected" : ""}>Highest rated</option>
                       <option value="rating-low"${reviewFilters.sort === "rating-low" ? " selected" : ""}>Lowest rated</option>
                     </select>
+
+                    <div class="custom-select-dropdown professor-review-custom-dropdown" data-select-id="professor-review-filter-sort">
+                      <button class="custom-select-trigger" type="button" aria-expanded="false">
+                        <span class="custom-select-value">${escapeHtml(getSortFilterLabel(reviewFilters.sort))}</span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu">
+                        <button class="custom-select-option${reviewFilters.sort === "newest" ? " active" : ""}" type="button" data-value="newest">Newest first</button>
+                        <button class="custom-select-option${reviewFilters.sort === "oldest" ? " active" : ""}" type="button" data-value="oldest">Oldest first</button>
+                        <button class="custom-select-option${reviewFilters.sort === "rating-high" ? " active" : ""}" type="button" data-value="rating-high">Highest rated</button>
+                        <button class="custom-select-option${reviewFilters.sort === "rating-low" ? " active" : ""}" type="button" data-value="rating-low">Lowest rated</button>
+                      </div>
+                    </div>
                   </label>
                 </div>
 
