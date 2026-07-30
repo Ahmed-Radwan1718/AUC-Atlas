@@ -22,6 +22,18 @@ const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const MAX_REQUEST_BYTES = MAX_UPLOAD_BYTES + 1024 * 1024;
 const CLOUDINARY_MATERIAL_FOLDER = "auc-atlas/course-materials";
 const SIGNED_DOWNLOAD_SECONDS = 10 * 60;
+const MAX_REPORT_EXPLANATION_LENGTH = 600;
+const REPORT_STATUS_OPEN = "open";
+const MATERIAL_REPORT_REASONS = [
+  "Active assessment or unauthorized answer key",
+  "Copyrighted material shared without permission",
+  "Pirated textbook or paid content",
+  "Contains student names, IDs, grades or private information",
+  "File does not match its title or metadata",
+  "Malicious, unsafe or corrupted file",
+  "Spam or irrelevant content",
+  "Other"
+];
 
 const SEMESTER_OPTIONS = [
   { value: "fall-2024", label: "Fall 2024" },
@@ -783,6 +795,169 @@ async function handleAdminMaterials(req, res, decodedUser) {
   });
 }
 
+function cleanReportReason(value) {
+  const requestedReason = cleanString(value, 180).toLowerCase();
+
+  return MATERIAL_REPORT_REASONS.find(function (reason) {
+    return reason.toLowerCase() === requestedReason;
+  }) || "";
+}
+
+function cleanReportExplanation(value) {
+  return cleanString(value, MAX_REPORT_EXPLANATION_LENGTH);
+}
+
+function getOpenReportKey(contentType, contentId, uid) {
+  const reporterHash = crypto.createHash("sha256").update(uid).digest("hex").slice(0, 32);
+  return contentType + "_" + contentId + "_" + reporterHash;
+}
+
+function createMaterialReportSnapshot(materialId, data) {
+  return {
+    materialId,
+    title: data.title || "",
+    description: cleanString(data.description || "", 500),
+    courseCode: data.courseCode || "",
+    courseTitle: data.courseTitle || "",
+    professorId: data.professorId || "",
+    professorName: data.professorName || "",
+    semester: data.semester || "",
+    semesterLabel: data.semesterLabel || "",
+    materialType: data.materialType || "",
+    materialTypeLabel: data.materialTypeLabel || data.type || "",
+    originalFilename: data.originalFilename || "",
+    fileType: data.fileType || "",
+    fileExtension: data.fileExtension || data.cloudinaryFormat || "",
+    fileSize: Number(data.fileSize || 0),
+    status: data.status || "available",
+    createdAt: serializeTimestamp(data.createdAt),
+    updatedAt: serializeTimestamp(data.updatedAt)
+  };
+}
+
+async function handleCreateMaterialReport(req, res) {
+  const parsedBody = await getRequestBody(req);
+  const body = parsedBody.fields || {};
+  const materialId = cleanMaterialId(body.materialId);
+  const reason = cleanReportReason(body.reason);
+  const rawExplanation = String(body.explanation || "").trim();
+
+  if (!materialId) {
+    return res.status(400).json({ error: "Missing material id." });
+  }
+
+  if (!reason) {
+    return res.status(400).json({ error: "Choose a report reason." });
+  }
+
+  if (rawExplanation.length > MAX_REPORT_EXPLANATION_LENGTH) {
+    return res.status(400).json({ error: "Keep the report explanation under 600 characters." });
+  }
+
+  const explanation = cleanReportExplanation(rawExplanation);
+
+  if (reason === "Other" && !explanation) {
+    return res.status(400).json({ error: "Write a brief explanation when choosing Other." });
+  }
+
+  const decodedUser = await getSignedInUser(req);
+
+  await consumeRateLimit({
+    bucket: "content-report-submit-user",
+    keyParts: [decodedUser.uid, getClientIp(req)],
+    firstLimit: 12,
+    secondLimit: 24,
+    firstLockMs: THIRTY_MINUTES_MS,
+    secondLockMs: ONE_HOUR_MS,
+    errorMessage: "Too many report submissions."
+  });
+
+  await consumeRateLimit({
+    bucket: "content-report-submit-item",
+    keyParts: [decodedUser.uid, "material", materialId],
+    firstLimit: 2,
+    secondLimit: 4,
+    firstLockMs: THIRTY_MINUTES_MS,
+    secondLockMs: ONE_HOUR_MS,
+    errorMessage: "Too many report attempts for this item."
+  });
+
+  const db = admin.firestore();
+  const materialRef = db.collection(MATERIALS_COLLECTION).doc(materialId);
+  const reportRef = db.collection("contentReports").doc();
+  const duplicateRef = db.collection("openReportKeys").doc(getOpenReportKey("material", materialId, decodedUser.uid));
+  const now = admin.firestore.FieldValue.serverTimestamp();
+  let reportSnapshot = null;
+
+  await db.runTransaction(async function (transaction) {
+    const duplicateDoc = await transaction.get(duplicateRef);
+
+    if (duplicateDoc.exists) {
+      const error = new Error("You already reported this item. It is still waiting for review.");
+      error.statusCode = 409;
+      throw error;
+    }
+
+    const materialDoc = await transaction.get(materialRef);
+
+    if (!materialDoc.exists) {
+      const error = new Error("Material not found.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const materialData = materialDoc.data() || {};
+
+    if ((materialData.status || "available") !== "available") {
+      const error = new Error("Material is not available.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (materialData.uploaderUid === decodedUser.uid) {
+      const error = new Error("You cannot report your own material.");
+      error.statusCode = 403;
+      throw error;
+    }
+
+    reportSnapshot = createMaterialReportSnapshot(materialId, materialData);
+
+    transaction.set(reportRef, {
+      reportId: reportRef.id,
+      contentType: "material",
+      contentId: materialId,
+      reporterUid: decodedUser.uid,
+      reason,
+      explanation,
+      status: REPORT_STATUS_OPEN,
+      statusLabel: "Open",
+      assignedAdminUid: "",
+      resolvingAdminUid: "",
+      resolvedAt: null,
+      resolutionAction: "",
+      resolutionReason: "",
+      contentSnapshot: reportSnapshot,
+      createdAt: now,
+      updatedAt: now
+    });
+
+    transaction.set(duplicateRef, {
+      reportId: reportRef.id,
+      contentType: "material",
+      contentId: materialId,
+      reporterUid: decodedUser.uid,
+      createdAt: now,
+      updatedAt: now
+    });
+  });
+
+  return res.status(200).json({
+    success: true,
+    reportId: reportRef.id,
+    message: "Report submitted for review."
+  });
+}
+
 async function handleCreateMaterial(req, res) {
   const parsedBody = await getRequestBody(req);
   const body = parsedBody.fields || {};
@@ -1023,6 +1198,10 @@ module.exports = async function handler(req, res) {
 
       if (action === "delete") {
         return await handleDeleteMaterial(req, res);
+      }
+
+      if (action === "report") {
+        return await handleCreateMaterialReport(req, res);
       }
 
       return await handleCreateMaterial(req, res);
