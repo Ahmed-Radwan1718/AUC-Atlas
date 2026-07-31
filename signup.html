@@ -336,12 +336,17 @@
 
   <script>
     const signupForm = document.getElementById("signup-form");
+    const signupButton = document.getElementById("signup-submit");
     const signupMessage = document.getElementById("signup-message");
     const passwordVisibilityToggles = document.querySelectorAll(".auth-password-visibility-toggle");
 
-    function showNonFunctionalMessage() {
-      signupMessage.textContent = "Signup is not connected yet.";
-      signupMessage.className = "auth-message error";
+    function showMessage(message, type) {
+      signupMessage.textContent = message;
+      signupMessage.className = "auth-message";
+
+      if (type) {
+        signupMessage.classList.add(type);
+      }
     }
 
     passwordVisibilityToggles.forEach(function (toggleButton) {
@@ -367,9 +372,93 @@
       });
     });
 
-    signupForm.addEventListener("submit", function (event) {
+    signupForm.addEventListener("submit", async function (event) {
       event.preventDefault();
-      showNonFunctionalMessage();
+
+      const fullName = document.getElementById("signup-name").value.trim();
+      const phone = document.getElementById("signup-phone").value.trim();
+      const email = document.getElementById("signup-email").value.trim();
+      const password = document.getElementById("signup-password").value;
+      const confirmPassword = document.getElementById("signup-confirm-password").value;
+      const phoneDigits = phone.replace(/\D/g, "");
+
+      if (!fullName || !phone || !email || !password || !confirmPassword) {
+        showMessage("Please complete all required fields.", "error");
+        return;
+      }
+
+      if (
+        !/^\+?[0-9][0-9\s().-]{7,28}$/.test(phone) ||
+        phoneDigits.length < 10 ||
+        phoneDigits.length > 15 ||
+        /^(\d)\1+$/.test(phoneDigits)
+      ) {
+        showMessage("Please enter a valid phone number.", "error");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showMessage("Passwords do not match.", "error");
+        return;
+      }
+
+      if (
+        password.length < 10 ||
+        password.length > 48 ||
+        !/[A-Z]/.test(password) ||
+        !/[a-z]/.test(password) ||
+        !/[0-9]/.test(password) ||
+        !/[^A-Za-z0-9\s]/.test(password)
+      ) {
+        showMessage("Password must be 10 to 48 characters and include uppercase, lowercase, special, and numeric characters.", "error");
+        return;
+      }
+
+      signupButton.disabled = true;
+      signupButton.textContent = "Creating Account...";
+      showMessage("", "");
+
+      try {
+        const response = await fetch("/api/signup", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            fullName: fullName,
+            phone: phone,
+            email: email,
+            password: password,
+            confirmPassword: confirmPassword
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Could not create account. Please try again.");
+        }
+
+        try {
+          localStorage.setItem("auc-atlas-signed-in", "1");
+          localStorage.setItem("aucAtlasSignedIn", "true");
+        } catch (error) {}
+
+        window.aucAtlasCurrentUser = data.user || null;
+        showMessage(data.message || "Account created successfully. Check your inbox to verify your email.", "success");
+
+        setTimeout(function () {
+          window.location.href = "accounts.html";
+        }, 1000);
+      } catch (error) {
+        showMessage(error.message || "Something went wrong. Please try again.", "error");
+      } finally {
+        signupButton.disabled = false;
+        signupButton.textContent = "Create Account";
+      }
     });
 
   </script>
