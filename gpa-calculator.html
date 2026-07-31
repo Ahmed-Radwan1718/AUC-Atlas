@@ -108,8 +108,8 @@
     }
 
     .gpa-row input,
-    .gpa-row select,
-    .prior-inputs input {
+    .prior-inputs input,
+    .grade-toggle {
       width: 100%;
       min-height: 46px;
       padding: 0 14px;
@@ -124,10 +124,73 @@
     }
 
     .gpa-row input:focus,
-    .gpa-row select:focus,
-    .prior-inputs input:focus {
+    .prior-inputs input:focus,
+    .grade-dropdown.open .grade-toggle {
       border-color: rgba(192, 154, 92, 0.58);
       box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .grade-dropdown {
+      position: relative;
+    }
+
+    .grade-toggle {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .grade-chevron {
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    .grade-dropdown.open .grade-chevron {
+      transform: rotate(225deg);
+    }
+
+    .grade-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      z-index: 30;
+      padding: 8px;
+      border-radius: 20px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.16);
+      display: grid;
+      gap: 4px;
+    }
+
+    .grade-menu[hidden] {
+      display: none;
+    }
+
+    .grade-option {
+      min-height: 36px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.72);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .grade-option:hover {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
     }
 
     .remove-course {
@@ -357,32 +420,73 @@
       ["0", "F"]
     ];
 
+    function getGradeLabel(value) {
+      const grade = grades.find(function (item) {
+        return item[0] === value;
+      });
+
+      return grade ? grade[1] : "Grade";
+    }
+
     function createCourseRow(courseName = "", credits = "3", grade = "") {
       const row = document.createElement("div");
       row.className = "gpa-row";
 
       row.innerHTML = `
         <input class="course-name" type="text" placeholder="Course name" value="${courseName}">
-        <select class="course-credits" aria-label="Credits">
-          <option value="1">1 credit</option>
-          <option value="2">2 credits</option>
-          <option value="3">3 credits</option>
-          <option value="4">4 credits</option>
-        </select>
-        <select class="course-grade" aria-label="Grade">
-          ${grades.map(function (item) {
-            return `<option value="${item[0]}">${item[1]}</option>`;
-          }).join("")}
-        </select>
+        <input class="course-credits" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Credits" value="${credits}" aria-label="Credits">
+        <div class="grade-dropdown">
+          <input class="course-grade" type="hidden" value="${grade}">
+          <button class="grade-toggle" type="button" aria-label="Grade">
+            <span class="grade-toggle-label">${getGradeLabel(grade)}</span>
+            <span class="grade-chevron"></span>
+          </button>
+          <div class="grade-menu" hidden>
+            ${grades.map(function (item) {
+              return `<button class="grade-option" type="button" data-grade-value="${item[0]}">${item[1]}</button>`;
+            }).join("")}
+          </div>
+        </div>
         <button class="remove-course" type="button" aria-label="Remove course" title="Remove course">X</button>
       `;
 
-      row.querySelector(".course-credits").value = credits;
-      row.querySelector(".course-grade").value = grade;
+      const creditsInput = row.querySelector(".course-credits");
+      const gradeInput = row.querySelector(".course-grade");
+      const gradeDropdown = row.querySelector(".grade-dropdown");
+      const gradeToggle = row.querySelector(".grade-toggle");
+      const gradeToggleLabel = row.querySelector(".grade-toggle-label");
+      const gradeMenu = row.querySelector(".grade-menu");
 
-      row.querySelectorAll("input, select").forEach(function (field) {
-        field.addEventListener("input", calculateGpa);
-        field.addEventListener("change", calculateGpa);
+      creditsInput.addEventListener("input", function () {
+        creditsInput.value = creditsInput.value.replace(/[^0-9]/g, "");
+        calculateGpa();
+      });
+
+      row.querySelector(".course-name").addEventListener("input", calculateGpa);
+
+      gradeToggle.addEventListener("click", function () {
+        const isOpen = !gradeMenu.hidden;
+
+        document.querySelectorAll(".grade-menu").forEach(function (menu) {
+          menu.hidden = true;
+        });
+
+        document.querySelectorAll(".grade-dropdown").forEach(function (dropdown) {
+          dropdown.classList.remove("open");
+        });
+
+        gradeMenu.hidden = isOpen;
+        gradeDropdown.classList.toggle("open", !isOpen);
+      });
+
+      row.querySelectorAll(".grade-option").forEach(function (option) {
+        option.addEventListener("click", function () {
+          gradeInput.value = option.dataset.gradeValue;
+          gradeToggleLabel.textContent = option.textContent;
+          gradeMenu.hidden = true;
+          gradeDropdown.classList.remove("open");
+          calculateGpa();
+        });
       });
 
       row.querySelector(".remove-course").addEventListener("click", function () {
@@ -404,7 +508,7 @@
       let totalQualityPoints = 0;
 
       document.querySelectorAll(".gpa-row").forEach(function (row) {
-        const credits = Number(row.querySelector(".course-credits").value);
+        const credits = Number(row.querySelector(".course-credits").value || 0);
         const gradeValue = row.querySelector(".course-grade").value;
 
         if (gradeValue === "") {
@@ -429,6 +533,20 @@
       qualityPointsOutput.textContent = totalQualityPoints.toFixed(2);
       cumulativeGpaOutput.textContent = cumulativeGpa.toFixed(2);
     }
+
+    document.addEventListener("click", function (event) {
+      if (event.target.closest(".grade-dropdown")) {
+        return;
+      }
+
+      document.querySelectorAll(".grade-menu").forEach(function (menu) {
+        menu.hidden = true;
+      });
+
+      document.querySelectorAll(".grade-dropdown").forEach(function (dropdown) {
+        dropdown.classList.remove("open");
+      });
+    });
 
     addCourseButton.addEventListener("click", function () {
       createCourseRow();
