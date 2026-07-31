@@ -183,13 +183,43 @@
     .semester-actions {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
       gap: 8px;
     }
 
+    .remove-semester {
+      flex: 0 0 42px;
+    }
+
+    .semester-course-footer {
+      margin-top: 12px;
+      display: flex;
+      justify-content: center;
+    }
+
     .semester-add-course {
-      min-height: 42px;
-      padding: 0 14px;
-      font-size: 11px;
+      width: 46px;
+      height: 46px;
+      min-height: 46px;
+      padding: 0;
+      border-color: rgba(192, 154, 92, 0.42);
+      background: rgba(255, 255, 255, 0.72);
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 30px;
+      font-weight: 300;
+      letter-spacing: 0;
+      line-height: 1;
+      text-transform: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 26px rgba(42, 32, 20, 0.08);
+    }
+
+    .semester-add-course:hover {
+      border-color: rgba(192, 154, 92, 0.68);
+      background: rgba(192, 154, 92, 0.84);
+      color: white;
     }
 
     .semester-name,
@@ -824,7 +854,6 @@
         <div class="gpa-semester-header">
           <input class="semester-name" type="text" value="${title}" aria-label="Semester name">
           <div class="semester-actions">
-            <button class="gpa-action semester-add-course" type="button">Add Course</button>
             <button class="remove-course remove-semester" type="button" aria-label="Remove semester" title="Remove semester">&times;</button>
           </div>
         </div>
@@ -837,6 +866,10 @@
         </div>
 
         <div class="semester-courses"></div>
+
+        <div class="semester-course-footer">
+          <button class="gpa-action semester-add-course" type="button" aria-label="Add course" title="Add course">+</button>
+        </div>
       `;
 
       const semesterCoursesRoot = semester.querySelector(".semester-courses");
