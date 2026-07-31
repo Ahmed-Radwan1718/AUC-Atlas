@@ -313,7 +313,12 @@
       gap: 18px;
     }
 
-    .account-connected-grid,
+    .account-connected-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
     .account-two-factor-methods,
     .account-session-list,
     .account-saved-list,
@@ -323,7 +328,108 @@
       gap: 14px;
     }
 
-    .account-connected-account-card,
+    .account-connected-account-card {
+      min-height: 118px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.72);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: flex-start;
+      gap: 18px;
+      content-visibility: auto;
+      contain-intrinsic-size: 118px;
+    }
+
+    .account-connected-account-main {
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-connected-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .account-connected-icon {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      display: block;
+      flex: 0 0 auto;
+    }
+
+    .account-connected-title span {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .account-connected-account-main strong {
+      color: #171717;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .account-connected-account-main p {
+      max-width: 360px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .account-connected-actions {
+      display: grid;
+      justify-items: end;
+      gap: 8px;
+    }
+
+    .account-connected-badge {
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .account-connected-badge.is-connected {
+      border: 1px solid rgba(192, 154, 92, 0.28);
+      background: rgba(192, 154, 92, 0.12);
+      color: rgba(126, 90, 34, 0.96);
+    }
+
+    .account-connected-badge.is-not-connected {
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      background: rgba(23, 23, 23, 0.04);
+      color: rgba(23, 23, 23, 0.56);
+    }
+
+    .account-connected-action-button {
+      min-height: 32px;
+      padding: 0 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      background: rgba(255, 255, 255, 0.9);
+      color: #171717;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
     .account-two-factor-card,
     .account-session-card,
     .account-saved-item,
@@ -359,6 +465,24 @@
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+      .account-connected-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .account-connected-account-card {
+        grid-template-columns: 1fr;
+      }
+
+      .account-connected-actions {
+        justify-items: start;
+      }
+
+      .account-connected-badge {
+        width: fit-content;
+      }
     }
 
     .account-primary-button,
@@ -527,22 +651,51 @@
                 </div>
 
                 <div class="account-connected-grid">
-                  <div class="account-connected-account-card">
-                    <div class="account-card-title">Email & Password</div>
-                    <p class="account-card-copy">Use your email address and password to sign in.</p>
-                    <span class="account-badge">Connected</span>
+                  <div class="account-connected-account-card" id="connected-password-card">
+                    <div class="account-connected-account-main">
+                      <div class="account-connected-title">
+                        <img class="account-connected-icon" src="email-2fa-icon.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                        <span>Email & Password</span>
+                      </div>
+                      <strong>Connected</strong>
+                      <p>Use your email address and password to sign in.</p>
+                    </div>
+
+                    <div class="account-connected-actions">
+                      <span class="account-connected-badge is-connected">Connected</span>
+                    </div>
                   </div>
 
-                  <div class="account-connected-account-card">
-                    <div class="account-card-title">Google</div>
-                    <p class="account-card-copy">Use your Google account to sign in faster.</p>
-                    <span class="account-badge">Not connected</span>
+                  <div class="account-connected-account-card" id="connected-google-card">
+                    <div class="account-connected-account-main">
+                      <div class="account-connected-title">
+                        <img class="account-connected-icon" src="google-logo.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                        <span>Google</span>
+                      </div>
+                      <strong>Not connected</strong>
+                      <p>Use your Google account to sign in faster.</p>
+                    </div>
+
+                    <div class="account-connected-actions">
+                      <span class="account-connected-badge is-not-connected">Not connected</span>
+                      <button class="account-connected-action-button" type="button" id="connected-google-action" data-provider="google" hidden>Connect</button>
+                    </div>
                   </div>
 
-                  <div class="account-connected-account-card">
-                    <div class="account-card-title">GitHub</div>
-                    <p class="account-card-copy">Use your GitHub account to sign in faster.</p>
-                    <span class="account-badge">Not connected</span>
+                  <div class="account-connected-account-card" id="connected-github-card">
+                    <div class="account-connected-account-main">
+                      <div class="account-connected-title">
+                        <img class="account-connected-icon" src="github-logo.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                        <span>GitHub</span>
+                      </div>
+                      <strong>Not connected</strong>
+                      <p>Use your GitHub account to sign in faster.</p>
+                    </div>
+
+                    <div class="account-connected-actions">
+                      <span class="account-connected-badge is-not-connected">Not connected</span>
+                      <button class="account-connected-action-button" type="button" id="connected-github-action" data-provider="github" hidden>Connect</button>
+                    </div>
                   </div>
                 </div>
 
