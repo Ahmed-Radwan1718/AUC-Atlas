@@ -362,7 +362,7 @@
           <span>Login</span>
         </a>
 
-        <a href="account.html" class="floating-account-menu-link" id="floating-account-link" hidden>
+        <a href="accounts.html" class="floating-account-menu-link" id="floating-account-link" hidden>
           <img src="user.png" alt="">
           <span>Account</span>
         </a>
