@@ -400,13 +400,29 @@
 
   <script>
     const loginForm = document.getElementById("login-form");
+    const loginButton = document.getElementById("login-submit");
     const loginMessage = document.getElementById("login-message");
     const passwordVisibilityToggles = document.querySelectorAll(".auth-password-visibility-toggle");
     const passwordlessLoginButton = document.getElementById("login-passwordless-button");
 
-    function showNonFunctionalMessage() {
-      loginMessage.textContent = "Login is not connected yet.";
-      loginMessage.className = "auth-message error";
+    function showMessage(message, type) {
+      loginMessage.textContent = message;
+      loginMessage.className = "auth-message";
+
+      if (type) {
+        loginMessage.classList.add(type);
+      }
+    }
+
+    function getLoginRedirectTarget() {
+      const savedRedirect = localStorage.getItem("auc-atlas-login-redirect");
+
+      if (savedRedirect) {
+        localStorage.removeItem("auc-atlas-login-redirect");
+        return savedRedirect;
+      }
+
+      return "accounts.html";
     }
 
     passwordVisibilityToggles.forEach(function (toggleButton) {
@@ -432,12 +448,59 @@
       });
     });
 
-    loginForm.addEventListener("submit", function (event) {
+    loginForm.addEventListener("submit", async function (event) {
       event.preventDefault();
-      showNonFunctionalMessage();
+
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+
+      loginButton.disabled = true;
+      loginButton.textContent = "Logging In...";
+      showMessage("", "");
+
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Incorrect email or password.");
+        }
+
+        try {
+          localStorage.setItem("auc-atlas-signed-in", "1");
+          localStorage.setItem("aucAtlasSignedIn", "true");
+        } catch (error) {}
+
+        window.aucAtlasCurrentUser = data.user || null;
+        showMessage("Logged in successfully.", "success");
+
+        setTimeout(function () {
+          window.location.href = getLoginRedirectTarget();
+        }, 700);
+      } catch (error) {
+        showMessage(error.message || "Something went wrong. Please try again.", "error");
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = "Log In";
+      }
     });
 
-    passwordlessLoginButton.addEventListener("click", showNonFunctionalMessage);
+    passwordlessLoginButton.addEventListener("click", function () {
+      showMessage("Email sign-in codes are not connected yet.", "error");
+    });
   </script>
 </body>
 </html>
