@@ -3,7 +3,8 @@ const admin = require("../_lib/firebaseAdmin");
 const {
   createSiteSessionForUid,
   createSiteSessionFromIdToken,
-  signInWithCustomToken
+  signInWithCustomToken,
+  ensureAllowedAucEmail
 } = require("../_lib/securityHelpers");
 
 const WINDOW_MS = 30 * 60 * 1000;
@@ -256,6 +257,8 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: providerConfig.name + " account email is required." });
       }
 
+      ensureAllowedAucEmail(email, "create an account");
+
       const userRef = admin.firestore().collection("users").doc(decodedToken.uid);
       const userDoc = await userRef.get();
       const existingUser = userDoc.exists ? userDoc.data() || {} : {};
@@ -295,6 +298,8 @@ module.exports = async function handler(req, res) {
     if (!fullName || !phone || !email || !password || !confirmPassword) {
       return res.status(400).json({ error: "Please complete all required fields." });
     }
+
+    ensureAllowedAucEmail(email, "create an account");
 
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "Passwords do not match." });
