@@ -95,6 +95,13 @@ async function signInWithPassword(email, password) {
   });
 }
 
+async function signInWithCustomToken(customToken) {
+  return await firebaseAuthRest("accounts:signInWithCustomToken", {
+    token: customToken,
+    returnSecureToken: true
+  });
+}
+
 async function createSiteSessionFromIdToken(idToken, res) {
   const sessionCookie = await admin.auth().createSessionCookie(idToken, {
     expiresIn: SITE_SESSION_EXPIRES_MS
@@ -108,6 +115,16 @@ async function createSiteSessionFromIdToken(idToken, res) {
   );
 
   return sessionCookie;
+}
+
+async function createSiteSessionForUid(uid, res) {
+  const customToken = await admin.auth().createCustomToken(uid);
+  const signInData = await signInWithCustomToken(customToken);
+  const sessionCookie = await createSiteSessionFromIdToken(signInData.idToken, res);
+
+  return Object.assign({}, signInData, {
+    sessionCookie
+  });
 }
 
 function clearSiteSessionCookie(res) {
@@ -140,7 +157,9 @@ async function getOptionalSiteSessionUser(req, options) {
 
 module.exports = {
   signInWithPassword,
+  signInWithCustomToken,
   createSiteSessionFromIdToken,
+  createSiteSessionForUid,
   clearSiteSessionCookie,
   getSiteSessionUser,
   getOptionalSiteSessionUser
