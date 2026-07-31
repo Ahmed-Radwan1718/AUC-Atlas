@@ -542,14 +542,6 @@
               <span id="cumulative-gpa">0.00</span>
             </div>
           </div>
-
-          <div class="prior-box">
-            <h2>Current record</h2>
-            <div class="prior-inputs">
-              <input id="current-gpa" type="number" min="0" max="4" step="0.01" placeholder="Current GPA">
-              <input id="completed-credits" type="number" min="0" step="1" placeholder="Completed credits">
-            </div>
-          </div>
         </aside>
       </section>
     </div>
@@ -563,8 +555,6 @@
     const semesterCreditsOutput = document.getElementById("semester-credits");
     const qualityPointsOutput = document.getElementById("quality-points");
     const cumulativeGpaOutput = document.getElementById("cumulative-gpa");
-    const currentGpaInput = document.getElementById("current-gpa");
-    const completedCreditsInput = document.getElementById("completed-credits");
 
     const grades = [
       ["", "Grade"],
@@ -794,12 +784,7 @@
       });
 
       const semesterGpa = totalCredits ? totalQualityPoints / totalCredits : 0;
-      const currentGpa = Number(currentGpaInput.value);
-      const completedCredits = Number(completedCreditsInput.value);
-      const hasCurrentRecord = currentGpaInput.value !== "" && completedCreditsInput.value !== "";
-      const cumulativeGpa = hasCurrentRecord && completedCredits + totalCredits
-        ? ((currentGpa * completedCredits) + totalQualityPoints) / (completedCredits + totalCredits)
-        : semesterGpa;
+      const cumulativeGpa = semesterGpa;
 
       updateGpaColor(semesterGpa, totalCredits > 0);
       animateSummaryNumber(semesterGpaOutput, semesterGpa, 2);
@@ -828,16 +813,11 @@
 
     resetButton.addEventListener("click", function () {
       coursesRoot.innerHTML = "";
-      currentGpaInput.value = "";
-      completedCreditsInput.value = "";
       createCourseRow();
       createCourseRow();
       createCourseRow();
       calculateGpa();
     });
-
-    currentGpaInput.addEventListener("input", calculateGpa);
-    completedCreditsInput.addEventListener("input", calculateGpa);
 
     createCourseRow();
     createCourseRow();
