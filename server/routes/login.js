@@ -2,7 +2,8 @@ const admin = require("../_lib/firebaseAdmin");
 
 const {
   signInWithPassword,
-  createSiteSessionFromIdToken
+  createSiteSessionFromIdToken,
+  ensureAllowedAucEmail
 } = require("../_lib/securityHelpers");
 
 function cleanEmail(value) {
@@ -25,6 +26,8 @@ module.exports = async function handler(req, res) {
     if (!email || !password) {
       return res.status(400).json({ error: "Please enter your email and password." });
     }
+
+    ensureAllowedAucEmail(email, "log in");
 
     let loginResult;
 
