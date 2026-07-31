@@ -212,7 +212,6 @@
 
   function renderProfessors() {
     const grid = document.getElementById("professors-grid");
-    const count = document.getElementById("professors-result-count");
     const visibleProfessors = professors.filter(professorMatches);
 
     grid.innerHTML = visibleProfessors.map(function (professor) {
@@ -237,8 +236,6 @@
     if (!visibleProfessors.length) {
       grid.innerHTML = '<p class="professors-empty">No professors match those filters.</p>';
     }
-
-    count.textContent = visibleProfessors.length + " professors shown";
   }
 
   function setupProfessorFilters() {
