@@ -177,7 +177,7 @@
     }
 
     .nav-menu-link:hover {
-      background: rgba(138, 23, 34, 0.08);
+      background: rgba(192, 154, 92, 0.12);
       color: #171717;
     }
 
