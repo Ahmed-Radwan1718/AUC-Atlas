@@ -309,6 +309,22 @@
       box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
     }
 
+    .account-field input:-webkit-autofill,
+    .account-field input:-webkit-autofill:hover {
+      -webkit-text-fill-color: #171717;
+      caret-color: #171717;
+      box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.82) inset;
+      transition: background-color 9999s ease-out;
+    }
+
+    .account-field input:-webkit-autofill:focus {
+      -webkit-text-fill-color: #171717;
+      caret-color: #171717;
+      box-shadow:
+        0 0 0 1000px white inset,
+        0 0 0 4px rgba(192, 154, 92, 0.13);
+    }
+
     .account-field input[readonly] {
       opacity: 0.7;
       cursor: default;
