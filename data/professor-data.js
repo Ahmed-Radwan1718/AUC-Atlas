@@ -1,24 +1,24 @@
 (function () {
   const professors = [
-    { name: "Eslam Badr", department: "Computer Science", status: "No ratings yet", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
-    { name: "Ehab ElSawy", department: "Engineering", status: "No ratings yet", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249148/Ehab_ElSawy_ifg2np.png" },
-    { name: "Nageh Allam", department: "Engineering", status: "No ratings yet", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249240/Nageh_Allam_wfaser.png" },
-    { name: "Tamer Shoeib", department: "Sciences", status: "No ratings yet", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249461/Tamer_Shoeib_qmcccs.png" },
-    { name: "Hassan Azazy", department: "Sciences", status: "No ratings yet", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785286932/Hassan_Azazy_frfg0s.png" },
-    { name: "Ibrahim Abotaleb", department: "Engineering", status: "No ratings yet", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785287149/Ibrahim_Abotaleb_awad4c.png" },
-    { name: "Arthur Bos", department: "Business", status: "No ratings yet", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288244/Arthur_Bos_tegujk.png" },
-    { name: "Walid Fouad", department: "Business", status: "No ratings yet", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288250/Walid_Fouad_khxyvf.png" },
-    { name: "Mohamed Badran", department: "Engineering", status: "No ratings yet", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288787/Mohamed_Badran_ssh771.png" },
-    { name: "Ahmed Abdellatif", department: "Business", status: "No ratings yet", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288910/Ahmed_Abdellatif_elvz21.png" },
-    { name: "Wafik Lotfallah", department: "Business", status: "No ratings yet", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785326069/Wafik_Lotfallah_to4w8v.png" },
-    { name: "Laila ElSerty", department: "Humanities", status: "No ratings yet", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344850/Laila_ElSerty_gf6bkr.png" },
-    { name: "Mariah Fairley", department: "Rhetoric & Writing", status: "No ratings yet", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Mariah_Fairley_h9ykwv.png" },
-    { name: "Gretchen McCullough", department: "Rhetoric & Writing", status: "No ratings yet", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Gretchen_McCullough_ktotfl.png" },
-    { name: "Kathleen Saville", department: "Rhetoric & Writing", status: "No ratings yet", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Kathleen_Saville_hz1cgi.png" },
-    { name: "Iman Baza", department: "Humanities", status: "No ratings yet", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Iman_Baza_ohxkad.png" },
-    { name: "Fikry Boutros", department: "Humanities", status: "No ratings yet", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Fikry_Boutros_gbqnkt.png" },
-    { name: "Alexander Lewko", department: "Humanities", status: "No ratings yet", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344860/Alexander_Lewko_dexjfc.png" },
-    { name: "Mariam Osman", department: "Humanities", status: "No ratings yet", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344867/Mariam_Osman_rmlqxj.png" }
+    { name: "Eslam Badr", department: "Computer Science", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
+    { name: "Ehab ElSawy", department: "Engineering", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249148/Ehab_ElSawy_ifg2np.png" },
+    { name: "Nageh Allam", department: "Engineering", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249240/Nageh_Allam_wfaser.png" },
+    { name: "Tamer Shoeib", department: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249461/Tamer_Shoeib_qmcccs.png" },
+    { name: "Hassan Azazy", department: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785286932/Hassan_Azazy_frfg0s.png" },
+    { name: "Ibrahim Abotaleb", department: "Engineering", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785287149/Ibrahim_Abotaleb_awad4c.png" },
+    { name: "Arthur Bos", department: "Business", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288244/Arthur_Bos_tegujk.png" },
+    { name: "Walid Fouad", department: "Business", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288250/Walid_Fouad_khxyvf.png" },
+    { name: "Mohamed Badran", department: "Engineering", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288787/Mohamed_Badran_ssh771.png" },
+    { name: "Ahmed Abdellatif", department: "Business", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288910/Ahmed_Abdellatif_elvz21.png" },
+    { name: "Wafik Lotfallah", department: "Business", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785326069/Wafik_Lotfallah_to4w8v.png" },
+    { name: "Laila ElSerty", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344850/Laila_ElSerty_gf6bkr.png" },
+    { name: "Mariah Fairley", department: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Mariah_Fairley_h9ykwv.png" },
+    { name: "Gretchen McCullough", department: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Gretchen_McCullough_ktotfl.png" },
+    { name: "Kathleen Saville", department: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Kathleen_Saville_hz1cgi.png" },
+    { name: "Iman Baza", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Iman_Baza_ohxkad.png" },
+    { name: "Fikry Boutros", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Fikry_Boutros_gbqnkt.png" },
+    { name: "Alexander Lewko", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344860/Alexander_Lewko_dexjfc.png" },
+    { name: "Mariam Osman", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344867/Mariam_Osman_rmlqxj.png" }
   ];
 
   const style = document.createElement("style");
@@ -201,7 +201,7 @@
     const statuses = getCheckedValues("status");
     const groups = getCheckedValues("group");
 
-    const searchableText = normalize([professor.name, professor.department, professor.status, professor.group].join(" "));
+    const searchableText = normalize([professor.name, professor.department, professor.status, professor.course, professor.group].join(" "));
     const matchesSearch = !query || searchableText.includes(query);
     const matchesDepartment = !departments.length || departments.includes(professor.department);
     const matchesStatus = !statuses.length || statuses.includes(professor.status);
@@ -225,7 +225,7 @@
             <h2>${professor.name}</h2>
             <div class="professor-meta">
               <span>${professor.status}</span>
-              <span>${professor.department}</span>
+              <span>${professor.course}</span>
             </div>
           </div>
         </article>
