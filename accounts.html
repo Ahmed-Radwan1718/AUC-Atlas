@@ -777,6 +777,7 @@
     }
 
     .account-message.error { color: #9d3b3b; }
+    .account-message.success { color: rgba(27, 112, 62, 0.96); }
 
     @media (max-width: 900px) {
       .account-page { padding-top: 88px; }
@@ -1054,6 +1055,7 @@
     const photoPreview = document.getElementById("account-photo-preview");
     const photoInitial = document.getElementById("account-photo-initial");
     const detailsForm = document.getElementById("account-details-form");
+    const detailsButton = detailsForm ? detailsForm.querySelector(".account-primary-button") : null;
     const detailsMessage = document.getElementById("account-details-message");
     const logoutButton = document.getElementById("account-logout-sidebar");
     const accountNameInput = document.getElementById("account-name");
@@ -1081,13 +1083,14 @@
       window.location.hash = panelName;
     }
 
-    function showMessage(element, message) {
+    function showMessage(element, message, type) {
       if (!element) {
         return;
       }
 
+      const messageType = type || (message ? "error" : "");
       element.textContent = message;
-      element.className = "account-message error";
+      element.className = "account-message" + (messageType ? " " + messageType : "");
     }
 
     function getAccountInitials(user) {
@@ -1388,9 +1391,48 @@
       photoRemoveButton.hidden = true;
     });
 
-    detailsForm.addEventListener("submit", function (event) {
+    detailsForm.addEventListener("submit", async function (event) {
       event.preventDefault();
-      showMessage(detailsMessage, "Account saving is not connected yet.");
+
+      if (detailsButton) {
+        detailsButton.disabled = true;
+        detailsButton.textContent = "Saving...";
+      }
+
+      showMessage(detailsMessage, "", "");
+
+      try {
+        const response = await fetch("/api/me", {
+          method: "PATCH",
+          credentials: "same-origin",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            fullName: accountNameInput.value.trim(),
+            phone: getAccountPhoneValueForSave(),
+            major: accountMajorInput.value.trim()
+          })
+        });
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.user) {
+          throw new Error(data.error || "Could not save your details.");
+        }
+
+        hydrateAccountDetails(data.user);
+        showMessage(detailsMessage, "Account details saved.", "success");
+      } catch (error) {
+        showMessage(detailsMessage, error.message || "Could not save your details. Please try again.", "error");
+      } finally {
+        if (detailsButton) {
+          detailsButton.disabled = false;
+          detailsButton.textContent = "Save Changes";
+        }
+      }
     });
 
     document.querySelectorAll("[data-account-action]").forEach(function (button) {
