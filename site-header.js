@@ -254,7 +254,7 @@
   </nav>
 
   <div class="site-header-actions">
-    <a href="account.html" class="site-header-user" aria-label="Account">
+    <a href="login.html" class="site-header-user" aria-label="Log in">
       <img src="user.png" alt="">
     </a>
   </div>
