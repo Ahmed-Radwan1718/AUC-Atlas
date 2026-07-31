@@ -14,7 +14,7 @@
       z-index: 90;
       width: min(1120px, calc(100% - 48px));
       min-height: 62px;
-      padding: 0 24px;
+      padding: 0 14px 0 24px;
       border-radius: 999px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       background: rgba(255, 255, 255, 0.86);
@@ -22,13 +22,15 @@
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       transform: translateX(-50%);
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(160px, 1fr) auto minmax(160px, 1fr);
       align-items: center;
-      gap: 28px;
+      gap: 24px;
     }
 
     .site-header-logo,
     .site-header-logo:visited {
+      justify-self: start;
       color: #171717;
       font-size: 16px;
       font-weight: 700;
@@ -38,11 +40,12 @@
     }
 
     .site-header-nav {
-      flex: 1;
+      grid-column: 2;
+      justify-self: center;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      gap: 26px;
+      justify-content: center;
+      gap: 34px;
     }
 
     .site-header-nav > a,
@@ -58,6 +61,41 @@
 
     .site-header-nav > a:hover {
       color: #171717;
+    }
+
+    .site-header-actions {
+      grid-column: 3;
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .site-header-user,
+    .site-header-user:visited {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      background: rgba(23, 23, 23, 0.04);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+    }
+
+    .site-header-user:hover {
+      border-color: rgba(23, 23, 23, 0.16);
+      background: rgba(138, 23, 34, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .site-header-user img {
+      width: 24px;
+      height: 24px;
+      display: block;
+      object-fit: contain;
     }
 
     .hamburger-toggle {
@@ -147,7 +185,7 @@
         padding: 0 10px;
         transform: none;
         display: grid;
-        grid-template-columns: 80px minmax(0, 1fr) 80px;
+        grid-template-columns: 52px minmax(0, 1fr) 52px;
         align-items: center;
         gap: 0;
       }
@@ -158,6 +196,8 @@
 
       .site-header-logo,
       .site-header-logo:visited {
+        grid-column: 2;
+        justify-self: center;
         display: block;
         overflow: hidden;
         font-size: 15px;
@@ -165,7 +205,21 @@
         text-overflow: ellipsis;
       }
 
+      .site-header-actions {
+        grid-column: 3;
+        justify-self: end;
+        display: flex;
+      }
+
+      .site-header-user,
+      .site-header-user:visited {
+        width: 42px;
+        height: 42px;
+      }
+
       .hamburger-toggle {
+        grid-column: 1;
+        grid-row: 1;
         display: flex;
         justify-self: start;
         width: 44px;
@@ -184,6 +238,12 @@
     <a href="professors.html">Professors</a>
     <a href="courses.html">Courses</a>
   </nav>
+
+  <div class="site-header-actions">
+    <a href="account.html" class="site-header-user" aria-label="Account">
+      <img src="user.png" alt="">
+    </a>
+  </div>
 
   <button class="hamburger-toggle" type="button" aria-label="Open menu" aria-expanded="false">
     <span></span>
