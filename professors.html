@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Professors | AUC Atlas</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .professors-page {
+      min-height: 100vh;
+      padding: 126px 0 86px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+    }
+
+    .professors-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .professors-kicker {
+      margin-bottom: 16px;
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .professors-header {
+      margin-bottom: 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 28px;
+      align-items: end;
+    }
+
+    .professors-header h1 {
+      max-width: 780px;
+      color: #171717;
+      font-size: clamp(44px, 7vw, 82px);
+      font-weight: 800;
+      line-height: 1.04;
+      text-transform: uppercase;
+    }
+
+    .professors-header p {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .professors-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .professor-card {
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+    }
+
+    .professor-card-image {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: rgba(23, 23, 23, 0.04);
+      overflow: hidden;
+    }
+
+    .professor-card-image img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .professor-card-body {
+      padding: 20px;
+    }
+
+    .professor-card-body h2 {
+      margin-bottom: 12px;
+      color: #171717;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.18;
+    }
+
+    .professor-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .professor-meta span {
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      background: rgba(247, 244, 238, 0.74);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 980px) {
+      .professors-header {
+        grid-template-columns: 1fr;
+      }
+
+      .professors-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .professors-page {
+        padding-top: 96px;
+      }
+
+      .professors-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .professor-card {
+        border-radius: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="site-header-root"></div>
+  <script src="site-header.js"></script>
+
+  <main class="professors-page">
+    <div class="professors-inner">
+      <section class="professors-header">
+        <div>
+          <p class="professors-kicker">Professor atlas</p>
+          <h1>Find your next professor.</h1>
+        </div>
+
+        <p>
+          Browse AUC professors and check ratings, courses, and student reviews as the atlas grows.
+        </p>
+      </section>
+
+      <section class="professors-grid" aria-label="Professor list">
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249148/Ehab_ElSawy_ifg2np.png" alt="Ehab ElSawy">
+          </div>
+          <div class="professor-card-body">
+            <h2>Ehab ElSawy</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249240/Nageh_Allam_wfaser.png" alt="Nageh Allam">
+          </div>
+          <div class="professor-card-body">
+            <h2>Nageh Allam</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249461/Tamer_Shoeib_qmcccs.png" alt="Tamer Shoeib">
+          </div>
+          <div class="professor-card-body">
+            <h2>Tamer Shoeib</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785286932/Hassan_Azazy_frfg0s.png" alt="Hassan Azazy">
+          </div>
+          <div class="professor-card-body">
+            <h2>Hassan Azazy</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785287149/Ibrahim_Abotaleb_awad4c.png" alt="Ibrahim Abotaleb">
+          </div>
+          <div class="professor-card-body">
+            <h2>Ibrahim Abotaleb</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288244/Arthur_Bos_tegujk.png" alt="Arthur Bos">
+          </div>
+          <div class="professor-card-body">
+            <h2>Arthur Bos</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288250/Walid_Fouad_khxyvf.png" alt="Walid Fouad">
+          </div>
+          <div class="professor-card-body">
+            <h2>Walid Fouad</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288787/Mohamed_Badran_ssh771.png" alt="Mohamed Badran">
+          </div>
+          <div class="professor-card-body">
+            <h2>Mohamed Badran</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288910/Ahmed_Abdellatif_elvz21.png" alt="Ahmed Abdellatif">
+          </div>
+          <div class="professor-card-body">
+            <h2>Ahmed Abdellatif</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785326069/Wafik_Lotfallah_to4w8v.png" alt="Wafik Lotfallah">
+          </div>
+          <div class="professor-card-body">
+            <h2>Wafik Lotfallah</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344850/Laila_ElSerty_gf6bkr.png" alt="Laila ElSerty">
+          </div>
+          <div class="professor-card-body">
+            <h2>Laila ElSerty</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Mariah_Fairley_h9ykwv.png" alt="Mariah Fairley">
+          </div>
+          <div class="professor-card-body">
+            <h2>Mariah Fairley</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Gretchen_McCullough_ktotfl.png" alt="Gretchen McCullough">
+          </div>
+          <div class="professor-card-body">
+            <h2>Gretchen McCullough</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Kathleen_Saville_hz1cgi.png" alt="Kathleen Saville">
+          </div>
+          <div class="professor-card-body">
+            <h2>Kathleen Saville</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Iman_Baza_ohxkad.png" alt="Iman Baza">
+          </div>
+          <div class="professor-card-body">
+            <h2>Iman Baza</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Fikry_Boutros_gbqnkt.png" alt="Fikry Boutros">
+          </div>
+          <div class="professor-card-body">
+            <h2>Fikry Boutros</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344860/Alexander_Lewko_dexjfc.png" alt="Alexander Lewko">
+          </div>
+          <div class="professor-card-body">
+            <h2>Alexander Lewko</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="professor-card">
+          <div class="professor-card-image">
+            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344867/Mariam_Osman_rmlqxj.png" alt="Mariam Osman">
+          </div>
+          <div class="professor-card-body">
+            <h2>Mariam Osman</h2>
+            <div class="professor-meta">
+              <span>No ratings yet</span>
+              <span>Professor</span>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
