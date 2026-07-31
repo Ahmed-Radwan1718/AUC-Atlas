@@ -8,6 +8,58 @@ const SITE_SESSION_COOKIE_NAME = IS_PRODUCTION
   : "auc_atlas_session";
 
 const SITE_SESSION_EXPIRES_MS = 5 * 24 * 60 * 60 * 1000;
+const ALLOWED_AUC_EMAIL_DOMAIN = "aucegypt.edu";
+
+function cleanAuthEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isAllowedAucEmail(email) {
+  const normalizedEmail = cleanAuthEmail(email);
+  const atIndex = normalizedEmail.indexOf("@");
+
+  if (atIndex <= 0 || atIndex !== normalizedEmail.lastIndexOf("@")) {
+    return false;
+  }
+
+  return normalizedEmail.slice(atIndex + 1) === ALLOWED_AUC_EMAIL_DOMAIN;
+}
+
+function createAucEmailRequiredError(action) {
+  const error = new Error("Please use your AUC email address (@aucegypt.edu) to " + (action || "continue") + ".");
+  error.statusCode = 403;
+  return error;
+}
+
+function ensureAllowedAucEmail(email, action) {
+  const normalizedEmail = cleanAuthEmail(email);
+
+  if (!isAllowedAucEmail(normalizedEmail)) {
+    throw createAucEmailRequiredError(action);
+  }
+
+  return normalizedEmail;
+}
+
+async function getDecodedUserEmail(decodedUser) {
+  const tokenEmail = cleanAuthEmail(decodedUser && decodedUser.email);
+
+  if (tokenEmail) {
+    return tokenEmail;
+  }
+
+  if (decodedUser && decodedUser.uid) {
+    const userRecord = await admin.auth().getUser(decodedUser.uid);
+    return cleanAuthEmail(userRecord.email);
+  }
+
+  return "";
+}
+
+async function ensureDecodedUserHasAllowedAucEmail(decodedUser, action) {
+  const email = await getDecodedUserEmail(decodedUser);
+  return ensureAllowedAucEmail(email, action);
+}
 
 function appendSetCookie(res, cookieValue) {
   const existing = res.getHeader("Set-Cookie");
@@ -103,6 +155,9 @@ async function signInWithCustomToken(customToken) {
 }
 
 async function createSiteSessionFromIdToken(idToken, res) {
+  const decodedToken = await admin.auth().verifyIdToken(idToken);
+  await ensureDecodedUserHasAllowedAucEmail(decodedToken, "continue");
+
   const sessionCookie = await admin.auth().createSessionCookie(idToken, {
     expiresIn: SITE_SESSION_EXPIRES_MS
   });
@@ -141,10 +196,14 @@ async function getSiteSessionUser(req, options) {
     throw error;
   }
 
-  return await admin.auth().verifySessionCookie(
+  const decodedUser = await admin.auth().verifySessionCookie(
     sessionCookie,
     settings.checkRevoked !== false
   );
+
+  await ensureDecodedUserHasAllowedAucEmail(decodedUser, "continue");
+
+  return decodedUser;
 }
 
 async function getOptionalSiteSessionUser(req, options) {
@@ -156,6 +215,8 @@ async function getOptionalSiteSessionUser(req, options) {
 }
 
 module.exports = {
+  isAllowedAucEmail,
+  ensureAllowedAucEmail,
   signInWithPassword,
   signInWithCustomToken,
   createSiteSessionFromIdToken,
