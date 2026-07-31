@@ -32,11 +32,23 @@
     .site-header-logo:visited {
       justify-self: start;
       color: #171717;
-      font-size: 16px;
       font-weight: 700;
       letter-spacing: -0.02em;
       text-decoration: none;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .site-header-logo-auc {
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 14px;
+    }
+
+    .site-header-logo-atlas {
+      color: #171717;
+      font-size: 18px;
     }
 
     .site-header-nav {
@@ -75,19 +87,15 @@
     .site-header-user:visited {
       width: 42px;
       height: 42px;
-      border-radius: 999px;
-      border: 1px solid rgba(23, 23, 23, 0.08);
-      background: rgba(23, 23, 23, 0.04);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       text-decoration: none;
-      transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+      transition: opacity 0.22s ease, transform 0.22s ease;
     }
 
     .site-header-user:hover {
-      border-color: rgba(23, 23, 23, 0.16);
-      background: rgba(138, 23, 34, 0.08);
+      opacity: 0.72;
       transform: translateY(-1px);
     }
 
@@ -232,7 +240,7 @@
 
   headerRoot.outerHTML = `
 <header class="site-header">
-  <a href="index.html" class="site-header-logo">AUC Atlas</a>
+  <a href="index.html" class="site-header-logo"><span class="site-header-logo-auc">AUC</span><span class="site-header-logo-atlas">Atlas</span></a>
 
   <nav class="site-header-nav" aria-label="Main navigation">
     <a href="professors.html">Professors</a>
