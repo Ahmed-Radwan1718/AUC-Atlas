@@ -704,6 +704,12 @@
     const detailsForm = document.getElementById("account-details-form");
     const detailsMessage = document.getElementById("account-details-message");
     const logoutButton = document.getElementById("account-logout-sidebar");
+    const accountNameInput = document.getElementById("account-name");
+    const accountEmailInput = document.getElementById("account-email");
+    const accountPhoneInput = document.getElementById("account-phone");
+    const accountMajorInput = document.getElementById("account-major");
+
+    let accountCurrentUser = null;
 
     function showPanel(panelName) {
       sidebarLinks.forEach(function (link) {
@@ -724,6 +730,73 @@
 
       element.textContent = message;
       element.className = "account-message error";
+    }
+
+    function getAccountInitials(user) {
+      const name = String(user.fullName || user.displayName || "").trim();
+
+      if (name) {
+        return name.split(/\s+/).slice(0, 2).map(function (part) {
+          return part.charAt(0).toUpperCase();
+        }).join("");
+      }
+
+      return String(user.email || "AUC").charAt(0).toUpperCase();
+    }
+
+    function hydrateAccountDetails(user) {
+      const displayName = user.fullName || user.displayName || String(user.email || "").split("@")[0] || "AUC Student";
+
+      accountCurrentUser = user;
+      window.aucAtlasCurrentUser = user;
+
+      accountNameInput.value = displayName;
+      accountEmailInput.value = user.email || "";
+      accountPhoneInput.value = user.phone || "";
+      accountMajorInput.value = user.major || "";
+
+      photoInitial.textContent = getAccountInitials(user);
+
+      if (user.photoURL) {
+        photoPreview.src = user.photoURL;
+        photoPreview.hidden = false;
+        photoInitial.hidden = true;
+        photoRemoveButton.hidden = false;
+      } else {
+        photoPreview.src = "";
+        photoPreview.hidden = true;
+        photoInitial.hidden = false;
+        photoRemoveButton.hidden = true;
+      }
+    }
+
+    async function loadAccountDetails() {
+      try {
+        const response = await fetch("/api/me", {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.signedIn || !data.user) {
+          throw new Error("Please log in to view your account.");
+        }
+
+        hydrateAccountDetails(data.user);
+      } catch (error) {
+        try {
+          localStorage.setItem("auc-atlas-login-redirect", "accounts.html");
+        } catch (storageError) {}
+
+        window.location.href = "login.html";
+      }
     }
 
     sidebarLinks.forEach(function (link) {
@@ -770,7 +843,16 @@
       });
     });
 
-    logoutButton.addEventListener("click", function () {
+    logoutButton.addEventListener("click", async function () {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
+      }).catch(function () {});
+
       try {
         localStorage.removeItem("auc-atlas-signed-in");
         localStorage.removeItem("aucAtlasSignedIn");
@@ -786,6 +868,8 @@
     if (document.getElementById("account-panel-" + initialPanel)) {
       showPanel(initialPanel);
     }
+
+    loadAccountDetails();
   </script>
 </body>
 </html>
