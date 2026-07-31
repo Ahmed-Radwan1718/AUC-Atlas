@@ -386,12 +386,12 @@
 
           <div class="auth-panel-footer">
             <span>Forgot your password?</span>
-            <a href="#">Reset Password</a>
+            <a href="forgot-password.html">Reset Password</a>
           </div>
 
           <div class="auth-panel-footer">
             <span>Do not have an account?</span>
-            <a href="#">Create Account</a>
+            <a href="signup.html">Create Account</a>
           </div>
         </div>
       </div>
@@ -438,13 +438,6 @@
     });
 
     passwordlessLoginButton.addEventListener("click", showNonFunctionalMessage);
-
-    document.querySelectorAll(".auth-panel-footer a").forEach(function (link) {
-      link.addEventListener("click", function (event) {
-        event.preventDefault();
-        showNonFunctionalMessage();
-      });
-    });
   </script>
 </body>
 </html>
