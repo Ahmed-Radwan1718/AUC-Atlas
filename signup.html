@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Create Account - AUC Atlas</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .auth-page {
+      min-height: 100vh;
+      padding-top: 104px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+    }
+
+    .auth-section {
+      min-height: calc(100vh - 104px);
+      padding: 92px 44px 104px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-section-inner { width: 100%; max-width: 500px; margin: 0 auto; }
+    .auth-section-header { margin-bottom: 34px; text-align: left; }
+
+    .auth-section-title {
+      max-width: 620px;
+      margin-bottom: 22px;
+      color: #171717;
+      font-size: 52px;
+      font-weight: bold;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .auth-section-intro {
+      max-width: 560px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .auth-panel {
+      padding: 30px;
+      border-radius: 26px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.12);
+    }
+
+    .auth-form { display: grid; gap: 18px; }
+
+    .auth-google-button {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .auth-google-button:hover { background: white; }
+
+    .auth-provider-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.14);
+      color: rgba(192, 154, 92, 0.95);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: rgba(23, 23, 23, 0.12);
+    }
+
+    .auth-field { display: grid; gap: 10px; }
+
+    .auth-field label {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .auth-field input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .auth-field input:focus {
+      background: white;
+      border-color: rgba(192, 154, 92, 0.84);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
+    }
+
+    .auth-password-input-wrap { position: relative; }
+    .auth-password-input-wrap input { padding-right: 54px; }
+
+    .auth-password-visibility-toggle {
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transform: translateY(-50%);
+    }
+
+    .auth-password-visibility-toggle svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+      display: block;
+    }
+
+    .auth-password-visibility-toggle::after {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: 12px;
+      width: 23px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: 0;
+      transform: rotate(-42deg);
+    }
+
+    .auth-password-visibility-toggle.password-hidden::after { opacity: 0.95; }
+
+    .auth-small-note {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .auth-button {
+      width: 100%;
+      min-height: 52px;
+      margin-top: 4px;
+      border: 1px solid rgba(192, 154, 92, 0.84);
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.84);
+      color: white;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .auth-button:hover {
+      background: rgba(171, 132, 70, 0.92);
+      border-color: rgba(171, 132, 70, 0.92);
+    }
+
+    .auth-message {
+      min-height: 22px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .auth-message.error { color: #9d3b3b; }
+
+    .auth-panel-footer {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(23, 23, 23, 0.09);
+      color: rgba(23, 23, 23, 0.58);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 14px;
+    }
+
+    .auth-panel-footer a,
+    .auth-panel-footer a:visited {
+      color: rgba(192, 154, 92, 0.95);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    @media (max-width: 900px) {
+      .auth-page { padding-top: 88px; }
+      .auth-section { min-height: calc(100vh - 88px); padding: 54px 20px 72px; }
+      .auth-section-title { font-size: 34px; }
+      .auth-section-intro { font-size: 15px; }
+      .auth-panel { padding: 22px; border-radius: 22px; }
+      .auth-panel-footer { justify-content: center; text-align: center; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="site-header-root"></div>
+  <script src="site-header.js"></script>
+
+  <main class="auth-page">
+    <section class="auth-section">
+      <div class="auth-section-inner">
+        <div class="auth-section-header">
+          <h1 class="auth-section-title">Create Account</h1>
+          <p class="auth-section-intro">
+            Create an account to save professors, manage course materials, and keep your AUC Atlas reviews in one place.
+          </p>
+        </div>
+
+        <div class="auth-panel">
+          <form class="auth-form" id="signup-form">
+            <button class="auth-google-button" type="button" data-auth-action>
+              <span class="auth-provider-mark">G</span>
+              <span>Continue with Google</span>
+            </button>
+
+            <button class="auth-google-button" type="button" data-auth-action>
+              <span class="auth-provider-mark">GH</span>
+              <span>Continue with GitHub</span>
+            </button>
+
+            <button class="auth-google-button" type="button" data-auth-action>
+              <span class="auth-provider-mark">F</span>
+              <span>Continue with Facebook</span>
+            </button>
+
+            <div class="auth-divider"><span>or create with email</span></div>
+
+            <div class="auth-field">
+              <label for="signup-name">Full Name</label>
+              <input type="text" id="signup-name" autocomplete="name">
+            </div>
+
+            <div class="auth-field">
+              <label for="signup-phone">Phone Number</label>
+              <input type="tel" id="signup-phone" autocomplete="tel" inputmode="tel">
+            </div>
+
+            <div class="auth-field">
+              <label for="signup-email">Email Address</label>
+              <input type="email" id="signup-email" autocomplete="email">
+            </div>
+
+            <div class="auth-field auth-password-field">
+              <label for="signup-password">Password</label>
+
+              <div class="auth-password-input-wrap">
+                <input type="password" id="signup-password" autocomplete="new-password">
+
+                <button class="auth-password-visibility-toggle password-hidden" type="button" data-target="signup-password" aria-label="Show password">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 5C6 5 2.1 9.6 1 12c1.1 2.4 5 7 11 7s9.9-4.6 11-7c-1.1-2.4-5-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="auth-field auth-password-field">
+              <label for="signup-confirm-password">Confirm Password</label>
+
+              <div class="auth-password-input-wrap">
+                <input type="password" id="signup-confirm-password" autocomplete="new-password">
+
+                <button class="auth-password-visibility-toggle password-hidden" type="button" data-target="signup-confirm-password" aria-label="Show confirm password">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 5C6 5 2.1 9.6 1 12c1.1 2.4 5 7 11 7s9.9-4.6 11-7c-1.1-2.4-5-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <p class="auth-small-note">
+              Use 10 to 48 characters with uppercase, lowercase, special, and numeric characters.
+            </p>
+
+            <button class="auth-button" type="submit" id="signup-submit">
+              Create Account
+            </button>
+
+            <p class="auth-message" id="signup-message" aria-live="polite"></p>
+          </form>
+
+          <div class="auth-panel-footer">
+            <span>Already have an account?</span>
+            <a href="login.html">Log in</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const signupForm = document.getElementById("signup-form");
+    const signupMessage = document.getElementById("signup-message");
+    const passwordVisibilityToggles = document.querySelectorAll(".auth-password-visibility-toggle");
+
+    function showNonFunctionalMessage() {
+      signupMessage.textContent = "Signup is not connected yet.";
+      signupMessage.className = "auth-message error";
+    }
+
+    passwordVisibilityToggles.forEach(function (toggleButton) {
+      const targetId = toggleButton.getAttribute("data-target");
+      const targetInput = document.getElementById(targetId);
+
+      toggleButton.addEventListener("click", function () {
+        if (!targetInput) {
+          return;
+        }
+
+        if (targetInput.type === "password") {
+          targetInput.type = "text";
+          toggleButton.classList.remove("password-hidden");
+          toggleButton.classList.add("password-visible");
+          toggleButton.setAttribute("aria-label", "Hide password");
+        } else {
+          targetInput.type = "password";
+          toggleButton.classList.add("password-hidden");
+          toggleButton.classList.remove("password-visible");
+          toggleButton.setAttribute("aria-label", "Show password");
+        }
+      });
+    });
+
+    signupForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      showNonFunctionalMessage();
+    });
+
+    document.querySelectorAll("[data-auth-action]").forEach(function (button) {
+      button.addEventListener("click", showNonFunctionalMessage);
+    });
+  </script>
+</body>
+</html>
