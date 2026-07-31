@@ -340,9 +340,26 @@
 
     .summary-gpa {
       margin: 12px 0 18px;
+      color: #171717;
       font-size: 58px;
       font-weight: 700;
       line-height: 1;
+      transition: color 0.35s ease, text-shadow 0.35s ease;
+    }
+
+    .summary-gpa.gpa-good {
+      color: #2f8f5b;
+      text-shadow: 0 12px 30px rgba(47, 143, 91, 0.16);
+    }
+
+    .summary-gpa.gpa-mid {
+      color: #c09a5c;
+      text-shadow: 0 12px 30px rgba(192, 154, 92, 0.18);
+    }
+
+    .summary-gpa.gpa-low {
+      color: #c45b4d;
+      text-shadow: 0 12px 30px rgba(196, 91, 77, 0.16);
     }
 
     .summary-items {
@@ -608,6 +625,22 @@
       element.gpaAnimationFrame = requestAnimationFrame(updateFrame);
     }
 
+    function updateGpaColor(value, hasGrades) {
+      semesterGpaOutput.classList.remove("gpa-good", "gpa-mid", "gpa-low");
+
+      if (!hasGrades) {
+        return;
+      }
+
+      if (value >= 3.4) {
+        semesterGpaOutput.classList.add("gpa-good");
+      } else if (value >= 2.3) {
+        semesterGpaOutput.classList.add("gpa-mid");
+      } else {
+        semesterGpaOutput.classList.add("gpa-low");
+      }
+    }
+
     function animateCourseRowIn(row) {
       if (prefersReducedMotion()) {
         coursesRoot.appendChild(row);
@@ -768,6 +801,7 @@
         ? ((currentGpa * completedCredits) + totalQualityPoints) / (completedCredits + totalCredits)
         : semesterGpa;
 
+      updateGpaColor(semesterGpa, totalCredits > 0);
       animateSummaryNumber(semesterGpaOutput, semesterGpa, 2);
       animateSummaryNumber(semesterCreditsOutput, totalCredits, 0);
       animateSummaryNumber(qualityPointsOutput, totalQualityPoints, 2);
