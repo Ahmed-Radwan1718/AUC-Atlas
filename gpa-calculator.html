@@ -102,18 +102,24 @@
       position: relative;
       z-index: 1;
       transform-origin: center top;
-      animation: gpaRowIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
-      transition: opacity 0.24s ease, transform 0.24s ease;
+      transition: height 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease, transform 0.28s ease;
+      will-change: height, opacity, transform;
     }
 
     .gpa-row:has(.grade-dropdown.open) {
       z-index: 40;
     }
 
+    .gpa-row.is-entering {
+      opacity: 0;
+      transform: translateY(-10px) scale(0.98);
+      pointer-events: none;
+    }
+
     .gpa-row.is-removing {
       z-index: 1;
       opacity: 0;
-      transform: translateX(14px) scale(0.98);
+      transform: translateY(-10px) scale(0.98);
       pointer-events: none;
     }
 
@@ -566,11 +572,14 @@
       return grade ? grade[1] : "Grade";
     }
 
+    function prefersReducedMotion() {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+
     function animateSummaryNumber(element, nextValue, decimals) {
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const currentValue = Number(element.textContent) || 0;
 
-      if (prefersReducedMotion || Math.abs(currentValue - nextValue) < 0.01) {
+      if (prefersReducedMotion() || Math.abs(currentValue - nextValue) < 0.01) {
         element.textContent = nextValue.toFixed(decimals);
         return;
       }
@@ -597,6 +606,73 @@
       }
 
       element.gpaAnimationFrame = requestAnimationFrame(updateFrame);
+    }
+
+    function animateCourseRowIn(row) {
+      if (prefersReducedMotion()) {
+        coursesRoot.appendChild(row);
+        calculateGpa();
+        return;
+      }
+
+      row.classList.add("is-entering");
+      row.style.height = "0px";
+      row.style.overflow = "hidden";
+      coursesRoot.appendChild(row);
+
+      const rowHeight = row.scrollHeight;
+
+      window.requestAnimationFrame(function () {
+        row.style.height = rowHeight + "px";
+        row.classList.remove("is-entering");
+      });
+
+      row.addEventListener("transitionend", function handleRowIn(event) {
+        if (event.propertyName !== "height") {
+          return;
+        }
+
+        row.style.height = "";
+        row.style.overflow = "";
+        row.removeEventListener("transitionend", handleRowIn);
+      });
+
+      calculateGpa();
+    }
+
+    function removeCourseRow(row, removeButton) {
+      if (row.classList.contains("is-removing")) {
+        return;
+      }
+
+      removeButton.disabled = true;
+
+      if (prefersReducedMotion()) {
+        row.remove();
+
+        if (!coursesRoot.children.length) {
+          createCourseRow();
+        }
+
+        calculateGpa();
+        return;
+      }
+
+      row.style.height = row.getBoundingClientRect().height + "px";
+      row.style.overflow = "hidden";
+      row.offsetHeight;
+      row.classList.add("is-removing");
+      row.style.height = "0px";
+
+      window.setTimeout(function () {
+        row.remove();
+
+        if (!coursesRoot.children.length) {
+          createCourseRow();
+        }
+
+        calculateGpa();
+      }, 300);
     }
 
     function createCourseRow(courseName = "", credits = "3", grade = "") {
@@ -661,28 +737,10 @@
       });
 
       row.querySelector(".remove-course").addEventListener("click", function () {
-        const removeButton = row.querySelector(".remove-course");
-
-        if (row.classList.contains("is-removing")) {
-          return;
-        }
-
-        removeButton.disabled = true;
-        row.classList.add("is-removing");
-
-        window.setTimeout(function () {
-          row.remove();
-
-          if (!coursesRoot.children.length) {
-            createCourseRow();
-          }
-
-          calculateGpa();
-        }, 240);
+        removeCourseRow(row, row.querySelector(".remove-course"));
       });
 
-      coursesRoot.appendChild(row);
-      calculateGpa();
+      animateCourseRowIn(row);
     }
 
     function calculateGpa() {
