@@ -198,6 +198,7 @@
     }
 
     .semester-add-course {
+      position: relative;
       width: 46px;
       height: 46px;
       min-height: 46px;
@@ -205,7 +206,7 @@
       border-color: rgba(192, 154, 92, 0.42);
       background: rgba(255, 255, 255, 0.72);
       color: rgba(192, 154, 92, 0.96);
-      font-size: 30px;
+      font-size: 0;
       font-weight: 300;
       letter-spacing: 0;
       line-height: 1;
@@ -214,6 +215,20 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 12px 26px rgba(42, 32, 20, 0.08);
+    }
+
+    .semester-add-course::before,
+    .semester-add-course::after {
+      content: "";
+      position: absolute;
+      width: 34px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .semester-add-course::after {
+      transform: rotate(90deg);
     }
 
     .semester-add-course:hover {
