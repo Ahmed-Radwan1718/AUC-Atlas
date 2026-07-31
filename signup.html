@@ -270,22 +270,6 @@
 
         <div class="auth-panel">
           <form class="auth-form" id="signup-form">
-            <button class="auth-google-button" type="button" data-auth-action>
-              <span class="auth-provider-mark">G</span>
-              <span>Continue with Google</span>
-            </button>
-
-            <button class="auth-google-button" type="button" data-auth-action>
-              <span class="auth-provider-mark">GH</span>
-              <span>Continue with GitHub</span>
-            </button>
-
-            <button class="auth-google-button" type="button" data-auth-action>
-              <span class="auth-provider-mark">F</span>
-              <span>Continue with Facebook</span>
-            </button>
-
-            <div class="auth-divider"><span>or create with email</span></div>
 
             <div class="auth-field">
               <label for="signup-name">Full Name</label>
@@ -388,9 +372,6 @@
       showNonFunctionalMessage();
     });
 
-    document.querySelectorAll("[data-auth-action]").forEach(function (button) {
-      button.addEventListener("click", showNonFunctionalMessage);
-    });
   </script>
 </body>
 </html>
