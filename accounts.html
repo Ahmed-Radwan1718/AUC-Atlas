@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>My Account - AUC Atlas</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .account-page {
+      min-height: 100vh;
+      padding-top: 104px;
+      overflow-x: clip;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+    }
+
+    .account-section {
+      min-height: calc(100vh - 104px);
+      padding: 76px 44px 96px;
+    }
+
+    .account-section-inner {
+      width: 100%;
+      max-width: 1220px;
+      margin: 0 auto;
+    }
+
+    .account-header {
+      margin: 0 0 34px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      text-align: left;
+    }
+
+    .account-header h1 {
+      color: #171717;
+      font-size: 46px;
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .account-header p {
+      max-width: 390px;
+      margin-bottom: 8px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 16px;
+      line-height: 1.6;
+      text-align: right;
+    }
+
+    .account-layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .account-sidebar,
+    .account-panel {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.12);
+    }
+
+    .account-sidebar {
+      position: sticky;
+      top: 120px;
+      padding: 14px;
+      border-radius: 26px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-sidebar-link {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.64);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: left;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+    }
+
+    .account-sidebar-link:hover,
+    .account-sidebar-link.active {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
+
+    .account-sidebar-icon,
+    .account-sidebar-link img {
+      width: 19px;
+      height: 19px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      object-fit: contain;
+      color: rgba(192, 154, 92, 0.95);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .account-logout-link {
+      margin-top: 8px;
+      color: #c73636;
+    }
+
+    .account-content { min-width: 0; }
+
+    .account-panel {
+      display: none;
+      padding: 30px;
+      border-radius: 26px;
+      transform-origin: top center;
+    }
+
+    .account-panel.active {
+      display: block;
+      animation: accountPanelEnter 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes accountPanelEnter {
+      from { opacity: 0; transform: translateY(18px) scale(0.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .account-panel-header {
+      margin-bottom: 28px;
+    }
+
+    .account-panel-header h2 {
+      margin-bottom: 12px;
+      color: #171717;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .account-panel-header p,
+    .account-panel-subheader p {
+      max-width: 680px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .account-form,
+    .account-form-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .account-profile-photo-section,
+    .account-empty-state,
+    .account-connected-account-card,
+    .account-two-factor-card,
+    .account-session-card,
+    .account-saved-item,
+    .account-support-item,
+    .account-review-item {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.58);
+      border-radius: 22px;
+    }
+
+    .account-profile-photo-section {
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .account-profile-photo-preview-wrap {
+      width: 96px;
+      height: 96px;
+      flex: 0 0 96px;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .account-profile-photo-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .account-profile-photo-preview[hidden],
+    .account-profile-photo-initial[hidden] { display: none; }
+
+    .account-profile-photo-initial {
+      color: rgba(192, 154, 92, 0.95);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .account-profile-photo-actions {
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-profile-photo-actions h3,
+    .account-panel-subheader h3,
+    .account-empty-state h3 {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    .account-profile-photo-actions p,
+    .account-empty-state p {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .account-profile-photo-button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .account-field {
+      display: grid;
+      gap: 9px;
+    }
+
+    .account-field label {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .account-field input,
+    .account-field textarea {
+      width: 100%;
+      min-height: 50px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .account-field textarea {
+      min-height: 118px;
+      padding: 15px 16px;
+      border-radius: 22px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .account-field input:focus,
+    .account-field textarea:focus {
+      background: white;
+      border-color: rgba(192, 154, 92, 0.84);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
+    }
+
+    .account-field input[readonly] {
+      opacity: 0.7;
+      cursor: default;
+    }
+
+    .account-divider {
+      height: 1px;
+      margin: 26px 0;
+      background: rgba(23, 23, 23, 0.09);
+    }
+
+    .account-panel-subheader {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .account-connected-grid,
+    .account-two-factor-methods,
+    .account-session-list,
+    .account-saved-list,
+    .account-support-list,
+    .account-review-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .account-connected-account-card,
+    .account-two-factor-card,
+    .account-session-card,
+    .account-saved-item,
+    .account-support-item,
+    .account-review-item,
+    .account-empty-state {
+      padding: 18px;
+    }
+
+    .account-card-title {
+      margin-bottom: 8px;
+      color: #171717;
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .account-card-copy {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .account-badge {
+      width: fit-content;
+      margin-top: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(192, 154, 92, 0.24);
+      background: rgba(192, 154, 92, 0.12);
+      color: rgba(126, 90, 34, 0.96);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .account-primary-button,
+    .account-secondary-button,
+    .account-danger-button,
+    .account-profile-photo-button,
+    .account-profile-photo-remove-button {
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .account-primary-button {
+      width: fit-content;
+      border: 1px solid rgba(192, 154, 92, 0.84);
+      background: rgba(192, 154, 92, 0.84);
+      color: white;
+    }
+
+    .account-secondary-button,
+    .account-profile-photo-button {
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      background: rgba(255, 255, 255, 0.66);
+      color: #171717;
+    }
+
+    .account-danger-button,
+    .account-profile-photo-remove-button {
+      border: 1px solid rgba(199, 54, 54, 0.22);
+      background: rgba(199, 54, 54, 0.08);
+      color: #c73636;
+    }
+
+    .account-message {
+      min-height: 22px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .account-message.error { color: #9d3b3b; }
+
+    @media (max-width: 900px) {
+      .account-page { padding-top: 88px; }
+      .account-section { padding: 54px 20px 72px; }
+      .account-header { display: grid; }
+      .account-header h1 { font-size: 34px; }
+      .account-header p { text-align: left; }
+      .account-layout { grid-template-columns: 1fr; }
+      .account-sidebar { position: static; }
+      .account-panel { padding: 22px; border-radius: 22px; }
+      .account-panel-subheader { display: grid; }
+      .account-profile-photo-section { align-items: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="site-header-root"></div>
+  <script src="site-header.js"></script>
+
+  <main class="account-page">
+    <section class="account-section">
+      <div class="account-section-inner">
+        <div class="account-header">
+          <h1>My Account</h1>
+          <p>Manage your details, saved professors, security, review history, and support requests.</p>
+        </div>
+
+        <div class="account-layout">
+          <aside class="account-sidebar">
+            <button class="account-sidebar-link active" type="button" data-account-panel="details">
+              <img src="user.png" alt="">
+              <span>Account Details</span>
+            </button>
+
+            <button class="account-sidebar-link" type="button" data-account-panel="security">
+              <span class="account-sidebar-icon">S</span>
+              <span>Security</span>
+            </button>
+
+            <button class="account-sidebar-link" type="button" data-account-panel="saved">
+              <span class="account-sidebar-icon">B</span>
+              <span>Saved for Later</span>
+            </button>
+
+            <button class="account-sidebar-link" type="button" data-account-panel="support">
+              <span class="account-sidebar-icon">H</span>
+              <span>Support History</span>
+            </button>
+
+            <button class="account-sidebar-link" type="button" data-account-panel="reviews">
+              <span class="account-sidebar-icon">R</span>
+              <span>Review History</span>
+            </button>
+
+            <button class="account-sidebar-link account-logout-link" type="button" id="account-logout-sidebar">
+              <img src="logout-icon.png" alt="">
+              <span>Logout</span>
+            </button>
+          </aside>
+
+          <section class="account-content">
+            <article class="account-panel active" id="account-panel-details">
+              <div class="account-panel-header">
+                <h2>Saved Details</h2>
+                <p>Your profile photo, display name, email, phone number, and AUC profile details can be updated here.</p>
+              </div>
+
+              <form class="account-form" id="account-details-form">
+                <div class="account-profile-photo-section">
+                  <div class="account-profile-photo-preview-wrap">
+                    <img src="" alt="Profile photo preview" class="account-profile-photo-preview" id="account-photo-preview" hidden>
+                    <span class="account-profile-photo-initial" id="account-photo-initial">AUC</span>
+                  </div>
+
+                  <div class="account-profile-photo-actions">
+                    <h3>Profile Photo</h3>
+                    <p>Choose an image up to 4MB.</p>
+
+                    <input type="file" id="account-photo-input" accept="image/png,image/jpeg,image/webp" hidden>
+
+                    <div class="account-profile-photo-button-row">
+                      <button class="account-profile-photo-button" type="button" id="account-photo-choose-button">Choose Photo</button>
+                      <button class="account-profile-photo-remove-button" type="button" id="account-photo-remove-button" hidden>Remove Photo</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="account-form-grid">
+                  <div class="account-field">
+                    <label for="account-name">Display Name</label>
+                    <input type="text" id="account-name" value="AUC Student">
+                  </div>
+
+                  <div class="account-field">
+                    <label for="account-email">Email Address</label>
+                    <input type="email" id="account-email" value="student@aucegypt.edu" readonly>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="account-phone">Phone Number</label>
+                    <input type="tel" id="account-phone" placeholder="+20">
+                  </div>
+
+                  <div class="account-field">
+                    <label for="account-major">Major</label>
+                    <input type="text" id="account-major" placeholder="Computer Science, Business, Engineering">
+                  </div>
+                </div>
+
+                <div class="account-divider"></div>
+
+                <div class="account-panel-subheader">
+                  <div>
+                    <h3>Connected Accounts</h3>
+                    <p>View the sign-in methods currently connected to your account.</p>
+                  </div>
+                </div>
+
+                <div class="account-connected-grid">
+                  <div class="account-connected-account-card">
+                    <div class="account-card-title">Email & Password</div>
+                    <p class="account-card-copy">Use your email address and password to sign in.</p>
+                    <span class="account-badge">Connected</span>
+                  </div>
+
+                  <div class="account-connected-account-card">
+                    <div class="account-card-title">Google</div>
+                    <p class="account-card-copy">Use your Google account to sign in faster.</p>
+                    <span class="account-badge">Not connected</span>
+                  </div>
+
+                  <div class="account-connected-account-card">
+                    <div class="account-card-title">GitHub</div>
+                    <p class="account-card-copy">Use your GitHub account to sign in faster.</p>
+                    <span class="account-badge">Not connected</span>
+                  </div>
+                </div>
+
+                <button class="account-primary-button" type="submit">Save Changes</button>
+                <p class="account-message" id="account-details-message" aria-live="polite"></p>
+              </form>
+            </article>
+
+            <article class="account-panel" id="account-panel-security">
+              <div class="account-panel-header">
+                <h2>Change your password</h2>
+                <p>For your security, choose a unique password that you do not use for any other account.</p>
+              </div>
+
+              <button class="account-primary-button" type="button" data-account-action>Change Password</button>
+
+              <div class="account-divider"></div>
+
+              <div class="account-panel-subheader">
+                <div>
+                  <h3>Two-Factor Authentication</h3>
+                  <p>Require a verification code after your password whenever you sign in.</p>
+                </div>
+              </div>
+
+              <div class="account-two-factor-methods">
+                <article class="account-two-factor-card">
+                  <div class="account-card-title">Authenticator App</div>
+                  <p class="account-card-copy">Use a code from Google Authenticator, Microsoft Authenticator, Authy, or another authenticator app.</p>
+                  <span class="account-badge">Off</span>
+                </article>
+
+                <article class="account-two-factor-card">
+                  <div class="account-card-title">Email</div>
+                  <p class="account-card-copy">Use a 6-digit code sent to the email address connected to your account.</p>
+                  <span class="account-badge">Off</span>
+                </article>
+              </div>
+
+              <div class="account-divider"></div>
+
+              <div class="account-panel-subheader">
+                <div>
+                  <h3>Logged-In Sessions</h3>
+                  <p>Browsers and devices that are currently signed in to your account.</p>
+                </div>
+              </div>
+
+              <div class="account-session-list">
+                <article class="account-session-card">
+                  <div class="account-card-title">Current Browser</div>
+                  <p class="account-card-copy">AUC Atlas demo session on this device.</p>
+                  <span class="account-badge">Current</span>
+                </article>
+              </div>
+
+              <div class="account-divider"></div>
+
+              <div class="account-panel-subheader">
+                <div>
+                  <h3>Delete Account</h3>
+                  <p>This permanently deletes your account, saved data, reviews, and support requests.</p>
+                </div>
+              </div>
+
+              <button class="account-danger-button" type="button" data-account-action>Delete Account</button>
+              <p class="account-message" id="security-message" aria-live="polite"></p>
+            </article>
+
+            <article class="account-panel" id="account-panel-saved">
+              <div class="account-panel-header">
+                <h2>Saved Items</h2>
+                <p>Professors, courses, and materials you save are synced to your account and appear here.</p>
+              </div>
+
+              <div class="account-panel-subheader">
+                <div>
+                  <h3>Saved Professors</h3>
+                  <p>Professors you saved for enrollment planning.</p>
+                </div>
+              </div>
+
+              <div class="account-saved-list">
+                <div class="account-empty-state">
+                  <h3>No saved professors yet</h3>
+                  <p>Open a professor page and save it to keep it here.</p>
+                </div>
+              </div>
+
+              <div class="account-panel-subheader">
+                <div>
+                  <h3>Saved Courses</h3>
+                  <p>Courses you want to revisit later.</p>
+                </div>
+              </div>
+
+              <div class="account-saved-list">
+                <div class="account-empty-state">
+                  <h3>No saved courses yet</h3>
+                  <p>Save a course to compare reviews, materials, and professor notes.</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="account-panel" id="account-panel-support">
+              <div class="account-panel-header">
+                <h2>Support Requests</h2>
+                <p>Create and track help requests for account issues, reviews, materials, and general questions.</p>
+              </div>
+
+              <div class="account-panel-subheader">
+                <div>
+                  <h3>Request History</h3>
+                  <p>Any support request you create will appear here.</p>
+                </div>
+
+                <button class="account-primary-button" type="button" data-account-action>New Request</button>
+              </div>
+
+              <div class="account-support-list">
+                <div class="account-empty-state">
+                  <h3>No requests yet</h3>
+                  <p>Your AUC Atlas support requests will appear here.</p>
+                </div>
+              </div>
+
+              <p class="account-message" id="support-message" aria-live="polite"></p>
+            </article>
+
+            <article class="account-panel" id="account-panel-reviews">
+              <div class="account-panel-header">
+                <h2>Reviews</h2>
+                <p>Track professor and course reviews submitted from your account.</p>
+              </div>
+
+              <div class="account-review-list">
+                <div class="account-empty-state">
+                  <h3>No reviews yet</h3>
+                  <p>Your professor and course reviews will appear here after submission.</p>
+                </div>
+              </div>
+
+              <p class="account-message" id="reviews-message" aria-live="polite"></p>
+            </article>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const sidebarLinks = document.querySelectorAll("[data-account-panel]");
+    const accountPanels = document.querySelectorAll(".account-panel");
+    const photoInput = document.getElementById("account-photo-input");
+    const photoChooseButton = document.getElementById("account-photo-choose-button");
+    const photoRemoveButton = document.getElementById("account-photo-remove-button");
+    const photoPreview = document.getElementById("account-photo-preview");
+    const photoInitial = document.getElementById("account-photo-initial");
+    const detailsForm = document.getElementById("account-details-form");
+    const detailsMessage = document.getElementById("account-details-message");
+    const logoutButton = document.getElementById("account-logout-sidebar");
+
+    function showPanel(panelName) {
+      sidebarLinks.forEach(function (link) {
+        link.classList.toggle("active", link.dataset.accountPanel === panelName);
+      });
+
+      accountPanels.forEach(function (panel) {
+        panel.classList.toggle("active", panel.id === "account-panel-" + panelName);
+      });
+
+      window.location.hash = panelName;
+    }
+
+    function showMessage(element, message) {
+      if (!element) {
+        return;
+      }
+
+      element.textContent = message;
+      element.className = "account-message error";
+    }
+
+    sidebarLinks.forEach(function (link) {
+      link.addEventListener("click", function () {
+        showPanel(link.dataset.accountPanel);
+      });
+    });
+
+    photoChooseButton.addEventListener("click", function () {
+      photoInput.click();
+    });
+
+    photoInput.addEventListener("change", function () {
+      const file = photoInput.files && photoInput.files[0];
+
+      if (!file) {
+        return;
+      }
+
+      photoPreview.src = URL.createObjectURL(file);
+      photoPreview.hidden = false;
+      photoInitial.hidden = true;
+      photoRemoveButton.hidden = false;
+    });
+
+    photoRemoveButton.addEventListener("click", function () {
+      photoInput.value = "";
+      photoPreview.src = "";
+      photoPreview.hidden = true;
+      photoInitial.hidden = false;
+      photoRemoveButton.hidden = true;
+    });
+
+    detailsForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      showMessage(detailsMessage, "Account saving is not connected yet.");
+    });
+
+    document.querySelectorAll("[data-account-action]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        const panel = button.closest(".account-panel");
+        const message = panel ? panel.querySelector(".account-message") : null;
+        showMessage(message, "This account action is not connected yet.");
+      });
+    });
+
+    logoutButton.addEventListener("click", function () {
+      try {
+        localStorage.removeItem("auc-atlas-signed-in");
+        localStorage.removeItem("aucAtlasSignedIn");
+        sessionStorage.removeItem("auc-atlas-signed-in");
+        sessionStorage.removeItem("aucAtlasSignedIn");
+      } catch (error) {}
+
+      window.location.href = "login.html";
+    });
+
+    const initialPanel = window.location.hash.replace("#", "") || "details";
+
+    if (document.getElementById("account-panel-" + initialPanel)) {
+      showPanel(initialPanel);
+    }
+  </script>
+</body>
+</html>
