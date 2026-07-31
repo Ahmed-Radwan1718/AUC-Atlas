@@ -38,6 +38,7 @@
       grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
       gap: 28px;
       align-items: end;
+      animation: gpaFadeUp 0.56s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     .gpa-kicker {
@@ -82,6 +83,11 @@
 
     .gpa-panel {
       padding: 18px;
+      animation: gpaFadeUp 0.58s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+    }
+
+    .gpa-summary {
+      animation: gpaFadeUp 0.58s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
     }
 
     .gpa-row,
@@ -90,6 +96,18 @@
       grid-template-columns: minmax(130px, 1fr) 110px 120px 42px;
       gap: 10px;
       align-items: center;
+    }
+
+    .gpa-row {
+      transform-origin: center top;
+      animation: gpaRowIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition: opacity 0.24s ease, transform 0.24s ease;
+    }
+
+    .gpa-row.is-removing {
+      opacity: 0;
+      transform: translateX(14px) scale(0.98);
+      pointer-events: none;
     }
 
     .gpa-table-head {
@@ -127,6 +145,14 @@
       font-size: 14px;
       font-weight: 600;
       outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .gpa-row input:hover,
+    .prior-inputs input:hover,
+    .grade-toggle:hover {
+      border-color: rgba(23, 23, 23, 0.18);
+      background: rgba(255, 255, 255, 0.72);
     }
 
     .gpa-row input:focus,
@@ -149,12 +175,17 @@
       text-align: left;
     }
 
+    .grade-toggle:active {
+      transform: translateY(1px);
+    }
+
     .grade-chevron {
       width: 8px;
       height: 8px;
       border-right: 1.5px solid currentColor;
       border-bottom: 1.5px solid currentColor;
       transform: rotate(45deg);
+      transition: transform 0.22s ease;
     }
 
     .grade-dropdown.open .grade-chevron {
@@ -174,6 +205,8 @@
       box-shadow: 0 22px 55px rgba(42, 32, 20, 0.16);
       display: grid;
       gap: 4px;
+      transform-origin: top center;
+      animation: gpaMenuIn 0.18s ease both;
     }
 
     .grade-menu[hidden] {
@@ -192,11 +225,13 @@
       font-weight: 700;
       text-align: left;
       cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
     }
 
     .grade-option:hover {
       background: rgba(192, 154, 92, 0.12);
       color: #171717;
+      transform: translateX(2px);
     }
 
     .remove-course {
@@ -215,11 +250,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
     }
 
     .remove-course:hover {
       background: rgba(192, 154, 92, 0.16);
       color: #171717;
+      transform: translateY(-1px);
+    }
+
+    .remove-course:active {
+      transform: translateY(1px) scale(0.96);
+    }
+
+    .remove-course:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
     }
 
     .gpa-actions {
@@ -241,12 +287,28 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
+      transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease, transform 0.22s ease;
+    }
+
+    .gpa-action:hover {
+      border-color: rgba(192, 154, 92, 0.34);
+      background: rgba(255, 255, 255, 0.78);
+      transform: translateY(-1px);
+    }
+
+    .gpa-action:active {
+      transform: translateY(1px);
     }
 
     .gpa-action.primary {
       border-color: rgba(192, 154, 92, 0.84);
       background: rgba(192, 154, 92, 0.84);
       color: white;
+    }
+
+    .gpa-action.primary:hover {
+      border-color: rgba(178, 139, 74, 0.94);
+      background: rgba(178, 139, 74, 0.94);
     }
 
     .gpa-summary {
@@ -307,6 +369,63 @@
     .prior-inputs {
       display: grid;
       gap: 10px;
+    }
+
+    @keyframes gpaFadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes gpaRowIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.99);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes gpaMenuIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .gpa-header,
+      .gpa-panel,
+      .gpa-summary,
+      .gpa-row,
+      .grade-menu {
+        animation: none;
+      }
+
+      .gpa-row,
+      .gpa-row input,
+      .prior-inputs input,
+      .grade-toggle,
+      .grade-chevron,
+      .grade-option,
+      .remove-course,
+      .gpa-action {
+        transition: none;
+      }
     }
 
     @media (max-width: 900px) {
@@ -502,13 +621,25 @@
       });
 
       row.querySelector(".remove-course").addEventListener("click", function () {
-        row.remove();
+      row.querySelector(".remove-course").addEventListener("click", function () {
+        const removeButton = row.querySelector(".remove-course");
 
-        if (!coursesRoot.children.length) {
-          createCourseRow();
+        if (row.classList.contains("is-removing")) {
+          return;
         }
 
-        calculateGpa();
+        removeButton.disabled = true;
+        row.classList.add("is-removing");
+
+        window.setTimeout(function () {
+          row.remove();
+
+          if (!coursesRoot.children.length) {
+            createCourseRow();
+          }
+
+          calculateGpa();
+        }, 240);
       });
 
       coursesRoot.appendChild(row);
