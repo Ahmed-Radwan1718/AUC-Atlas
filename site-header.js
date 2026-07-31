@@ -196,12 +196,23 @@
       color: #c73636;
     }
 
-    .floating-account-logout img {
+    .floating-logout-icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+      background: currentColor;
       opacity: 0.95;
+      transition: opacity 0.2s ease;
+      -webkit-mask: url("logout-icon.png") center / contain no-repeat;
+      mask: url("logout-icon.png") center / contain no-repeat;
     }
 
     .floating-account-logout:hover {
       color: #a91515;
+    }
+
+    .floating-account-logout:hover .floating-logout-icon {
+      opacity: 1;
     }
 
     .hamburger-toggle {
@@ -368,7 +379,7 @@
         </a>
 
         <button class="floating-account-menu-link floating-account-logout" id="floating-logout-button" type="button" hidden>
-          <img src="logout-icon.png" alt="">
+          <span class="floating-logout-icon" aria-hidden="true"></span>
           <span>Logout</span>
         </button>
       </div>
