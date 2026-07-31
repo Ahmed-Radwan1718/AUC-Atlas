@@ -566,6 +566,39 @@
       return grade ? grade[1] : "Grade";
     }
 
+    function animateSummaryNumber(element, nextValue, decimals) {
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const currentValue = Number(element.textContent) || 0;
+
+      if (prefersReducedMotion || Math.abs(currentValue - nextValue) < 0.01) {
+        element.textContent = nextValue.toFixed(decimals);
+        return;
+      }
+
+      if (element.gpaAnimationFrame) {
+        cancelAnimationFrame(element.gpaAnimationFrame);
+      }
+
+      const startTime = performance.now();
+      const duration = 520;
+
+      function updateFrame(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        const displayedValue = currentValue + (nextValue - currentValue) * easedProgress;
+
+        element.textContent = displayedValue.toFixed(decimals);
+
+        if (progress < 1) {
+          element.gpaAnimationFrame = requestAnimationFrame(updateFrame);
+        } else {
+          element.textContent = nextValue.toFixed(decimals);
+        }
+      }
+
+      element.gpaAnimationFrame = requestAnimationFrame(updateFrame);
+    }
+
     function createCourseRow(courseName = "", credits = "3", grade = "") {
       const row = document.createElement("div");
       row.className = "gpa-row";
@@ -677,10 +710,10 @@
         ? ((currentGpa * completedCredits) + totalQualityPoints) / (completedCredits + totalCredits)
         : semesterGpa;
 
-      semesterGpaOutput.textContent = semesterGpa.toFixed(2);
-      semesterCreditsOutput.textContent = totalCredits;
-      qualityPointsOutput.textContent = totalQualityPoints.toFixed(2);
-      cumulativeGpaOutput.textContent = cumulativeGpa.toFixed(2);
+      animateSummaryNumber(semesterGpaOutput, semesterGpa, 2);
+      animateSummaryNumber(semesterCreditsOutput, totalCredits, 0);
+      animateSummaryNumber(qualityPointsOutput, totalQualityPoints, 2);
+      animateSummaryNumber(cumulativeGpaOutput, cumulativeGpa, 2);
     }
 
     document.addEventListener("click", function (event) {
