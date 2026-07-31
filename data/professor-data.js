@@ -1,6 +1,6 @@
 (function () {
   const professors = [
-    { name: "Eslam Badr", department: "Computer Science", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
+    { name: "Eslam Badr", department: "Computer Science", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
     { name: "Ehab ElSawy", department: "Engineering", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249148/Ehab_ElSawy_ifg2np.png" },
     { name: "Nageh Allam", department: "Engineering", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249240/Nageh_Allam_wfaser.png" },
     { name: "Tamer Shoeib", department: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249461/Tamer_Shoeib_qmcccs.png" },
@@ -201,7 +201,7 @@
     const statuses = getCheckedValues("status");
     const groups = getCheckedValues("group");
 
-    const searchableText = normalize([professor.name, professor.department, professor.status, professor.course, professor.group].join(" "));
+    const searchableText = normalize([professor.name, professor.department, professor.status, professor.course, professor.bio, professor.group].join(" "));
     const matchesSearch = !query || searchableText.includes(query);
     const matchesDepartment = !departments.length || departments.includes(professor.department);
     const matchesStatus = !statuses.length || statuses.includes(professor.status);
@@ -228,6 +228,7 @@
               <span>${professor.reviewCount || 0} ${(professor.reviewCount || 0) === 1 ? "Review" : "Reviews"}</span>
               <span>${professor.averageStars || "No Stars Yet"}</span>
             </div>
+            <p class="professor-bio">${professor.bio || "Bio coming soon."}</p>
           </div>
         </article>
       `;
