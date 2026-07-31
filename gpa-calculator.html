@@ -110,16 +110,31 @@
       z-index: 40;
     }
 
+    .gpa-row > .course-name,
+    .gpa-row > .course-credits,
+    .gpa-row > .grade-dropdown {
+      transform-origin: right center;
+      transition: opacity 0.26s ease, transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), filter 0.26s ease;
+    }
+
     .gpa-row.is-entering {
       opacity: 0;
       transform: translateY(-10px) scale(0.98);
       pointer-events: none;
     }
 
+    .gpa-row.is-bin-deleting > .course-name,
+    .gpa-row.is-bin-deleting > .course-credits,
+    .gpa-row.is-bin-deleting > .grade-dropdown {
+      opacity: 0;
+      filter: blur(1px);
+      transform: translateX(74px) translateY(-4px) scale(0.18);
+    }
+
     .gpa-row.is-removing {
       z-index: 1;
       opacity: 0;
-      transform: translateY(-10px) scale(0.98);
+      transform: translateY(-6px) scale(0.99);
       pointer-events: none;
     }
 
@@ -306,73 +321,77 @@
       border: 1px solid rgba(23, 23, 23, 0.08);
       border-radius: 999px;
       background: rgba(247, 244, 238, 0.7);
-      color: rgba(23, 23, 23, 0.58);
       cursor: pointer;
-      overflow: hidden;
+      overflow: visible;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease, transform 0.22s ease, opacity 0.22s ease;
+      transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease, opacity 0.22s ease;
     }
 
     .remove-course::before {
       content: "";
       position: absolute;
-      inset: 8px;
+      inset: 6px;
       border-radius: 999px;
       background: rgba(196, 91, 77, 0.12);
       opacity: 0;
-      transform: scale(0.72);
+      transform: scale(0.74);
       transition: opacity 0.22s ease, transform 0.22s ease;
     }
 
-    .remove-icon {
+    .bin-icon-wrap {
       position: relative;
       z-index: 1;
-      width: 16px;
-      height: 16px;
+      width: 23px;
+      height: 23px;
       display: block;
     }
 
-    .remove-icon::before {
-      content: "";
+    .bin-body-image,
+    .bin-lid-image {
       position: absolute;
-      left: 4px;
-      top: 2px;
-      width: 8px;
-      height: 2px;
-      border-radius: 999px;
-      background: currentColor;
-      transform-origin: center;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+    }
+
+    .bin-body-image {
+      clip-path: inset(22% 0 0 0);
       transition: transform 0.22s ease;
     }
 
-    .remove-icon::after {
-      content: "";
-      position: absolute;
-      left: 3px;
-      top: 6px;
-      width: 10px;
-      height: 8px;
-      border: 2px solid currentColor;
-      border-top: 0;
-      border-radius: 0 0 4px 4px;
+    .bin-lid-image {
+      clip-path: inset(0 0 58% 0);
+      transform-origin: 62% 46%;
+      transition: transform 0.22s ease;
     }
 
     .remove-course:hover {
       border-color: rgba(196, 91, 77, 0.24);
       background: rgba(255, 255, 255, 0.78);
-      color: #c45b4d;
       transform: translateY(-1px);
     }
 
-    .remove-course:hover::before {
+    .remove-course:hover::before,
+    .remove-course.is-deleting::before {
       opacity: 1;
       transform: scale(1);
     }
 
-    .remove-course:hover .remove-icon::before {
-      transform: translateY(-1px) rotate(-8deg);
+    .remove-course:hover .bin-lid-image {
+      transform: translateY(-4px) rotate(-12deg);
+    }
+
+    .remove-course.is-deleting .bin-lid-image {
+      animation: binLidPop 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .remove-course.is-deleting .bin-body-image {
+      animation: binCatch 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     .remove-course:active {
@@ -382,6 +401,30 @@
     .remove-course:disabled {
       opacity: 0.48;
       cursor: not-allowed;
+    }
+
+    @keyframes binLidPop {
+      0% {
+        transform: translateY(0) rotate(0);
+      }
+
+      42% {
+        transform: translateY(-8px) rotate(-22deg);
+      }
+
+      100% {
+        transform: translateY(0) rotate(0);
+      }
+    }
+
+    @keyframes binCatch {
+      0%, 100% {
+        transform: translateY(0) scale(1);
+      }
+
+      52% {
+        transform: translateY(2px) scale(0.92);
+      }
     }
 
     .gpa-actions {
@@ -792,7 +835,7 @@
     }
 
     function removeCourseRow(row, semesterCoursesRoot, removeButton) {
-      if (row.classList.contains("is-removing")) {
+      if (row.classList.contains("is-removing") || row.classList.contains("is-bin-deleting")) {
         return;
       }
 
@@ -810,10 +853,15 @@
       }
 
       row.style.height = row.getBoundingClientRect().height + "px";
-      row.style.overflow = "hidden";
       row.offsetHeight;
-      row.classList.add("is-removing");
-      row.style.height = "0px";
+      removeButton.classList.add("is-deleting");
+      row.classList.add("is-bin-deleting");
+
+      window.setTimeout(function () {
+        row.style.overflow = "hidden";
+        row.classList.add("is-removing");
+        row.style.height = "0px";
+      }, 260);
 
       window.setTimeout(function () {
         row.remove();
@@ -823,7 +871,7 @@
         }
 
         calculateGpa();
-      }, 300);
+      }, 620);
     }
 
     function removeSemesterBlock(semester, removeButton) {
@@ -873,7 +921,10 @@
           <div class="semester-actions">
             <button class="gpa-action semester-add-course" type="button">Add Course</button>
             <button class="remove-course remove-semester" type="button" aria-label="Remove semester" title="Remove semester">
-              <span class="remove-icon" aria-hidden="true"></span>
+              <span class="bin-icon-wrap" aria-hidden="true">
+                <img class="bin-body-image" src="bin.png" alt="">
+                <img class="bin-lid-image" src="bin.png" alt="">
+              </span>
             </button>
           </div>
         </div>
@@ -926,7 +977,10 @@
           </div>
         </div>
         <button class="remove-course" type="button" aria-label="Remove course" title="Remove course">
-          <span class="remove-icon" aria-hidden="true"></span>
+          <span class="bin-icon-wrap" aria-hidden="true">
+            <img class="bin-body-image" src="bin.png" alt="">
+            <img class="bin-lid-image" src="bin.png" alt="">
+          </span>
         </button>
       `;
 
