@@ -336,6 +336,7 @@
     }
 
     .remove-course {
+      position: relative;
       width: 42px;
       height: 42px;
       padding: 0;
@@ -343,7 +344,7 @@
       background: transparent;
       color: #c45b4d;
       font-family: inherit;
-      font-size: 40px;
+      font-size: 0;
       font-weight: 300;
       line-height: 1;
       cursor: pointer;
@@ -351,6 +352,24 @@
       align-items: center;
       justify-content: center;
       transition: color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .remove-course::before,
+    .remove-course::after {
+      content: "";
+      position: absolute;
+      width: 34px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .remove-course::before {
+      transform: rotate(45deg);
+    }
+
+    .remove-course::after {
+      transform: rotate(-45deg);
     }
 
     .remove-course:hover {
