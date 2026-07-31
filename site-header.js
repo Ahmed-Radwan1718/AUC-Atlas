@@ -84,27 +84,124 @@
       gap: 12px;
     }
 
-    .site-header-user,
-    .site-header-user:visited {
+    .floating-account-widget {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .floating-account-button {
       width: 42px;
       height: 42px;
-      display: inline-flex;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      display: flex;
       align-items: center;
       justify-content: center;
-      text-decoration: none;
-      transition: opacity 0.22s ease, transform 0.22s ease;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
-    .site-header-user:hover {
-      opacity: 0.72;
-      transform: translateY(-1px);
-    }
-
-    .site-header-user img {
+    .floating-account-button img {
       width: 24px;
       height: 24px;
       display: block;
       object-fit: contain;
+    }
+
+    .floating-account-button:hover {
+      opacity: 0.72;
+      transform: translateY(-1px);
+    }
+
+    .floating-account-menu {
+      position: absolute;
+      top: 52px;
+      right: 0;
+      min-width: 198px;
+      padding: 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.16);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: grid;
+      gap: 4px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px) scale(0.98);
+      transform-origin: top right;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    }
+
+    .floating-account-menu.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .floating-account-menu[hidden],
+    .floating-account-menu-link[hidden] {
+      display: none;
+    }
+
+    .floating-account-menu-link,
+    .floating-account-menu-link:visited {
+      width: 100%;
+      min-height: 38px;
+      padding: 0 13px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.68);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: left;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .floating-account-menu-link:hover {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
+
+    .floating-account-menu-link img {
+      width: 16px;
+      height: 16px;
+      display: block;
+      object-fit: contain;
+      opacity: 0.68;
+      transition: opacity 0.2s ease;
+    }
+
+    .floating-account-menu-link:hover img {
+      opacity: 1;
+    }
+
+    .floating-account-logout {
+      color: #c73636;
+    }
+
+    .floating-account-logout img {
+      opacity: 0.95;
+    }
+
+    .floating-account-logout:hover {
+      color: #a91515;
     }
 
     .hamburger-toggle {
@@ -254,9 +351,28 @@
   </nav>
 
   <div class="site-header-actions">
-    <a href="login.html" class="site-header-user" aria-label="Log in">
-      <img src="user.png" alt="">
-    </a>
+    <div class="floating-account-widget" id="floating-account-widget">
+      <button class="floating-account-button" id="floating-account-button" type="button" aria-label="Open account menu" aria-expanded="false">
+        <img src="user.png" alt="Account">
+      </button>
+
+      <div class="floating-account-menu" id="floating-account-menu" hidden>
+        <a href="login.html" class="floating-account-menu-link" id="floating-login-link">
+          <img src="user.png" alt="">
+          <span>Login</span>
+        </a>
+
+        <a href="account.html" class="floating-account-menu-link" id="floating-account-link" hidden>
+          <img src="user.png" alt="">
+          <span>Account</span>
+        </a>
+
+        <button class="floating-account-menu-link floating-account-logout" id="floating-logout-button" type="button" hidden>
+          <img src="logout-icon.png" alt="">
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <button class="hamburger-toggle" type="button" aria-label="Open menu" aria-expanded="false">
@@ -280,6 +396,11 @@
   const menuButton = document.querySelector(".hamburger-toggle");
   const menuOverlay = document.querySelector(".nav-menu-overlay");
   const menuLinks = document.querySelectorAll(".nav-menu-link");
+  const accountButton = document.getElementById("floating-account-button");
+  const accountMenu = document.getElementById("floating-account-menu");
+  const loginLink = document.getElementById("floating-login-link");
+  const accountLink = document.getElementById("floating-account-link");
+  const logoutButton = document.getElementById("floating-logout-button");
 
   function closeNavMenu() {
     document.body.classList.remove("nav-menu-open");
@@ -293,11 +414,94 @@
     }
   }
 
+  function closeAccountMenu() {
+    if (!accountButton || !accountMenu) {
+      return;
+    }
+
+    accountButton.setAttribute("aria-expanded", "false");
+    accountMenu.classList.remove("is-open");
+
+    window.setTimeout(function () {
+      if (!accountMenu.classList.contains("is-open")) {
+        accountMenu.hidden = true;
+      }
+    }, 180);
+  }
+
+  function openAccountMenu() {
+    if (!accountButton || !accountMenu) {
+      return;
+    }
+
+    accountMenu.hidden = false;
+    accountButton.setAttribute("aria-expanded", "true");
+
+    window.requestAnimationFrame(function () {
+      accountMenu.classList.add("is-open");
+    });
+  }
+
+  function readSignedInFlag(storage, key) {
+    try {
+      const value = storage.getItem(key);
+      return value === "1" || value === "true";
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function userIsSignedIn() {
+    return Boolean(window.aucAtlasCurrentUser) ||
+      readSignedInFlag(localStorage, "auc-atlas-signed-in") ||
+      readSignedInFlag(sessionStorage, "auc-atlas-signed-in") ||
+      readSignedInFlag(localStorage, "aucAtlasSignedIn") ||
+      readSignedInFlag(sessionStorage, "aucAtlasSignedIn");
+  }
+
+  function showLoggedOutAccountState() {
+    if (loginLink) {
+      loginLink.hidden = false;
+    }
+
+    if (accountLink) {
+      accountLink.hidden = true;
+    }
+
+    if (logoutButton) {
+      logoutButton.hidden = true;
+    }
+  }
+
+  function showLoggedInAccountState() {
+    if (loginLink) {
+      loginLink.hidden = true;
+    }
+
+    if (accountLink) {
+      accountLink.hidden = false;
+    }
+
+    if (logoutButton) {
+      logoutButton.hidden = false;
+    }
+  }
+
+  function updateAccountMenuState() {
+    if (userIsSignedIn()) {
+      showLoggedInAccountState();
+      return;
+    }
+
+    showLoggedOutAccountState();
+  }
+
   if (menuButton && menuOverlay) {
     menuButton.addEventListener("click", function () {
       const menuIsOpen = document.body.classList.toggle("nav-menu-open");
       menuButton.setAttribute("aria-expanded", String(menuIsOpen));
       menuOverlay.setAttribute("aria-hidden", String(!menuIsOpen));
+      closeAccountMenu();
     });
 
     menuOverlay.addEventListener("click", function (event) {
@@ -309,11 +513,56 @@
     menuLinks.forEach(function (link) {
       link.addEventListener("click", closeNavMenu);
     });
+  }
 
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") {
-        closeNavMenu();
+  if (accountButton && accountMenu) {
+    updateAccountMenuState();
+
+    accountButton.addEventListener("click", function (event) {
+      event.stopPropagation();
+      updateAccountMenuState();
+
+      if (accountMenu.hidden || !accountMenu.classList.contains("is-open")) {
+        openAccountMenu();
+      } else {
+        closeAccountMenu();
+      }
+    });
+
+    if (loginLink) {
+      loginLink.addEventListener("click", closeAccountMenu);
+    }
+
+    if (accountLink) {
+      accountLink.addEventListener("click", closeAccountMenu);
+    }
+
+    if (logoutButton) {
+      logoutButton.addEventListener("click", function () {
+        try {
+          localStorage.removeItem("auc-atlas-signed-in");
+          localStorage.removeItem("aucAtlasSignedIn");
+          sessionStorage.removeItem("auc-atlas-signed-in");
+          sessionStorage.removeItem("aucAtlasSignedIn");
+        } catch (error) {}
+
+        window.aucAtlasCurrentUser = null;
+        showLoggedOutAccountState();
+        closeAccountMenu();
+      });
+    }
+
+    document.addEventListener("click", function (event) {
+      if (!accountMenu.contains(event.target) && event.target !== accountButton) {
+        closeAccountMenu();
       }
     });
   }
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeNavMenu();
+      closeAccountMenu();
+    }
+  });
 })();
