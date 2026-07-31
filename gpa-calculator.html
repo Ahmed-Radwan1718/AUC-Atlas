@@ -318,26 +318,15 @@
       width: 42px;
       height: 42px;
       padding: 0;
-      border: 1px solid rgba(23, 23, 23, 0.08);
+      border: 1px solid rgba(196, 91, 77, 0.9);
       border-radius: 999px;
-      background: rgba(247, 244, 238, 0.7);
+      background: #c45b4d;
       cursor: pointer;
       overflow: visible;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease, opacity 0.22s ease;
-    }
-
-    .remove-course::before {
-      content: "";
-      position: absolute;
-      inset: 6px;
-      border-radius: 999px;
-      background: rgba(196, 91, 77, 0.12);
-      opacity: 0;
-      transform: scale(0.74);
-      transition: opacity 0.22s ease, transform 0.22s ease;
     }
 
     .bin-icon-wrap {
@@ -356,6 +345,7 @@
       height: 100%;
       object-fit: contain;
       display: block;
+      filter: brightness(0) invert(1);
       pointer-events: none;
     }
 
@@ -366,24 +356,18 @@
 
     .bin-lid-image {
       clip-path: inset(0 0 58% 0);
-      transform-origin: 62% 46%;
+      transform-origin: 38% 46%;
       transition: transform 0.22s ease;
     }
 
     .remove-course:hover {
-      border-color: rgba(196, 91, 77, 0.24);
-      background: rgba(255, 255, 255, 0.78);
+      border-color: rgba(173, 77, 66, 0.96);
+      background: #ad4d42;
       transform: translateY(-1px);
     }
 
-    .remove-course:hover::before,
-    .remove-course.is-deleting::before {
-      opacity: 1;
-      transform: scale(1);
-    }
-
     .remove-course:hover .bin-lid-image {
-      transform: translateY(-4px) rotate(-12deg);
+      transform: translateY(-4px) rotate(12deg);
     }
 
     .remove-course.is-deleting .bin-lid-image {
@@ -409,7 +393,7 @@
       }
 
       42% {
-        transform: translateY(-8px) rotate(-22deg);
+        transform: translateY(-8px) rotate(22deg);
       }
 
       100% {
