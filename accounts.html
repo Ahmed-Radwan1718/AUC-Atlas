@@ -112,17 +112,28 @@
     }
 
     .account-sidebar-icon,
-    .account-sidebar-link img,
     .account-logout-icon {
       width: 19px;
       height: 19px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      object-fit: contain;
-      color: rgba(192, 154, 92, 0.95);
-      font-size: 10px;
-      font-weight: 800;
+      display: block;
+      color: inherit;
+      background: currentColor;
+      flex: 0 0 19px;
+    }
+
+    .account-details-icon {
+      -webkit-mask: url("user.png") center / contain no-repeat;
+      mask: url("user.png") center / contain no-repeat;
+    }
+
+    .account-security-icon {
+      -webkit-mask: url("security-icon.png") center / contain no-repeat;
+      mask: url("security-icon.png") center / contain no-repeat;
+    }
+
+    .account-reviews-icon {
+      -webkit-mask: url("support-icon.png") center / contain no-repeat;
+      mask: url("support-icon.png") center / contain no-repeat;
     }
 
     .account-logout-link {
@@ -131,8 +142,6 @@
     }
 
     .account-logout-icon {
-      color: #c73636;
-      background: #c73636;
       -webkit-mask: url("logout-icon.png") center / contain no-repeat;
       mask: url("logout-icon.png") center / contain no-repeat;
     }
@@ -783,17 +792,17 @@
         <div class="account-layout">
           <aside class="account-sidebar">
             <button class="account-sidebar-link active" type="button" data-account-panel="details">
-              <img src="user.png" alt="">
+              <span class="account-sidebar-icon account-details-icon" aria-hidden="true"></span>
               <span>Account Details</span>
             </button>
 
             <button class="account-sidebar-link" type="button" data-account-panel="security">
-              <img src="security-icon.png" alt="">
+              <span class="account-sidebar-icon account-security-icon" aria-hidden="true"></span>
               <span>Security</span>
             </button>
 
             <button class="account-sidebar-link" type="button" data-account-panel="reviews">
-              <img src="support-icon.png" alt="">
+              <span class="account-sidebar-icon account-reviews-icon" aria-hidden="true"></span>
               <span>Review History</span>
             </button>
 
