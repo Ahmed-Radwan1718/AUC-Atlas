@@ -40,6 +40,9 @@ module.exports = async function handler(req, res) {
     const fullName = userData.fullName || userRecord.displayName || "";
     const email = userRecord.email || userData.email || decodedUser.email || "";
     const photoURL = userData.photoURL || userRecord.photoURL || "";
+    const phone = userData.phone || "";
+    const major = userData.major || "";
+    const authProvider = userData.authProvider || "password";
 
     return res.status(200).json({
       signedIn: true,
@@ -48,11 +51,14 @@ module.exports = async function handler(req, res) {
       user: {
         uid: decodedUser.uid,
         email,
-        emailVerified: Boolean(userRecord.emailVerified),
+        emailVerified: Boolean(userRecord.emailVerified || userData.emailVerified),
         displayName: fullName,
         fullName,
         photoURL,
-        firstName: getFirstName(fullName, email)
+        firstName: getFirstName(fullName, email),
+        phone,
+        major,
+        authProvider
       }
     });
   } catch (error) {
