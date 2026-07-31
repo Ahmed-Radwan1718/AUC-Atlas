@@ -48,7 +48,7 @@
 
     .site-header-logo-atlas {
       color: #171717;
-      font-size: 18px;
+      font-size: 22px;
     }
 
     .site-header-nav {
@@ -81,6 +81,32 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 12px;
+    }
+
+    .site-header-gpa,
+    .site-header-gpa:visited {
+      min-height: 40px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(192, 154, 92, 0.34);
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+    }
+
+    .site-header-gpa:hover {
+      border-color: rgba(192, 154, 92, 0.54);
+      background: rgba(192, 154, 92, 0.18);
+      transform: translateY(-1px);
     }
 
     .site-header-user,
@@ -219,6 +245,10 @@
         display: flex;
       }
 
+      .site-header-gpa {
+        display: none;
+      }
+
       .site-header-user,
       .site-header-user:visited {
         width: 42px;
@@ -248,6 +278,7 @@
   </nav>
 
   <div class="site-header-actions">
+    <a href="gpa-calculator.html" class="site-header-gpa">GPA Calculator</a>
     <a href="account.html" class="site-header-user" aria-label="Account">
       <img src="user.png" alt="">
     </a>
@@ -265,6 +296,7 @@
     <div class="nav-menu-links">
       <a href="professors.html" class="nav-menu-link">Professors</a>
       <a href="courses.html" class="nav-menu-link">Courses</a>
+      <a href="gpa-calculator.html" class="nav-menu-link">GPA Calculator</a>
     </div>
   </div>
 </div>
