@@ -1,7 +1,8 @@
 const routeLoaders = {
   "login": function () { return require("../server/routes/login"); },
   "logout": function () { return require("../server/routes/logout"); },
-  "me": function () { return require("../server/routes/me"); }
+  "me": function () { return require("../server/routes/me"); },
+  "signup": function () { return require("../server/routes/signup"); }
 };
 
 function getRouteName(req) {
