@@ -442,24 +442,25 @@
     });
   }
 
-  function readSignedInFlag(storage, key) {
+  function clearLocalSignedInFlags() {
     try {
-      const value = storage.getItem(key);
-      return value === "1" || value === "true";
-    } catch (error) {
-      return false;
-    }
+      localStorage.removeItem("auc-atlas-signed-in");
+      localStorage.removeItem("aucAtlasSignedIn");
+      sessionStorage.removeItem("auc-atlas-signed-in");
+      sessionStorage.removeItem("aucAtlasSignedIn");
+    } catch (error) {}
   }
 
-  function userIsSignedIn() {
-    return Boolean(window.aucAtlasCurrentUser) ||
-      readSignedInFlag(localStorage, "auc-atlas-signed-in") ||
-      readSignedInFlag(sessionStorage, "auc-atlas-signed-in") ||
-      readSignedInFlag(localStorage, "aucAtlasSignedIn") ||
-      readSignedInFlag(sessionStorage, "aucAtlasSignedIn");
+  function saveLocalSignedInFlags() {
+    try {
+      localStorage.setItem("auc-atlas-signed-in", "1");
+      localStorage.setItem("aucAtlasSignedIn", "true");
+    } catch (error) {}
   }
 
   function showLoggedOutAccountState() {
+    window.aucAtlasCurrentUser = null;
+
     if (loginLink) {
       loginLink.hidden = false;
     }
@@ -473,7 +474,10 @@
     }
   }
 
-  function showLoggedInAccountState() {
+  function showLoggedInAccountState(user) {
+    window.aucAtlasCurrentUser = user || window.aucAtlasCurrentUser || {};
+    saveLocalSignedInFlags();
+
     if (loginLink) {
       loginLink.hidden = true;
     }
@@ -487,13 +491,30 @@
     }
   }
 
-  function updateAccountMenuState() {
-    if (userIsSignedIn()) {
-      showLoggedInAccountState();
-      return;
-    }
+  async function loadAccountState() {
+    try {
+      const response = await fetch("/api/me", {
+        method: "GET",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
 
+      const data = await response.json().catch(function () {
+        return {};
+      });
+
+      if (response.ok && data.signedIn && data.user) {
+        showLoggedInAccountState(data.user);
+        return data.user;
+      }
+    } catch (error) {}
+
+    clearLocalSignedInFlags();
     showLoggedOutAccountState();
+    return null;
   }
 
   if (menuButton && menuOverlay) {
@@ -516,11 +537,11 @@
   }
 
   if (accountButton && accountMenu) {
-    updateAccountMenuState();
+    loadAccountState();
 
     accountButton.addEventListener("click", function (event) {
       event.stopPropagation();
-      updateAccountMenuState();
+      loadAccountState();
 
       if (accountMenu.hidden || !accountMenu.classList.contains("is-open")) {
         openAccountMenu();
@@ -538,17 +559,23 @@
     }
 
     if (logoutButton) {
-      logoutButton.addEventListener("click", function () {
-        try {
-          localStorage.removeItem("auc-atlas-signed-in");
-          localStorage.removeItem("aucAtlasSignedIn");
-          sessionStorage.removeItem("auc-atlas-signed-in");
-          sessionStorage.removeItem("aucAtlasSignedIn");
-        } catch (error) {}
+      logoutButton.addEventListener("click", async function () {
+        logoutButton.disabled = true;
 
-        window.aucAtlasCurrentUser = null;
+        await fetch("/api/logout", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({})
+        }).catch(function () {});
+
+        clearLocalSignedInFlags();
         showLoggedOutAccountState();
         closeAccountMenu();
+        logoutButton.disabled = false;
+        window.location.href = "index.html";
       });
     }
 
