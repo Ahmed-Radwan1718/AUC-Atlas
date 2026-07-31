@@ -180,8 +180,6 @@
     .account-connected-account-card,
     .account-two-factor-card,
     .account-session-card,
-    .account-saved-item,
-    .account-support-item,
     .account-review-item {
       border: 1px solid rgba(23, 23, 23, 0.1);
       background: rgba(255, 255, 255, 0.58);
@@ -540,8 +538,6 @@
 
     .account-two-factor-methods,
     .account-session-list,
-    .account-saved-list,
-    .account-support-list,
     .account-review-list {
       display: grid;
       gap: 14px;
@@ -651,8 +647,6 @@
 
     .account-two-factor-card,
     .account-session-card,
-    .account-saved-item,
-    .account-support-item,
     .account-review-item,
     .account-empty-state {
       padding: 18px;
@@ -775,7 +769,7 @@
       <div class="account-section-inner">
         <div class="account-header">
           <h1>My Account</h1>
-          <p>Manage your details, saved professors, security, review history, and support requests.</p>
+          <p>Manage your details, security, and review history.</p>
         </div>
 
         <div class="account-layout">
@@ -788,16 +782,6 @@
             <button class="account-sidebar-link" type="button" data-account-panel="security">
               <span class="account-sidebar-icon">S</span>
               <span>Security</span>
-            </button>
-
-            <button class="account-sidebar-link" type="button" data-account-panel="saved">
-              <span class="account-sidebar-icon">B</span>
-              <span>Saved for Later</span>
-            </button>
-
-            <button class="account-sidebar-link" type="button" data-account-panel="support">
-              <span class="account-sidebar-icon">H</span>
-              <span>Support History</span>
             </button>
 
             <button class="account-sidebar-link" type="button" data-account-panel="reviews">
@@ -999,72 +983,12 @@
               <div class="account-panel-subheader">
                 <div>
                   <h3>Delete Account</h3>
-                  <p>This permanently deletes your account, saved data, reviews, and support requests.</p>
+                  <p>This permanently deletes your account, profile data, and reviews.</p>
                 </div>
               </div>
 
               <button class="account-danger-button" type="button" data-account-action>Delete Account</button>
               <p class="account-message" id="security-message" aria-live="polite"></p>
-            </article>
-
-            <article class="account-panel" id="account-panel-saved">
-              <div class="account-panel-header">
-                <h2>Saved Items</h2>
-                <p>Professors, courses, and materials you save are synced to your account and appear here.</p>
-              </div>
-
-              <div class="account-panel-subheader">
-                <div>
-                  <h3>Saved Professors</h3>
-                  <p>Professors you saved for enrollment planning.</p>
-                </div>
-              </div>
-
-              <div class="account-saved-list">
-                <div class="account-empty-state">
-                  <h3>No saved professors yet</h3>
-                  <p>Open a professor page and save it to keep it here.</p>
-                </div>
-              </div>
-
-              <div class="account-panel-subheader">
-                <div>
-                  <h3>Saved Courses</h3>
-                  <p>Courses you want to revisit later.</p>
-                </div>
-              </div>
-
-              <div class="account-saved-list">
-                <div class="account-empty-state">
-                  <h3>No saved courses yet</h3>
-                  <p>Save a course to compare reviews, materials, and professor notes.</p>
-                </div>
-              </div>
-            </article>
-
-            <article class="account-panel" id="account-panel-support">
-              <div class="account-panel-header">
-                <h2>Support Requests</h2>
-                <p>Create and track help requests for account issues, reviews, materials, and general questions.</p>
-              </div>
-
-              <div class="account-panel-subheader">
-                <div>
-                  <h3>Request History</h3>
-                  <p>Any support request you create will appear here.</p>
-                </div>
-
-                <button class="account-primary-button" type="button" data-account-action>New Request</button>
-              </div>
-
-              <div class="account-support-list">
-                <div class="account-empty-state">
-                  <h3>No requests yet</h3>
-                  <p>Your AUC Atlas support requests will appear here.</p>
-                </div>
-              </div>
-
-              <p class="account-message" id="support-message" aria-live="polite"></p>
             </article>
 
             <article class="account-panel" id="account-panel-reviews">
