@@ -104,7 +104,8 @@
 
     .gpa-table-head span:nth-child(2),
     .gpa-table-head span:nth-child(3) {
-      text-align: center;
+      padding-left: 14px;
+      text-align: left;
     }
 
     .gpa-courses {
@@ -201,13 +202,19 @@
     .remove-course {
       width: 42px;
       height: 42px;
+      padding: 0;
       border: 0;
       border-radius: 999px;
       background: rgba(23, 23, 23, 0.06);
       color: rgba(23, 23, 23, 0.62);
-      font-size: 15px;
-      font-weight: 800;
+      font-family: inherit;
+      font-size: 30px;
+      font-weight: 300;
+      line-height: 1;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .remove-course:hover {
@@ -452,7 +459,7 @@
             }).join("")}
           </div>
         </div>
-        <button class="remove-course" type="button" aria-label="Remove course" title="Remove course">X</button>
+        <button class="remove-course" type="button" aria-label="Remove course" title="Remove course">&times;</button>
       `;
 
       const creditsInput = row.querySelector(".course-credits");
