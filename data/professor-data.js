@@ -224,8 +224,9 @@
           <div class="professor-card-body">
             <h2>${professor.name}</h2>
             <div class="professor-meta">
-              <span>${professor.status}</span>
-              <span>${professor.course}</span>
+              <span>${professor.department}</span>
+              <span>${professor.reviewCount || 0} ${(professor.reviewCount || 0) === 1 ? "Review" : "Reviews"}</span>
+              <span>${professor.averageStars || "No Stars Yet"}</span>
             </div>
           </div>
         </article>
