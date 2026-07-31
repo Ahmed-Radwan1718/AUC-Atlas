@@ -139,11 +139,53 @@
       text-align: left;
     }
 
-    .gpa-courses {
+    .gpa-semesters,
+    .semester-courses {
       display: grid;
       gap: 10px;
     }
 
+    .gpa-semesters {
+      gap: 16px;
+    }
+
+    .gpa-semester {
+      padding: 14px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 22px;
+      background: rgba(247, 244, 238, 0.42);
+      transition: height 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease, transform 0.28s ease;
+      will-change: height, opacity, transform;
+    }
+
+    .gpa-semester.is-entering,
+    .gpa-semester.is-removing {
+      opacity: 0;
+      transform: translateY(-10px) scale(0.98);
+      pointer-events: none;
+    }
+
+    .gpa-semester-header {
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .semester-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .semester-add-course {
+      min-height: 42px;
+      padding: 0 14px;
+      font-size: 11px;
+    }
+
+    .semester-name,
     .gpa-row input,
     .prior-inputs input,
     .grade-toggle {
@@ -161,6 +203,14 @@
       transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
 
+    .semester-name {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .semester-name:hover,
     .gpa-row input:hover,
     .prior-inputs input:hover,
     .grade-toggle:hover {
@@ -168,6 +218,7 @@
       background: rgba(255, 255, 255, 0.72);
     }
 
+    .semester-name:focus,
     .gpa-row input:focus,
     .prior-inputs input:focus,
     .grade-dropdown.open .grade-toggle {
@@ -509,23 +560,16 @@
 
       <section class="gpa-layout" aria-label="GPA calculator">
         <section class="gpa-panel">
-          <div class="gpa-table-head">
-            <span>Course</span>
-            <span>Credits</span>
-            <span>Grade</span>
-            <span></span>
-          </div>
-
-          <div class="gpa-courses" id="gpa-courses"></div>
+          <div class="gpa-semesters" id="gpa-semesters"></div>
 
           <div class="gpa-actions">
-            <button class="gpa-action primary" type="button" id="add-course">Add Course</button>
+            <button class="gpa-action primary" type="button" id="add-semester">Add Semester</button>
             <button class="gpa-action" type="button" id="reset-courses">Reset</button>
           </div>
         </section>
 
         <aside class="gpa-summary">
-          <span class="summary-label">Semester GPA</span>
+          <span class="summary-label">Overall GPA</span>
           <div class="summary-gpa" id="semester-gpa">0.00</div>
 
           <div class="summary-items">
@@ -548,8 +592,8 @@
   </main>
 
   <script>
-    const coursesRoot = document.getElementById("gpa-courses");
-    const addCourseButton = document.getElementById("add-course");
+    const semestersRoot = document.getElementById("gpa-semesters");
+    const addSemesterButton = document.getElementById("add-semester");
     const resetButton = document.getElementById("reset-courses");
     const semesterGpaOutput = document.getElementById("semester-gpa");
     const semesterCreditsOutput = document.getElementById("semester-credits");
@@ -631,9 +675,9 @@
       }
     }
 
-    function animateCourseRowIn(row) {
+    function animateCourseRowIn(row, semesterCoursesRoot) {
       if (prefersReducedMotion()) {
-        coursesRoot.appendChild(row);
+        semesterCoursesRoot.appendChild(row);
         calculateGpa();
         return;
       }
@@ -641,7 +685,7 @@
       row.classList.add("is-entering");
       row.style.height = "0px";
       row.style.overflow = "hidden";
-      coursesRoot.appendChild(row);
+      semesterCoursesRoot.appendChild(row);
 
       const rowHeight = row.scrollHeight;
 
@@ -663,7 +707,39 @@
       calculateGpa();
     }
 
-    function removeCourseRow(row, removeButton) {
+    function animateSemesterIn(semester) {
+      if (prefersReducedMotion()) {
+        semestersRoot.appendChild(semester);
+        calculateGpa();
+        return;
+      }
+
+      semester.classList.add("is-entering");
+      semester.style.height = "0px";
+      semester.style.overflow = "hidden";
+      semestersRoot.appendChild(semester);
+
+      const semesterHeight = semester.scrollHeight;
+
+      window.requestAnimationFrame(function () {
+        semester.style.height = semesterHeight + "px";
+        semester.classList.remove("is-entering");
+      });
+
+      semester.addEventListener("transitionend", function handleSemesterIn(event) {
+        if (event.propertyName !== "height") {
+          return;
+        }
+
+        semester.style.height = "";
+        semester.style.overflow = "";
+        semester.removeEventListener("transitionend", handleSemesterIn);
+      });
+
+      calculateGpa();
+    }
+
+    function removeCourseRow(row, semesterCoursesRoot, removeButton) {
       if (row.classList.contains("is-removing")) {
         return;
       }
@@ -673,8 +749,8 @@
       if (prefersReducedMotion()) {
         row.remove();
 
-        if (!coursesRoot.children.length) {
-          createCourseRow();
+        if (!semesterCoursesRoot.children.length) {
+          createCourseRow(semesterCoursesRoot);
         }
 
         calculateGpa();
@@ -690,15 +766,93 @@
       window.setTimeout(function () {
         row.remove();
 
-        if (!coursesRoot.children.length) {
-          createCourseRow();
+        if (!semesterCoursesRoot.children.length) {
+          createCourseRow(semesterCoursesRoot);
         }
 
         calculateGpa();
       }, 300);
     }
 
-    function createCourseRow(courseName = "", credits = "3", grade = "") {
+    function removeSemesterBlock(semester, removeButton) {
+      if (semester.classList.contains("is-removing")) {
+        return;
+      }
+
+      removeButton.disabled = true;
+
+      if (prefersReducedMotion()) {
+        semester.remove();
+
+        if (!semestersRoot.children.length) {
+          createSemesterBlock();
+        }
+
+        calculateGpa();
+        return;
+      }
+
+      semester.style.height = semester.getBoundingClientRect().height + "px";
+      semester.style.overflow = "hidden";
+      semester.offsetHeight;
+      semester.classList.add("is-removing");
+      semester.style.height = "0px";
+
+      window.setTimeout(function () {
+        semester.remove();
+
+        if (!semestersRoot.children.length) {
+          createSemesterBlock();
+        }
+
+        calculateGpa();
+      }, 320);
+    }
+
+    function createSemesterBlock(semesterName = "") {
+      const semester = document.createElement("section");
+      const semesterNumber = semestersRoot.children.length + 1;
+      const title = semesterName || "Semester " + semesterNumber;
+
+      semester.className = "gpa-semester";
+      semester.innerHTML = `
+        <div class="gpa-semester-header">
+          <input class="semester-name" type="text" value="${title}" aria-label="Semester name">
+          <div class="semester-actions">
+            <button class="gpa-action semester-add-course" type="button">Add Course</button>
+            <button class="remove-course remove-semester" type="button" aria-label="Remove semester" title="Remove semester">&times;</button>
+          </div>
+        </div>
+
+        <div class="gpa-table-head">
+          <span>Course</span>
+          <span>Credits</span>
+          <span>Grade</span>
+          <span></span>
+        </div>
+
+        <div class="semester-courses"></div>
+      `;
+
+      const semesterCoursesRoot = semester.querySelector(".semester-courses");
+
+      semester.querySelector(".semester-add-course").addEventListener("click", function () {
+        createCourseRow(semesterCoursesRoot);
+      });
+
+      semester.querySelector(".remove-semester").addEventListener("click", function () {
+        removeSemesterBlock(semester, semester.querySelector(".remove-semester"));
+      });
+
+      semester.querySelector(".semester-name").addEventListener("input", calculateGpa);
+
+      createCourseRow(semesterCoursesRoot, "", "3", "", false);
+      createCourseRow(semesterCoursesRoot, "", "3", "", false);
+      createCourseRow(semesterCoursesRoot, "", "3", "", false);
+      animateSemesterIn(semester);
+    }
+
+    function createCourseRow(semesterCoursesRoot, courseName = "", credits = "3", grade = "", animateRow = true) {
       const row = document.createElement("div");
       row.className = "gpa-row";
 
@@ -760,10 +914,14 @@
       });
 
       row.querySelector(".remove-course").addEventListener("click", function () {
-        removeCourseRow(row, row.querySelector(".remove-course"));
+        removeCourseRow(row, semesterCoursesRoot, row.querySelector(".remove-course"));
       });
 
-      animateCourseRowIn(row);
+      if (animateRow) {
+        animateCourseRowIn(row, semesterCoursesRoot);
+      } else {
+        semesterCoursesRoot.appendChild(row);
+      }
     }
 
     function calculateGpa() {
@@ -807,21 +965,17 @@
       });
     });
 
-    addCourseButton.addEventListener("click", function () {
-      createCourseRow();
+    addSemesterButton.addEventListener("click", function () {
+      createSemesterBlock();
     });
 
     resetButton.addEventListener("click", function () {
-      coursesRoot.innerHTML = "";
-      createCourseRow();
-      createCourseRow();
-      createCourseRow();
+      semestersRoot.innerHTML = "";
+      createSemesterBlock("Semester 1");
       calculateGpa();
     });
 
-    createCourseRow();
-    createCourseRow();
-    createCourseRow();
+    createSemesterBlock("Semester 1");
   </script>
 </body>
 </html>
