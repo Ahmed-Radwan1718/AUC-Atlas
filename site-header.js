@@ -14,11 +14,11 @@
       z-index: 90;
       width: min(1120px, calc(100% - 48px));
       min-height: 62px;
-      padding: 0 14px 0 24px;
+      padding: 0 24px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(24, 25, 24, 0.9);
-      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.2);
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.12);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       transform: translateX(-50%);
@@ -29,7 +29,7 @@
 
     .site-header-logo,
     .site-header-logo:visited {
-      color: white;
+      color: #171717;
       font-size: 16px;
       font-weight: 700;
       letter-spacing: -0.02em;
@@ -41,13 +41,13 @@
       flex: 1;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-end;
       gap: 26px;
     }
 
     .site-header-nav > a,
     .site-header-nav > a:visited {
-      color: rgba(255, 255, 255, 0.68);
+      color: rgba(23, 23, 23, 0.62);
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.06em;
@@ -57,40 +57,7 @@
     }
 
     .site-header-nav > a:hover {
-      color: white;
-    }
-
-    .site-header-actions {
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-
-    .site-header-action,
-    .site-header-action:visited {
-      min-height: 42px;
-      padding: 0 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      background: rgba(255, 255, 255, 0.08);
-      color: white;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
-    }
-
-    .site-header-action:hover {
-      border-color: rgba(255, 255, 255, 0.3);
-      background: rgba(255, 255, 255, 0.13);
-      transform: translateY(-1px);
+      color: #171717;
     }
 
     .hamburger-toggle {
@@ -108,7 +75,7 @@
       width: 18px;
       height: 2px;
       border-radius: 999px;
-      background: white;
+      background: #171717;
       display: block;
     }
 
@@ -117,7 +84,7 @@
       inset: 0;
       z-index: 1001;
       padding: 82px 14px 14px;
-      background: rgba(12, 12, 12, 0.34);
+      background: rgba(23, 23, 23, 0.18);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.22s ease;
@@ -131,9 +98,9 @@
     .nav-menu-panel {
       padding: 18px;
       border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.11);
-      background: rgba(24, 25, 24, 0.94);
-      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.16);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       display: none;
@@ -153,7 +120,7 @@
       min-height: 48px;
       padding: 0 14px;
       border-radius: 16px;
-      color: rgba(255, 255, 255, 0.78);
+      color: rgba(23, 23, 23, 0.68);
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -164,8 +131,8 @@
     }
 
     .nav-menu-link:hover {
-      background: rgba(255, 255, 255, 0.09);
-      color: white;
+      background: rgba(138, 23, 34, 0.08);
+      color: #171717;
     }
 
     @media (max-width: 900px) {
@@ -185,8 +152,7 @@
         gap: 0;
       }
 
-      .site-header-nav,
-      .site-header-actions {
+      .site-header-nav {
         display: none;
       }
 
@@ -217,13 +183,7 @@
   <nav class="site-header-nav" aria-label="Main navigation">
     <a href="professors.html">Professors</a>
     <a href="courses.html">Courses</a>
-    <a href="materials.html">Materials</a>
-    <a href="reviews.html">Reviews</a>
   </nav>
-
-  <div class="site-header-actions">
-    <a href="reviews.html" class="site-header-action">Submit Review</a>
-  </div>
 
   <button class="hamburger-toggle" type="button" aria-label="Open menu" aria-expanded="false">
     <span></span>
@@ -237,8 +197,6 @@
     <div class="nav-menu-links">
       <a href="professors.html" class="nav-menu-link">Professors</a>
       <a href="courses.html" class="nav-menu-link">Courses</a>
-      <a href="materials.html" class="nav-menu-link">Materials</a>
-      <a href="reviews.html" class="nav-menu-link">Submit Review</a>
     </div>
   </div>
 </div>
