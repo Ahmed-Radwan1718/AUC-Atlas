@@ -99,12 +99,19 @@
     }
 
     .gpa-row {
+      position: relative;
+      z-index: 1;
       transform-origin: center top;
       animation: gpaRowIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
       transition: opacity 0.24s ease, transform 0.24s ease;
     }
 
+    .gpa-row:has(.grade-dropdown.open) {
+      z-index: 40;
+    }
+
     .gpa-row.is-removing {
+      z-index: 1;
       opacity: 0;
       transform: translateX(14px) scale(0.98);
       pointer-events: none;
