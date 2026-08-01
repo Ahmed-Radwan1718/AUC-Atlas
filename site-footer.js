@@ -20,7 +20,7 @@
 
       .site-footer-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.8fr) minmax(180px, 0.8fr);
+        grid-template-columns: 1fr;
         gap: 34px;
       }
 
@@ -101,24 +101,6 @@
           <div class="site-footer-column site-footer-brand">
             <h2 class="site-footer-logo"><span class="site-footer-logo-auc">AUC</span><span class="site-footer-logo-atlas">Atlas</span></h2>
             <p>All your academic needs in one place.</p>
-          </div>
-
-          <div class="site-footer-column">
-            <h3>Explore</h3>
-            <ul class="site-footer-links">
-              <li><a href="professors.html">Professors</a></li>
-              <li><a href="courses.html">Courses</a></li>
-              <li><a href="gpa-calculator.html">GPA Calculator</a></li>
-            </ul>
-          </div>
-
-          <div class="site-footer-column">
-            <h3>Account</h3>
-            <ul class="site-footer-links">
-              <li><a href="login.html">Login</a></li>
-              <li><a href="signup.html">Sign Up</a></li>
-              <li><a href="accounts.html">Account</a></li>
-            </ul>
           </div>
         </div>
 
