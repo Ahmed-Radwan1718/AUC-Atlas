@@ -43,15 +43,42 @@
 
     .site-header-logo,
     .site-header-logo:visited {
+      position: relative;
       justify-self: start;
+      min-width: 88px;
+      min-height: 34px;
       color: #171717;
       font-weight: 700;
       letter-spacing: -0.02em;
       text-decoration: none;
       white-space: nowrap;
       display: inline-flex;
-      align-items: baseline;
+      align-items: center;
+      justify-content: center;
       gap: 4px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .site-header-logo::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 32px;
+      height: 32px;
+      background: url("favicon.svg") center / contain no-repeat;
+      opacity: 0;
+      filter: drop-shadow(0 10px 18px rgba(42, 32, 20, 0.18));
+      transform: translate(-50%, -50%) scale(0.18) rotate(-28deg);
+      transition: opacity 0.28s ease, transform 0.42s cubic-bezier(0.2, 0.9, 0.2, 1.2);
+    }
+
+    .site-header-logo-auc,
+    .site-header-logo-atlas {
+      display: inline-block;
+      transform-origin: center;
+      transition: opacity 0.24s ease, filter 0.24s ease, transform 0.36s cubic-bezier(0.2, 0.9, 0.2, 1);
     }
 
     .site-header-logo-auc {
@@ -62,6 +89,26 @@
     .site-header-logo-atlas {
       color: #171717;
       font-size: 22px;
+    }
+
+    .site-header-logo:hover .site-header-logo-auc,
+    .site-header-logo:focus-visible .site-header-logo-auc {
+      opacity: 0;
+      filter: blur(6px);
+      transform: translateX(22px) scale(0.15) rotate(24deg);
+    }
+
+    .site-header-logo:hover .site-header-logo-atlas,
+    .site-header-logo:focus-visible .site-header-logo-atlas {
+      opacity: 0;
+      filter: blur(6px);
+      transform: translateX(-20px) scale(0.15) rotate(-20deg);
+    }
+
+    .site-header-logo:hover::after,
+    .site-header-logo:focus-visible::after {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1) rotate(0deg);
     }
 
     .site-header-nav {
@@ -336,11 +383,10 @@
       .site-header-logo:visited {
         grid-column: 2;
         justify-self: center;
-        display: block;
+        min-width: 88px;
+        display: inline-flex;
         overflow: hidden;
-        font-size: 15px;
         text-align: center;
-        text-overflow: ellipsis;
       }
 
       .site-header-actions {
