@@ -95,6 +95,26 @@ function getDisplayNameUnlockDateText(value) {
   });
 }
 
+async function getTwoFactorResponse(uid, userData) {
+  const twoFactorData = userData && userData.twoFactor && typeof userData.twoFactor === "object"
+    ? userData.twoFactor
+    : {};
+  let hasAuthenticatorApp = Boolean(twoFactorData.appEnabled || twoFactorData.appSecret);
+
+  if (!hasAuthenticatorApp) {
+    const secretDoc = await admin.firestore().collection("twoFactorSecrets").doc(uid).get().catch(function () {
+      return null;
+    });
+    const secretData = secretDoc && secretDoc.exists ? secretDoc.data() || {} : {};
+    hasAuthenticatorApp = Boolean(secretData.appSecret);
+  }
+
+  return {
+    appEnabled: hasAuthenticatorApp,
+    emailEnabled: Boolean(twoFactorData.emailEnabled)
+  };
+}
+
 module.exports = async function handler(req, res) {
   try {
     if (req.method === "PATCH") {
@@ -196,6 +216,7 @@ module.exports = async function handler(req, res) {
       const savedMajor = userData.major || "";
       const authProvider = userData.authProvider || "password";
       const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
+      const twoFactor = await getTwoFactorResponse(decodedUser.uid, userData);
 
       return res.status(200).json({
         success: true,
@@ -213,6 +234,7 @@ module.exports = async function handler(req, res) {
           phone: savedPhone,
           major: savedMajor,
           authProvider,
+          twoFactor,
           displayNameLastChangedAt
         }
       });
@@ -246,6 +268,7 @@ module.exports = async function handler(req, res) {
     const major = userData.major || "";
     const authProvider = userData.authProvider || "password";
     const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
+    const twoFactor = await getTwoFactorResponse(decodedUser.uid, userData);
 
     return res.status(200).json({
       signedIn: true,
@@ -262,6 +285,7 @@ module.exports = async function handler(req, res) {
         phone,
         major,
         authProvider,
+        twoFactor,
         displayNameLastChangedAt
       }
     });
