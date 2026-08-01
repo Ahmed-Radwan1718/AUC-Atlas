@@ -278,6 +278,11 @@
             </div>
 
             <div class="auth-field">
+              <label for="signup-auc-id">AUC ID Number</label>
+              <input type="text" id="signup-auc-id" inputmode="numeric" autocomplete="off" maxlength="9" placeholder="900123456">
+            </div>
+
+            <div class="auth-field">
               <label for="signup-phone">Phone Number</label>
               <input type="tel" id="signup-phone" autocomplete="tel" inputmode="tel">
             </div>
@@ -377,14 +382,20 @@
       event.preventDefault();
 
       const fullName = document.getElementById("signup-name").value.trim();
+      const aucId = document.getElementById("signup-auc-id").value.replace(/\D/g, "");
       const phone = document.getElementById("signup-phone").value.trim();
       const email = document.getElementById("signup-email").value.trim().toLowerCase();
       const password = document.getElementById("signup-password").value;
       const confirmPassword = document.getElementById("signup-confirm-password").value;
       const phoneDigits = phone.replace(/\D/g, "");
 
-      if (!fullName || !phone || !email || !password || !confirmPassword) {
+      if (!fullName || !aucId || !phone || !email || !password || !confirmPassword) {
         showMessage("Please complete all required fields.", "error");
+        return;
+      }
+
+      if (!/^900\d{6}$/.test(aucId)) {
+        showMessage("AUC ID number must start with 900 and be 9 digits total.", "error");
         return;
       }
 
@@ -433,6 +444,7 @@
           },
           body: JSON.stringify({
             fullName: fullName,
+            aucId: aucId,
             phone: phone,
             email: email,
             password: password,
