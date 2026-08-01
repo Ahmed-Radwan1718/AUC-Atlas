@@ -70,7 +70,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
-        await createSiteSessionFromIdToken(loginResult.idToken, res, req);
+    await createSiteSessionFromIdToken(loginResult.idToken, res, req);
 
     return res.status(200).json({
       success: true,
