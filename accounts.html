@@ -1056,8 +1056,7 @@
       text-transform: uppercase;
     }
 
-    .account-authenticator-modal-header p,
-    .account-authenticator-manual span {
+    .account-authenticator-modal-header p {
       color: rgba(23, 23, 23, 0.62);
       font-size: 14px;
       line-height: 1.6;
@@ -1067,7 +1066,7 @@
       display: grid;
       grid-template-columns: 220px minmax(0, 1fr);
       gap: 18px;
-      align-items: center;
+      align-items: stretch;
     }
 
     .account-authenticator-qr-wrap {
@@ -1086,15 +1085,74 @@
     }
 
     .account-authenticator-manual {
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(192, 154, 92, 0.2);
+      background: rgba(192, 154, 92, 0.09);
       display: grid;
-      gap: 8px;
+      align-content: center;
+      gap: 10px;
+    }
+
+    .account-authenticator-manual span,
+    .account-authenticator-code-field > label {
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      line-height: 1.35;
+      text-transform: uppercase;
     }
 
     .account-authenticator-manual strong {
+      padding: 12px 13px;
+      border-radius: 16px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      background: rgba(255, 255, 255, 0.82);
       color: #171717;
       font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
       line-height: 1.6;
+      text-transform: uppercase;
       overflow-wrap: anywhere;
+    }
+
+    .account-authenticator-code-field {
+      display: grid;
+      gap: 10px;
+    }
+
+    .account-authenticator-code-inputs {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .account-authenticator-code-input {
+      width: 100%;
+      min-width: 0;
+      height: 62px;
+      border-radius: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      font-family: inherit;
+      font-size: 24px;
+      font-weight: 800;
+      text-align: center;
+      outline: 0;
+    }
+
+    .account-authenticator-code-input:focus {
+      background: white;
+      border-color: rgba(192, 154, 92, 0.84);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
+    }
+
+    .account-authenticator-code-input[aria-invalid="true"] {
+      border-color: rgba(157, 59, 59, 0.54);
+      box-shadow: 0 0 0 4px rgba(157, 59, 59, 0.1);
     }
 
     .account-authenticator-modal-actions {
@@ -1102,6 +1160,33 @@
       gap: 10px;
       justify-content: flex-end;
       flex-wrap: wrap;
+    }
+
+    .account-authenticator-modal-actions .account-primary-button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 620px) {
+      .account-authenticator-setup-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .account-authenticator-qr-wrap {
+        width: min(100%, 220px);
+        height: auto;
+        aspect-ratio: 1;
+      }
+
+      .account-authenticator-code-inputs {
+        gap: 8px;
+      }
+
+      .account-authenticator-code-input {
+        height: 52px;
+        border-radius: 16px;
+        font-size: 22px;
+      }
     }
 
     @media (max-width: 900px) {
@@ -1411,14 +1496,24 @@
       </div>
 
       <form class="account-form" id="authenticator-setup-form">
-        <div class="account-field">
-          <label for="authenticator-setup-code">Authenticator Code</label>
-          <input type="text" id="authenticator-setup-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+        <div class="account-authenticator-code-field">
+          <label for="authenticator-code-digit-1">Authenticator Code</label>
+
+          <div class="account-authenticator-code-inputs" aria-label="Authenticator code">
+            <input class="account-authenticator-code-input" type="text" id="authenticator-code-digit-1" inputmode="numeric" autocomplete="one-time-code" maxlength="1" data-authenticator-code-input aria-label="Digit 1" required>
+            <input class="account-authenticator-code-input" type="text" inputmode="numeric" maxlength="1" data-authenticator-code-input aria-label="Digit 2" required>
+            <input class="account-authenticator-code-input" type="text" inputmode="numeric" maxlength="1" data-authenticator-code-input aria-label="Digit 3" required>
+            <input class="account-authenticator-code-input" type="text" inputmode="numeric" maxlength="1" data-authenticator-code-input aria-label="Digit 4" required>
+            <input class="account-authenticator-code-input" type="text" inputmode="numeric" maxlength="1" data-authenticator-code-input aria-label="Digit 5" required>
+            <input class="account-authenticator-code-input" type="text" inputmode="numeric" maxlength="1" data-authenticator-code-input aria-label="Digit 6" required>
+          </div>
+
+          <input type="hidden" id="authenticator-setup-code">
         </div>
 
         <div class="account-authenticator-modal-actions">
           <button class="account-secondary-button" type="button" id="authenticator-modal-cancel">Cancel</button>
-          <button class="account-primary-button" type="submit" id="authenticator-setup-confirm">Verify and Enable</button>
+          <button class="account-primary-button" type="submit" id="authenticator-setup-confirm" disabled>Verify and Enable</button>
         </div>
 
         <p class="account-message" id="authenticator-message" aria-live="polite"></p>
@@ -1460,6 +1555,7 @@
     const authenticatorSecretKey = document.getElementById("authenticator-secret-key");
     const authenticatorSetupForm = document.getElementById("authenticator-setup-form");
     const authenticatorSetupCode = document.getElementById("authenticator-setup-code");
+    const authenticatorCodeInputs = Array.from(document.querySelectorAll("[data-authenticator-code-input]"));
     const authenticatorSetupConfirm = document.getElementById("authenticator-setup-confirm");
     const authenticatorMessage = document.getElementById("authenticator-message");
 
@@ -1853,25 +1949,128 @@
     });
 
     function formatAuthenticatorSecret(secret) {
-      return String(secret || "").replace(/(.{4})/g, "$1 ").trim();
+      const compactSecret = String(secret || "").replace(/\s+/g, "").toUpperCase();
+      return compactSecret.replace(/(.{4})/g, "$1 ").trim();
+    }
+
+    function getAuthenticatorCodeValue() {
+      return authenticatorCodeInputs.map(function (input) {
+        return input.value;
+      }).join("").replace(/\D/g, "").slice(0, 6);
+    }
+
+    function setAuthenticatorCodeInvalid(isInvalid) {
+      authenticatorCodeInputs.forEach(function (input) {
+        if (isInvalid) {
+          input.setAttribute("aria-invalid", "true");
+        } else {
+          input.removeAttribute("aria-invalid");
+        }
+      });
+    }
+
+    function syncAuthenticatorCodeValue() {
+      const code = getAuthenticatorCodeValue();
+
+      if (authenticatorSetupCode) {
+        authenticatorSetupCode.value = code;
+      }
+
+      if (authenticatorSetupConfirm) {
+        authenticatorSetupConfirm.disabled = code.length !== 6;
+      }
+
+      return code;
+    }
+
+    function resetAuthenticatorCodeInputs() {
+      authenticatorCodeInputs.forEach(function (input) {
+        input.value = "";
+      });
+
+      setAuthenticatorCodeInvalid(false);
+      syncAuthenticatorCodeValue();
+    }
+
+    function fillAuthenticatorCodeInputs(value) {
+      const digits = String(value || "").replace(/\D/g, "").slice(0, 6).split("");
+
+      authenticatorCodeInputs.forEach(function (input, index) {
+        input.value = digits[index] || "";
+      });
+
+      setAuthenticatorCodeInvalid(false);
+      syncAuthenticatorCodeValue();
+
+      const focusIndex = Math.min(digits.length, authenticatorCodeInputs.length - 1);
+      const focusTarget = authenticatorCodeInputs[focusIndex];
+
+      if (focusTarget) {
+        focusTarget.focus();
+      }
     }
 
     function openAuthenticatorModal(data) {
       if (authenticatorQrCode) authenticatorQrCode.src = data.qrDataUrl || "";
       if (authenticatorSecretKey) authenticatorSecretKey.textContent = formatAuthenticatorSecret(data.secret || "");
-      if (authenticatorSetupCode) authenticatorSetupCode.value = "";
+      resetAuthenticatorCodeInputs();
       showMessage(authenticatorMessage, "", "");
       authenticatorModal.hidden = false;
 
       setTimeout(function () {
-        if (authenticatorSetupCode) authenticatorSetupCode.focus();
+        if (authenticatorCodeInputs[0]) authenticatorCodeInputs[0].focus();
       }, 50);
     }
 
     function closeAuthenticatorModal() {
       authenticatorModal.hidden = true;
+      resetAuthenticatorCodeInputs();
       showMessage(authenticatorMessage, "", "");
     }
+
+    authenticatorCodeInputs.forEach(function (input, index) {
+      input.addEventListener("input", function () {
+        const digits = String(input.value || "").replace(/\D/g, "");
+
+        if (digits.length > 1) {
+          fillAuthenticatorCodeInputs(digits);
+          return;
+        }
+
+        input.value = digits;
+        setAuthenticatorCodeInvalid(false);
+        syncAuthenticatorCodeValue();
+
+        if (digits && authenticatorCodeInputs[index + 1]) {
+          authenticatorCodeInputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener("keydown", function (event) {
+        if (event.key === "Backspace" && !input.value && authenticatorCodeInputs[index - 1]) {
+          authenticatorCodeInputs[index - 1].focus();
+          authenticatorCodeInputs[index - 1].value = "";
+          syncAuthenticatorCodeValue();
+        }
+
+        if (event.key === "ArrowLeft" && authenticatorCodeInputs[index - 1]) {
+          authenticatorCodeInputs[index - 1].focus();
+        }
+
+        if (event.key === "ArrowRight" && authenticatorCodeInputs[index + 1]) {
+          authenticatorCodeInputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener("paste", function (event) {
+        const pastedCode = event.clipboardData ? event.clipboardData.getData("text") : "";
+
+        if (pastedCode) {
+          event.preventDefault();
+          fillAuthenticatorCodeInputs(pastedCode);
+        }
+      });
+    });
 
     async function requestAuthenticatorAction(action, payload) {
       const response = await fetch("/api/authenticator", {
@@ -1949,23 +2148,38 @@
       authenticatorSetupForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
+        const code = syncAuthenticatorCodeValue();
+
+        if (!/^\d{6}$/.test(code)) {
+          setAuthenticatorCodeInvalid(true);
+          showMessage(authenticatorMessage, "Please enter the 6-digit authenticator code.", "error");
+
+          if (authenticatorCodeInputs[0]) {
+            authenticatorCodeInputs[0].focus();
+          }
+
+          return;
+        }
+
         authenticatorSetupConfirm.disabled = true;
         authenticatorSetupConfirm.textContent = "Verifying...";
+        setAuthenticatorCodeInvalid(false);
         showMessage(authenticatorMessage, "", "");
 
         try {
           const data = await requestAuthenticatorAction("verify-setup", {
-            code: authenticatorSetupCode.value
+            code: code
           });
 
           syncTwoFactorState(data.twoFactor || { appEnabled: true });
           closeAuthenticatorModal();
           showMessage(securityMessage, "Authenticator app enabled.", "success");
         } catch (error) {
+          setAuthenticatorCodeInvalid(true);
           showMessage(authenticatorMessage, error.message || "Invalid authenticator code.", "error");
         } finally {
-          authenticatorSetupConfirm.disabled = false;
           authenticatorSetupConfirm.textContent = "Verify and Enable";
+          syncAuthenticatorCodeValue();
         }
       });
     }
