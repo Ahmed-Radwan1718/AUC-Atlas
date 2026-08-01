@@ -1,6 +1,6 @@
 (function () {
   const professors = [
-    { id: "eslam-badr", name: "Eslam Badr", department: "MACT", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
+    { id: "eslam-badr", name: "Eslam Badr", department: "Department of Mathematics and Actuarial Science", status: "No ratings yet", course: "Calculus 1, Linear Algebra", group: "A-F", email: "eslammath@aucegypt.edu", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
     { id: "ehab-elsawy", name: "Ehab ElSawy", department: "CHEM", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Ehab El Sawy earned his PhD in physical chemistry at the University of Calgary before joining AUC in 2017. His work focuses on nano-electrochemistry, fuel cells, hydrogen production, batteries, sensors, and corrosion protection.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249148/Ehab_ElSawy_ifg2np.png" },
     { id: "nageh-allam", name: "Nageh Allam", department: "PHYS", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Nageh Allam earned his PhD in materials science and engineering from Penn State before joining AUC in 2011. His work focuses on nanomaterials for energy, sensors, desalination, biomaterials, and computational materials science.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249240/Nageh_Allam_wfaser.png" },
     { id: "tamer-shoeib", name: "Tamer Shoeib", department: "CHEM", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Tamer Shoeib earned his PhD in chemistry from York University before conducting postdoctoral research in Canada. His work focuses on analytical and biophysical chemistry, molecular structure, mass spectrometry, and metal-containing biomolecules.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249461/Tamer_Shoeib_qmcccs.png" },
@@ -255,47 +255,38 @@
       gap: 16px;
     }
 
-    .professor-profile-back {
-      width: fit-content;
-      color: rgba(192, 154, 92, 0.96);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-decoration: none;
-      text-transform: uppercase;
-    }
-
-    .professor-profile-meta {
-      display: flex;
+    .professor-profile-info {
+      max-width: 660px;
+      display: grid;
       gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
     }
 
-    .professor-profile-meta span,
-    .professor-profile-contact span {
-      padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(23, 23, 23, 0.08);
-      background: rgba(247, 244, 238, 0.74);
-      color: rgba(23, 23, 23, 0.62);
+    .professor-profile-info div {
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      display: grid;
+      gap: 3px;
+    }
+
+    .professor-profile-info div:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .professor-profile-info div > span:first-child {
+      color: rgba(192, 154, 92, 0.92);
       font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.05em;
+      font-weight: 900;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
-    .professor-profile-contact {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
+    .professor-profile-info strong,
     .professor-profile-email {
       color: #171717;
       font-size: 14px;
       font-weight: 800;
+      line-height: 1.45;
       text-decoration: none;
     }
 
@@ -512,18 +503,21 @@
           <img src="${escapeHtml(professor.image || "user.png")}" alt="${escapeHtml(professor.name)}">
         </div>
         <div class="professor-profile-body">
-          <a class="professor-profile-back" href="professors.html">All Professors</a>
+          <div class="professor-profile-info">
+            <div>
+              <span>Department</span>
+              <strong>${escapeHtml(professor.department || "Department coming soon")}</strong>
+            </div>
 
-          <div class="professor-profile-meta">
-            <span>${escapeHtml(professor.department)}</span>
-            <span>${escapeHtml(professor.course || "Course coming soon")}</span>
-            <span>${escapeHtml((professor.reviewCount || 0) + " " + ((professor.reviewCount || 0) === 1 ? "Review" : "Reviews"))}</span>
-            <span>${escapeHtml(professor.averageStars || "No Stars Yet")}</span>
-          </div>
+            <div>
+              <span>Email</span>
+              ${professorEmailMarkup}
+            </div>
 
-          <div class="professor-profile-contact">
-            <span>Email</span>
-            ${professorEmailMarkup}
+            <div>
+              <span>Teaches</span>
+              <strong>${escapeHtml(professor.course || "Courses coming soon")}</strong>
+            </div>
           </div>
 
           <p class="professor-profile-bio">${escapeHtml(professor.bio || "Bio coming soon.")}</p>
