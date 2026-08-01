@@ -1071,6 +1071,18 @@
       border-color: rgba(192, 154, 92, 0.34);
     }
 
+    .account-two-factor-button.is-danger {
+      border-color: rgba(199, 54, 54, 0.34);
+      background: rgba(199, 54, 54, 0.1);
+      color: #c73636;
+    }
+
+    .account-two-factor-button.is-danger:hover {
+      border-color: rgba(169, 21, 21, 0.42);
+      background: rgba(199, 54, 54, 0.16);
+      color: #a91515;
+    }
+
     .account-two-factor-button:disabled {
       opacity: 0.48;
       cursor: not-allowed;
@@ -2438,8 +2450,8 @@
 
       if (twoFactorAppButton) {
         twoFactorAppButton.textContent = accountTwoFactor.appEnabled ? "Disable app" : "Set up app";
+        twoFactorAppButton.classList.toggle("is-danger", accountTwoFactor.appEnabled);
       }
-    }
 
     function hydrateAccountDetails(user) {
       const displayName = user.fullName || user.displayName || String(user.email || "").split("@")[0] || "AUC Student";
