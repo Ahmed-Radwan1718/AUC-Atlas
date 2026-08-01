@@ -125,6 +125,14 @@
       object-fit: contain;
     }
 
+    .floating-account-button img.has-profile-photo {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      object-fit: cover;
+      background: rgba(192, 154, 92, 0.14);
+    }
+
     .floating-account-button:hover {
       opacity: 0.72;
       transform: translateY(-1px);
@@ -377,7 +385,7 @@
   <div class="site-header-actions">
     <div class="floating-account-widget" id="floating-account-widget">
       <button class="floating-account-button" id="floating-account-button" type="button" aria-label="Open account menu" aria-expanded="false">
-        <img src="user.png" alt="Account">
+        <img src="user.png" alt="Account" id="floating-account-photo">
       </button>
 
       <div class="floating-account-menu" id="floating-account-menu" hidden>
@@ -421,6 +429,7 @@
   const menuOverlay = document.querySelector(".nav-menu-overlay");
   const menuLinks = document.querySelectorAll(".nav-menu-link");
   const accountButton = document.getElementById("floating-account-button");
+  const accountPhoto = document.getElementById("floating-account-photo");
   const accountMenu = document.getElementById("floating-account-menu");
   const loginLink = document.getElementById("floating-login-link");
   const accountLink = document.getElementById("floating-account-link");
@@ -482,8 +491,28 @@
     } catch (error) {}
   }
 
+  function setAccountPhoto(photoURL) {
+    const safePhotoURL = String(photoURL || "").trim();
+
+    if (!accountPhoto) {
+      return;
+    }
+
+    if (safePhotoURL) {
+      accountPhoto.src = safePhotoURL;
+      accountPhoto.alt = "Account profile photo";
+      accountPhoto.classList.add("has-profile-photo");
+      return;
+    }
+
+    accountPhoto.src = "user.png";
+    accountPhoto.alt = "Account";
+    accountPhoto.classList.remove("has-profile-photo");
+  }
+
   function showLoggedOutAccountState() {
     window.aucAtlasCurrentUser = null;
+    setAccountPhoto("");
 
     if (loginLink) {
       loginLink.hidden = false;
@@ -501,6 +530,7 @@
   function showLoggedInAccountState(user) {
     window.aucAtlasCurrentUser = user || window.aucAtlasCurrentUser || {};
     saveLocalSignedInFlags();
+    setAccountPhoto((user || {}).photoURL || "");
 
     if (loginLink) {
       loginLink.hidden = true;
