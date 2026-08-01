@@ -989,6 +989,108 @@
     .account-message.error { color: #9d3b3b; }
     .account-message.success { color: rgba(27, 112, 62, 0.96); }
 
+    .account-authenticator-modal[hidden] {
+      display: none;
+    }
+
+    .account-authenticator-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .account-authenticator-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(23, 23, 23, 0.38);
+    }
+
+    .account-authenticator-modal-card {
+      position: relative;
+      width: min(100%, 520px);
+      padding: 26px;
+      border-radius: 26px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.18);
+      display: grid;
+      gap: 18px;
+    }
+
+    .account-authenticator-modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: white;
+      color: #171717;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .account-authenticator-modal-header h2 {
+      padding-right: 42px;
+      color: #171717;
+      font-size: 24px;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .account-authenticator-modal-header p,
+    .account-authenticator-manual span {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .account-authenticator-setup-grid {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+    }
+
+    .account-authenticator-qr-wrap {
+      width: 220px;
+      height: 220px;
+      padding: 10px;
+      border-radius: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: white;
+    }
+
+    .account-authenticator-qr-wrap img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .account-authenticator-manual {
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-authenticator-manual strong {
+      color: #171717;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .account-authenticator-modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
     @media (max-width: 900px) {
       .account-page { padding-top: 88px; }
       .account-section { padding: 54px 20px 72px; }
@@ -1273,6 +1375,44 @@
     </section>
   </main>
 
+  <div class="account-authenticator-modal" id="authenticator-modal" hidden>
+    <div class="account-authenticator-modal-backdrop" id="authenticator-modal-backdrop"></div>
+
+    <div class="account-authenticator-modal-card" role="dialog" aria-modal="true" aria-labelledby="authenticator-modal-title">
+      <button class="account-authenticator-modal-close" type="button" id="authenticator-modal-close" aria-label="Close authenticator setup">×</button>
+
+      <div class="account-authenticator-modal-header">
+        <h2 id="authenticator-modal-title">Set up authenticator app</h2>
+        <p>Scan this QR code in your authenticator app, then enter the 6-digit code it shows.</p>
+      </div>
+
+      <div class="account-authenticator-setup-grid">
+        <div class="account-authenticator-qr-wrap">
+          <img src="" alt="Authenticator setup QR code" id="authenticator-qr-code">
+        </div>
+
+        <div class="account-authenticator-manual">
+          <span>Manual setup key</span>
+          <strong id="authenticator-secret-key"></strong>
+        </div>
+      </div>
+
+      <form class="account-form" id="authenticator-setup-form">
+        <div class="account-field">
+          <label for="authenticator-setup-code">Authenticator Code</label>
+          <input type="text" id="authenticator-setup-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+        </div>
+
+        <div class="account-authenticator-modal-actions">
+          <button class="account-secondary-button" type="button" id="authenticator-modal-cancel">Cancel</button>
+          <button class="account-primary-button" type="submit" id="authenticator-setup-confirm">Verify and Enable</button>
+        </div>
+
+        <p class="account-message" id="authenticator-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
   <script>
     const sidebarLinks = document.querySelectorAll("[data-account-panel]");
     const accountPanels = document.querySelectorAll(".account-panel");
@@ -1295,8 +1435,23 @@
     const accountPhoneCountrySearch = document.getElementById("account-phone-country-search");
     const accountPhoneCountryOptions = document.getElementById("account-phone-country-options");
     const accountMajorInput = document.getElementById("account-major");
+    const securityMessage = document.getElementById("security-message");
+    const twoFactorAppStatus = document.getElementById("two-factor-app-status");
+    const twoFactorEmailStatus = document.getElementById("two-factor-email-status");
+    const twoFactorAppButton = document.getElementById("two-factor-app-button");
+    const authenticatorModal = document.getElementById("authenticator-modal");
+    const authenticatorModalBackdrop = document.getElementById("authenticator-modal-backdrop");
+    const authenticatorModalClose = document.getElementById("authenticator-modal-close");
+    const authenticatorModalCancel = document.getElementById("authenticator-modal-cancel");
+    const authenticatorQrCode = document.getElementById("authenticator-qr-code");
+    const authenticatorSecretKey = document.getElementById("authenticator-secret-key");
+    const authenticatorSetupForm = document.getElementById("authenticator-setup-form");
+    const authenticatorSetupCode = document.getElementById("authenticator-setup-code");
+    const authenticatorSetupConfirm = document.getElementById("authenticator-setup-confirm");
+    const authenticatorMessage = document.getElementById("authenticator-message");
 
     let accountCurrentUser = null;
+    let accountTwoFactor = { appEnabled: false, emailEnabled: false };
 
     function showPanel(panelName) {
       sidebarLinks.forEach(function (link) {
@@ -1532,6 +1687,27 @@
       syncAccountPhoneCountryDropdown();
     }
 
+    function syncTwoFactorState(twoFactor) {
+      accountTwoFactor = {
+        appEnabled: Boolean(twoFactor && twoFactor.appEnabled),
+        emailEnabled: Boolean(twoFactor && twoFactor.emailEnabled)
+      };
+
+      if (twoFactorAppStatus) {
+        twoFactorAppStatus.textContent = accountTwoFactor.appEnabled ? "On" : "Off";
+        twoFactorAppStatus.classList.toggle("enabled", accountTwoFactor.appEnabled);
+      }
+
+      if (twoFactorEmailStatus) {
+        twoFactorEmailStatus.textContent = accountTwoFactor.emailEnabled ? "On" : "Off";
+        twoFactorEmailStatus.classList.toggle("enabled", accountTwoFactor.emailEnabled);
+      }
+
+      if (twoFactorAppButton) {
+        twoFactorAppButton.textContent = accountTwoFactor.appEnabled ? "Disable app" : "Set up app";
+      }
+    }
+
     function hydrateAccountDetails(user) {
       const displayName = user.fullName || user.displayName || String(user.email || "").split("@")[0] || "AUC Student";
 
@@ -1542,6 +1718,7 @@
       accountEmailInput.value = user.email || "";
       hydrateAccountPhoneValue(user.phone || "");
       accountMajorInput.value = user.major || "";
+      syncTwoFactorState(user.twoFactor || {});
 
       photoInitial.textContent = getAccountInitials(user);
 
@@ -1662,7 +1839,135 @@
       }
     });
 
+    function formatAuthenticatorSecret(secret) {
+      return String(secret || "").replace(/(.{4})/g, "$1 ").trim();
+    }
+
+    function openAuthenticatorModal(data) {
+      if (authenticatorQrCode) authenticatorQrCode.src = data.qrDataUrl || "";
+      if (authenticatorSecretKey) authenticatorSecretKey.textContent = formatAuthenticatorSecret(data.secret || "");
+      if (authenticatorSetupCode) authenticatorSetupCode.value = "";
+      showMessage(authenticatorMessage, "", "");
+      authenticatorModal.hidden = false;
+
+      setTimeout(function () {
+        if (authenticatorSetupCode) authenticatorSetupCode.focus();
+      }, 50);
+    }
+
+    function closeAuthenticatorModal() {
+      authenticatorModal.hidden = true;
+      showMessage(authenticatorMessage, "", "");
+    }
+
+    async function requestAuthenticatorAction(action, payload) {
+      const response = await fetch("/api/authenticator", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(Object.assign({ action: action }, payload || {}))
+      });
+
+      const data = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Could not update authenticator app.");
+      }
+
+      return data;
+    }
+
+    async function startAuthenticatorSetup() {
+      twoFactorAppButton.disabled = true;
+      twoFactorAppButton.textContent = "Setting up...";
+      showMessage(securityMessage, "", "");
+
+      try {
+        const data = await requestAuthenticatorAction("setup");
+        openAuthenticatorModal(data);
+      } catch (error) {
+        showMessage(securityMessage, error.message || "Could not start authenticator setup.", "error");
+      } finally {
+        twoFactorAppButton.disabled = false;
+        twoFactorAppButton.textContent = accountTwoFactor.appEnabled ? "Disable app" : "Set up app";
+      }
+    }
+
+    async function disableAuthenticatorApp() {
+      const code = window.prompt("Enter your 6-digit authenticator code to disable it.");
+
+      if (!code) {
+        return;
+      }
+
+      twoFactorAppButton.disabled = true;
+      twoFactorAppButton.textContent = "Disabling...";
+      showMessage(securityMessage, "", "");
+
+      try {
+        const data = await requestAuthenticatorAction("disable", { code: code });
+        syncTwoFactorState(data.twoFactor || { appEnabled: false });
+        showMessage(securityMessage, "Authenticator app disabled.", "success");
+      } catch (error) {
+        showMessage(securityMessage, error.message || "Could not disable authenticator app.", "error");
+      } finally {
+        twoFactorAppButton.disabled = false;
+        twoFactorAppButton.textContent = accountTwoFactor.appEnabled ? "Disable app" : "Set up app";
+      }
+    }
+
+    if (twoFactorAppButton) {
+      twoFactorAppButton.addEventListener("click", function () {
+        if (accountTwoFactor.appEnabled) {
+          disableAuthenticatorApp();
+          return;
+        }
+
+        startAuthenticatorSetup();
+      });
+    }
+
+    if (authenticatorSetupForm) {
+      authenticatorSetupForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        authenticatorSetupConfirm.disabled = true;
+        authenticatorSetupConfirm.textContent = "Verifying...";
+        showMessage(authenticatorMessage, "", "");
+
+        try {
+          const data = await requestAuthenticatorAction("verify-setup", {
+            code: authenticatorSetupCode.value
+          });
+
+          syncTwoFactorState(data.twoFactor || { appEnabled: true });
+          closeAuthenticatorModal();
+          showMessage(securityMessage, "Authenticator app enabled.", "success");
+        } catch (error) {
+          showMessage(authenticatorMessage, error.message || "Invalid authenticator code.", "error");
+        } finally {
+          authenticatorSetupConfirm.disabled = false;
+          authenticatorSetupConfirm.textContent = "Verify and Enable";
+        }
+      });
+    }
+
+    [authenticatorModalBackdrop, authenticatorModalClose, authenticatorModalCancel].forEach(function (control) {
+      if (control) {
+        control.addEventListener("click", closeAuthenticatorModal);
+      }
+    });
+
     document.querySelectorAll("[data-account-action]").forEach(function (button) {
+      if (button.id === "two-factor-app-button") {
+        return;
+      }
+
       button.addEventListener("click", function () {
         const panel = button.closest(".account-panel");
         const message = panel ? panel.querySelector(".account-message") : null;
