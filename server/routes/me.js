@@ -23,6 +23,10 @@ function cleanPhone(value) {
   return cleanString(value, 30);
 }
 
+function cleanAucId(value) {
+  return String(value || "").replace(/\D/g, "").slice(0, 9);
+}
+
 function hasValidPhoneFormat(value) {
   const phone = cleanPhone(value);
   const phoneDigits = phone.replace(/\D/g, "");
@@ -36,10 +40,20 @@ function hasValidPhoneFormat(value) {
   );
 }
 
+function hasValidAucIdFormat(value) {
+  return /^900\d{6}$/.test(cleanAucId(value));
+}
+
 function getPhoneLookupKey(value) {
   const phone = cleanPhone(value);
 
   return hasValidPhoneFormat(phone) ? phone.replace(/\D/g, "") : "";
+}
+
+function getAucIdLookupKey(value) {
+  const aucId = cleanAucId(value);
+
+  return hasValidAucIdFormat(aucId) ? aucId : "";
 }
 
 function createProfileError(message, statusCode) {
@@ -49,6 +63,7 @@ function createProfileError(message, statusCode) {
 }
 
 const DISPLAY_NAME_CHANGE_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+const AUC_ID_CHANGE_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
 
 function getDateFromStoredValue(value) {
   if (!value) {
@@ -71,6 +86,18 @@ function getDateFromStoredValue(value) {
   return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
 }
 
+function getUnlockDateText(unlockDate) {
+  if (!unlockDate) {
+    return "";
+  }
+
+  return unlockDate.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
 function getDisplayNameUnlockDate(value) {
   const lastChangeDate = getDateFromStoredValue(value);
 
@@ -81,18 +108,22 @@ function getDisplayNameUnlockDate(value) {
   return new Date(lastChangeDate.getTime() + DISPLAY_NAME_CHANGE_COOLDOWN_MS);
 }
 
-function getDisplayNameUnlockDateText(value) {
-  const unlockDate = getDisplayNameUnlockDate(value);
+function getAucIdUnlockDate(value) {
+  const lastChangeDate = getDateFromStoredValue(value);
 
-  if (!unlockDate) {
-    return "";
+  if (!lastChangeDate) {
+    return null;
   }
 
-  return unlockDate.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric"
-  });
+  return new Date(lastChangeDate.getTime() + AUC_ID_CHANGE_COOLDOWN_MS);
+}
+
+function getDisplayNameUnlockDateText(value) {
+  return getUnlockDateText(getDisplayNameUnlockDate(value));
+}
+
+function getAucIdUnlockDateText(value) {
+  return getUnlockDateText(getAucIdUnlockDate(value));
 }
 
 async function getTwoFactorResponse(uid, userData) {
@@ -122,6 +153,7 @@ module.exports = async function handler(req, res) {
         checkRevoked: true
       });
       const fullName = cleanString((req.body || {}).fullName, 80);
+      const aucId = cleanAucId((req.body || {}).aucId);
       const phone = cleanPhone((req.body || {}).phone);
       const major = cleanString((req.body || {}).major, 100);
 
@@ -129,16 +161,27 @@ module.exports = async function handler(req, res) {
         throw createProfileError("Please enter your display name.", 400);
       }
 
+      if (!aucId) {
+        throw createProfileError("Please enter your AUC ID.", 400);
+      }
+
+      if (!hasValidAucIdFormat(aucId)) {
+        throw createProfileError("AUC ID number must start with 900 and be 9 digits total.", 400);
+      }
+
       if (phone && !hasValidPhoneFormat(phone)) {
         throw createProfileError("Please enter a valid phone number.", 400);
       }
 
       const phoneLookupKey = phone ? getPhoneLookupKey(phone) : "";
+      const aucIdLookupKey = getAucIdLookupKey(aucId);
       const db = admin.firestore();
       const userRef = db.collection("users").doc(decodedUser.uid);
       const phoneReservations = db.collection("accountPhoneNumbers");
+      const aucIdReservations = db.collection("accountAucIds");
       const existingUserRecord = await admin.auth().getUser(decodedUser.uid);
       let displayNameChanged = false;
+      let aucIdChanged = false;
 
       await db.runTransaction(async function (transaction) {
         const userDoc = await transaction.get(userRef);
@@ -146,17 +189,32 @@ module.exports = async function handler(req, res) {
         const currentPhoneLookupKey = userData.phoneLookupKey || getPhoneLookupKey(userData.phone || "");
         const oldPhoneRef = currentPhoneLookupKey ? phoneReservations.doc(currentPhoneLookupKey) : null;
         const nextPhoneRef = phoneLookupKey ? phoneReservations.doc(phoneLookupKey) : null;
+        const currentAucIdLookupKey = userData.aucIdLookupKey || getAucIdLookupKey(userData.aucId || "");
+        const oldAucIdRef = currentAucIdLookupKey ? aucIdReservations.doc(currentAucIdLookupKey) : null;
+        const nextAucIdRef = aucIdLookupKey ? aucIdReservations.doc(aucIdLookupKey) : null;
         const currentFullName = cleanString(userData.fullName || existingUserRecord.displayName || "", 80);
+        const currentAucId = cleanAucId(userData.aucId || currentAucIdLookupKey || "");
         const lastDisplayNameChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
+        const lastAucIdChangedAt = userData.aucIdLastChangedAt || null;
         const requestedDisplayNameChanged = fullName !== currentFullName;
+        const requestedAucIdChanged = aucId !== currentAucId;
 
         displayNameChanged = requestedDisplayNameChanged;
+        aucIdChanged = requestedAucIdChanged;
 
         if (requestedDisplayNameChanged) {
           const unlockDate = getDisplayNameUnlockDate(lastDisplayNameChangedAt);
 
           if (unlockDate && unlockDate.getTime() > Date.now()) {
             throw createProfileError("You can change your display name again on " + getDisplayNameUnlockDateText(lastDisplayNameChangedAt) + ".", 429);
+          }
+        }
+
+        if (requestedAucIdChanged) {
+          const unlockDate = getAucIdUnlockDate(lastAucIdChangedAt);
+
+          if (unlockDate && unlockDate.getTime() > Date.now()) {
+            throw createProfileError("You can change your AUC ID again on " + getAucIdUnlockDateText(lastAucIdChangedAt) + ".", 429);
           }
         }
 
@@ -169,9 +227,20 @@ module.exports = async function handler(req, res) {
           }
         }
 
+        if (nextAucIdRef && aucIdLookupKey !== currentAucIdLookupKey) {
+          const aucIdDoc = await transaction.get(nextAucIdRef);
+          const aucIdData = aucIdDoc.exists ? aucIdDoc.data() || {} : {};
+
+          if (aucIdDoc.exists && (aucIdData.uid || "") !== decodedUser.uid) {
+            throw createProfileError("This AUC ID number is already used by another account.", 409);
+          }
+        }
+
         const now = admin.firestore.FieldValue.serverTimestamp();
         const updateData = {
           fullName,
+          aucId,
+          aucIdLookupKey,
           phone,
           phoneLookupKey,
           major,
@@ -180,6 +249,10 @@ module.exports = async function handler(req, res) {
 
         if (displayNameChanged) {
           updateData.displayNameLastChangedAt = now;
+        }
+
+        if (aucIdChanged) {
+          updateData.aucIdLastChangedAt = now;
         }
 
         if (!userDoc.exists) {
@@ -194,11 +267,24 @@ module.exports = async function handler(req, res) {
           transaction.delete(oldPhoneRef);
         }
 
+        if (oldAucIdRef && currentAucIdLookupKey !== aucIdLookupKey) {
+          transaction.delete(oldAucIdRef);
+        }
+
         if (nextPhoneRef) {
           transaction.set(nextPhoneRef, {
             uid: decodedUser.uid,
             phone,
             phoneLookupKey,
+            updatedAt: now
+          }, { merge: true });
+        }
+
+        if (nextAucIdRef) {
+          transaction.set(nextAucIdRef, {
+            uid: decodedUser.uid,
+            aucId,
+            aucIdLookupKey,
             updatedAt: now
           }, { merge: true });
         }
@@ -217,6 +303,7 @@ module.exports = async function handler(req, res) {
       const aucId = userData.aucId || userData.aucIdLookupKey || "";
       const authProvider = userData.authProvider || "password";
       const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
+      const aucIdLastChangedAt = userData.aucIdLastChangedAt || null;
       const twoFactor = await getTwoFactorResponse(decodedUser.uid, userData);
 
       return res.status(200).json({
@@ -237,7 +324,8 @@ module.exports = async function handler(req, res) {
           aucId,
           authProvider,
           twoFactor,
-          displayNameLastChangedAt
+          displayNameLastChangedAt,
+          aucIdLastChangedAt
         }
       });
     }
@@ -271,6 +359,7 @@ module.exports = async function handler(req, res) {
     const aucId = userData.aucId || userData.aucIdLookupKey || "";
     const authProvider = userData.authProvider || "password";
     const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
+    const aucIdLastChangedAt = userData.aucIdLastChangedAt || null;
     const twoFactor = await getTwoFactorResponse(decodedUser.uid, userData);
 
     return res.status(200).json({
@@ -290,7 +379,8 @@ module.exports = async function handler(req, res) {
         aucId,
         authProvider,
         twoFactor,
-        displayNameLastChangedAt
+        displayNameLastChangedAt,
+        aucIdLastChangedAt
       }
     });
   } catch (error) {
