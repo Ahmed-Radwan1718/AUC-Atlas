@@ -569,6 +569,17 @@
       gap: 14px;
     }
 
+    .account-two-factor-section {
+      display: grid;
+      gap: 18px;
+      align-items: start;
+      contain: layout style;
+    }
+
+    .account-two-factor-section .account-panel-subheader {
+      margin-bottom: 0;
+    }
+
     .account-two-factor-methods,
     .account-session-list,
     .account-review-list {
@@ -958,25 +969,43 @@
 
               <div class="account-divider"></div>
 
-              <div class="account-panel-subheader">
-                <div>
+              <div class="account-two-factor-section">
+                <div class="account-panel-subheader">
                   <h3>Two-Factor Authentication</h3>
-                  <p>Require a verification code after your password whenever you sign in.</p>
+                  <p>Require a verification code after your password whenever you sign in. You can use an authenticator app, email, or both.</p>
                 </div>
-              </div>
 
-              <div class="account-two-factor-methods">
-                <article class="account-two-factor-card">
-                  <div class="account-card-title">Authenticator App</div>
-                  <p class="account-card-copy">Use a code from Google Authenticator, Microsoft Authenticator, Authy, or another authenticator app.</p>
-                  <span class="account-badge">Off</span>
-                </article>
+                <div class="account-two-factor-methods">
+                  <article class="account-two-factor-card">
+                    <div class="account-two-factor-icon">
+                      <img src="authenticator-icon.png" alt="" loading="lazy" decoding="async">
+                    </div>
 
-                <article class="account-two-factor-card">
-                  <div class="account-card-title">Email</div>
-                  <p class="account-card-copy">Use a 6-digit code sent to the email address connected to your account.</p>
-                  <span class="account-badge">Off</span>
-                </article>
+                    <div class="account-two-factor-text">
+                      <h4>Authenticator App <span class="account-two-factor-status" id="two-factor-app-status">Off</span></h4>
+                      <p>Use a code from Google Authenticator, Microsoft Authenticator, Authy, or another authenticator app.</p>
+                    </div>
+
+                    <button class="account-two-factor-button" type="button" id="two-factor-app-button" data-account-action>
+                      Set up app
+                    </button>
+                  </article>
+
+                  <article class="account-two-factor-card">
+                    <div class="account-two-factor-icon">
+                      <img src="email-2fa-icon.png" alt="" loading="lazy" decoding="async">
+                    </div>
+
+                    <div class="account-two-factor-text">
+                      <h4>Email <span class="account-two-factor-status" id="two-factor-email-status">Off</span></h4>
+                      <p>Use a 6-digit code sent to the email address connected to your account.</p>
+                    </div>
+
+                    <button class="account-two-factor-button" type="button" id="two-factor-email-button" data-account-action>
+                      Enable email
+                    </button>
+                  </article>
+                </div>
               </div>
 
               <div class="account-divider"></div>
