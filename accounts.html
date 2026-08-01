@@ -1571,9 +1571,25 @@
                     <input type="text" id="account-major" placeholder="Computer Science, Business, Engineering">
                   </div>
 
-                  <div class="account-field">
+                  <div class="account-field account-display-name-field account-auc-id-field">
                     <label for="account-auc-id">AUC ID</label>
-                    <input type="text" id="account-auc-id" placeholder="900123456" readonly>
+
+                    <div class="account-display-name-row">
+                      <div class="account-display-name-input-wrap">
+                        <input type="text" id="account-auc-id" placeholder="900123456" inputmode="numeric" maxlength="9" readonly>
+
+                        <span class="account-display-name-info-button" aria-label="AUC ID information">
+                          <img src="username-info-icon.png" alt="">
+                          <span class="account-display-name-tooltip">You can change your AUC ID once every 30 days.</span>
+                        </span>
+                      </div>
+
+                      <button class="account-display-name-edit-button" type="button" id="account-auc-id-edit-button" aria-label="Edit AUC ID">
+                        <img src="username-edit-icon.png" alt="">
+                      </button>
+                    </div>
+
+                    <p class="account-display-name-note" id="account-auc-id-note"></p>
                   </div>
                 </div>
 
@@ -1838,6 +1854,8 @@
     const accountPhoneCountryOptions = document.getElementById("account-phone-country-options");
     const accountMajorInput = document.getElementById("account-major");
     const accountAucIdInput = document.getElementById("account-auc-id");
+    const accountAucIdEditButton = document.getElementById("account-auc-id-edit-button");
+    const accountAucIdNote = document.getElementById("account-auc-id-note");
     const securityMessage = document.getElementById("security-message");
     const changePasswordOpenButton = document.getElementById("change-password-open-button");
     const changePasswordForm = document.getElementById("change-password-form");
@@ -1865,13 +1883,17 @@
     const PROFILE_PHOTO_MAX_SIZE = 4 * 1024 * 1024;
     const PROFILE_PHOTO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
     const DISPLAY_NAME_COOLDOWN_DAYS = 30;
+    const AUC_ID_COOLDOWN_DAYS = 30;
 
     let accountCurrentUser = null;
     let accountTwoFactor = { appEnabled: false, emailEnabled: false };
     let activePhotoPreviewUrl = "";
     let originalDisplayName = "";
+    let originalAucId = "";
     let displayNameLastChangedAt = null;
+    let aucIdLastChangedAt = null;
     let displayNameEditMode = false;
+    let aucIdEditMode = false;
 
     function getAccountDateFromValue(value) {
       if (!value) {
@@ -1943,6 +1965,62 @@
         accountDisplayNameEditButton.disabled = false;
         accountDisplayNameEditButton.setAttribute("aria-label", "Edit display name");
         accountDisplayNameNote.textContent = "";
+      }
+    }
+
+    function getAucIdUnlockDate() {
+      const lastChangeDate = getAccountDateFromValue(aucIdLastChangedAt);
+
+      if (!lastChangeDate) {
+        return null;
+      }
+
+      return new Date(lastChangeDate.getTime() + AUC_ID_COOLDOWN_DAYS * 24 * 60 * 60 * 1000);
+    }
+
+    function getAucIdDaysLeft() {
+      const unlockDate = getAucIdUnlockDate();
+
+      if (!unlockDate) {
+        return 0;
+      }
+
+      const millisecondsLeft = unlockDate.getTime() - Date.now();
+      return millisecondsLeft > 0 ? Math.ceil(millisecondsLeft / (24 * 60 * 60 * 1000)) : 0;
+    }
+
+    function getAucIdUnlockDateText() {
+      const unlockDate = getAucIdUnlockDate();
+
+      if (!unlockDate) {
+        return "";
+      }
+
+      return unlockDate.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    function updateAucIdLockState() {
+      if (!accountAucIdInput || !accountAucIdEditButton || !accountAucIdNote) {
+        return;
+      }
+
+      const daysLeft = getAucIdDaysLeft();
+
+      if (daysLeft > 0) {
+        aucIdEditMode = false;
+        accountAucIdInput.readOnly = true;
+        accountAucIdEditButton.disabled = true;
+        accountAucIdEditButton.setAttribute("aria-label", "AUC ID locked");
+        accountAucIdNote.textContent = "You can change your AUC ID again on " + getAucIdUnlockDateText() + ".";
+      } else {
+        accountAucIdInput.readOnly = !aucIdEditMode;
+        accountAucIdEditButton.disabled = false;
+        accountAucIdEditButton.setAttribute("aria-label", "Edit AUC ID");
+        accountAucIdNote.textContent = "";
       }
     }
 
@@ -2371,8 +2449,11 @@
 
       accountNameInput.value = displayName;
       originalDisplayName = displayName;
+      originalAucId = user.aucId || "";
       displayNameLastChangedAt = user.displayNameLastChangedAt || user.usernameLastChangedAt || null;
+      aucIdLastChangedAt = user.aucIdLastChangedAt || null;
       displayNameEditMode = false;
+      aucIdEditMode = false;
       updateDisplayNameLockState();
 
       accountEmailInput.value = user.email || "";
@@ -2380,8 +2461,10 @@
       accountMajorInput.value = user.major || "";
 
       if (accountAucIdInput) {
-        accountAucIdInput.value = user.aucId || "";
+        accountAucIdInput.value = originalAucId;
       }
+
+      updateAucIdLockState();
 
       syncTwoFactorState(user.twoFactor || {});
 
@@ -2592,6 +2675,20 @@
       accountNameInput.select();
     });
 
+    if (accountAucIdEditButton && accountAucIdInput) {
+      accountAucIdEditButton.addEventListener("click", function () {
+        if (getAucIdDaysLeft() > 0) {
+          updateAucIdLockState();
+          return;
+        }
+
+        aucIdEditMode = true;
+        updateAucIdLockState();
+        accountAucIdInput.focus();
+        accountAucIdInput.select();
+      });
+    }
+
     photoChooseButton.addEventListener("click", function () {
       photoInput.click();
     });
@@ -2614,10 +2711,22 @@
       event.preventDefault();
 
       const nextDisplayName = accountNameInput.value.trim();
+      const nextAucId = accountAucIdInput ? accountAucIdInput.value.replace(/\D/g, "") : "";
       const displayNameIsChanging = nextDisplayName !== originalDisplayName;
+      const aucIdIsChanging = nextAucId !== originalAucId;
 
       if (!nextDisplayName) {
         showMessage(detailsMessage, "Please enter your display name.", "error");
+        return;
+      }
+
+      if (!nextAucId) {
+        showMessage(detailsMessage, "Please enter your AUC ID.", "error");
+        return;
+      }
+
+      if (!/^900\d{6}$/.test(nextAucId)) {
+        showMessage(detailsMessage, "AUC ID number must start with 900 and be 9 digits total.", "error");
         return;
       }
 
@@ -2625,6 +2734,13 @@
         accountNameInput.value = originalDisplayName;
         updateDisplayNameLockState();
         showMessage(detailsMessage, "You can change your display name again on " + getDisplayNameUnlockDateText() + ".", "error");
+        return;
+      }
+
+      if (aucIdIsChanging && getAucIdDaysLeft() > 0) {
+        accountAucIdInput.value = originalAucId;
+        updateAucIdLockState();
+        showMessage(detailsMessage, "You can change your AUC ID again on " + getAucIdUnlockDateText() + ".", "error");
         return;
       }
 
@@ -2645,6 +2761,7 @@
           },
           body: JSON.stringify({
             fullName: nextDisplayName,
+            aucId: nextAucId,
             phone: getAccountPhoneValueForSave(),
             major: accountMajorInput.value.trim()
           })
@@ -2658,10 +2775,16 @@
         }
 
         hydrateAccountDetails(data.user);
-        showMessage(detailsMessage, displayNameIsChanging ? "Account details saved. Display name can be changed again on " + getDisplayNameUnlockDateText() + "." : "Account details saved.", "success");
+        showMessage(detailsMessage, "Account details saved.", "success");
       } catch (error) {
         accountNameInput.value = originalDisplayName;
+
+        if (accountAucIdInput) {
+          accountAucIdInput.value = originalAucId;
+        }
+
         updateDisplayNameLockState();
+        updateAucIdLockState();
         showMessage(detailsMessage, error.message || "Could not save your details. Please try again.", "error");
       } finally {
         if (detailsButton) {
