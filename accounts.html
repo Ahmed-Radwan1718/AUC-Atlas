@@ -692,24 +692,17 @@
     }
 
     .account-login-session-card {
-      min-height: 118px;
       padding: 20px;
       border-radius: 22px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       background: rgba(255, 255, 255, 0.72);
-      display: grid;
-      grid-template-columns: 34px minmax(0, 1fr) auto;
-      gap: 18px;
-      align-items: center;
       content-visibility: auto;
-      contain-intrinsic-size: 118px;
+      contain-intrinsic-size: 112px;
     }
 
-    .account-login-session-browser-icon {
-      width: 30px;
-      height: 30px;
-      display: block;
-      object-fit: contain;
+    .account-login-session-card.current {
+      border-color: rgba(47, 146, 85, 0.28);
+      background: rgba(185, 255, 202, 0.12);
     }
 
     .account-login-session-main {
@@ -731,20 +724,29 @@
       min-width: 0;
     }
 
+    .account-login-session-browser-icon {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      display: block;
+      object-fit: contain;
+    }
+
     .account-login-session-title h4 {
       min-width: 0;
       color: #171717;
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 700;
       line-height: 1.25;
       text-transform: uppercase;
     }
 
-    .account-login-session-main p {
-      max-width: 620px;
-      color: rgba(23, 23, 23, 0.62);
-      font-size: 14px;
-      line-height: 1.55;
+    .account-login-session-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      margin-left: auto;
     }
 
     .account-login-session-current {
@@ -758,6 +760,25 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       white-space: nowrap;
+    }
+
+    .account-login-session-main p,
+    .account-login-sessions-empty {
+      max-width: 620px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .account-login-session-meta {
+      display: flex;
+      gap: 10px 16px;
+      flex-wrap: wrap;
+      color: rgba(23, 23, 23, 0.44);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
     .account-two-factor-card {
@@ -862,6 +883,15 @@
     @media (max-width: 700px) {
       .account-two-factor-card {
         grid-template-columns: 1fr;
+      }
+
+      .account-login-session-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .account-login-session-actions {
+        margin-left: 0;
       }
     }
 
@@ -1190,14 +1220,21 @@
                     <div class="account-login-session-main">
                       <div class="account-login-session-head">
                         <div class="account-login-session-title">
-                          <img class="account-login-session-browser-icon" src="security-icon.png" alt="" loading="lazy" decoding="async">
+                          <img class="account-login-session-browser-icon" src="chrome-icon.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
                           <h4>Current Browser</h4>
                         </div>
 
-                        <span class="account-login-session-current">Current</span>
+                        <div class="account-login-session-actions">
+                          <span class="account-login-session-current">Current</span>
+                        </div>
                       </div>
 
-                      <p>AUC Atlas demo session on this device.</p>
+                      <p>Chrome · Windows</p>
+
+                      <div class="account-login-session-meta">
+                        <span>AUC Atlas demo session</span>
+                        <span>This device</span>
+                      </div>
                     </div>
                   </article>
                 </div>
