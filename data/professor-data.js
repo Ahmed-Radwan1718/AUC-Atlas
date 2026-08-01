@@ -1,6 +1,6 @@
 (function () {
   const professors = [
-    { id: "eslam-badr", name: "Eslam Badr", department: "Department of Mathematics and Actuarial Science", status: "No ratings yet", course: "Calculus 1, Linear Algebra", group: "A-F", email: "eslammath@aucegypt.edu", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
+    { id: "eslam-badr", name: "Eslam Badr", department: "Department of Mathematics and Actuarial Science", displayDepartment: "MACT", status: "No ratings yet", course: "Calculus 1, Linear Algebra", group: "A-F", email: "eslammath@aucegypt.edu", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
     { id: "ehab-elsawy", name: "Ehab ElSawy", department: "CHEM", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Ehab El Sawy earned his PhD in physical chemistry at the University of Calgary before joining AUC in 2017. His work focuses on nano-electrochemistry, fuel cells, hydrogen production, batteries, sensors, and corrosion protection.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249148/Ehab_ElSawy_ifg2np.png" },
     { id: "nageh-allam", name: "Nageh Allam", department: "PHYS", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Nageh Allam earned his PhD in materials science and engineering from Penn State before joining AUC in 2011. His work focuses on nanomaterials for energy, sensors, desalination, biomaterials, and computational materials science.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249240/Nageh_Allam_wfaser.png" },
     { id: "tamer-shoeib", name: "Tamer Shoeib", department: "CHEM", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Tamer Shoeib earned his PhD in chemistry from York University before conducting postdoctoral research in Canada. His work focuses on analytical and biophysical chemistry, molecular structure, mass spectrometry, and metal-containing biomolecules.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249461/Tamer_Shoeib_qmcccs.png" },
@@ -281,11 +281,11 @@
       text-transform: uppercase;
     }
 
-    .professor-profile-info strong,
+    .professor-profile-value,
     .professor-profile-email {
       color: #171717;
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 500;
       line-height: 1.45;
       text-decoration: none;
     }
@@ -506,7 +506,7 @@
           <div class="professor-profile-info">
             <div>
               <span>Department</span>
-              <strong>${escapeHtml(professor.department || "Department coming soon")}</strong>
+              <span class="professor-profile-value">${escapeHtml(professor.department || "Department coming soon")}</span>
             </div>
 
             <div>
@@ -516,7 +516,7 @@
 
             <div>
               <span>Teaches</span>
-              <strong>${escapeHtml(professor.course || "Courses coming soon")}</strong>
+              <span class="professor-profile-value">${escapeHtml(professor.course || "Courses coming soon")}</span>
             </div>
           </div>
 
@@ -691,7 +691,7 @@
             <h2>${escapeHtml(professor.name)}</h2>
             <p class="professor-bio">${escapeHtml(professor.bio || "Bio coming soon.")}</p>
             <div class="professor-meta">
-              <span>${escapeHtml(professor.department)}</span>
+              <span>${escapeHtml(professor.displayDepartment || professor.department)}</span>
               <span>${escapeHtml((professor.reviewCount || 0) + " " + ((professor.reviewCount || 0) === 1 ? "Review" : "Reviews"))}</span>
               <span>${escapeHtml(professor.averageStars || "No Stars Yet")}</span>
             </div>
