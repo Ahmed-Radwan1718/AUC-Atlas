@@ -448,18 +448,40 @@ async function createSiteSessionFromIdToken(idToken, res, req) {
   const decodedToken = await admin.auth().verifyIdToken(idToken);
   await ensureDecodedUserHasAllowedAucEmail(decodedToken, "continue");
 
-  const sessionCookie = await admin.auth().createSessionCookie(idToken, {
-    expiresIn: SITE_SESSION_EXPIRES_MS
-  });
+  const fallbackSessionPrefix = "idtoken.";
+  let sessionCookie = "";
+  let sessionMaxAgeSeconds = Math.floor(SITE_SESSION_EXPIRES_MS / 1000);
 
-  await createSiteSessionRecord(decodedToken, req, res);
+  try {
+    sessionCookie = await Promise.race([
+      admin.auth().createSessionCookie(idToken, {
+        expiresIn: SITE_SESSION_EXPIRES_MS
+      }),
+      new Promise(function (_, reject) {
+        setTimeout(function () {
+          const error = new Error("session-cookie-timeout");
+          error.sessionCookieTimeout = true;
+          reject(error);
+        }, 2500);
+      })
+    ]);
+  } catch (error) {
+    if (!error || !error.sessionCookieTimeout) {
+      throw error;
+    }
+
+    sessionCookie = fallbackSessionPrefix + idToken;
+    sessionMaxAgeSeconds = 55 * 60;
+  }
 
   setCookie(
     res,
     SITE_SESSION_COOKIE_NAME,
     sessionCookie,
-    Math.floor(SITE_SESSION_EXPIRES_MS / 1000)
+    sessionMaxAgeSeconds
   );
+
+  createSiteSessionRecord(decodedToken, req, null).catch(function () {});
 
   return sessionCookie;
 }
@@ -482,6 +504,7 @@ function clearSiteSessionCookie(res) {
 async function getSiteSessionUser(req, options) {
   const settings = options || {};
   const sessionCookie = getCookie(req, SITE_SESSION_COOKIE_NAME);
+  const fallbackSessionPrefix = "idtoken.";
 
   if (!sessionCookie) {
     const error = new Error("not-signed-in");
@@ -489,10 +512,13 @@ async function getSiteSessionUser(req, options) {
     throw error;
   }
 
-  const decodedUser = await admin.auth().verifySessionCookie(
-    sessionCookie,
-    settings.checkRevoked !== false
-  );
+  const usesFallbackIdToken = sessionCookie.startsWith(fallbackSessionPrefix);
+  const cookieToken = usesFallbackIdToken
+    ? sessionCookie.slice(fallbackSessionPrefix.length)
+    : sessionCookie;
+  const decodedUser = usesFallbackIdToken
+    ? await admin.auth().verifyIdToken(cookieToken, settings.checkRevoked !== false)
+    : await admin.auth().verifySessionCookie(cookieToken, settings.checkRevoked !== false);
 
   await ensureDecodedUserHasAllowedAucEmail(decodedUser, "continue");
 
