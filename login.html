@@ -405,6 +405,13 @@
     const loginMessage = document.getElementById("login-message");
     const passwordVisibilityToggles = document.querySelectorAll(".auth-password-visibility-toggle");
     const passwordlessLoginButton = document.getElementById("login-passwordless-button");
+    const loginOptions = loginForm.querySelector(".auth-login-options");
+    const loginDivider = loginForm.querySelector(".auth-divider");
+    const credentialFields = Array.from(loginForm.querySelectorAll(".auth-field"));
+
+    let awaitingAuthenticatorCode = false;
+    let authenticatorCodeField = null;
+    let authenticatorCodeInput = null;
 
     function showMessage(message, type) {
       loginMessage.textContent = message;
@@ -413,6 +420,24 @@
       if (type) {
         loginMessage.classList.add(type);
       }
+    }
+
+    function clearLocalSignedInState() {
+      try {
+        localStorage.removeItem("auc-atlas-signed-in");
+        localStorage.removeItem("aucAtlasSignedIn");
+      } catch (error) {}
+
+      window.aucAtlasCurrentUser = null;
+    }
+
+    function markLocalSignedIn(user) {
+      try {
+        localStorage.setItem("auc-atlas-signed-in", "1");
+        localStorage.setItem("aucAtlasSignedIn", "true");
+      } catch (error) {}
+
+      window.aucAtlasCurrentUser = user || null;
     }
 
     function getLoginRedirectTarget() {
@@ -424,6 +449,146 @@
       }
 
       return "accounts.html";
+    }
+
+    function finishLogin(user) {
+      markLocalSignedIn(user);
+      showMessage("Logged in successfully.", "success");
+
+      setTimeout(function () {
+        window.location.href = getLoginRedirectTarget();
+      }, 700);
+    }
+
+    function ensureAuthenticatorCodeField() {
+      if (authenticatorCodeField) {
+        return;
+      }
+
+      authenticatorCodeField = document.createElement("div");
+      authenticatorCodeField.className = "auth-field";
+      authenticatorCodeField.hidden = true;
+      authenticatorCodeField.innerHTML = [
+        "<label for=\"login-authenticator-code\">Authenticator Code</label>",
+        "<input type=\"text\" id=\"login-authenticator-code\" inputmode=\"numeric\" autocomplete=\"one-time-code\" maxlength=\"6\" placeholder=\"Enter 6-digit code\">"
+      ].join("");
+
+      loginForm.insertBefore(authenticatorCodeField, loginOptions);
+      authenticatorCodeInput = document.getElementById("login-authenticator-code");
+
+      authenticatorCodeInput.addEventListener("input", function () {
+        authenticatorCodeInput.value = authenticatorCodeInput.value.replace(/\D/g, "").slice(0, 6);
+      });
+    }
+
+    function setCredentialFieldsHidden(hidden) {
+      credentialFields.forEach(function (field) {
+        field.hidden = hidden;
+
+        field.querySelectorAll("input, button").forEach(function (control) {
+          control.disabled = hidden;
+        });
+      });
+    }
+
+    function showAuthenticatorStep() {
+      clearLocalSignedInState();
+      ensureAuthenticatorCodeField();
+
+      awaitingAuthenticatorCode = true;
+      setCredentialFieldsHidden(true);
+
+      authenticatorCodeField.hidden = false;
+      authenticatorCodeInput.disabled = false;
+      authenticatorCodeInput.value = "";
+
+      if (loginDivider) {
+        loginDivider.hidden = true;
+      }
+
+      if (passwordlessLoginButton) {
+        passwordlessLoginButton.disabled = false;
+        passwordlessLoginButton.textContent = "Cancel Sign In";
+      }
+
+      loginButton.disabled = false;
+      loginButton.textContent = "Verify Code";
+      showMessage("Enter the 6-digit code from your authenticator app.", "");
+
+      setTimeout(function () {
+        authenticatorCodeInput.focus();
+      }, 50);
+    }
+
+    function resetAuthenticatorStep(message) {
+      awaitingAuthenticatorCode = false;
+      setCredentialFieldsHidden(false);
+
+      if (authenticatorCodeField) {
+        authenticatorCodeField.hidden = true;
+        authenticatorCodeInput.disabled = true;
+        authenticatorCodeInput.value = "";
+      }
+
+      if (loginDivider) {
+        loginDivider.hidden = false;
+      }
+
+      if (passwordlessLoginButton) {
+        passwordlessLoginButton.disabled = false;
+        passwordlessLoginButton.textContent = "Email Me a Sign-In Code";
+      }
+
+      loginButton.disabled = false;
+      loginButton.textContent = "Log In";
+      showMessage(message || "", message ? "error" : "");
+    }
+
+    async function verifyAuthenticatorLogin() {
+      const code = authenticatorCodeInput ? authenticatorCodeInput.value.trim() : "";
+
+      if (!/^\d{6}$/.test(code)) {
+        showMessage("Please enter your 6-digit authenticator code.", "error");
+        authenticatorCodeInput.focus();
+        return;
+      }
+
+      loginButton.disabled = true;
+      loginButton.textContent = "Verifying...";
+      showMessage("", "");
+
+      try {
+        const response = await fetch("/api/verify-login-authenticator", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            code: code
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Invalid authenticator code.");
+        }
+
+        awaitingAuthenticatorCode = false;
+        finishLogin(data.user || null);
+      } catch (error) {
+        showMessage(error.message || "The authenticator code is incorrect.", "error");
+        authenticatorCodeInput.value = "";
+        authenticatorCodeInput.focus();
+      } finally {
+        if (awaitingAuthenticatorCode) {
+          loginButton.disabled = false;
+          loginButton.textContent = "Verify Code";
+        }
+      }
     }
 
     passwordVisibilityToggles.forEach(function (toggleButton) {
@@ -451,6 +616,11 @@
 
     loginForm.addEventListener("submit", async function (event) {
       event.preventDefault();
+
+      if (awaitingAuthenticatorCode) {
+        await verifyAuthenticatorLogin();
+        return;
+      }
 
       const email = document.getElementById("login-email").value.trim();
       const password = document.getElementById("login-password").value;
@@ -480,26 +650,29 @@
           throw new Error(data.error || "Incorrect email or password.");
         }
 
-        try {
-          localStorage.setItem("auc-atlas-signed-in", "1");
-          localStorage.setItem("aucAtlasSignedIn", "true");
-        } catch (error) {}
+        if (data.requiresTwoFactor) {
+          showAuthenticatorStep();
+          return;
+        }
 
-        window.aucAtlasCurrentUser = data.user || null;
-        showMessage("Logged in successfully.", "success");
-
-        setTimeout(function () {
-          window.location.href = getLoginRedirectTarget();
-        }, 700);
+        finishLogin(data.user || null);
       } catch (error) {
+        clearLocalSignedInState();
         showMessage(error.message || "Something went wrong. Please try again.", "error");
       } finally {
-        loginButton.disabled = false;
-        loginButton.textContent = "Log In";
+        if (!awaitingAuthenticatorCode) {
+          loginButton.disabled = false;
+          loginButton.textContent = "Log In";
+        }
       }
     });
 
     passwordlessLoginButton.addEventListener("click", function () {
+      if (awaitingAuthenticatorCode) {
+        resetAuthenticatorStep("Sign in cancelled.");
+        return;
+      }
+
       showMessage("Email sign-in codes are not connected yet.", "error");
     });
   </script>
