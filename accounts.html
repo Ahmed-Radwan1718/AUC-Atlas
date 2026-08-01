@@ -2443,13 +2443,14 @@
 
     function hydrateAccountDetails(user) {
       const displayName = user.fullName || user.displayName || String(user.email || "").split("@")[0] || "AUC Student";
+      const savedAucId = user.aucId || user.aucIdLookupKey || "";
 
       accountCurrentUser = user;
       window.aucAtlasCurrentUser = user;
 
       accountNameInput.value = displayName;
       originalDisplayName = displayName;
-      originalAucId = user.aucId || "";
+      originalAucId = savedAucId;
       displayNameLastChangedAt = user.displayNameLastChangedAt || user.usernameLastChangedAt || null;
       aucIdLastChangedAt = user.aucIdLastChangedAt || null;
       displayNameEditMode = false;
@@ -2461,7 +2462,7 @@
       accountMajorInput.value = user.major || "";
 
       if (accountAucIdInput) {
-        accountAucIdInput.value = originalAucId;
+        accountAucIdInput.value = savedAucId;
       }
 
       updateAucIdLockState();
