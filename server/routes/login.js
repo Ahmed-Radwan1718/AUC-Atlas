@@ -3,6 +3,7 @@ const admin = require("../_lib/firebaseAdmin");
 const {
   signInWithPassword,
   createSiteSessionFromIdToken,
+  createLoginChallenge,
   ensureAllowedAucEmail
 } = require("../_lib/securityHelpers");
 
@@ -43,15 +44,33 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: "Could not start login session." });
     }
 
-    await createSiteSessionFromIdToken(loginResult.idToken, res);
-
     const userRecord = await admin.auth().getUser(uid);
     const userDoc = await admin.firestore().collection("users").doc(uid).get();
     const userData = userDoc.exists ? userDoc.data() || {} : {};
+    const twoFactor = userData.twoFactor && typeof userData.twoFactor === "object" ? userData.twoFactor : {};
 
     const fullName = userData.fullName || userRecord.displayName || "";
     const emailAddress = userRecord.email || userData.email || email;
     const photoURL = userData.photoURL || userRecord.photoURL || "";
+
+    if (twoFactor.appEnabled) {
+      await createLoginChallenge(uid, res, {
+        email: emailAddress,
+        idToken: loginResult.idToken,
+        twoFactor: {
+          appEnabled: true,
+          emailEnabled: Boolean(twoFactor.emailEnabled)
+        }
+      });
+
+      return res.status(200).json({
+        success: true,
+        requiresTwoFactor: true,
+        method: "app"
+      });
+    }
+
+    await createSiteSessionFromIdToken(loginResult.idToken, res);
 
     return res.status(200).json({
       success: true,
