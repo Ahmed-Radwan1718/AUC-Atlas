@@ -1,6 +1,16 @@
 (function () {
+  const footerHiddenPages = new Set([
+    "accounts.html",
+    "login.html",
+    "signup.html",
+    "forgot-password.html",
+    "reset-password.html"
+  ]);
+
   function renderSiteFooter() {
-    if (document.querySelector(".site-footer")) {
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
+
+    if (footerHiddenPages.has(currentPage) || document.querySelector(".site-footer")) {
       return;
     }
 
