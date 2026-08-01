@@ -67,7 +67,7 @@
       top: 50%;
       width: 32px;
       height: 32px;
-      background: url("favicon.svg") center / contain no-repeat;
+      background: url("logo.svg") center / contain no-repeat;
       opacity: 0;
       filter: drop-shadow(0 10px 18px rgba(42, 32, 20, 0.18));
       transform: translate(-50%, -50%) scale(0.18) rotate(-28deg);
