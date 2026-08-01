@@ -5,6 +5,13 @@
   faviconLink.href = "favicon.svg";
   document.head.appendChild(faviconLink);
 
+  if (!document.querySelector('script[src="site-footer.js"]')) {
+    const footerScript = document.createElement("script");
+    footerScript.src = "site-footer.js";
+    footerScript.defer = true;
+    document.head.appendChild(footerScript);
+  }
+
   const headerRoot = document.getElementById("site-header-root");
 
   if (!headerRoot) {
