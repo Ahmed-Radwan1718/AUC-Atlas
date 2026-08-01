@@ -24,11 +24,24 @@
         gap: 34px;
       }
 
-      .site-footer-brand h2 {
+      .site-footer-logo {
         margin-bottom: 10px;
         color: #171717;
-        font-size: 26px;
         font-weight: 700;
+        letter-spacing: -0.02em;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 4px;
+      }
+
+      .site-footer-logo-auc {
+        color: rgba(192, 154, 92, 0.84);
+        font-size: 14px;
+      }
+
+      .site-footer-logo-atlas {
+        color: #171717;
+        font-size: 22px;
       }
 
       .site-footer-brand p,
@@ -86,7 +99,7 @@
       <div class="site-footer-inner">
         <div class="site-footer-grid">
           <div class="site-footer-column site-footer-brand">
-            <h2>AUC Atlas</h2>
+            <h2 class="site-footer-logo"><span class="site-footer-logo-auc">AUC</span><span class="site-footer-logo-atlas">Atlas</span></h2>
             <p>Professors, courses, and student tools for AUC students.</p>
           </div>
 
