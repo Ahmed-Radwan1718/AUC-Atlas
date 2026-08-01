@@ -44,9 +44,9 @@ module.exports = async function handler(req, res) {
     }
 
     if (challenge.idToken) {
-      await createSiteSessionFromIdToken(challenge.idToken, res);
+      await createSiteSessionFromIdToken(challenge.idToken, res, req);
     } else {
-      await createSiteSessionForUid(challenge.uid, res);
+      await createSiteSessionForUid(challenge.uid, res, req);
     }
 
     await clearLoginChallenge(req, res);
