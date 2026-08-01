@@ -1,8 +1,10 @@
 const routeLoaders = {
+  "authenticator": function () { return require("../server/routes/authenticator"); },
   "login": function () { return require("../server/routes/login"); },
   "logout": function () { return require("../server/routes/logout"); },
   "me": function () { return require("../server/routes/me"); },
-  "signup": function () { return require("../server/routes/signup"); }
+  "signup": function () { return require("../server/routes/signup"); },
+  "verify-login-authenticator": function () { return require("../server/routes/verify-login-authenticator"); }
 };
 
 function getRouteName(req) {
