@@ -165,6 +165,27 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
+    @keyframes accountPasswordButtonPress {
+      0% { transform: translateY(0) scale(1); }
+      45% { transform: translateY(1px) scale(0.965); }
+      100% { transform: translateY(-2px) scale(0.98); opacity: 0; }
+    }
+
+    @keyframes accountPasswordFormIn {
+      from { opacity: 0; max-height: 0; margin-top: 0; transform: translateY(-12px) scale(0.985); filter: blur(5px); }
+      to { opacity: 1; max-height: 680px; margin-top: 18px; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
+    @keyframes accountPasswordFormOut {
+      from { opacity: 1; max-height: 680px; margin-top: 18px; transform: translateY(0) scale(1); }
+      to { opacity: 0; max-height: 0; margin-top: 0; transform: translateY(-8px) scale(0.99); }
+    }
+
+    @keyframes accountPasswordFieldIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .account-panel-header {
       margin-bottom: 28px;
     }
@@ -194,11 +215,32 @@
 
     .account-password-form {
       margin-top: 18px;
+      overflow: hidden;
+      transform-origin: top center;
     }
 
     .account-password-form[hidden] {
       display: none;
     }
+
+    .account-password-form.is-opening {
+      animation: accountPasswordFormIn 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .account-password-form.is-closing {
+      animation: accountPasswordFormOut 0.24s ease both;
+      pointer-events: none;
+    }
+
+    .account-password-form.is-opening .account-field,
+    .account-password-form.is-opening .account-password-actions,
+    .account-password-form.is-opening .account-message {
+      animation: accountPasswordFieldIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .account-password-form.is-opening .account-field:nth-child(2) { animation-delay: 0.04s; }
+    .account-password-form.is-opening .account-field:nth-child(3) { animation-delay: 0.08s; }
+    .account-password-form.is-opening .account-password-actions { animation-delay: 0.1s; }
 
     .account-password-actions {
       display: flex;
@@ -1069,6 +1111,8 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
+      transform-origin: center;
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, filter 0.22s ease, opacity 0.22s ease;
     }
 
     .account-primary-button {
@@ -1076,6 +1120,21 @@
       border: 1px solid rgba(192, 154, 92, 0.84);
       background: rgba(192, 154, 92, 0.84);
       color: white;
+    }
+
+    #change-password-open-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(192, 154, 92, 0.22);
+    }
+
+    #change-password-open-button:active {
+      transform: translateY(1px) scale(0.965);
+      filter: saturate(1.08);
+    }
+
+    #change-password-open-button.is-pressed {
+      animation: accountPasswordButtonPress 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+      pointer-events: none;
     }
 
     .account-secondary-button,
@@ -2302,10 +2361,63 @@
       showMessage(changePasswordMessage, "", "");
     }
 
+    function accountPrefersReducedMotion() {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+
+    function openChangePasswordForm() {
+      if (!changePasswordForm || !changePasswordOpenButton) {
+        return;
+      }
+
+      showMessage(securityMessage, "", "");
+      resetChangePasswordForm();
+
+      if (accountPrefersReducedMotion()) {
+        changePasswordOpenButton.hidden = true;
+        changePasswordForm.hidden = false;
+        currentPasswordInput.focus();
+        return;
+      }
+
+      changePasswordOpenButton.classList.add("is-pressed");
+
+      window.setTimeout(function () {
+        changePasswordOpenButton.hidden = true;
+        changePasswordOpenButton.classList.remove("is-pressed");
+        changePasswordForm.hidden = false;
+        changePasswordForm.classList.remove("is-closing");
+        changePasswordForm.classList.add("is-opening");
+
+        window.setTimeout(function () {
+          changePasswordForm.classList.remove("is-opening");
+        }, 420);
+
+        currentPasswordInput.focus();
+      }, 160);
+    }
+
     function closeChangePasswordForm() {
       resetChangePasswordForm();
-      if (changePasswordForm) changePasswordForm.hidden = true;
-      if (changePasswordOpenButton) changePasswordOpenButton.hidden = false;
+
+      if (!changePasswordForm || !changePasswordOpenButton) {
+        return;
+      }
+
+      if (accountPrefersReducedMotion()) {
+        changePasswordForm.hidden = true;
+        changePasswordOpenButton.hidden = false;
+        return;
+      }
+
+      changePasswordForm.classList.remove("is-opening");
+      changePasswordForm.classList.add("is-closing");
+
+      window.setTimeout(function () {
+        changePasswordForm.hidden = true;
+        changePasswordForm.classList.remove("is-closing");
+        changePasswordOpenButton.hidden = false;
+      }, 240);
     }
 
     function passwordMeetsRules(password) {
@@ -2318,13 +2430,7 @@
     }
 
     if (changePasswordOpenButton) {
-      changePasswordOpenButton.addEventListener("click", function () {
-        changePasswordOpenButton.hidden = true;
-        changePasswordForm.hidden = false;
-        showMessage(securityMessage, "", "");
-        resetChangePasswordForm();
-        currentPasswordInput.focus();
-      });
+      changePasswordOpenButton.addEventListener("click", openChangePasswordForm);
     }
 
     if (changePasswordCancelButton) {
