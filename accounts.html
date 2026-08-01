@@ -569,19 +569,21 @@
       gap: 14px;
     }
 
-    .account-two-factor-section {
+    .account-two-factor-section,
+    .account-login-sessions-section {
       display: grid;
       gap: 18px;
       align-items: start;
       contain: layout style;
     }
 
-    .account-two-factor-section .account-panel-subheader {
+    .account-two-factor-section .account-panel-subheader,
+    .account-login-sessions-section .account-panel-subheader {
       margin-bottom: 0;
     }
 
     .account-two-factor-methods,
-    .account-session-list,
+    .account-login-sessions-list,
     .account-review-list {
       display: grid;
       gap: 14px;
@@ -687,6 +689,75 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
+    }
+
+    .account-login-session-card {
+      min-height: 118px;
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.72);
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      content-visibility: auto;
+      contain-intrinsic-size: 118px;
+    }
+
+    .account-login-session-browser-icon {
+      width: 30px;
+      height: 30px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .account-login-session-main {
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-login-session-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .account-login-session-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .account-login-session-title h4 {
+      min-width: 0;
+      color: #171717;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+
+    .account-login-session-main p {
+      max-width: 620px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .account-login-session-current {
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(47, 146, 85, 0.28);
+      background: rgba(185, 255, 202, 0.28);
+      color: rgba(27, 112, 62, 0.96);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .account-two-factor-card {
@@ -1108,19 +1179,28 @@
 
               <div class="account-divider"></div>
 
-              <div class="account-panel-subheader">
-                <div>
+              <div class="account-login-sessions-section">
+                <div class="account-panel-subheader">
                   <h3>Logged-In Sessions</h3>
                   <p>Browsers and devices that are currently signed in to your account.</p>
                 </div>
-              </div>
 
-              <div class="account-session-list">
-                <article class="account-session-card">
-                  <div class="account-card-title">Current Browser</div>
-                  <p class="account-card-copy">AUC Atlas demo session on this device.</p>
-                  <span class="account-badge">Current</span>
-                </article>
+                <div class="account-login-sessions-list">
+                  <article class="account-login-session-card current">
+                    <div class="account-login-session-main">
+                      <div class="account-login-session-head">
+                        <div class="account-login-session-title">
+                          <img class="account-login-session-browser-icon" src="security-icon.png" alt="" loading="lazy" decoding="async">
+                          <h4>Current Browser</h4>
+                        </div>
+
+                        <span class="account-login-session-current">Current</span>
+                      </div>
+
+                      <p>AUC Atlas demo session on this device.</p>
+                    </div>
+                  </article>
+                </div>
               </div>
 
               <div class="account-divider"></div>
