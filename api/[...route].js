@@ -5,6 +5,7 @@ const routeLoaders = {
   "logout": function () { return require("../server/routes/logout"); },
   "me": function () { return require("../server/routes/me"); },
   "profile-photo": function () { return require("../server/routes/profile-photo"); },
+  "professor-reviews": function () { return require("../server/routes/professor-reviews"); },
   "sessions": function () { return require("../server/routes/sessions"); },
   "signup": function () { return require("../server/routes/signup"); },
   "verify-login-authenticator": function () { return require("../server/routes/verify-login-authenticator"); }
