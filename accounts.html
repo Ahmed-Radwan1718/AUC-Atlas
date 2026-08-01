@@ -330,6 +330,106 @@
       cursor: default;
     }
 
+    .account-display-name-field input[readonly] {
+      opacity: 1;
+      cursor: default;
+    }
+
+    .account-display-name-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 50px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .account-display-name-input-wrap {
+      position: relative;
+    }
+
+    .account-display-name-input-wrap input {
+      padding-right: 54px;
+    }
+
+    .account-display-name-info-button {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: help;
+      transform: translateY(-50%);
+    }
+
+    .account-display-name-info-button img,
+    .account-display-name-edit-button img {
+      width: 22px;
+      height: 22px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .account-display-name-tooltip {
+      position: absolute;
+      right: -12px;
+      bottom: calc(100% + 12px);
+      width: 238px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 18px 44px rgba(42, 32, 20, 0.16);
+      color: rgba(23, 23, 23, 0.72);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.55;
+      text-transform: none;
+      letter-spacing: 0;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(4px);
+      transition: opacity 0.18s ease, visibility 0.18s ease, transform 0.18s ease;
+    }
+
+    .account-display-name-info-button:hover .account-display-name-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .account-display-name-edit-button {
+      width: 50px;
+      height: 50px;
+      padding: 0;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.82);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .account-display-name-edit-button:hover {
+      background: white;
+      border-color: rgba(192, 154, 92, 0.34);
+    }
+
+    .account-display-name-edit-button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    .account-display-name-note {
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
     .custom-select-dropdown {
       position: relative;
       width: 100%;
@@ -1276,9 +1376,25 @@
                 </div>
 
                 <div class="account-form-grid">
-                  <div class="account-field">
+                  <div class="account-field account-display-name-field">
                     <label for="account-name">Display Name</label>
-                    <input type="text" id="account-name" value="AUC Student">
+
+                    <div class="account-display-name-row">
+                      <div class="account-display-name-input-wrap">
+                        <input type="text" id="account-name" value="AUC Student" autocomplete="name" maxlength="80" readonly>
+
+                        <span class="account-display-name-info-button" aria-label="Display name information">
+                          <img src="username-info-icon.png" alt="">
+                          <span class="account-display-name-tooltip">You can change your display name once every 30 days.</span>
+                        </span>
+                      </div>
+
+                      <button class="account-display-name-edit-button" type="button" id="account-display-name-edit-button" aria-label="Edit display name">
+                        <img src="username-edit-icon.png" alt="">
+                      </button>
+                    </div>
+
+                    <p class="account-display-name-note" id="account-display-name-note"></p>
                   </div>
 
                   <div class="account-field">
@@ -1543,6 +1659,8 @@
     const detailsMessage = document.getElementById("account-details-message");
     const logoutButton = document.getElementById("account-logout-sidebar");
     const accountNameInput = document.getElementById("account-name");
+    const accountDisplayNameEditButton = document.getElementById("account-display-name-edit-button");
+    const accountDisplayNameNote = document.getElementById("account-display-name-note");
     const accountEmailInput = document.getElementById("account-email");
     const accountPhoneInput = document.getElementById("account-phone");
     const accountPhoneCountry = document.getElementById("account-phone-country");
@@ -1570,10 +1688,87 @@
 
     const PROFILE_PHOTO_MAX_SIZE = 4 * 1024 * 1024;
     const PROFILE_PHOTO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+    const DISPLAY_NAME_COOLDOWN_DAYS = 30;
 
     let accountCurrentUser = null;
     let accountTwoFactor = { appEnabled: false, emailEnabled: false };
     let activePhotoPreviewUrl = "";
+    let originalDisplayName = "";
+    let displayNameLastChangedAt = null;
+    let displayNameEditMode = false;
+
+    function getAccountDateFromValue(value) {
+      if (!value) {
+        return null;
+      }
+
+      if (typeof value.toDate === "function") {
+        return value.toDate();
+      }
+
+      if (typeof value.seconds === "number") {
+        return new Date(value.seconds * 1000);
+      }
+
+      if (typeof value._seconds === "number") {
+        return new Date(value._seconds * 1000);
+      }
+
+      const parsedDate = new Date(value);
+      return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+    }
+
+    function getDisplayNameUnlockDate() {
+      const lastChangeDate = getAccountDateFromValue(displayNameLastChangedAt);
+
+      if (!lastChangeDate) {
+        return null;
+      }
+
+      return new Date(lastChangeDate.getTime() + DISPLAY_NAME_COOLDOWN_DAYS * 24 * 60 * 60 * 1000);
+    }
+
+    function getDisplayNameDaysLeft() {
+      const unlockDate = getDisplayNameUnlockDate();
+
+      if (!unlockDate) {
+        return 0;
+      }
+
+      const millisecondsLeft = unlockDate.getTime() - Date.now();
+      return millisecondsLeft > 0 ? Math.ceil(millisecondsLeft / (24 * 60 * 60 * 1000)) : 0;
+    }
+
+    function getDisplayNameUnlockDateText() {
+      const unlockDate = getDisplayNameUnlockDate();
+
+      if (!unlockDate) {
+        return "";
+      }
+
+      return unlockDate.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    function updateDisplayNameLockState() {
+      const daysLeft = getDisplayNameDaysLeft();
+
+      if (daysLeft > 0) {
+        displayNameEditMode = false;
+        accountNameInput.readOnly = true;
+        accountDisplayNameEditButton.disabled = true;
+        accountDisplayNameEditButton.setAttribute("aria-label", "Display name locked");
+        accountDisplayNameNote.textContent = "You can change your display name again on " + getDisplayNameUnlockDateText() + ".";
+      } else {
+        accountNameInput.readOnly = !displayNameEditMode;
+        accountDisplayNameEditButton.disabled = false;
+        accountDisplayNameEditButton.setAttribute("aria-label", "Edit display name");
+        accountDisplayNameNote.textContent = "";
+      }
+    }
 
     function clearTemporaryProfilePhotoPreview() {
       if (activePhotoPreviewUrl) {
@@ -1999,6 +2194,11 @@
       window.aucAtlasCurrentUser = user;
 
       accountNameInput.value = displayName;
+      originalDisplayName = displayName;
+      displayNameLastChangedAt = user.displayNameLastChangedAt || user.usernameLastChangedAt || null;
+      displayNameEditMode = false;
+      updateDisplayNameLockState();
+
       accountEmailInput.value = user.email || "";
       hydrateAccountPhoneValue(user.phone || "");
       accountMajorInput.value = user.major || "";
@@ -2055,6 +2255,18 @@
       });
     });
 
+    accountDisplayNameEditButton.addEventListener("click", function () {
+      if (getDisplayNameDaysLeft() > 0) {
+        updateDisplayNameLockState();
+        return;
+      }
+
+      displayNameEditMode = true;
+      updateDisplayNameLockState();
+      accountNameInput.focus();
+      accountNameInput.select();
+    });
+
     photoChooseButton.addEventListener("click", function () {
       photoInput.click();
     });
@@ -2076,6 +2288,21 @@
     detailsForm.addEventListener("submit", async function (event) {
       event.preventDefault();
 
+      const nextDisplayName = accountNameInput.value.trim();
+      const displayNameIsChanging = nextDisplayName !== originalDisplayName;
+
+      if (!nextDisplayName) {
+        showMessage(detailsMessage, "Please enter your display name.", "error");
+        return;
+      }
+
+      if (displayNameIsChanging && getDisplayNameDaysLeft() > 0) {
+        accountNameInput.value = originalDisplayName;
+        updateDisplayNameLockState();
+        showMessage(detailsMessage, "You can change your display name again on " + getDisplayNameUnlockDateText() + ".", "error");
+        return;
+      }
+
       if (detailsButton) {
         detailsButton.disabled = true;
         detailsButton.textContent = "Saving...";
@@ -2092,7 +2319,7 @@
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            fullName: accountNameInput.value.trim(),
+            fullName: nextDisplayName,
             phone: getAccountPhoneValueForSave(),
             major: accountMajorInput.value.trim()
           })
@@ -2106,8 +2333,10 @@
         }
 
         hydrateAccountDetails(data.user);
-        showMessage(detailsMessage, "Account details saved.", "success");
+        showMessage(detailsMessage, displayNameIsChanging ? "Account details saved. Display name can be changed again on " + getDisplayNameUnlockDateText() + "." : "Account details saved.", "success");
       } catch (error) {
+        accountNameInput.value = originalDisplayName;
+        updateDisplayNameLockState();
         showMessage(detailsMessage, error.message || "Could not save your details. Please try again.", "error");
       } finally {
         if (detailsButton) {
