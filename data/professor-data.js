@@ -206,18 +206,37 @@
       grid-template-columns: minmax(0, 1fr);
     }
 
+    .professors-header.professor-profile-heading {
+      margin-bottom: 22px;
+      align-items: center;
+    }
+
+    .professors-header.professor-profile-heading h1 {
+      font-size: clamp(30px, 3.2vw, 46px);
+      line-height: 1.05;
+    }
+
+    .professors-header.professor-profile-heading p:not(.professors-kicker) {
+      max-width: 500px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
     .professor-profile-card {
+      width: min(100%, 1120px);
+      margin: 0 auto;
       overflow: hidden;
       border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 28px;
+      border-radius: 24px;
       background: rgba(255, 255, 255, 0.78);
-      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      box-shadow: 0 20px 54px rgba(42, 32, 20, 0.1);
       display: grid;
-      grid-template-columns: minmax(280px, 0.38fr) minmax(0, 1fr);
+      grid-template-columns: 320px minmax(0, 1fr);
+      align-items: start;
     }
 
     .professor-profile-image {
-      min-height: 560px;
+      height: 360px;
       background: rgba(23, 23, 23, 0.04);
     }
 
@@ -230,10 +249,10 @@
     }
 
     .professor-profile-body {
-      padding: clamp(24px, 3vw, 42px);
+      padding: 28px;
       display: grid;
       align-content: start;
-      gap: 20px;
+      gap: 16px;
     }
 
     .professor-profile-back {
@@ -285,10 +304,10 @@
     }
 
     .professor-profile-bio {
-      max-width: 780px;
+      max-width: 660px;
       color: rgba(23, 23, 23, 0.66);
-      font-size: 15px;
-      line-height: 1.8;
+      font-size: 14px;
+      line-height: 1.65;
     }
 
     .professor-review-panel {
@@ -400,7 +419,7 @@
       }
 
       .professor-profile-image {
-        min-height: 320px;
+        height: 300px;
       }
 
       .professor-review-form {
@@ -474,6 +493,7 @@
     const pageHeader = document.querySelector(".professors-header");
 
     if (pageHeader) {
+      pageHeader.classList.add("professor-profile-heading");
       pageHeader.innerHTML = `
         <div>
           <p class="professors-kicker">Professor profile</p>
