@@ -48,6 +48,53 @@ function createProfileError(message, statusCode) {
   return error;
 }
 
+const DISPLAY_NAME_CHANGE_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+
+function getDateFromStoredValue(value) {
+  if (!value) {
+    return null;
+  }
+
+  if (typeof value.toDate === "function") {
+    return value.toDate();
+  }
+
+  if (typeof value.seconds === "number") {
+    return new Date(value.seconds * 1000);
+  }
+
+  if (typeof value._seconds === "number") {
+    return new Date(value._seconds * 1000);
+  }
+
+  const parsedDate = new Date(value);
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+}
+
+function getDisplayNameUnlockDate(value) {
+  const lastChangeDate = getDateFromStoredValue(value);
+
+  if (!lastChangeDate) {
+    return null;
+  }
+
+  return new Date(lastChangeDate.getTime() + DISPLAY_NAME_CHANGE_COOLDOWN_MS);
+}
+
+function getDisplayNameUnlockDateText(value) {
+  const unlockDate = getDisplayNameUnlockDate(value);
+
+  if (!unlockDate) {
+    return "";
+  }
+
+  return unlockDate.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
 module.exports = async function handler(req, res) {
   try {
     if (req.method === "PATCH") {
@@ -70,6 +117,8 @@ module.exports = async function handler(req, res) {
       const db = admin.firestore();
       const userRef = db.collection("users").doc(decodedUser.uid);
       const phoneReservations = db.collection("accountPhoneNumbers");
+      const existingUserRecord = await admin.auth().getUser(decodedUser.uid);
+      let displayNameChanged = false;
 
       await db.runTransaction(async function (transaction) {
         const userDoc = await transaction.get(userRef);
@@ -77,6 +126,19 @@ module.exports = async function handler(req, res) {
         const currentPhoneLookupKey = userData.phoneLookupKey || getPhoneLookupKey(userData.phone || "");
         const oldPhoneRef = currentPhoneLookupKey ? phoneReservations.doc(currentPhoneLookupKey) : null;
         const nextPhoneRef = phoneLookupKey ? phoneReservations.doc(phoneLookupKey) : null;
+        const currentFullName = cleanString(userData.fullName || existingUserRecord.displayName || "", 80);
+        const lastDisplayNameChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
+        const requestedDisplayNameChanged = fullName !== currentFullName;
+
+        displayNameChanged = requestedDisplayNameChanged;
+
+        if (requestedDisplayNameChanged) {
+          const unlockDate = getDisplayNameUnlockDate(lastDisplayNameChangedAt);
+
+          if (unlockDate && unlockDate.getTime() > Date.now()) {
+            throw createProfileError("You can change your display name again on " + getDisplayNameUnlockDateText(lastDisplayNameChangedAt) + ".", 429);
+          }
+        }
 
         if (nextPhoneRef && phoneLookupKey !== currentPhoneLookupKey) {
           const phoneDoc = await transaction.get(nextPhoneRef);
@@ -95,6 +157,10 @@ module.exports = async function handler(req, res) {
           major,
           updatedAt: now
         };
+
+        if (displayNameChanged) {
+          updateData.displayNameLastChangedAt = now;
+        }
 
         if (!userDoc.exists) {
           updateData.email = decodedUser.email || "";
@@ -129,6 +195,7 @@ module.exports = async function handler(req, res) {
       const savedPhone = userData.phone || "";
       const savedMajor = userData.major || "";
       const authProvider = userData.authProvider || "password";
+      const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
 
       return res.status(200).json({
         success: true,
@@ -145,7 +212,8 @@ module.exports = async function handler(req, res) {
           firstName: getFirstName(savedFullName, email),
           phone: savedPhone,
           major: savedMajor,
-          authProvider
+          authProvider,
+          displayNameLastChangedAt
         }
       });
     }
@@ -177,6 +245,7 @@ module.exports = async function handler(req, res) {
     const phone = userData.phone || "";
     const major = userData.major || "";
     const authProvider = userData.authProvider || "password";
+    const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
 
     return res.status(200).json({
       signedIn: true,
@@ -192,7 +261,8 @@ module.exports = async function handler(req, res) {
         firstName: getFirstName(fullName, email),
         phone,
         major,
-        authProvider
+        authProvider,
+        displayNameLastChangedAt
       }
     });
   } catch (error) {
