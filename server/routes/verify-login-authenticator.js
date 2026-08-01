@@ -49,25 +49,18 @@ module.exports = async function handler(req, res) {
       await createSiteSessionForUid(challenge.uid, res, req);
     }
 
-    await clearLoginChallenge(req, res);
-
-    const userRecord = await admin.auth().getUser(challenge.uid);
-    const userDoc = await admin.firestore().collection("users").doc(challenge.uid).get();
-    const userData = userDoc.exists ? userDoc.data() || {} : {};
-    const fullName = userData.fullName || userRecord.displayName || "";
-    const email = userRecord.email || userData.email || challenge.email || "";
-    const photoURL = userData.photoURL || userRecord.photoURL || "";
+    clearLoginChallenge(req, res).catch(function () {});
 
     return res.status(200).json({
       success: true,
       requiresTwoFactor: false,
       user: {
         uid: challenge.uid,
-        email,
-        emailVerified: Boolean(userRecord.emailVerified || userData.emailVerified),
-        displayName: fullName,
-        fullName,
-        photoURL
+        email: challenge.email || "",
+        emailVerified: false,
+        displayName: "",
+        fullName: "",
+        photoURL: ""
       }
     });
   } catch (error) {
