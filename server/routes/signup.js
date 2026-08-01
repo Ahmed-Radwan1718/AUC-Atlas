@@ -26,6 +26,10 @@ function cleanPhone(value) {
   return cleanString(value, 30);
 }
 
+function cleanAucId(value) {
+  return String(value || "").replace(/\D/g, "").slice(0, 9);
+}
+
 function hasValidPhoneFormat(value) {
   const phone = cleanPhone(value);
   const phoneDigits = phone.replace(/\D/g, "");
@@ -39,10 +43,20 @@ function hasValidPhoneFormat(value) {
   );
 }
 
+function hasValidAucIdFormat(value) {
+  return /^900\d{6}$/.test(cleanAucId(value));
+}
+
 function getPhoneLookupKey(value) {
   const phone = cleanPhone(value);
 
   return hasValidPhoneFormat(phone) ? phone.replace(/\D/g, "") : "";
+}
+
+function getAucIdLookupKey(value) {
+  const aucId = cleanAucId(value);
+
+  return hasValidAucIdFormat(aucId) ? aucId : "";
 }
 
 function createInvalidPhoneError() {
@@ -53,6 +67,18 @@ function createInvalidPhoneError() {
 
 function createPhoneInUseError() {
   const error = new Error("This phone number is already used by another account.");
+  error.statusCode = 409;
+  return error;
+}
+
+function createInvalidAucIdError() {
+  const error = new Error("AUC ID number must start with 900 and be 9 digits total.");
+  error.statusCode = 400;
+  return error;
+}
+
+function createAucIdInUseError() {
+  const error = new Error("This AUC ID number is already used by another account.");
   error.statusCode = 409;
   return error;
 }
@@ -84,6 +110,33 @@ async function ensurePhoneCanCreateAccount(phone) {
   return phoneLookupKey;
 }
 
+async function ensureAucIdCanCreateAccount(aucId) {
+  const aucIdLookupKey = getAucIdLookupKey(aucId);
+
+  if (!aucIdLookupKey) {
+    throw createInvalidAucIdError();
+  }
+
+  const db = admin.firestore();
+  const aucIdReservationRef = db.collection("accountAucIds").doc(aucIdLookupKey);
+  const aucIdReservationDoc = await aucIdReservationRef.get();
+
+  if (aucIdReservationDoc.exists) {
+    throw createAucIdInUseError();
+  }
+
+  const [exactAucIdSnapshot, normalizedAucIdSnapshot] = await Promise.all([
+    db.collection("users").where("aucId", "==", aucIdLookupKey).limit(1).get(),
+    db.collection("users").where("aucIdLookupKey", "==", aucIdLookupKey).limit(1).get()
+  ]);
+
+  if (!exactAucIdSnapshot.empty || !normalizedAucIdSnapshot.empty) {
+    throw createAucIdInUseError();
+  }
+
+  return aucIdLookupKey;
+}
+
 async function reserveAccountPhone(phone, uid) {
   const phoneLookupKey = await ensurePhoneCanCreateAccount(phone);
   const phoneRef = admin.firestore().collection("accountPhoneNumbers").doc(phoneLookupKey);
@@ -104,6 +157,28 @@ async function reserveAccountPhone(phone, uid) {
   }
 
   return { phoneLookupKey, phoneRef };
+}
+
+async function reserveAccountAucId(aucId, uid) {
+  const aucIdLookupKey = await ensureAucIdCanCreateAccount(aucId);
+  const aucIdRef = admin.firestore().collection("accountAucIds").doc(aucIdLookupKey);
+
+  try {
+    await aucIdRef.create({
+      uid,
+      aucId: aucIdLookupKey,
+      aucIdLookupKey,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (error) {
+    if (String(error.code) === "6" || error.code === "already-exists" || /already exists/i.test(error.message || "")) {
+      throw createAucIdInUseError();
+    }
+
+    throw error;
+  }
+
+  return { aucIdLookupKey, aucIdRef };
 }
 
 function timestampToMillis(value) {
@@ -290,16 +365,21 @@ module.exports = async function handler(req, res) {
     }
 
     const fullName = cleanString((req.body || {}).fullName, 80);
+    const aucId = cleanAucId((req.body || {}).aucId);
     const phone = cleanPhone((req.body || {}).phone);
     const email = cleanEmail((req.body || {}).email);
     const password = cleanPassword((req.body || {}).password);
     const confirmPassword = cleanPassword((req.body || {}).confirmPassword);
 
-    if (!fullName || !phone || !email || !password || !confirmPassword) {
+    if (!fullName || !aucId || !phone || !email || !password || !confirmPassword) {
       return res.status(400).json({ error: "Please complete all required fields." });
     }
 
     ensureAllowedAucEmail(email, "create an account");
+
+    if (!hasValidAucIdFormat(aucId)) {
+      throw createInvalidAucIdError();
+    }
 
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "Passwords do not match." });
@@ -317,6 +397,7 @@ module.exports = async function handler(req, res) {
     }
 
     await checkSignupRateLimit(email);
+    await ensureAucIdCanCreateAccount(aucId);
     await ensurePhoneCanCreateAccount(phone);
     await ensureEmailCanCreateAccount(email);
 
@@ -328,13 +409,17 @@ module.exports = async function handler(req, res) {
     });
 
     let phoneReservation = null;
+    let aucIdReservation = null;
     const userRef = admin.firestore().collection("users").doc(userRecord.uid);
 
     try {
       phoneReservation = await reserveAccountPhone(phone, userRecord.uid);
+      aucIdReservation = await reserveAccountAucId(aucId, userRecord.uid);
 
       await userRef.set({
         fullName,
+        aucId,
+        aucIdLookupKey: aucIdReservation.aucIdLookupKey,
         phone,
         phoneLookupKey: phoneReservation.phoneLookupKey,
         email,
@@ -348,6 +433,10 @@ module.exports = async function handler(req, res) {
     } catch (error) {
       if (phoneReservation && phoneReservation.phoneRef) {
         await phoneReservation.phoneRef.delete().catch(function () {});
+      }
+
+      if (aucIdReservation && aucIdReservation.aucIdRef) {
+        await aucIdReservation.aucIdRef.delete().catch(function () {});
       }
 
       await userRef.delete().catch(function () {});
@@ -364,6 +453,7 @@ module.exports = async function handler(req, res) {
       user: {
         uid: userRecord.uid,
         email,
+        aucId,
         displayName: fullName,
         emailVerified: false
       }
