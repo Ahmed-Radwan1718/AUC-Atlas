@@ -192,6 +192,20 @@
       gap: 18px;
     }
 
+    .account-password-form {
+      margin-top: 18px;
+    }
+
+    .account-password-form[hidden] {
+      display: none;
+    }
+
+    .account-password-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
     .account-profile-photo-section,
     .account-empty-state,
     .account-connected-account-card,
@@ -1489,7 +1503,33 @@
                 <p>For your security, choose a unique password that you do not use for any other account.</p>
               </div>
 
-              <button class="account-primary-button" type="button" data-account-action>Change Password</button>
+              <button class="account-primary-button" type="button" id="change-password-open-button">Change Password</button>
+
+              <form class="account-form account-password-form" id="change-password-form" hidden>
+                <div class="account-form-grid">
+                  <div class="account-field">
+                    <label for="current-password">Current Password</label>
+                    <input type="password" id="current-password" autocomplete="current-password" required>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="new-password">New Password</label>
+                    <input type="password" id="new-password" autocomplete="new-password" required>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="confirm-new-password">Confirm New Password</label>
+                    <input type="password" id="confirm-new-password" autocomplete="new-password" required>
+                  </div>
+                </div>
+
+                <div class="account-password-actions">
+                  <button class="account-secondary-button" type="button" id="change-password-cancel-button">Cancel</button>
+                  <button class="account-primary-button" type="submit" id="change-password-submit-button">Save Password</button>
+                </div>
+
+                <p class="account-message" id="change-password-message" aria-live="polite"></p>
+              </form>
 
               <div class="account-divider"></div>
 
@@ -1671,6 +1711,14 @@
     const accountPhoneCountryOptions = document.getElementById("account-phone-country-options");
     const accountMajorInput = document.getElementById("account-major");
     const securityMessage = document.getElementById("security-message");
+    const changePasswordOpenButton = document.getElementById("change-password-open-button");
+    const changePasswordForm = document.getElementById("change-password-form");
+    const changePasswordCancelButton = document.getElementById("change-password-cancel-button");
+    const changePasswordSubmitButton = document.getElementById("change-password-submit-button");
+    const currentPasswordInput = document.getElementById("current-password");
+    const newPasswordInput = document.getElementById("new-password");
+    const confirmNewPasswordInput = document.getElementById("confirm-new-password");
+    const changePasswordMessage = document.getElementById("change-password-message");
     const twoFactorAppStatus = document.getElementById("two-factor-app-status");
     const twoFactorEmailStatus = document.getElementById("two-factor-email-status");
     const twoFactorAppButton = document.getElementById("two-factor-app-button");
@@ -2247,6 +2295,103 @@
 
         window.location.href = "login.html";
       }
+    }
+
+    function resetChangePasswordForm() {
+      if (changePasswordForm) changePasswordForm.reset();
+      showMessage(changePasswordMessage, "", "");
+    }
+
+    function closeChangePasswordForm() {
+      resetChangePasswordForm();
+      if (changePasswordForm) changePasswordForm.hidden = true;
+      if (changePasswordOpenButton) changePasswordOpenButton.hidden = false;
+    }
+
+    function passwordMeetsRules(password) {
+      return password.length >= 10 &&
+        password.length <= 48 &&
+        /[A-Z]/.test(password) &&
+        /[a-z]/.test(password) &&
+        /[0-9]/.test(password) &&
+        /[^A-Za-z0-9\s]/.test(password);
+    }
+
+    if (changePasswordOpenButton) {
+      changePasswordOpenButton.addEventListener("click", function () {
+        changePasswordOpenButton.hidden = true;
+        changePasswordForm.hidden = false;
+        showMessage(securityMessage, "", "");
+        resetChangePasswordForm();
+        currentPasswordInput.focus();
+      });
+    }
+
+    if (changePasswordCancelButton) {
+      changePasswordCancelButton.addEventListener("click", closeChangePasswordForm);
+    }
+
+    if (changePasswordForm) {
+      changePasswordForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const currentPassword = currentPasswordInput.value;
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmNewPasswordInput.value;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          showMessage(changePasswordMessage, "Please complete all password fields.", "error");
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          showMessage(changePasswordMessage, "New passwords do not match.", "error");
+          return;
+        }
+
+        if (!passwordMeetsRules(newPassword)) {
+          showMessage(changePasswordMessage, "Password must be 10 to 48 characters and include uppercase, lowercase, special, and numeric characters.", "error");
+          return;
+        }
+
+        changePasswordSubmitButton.disabled = true;
+        changePasswordCancelButton.disabled = true;
+        changePasswordSubmitButton.textContent = "Saving...";
+        showMessage(changePasswordMessage, "", "");
+
+        try {
+          const response = await fetch("/api/change-password", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              currentPassword,
+              newPassword,
+              confirmPassword
+            })
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (!response.ok || !data.success) {
+            throw new Error(data.error || "Could not change your password.");
+          }
+
+          closeChangePasswordForm();
+          showMessage(securityMessage, "Password changed successfully.", "success");
+        } catch (error) {
+          showMessage(changePasswordMessage, error.message || "Could not change your password.", "error");
+        } finally {
+          changePasswordSubmitButton.disabled = false;
+          changePasswordCancelButton.disabled = false;
+          changePasswordSubmitButton.textContent = "Save Password";
+        }
+      });
     }
 
     sidebarLinks.forEach(function (link) {
