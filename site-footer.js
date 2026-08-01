@@ -100,7 +100,7 @@
         <div class="site-footer-grid">
           <div class="site-footer-column site-footer-brand">
             <h2 class="site-footer-logo"><span class="site-footer-logo-auc">AUC</span><span class="site-footer-logo-atlas">Atlas</span></h2>
-            <p>Professors, courses, and student tools for AUC students.</p>
+            <p>All your academic needs in one place.</p>
           </div>
 
           <div class="site-footer-column">
