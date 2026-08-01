@@ -2452,6 +2452,7 @@
         twoFactorAppButton.textContent = accountTwoFactor.appEnabled ? "Disable app" : "Set up app";
         twoFactorAppButton.classList.toggle("is-danger", accountTwoFactor.appEnabled);
       }
+    }
 
     function hydrateAccountDetails(user) {
       const displayName = user.fullName || user.displayName || String(user.email || "").split("@")[0] || "AUC Student";
