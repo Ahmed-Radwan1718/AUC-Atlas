@@ -212,8 +212,13 @@
       align-items: center;
     }
 
+    .professors-header.professor-profile-heading .professors-kicker {
+      font-weight: 700;
+    }
+
     .professors-header.professor-profile-heading h1 {
       font-size: clamp(30px, 3.2vw, 46px);
+      font-weight: 600;
       line-height: 1.05;
     }
 
@@ -221,6 +226,7 @@
       max-width: 500px;
       justify-self: end;
       font-size: 15px;
+      font-weight: 400;
       line-height: 1.6;
     }
 
@@ -278,7 +284,7 @@
     .professor-profile-info div > span:first-child {
       color: rgba(192, 154, 92, 0.92);
       font-size: 10px;
-      font-weight: 900;
+      font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
@@ -287,7 +293,7 @@
     .professor-profile-email {
       color: #171717;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 400;
       line-height: 1.45;
       text-decoration: none;
     }
@@ -301,6 +307,10 @@
       color: rgba(23, 23, 23, 0.66);
       font-size: 14px;
       line-height: 1.65;
+    }
+
+    body.review-modal-open {
+      overflow: hidden;
     }
 
     .professor-review-panel {
@@ -321,7 +331,7 @@
       background: #171717;
       color: #fff;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
@@ -353,6 +363,9 @@
       margin: 0;
       padding: 24px;
       overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-gutter: stable;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 24px;
       background: rgba(255, 255, 255, 0.94);
@@ -375,7 +388,7 @@
     .review-modal-header span {
       color: rgba(192, 154, 92, 0.92);
       font-size: 10px;
-      font-weight: 900;
+      font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
@@ -384,6 +397,7 @@
       margin-top: 4px;
       color: #171717;
       font-size: 24px;
+      font-weight: 600;
       line-height: 1.1;
     }
 
@@ -396,7 +410,7 @@
       color: #171717;
       font: inherit;
       font-size: 22px;
-      font-weight: 700;
+      font-weight: 400;
       cursor: pointer;
       display: grid;
       place-items: center;
@@ -416,9 +430,9 @@
     }
 
     .review-field label {
-      color: rgba(23, 23, 23, 0.62);
+      color: rgba(23, 23, 23, 0.58);
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
@@ -427,30 +441,143 @@
     .review-field select,
     .review-field textarea {
       width: 100%;
-      min-height: 44px;
-      padding: 0 13px;
+      min-height: 46px;
+      padding: 0 14px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 14px;
-      background: rgba(247, 244, 238, 0.68);
+      background: rgba(255, 255, 255, 0.58);
       color: #171717;
       font: inherit;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 400;
       outline: none;
+    }
+
+    .review-field select {
+      appearance: none;
+      background:
+        linear-gradient(45deg, transparent 50%, rgba(23, 23, 23, 0.58) 50%) calc(100% - 18px) 50% / 7px 7px no-repeat,
+        linear-gradient(135deg, rgba(23, 23, 23, 0.58) 50%, transparent 50%) calc(100% - 13px) 50% / 7px 7px no-repeat,
+        rgba(255, 255, 255, 0.58);
+    }
+
+    .review-field select option {
+      background: #fffdf8;
+      color: #171717;
+      font-weight: 400;
+    }
+
+    .review-native-select {
+      display: none;
+    }
+
+    .review-choice {
+      position: relative;
+    }
+
+    .review-choice-button {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 40px 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.58);
+      color: #171717;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .review-choice-button::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid rgba(23, 23, 23, 0.58);
+      border-bottom: 1.5px solid rgba(23, 23, 23, 0.58);
+      transform: rotate(45deg) translateY(-2px);
+      pointer-events: none;
+    }
+
+    .review-choice.open .review-choice-button,
+    .review-choice-button:focus-visible {
+      border-color: rgba(192, 154, 92, 0.5);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.1);
+      outline: none;
+    }
+
+    .review-choice-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      z-index: 4;
+      max-height: 230px;
+      padding: 6px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 18px 45px rgba(42, 32, 20, 0.16);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .review-choice.open .review-choice-menu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .review-choice-option {
+      width: 100%;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.72);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .review-choice-option:hover,
+    .review-choice-option.is-selected {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
     }
 
     .review-field textarea {
       min-height: 112px;
-      padding: 13px;
+      padding: 13px 14px;
       resize: vertical;
       line-height: 1.6;
+    }
+
+    .review-field input::placeholder,
+    .review-field textarea::placeholder {
+      color: rgba(23, 23, 23, 0.38);
     }
 
     .review-field input:focus,
     .review-field select:focus,
     .review-field textarea:focus {
-      border-color: rgba(192, 154, 92, 0.58);
-      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+      border-color: rgba(192, 154, 92, 0.5);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.1);
     }
 
     .review-submit-button {
@@ -463,7 +590,7 @@
       color: #171717;
       font: inherit;
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
@@ -737,6 +864,122 @@
         </div>
       </article>
     `;
+
+    setupReviewModalBehavior(grid);
+  }
+
+  function setupReviewChoiceMenus(form) {
+    function closeChoices(exceptChoice) {
+      form.querySelectorAll(".review-choice.open").forEach(function (choice) {
+        if (choice !== exceptChoice) {
+          choice.classList.remove("open");
+        }
+      });
+    }
+
+    form.querySelectorAll("select").forEach(function (select) {
+      if (select.dataset.reviewChoiceReady === "true") {
+        return;
+      }
+
+      select.dataset.reviewChoiceReady = "true";
+      select.classList.add("review-native-select");
+
+      const choice = document.createElement("div");
+      const button = document.createElement("button");
+      const label = document.createElement("span");
+      const menu = document.createElement("div");
+
+      choice.className = "review-choice";
+      button.className = "review-choice-button";
+      button.type = "button";
+      label.className = "review-choice-label";
+      menu.className = "review-choice-menu";
+
+      function syncLabel() {
+        const selectedOption = select.options[select.selectedIndex];
+        label.textContent = selectedOption ? selectedOption.textContent : "";
+      }
+
+      Array.from(select.options).forEach(function (option) {
+        const optionButton = document.createElement("button");
+        optionButton.className = "review-choice-option";
+        optionButton.type = "button";
+        optionButton.dataset.choiceValue = option.value;
+        optionButton.textContent = option.textContent;
+        menu.appendChild(optionButton);
+      });
+
+      button.appendChild(label);
+      choice.appendChild(button);
+      choice.appendChild(menu);
+      select.insertAdjacentElement("afterend", choice);
+      syncLabel();
+
+      button.addEventListener("click", function (event) {
+        event.stopPropagation();
+        closeChoices(choice);
+        choice.classList.toggle("open");
+      });
+
+      menu.addEventListener("click", function (event) {
+        const optionButton = event.target.closest("[data-choice-value]");
+
+        if (!optionButton) {
+          return;
+        }
+
+        select.value = optionButton.dataset.choiceValue;
+        syncLabel();
+        menu.querySelectorAll(".review-choice-option").forEach(function (button) {
+          button.classList.toggle("is-selected", button.dataset.choiceValue === select.value);
+        });
+        choice.classList.remove("open");
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+
+      menu.querySelectorAll(".review-choice-option").forEach(function (button) {
+        button.classList.toggle("is-selected", button.dataset.choiceValue === select.value);
+      });
+    });
+
+    form.addEventListener("click", function (event) {
+      if (!event.target.closest(".review-choice")) {
+        closeChoices();
+      }
+    });
+  }
+
+  function setupReviewModalBehavior(grid) {
+    const panel = grid.querySelector(".professor-review-panel");
+    const form = grid.querySelector(".professor-review-form");
+    const backdrop = grid.querySelector(".review-modal-backdrop");
+
+    if (!panel || !form) {
+      return;
+    }
+
+    setupReviewChoiceMenus(form);
+
+    function syncReviewModalLock() {
+      document.body.classList.toggle("review-modal-open", panel.open);
+
+      if (!panel.open) {
+        form.querySelectorAll(".review-choice.open").forEach(function (choice) {
+          choice.classList.remove("open");
+        });
+      }
+    }
+
+    panel.addEventListener("toggle", syncReviewModalLock);
+
+    if (backdrop) {
+      backdrop.addEventListener("wheel", function (event) {
+        event.preventDefault();
+      }, { passive: false });
+    }
+
+    syncReviewModalLock();
   }
 
   function renderProfessorNotFound(grid, professorId) {
