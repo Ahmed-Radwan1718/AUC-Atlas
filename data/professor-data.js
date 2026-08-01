@@ -207,7 +207,8 @@
     }
 
     .professors-header.professor-profile-heading {
-      margin-bottom: 22px;
+      width: min(100%, 1120px);
+      margin: 0 auto 22px;
       align-items: center;
     }
 
@@ -218,6 +219,7 @@
 
     .professors-header.professor-profile-heading p:not(.professors-kicker) {
       max-width: 500px;
+      justify-self: end;
       font-size: 15px;
       line-height: 1.6;
     }
@@ -303,6 +305,12 @@
 
     .professor-review-panel {
       margin-top: 6px;
+      width: fit-content;
+    }
+
+    .professor-review-panel[open] {
+      position: relative;
+      z-index: 1200;
     }
 
     .professor-review-toggle {
@@ -326,11 +334,76 @@
       display: none;
     }
 
+    .review-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      background: rgba(247, 244, 238, 0.42);
+      backdrop-filter: blur(12px);
+      animation: reviewBackdropIn 0.24s ease both;
+    }
+
     .professor-review-form {
-      margin-top: 18px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 1201;
+      width: min(920px, calc(100% - 32px));
+      max-height: min(82vh, 760px);
+      margin: 0;
+      padding: 24px;
+      overflow-y: auto;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 34px 90px rgba(42, 32, 20, 0.2);
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
+      animation: reviewModalIn 0.28s ease both;
+    }
+
+    .review-modal-header {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 4px;
+    }
+
+    .review-modal-header span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .review-modal-header h2 {
+      margin-top: 4px;
+      color: #171717;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .review-close-button {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+      color: #171717;
+      font: inherit;
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .review-close-button:hover {
+      background: rgba(23, 23, 23, 0.14);
     }
 
     .review-field {
@@ -394,6 +467,23 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
+    }
+
+    @keyframes reviewBackdropIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes reviewModalIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -46%) scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
     }
 
     @media (max-width: 980px) {
@@ -525,7 +615,17 @@
           <details class="professor-review-panel">
             <summary class="professor-review-toggle">Leave a review</summary>
 
-            <form class="professor-review-form" onsubmit="event.preventDefault();">
+            <div class="review-modal-backdrop" onclick="this.closest('details').removeAttribute('open')"></div>
+
+            <form class="professor-review-form" onsubmit="event.preventDefault();" aria-label="Professor review form">
+              <div class="review-modal-header">
+                <div>
+                  <span>Professor review</span>
+                  <h2>Leave a review</h2>
+                </div>
+                <button class="review-close-button" type="button" aria-label="Close review form" onclick="this.closest('details').removeAttribute('open')">&times;</button>
+              </div>
+
               <input type="hidden" name="professor" value="${escapeHtml(professor.name)}">
 
               <div class="review-field">
