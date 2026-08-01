@@ -240,6 +240,20 @@
       gap: 18px;
     }
 
+    .account-details-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .account-field-full {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 760px) {
+      .account-details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .account-password-form {
       margin-top: 18px;
       overflow: hidden;
@@ -1485,7 +1499,7 @@
                   </div>
                 </div>
 
-                <div class="account-form-grid">
+                <div class="account-form-grid account-details-grid">
                   <div class="account-field account-display-name-field">
                     <label for="account-name">Display Name</label>
 
@@ -1543,6 +1557,11 @@
                   <div class="account-field">
                     <label for="account-major">Major</label>
                     <input type="text" id="account-major" placeholder="Computer Science, Business, Engineering">
+                  </div>
+
+                  <div class="account-field">
+                    <label for="account-auc-id">AUC ID</label>
+                    <input type="text" id="account-auc-id" placeholder="900123456" readonly>
                   </div>
                 </div>
 
@@ -1806,6 +1825,7 @@
     const accountPhoneCountrySearch = document.getElementById("account-phone-country-search");
     const accountPhoneCountryOptions = document.getElementById("account-phone-country-options");
     const accountMajorInput = document.getElementById("account-major");
+    const accountAucIdInput = document.getElementById("account-auc-id");
     const securityMessage = document.getElementById("security-message");
     const changePasswordOpenButton = document.getElementById("change-password-open-button");
     const changePasswordForm = document.getElementById("change-password-form");
@@ -2346,6 +2366,11 @@
       accountEmailInput.value = user.email || "";
       hydrateAccountPhoneValue(user.phone || "");
       accountMajorInput.value = user.major || "";
+
+      if (accountAucIdInput) {
+        accountAucIdInput.value = user.aucId || "";
+      }
+
       syncTwoFactorState(user.twoFactor || {});
 
       clearTemporaryProfilePhotoPreview();
