@@ -358,7 +358,7 @@
       top: 50%;
       left: 50%;
       z-index: 1201;
-      width: min(920px, calc(100% - 32px));
+      width: min(820px, calc(100% - 32px));
       max-height: min(82vh, 760px);
       margin: 0;
       padding: 24px;
@@ -371,24 +371,23 @@
       background: rgba(255, 255, 255, 0.94);
       box-shadow: 0 34px 90px rgba(42, 32, 20, 0.2);
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      grid-template-columns: 1fr;
+      gap: 18px;
       animation: reviewModalIn 0.28s ease both;
     }
 
     .review-modal-header {
-      grid-column: 1 / -1;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
-      padding-bottom: 4px;
+      padding-bottom: 2px;
     }
 
     .review-modal-header span {
       color: rgba(192, 154, 92, 0.92);
       font-size: 10px;
-      font-weight: 700;
+      font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
@@ -397,7 +396,7 @@
       margin-top: 4px;
       color: #171717;
       font-size: 24px;
-      font-weight: 600;
+      font-weight: 500;
       line-height: 1.1;
     }
 
@@ -418,6 +417,69 @@
 
     .review-close-button:hover {
       background: rgba(23, 23, 23, 0.14);
+    }
+
+    .review-progress {
+      display: grid;
+      gap: 8px;
+    }
+
+    .review-progress-label {
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .review-progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+    }
+
+    .review-progress-fill {
+      width: 33.333%;
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(192, 154, 92, 0.88);
+      display: block;
+      transition: width 0.24s ease;
+    }
+
+    .review-step {
+      display: none;
+      border: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .review-step.is-active {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      animation: reviewStepIn 0.22s ease both;
+    }
+
+    .review-step-heading {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 5px;
+    }
+
+    .review-step-heading span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .review-step-heading p {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 14px;
+      line-height: 1.55;
     }
 
     .review-field {
