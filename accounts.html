@@ -997,28 +997,41 @@
       position: fixed;
       inset: 0;
       z-index: 120;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 100vw;
+      min-height: 100vh;
+      min-height: 100dvh;
       padding: 24px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      isolation: isolate;
     }
 
     .account-authenticator-modal-backdrop {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      background: rgba(23, 23, 23, 0.38);
+      z-index: 0;
+      background: rgba(23, 23, 23, 0.56);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     .account-authenticator-modal-card {
-      position: relative;
-      width: min(100%, 520px);
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 1;
+      width: min(calc(100vw - 48px), 520px);
+      max-height: calc(100dvh - 48px);
+      margin: 0;
       padding: 26px;
       border-radius: 26px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       background: rgba(255, 255, 255, 0.98);
-      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.18);
+      box-shadow: 0 28px 70px rgba(23, 23, 23, 0.28);
       display: grid;
       gap: 18px;
+      overflow-y: auto;
+      transform: translate(-50%, -50%);
     }
 
     .account-authenticator-modal-close {
