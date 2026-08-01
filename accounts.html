@@ -978,6 +978,15 @@
       color: #c73636;
     }
 
+    .account-primary-button:disabled,
+    .account-secondary-button:disabled,
+    .account-danger-button:disabled,
+    .account-profile-photo-button:disabled,
+    .account-profile-photo-remove-button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
     .account-message {
       min-height: 22px;
       color: rgba(23, 23, 23, 0.62);
@@ -1559,8 +1568,174 @@
     const authenticatorSetupConfirm = document.getElementById("authenticator-setup-confirm");
     const authenticatorMessage = document.getElementById("authenticator-message");
 
+    const PROFILE_PHOTO_MAX_SIZE = 4 * 1024 * 1024;
+    const PROFILE_PHOTO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
     let accountCurrentUser = null;
     let accountTwoFactor = { appEnabled: false, emailEnabled: false };
+    let activePhotoPreviewUrl = "";
+
+    function clearTemporaryProfilePhotoPreview() {
+      if (activePhotoPreviewUrl) {
+        URL.revokeObjectURL(activePhotoPreviewUrl);
+        activePhotoPreviewUrl = "";
+      }
+    }
+
+    function setPhotoButtonsDisabled(isDisabled) {
+      if (photoChooseButton) {
+        photoChooseButton.disabled = isDisabled;
+      }
+
+      if (photoRemoveButton) {
+        photoRemoveButton.disabled = isDisabled;
+      }
+    }
+
+    function setTemporaryProfilePhotoPreview(file) {
+      clearTemporaryProfilePhotoPreview();
+
+      activePhotoPreviewUrl = URL.createObjectURL(file);
+      photoPreview.src = activePhotoPreviewUrl;
+      photoPreview.hidden = false;
+      photoInitial.hidden = true;
+      photoRemoveButton.hidden = false;
+    }
+
+    function resetPhotoPreviewToCurrentUser() {
+      clearTemporaryProfilePhotoPreview();
+      photoInput.value = "";
+
+      const user = accountCurrentUser || {};
+      photoInitial.textContent = getAccountInitials(user);
+
+      if (user.photoURL) {
+        photoPreview.src = user.photoURL;
+        photoPreview.hidden = false;
+        photoInitial.hidden = true;
+        photoRemoveButton.hidden = false;
+      } else {
+        photoPreview.src = "";
+        photoPreview.hidden = true;
+        photoInitial.hidden = false;
+        photoRemoveButton.hidden = true;
+      }
+    }
+
+    function validateProfilePhotoFile(file) {
+      if (!file) {
+        throw new Error("Please choose a profile photo.");
+      }
+
+      if (PROFILE_PHOTO_ALLOWED_TYPES.indexOf(file.type) === -1) {
+        throw new Error("Please choose a PNG, JPG, or WebP image.");
+      }
+
+      if (file.size > PROFILE_PHOTO_MAX_SIZE) {
+        throw new Error("Please choose an image up to 4MB.");
+      }
+    }
+
+    async function requestProfilePhotoAction(payload) {
+      const response = await fetch("/api/profile-photo", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload || {})
+      });
+
+      const data = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Could not update profile photo.");
+      }
+
+      return data;
+    }
+
+    async function uploadProfilePhotoToCloudinary(file) {
+      const signatureData = await requestProfilePhotoAction({
+        action: "signature"
+      });
+
+      const uploadForm = new FormData();
+      uploadForm.append("file", file);
+      uploadForm.append("api_key", signatureData.apiKey);
+      uploadForm.append("timestamp", signatureData.timestamp);
+      uploadForm.append("public_id", signatureData.publicId);
+      uploadForm.append("overwrite", signatureData.overwrite || "true");
+      uploadForm.append("invalidate", signatureData.invalidate || "true");
+      uploadForm.append("signature", signatureData.signature);
+
+      const cloudinaryResponse = await fetch("https://api.cloudinary.com/v1_1/" + encodeURIComponent(signatureData.cloudName) + "/image/upload", {
+        method: "POST",
+        body: uploadForm
+      });
+
+      const cloudinaryData = await cloudinaryResponse.json().catch(function () {
+        return {};
+      });
+
+      if (!cloudinaryResponse.ok || !cloudinaryData.secure_url || !cloudinaryData.public_id) {
+        throw new Error(cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : "Could not upload profile photo.");
+      }
+
+      return requestProfilePhotoAction({
+        action: "save",
+        photoURL: cloudinaryData.secure_url,
+        publicId: cloudinaryData.public_id
+      });
+    }
+
+    async function uploadProfilePhotoFile(file) {
+      validateProfilePhotoFile(file);
+      setTemporaryProfilePhotoPreview(file);
+      setPhotoButtonsDisabled(true);
+      photoChooseButton.textContent = "Uploading...";
+      showMessage(detailsMessage, "", "");
+
+      try {
+        const data = await uploadProfilePhotoToCloudinary(file);
+
+        photoInput.value = "";
+        hydrateAccountDetails(data.user);
+        showMessage(detailsMessage, "Profile photo updated.", "success");
+      } catch (error) {
+        resetPhotoPreviewToCurrentUser();
+        showMessage(detailsMessage, error.message || "Could not upload profile photo.", "error");
+      } finally {
+        setPhotoButtonsDisabled(false);
+        photoChooseButton.textContent = "Choose Photo";
+        photoRemoveButton.textContent = "Remove Photo";
+      }
+    }
+
+    async function removeProfilePhoto() {
+      setPhotoButtonsDisabled(true);
+      photoRemoveButton.textContent = "Removing...";
+      showMessage(detailsMessage, "", "");
+
+      try {
+        const data = await requestProfilePhotoAction({
+          action: "remove"
+        });
+
+        photoInput.value = "";
+        hydrateAccountDetails(data.user);
+        showMessage(detailsMessage, "Profile photo removed.", "success");
+      } catch (error) {
+        showMessage(detailsMessage, error.message || "Could not remove profile photo.", "error");
+      } finally {
+        setPhotoButtonsDisabled(false);
+        photoChooseButton.textContent = "Choose Photo";
+        photoRemoveButton.textContent = "Remove Photo";
+      }
+    }
 
     function showPanel(panelName) {
       sidebarLinks.forEach(function (link) {
@@ -1829,6 +2004,7 @@
       accountMajorInput.value = user.major || "";
       syncTwoFactorState(user.twoFactor || {});
 
+      clearTemporaryProfilePhotoPreview();
       photoInitial.textContent = getAccountInitials(user);
 
       if (user.photoURL) {
@@ -1883,25 +2059,18 @@
       photoInput.click();
     });
 
-    photoInput.addEventListener("change", function () {
+    photoInput.addEventListener("change", async function () {
       const file = photoInput.files && photoInput.files[0];
 
       if (!file) {
         return;
       }
 
-      photoPreview.src = URL.createObjectURL(file);
-      photoPreview.hidden = false;
-      photoInitial.hidden = true;
-      photoRemoveButton.hidden = false;
+      await uploadProfilePhotoFile(file);
     });
 
-    photoRemoveButton.addEventListener("click", function () {
-      photoInput.value = "";
-      photoPreview.src = "";
-      photoPreview.hidden = true;
-      photoInitial.hidden = false;
-      photoRemoveButton.hidden = true;
+    photoRemoveButton.addEventListener("click", async function () {
+      await removeProfilePhoto();
     });
 
     detailsForm.addEventListener("submit", async function (event) {
