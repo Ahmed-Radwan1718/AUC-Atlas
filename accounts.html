@@ -455,6 +455,11 @@
       object-fit: contain;
     }
 
+    .account-display-name-edit-button img {
+      filter: invert(1) brightness(1.8);
+      opacity: 0.96;
+    }
+
     .account-display-name-tooltip {
       position: absolute;
       right: -12px;
@@ -488,9 +493,9 @@
       width: 50px;
       height: 50px;
       padding: 0;
-      border: 1px solid rgba(23, 23, 23, 0.12);
+      border: 1px solid rgba(23, 23, 23, 0.9);
       border-radius: 16px;
-      background: rgba(255, 255, 255, 0.82);
+      background: rgba(23, 23, 23, 0.92);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -498,8 +503,8 @@
     }
 
     .account-display-name-edit-button:hover {
-      background: white;
-      border-color: rgba(192, 154, 92, 0.34);
+      background: rgba(0, 0, 0, 0.96);
+      border-color: rgba(0, 0, 0, 0.96);
     }
 
     .account-display-name-edit-button:disabled {
