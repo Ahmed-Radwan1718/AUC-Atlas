@@ -2958,9 +2958,22 @@
     }
 
     async function disableAuthenticatorApp() {
-      const code = window.prompt("Enter your 6-digit authenticator code to disable it.");
+      const codeInput = window.prompt("Enter your 6-digit authenticator code to disable it.");
 
-      if (!code) {
+      if (codeInput === null) {
+        return;
+      }
+
+      const code = String(codeInput || "").replace(/\D/g, "");
+
+      if (!/^\d{6}$/.test(code)) {
+        showMessage(securityMessage, "Please enter a valid 6-digit authenticator code.", "error");
+        return;
+      }
+
+      const confirmed = window.confirm("Disable authenticator app two-factor authentication for this account?");
+
+      if (!confirmed) {
         return;
       }
 
@@ -2970,7 +2983,7 @@
 
       try {
         const data = await requestAuthenticatorAction("disable", { code: code });
-        syncTwoFactorState(data.twoFactor || { appEnabled: false });
+        syncTwoFactorState(data.twoFactor || { appEnabled: false, emailEnabled: accountTwoFactor.emailEnabled });
         showMessage(securityMessage, "Authenticator app disabled.", "success");
       } catch (error) {
         showMessage(securityMessage, error.message || "Could not disable authenticator app.", "error");
