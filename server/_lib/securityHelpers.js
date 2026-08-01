@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const admin = require("./firebaseAdmin");
 
 const IS_PRODUCTION =
@@ -7,8 +8,34 @@ const SITE_SESSION_COOKIE_NAME = IS_PRODUCTION
   ? "__Host-auc_atlas_session"
   : "auc_atlas_session";
 
+const LOGIN_CHALLENGE_COOKIE_NAME = IS_PRODUCTION
+  ? "__Host-auc_atlas_login_challenge"
+  : "auc_atlas_login_challenge";
+
 const SITE_SESSION_EXPIRES_MS = 5 * 24 * 60 * 60 * 1000;
+const LOGIN_CHALLENGE_EXPIRES_MS = 10 * 60 * 1000;
 const ALLOWED_AUC_EMAIL_DOMAIN = "aucegypt.edu";
+
+function getSecuritySecret() {
+  return String(process.env.SECURITY_CODE_SECRET || process.env.FIREBASE_PRIVATE_KEY || process.env.FIREBASE_CLIENT_EMAIL || "auc-atlas-security-secret");
+}
+
+function createRandomToken() {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+function isExpired(timestamp) {
+  if (!timestamp) return true;
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  return date.getTime() <= Date.now();
+}
+
+function getLoginChallengeHash(uid, challengeId, token, salt) {
+  return crypto
+    .createHmac("sha256", getSecuritySecret())
+    .update("login-challenge:" + uid + ":" + challengeId + ":" + token + ":" + salt)
+    .digest("hex");
+}
 
 function cleanAuthEmail(value) {
   return String(value || "").trim().toLowerCase();
@@ -214,6 +241,104 @@ async function getOptionalSiteSessionUser(req, options) {
   }
 }
 
+async function createLoginChallenge(uid, res, details) {
+  const db = admin.firestore();
+  const challengeRef = db.collection("loginChallenges").doc();
+  const challengeId = challengeRef.id;
+  const token = createRandomToken();
+  const salt = db.collection("_").doc().id;
+
+  await challengeRef.set({
+    uid,
+    challengeHash: getLoginChallengeHash(uid, challengeId, token, salt),
+    salt,
+    email: details && details.email ? details.email : "",
+    idToken: details && details.idToken ? details.idToken : "",
+    twoFactor: details && details.twoFactor ? details.twoFactor : {},
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    expiresAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() + LOGIN_CHALLENGE_EXPIRES_MS))
+  });
+
+  setCookie(res, LOGIN_CHALLENGE_COOKIE_NAME, challengeId + "." + token, Math.floor(LOGIN_CHALLENGE_EXPIRES_MS / 1000));
+
+  return { challengeId };
+}
+
+async function getLoginChallenge(req) {
+  const cookieValue = getCookie(req, LOGIN_CHALLENGE_COOKIE_NAME);
+
+  if (!cookieValue || !cookieValue.includes(".")) {
+    const error = new Error("Please log in again.");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const parts = cookieValue.split(".");
+  const challengeId = parts[0];
+  const token = parts.slice(1).join(".");
+  const challengeRef = admin.firestore().collection("loginChallenges").doc(challengeId);
+  const challengeDoc = await challengeRef.get();
+
+  if (!challengeDoc.exists) {
+    const error = new Error("Please log in again.");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const data = challengeDoc.data() || {};
+
+  if (isExpired(data.expiresAt)) {
+    await challengeRef.delete().catch(function () {});
+    const error = new Error("Authenticator login expired. Please log in again.");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const submittedHash = getLoginChallengeHash(data.uid, challengeId, token, data.salt || "");
+  const savedBuffer = Buffer.from(data.challengeHash || "", "hex");
+  const submittedBuffer = Buffer.from(submittedHash, "hex");
+
+  if (savedBuffer.length !== submittedBuffer.length || !crypto.timingSafeEqual(savedBuffer, submittedBuffer)) {
+    const error = new Error("Please log in again.");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  return {
+    challengeId,
+    ref: challengeRef,
+    uid: data.uid || "",
+    email: data.email || "",
+    idToken: data.idToken || "",
+    twoFactor: data.twoFactor || {}
+  };
+}
+
+async function clearLoginChallenge(req, res) {
+  clearCookie(res, LOGIN_CHALLENGE_COOKIE_NAME);
+
+  try {
+    const challenge = await getLoginChallenge(req);
+    await challenge.ref.delete().catch(function () {});
+  } catch (error) {}
+}
+
+async function getAuthenticatorSecret(uid) {
+  const db = admin.firestore();
+  const secretDoc = await db.collection("twoFactorSecrets").doc(uid).get();
+
+  if (secretDoc.exists) {
+    const data = secretDoc.data() || {};
+    return data.appSecret || "";
+  }
+
+  const userDoc = await db.collection("users").doc(uid).get();
+  const userData = userDoc.exists ? userDoc.data() || {} : {};
+  const twoFactor = userData.twoFactor || {};
+
+  return twoFactor.appSecret || "";
+}
+
 module.exports = {
   isAllowedAucEmail,
   ensureAllowedAucEmail,
@@ -223,5 +348,9 @@ module.exports = {
   createSiteSessionForUid,
   clearSiteSessionCookie,
   getSiteSessionUser,
-  getOptionalSiteSessionUser
+  getOptionalSiteSessionUser,
+  createLoginChallenge,
+  getLoginChallenge,
+  clearLoginChallenge,
+  getAuthenticatorSecret
 };
