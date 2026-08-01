@@ -300,7 +300,7 @@ module.exports = async function handler(req, res) {
       const photoURL = userData.photoURL || userRecord.photoURL || "";
       const savedPhone = userData.phone || "";
       const savedMajor = userData.major || "";
-      const aucId = userData.aucId || userData.aucIdLookupKey || "";
+      const savedAucId = userData.aucId || userData.aucIdLookupKey || "";
       const authProvider = userData.authProvider || "password";
       const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
       const aucIdLastChangedAt = userData.aucIdLastChangedAt || null;
@@ -321,7 +321,7 @@ module.exports = async function handler(req, res) {
           firstName: getFirstName(savedFullName, email),
           phone: savedPhone,
           major: savedMajor,
-          aucId,
+          aucId: savedAucId,
           authProvider,
           twoFactor,
           displayNameLastChangedAt,
