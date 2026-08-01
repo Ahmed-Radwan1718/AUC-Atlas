@@ -3,6 +3,7 @@ const routeLoaders = {
   "login": function () { return require("../server/routes/login"); },
   "logout": function () { return require("../server/routes/logout"); },
   "me": function () { return require("../server/routes/me"); },
+  "profile-photo": function () { return require("../server/routes/profile-photo"); },
   "signup": function () { return require("../server/routes/signup"); },
   "verify-login-authenticator": function () { return require("../server/routes/verify-login-authenticator"); }
 };
