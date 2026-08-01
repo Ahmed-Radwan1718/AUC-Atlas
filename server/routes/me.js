@@ -334,18 +334,9 @@ module.exports = async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed" });
     }
 
-    const decodedUser = await getOptionalSiteSessionUser(req, {
+    const decodedUser = await getSiteSessionUser(req, {
       checkRevoked: true
     });
-
-    if (!decodedUser || !decodedUser.uid) {
-      return res.status(200).json({
-        signedIn: false,
-        authenticated: false,
-        loggedIn: false,
-        user: null
-      });
-    }
 
     const userRecord = await admin.auth().getUser(decodedUser.uid);
     const userDoc = await admin.firestore().collection("users").doc(decodedUser.uid).get();
@@ -384,6 +375,13 @@ module.exports = async function handler(req, res) {
       }
     });
   } catch (error) {
+    console.error("AUC Atlas /api/me failed:", {
+      message: error && error.message ? error.message : "",
+      code: error && error.code ? error.code : "",
+      statusCode: error && error.statusCode ? error.statusCode : 500,
+      hasCookieHeader: Boolean(req.headers && req.headers.cookie)
+    });
+
     if (req.method !== "GET") {
       return res.status(error.statusCode || 500).json({
         error: error.message || "Could not save account details."
@@ -394,6 +392,9 @@ module.exports = async function handler(req, res) {
       signedIn: false,
       authenticated: false,
       loggedIn: false,
+      authError: error && error.message ? error.message : "unknown-auth-error",
+      authErrorCode: error && error.code ? error.code : "",
+      hasCookieHeader: Boolean(req.headers && req.headers.cookie),
       user: null
     });
   }
