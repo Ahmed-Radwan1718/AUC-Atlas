@@ -214,6 +214,7 @@ module.exports = async function handler(req, res) {
       const photoURL = userData.photoURL || userRecord.photoURL || "";
       const savedPhone = userData.phone || "";
       const savedMajor = userData.major || "";
+      const aucId = userData.aucId || userData.aucIdLookupKey || "";
       const authProvider = userData.authProvider || "password";
       const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
       const twoFactor = await getTwoFactorResponse(decodedUser.uid, userData);
@@ -233,6 +234,7 @@ module.exports = async function handler(req, res) {
           firstName: getFirstName(savedFullName, email),
           phone: savedPhone,
           major: savedMajor,
+          aucId,
           authProvider,
           twoFactor,
           displayNameLastChangedAt
@@ -266,6 +268,7 @@ module.exports = async function handler(req, res) {
     const photoURL = userData.photoURL || userRecord.photoURL || "";
     const phone = userData.phone || "";
     const major = userData.major || "";
+    const aucId = userData.aucId || userData.aucIdLookupKey || "";
     const authProvider = userData.authProvider || "password";
     const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
     const twoFactor = await getTwoFactorResponse(decodedUser.uid, userData);
@@ -284,6 +287,7 @@ module.exports = async function handler(req, res) {
         firstName: getFirstName(fullName, email),
         phone,
         major,
+        aucId,
         authProvider,
         twoFactor,
         displayNameLastChangedAt
