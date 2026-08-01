@@ -213,11 +213,11 @@
       background: rgba(255, 255, 255, 0.78);
       box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
       display: grid;
-      grid-template-columns: minmax(280px, 0.42fr) minmax(0, 1fr);
+      grid-template-columns: minmax(280px, 0.38fr) minmax(0, 1fr);
     }
 
     .professor-profile-image {
-      min-height: 460px;
+      min-height: 560px;
       background: rgba(23, 23, 23, 0.04);
     }
 
@@ -230,10 +230,10 @@
     }
 
     .professor-profile-body {
-      padding: 34px;
+      padding: clamp(24px, 3vw, 42px);
       display: grid;
       align-content: start;
-      gap: 18px;
+      gap: 20px;
     }
 
     .professor-profile-back {
@@ -246,20 +246,6 @@
       text-transform: uppercase;
     }
 
-    .professor-profile-body h2 {
-      color: #171717;
-      font-size: clamp(34px, 4vw, 56px);
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .professor-profile-body p {
-      max-width: 760px;
-      color: rgba(23, 23, 23, 0.66);
-      font-size: 15px;
-      line-height: 1.8;
-    }
-
     .professor-profile-meta {
       display: flex;
       gap: 10px;
@@ -267,7 +253,8 @@
       flex-wrap: wrap;
     }
 
-    .professor-profile-meta span {
+    .professor-profile-meta span,
+    .professor-profile-contact span {
       padding: 9px 12px;
       border-radius: 999px;
       border: 1px solid rgba(23, 23, 23, 0.08);
@@ -277,6 +264,126 @@
       font-weight: 800;
       letter-spacing: 0.05em;
       text-transform: uppercase;
+    }
+
+    .professor-profile-contact {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .professor-profile-email {
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .professor-profile-email.is-empty {
+      color: rgba(23, 23, 23, 0.48);
+    }
+
+    .professor-profile-bio {
+      max-width: 780px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .professor-review-panel {
+      margin-top: 6px;
+    }
+
+    .professor-review-toggle {
+      width: fit-content;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: #171717;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      list-style: none;
+    }
+
+    .professor-review-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .professor-review-form {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .review-field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .review-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .review-field label {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .review-field input,
+    .review-field select,
+    .review-field textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: 0 13px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      background: rgba(247, 244, 238, 0.68);
+      color: #171717;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .review-field textarea {
+      min-height: 112px;
+      padding: 13px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .review-field input:focus,
+    .review-field select:focus,
+    .review-field textarea:focus {
+      border-color: rgba(192, 154, 92, 0.58);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .review-submit-button {
+      width: fit-content;
+      min-height: 46px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.96);
+      color: #171717;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
     }
 
     @media (max-width: 980px) {
@@ -294,6 +401,10 @@
 
       .professor-profile-image {
         min-height: 320px;
+      }
+
+      .professor-review-form {
+        grid-template-columns: 1fr;
       }
     }
   `;
@@ -355,21 +466,160 @@
 
   function renderProfessorProfile(grid, professor) {
     document.title = professor.name + " | AUC Atlas";
+
+    const professorEmail = professor.email || "";
+    const professorEmailMarkup = professorEmail
+      ? '<a class="professor-profile-email" href="mailto:' + escapeHtml(professorEmail) + '">' + escapeHtml(professorEmail) + '</a>'
+      : '<span class="professor-profile-email is-empty">Email coming soon</span>';
+    const pageHeader = document.querySelector(".professors-header");
+
+    if (pageHeader) {
+      pageHeader.innerHTML = `
+        <div>
+          <p class="professors-kicker">Professor profile</p>
+          <h1>${escapeHtml(professor.name)}</h1>
+        </div>
+
+        <p>
+          Check contact details, read the current short bio, and leave a course-specific review.
+        </p>
+      `;
+    }
+
     grid.innerHTML = `
       <article class="professor-profile-card">
         <div class="professor-profile-image">
-          <img src="${escapeHtml(professor.image)}" alt="${escapeHtml(professor.name)}">
+          <img src="${escapeHtml(professor.image || "user.png")}" alt="${escapeHtml(professor.name)}">
         </div>
         <div class="professor-profile-body">
           <a class="professor-profile-back" href="professors.html">All Professors</a>
-          <h2>${escapeHtml(professor.name)}</h2>
+
           <div class="professor-profile-meta">
             <span>${escapeHtml(professor.department)}</span>
             <span>${escapeHtml(professor.course || "Course coming soon")}</span>
             <span>${escapeHtml((professor.reviewCount || 0) + " " + ((professor.reviewCount || 0) === 1 ? "Review" : "Reviews"))}</span>
             <span>${escapeHtml(professor.averageStars || "No Stars Yet")}</span>
           </div>
-          <p>${escapeHtml(professor.bio || "Bio coming soon.")}</p>
+
+          <div class="professor-profile-contact">
+            <span>Email</span>
+            ${professorEmailMarkup}
+          </div>
+
+          <p class="professor-profile-bio">${escapeHtml(professor.bio || "Bio coming soon.")}</p>
+
+          <details class="professor-review-panel">
+            <summary class="professor-review-toggle">Leave a review</summary>
+
+            <form class="professor-review-form" onsubmit="event.preventDefault();">
+              <input type="hidden" name="professor" value="${escapeHtml(professor.name)}">
+
+              <div class="review-field">
+                <label for="review-course">Course taken</label>
+                <input id="review-course" name="courseTaken" type="text" placeholder="Example: CSCE 1101">
+              </div>
+
+              <div class="review-field">
+                <label for="review-semester">Semester taken</label>
+                <input id="review-semester" name="semesterTaken" type="text" placeholder="Example: Fall 2026">
+              </div>
+
+              <div class="review-field">
+                <label for="review-attendance">Attendance policy</label>
+                <select id="review-attendance" name="attendancePolicy">
+                  <option>Required</option>
+                  <option>Sometimes checked</option>
+                  <option>Not important</option>
+                  <option>Not sure</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-grading-style">Grading style</label>
+                <select id="review-grading-style" name="gradingStyle">
+                  <option>Exams-heavy</option>
+                  <option>Projects-heavy</option>
+                  <option>Assignments-heavy</option>
+                  <option>Participation-heavy</option>
+                  <option>Mixed</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-workload">Workload</label>
+                <select id="review-workload" name="workload">
+                  <option>Light</option>
+                  <option>Moderate</option>
+                  <option>Heavy</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-exam-difficulty">Exam difficulty</label>
+                <select id="review-exam-difficulty" name="examDifficulty">
+                  <option>Easier than class material</option>
+                  <option>Matches class material</option>
+                  <option>Harder than class material</option>
+                  <option>No exams</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-transparency">Grading transparency</label>
+                <select id="review-transparency" name="gradingTransparency">
+                  <option>Rubrics clear</option>
+                  <option>Somewhat clear</option>
+                  <option>Unclear</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-feedback">Feedback quality</label>
+                <select id="review-feedback" name="feedbackQuality">
+                  <option>Helpful</option>
+                  <option>Minimal</option>
+                  <option>None</option>
+                  <option>Not applicable</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-lecture">Lecture usefulness</label>
+                <select id="review-lecture" name="lectureUsefulness">
+                  <option>Essential</option>
+                  <option>Helpful</option>
+                  <option>Skippable</option>
+                  <option>Not lecture-based</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-office-hours">Office hours/help</label>
+                <select id="review-office-hours" name="officeHours">
+                  <option>Helpful</option>
+                  <option>Available but limited</option>
+                  <option>Hard to reach</option>
+                  <option>Did not use</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-recommend">Would you recommend for this course?</label>
+                <select id="review-recommend" name="recommendation">
+                  <option>Yes</option>
+                  <option>Depends</option>
+                  <option>No</option>
+                </select>
+              </div>
+
+              <div class="review-field full">
+                <label for="review-note">What should a student know before taking this professor?</label>
+                <textarea id="review-note" name="studentNote" maxlength="360" required></textarea>
+              </div>
+
+              <button class="review-submit-button" type="submit">Submit Review</button>
+            </form>
+          </details>
         </div>
       </article>
     `;
