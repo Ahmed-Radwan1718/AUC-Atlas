@@ -482,6 +482,30 @@
       line-height: 1.55;
     }
 
+    .review-section-heading {
+      grid-column: 1 / -1;
+      margin-top: 4px;
+      color: rgba(192, 154, 92, 0.86);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .review-section-heading::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: rgba(23, 23, 23, 0.08);
+    }
+
+    .review-section-heading:first-of-type {
+      margin-top: 0;
+    }
+
     .review-field {
       display: grid;
       gap: 7px;
@@ -817,6 +841,8 @@
 
               <input type="hidden" name="professor" value="${escapeHtml(professor.name)}">
 
+              <div class="review-section-heading">Course context</div>
+
               <div class="review-field">
                 <label for="review-course">Course taken</label>
                 <input id="review-course" name="courseTaken" type="text" placeholder="Example: CSCE 1101">
@@ -826,6 +852,17 @@
                 <label for="review-semester">Semester taken</label>
                 <input id="review-semester" name="semesterTaken" type="text" placeholder="Example: Fall 2026">
               </div>
+
+              <div class="review-field">
+                <label for="review-recommend">Would you recommend for this course?</label>
+                <select id="review-recommend" name="recommendation">
+                  <option>Yes</option>
+                  <option>Depends</option>
+                  <option>No</option>
+                </select>
+              </div>
+
+              <div class="review-section-heading">Class experience</div>
 
               <div class="review-field">
                 <label for="review-attendance">Attendance policy</label>
@@ -838,6 +875,37 @@
               </div>
 
               <div class="review-field">
+                <label for="review-workload">Workload</label>
+                <select id="review-workload" name="workload">
+                  <option>Light</option>
+                  <option>Moderate</option>
+                  <option>Heavy</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-lecture">Lecture usefulness</label>
+                <select id="review-lecture" name="lectureUsefulness">
+                  <option>Essential</option>
+                  <option>Helpful</option>
+                  <option>Skippable</option>
+                  <option>Not lecture-based</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-office-hours">Office hours/help</label>
+                <select id="review-office-hours" name="officeHours">
+                  <option>Helpful</option>
+                  <option>Available but limited</option>
+                  <option>Hard to reach</option>
+                  <option>Did not use</option>
+                </select>
+              </div>
+
+              <div class="review-section-heading">Grading and advice</div>
+
+              <div class="review-field">
                 <label for="review-grading-style">Grading style</label>
                 <select id="review-grading-style" name="gradingStyle">
                   <option>Exams-heavy</option>
@@ -845,15 +913,6 @@
                   <option>Assignments-heavy</option>
                   <option>Participation-heavy</option>
                   <option>Mixed</option>
-                </select>
-              </div>
-
-              <div class="review-field">
-                <label for="review-workload">Workload</label>
-                <select id="review-workload" name="workload">
-                  <option>Light</option>
-                  <option>Moderate</option>
-                  <option>Heavy</option>
                 </select>
               </div>
 
@@ -883,35 +942,6 @@
                   <option>Minimal</option>
                   <option>None</option>
                   <option>Not applicable</option>
-                </select>
-              </div>
-
-              <div class="review-field">
-                <label for="review-lecture">Lecture usefulness</label>
-                <select id="review-lecture" name="lectureUsefulness">
-                  <option>Essential</option>
-                  <option>Helpful</option>
-                  <option>Skippable</option>
-                  <option>Not lecture-based</option>
-                </select>
-              </div>
-
-              <div class="review-field">
-                <label for="review-office-hours">Office hours/help</label>
-                <select id="review-office-hours" name="officeHours">
-                  <option>Helpful</option>
-                  <option>Available but limited</option>
-                  <option>Hard to reach</option>
-                  <option>Did not use</option>
-                </select>
-              </div>
-
-              <div class="review-field">
-                <label for="review-recommend">Would you recommend for this course?</label>
-                <select id="review-recommend" name="recommendation">
-                  <option>Yes</option>
-                  <option>Depends</option>
-                  <option>No</option>
                 </select>
               </div>
 
