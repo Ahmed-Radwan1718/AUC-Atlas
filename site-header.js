@@ -189,7 +189,7 @@
       position: absolute;
       top: 52px;
       right: 0;
-      min-width: 198px;
+      min-width: 238px;
       padding: 8px;
       border-radius: 18px;
       border: 1px solid rgba(23, 23, 23, 0.1);
@@ -247,7 +247,8 @@
       color: #171717;
     }
 
-    .floating-account-menu-link img {
+    .floating-account-menu-link img,
+    .floating-account-menu-icon {
       width: 16px;
       height: 16px;
       display: block;
@@ -256,8 +257,46 @@
       transition: opacity 0.2s ease;
     }
 
-    .floating-account-menu-link:hover img {
+    .floating-account-menu-icon {
+      flex: 0 0 16px;
+      color: inherit;
+      background: currentColor;
+    }
+
+    .floating-account-menu-link:hover img,
+    .floating-account-menu-link:hover .floating-account-menu-icon {
       opacity: 1;
+    }
+
+    .floating-degree-icon {
+      position: relative;
+      background: transparent;
+    }
+
+    .floating-degree-icon::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-left: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      border-radius: 0 0 0 3px;
+    }
+
+    .floating-degree-icon::after {
+      content: "";
+      position: absolute;
+      left: 5px;
+      bottom: 4px;
+      width: 3px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 5px -3px 0 currentColor, 10px -7px 0 currentColor;
+    }
+
+    .floating-reviews-icon {
+      -webkit-mask: url("support-icon.png") center / contain no-repeat;
+      mask: url("support-icon.png") center / contain no-repeat;
     }
 
     .floating-account-logout {
@@ -443,6 +482,16 @@
         <a href="accounts.html" class="floating-account-menu-link" id="floating-account-link" hidden>
           <img src="user.png" alt="">
           <span>Account</span>
+        </a>
+
+        <a href="degree-progression.html" class="floating-account-menu-link" id="floating-degree-link" hidden>
+          <span class="floating-account-menu-icon floating-degree-icon" aria-hidden="true"></span>
+          <span>Degree Progression</span>
+        </a>
+
+        <a href="accounts.html#reviews" class="floating-account-menu-link" id="floating-reviews-link" hidden>
+          <span class="floating-account-menu-icon floating-reviews-icon" aria-hidden="true"></span>
+          <span>Review History</span>
         </a>
 
         <button class="floating-account-menu-link floating-account-logout" id="floating-logout-button" type="button" hidden>
