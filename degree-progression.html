@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Degree Progression | AUC Atlas</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .degree-page {
+      min-height: 100vh;
+      padding-top: 104px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+    }
+
+    .degree-section {
+      min-height: calc(100vh - 104px);
+      padding: 76px 44px 96px;
+    }
+
+    .degree-inner {
+      width: 100%;
+      max-width: 1220px;
+      margin: 0 auto;
+    }
+
+    .degree-header {
+      margin: 0 0 34px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .degree-header h1 {
+      color: #171717;
+      font-size: 46px;
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .degree-header p,
+    .degree-panel p {
+      max-width: 680px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .degree-header p { max-width: 390px; text-align: right; }
+
+    .degree-layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .account-sidebar,
+    .degree-panel {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.12);
+    }
+
+    .account-sidebar {
+      position: sticky;
+      top: 120px;
+      padding: 14px;
+      border-radius: 26px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-sidebar-link {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.64);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: left;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+    }
+
+    .account-sidebar-link:hover,
+    .account-sidebar-link.active {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
+
+    .account-sidebar-icon,
+    .account-logout-icon {
+      width: 19px;
+      height: 19px;
+      display: block;
+      color: inherit;
+      background: currentColor;
+      flex: 0 0 19px;
+    }
+
+    .account-details-icon {
+      -webkit-mask: url("user.png") center / contain no-repeat;
+      mask: url("user.png") center / contain no-repeat;
+    }
+
+    .account-security-icon {
+      -webkit-mask: url("security-icon.png") center / contain no-repeat;
+      mask: url("security-icon.png") center / contain no-repeat;
+    }
+
+    .account-reviews-icon {
+      -webkit-mask: url("support-icon.png") center / contain no-repeat;
+      mask: url("support-icon.png") center / contain no-repeat;
+    }
+
+    .account-degree-icon {
+      position: relative;
+      background: transparent;
+    }
+
+    .account-degree-icon::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-left: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      border-radius: 0 0 0 3px;
+    }
+
+    .account-degree-icon::after {
+      content: "";
+      position: absolute;
+      left: 6px;
+      bottom: 5px;
+      width: 3px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 5px -3px 0 currentColor, 10px -7px 0 currentColor;
+    }
+
+    .account-logout-link {
+      margin-top: 8px;
+      color: #c73636;
+    }
+
+    .account-logout-icon {
+      -webkit-mask: url("logout-icon.png") center / contain no-repeat;
+      mask: url("logout-icon.png") center / contain no-repeat;
+    }
+
+    .degree-panel {
+      padding: 30px;
+      border-radius: 26px;
+      animation: degreePanelEnter 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .degree-panel h2 {
+      margin-bottom: 12px;
+      color: #171717;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    @keyframes degreePanelEnter {
+      from { opacity: 0; transform: translateY(18px) scale(0.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 900px) {
+      .degree-page { padding-top: 88px; }
+      .degree-section { padding: 54px 20px 72px; }
+      .degree-header { display: grid; }
+      .degree-header h1 { font-size: 34px; }
+      .degree-header p { text-align: left; }
+      .degree-layout { grid-template-columns: 1fr; }
+      .account-sidebar { position: static; }
+      .degree-panel { padding: 22px; border-radius: 22px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="site-header-root"></div>
+  <script src="site-header.js"></script>
+
+  <main class="degree-page">
+    <section class="degree-section">
+      <div class="degree-inner">
+        <div class="degree-header">
+          <h1>Degree Progression</h1>
+          <p>Track your academic progress and remaining requirements.</p>
+        </div>
+
+        <div class="degree-layout">
+          <aside class="account-sidebar">
+            <a class="account-sidebar-link" href="accounts.html#details">
+              <span class="account-sidebar-icon account-details-icon" aria-hidden="true"></span>
+              <span>Account Details</span>
+            </a>
+
+            <a class="account-sidebar-link" href="accounts.html#security">
+              <span class="account-sidebar-icon account-security-icon" aria-hidden="true"></span>
+              <span>Security</span>
+            </a>
+
+            <a class="account-sidebar-link active" href="degree-progression.html">
+              <span class="account-sidebar-icon account-degree-icon" aria-hidden="true"></span>
+              <span>Degree Progression</span>
+            </a>
+
+            <a class="account-sidebar-link" href="accounts.html#reviews">
+              <span class="account-sidebar-icon account-reviews-icon" aria-hidden="true"></span>
+              <span>Review History</span>
+            </a>
+
+            <button class="account-sidebar-link account-logout-link" type="button" id="degree-logout-sidebar">
+              <span class="account-logout-icon" aria-hidden="true"></span>
+              <span>Logout</span>
+            </button>
+          </aside>
+
+          <section>
+            <article class="degree-panel">
+              <h2>Degree Progression</h2>
+              <p>Coming soon.</p>
+            </article>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const logoutButton = document.getElementById("degree-logout-sidebar");
+
+    async function requireSignedIn() {
+      try {
+        const response = await fetch("/api/me", {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: { "Accept": "application/json" }
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.signedIn || !data.user) {
+          throw new Error("Please log in to view degree progression.");
+        }
+      } catch (error) {
+        try {
+          localStorage.setItem("auc-atlas-login-redirect", "degree-progression.html");
+        } catch (storageError) {}
+
+        window.location.href = "login.html";
+      }
+    }
+
+    logoutButton.addEventListener("click", async function () {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      }).catch(function () {});
+
+      try {
+        localStorage.removeItem("auc-atlas-signed-in");
+        localStorage.removeItem("aucAtlasSignedIn");
+        sessionStorage.removeItem("auc-atlas-signed-in");
+        sessionStorage.removeItem("aucAtlasSignedIn");
+      } catch (error) {}
+
+      window.location.href = "login.html";
+    });
+
+    requireSignedIn();
+  </script>
+</body>
+</html>
