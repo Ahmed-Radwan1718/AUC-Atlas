@@ -301,6 +301,103 @@
       opacity: 0.76;
     }
 
+    .auth-two-factor-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 3300;
+      padding: 24px;
+      background: rgba(23, 23, 23, 0.38);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-two-factor-panel[hidden] {
+      display: none;
+    }
+
+    .auth-two-factor-card {
+      width: min(500px, 100%);
+      padding: 30px;
+      border-radius: 26px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 28px 70px rgba(42, 32, 20, 0.22);
+    }
+
+    .auth-two-factor-header {
+      margin-bottom: 24px;
+    }
+
+    .auth-two-factor-eyebrow {
+      margin-bottom: 14px;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .auth-two-factor-header h2 {
+      margin-bottom: 12px;
+      color: #171717;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .auth-two-factor-header p {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .auth-two-factor-code-inputs {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .auth-field .auth-two-factor-code-input {
+      width: 100%;
+      min-height: 58px;
+      padding: 0;
+      border-radius: 16px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .auth-field .auth-two-factor-code-input:focus {
+      border-color: rgba(192, 154, 92, 0.84);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
+    }
+
+    .auth-two-factor-actions {
+      display: grid;
+      gap: 12px;
+    }
+
+    .auth-two-factor-link-button {
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.58);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .auth-two-factor-link-button:hover {
+      opacity: 0.72;
+    }
+
     @media (max-width: 900px) {
       .auth-page {
         padding-top: 88px;
@@ -330,6 +427,25 @@
       .auth-panel-footer {
         justify-content: center;
         text-align: center;
+      }
+
+      .auth-two-factor-card {
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      .auth-two-factor-header h2 {
+        font-size: 24px;
+      }
+
+      .auth-two-factor-code-inputs {
+        gap: 7px;
+      }
+
+      .auth-field .auth-two-factor-code-input {
+        min-height: 50px;
+        border-radius: 14px;
+        font-size: 20px;
       }
     }
   </style>
@@ -399,19 +515,57 @@
     </section>
   </main>
 
+  <div class="auth-two-factor-panel" id="login-two-factor-panel" hidden>
+    <div class="auth-two-factor-card">
+      <div class="auth-two-factor-header">
+        <p class="auth-two-factor-eyebrow">Two-Factor Authentication</p>
+        <h2>Enter Authenticator Code</h2>
+        <p>Open your authenticator app and enter the 6-digit code for AUC Atlas.</p>
+      </div>
+
+      <form class="auth-form" id="login-two-factor-form">
+        <div class="auth-field">
+          <label>Authenticator Code</label>
+
+          <div class="auth-two-factor-code-inputs" aria-label="Authenticator code">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" data-login-two-factor-input aria-label="Digit 1">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-two-factor-input aria-label="Digit 2">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-two-factor-input aria-label="Digit 3">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-two-factor-input aria-label="Digit 4">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-two-factor-input aria-label="Digit 5">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-two-factor-input aria-label="Digit 6">
+          </div>
+        </div>
+
+        <div class="auth-two-factor-actions">
+          <button class="auth-button" type="submit" id="login-two-factor-submit">
+            Verify Code
+          </button>
+
+          <button class="auth-two-factor-link-button" type="button" id="login-two-factor-cancel">
+            Cancel sign in
+          </button>
+        </div>
+
+        <p class="auth-message" id="login-two-factor-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
   <script>
     const loginForm = document.getElementById("login-form");
     const loginButton = document.getElementById("login-submit");
     const loginMessage = document.getElementById("login-message");
     const passwordVisibilityToggles = document.querySelectorAll(".auth-password-visibility-toggle");
     const passwordlessLoginButton = document.getElementById("login-passwordless-button");
-    const loginOptions = loginForm.querySelector(".auth-login-options");
-    const loginDivider = loginForm.querySelector(".auth-divider");
-    const credentialFields = Array.from(loginForm.querySelectorAll(".auth-field"));
+    const twoFactorPanel = document.getElementById("login-two-factor-panel");
+    const twoFactorForm = document.getElementById("login-two-factor-form");
+    const twoFactorCodeInputs = Array.from(document.querySelectorAll("[data-login-two-factor-input]"));
+    const twoFactorSubmit = document.getElementById("login-two-factor-submit");
+    const twoFactorCancelButton = document.getElementById("login-two-factor-cancel");
+    const twoFactorMessage = document.getElementById("login-two-factor-message");
 
     let awaitingAuthenticatorCode = false;
-    let authenticatorCodeField = null;
-    let authenticatorCodeInput = null;
 
     function showMessage(message, type) {
       loginMessage.textContent = message;
@@ -419,6 +573,15 @@
 
       if (type) {
         loginMessage.classList.add(type);
+      }
+    }
+
+    function showTwoFactorMessage(message, type) {
+      twoFactorMessage.textContent = message;
+      twoFactorMessage.className = "auth-message";
+
+      if (type) {
+        twoFactorMessage.classList.add(type);
       }
     }
 
@@ -453,109 +616,80 @@
 
     function finishLogin(user) {
       markLocalSignedIn(user);
-      showMessage("Logged in successfully.", "success");
+
+      if (twoFactorPanel && !twoFactorPanel.hidden) {
+        showTwoFactorMessage("Logged in successfully.", "success");
+      } else {
+        showMessage("Logged in successfully.", "success");
+      }
 
       setTimeout(function () {
         window.location.href = getLoginRedirectTarget();
       }, 700);
     }
 
-    function ensureAuthenticatorCodeField() {
-      if (authenticatorCodeField) {
-        return;
+    function clearTwoFactorCodeInputs() {
+      twoFactorCodeInputs.forEach(function (input) {
+        input.value = "";
+      });
+    }
+
+    function getTwoFactorCodeValue() {
+      return twoFactorCodeInputs.map(function (input) {
+        return input.value.trim();
+      }).join("");
+    }
+
+    function focusFirstTwoFactorCodeInput() {
+      if (twoFactorCodeInputs[0]) {
+        twoFactorCodeInputs[0].focus();
       }
-
-      authenticatorCodeField = document.createElement("div");
-      authenticatorCodeField.className = "auth-field";
-      authenticatorCodeField.hidden = true;
-      authenticatorCodeField.innerHTML = [
-        "<label for=\"login-authenticator-code\">Authenticator Code</label>",
-        "<input type=\"text\" id=\"login-authenticator-code\" inputmode=\"numeric\" autocomplete=\"one-time-code\" maxlength=\"6\" placeholder=\"Enter 6-digit code\">"
-      ].join("");
-
-      loginForm.insertBefore(authenticatorCodeField, loginOptions);
-      authenticatorCodeInput = document.getElementById("login-authenticator-code");
-
-      authenticatorCodeInput.addEventListener("input", function () {
-        authenticatorCodeInput.value = authenticatorCodeInput.value.replace(/\D/g, "").slice(0, 6);
-      });
     }
 
-    function setCredentialFieldsHidden(hidden) {
-      credentialFields.forEach(function (field) {
-        field.hidden = hidden;
-
-        field.querySelectorAll("input, button").forEach(function (control) {
-          control.disabled = hidden;
-        });
-      });
-    }
-
-    function showAuthenticatorStep() {
+    function openTwoFactorPanel() {
       clearLocalSignedInState();
-      ensureAuthenticatorCodeField();
-
       awaitingAuthenticatorCode = true;
-      setCredentialFieldsHidden(true);
+      clearTwoFactorCodeInputs();
+      showMessage("", "");
+      showTwoFactorMessage("", "");
 
-      authenticatorCodeField.hidden = false;
-      authenticatorCodeInput.disabled = false;
-      authenticatorCodeInput.value = "";
-
-      if (loginDivider) {
-        loginDivider.hidden = true;
-      }
-
-      if (passwordlessLoginButton) {
-        passwordlessLoginButton.disabled = false;
-        passwordlessLoginButton.textContent = "Cancel Sign In";
-      }
-
-      loginButton.disabled = false;
-      loginButton.textContent = "Verify Code";
-      showMessage("Enter the 6-digit code from your authenticator app.", "");
+      twoFactorPanel.hidden = false;
+      twoFactorSubmit.disabled = false;
+      twoFactorSubmit.textContent = "Verify Code";
 
       setTimeout(function () {
-        authenticatorCodeInput.focus();
+        focusFirstTwoFactorCodeInput();
       }, 50);
     }
 
-    function resetAuthenticatorStep(message) {
+    function closeTwoFactorPanel(message) {
       awaitingAuthenticatorCode = false;
-      setCredentialFieldsHidden(false);
+      twoFactorPanel.hidden = true;
+      clearTwoFactorCodeInputs();
+      showTwoFactorMessage("", "");
 
-      if (authenticatorCodeField) {
-        authenticatorCodeField.hidden = true;
-        authenticatorCodeInput.disabled = true;
-        authenticatorCodeInput.value = "";
-      }
-
-      if (loginDivider) {
-        loginDivider.hidden = false;
-      }
-
-      if (passwordlessLoginButton) {
-        passwordlessLoginButton.disabled = false;
-        passwordlessLoginButton.textContent = "Email Me a Sign-In Code";
-      }
-
+      twoFactorSubmit.disabled = false;
+      twoFactorSubmit.textContent = "Verify Code";
       loginButton.disabled = false;
       loginButton.textContent = "Log In";
-      showMessage(message || "", message ? "error" : "");
+
+      if (message) {
+        showMessage(message, "error");
+      }
     }
 
     async function verifyAuthenticatorLogin() {
-      const code = authenticatorCodeInput ? authenticatorCodeInput.value.trim() : "";
+      const code = getTwoFactorCodeValue();
 
       if (!/^\d{6}$/.test(code)) {
-        showMessage("Please enter your 6-digit authenticator code.", "error");
-        authenticatorCodeInput.focus();
+        showTwoFactorMessage("Please enter your 6-digit authenticator code.", "error");
+        focusFirstTwoFactorCodeInput();
         return;
       }
 
-      loginButton.disabled = true;
-      loginButton.textContent = "Verifying...";
-      showMessage("", "");
+      twoFactorSubmit.disabled = true;
+      twoFactorSubmit.textContent = "Verifying...";
+      showTwoFactorMessage("", "");
 
       try {
         const response = await fetch("/api/verify-login-authenticator", {
@@ -580,13 +714,13 @@
         awaitingAuthenticatorCode = false;
         finishLogin(data.user || null);
       } catch (error) {
-        showMessage(error.message || "The authenticator code is incorrect.", "error");
-        authenticatorCodeInput.value = "";
-        authenticatorCodeInput.focus();
+        showTwoFactorMessage(error.message || "The authenticator code is incorrect.", "error");
+        clearTwoFactorCodeInputs();
+        focusFirstTwoFactorCodeInput();
       } finally {
         if (awaitingAuthenticatorCode) {
-          loginButton.disabled = false;
-          loginButton.textContent = "Verify Code";
+          twoFactorSubmit.disabled = false;
+          twoFactorSubmit.textContent = "Verify Code";
         }
       }
     }
@@ -614,13 +748,44 @@
       });
     });
 
+    twoFactorCodeInputs.forEach(function (input, index) {
+      input.addEventListener("input", function () {
+        input.value = input.value.replace(/\D/g, "").slice(0, 1);
+
+        if (input.value && twoFactorCodeInputs[index + 1]) {
+          twoFactorCodeInputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener("keydown", function (event) {
+        if (event.key === "Backspace" && !input.value && twoFactorCodeInputs[index - 1]) {
+          twoFactorCodeInputs[index - 1].focus();
+        }
+      });
+
+      input.addEventListener("paste", function (event) {
+        const pastedCode = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+
+        if (!pastedCode) {
+          return;
+        }
+
+        event.preventDefault();
+
+        twoFactorCodeInputs.forEach(function (codeInput, codeIndex) {
+          codeInput.value = pastedCode.charAt(codeIndex) || "";
+        });
+
+        const focusIndex = Math.min(pastedCode.length, twoFactorCodeInputs.length) - 1;
+
+        if (twoFactorCodeInputs[focusIndex]) {
+          twoFactorCodeInputs[focusIndex].focus();
+        }
+      });
+    });
+
     loginForm.addEventListener("submit", async function (event) {
       event.preventDefault();
-
-      if (awaitingAuthenticatorCode) {
-        await verifyAuthenticatorLogin();
-        return;
-      }
 
       const email = document.getElementById("login-email").value.trim();
       const password = document.getElementById("login-password").value;
@@ -651,7 +816,7 @@
         }
 
         if (data.requiresTwoFactor) {
-          showAuthenticatorStep();
+          openTwoFactorPanel();
           return;
         }
 
@@ -667,12 +832,16 @@
       }
     });
 
-    passwordlessLoginButton.addEventListener("click", function () {
-      if (awaitingAuthenticatorCode) {
-        resetAuthenticatorStep("Sign in cancelled.");
-        return;
-      }
+    twoFactorForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      await verifyAuthenticatorLogin();
+    });
 
+    twoFactorCancelButton.addEventListener("click", function () {
+      closeTwoFactorPanel("Sign in cancelled.");
+    });
+
+    passwordlessLoginButton.addEventListener("click", function () {
       showMessage("Email sign-in codes are not connected yet.", "error");
     });
   </script>
