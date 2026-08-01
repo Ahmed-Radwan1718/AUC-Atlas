@@ -1,24 +1,24 @@
 (function () {
   const professors = [
-    { name: "Eslam Badr", department: "MACT", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
-    { name: "Ehab ElSawy", department: "CHEM", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Ehab El Sawy earned his PhD in physical chemistry at the University of Calgary before joining AUC in 2017. His work focuses on nano-electrochemistry, fuel cells, hydrogen production, batteries, sensors, and corrosion protection.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249148/Ehab_ElSawy_ifg2np.png" },
-    { name: "Nageh Allam", department: "PHYS", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Nageh Allam earned his PhD in materials science and engineering from Penn State before joining AUC in 2011. His work focuses on nanomaterials for energy, sensors, desalination, biomaterials, and computational materials science.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249240/Nageh_Allam_wfaser.png" },
-    { name: "Tamer Shoeib", department: "CHEM", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Tamer Shoeib earned his PhD in chemistry from York University before conducting postdoctoral research in Canada. His work focuses on analytical and biophysical chemistry, molecular structure, mass spectrometry, and metal-containing biomolecules.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249461/Tamer_Shoeib_qmcccs.png" },
-    { name: "Hassan Azazy", department: "CHEM", status: "No ratings yet", course: "CSCE 1101", group: "G-M", bio: "Hassan Azzazy earned his PhD from the University of North Texas Health Science Center before joining AUC. His work focuses on diagnostics, biosensors, nanobiotechnology, drug delivery, and clinical laboratory medicine.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785286932/Hassan_Azazy_frfg0s.png" },
-    { name: "Ibrahim Abotaleb", department: "MENG", status: "No ratings yet", course: "CSCE 1101", group: "G-M", bio: "Ibrahim Abotaleb earned his PhD from the University of Tennessee before joining AUC. His work focuses on AI in construction, sustainability, project control, risk, optimization, and contract management.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785287149/Ibrahim_Abotaleb_awad4c.png" },
-    { name: "Arthur Bos", department: "BIOL", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Arthur Bos earned his PhD in coastal zone management and fish biology from Hamburg University before joining AUC in 2011. His work focuses on reef fish, marine protected areas, invertebrates, seagrass ecology, and habitat restoration.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288244/Arthur_Bos_tegujk.png" },
-    { name: "Walid Fouad", department: "BIOL", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Walid Fouad earned his PhD in plant molecular and cellular biology from the University of Florida before joining AUC. His work focuses on plant biotechnology, crop improvement, stress tolerance, algae, biofuels, and sustainable agriculture.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288250/Walid_Fouad_khxyvf.png" },
-    { name: "Mohamed Badran", department: "MENG", status: "No ratings yet", course: "CSCE 1101", group: "G-M", bio: "Mohamed Badran earned his PhD in engineering systems and computing from the University of Guelph before joining AUC. His work focuses on operations research, optimization, autonomous vehicles, and BioMEMS sensors and actuators.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288787/Mohamed_Badran_ssh771.png" },
-    { name: "Ahmed Abdellatif", department: "BIOL", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Ahmed Abdellatif earned his MSc and PhD in anatomical sciences and neurobiology from the University of Louisville before joining AUC. His work focuses on tissue repair, diabetes, aging, dementia, and neurodegenerative diseases.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288910/Ahmed_Abdellatif_elvz21.png" },
-    { name: "Wafik Lotfallah", department: "MACT", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Wafik Lotfallah earned his PhD from the University of Wisconsin-Madison before joining AUC in 2009. His work focuses on finite model theory, descriptive complexity, fuzzy logic, and mathematical modeling.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785326069/Wafik_Lotfallah_to4w8v.png" },
-    { name: "Laila ElSerty", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344850/Laila_ElSerty_gf6bkr.png" },
-    { name: "Mariah Fairley", department: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Mariah_Fairley_h9ykwv.png" },
-    { name: "Gretchen McCullough", department: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Gretchen_McCullough_ktotfl.png" },
-    { name: "Kathleen Saville", department: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Kathleen_Saville_hz1cgi.png" },
-    { name: "Iman Baza", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Iman_Baza_ohxkad.png" },
-    { name: "Fikry Boutros", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Fikry_Boutros_gbqnkt.png" },
-    { name: "Alexander Lewko", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344860/Alexander_Lewko_dexjfc.png" },
-    { name: "Mariam Osman", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344867/Mariam_Osman_rmlqxj.png" }
+    { id: "eslam-badr", name: "Eslam Badr", department: "MACT", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
+    { id: "ehab-elsawy", name: "Ehab ElSawy", department: "CHEM", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Ehab El Sawy earned his PhD in physical chemistry at the University of Calgary before joining AUC in 2017. His work focuses on nano-electrochemistry, fuel cells, hydrogen production, batteries, sensors, and corrosion protection.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249148/Ehab_ElSawy_ifg2np.png" },
+    { id: "nageh-allam", name: "Nageh Allam", department: "PHYS", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Nageh Allam earned his PhD in materials science and engineering from Penn State before joining AUC in 2011. His work focuses on nanomaterials for energy, sensors, desalination, biomaterials, and computational materials science.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249240/Nageh_Allam_wfaser.png" },
+    { id: "tamer-shoeib", name: "Tamer Shoeib", department: "CHEM", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Tamer Shoeib earned his PhD in chemistry from York University before conducting postdoctoral research in Canada. His work focuses on analytical and biophysical chemistry, molecular structure, mass spectrometry, and metal-containing biomolecules.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785249461/Tamer_Shoeib_qmcccs.png" },
+    { id: "hassan-azazy", name: "Hassan Azazy", department: "CHEM", status: "No ratings yet", course: "CSCE 1101", group: "G-M", bio: "Hassan Azzazy earned his PhD from the University of North Texas Health Science Center before joining AUC. His work focuses on diagnostics, biosensors, nanobiotechnology, drug delivery, and clinical laboratory medicine.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785286932/Hassan_Azazy_frfg0s.png" },
+    { id: "ibrahim-abotaleb", name: "Ibrahim Abotaleb", department: "MENG", status: "No ratings yet", course: "CSCE 1101", group: "G-M", bio: "Ibrahim Abotaleb earned his PhD from the University of Tennessee before joining AUC. His work focuses on AI in construction, sustainability, project control, risk, optimization, and contract management.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785287149/Ibrahim_Abotaleb_awad4c.png" },
+    { id: "arthur-bos", name: "Arthur Bos", department: "BIOL", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Arthur Bos earned his PhD in coastal zone management and fish biology from Hamburg University before joining AUC in 2011. His work focuses on reef fish, marine protected areas, invertebrates, seagrass ecology, and habitat restoration.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288244/Arthur_Bos_tegujk.png" },
+    { id: "walid-fouad", name: "Walid Fouad", department: "BIOL", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Walid Fouad earned his PhD in plant molecular and cellular biology from the University of Florida before joining AUC. His work focuses on plant biotechnology, crop improvement, stress tolerance, algae, biofuels, and sustainable agriculture.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288250/Walid_Fouad_khxyvf.png" },
+    { id: "mohamed-badran", name: "Mohamed Badran", department: "MENG", status: "No ratings yet", course: "CSCE 1101", group: "G-M", bio: "Mohamed Badran earned his PhD in engineering systems and computing from the University of Guelph before joining AUC. His work focuses on operations research, optimization, autonomous vehicles, and BioMEMS sensors and actuators.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288787/Mohamed_Badran_ssh771.png" },
+    { id: "ahmed-abdellatif", name: "Ahmed Abdellatif", department: "BIOL", status: "No ratings yet", course: "CSCE 1101", group: "A-F", bio: "Ahmed Abdellatif earned his MSc and PhD in anatomical sciences and neurobiology from the University of Louisville before joining AUC. His work focuses on tissue repair, diabetes, aging, dementia, and neurodegenerative diseases.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288910/Ahmed_Abdellatif_elvz21.png" },
+    { id: "wafik-lotfallah", name: "Wafik Lotfallah", department: "MACT", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", bio: "Wafik Lotfallah earned his PhD from the University of Wisconsin-Madison before joining AUC in 2009. His work focuses on finite model theory, descriptive complexity, fuzzy logic, and mathematical modeling.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785326069/Wafik_Lotfallah_to4w8v.png" },
+    { id: "laila-elserty", name: "Laila ElSerty", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344850/Laila_ElSerty_gf6bkr.png" },
+    { id: "mariah-fairley", name: "Mariah Fairley", department: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Mariah_Fairley_h9ykwv.png" },
+    { id: "gretchen-mccullough", name: "Gretchen McCullough", department: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Gretchen_McCullough_ktotfl.png" },
+    { id: "kathleen-saville", name: "Kathleen Saville", department: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Kathleen_Saville_hz1cgi.png" },
+    { id: "iman-baza", name: "Iman Baza", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Iman_Baza_ohxkad.png" },
+    { id: "fikry-boutros", name: "Fikry Boutros", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344856/Fikry_Boutros_gbqnkt.png" },
+    { id: "alexander-lewko", name: "Alexander Lewko", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "A-F", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344860/Alexander_Lewko_dexjfc.png" },
+    { id: "mariam-osman", name: "Mariam Osman", department: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344867/Mariam_Osman_rmlqxj.png" }
   ];
 
   const style = document.createElement("style");
@@ -132,6 +132,7 @@
     }
 
     .professors-search-box {
+      max-width: 560px;
       margin-bottom: 18px;
     }
 
@@ -154,6 +155,25 @@
       box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
     }
 
+    .professor-card {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .professor-card:hover,
+    .professor-card:focus-visible {
+      border-color: rgba(192, 154, 92, 0.34);
+      box-shadow: 0 30px 80px rgba(42, 32, 20, 0.14);
+      transform: translateY(-3px);
+    }
+
+    .professor-card:focus-visible {
+      outline: 3px solid rgba(192, 154, 92, 0.26);
+      outline-offset: 4px;
+    }
+
     .professors-result-count {
       margin-bottom: 18px;
       color: rgba(23, 23, 23, 0.58);
@@ -173,6 +193,92 @@
       font-weight: 700;
     }
 
+    .professors-browser.professor-profile-mode {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .professors-browser.professor-profile-mode .filters-panel,
+    .professors-browser.professor-profile-mode .professors-search-box {
+      display: none;
+    }
+
+    .professors-grid.professor-profile-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .professor-profile-card {
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      display: grid;
+      grid-template-columns: minmax(280px, 0.42fr) minmax(0, 1fr);
+    }
+
+    .professor-profile-image {
+      min-height: 460px;
+      background: rgba(23, 23, 23, 0.04);
+    }
+
+    .professor-profile-image img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center 18%;
+    }
+
+    .professor-profile-body {
+      padding: 34px;
+      display: grid;
+      align-content: start;
+      gap: 18px;
+    }
+
+    .professor-profile-back {
+      width: fit-content;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .professor-profile-body h2 {
+      color: #171717;
+      font-size: clamp(34px, 4vw, 56px);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .professor-profile-body p {
+      max-width: 760px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .professor-profile-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .professor-profile-meta span {
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      background: rgba(247, 244, 238, 0.74);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
     @media (max-width: 980px) {
       .professors-browser {
         grid-template-columns: 1fr;
@@ -181,12 +287,48 @@
       .filters-panel {
         position: static;
       }
+
+      .professor-profile-card {
+        grid-template-columns: 1fr;
+      }
+
+      .professor-profile-image {
+        min-height: 320px;
+      }
     }
   `;
   document.head.appendChild(style);
 
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function normalize(value) {
     return String(value || "").toLowerCase().trim();
+  }
+
+  function normalizeProfessorId(value) {
+    return normalize(value)
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function getProfessorId(professor) {
+    return normalizeProfessorId(professor.id || professor.name);
+  }
+
+  function getCurrentProfessorId() {
+    return normalizeProfessorId(new URLSearchParams(window.location.search).get("id"));
+  }
+
+  function getProfessorUrl(professor) {
+    return "professors.html?id=" + encodeURIComponent(getProfessorId(professor));
   }
 
   function getCheckedValues(group) {
@@ -196,12 +338,13 @@
   }
 
   function professorMatches(professor) {
-    const query = normalize(document.getElementById("professor-search-input").value);
+    const searchInput = document.getElementById("professor-search-input");
+    const query = normalize(searchInput ? searchInput.value : "");
     const departments = getCheckedValues("department");
     const statuses = getCheckedValues("status");
     const groups = getCheckedValues("group");
 
-    const searchableText = normalize([professor.name, professor.department, professor.status, professor.course, professor.bio, professor.group].join(" "));
+    const searchableText = normalize([getProfessorId(professor), professor.name, professor.department, professor.status, professor.course, professor.bio, professor.group].join(" "));
     const matchesSearch = !query || searchableText.includes(query);
     const matchesDepartment = !departments.length || departments.includes(professor.department);
     const matchesStatus = !statuses.length || statuses.includes(professor.status);
@@ -210,26 +353,86 @@
     return matchesSearch && matchesDepartment && matchesStatus && matchesGroup;
   }
 
+  function renderProfessorProfile(grid, professor) {
+    document.title = professor.name + " | AUC Atlas";
+    grid.innerHTML = `
+      <article class="professor-profile-card">
+        <div class="professor-profile-image">
+          <img src="${escapeHtml(professor.image)}" alt="${escapeHtml(professor.name)}">
+        </div>
+        <div class="professor-profile-body">
+          <a class="professor-profile-back" href="professors.html">All Professors</a>
+          <h2>${escapeHtml(professor.name)}</h2>
+          <div class="professor-profile-meta">
+            <span>${escapeHtml(professor.department)}</span>
+            <span>${escapeHtml(professor.course || "Course coming soon")}</span>
+            <span>${escapeHtml((professor.reviewCount || 0) + " " + ((professor.reviewCount || 0) === 1 ? "Review" : "Reviews"))}</span>
+            <span>${escapeHtml(professor.averageStars || "No Stars Yet")}</span>
+          </div>
+          <p>${escapeHtml(professor.bio || "Bio coming soon.")}</p>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderProfessorNotFound(grid, professorId) {
+    document.title = "Professor Not Found | AUC Atlas";
+    grid.innerHTML = `
+      <div class="professors-empty">
+        Professor "${escapeHtml(professorId)}" was not found. <a href="professors.html">Back to all professors</a>.
+      </div>
+    `;
+  }
+
   function renderProfessors() {
     const grid = document.getElementById("professors-grid");
+    const browser = document.querySelector(".professors-browser");
+    const currentProfessorId = getCurrentProfessorId();
+
+    if (!grid) {
+      return;
+    }
+
+    grid.classList.toggle("professor-profile-grid", Boolean(currentProfessorId));
+
+    if (browser) {
+      browser.classList.toggle("professor-profile-mode", Boolean(currentProfessorId));
+    }
+
+    if (currentProfessorId) {
+      const professor = professors.find(function (item) {
+        return getProfessorId(item) === currentProfessorId;
+      });
+
+      if (professor) {
+        renderProfessorProfile(grid, professor);
+      } else {
+        renderProfessorNotFound(grid, currentProfessorId);
+      }
+
+      return;
+    }
+
+    document.title = "Professors | AUC Atlas";
+
     const visibleProfessors = professors.filter(professorMatches);
 
     grid.innerHTML = visibleProfessors.map(function (professor) {
       return `
-        <article class="professor-card">
+        <a class="professor-card" href="${escapeHtml(getProfessorUrl(professor))}" aria-label="Open ${escapeHtml(professor.name)} profile">
           <div class="professor-card-image">
-            <img src="${professor.image}" alt="${professor.name}">
+            <img src="${escapeHtml(professor.image)}" alt="${escapeHtml(professor.name)}">
           </div>
           <div class="professor-card-body">
-            <h2>${professor.name}</h2>
-            <p class="professor-bio">${professor.bio || "Bio coming soon."}</p>
+            <h2>${escapeHtml(professor.name)}</h2>
+            <p class="professor-bio">${escapeHtml(professor.bio || "Bio coming soon.")}</p>
             <div class="professor-meta">
-              <span>${professor.department}</span>
-              <span>${professor.reviewCount || 0} ${(professor.reviewCount || 0) === 1 ? "Review" : "Reviews"}</span>
-              <span>${professor.averageStars || "No Stars Yet"}</span>
+              <span>${escapeHtml(professor.department)}</span>
+              <span>${escapeHtml((professor.reviewCount || 0) + " " + ((professor.reviewCount || 0) === 1 ? "Review" : "Reviews"))}</span>
+              <span>${escapeHtml(professor.averageStars || "No Stars Yet")}</span>
             </div>
           </div>
-        </article>
+        </a>
       `;
     }).join("");
 
@@ -249,7 +452,12 @@
       input.addEventListener("change", renderProfessors);
     });
 
-    document.getElementById("professor-search-input").addEventListener("input", renderProfessors);
+    const searchInput = document.getElementById("professor-search-input");
+
+    if (searchInput) {
+      searchInput.addEventListener("input", renderProfessors);
+    }
+
     renderProfessors();
   }
 
