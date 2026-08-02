@@ -124,10 +124,44 @@ async function getProfessorReviews(professorId) {
   return reviews;
 }
 
+async function getAuthorReviews(authorUid) {
+  const reviewsById = new Map();
+  const collection = admin.firestore().collection("professorReviews");
+  const snapshots = await Promise.all([
+    collection.where("authorUid", "==", authorUid).limit(100).get(),
+    collection.where("authorUserId", "==", authorUid).limit(100).get()
+  ]);
+
+  snapshots.forEach(function (snapshot) {
+    snapshot.forEach(function (doc) {
+      reviewsById.set(doc.id, serializeReview(doc));
+    });
+  });
+
+  const reviews = Array.from(reviewsById.values());
+
+  reviews.sort(function (a, b) {
+    return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
+  });
+
+  return reviews;
+}
+
 module.exports = async function handler(req, res) {
   try {
     if (req.method === "GET") {
-      const professorId = cleanString((req.query || {}).professorId, 80);
+      const query = req.query || {};
+      const mine = cleanString(query.mine || query.author, 20);
+
+      if (mine === "true" || mine === "me") {
+        const decodedUser = await getSiteSessionUser(req, {
+          checkRevoked: true
+        });
+        const reviews = await getAuthorReviews(decodedUser.uid);
+        return res.status(200).json({ reviews });
+      }
+
+      const professorId = cleanString(query.professorId, 80);
 
       if (!professorId) {
         throw createReviewError("Professor not found.", 400);
