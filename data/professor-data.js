@@ -701,6 +701,173 @@
       color: #9b2f2f;
     }
 
+    .professor-reviews-section {
+      width: min(100%, 1120px);
+      margin: 22px auto 0;
+      display: grid;
+      gap: 16px;
+    }
+
+    .professor-reviews-header {
+      padding: 0 4px 4px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .professor-reviews-header span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .professor-reviews-header h2 {
+      margin-top: 4px;
+      color: #171717;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .professor-reviews-header p {
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .professor-reviews-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .professor-review-card {
+      padding: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 18px 44px rgba(42, 32, 20, 0.08);
+      display: grid;
+      gap: 14px;
+    }
+
+    .professor-review-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .professor-review-author {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .professor-review-avatar,
+    .professor-review-avatar-fallback {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+      border-radius: 14px;
+      background: #171717;
+      color: #fffdf8;
+      display: grid;
+      place-items: center;
+      object-fit: cover;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .professor-review-author strong {
+      display: block;
+      color: #171717;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    .professor-review-author span {
+      display: block;
+      margin-top: 4px;
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .professor-review-rating {
+      padding: 9px 11px;
+      border-radius: 999px;
+      background: #171717;
+      color: #fffdf8;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .professor-review-context,
+    .professor-review-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .professor-review-context span,
+    .professor-review-tags span {
+      padding: 8px 10px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.72);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .professor-review-tags span strong {
+      margin-right: 5px;
+      color: #171717;
+    }
+
+    .professor-review-note,
+    .professor-review-reason,
+    .professor-review-empty,
+    .professor-review-status {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.64);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .professor-review-empty,
+    .professor-review-status {
+      grid-column: 1 / -1;
+      padding: 22px;
+      border: 1px dashed rgba(23, 23, 23, 0.16);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.54);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .professor-reviews-header,
+      .professor-review-card-top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .professor-reviews-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @keyframes reviewBackdropIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -795,6 +962,149 @@
     const matchesGroup = !groups.length || groups.includes(professor.group);
 
     return matchesSearch && matchesDepartment && matchesStatus && matchesGroup;
+  }
+
+  function getReviewDateLabel(value) {
+    const date = new Date(value);
+
+    if (!value || Number.isNaN(date.getTime())) {
+      return "Just now";
+    }
+
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
+
+  function getReviewAuthorInitials(name) {
+    const initials = String(name || "AUC student")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(function (part) {
+        return part.charAt(0).toUpperCase();
+      })
+      .join("");
+
+    return initials || "A";
+  }
+
+  function renderReviewAvatar(review) {
+    const authorName = review.authorName || "AUC student";
+
+    if (review.authorPhotoURL) {
+      return '<img class="professor-review-avatar" src="' + escapeHtml(review.authorPhotoURL) + '" alt="' + escapeHtml(authorName) + ' profile photo">';
+    }
+
+    return '<span class="professor-review-avatar-fallback">' + escapeHtml(getReviewAuthorInitials(authorName)) + '</span>';
+  }
+
+  function getReviewDetailItems(review) {
+    return [
+      ["Attendance", review.attendancePolicy],
+      ["Workload", review.workload],
+      ["Lecture", review.lectureUsefulness],
+      ["Office hours", review.officeHours],
+      ["Grading", review.gradingStyle],
+      ["Exams", review.examDifficulty],
+      ["Transparency", review.gradingTransparency],
+      ["Feedback", review.feedbackQuality]
+    ].filter(function (item) {
+      return item[1];
+    });
+  }
+
+  function renderProfessorReviews(reviews) {
+    const list = document.getElementById("professor-reviews-list");
+    const count = document.getElementById("professor-reviews-count");
+    const safeReviews = Array.isArray(reviews) ? reviews : [];
+
+    if (!list) {
+      return;
+    }
+
+    if (count) {
+      count.textContent = safeReviews.length + " " + (safeReviews.length === 1 ? "review" : "reviews");
+    }
+
+    if (!safeReviews.length) {
+      list.innerHTML = '<p class="professor-review-empty">No reviews yet. Be the first to leave one.</p>';
+      return;
+    }
+
+    list.innerHTML = safeReviews.map(function (review) {
+      const authorUserId = review.authorUserId || review.authorUid || "";
+      const rating = Number(review.rating || 0);
+      const detailItems = getReviewDetailItems(review);
+
+      return `
+        <article class="professor-review-card" data-author-user-id="${escapeHtml(authorUserId)}">
+          <div class="professor-review-card-top">
+            <div class="professor-review-author">
+              ${renderReviewAvatar(review)}
+              <div>
+                <strong>${escapeHtml(review.authorName || "AUC student")}</strong>
+                <span>${escapeHtml(getReviewDateLabel(review.createdAt))}</span>
+              </div>
+            </div>
+
+            <div class="professor-review-rating">${escapeHtml(rating ? rating + " / 5" : "Not rated")}</div>
+          </div>
+
+          <div class="professor-review-context">
+            <span>${escapeHtml(review.courseTaken || "Course not listed")}</span>
+            <span>${escapeHtml(review.semesterTaken || "Semester not listed")}</span>
+            <span>${escapeHtml(review.recommendation ? "Recommend: " + review.recommendation : "Recommendation not listed")}</span>
+          </div>
+
+          ${review.recommendationReason ? '<p class="professor-review-reason">' + escapeHtml(review.recommendationReason) + '</p>' : ""}
+          <p class="professor-review-note">${escapeHtml(review.studentNote || "No written note.")}</p>
+
+          ${detailItems.length ? '<div class="professor-review-tags">' + detailItems.map(function (item) {
+            return '<span><strong>' + escapeHtml(item[0]) + '</strong>' + escapeHtml(item[1]) + '</span>';
+          }).join("") + '</div>' : ""}
+        </article>
+      `;
+    }).join("");
+  }
+
+  async function loadProfessorReviews(professorId) {
+    const list = document.getElementById("professor-reviews-list");
+    const count = document.getElementById("professor-reviews-count");
+
+    if (list) {
+      list.innerHTML = '<p class="professor-review-status">Loading reviews...</p>';
+    }
+
+    if (count) {
+      count.textContent = "Loading reviews...";
+    }
+
+    try {
+      const response = await fetch("/api/professor-reviews?professorId=" + encodeURIComponent(professorId), {
+        credentials: "same-origin"
+      });
+      const data = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not load reviews.");
+      }
+
+      renderProfessorReviews(data.reviews || []);
+    } catch (error) {
+      if (count) {
+        count.textContent = "Reviews unavailable";
+      }
+
+      if (list) {
+        list.innerHTML = '<p class="professor-review-status">Could not load reviews right now.</p>';
+      }
+    }
   }
 
   function renderProfessorProfile(grid, professor) {
@@ -994,9 +1304,24 @@
           </details>
         </div>
       </article>
+
+      <section class="professor-reviews-section" aria-label="Student reviews for ${escapeHtml(professor.name)}">
+        <div class="professor-reviews-header">
+          <div>
+            <span>Student reviews</span>
+            <h2>What students said</h2>
+          </div>
+          <p id="professor-reviews-count">Loading reviews...</p>
+        </div>
+
+        <div class="professor-reviews-list" id="professor-reviews-list">
+          <p class="professor-review-status">Loading reviews...</p>
+        </div>
+      </section>
     `;
 
     setupReviewModalBehavior(grid);
+    loadProfessorReviews(getProfessorId(professor));
   }
 
   function setupReviewChoiceMenus(form) {
@@ -1117,6 +1442,12 @@
 
       if (!response.ok) {
         throw new Error(data.error || "Could not save your review. Please log in and try again.");
+      }
+
+      if (Array.isArray(data.reviews)) {
+        renderProfessorReviews(data.reviews);
+      } else {
+        await loadProfessorReviews(payload.professorId);
       }
 
       if (message) {
