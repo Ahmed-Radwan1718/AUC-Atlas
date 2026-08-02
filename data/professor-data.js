@@ -779,17 +779,20 @@
       gap: 8px;
     }
 
-    .professor-review-insights-more,
-    .professor-review-insights-hidden {
+    .professor-review-insights-more {
       display: grid;
       gap: 8px;
     }
 
     .professor-review-insights-hidden {
-      margin-top: 8px;
+      order: 1;
+      display: grid;
+      gap: 8px;
+      margin-top: 0;
     }
 
     .professor-review-insights-more-toggle {
+      order: 2;
       width: fit-content;
       margin-top: 2px;
       padding: 0;
@@ -946,7 +949,7 @@
     }
 
     .professor-reviews-section {
-      width: min(100%, 820px);
+      width: min(100%, 720px);
       margin: 28px auto 0;
       display: grid;
       gap: 16px;
@@ -959,17 +962,21 @@
 
     .professor-reviews-list {
       display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      align-items: start;
       gap: 14px;
     }
 
     .professor-review-card {
-      padding: 18px;
+      min-height: 210px;
+      padding: 16px;
       border: 1px solid rgba(23, 23, 23, 0.09);
-      border-radius: 22px;
+      border-radius: 16px;
       background: rgba(255, 255, 255, 0.76);
       box-shadow: 0 18px 44px rgba(42, 32, 20, 0.08);
       display: grid;
-      gap: 14px;
+      align-content: start;
+      gap: 12px;
     }
 
     .professor-review-card-top {
@@ -988,10 +995,11 @@
 
     .professor-review-avatar,
     .professor-review-avatar-fallback {
-      width: 42px;
-      height: 42px;
-      flex: 0 0 42px;
-      border-radius: 14px;
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+      border-radius: 999px;
+      overflow: hidden;
       background: #171717;
       color: #fffdf8;
       display: grid;
@@ -1010,13 +1018,35 @@
     }
 
     .professor-review-rating {
-      padding: 9px 11px;
-      border-radius: 999px;
-      background: #171717;
-      color: #fffdf8;
-      font-size: 12px;
-      font-weight: 800;
+      color: #c09a5c;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .professor-review-stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .professor-review-star {
+      color: rgba(23, 23, 23, 0.18);
+    }
+
+    .professor-review-star.is-filled {
+      color: #c09a5c;
+    }
+
+    .professor-review-rating-text {
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .professor-review-context {
@@ -1040,8 +1070,8 @@
     .professor-review-status {
       margin: 0;
       color: rgba(23, 23, 23, 0.68);
-      font-size: 15px;
-      line-height: 1.68;
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     .professor-review-empty,
@@ -1358,6 +1388,20 @@
     panel.innerHTML = visibleRows.map(renderInsightCard).join("") + hiddenMarkup;
   }
 
+  function renderReviewStars(rating) {
+    const safeRating = Math.max(0, Math.min(5, Math.round(Number(rating || 0))));
+
+    if (!safeRating) {
+      return '<span class="professor-review-rating-text">Not rated</span>';
+    }
+
+    const stars = Array.from({ length: 5 }, function (_, index) {
+      return '<span class="professor-review-star' + (index < safeRating ? ' is-filled' : '') + '">&#9733;</span>';
+    }).join("");
+
+    return '<span class="professor-review-stars" aria-label="' + safeRating + ' out of 5 stars">' + stars + '</span>';
+  }
+
   function renderProfessorReviews(reviews) {
     const list = document.getElementById("professor-reviews-list");
     const count = document.getElementById("professor-reviews-count");
@@ -1392,7 +1436,7 @@
               </div>
             </div>
 
-            <div class="professor-review-rating">${escapeHtml(rating ? rating + " / 5" : "Not rated")}</div>
+            <div class="professor-review-rating">${renderReviewStars(rating)}</div>
           </div>
 
           <div class="professor-review-context">
@@ -1456,7 +1500,7 @@
 
     const professorEmail = professor.email || "";
     const professorEmailMarkup = professorEmail
-      ? '<a class="professor-profile-email" href="mailto:' + escapeHtml(professorEmail) + '">' + escapeHtml(professorEmail) + '</a>'
+      ? '<span class="professor-profile-email">' + escapeHtml(professorEmail) + '</span>'
       : '<span class="professor-profile-email is-empty">Email coming soon</span>';
     const pageHeader = document.querySelector(".professors-header");
 
