@@ -88,6 +88,22 @@ async function getAuthorProfile(decodedUser) {
   };
 }
 
+async function ensureVerifiedReviewAuthor(decodedUser) {
+  if (!decodedUser || !decodedUser.uid) {
+    throw createReviewError("Please log in before submitting a review.", 401);
+  }
+
+  if (decodedUser.email_verified === true) {
+    return;
+  }
+
+  const userRecord = await admin.auth().getUser(decodedUser.uid);
+
+  if (!userRecord.emailVerified) {
+    throw createReviewError("Please verify your email address before submitting a professor review.", 403);
+  }
+}
+
 async function getProfessorReviews(professorId) {
   const snapshot = await admin.firestore()
     .collection("professorReviews")
