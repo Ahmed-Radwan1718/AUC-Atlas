@@ -53,8 +53,8 @@
       text-decoration: none;
       white-space: nowrap;
       display: inline-flex;
-      align-items: baseline;
-      justify-content: flex-start;
+      align-items: center;
+      justify-content: center;
       gap: 4px;
       overflow: hidden;
       isolation: isolate;
