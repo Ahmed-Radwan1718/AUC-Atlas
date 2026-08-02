@@ -511,7 +511,7 @@
 
     grid.innerHTML = shownCourses.map(function (course) {
       return `
-        <a class="course-card" href="course.html?code=${encodeURIComponent(course.code)}" aria-label="Open ${course.code} course page">
+        <a class="course-card" href="courses.html?course=${encodeURIComponent(course.code)}" aria-label="Open ${course.code} course page">
           <div class="course-card-main">
             <span class="course-code">${course.code}</span>
             <h2>${course.title}</h2>
@@ -578,8 +578,71 @@
     setTimeout(animateCourseSearchPlaceholder, 250);
   }
 
+  function normalizeCourseCode(value) {
+    return String(value || "").replace(/\s+/g, " ").trim().toUpperCase();
+  }
+
+  function getSelectedCourseCode() {
+    const params = new URLSearchParams(window.location.search);
+    return normalizeCourseCode(params.get("course"));
+  }
+
+  function setCourseDetailText(id, value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  function renderCourseDetail(courseCode) {
+    const listView = document.getElementById("courses-list-view");
+    const detailView = document.getElementById("course-detail-view");
+
+    if (!courseCode || !detailView) {
+      return false;
+    }
+
+    const selectedCourse = courses.find(function (course) {
+      return normalizeCourseCode(course.code) === courseCode;
+    });
+
+    if (listView) {
+      listView.hidden = true;
+    }
+
+    detailView.hidden = false;
+
+    if (!selectedCourse) {
+      document.title = "Course not found | AUC Atlas";
+      setCourseDetailText("course-detail-code", "Course not found");
+      setCourseDetailText("course-detail-title", "Course not found.");
+      setCourseDetailText("course-detail-department", "Go back to courses and choose a course from the search results.");
+      setCourseDetailText("course-detail-subject", "Unavailable");
+      setCourseDetailText("course-detail-level", "Unavailable");
+      setCourseDetailText("course-detail-full-code", courseCode || "Unavailable");
+      setCourseDetailText("course-detail-note", "This course could not be matched to the current AUC Atlas course list.");
+      return true;
+    }
+
+    document.title = selectedCourse.code + " | AUC Atlas";
+    setCourseDetailText("course-detail-code", selectedCourse.code);
+    setCourseDetailText("course-detail-title", selectedCourse.title);
+    setCourseDetailText("course-detail-department", selectedCourse.department);
+    setCourseDetailText("course-detail-subject", selectedCourse.subject);
+    setCourseDetailText("course-detail-level", selectedCourse.level);
+    setCourseDetailText("course-detail-full-code", selectedCourse.code);
+    setCourseDetailText("course-detail-note", "This course page is ready for professor links, student notes, ratings, prerequisites, and review details.");
+
+    return true;
+  }
+
   function setupCoursesPage() {
     const searchInput = document.getElementById("course-search-input");
+
+    if (renderCourseDetail(getSelectedCourseCode())) {
+      return;
+    }
 
     if (searchInput) {
       searchInput.addEventListener("input", renderCourses);
