@@ -574,13 +574,7 @@
     }
 
     function getDegreeRequirementGroups(majorPlan) {
-      return DEGREE_REQUIREMENTS.core.map(function (group) {
-        return {
-          scope: "AUC Core",
-          title: group.title,
-          items: group.items
-        };
-      }).concat([
+      return [
         {
           scope: "Major",
           title: "Required major and supporting coursework",
@@ -596,7 +590,7 @@
           title: "Capstone / professional requirement",
           items: majorPlan.capstone || []
         }
-      ]).filter(function (group) {
+      ].filter(function (group) {
         return group.items && group.items.length;
       });
     }
@@ -680,9 +674,8 @@
     }
 
     function splitDegreeFallbackItems(item) {
-      return String(item || "").split(/;\s+|\.\s+(?=[A-Z])|\s+\band\b\s+(?=[A-Z][a-z])/).map(function (part) {
-        return part.trim().replace(/\.$/, "");
-      }).filter(Boolean);
+      const cleanItem = String(item || "").trim().replace(/\.$/, "");
+      return cleanItem ? [cleanItem] : [];
     }
 
     function getDegreeDisplayItems(item) {
@@ -767,8 +760,8 @@
       degreeMajorName.textContent = savedMajor || "No Major Selected";
       degreeMajorPill.textContent = savedMajor ? "Saved major" : "Missing major";
       degreeMajorCopy.textContent = savedMajor
-        ? "These requirements are based on your saved account major."
-        : "Choose your major from Account Details to see a degree progression checklist.";
+        ? "This beta checklist is based on your saved account major and is still being refined."
+        : "This page is in beta. Choose your major from Account Details to see a degree progression checklist.";
 
       if (!savedMajor) {
         currentDegreeStorageKey = "";
