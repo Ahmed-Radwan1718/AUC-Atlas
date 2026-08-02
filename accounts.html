@@ -1123,6 +1123,77 @@
       line-height: 1.65;
     }
 
+    .account-review-item {
+      display: grid;
+      gap: 14px;
+    }
+
+    .account-review-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .account-review-head h3 {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    .account-review-head p {
+      margin-top: 5px;
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .account-review-rating {
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: #171717;
+      color: #fffdf8;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .account-review-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .account-review-meta span {
+      padding: 8px 10px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.72);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .account-review-copy {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .account-review-link {
+      width: fit-content;
+      color: #171717;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
     .account-badge {
       width: fit-content;
       margin-top: 12px;
@@ -1778,7 +1849,7 @@
                 <p>Track professor and course reviews submitted from your account.</p>
               </div>
 
-              <div class="account-review-list">
+              <div class="account-review-list" id="account-review-list">
                 <div class="account-empty-state">
                   <h3>No reviews yet</h3>
                   <p>Your professor and course reviews will appear here after submission.</p>
@@ -1891,6 +1962,8 @@
     const authenticatorCodeInputs = Array.from(document.querySelectorAll("[data-authenticator-code-input]"));
     const authenticatorSetupConfirm = document.getElementById("authenticator-setup-confirm");
     const authenticatorMessage = document.getElementById("authenticator-message");
+    const accountReviewList = document.getElementById("account-review-list");
+    const reviewsMessage = document.getElementById("reviews-message");
 
     const PROFILE_PHOTO_MAX_SIZE = 4 * 1024 * 1024;
     const PROFILE_PHOTO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -2208,6 +2281,10 @@
       });
 
       window.location.hash = panelName;
+
+      if (panelName === "reviews") {
+        loadAccountReviewHistory();
+      }
     }
 
     function showMessage(element, message, type) {
@@ -2218,6 +2295,115 @@
       const messageType = type || (message ? "error" : "");
       element.textContent = message;
       element.className = "account-message" + (messageType ? " " + messageType : "");
+    }
+
+    function escapeAccountHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getAccountReviewDateLabel(value) {
+      const date = new Date(value);
+
+      if (!value || Number.isNaN(date.getTime())) {
+        return "Recently submitted";
+      }
+
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    function renderAccountReviewHistory(reviews) {
+      const safeReviews = Array.isArray(reviews) ? reviews : [];
+
+      if (!accountReviewList) {
+        return;
+      }
+
+      if (!safeReviews.length) {
+        accountReviewList.innerHTML = `
+          <div class="account-empty-state">
+            <h3>No reviews yet</h3>
+            <p>Your professor and course reviews will appear here after submission.</p>
+          </div>
+        `;
+        return;
+      }
+
+      accountReviewList.innerHTML = safeReviews.map(function (review) {
+        const professorId = review.professorId || "";
+        const rating = Number(review.rating || 0);
+
+        return `
+          <article class="account-review-item">
+            <div class="account-review-head">
+              <div>
+                <h3>${escapeAccountHtml(review.professorName || "Professor review")}</h3>
+                <p>${escapeAccountHtml(getAccountReviewDateLabel(review.createdAt))}</p>
+              </div>
+
+              <span class="account-review-rating">${escapeAccountHtml(rating ? rating + " / 5" : "Not rated")}</span>
+            </div>
+
+            <div class="account-review-meta">
+              <span>${escapeAccountHtml(review.courseTaken || "Course not listed")}</span>
+              <span>${escapeAccountHtml(review.semesterTaken || "Semester not listed")}</span>
+            </div>
+
+            <p class="account-review-copy">${escapeAccountHtml(review.studentNote || "No written note.")}</p>
+            ${professorId ? '<a class="account-review-link" href="professors.html?id=' + encodeURIComponent(professorId) + '">Open professor</a>' : ""}
+          </article>
+        `;
+      }).join("");
+    }
+
+    async function loadAccountReviewHistory() {
+      if (!accountReviewList) {
+        return;
+      }
+
+      showMessage(reviewsMessage, "", "");
+      accountReviewList.innerHTML = `
+        <div class="account-empty-state">
+          <h3>Loading reviews</h3>
+          <p>Checking the reviews submitted from your account.</p>
+        </div>
+      `;
+
+      try {
+        const response = await fetch("/api/professor-reviews?mine=true", {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not load your reviews.");
+        }
+
+        renderAccountReviewHistory(data.reviews || []);
+      } catch (error) {
+        accountReviewList.innerHTML = `
+          <div class="account-empty-state">
+            <h3>Could not load reviews</h3>
+            <p>Your review history could not be loaded right now.</p>
+          </div>
+        `;
+        showMessage(reviewsMessage, error.message || "Could not load your reviews.", "error");
+      }
     }
 
     function getAccountInitials(user) {
