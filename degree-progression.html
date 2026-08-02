@@ -327,12 +327,31 @@
       accent-color: rgba(192, 154, 92, 0.95);
     }
 
+    .degree-requirement-text {
+      display: grid;
+      gap: 3px;
+    }
+
+    .degree-course-code {
+      width: fit-content;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .degree-course-title {
+      color: rgba(23, 23, 23, 0.78);
+      font-weight: 750;
+    }
+
     .degree-requirement-item.is-complete {
       color: rgba(23, 23, 23, 0.46);
       background: rgba(185, 255, 202, 0.16);
     }
 
-    .degree-requirement-item.is-complete span {
+    .degree-requirement-item.is-complete .degree-requirement-text {
       text-decoration: line-through;
       text-decoration-thickness: 1px;
     }
@@ -381,6 +400,7 @@
 <body>
   <div id="site-header-root"></div>
   <script src="site-header.js"></script>
+  <script src="data/courses.js"></script>
 
   <main class="degree-page">
     <section class="degree-section">
@@ -581,15 +601,145 @@
       });
     }
 
+    function normalizeDegreeText(value) {
+      return String(value || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    }
+
+    function getDegreeWord(value) {
+      const word = normalizeDegreeText(value);
+
+      if (word.length > 4 && word.endsWith("ies")) {
+        return word.slice(0, -3) + "y";
+      }
+
+      if (word.length > 4 && word.endsWith("s")) {
+        return word.slice(0, -1);
+      }
+
+      return word;
+    }
+
+    function getDegreeCourseWords(value) {
+      const stopWords = new Set(["a", "an", "and", "for", "in", "i", "ii", "iii", "iv", "of", "the", "to", "with", "general", "introduction", "fundamentals", "principles", "applied", "selected", "topics", "lab", "laboratory"]);
+      return normalizeDegreeText(value).split(" ").map(getDegreeWord).filter(function (word) {
+        return word && !stopWords.has(word);
+      });
+    }
+
+    function getDegreeCoursesByCode() {
+      const coursesByCode = {};
+
+      (window.aucAtlasCourses || []).forEach(function (course) {
+        coursesByCode[course.code] = course;
+      });
+
+      return coursesByCode;
+    }
+
+    function getDegreeCourseLabel(code, coursesByCode) {
+      const course = coursesByCode[code];
+      return course ? course.code + " " + course.title : code;
+    }
+
+    function getDegreeDirectCourseCodes(item, coursesByCode) {
+      const matches = String(item || "").match(/[A-Z]{4}\s*\d{4}/g) || [];
+      return matches.map(function (code) {
+        return code.replace(/\s+/, " ").trim();
+      }).filter(function (code, index, codes) {
+        return codes.indexOf(code) === index;
+      });
+    }
+
+    function getDegreeMatchedCourseCodes(item, coursesByCode) {
+      const normalizedItem = normalizeDegreeText(item);
+      const itemWords = new Set(getDegreeCourseWords(item));
+      const matchedCodes = [];
+
+      (window.aucAtlasCourses || []).forEach(function (course) {
+        const courseWords = getDegreeCourseWords(course.title);
+
+        if (!courseWords.length) {
+          return;
+        }
+
+        const hitCount = courseWords.filter(function (word) {
+          return itemWords.has(word);
+        }).length;
+        const neededHits = courseWords.length <= 2 ? courseWords.length : Math.ceil(courseWords.length * 0.58);
+        const singleWordMatch = courseWords.length === 1 && normalizedItem.includes(courseWords[0]);
+
+        if ((singleWordMatch || hitCount >= neededHits) && matchedCodes.indexOf(course.code) === -1) {
+          matchedCodes.push(course.code);
+        }
+      });
+
+      return matchedCodes;
+    }
+
+    function splitDegreeFallbackItems(item) {
+      return String(item || "").split(/;\s+|\.\s+(?=[A-Z])|\s+\band\b\s+(?=[A-Z][a-z])/).map(function (part) {
+        return part.trim().replace(/\.$/, "");
+      }).filter(Boolean);
+    }
+
+    function getDegreeDisplayItems(item) {
+      const coursesByCode = getDegreeCoursesByCode();
+      const directCodes = getDegreeDirectCourseCodes(item, coursesByCode);
+
+      if (directCodes.length) {
+        return directCodes.map(function (code) {
+          return getDegreeCourseLabel(code, coursesByCode);
+        });
+      }
+
+      const matchedCodes = getDegreeMatchedCourseCodes(item, coursesByCode);
+
+      if (matchedCodes.length) {
+        return matchedCodes.map(function (code) {
+          return getDegreeCourseLabel(code, coursesByCode);
+        });
+      }
+
+      return splitDegreeFallbackItems(item);
+    }
+
+    function renderDegreeRequirementText(item) {
+      const match = String(item || "").match(/^([A-Z]{4}\s+\d{4})\s+(.+)$/);
+
+      if (!match) {
+        return `<span class="degree-requirement-text">${escapeDegreeHtml(item)}</span>`;
+      }
+
+      return `
+        <span class="degree-requirement-text">
+          <span class="degree-course-code">${escapeDegreeHtml(match[1])}</span>
+          <span class="degree-course-title">${escapeDegreeHtml(match[2])}</span>
+        </span>
+      `;
+    }
+
     function renderDegreeRequirementGroup(group, groupIndex, completedItems) {
-      const itemsMarkup = group.items.map(function (item, itemIndex) {
-        const itemKey = groupIndex + "-" + itemIndex;
-        const isChecked = completedItems.has(itemKey);
+      const expandedItems = [];
+
+      group.items.forEach(function (item, itemIndex) {
+        getDegreeDisplayItems(item).forEach(function (displayItem, displayIndex) {
+          expandedItems.push({
+            key: groupIndex + "-" + itemIndex + "-" + displayIndex + "-" + normalizeDegreeText(displayItem).slice(0, 36),
+            label: displayItem
+          });
+        });
+      });
+
+      const itemsMarkup = expandedItems.map(function (item) {
+        const isChecked = completedItems.has(item.key);
 
         return `
           <label class="degree-requirement-item${isChecked ? " is-complete" : ""}">
-            <input type="checkbox" data-degree-item="${escapeDegreeHtml(itemKey)}"${isChecked ? " checked" : ""}>
-            <span>${escapeDegreeHtml(item)}</span>
+            <input type="checkbox" data-degree-item="${escapeDegreeHtml(item.key)}"${isChecked ? " checked" : ""}>
+            ${renderDegreeRequirementText(item.label)}
           </label>
         `;
       }).join("");
