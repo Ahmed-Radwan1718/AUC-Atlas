@@ -15,55 +15,35 @@
       color: #171717;
     }
 
-    .faq-page,
-    .policies-page {
+    .info-page {
       min-height: 100vh;
-      padding-top: 104px;
+      padding: 126px 0 86px;
       background:
         linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
         #f7f4ee;
-      overflow-x: clip;
     }
 
-    .faq-section {
-      min-height: calc(100vh - 104px);
-      padding: 76px 44px 96px;
-    }
-
-    .faq-section-inner {
-      width: 100%;
-      max-width: 1220px;
+    .info-inner {
+      width: min(980px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 30px;
-      border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 26px;
-      background:
-        linear-gradient(135deg, rgba(192, 154, 92, 0.1), rgba(255, 255, 255, 0.58)),
-        rgba(255, 255, 255, 0.72);
-      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
     }
 
-    .faq-section-header {
-      max-width: 820px;
+    .info-header {
       margin-bottom: 28px;
+      display: grid;
+      gap: 12px;
     }
 
-    .faq-section-eyebrow,
-    .faq-category-label {
-      color: rgba(192, 154, 92, 0.92);
+    .info-kicker {
+      color: rgba(192, 154, 92, 0.84);
       font-size: 12px;
       font-weight: 800;
       letter-spacing: 0.14em;
-      line-height: 1.4;
       text-transform: uppercase;
     }
 
-    .faq-section-eyebrow {
-      margin-bottom: 12px;
-    }
-
-    .faq-section-title {
-      margin-bottom: 12px;
+    .info-header h1 {
+      max-width: 720px;
       color: #171717;
       font-size: clamp(34px, 4.8vw, 58px);
       font-weight: 700;
@@ -71,128 +51,47 @@
       text-transform: uppercase;
     }
 
-    .faq-section-header p {
-      max-width: 760px;
-      color: rgba(23, 23, 23, 0.64);
-      font-size: 16px;
+    .info-header p {
+      max-width: 680px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 17px;
       line-height: 1.7;
     }
 
-    .faq-accordion-list {
+    .info-list {
       display: grid;
-      gap: 34px;
+      gap: 12px;
     }
 
-    .faq-category-label {
-      margin-bottom: 14px;
+    .info-item {
+      padding: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 18px 55px rgba(42, 32, 20, 0.08);
     }
 
-    .faq-accordion-item {
-      border-top: 1px solid rgba(23, 23, 23, 0.1);
-      transition: border-color 0.24s ease;
-    }
-
-    .faq-accordion-item:last-child {
-      border-bottom: 1px solid rgba(23, 23, 23, 0.1);
-    }
-
-    .faq-accordion-item:hover,
-    .faq-accordion-item[open] {
-      border-color: rgba(192, 154, 92, 0.34);
-    }
-
-    .faq-question {
-      width: 100%;
-      padding: 24px 0;
-      list-style: none;
+    .info-item h2 {
+      margin-bottom: 10px;
       color: #171717;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 24px;
-      align-items: center;
-      cursor: pointer;
+      font-size: 21px;
+      line-height: 1.2;
     }
 
-    .faq-question::-webkit-details-marker {
-      display: none;
-    }
-
-    .faq-question span:first-child {
-      color: #171717;
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 1.35;
-      transition: color 0.24s ease;
-    }
-
-    .faq-question:hover span:first-child,
-    .faq-accordion-item[open] .faq-question span:first-child {
-      color: rgba(192, 154, 92, 0.98);
-    }
-
-    .faq-icon {
-      color: rgba(192, 154, 92, 0.84);
-      font-size: 28px;
-      font-weight: 300;
-      line-height: 1;
-      transition: transform 0.24s ease, color 0.24s ease;
-    }
-
-    .faq-accordion-item[open] .faq-icon {
-      color: rgba(192, 154, 92, 1);
-      transform: rotate(45deg);
-    }
-
-    .faq-answer {
-      padding: 0 64px 24px 0;
+    .info-item p {
       color: rgba(23, 23, 23, 0.64);
       font-size: 15px;
       line-height: 1.7;
     }
 
-    .faq-answer p {
-      max-width: 760px;
-      margin-bottom: 12px;
-    }
-
-    .faq-answer p:last-child {
-      margin-bottom: 0;
-    }
-
-    .faq-answer a,
-    .faq-answer a:visited {
+    .info-item a {
       color: #171717;
-      border-bottom: 1px solid rgba(192, 154, 92, 0.42);
       font-weight: 800;
-      text-decoration: none;
     }
 
-    @media (max-width: 700px) {
-      .faq-section {
-        padding: 46px 22px 70px;
-      }
-
-      .faq-section-inner {
-        padding: 24px;
-        border-radius: 22px;
-      }
-
-      .faq-section-title {
-        font-size: 30px;
-      }
-
-      .faq-question {
-        gap: 18px;
-        padding: 22px 0;
-      }
-
-      .faq-question span:first-child {
-        font-size: 16px;
-      }
-
-      .faq-answer {
-        padding-right: 0;
-      }
+    @media (max-width: 640px) {
+      .info-page { padding-top: 96px; }
+      .info-item { border-radius: 18px; }
     }
   </style>
 </head>
@@ -201,79 +100,51 @@
   <div id="site-header-root"></div>
   <script src="site-header.js"></script>
 
-  <main class="faq-page">
-    <section class="faq-section">
-      <div class="faq-section-inner">
-        <div class="faq-section-header">
-          <p class="faq-section-eyebrow">Help</p>
-          <h1 class="faq-section-title">Frequently Asked Questions</h1>
-          <p>Quick answers about AUC Atlas, course pages, professor information, uploaded materials, and account features.</p>
-        </div>
+  <main class="info-page">
+    <div class="info-inner">
+      <section class="info-header">
+        <p class="info-kicker">Help</p>
+        <h1>Frequently Asked Questions</h1>
+        <p>Quick answers about AUC Atlas, course pages, professor information, uploaded materials, and account features.</p>
+      </section>
 
-        <div class="faq-accordion-list">
-          <div class="faq-category">
-            <p class="faq-category-label">AUC Atlas</p>
+      <section class="info-list" aria-label="Frequently asked questions">
+        <article class="info-item">
+          <h2>What is AUC Atlas?</h2>
+          <p>AUC Atlas is a student-focused website for browsing professors, courses, GPA tools, and student-uploaded academic materials in one place.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>What is AUC Atlas?</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>AUC Atlas is a student-focused website for browsing professors, courses, GPA tools, and student-uploaded academic materials in one place.</p>
-              </div>
-            </details>
+        <article class="info-item">
+          <h2>Is AUC Atlas officially affiliated with AUC?</h2>
+          <p>No. AUC Atlas is an independent student resource and is not an official American University in Cairo website.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Is AUC Atlas officially affiliated with AUC?</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>No. AUC Atlas is an independent student resource and is not an official American University in Cairo website.</p>
-              </div>
-            </details>
-          </div>
+        <article class="info-item">
+          <h2>How do course material uploads work?</h2>
+          <p>When materials are uploaded, they can be tied to a course, professor, and semester. Uploaded files may be reviewed, organized, removed, or hidden if they are unsafe, irrelevant, inaccurate, or not allowed.</p>
+        </article>
 
-          <div class="faq-category">
-            <p class="faq-category-label">Course Materials</p>
+        <article class="info-item">
+          <h2>What should I upload?</h2>
+          <p>Upload useful course materials such as notes, review sheets, slides, summaries, practice questions, or study files that you have permission to share.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>How do course material uploads work?</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>When materials are uploaded, they can be tied to a course, professor, and semester. Uploaded files may be reviewed, organized, removed, or hidden if they are unsafe, irrelevant, inaccurate, or not allowed.</p>
-              </div>
-            </details>
+        <article class="info-item">
+          <h2>What should I not upload?</h2>
+          <p>Do not upload copyrighted books, paid materials, private messages, exams that are not allowed to be shared, personal data, malware, or anything you do not have permission to distribute.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>What should I upload?</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>Upload useful course materials such as notes, review sheets, slides, summaries, practice questions, or study files that you have permission to share.</p>
-              </div>
-            </details>
+        <article class="info-item">
+          <h2>Can materials be removed?</h2>
+          <p>Yes. AUC Atlas may remove files or information if they are reported, inaccurate, harmful, private, copyrighted, spam, or otherwise unsuitable for the site.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>What should I not upload?</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>Do not upload copyrighted books, paid materials, private messages, exams that are not allowed to be shared, personal data, malware, or anything you do not have permission to distribute.</p>
-              </div>
-            </details>
-
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Can materials be removed?</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>Yes. AUC Atlas may remove files or information if they are reported, inaccurate, harmful, private, copyrighted, spam, or otherwise unsuitable for the site.</p>
-              </div>
-            </details>
-          </div>
-
-          <div class="faq-category">
-            <p class="faq-category-label">Policies</p>
-
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Where can I read the rules?</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>Read the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a> for more details.</p>
-              </div>
-            </details>
-          </div>
-        </div>
-      </div>
-    </section>
+        <article class="info-item">
+          <h2>Where can I read the rules?</h2>
+          <p>Read the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a> for more details.</p>
+        </article>
+      </section>
+    </div>
   </main>
 </body>
 </html>
