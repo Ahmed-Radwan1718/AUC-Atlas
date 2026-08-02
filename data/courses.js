@@ -795,6 +795,7 @@
     setCourseDetailText("course-detail-full-code", selectedCourse.code);
     setCourseDetailText("course-detail-note", "This course page is ready for professor links, student notes, ratings, prerequisites, and review details.");
     renderCourseProfessors(selectedCourse);
+    loadCourseMaterials(selectedCourse);
     setupMaterialUploadForm(selectedCourse);
 
     return true;
