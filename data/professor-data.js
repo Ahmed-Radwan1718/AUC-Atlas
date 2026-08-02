@@ -877,6 +877,11 @@
       line-height: 1.35;
     }
 
+    .professor-review-insight-main p strong {
+      color: #171717;
+      font-weight: 900;
+    }
+
     .professor-review-detail-toggle {
       width: fit-content;
       min-height: auto;
@@ -1328,6 +1333,19 @@
     });
   }
 
+  function renderReviewInsightSummary(summary) {
+    const safeSummary = String(summary || "");
+    const reportMatch = safeSummary.match(/^(\d+% of students report\s+)(.*)$/);
+    const studentMatch = safeSummary.match(/^(\d+% of students\s+)(.*)$/);
+    const parts = reportMatch || studentMatch;
+
+    if (!parts) {
+      return escapeHtml(safeSummary);
+    }
+
+    return escapeHtml(parts[1]) + "<strong>" + escapeHtml(parts[2]) + "</strong>";
+  }
+
   function renderProfessorReviewStats(reviews) {
     const panel = document.getElementById("professor-review-stats");
     const statsCount = document.getElementById("professor-review-stats-count");
@@ -1345,7 +1363,7 @@
         <article class="professor-review-insight-card">
           <div class="professor-review-insight-main">
             <span>${escapeHtml(row.label)}</span>
-            <p>${escapeHtml(row.summary)}</p>
+            <p>${renderReviewInsightSummary(row.summary)}</p>
           </div>
 
           <details class="professor-review-detail">
