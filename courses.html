@@ -28,7 +28,7 @@
     }
 
     .courses-inner {
-      width: min(1120px, calc(100% - 32px));
+      width: min(1380px, calc(100% - 32px));
       margin: 0 auto;
     }
 
@@ -512,7 +512,7 @@
     }
 
     .course-detail-view {
-      max-width: 980px;
+      width: min(1180px, 100%);
       margin: 0 auto;
       display: grid;
       gap: 18px;
@@ -532,22 +532,34 @@
       color: #171717;
     }
 
-    .course-detail-shell {
-      overflow: hidden;
+    .course-profile-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 410px);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .course-profile-card,
+    .course-material-summary,
+    .material-upload-panel {
       border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 30px;
-      background: rgba(255, 255, 255, 0.76);
-      box-shadow: 0 28px 80px rgba(42, 32, 20, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 20px 54px rgba(42, 32, 20, 0.1);
+    }
+
+    .course-profile-card {
+      overflow: hidden;
     }
 
     .course-detail-hero {
-      padding: 34px;
+      padding: 30px;
       border-bottom: 1px solid rgba(23, 23, 23, 0.08);
       background: rgba(255, 255, 255, 0.48);
     }
 
     .course-detail-kicker {
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       color: rgba(192, 154, 92, 0.92);
       font-size: 12px;
       font-weight: 800;
@@ -558,9 +570,9 @@
     .course-detail-hero h1 {
       max-width: 760px;
       color: #171717;
-      font-size: clamp(34px, 4.8vw, 58px);
+      font-size: clamp(38px, 5vw, 64px);
       font-weight: 700;
-      line-height: 1.08;
+      line-height: 1.02;
     }
 
     .course-detail-department {
@@ -572,26 +584,28 @@
     }
 
     .course-detail-grid {
-      padding: 22px;
+      padding: 24px 30px 4px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      gap: 0;
     }
 
     .course-detail-stat {
-      min-height: 118px;
-      padding: 18px;
-      border: 1px solid rgba(23, 23, 23, 0.08);
-      border-radius: 20px;
-      background: rgba(247, 244, 238, 0.74);
+      min-height: 58px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
       display: grid;
-      align-content: space-between;
+      grid-template-columns: 120px minmax(0, 1fr);
+      align-items: center;
       gap: 18px;
     }
 
+    .course-detail-stat:last-child {
+      border-bottom: 0;
+    }
+
     .course-detail-stat span {
-      color: rgba(23, 23, 23, 0.5);
-      font-size: 11px;
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -599,14 +613,14 @@
 
     .course-detail-stat strong {
       color: #171717;
-      font-size: 18px;
-      line-height: 1.25;
+      font-size: 16px;
+      line-height: 1.35;
     }
 
     .course-detail-note {
-      margin: 0 22px 24px;
-      padding: 18px;
-      border-radius: 20px;
+      margin: 12px 30px 30px;
+      padding: 16px 18px;
+      border-radius: 18px;
       background: rgba(192, 154, 92, 0.1);
       color: rgba(23, 23, 23, 0.62);
       font-size: 14px;
@@ -614,19 +628,65 @@
       line-height: 1.65;
     }
 
-    .material-upload-panel {
-      margin: 0 22px 24px;
+    .course-action-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .course-material-summary {
       padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .course-material-summary span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .course-material-summary h2 {
+      margin-top: 4px;
+      color: #171717;
+      font-size: 24px;
+      line-height: 1.12;
+    }
+
+    .course-material-summary p {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .course-material-summary-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .course-material-summary-list span {
+      padding: 8px 10px;
+      border-radius: 999px;
       border: 1px solid rgba(23, 23, 23, 0.08);
-      border-radius: 24px;
+      background: rgba(247, 244, 238, 0.74);
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+    }
+
+    .material-upload-panel {
+      margin: 0;
+      padding: 22px;
       background: rgba(247, 244, 238, 0.74);
     }
 
     .material-upload-panel h2 {
       margin-bottom: 8px;
       color: #171717;
-      font-size: 22px;
-      line-height: 1.15;
+      font-size: 24px;
+      line-height: 1.12;
     }
 
     .material-upload-panel p {
@@ -643,7 +703,7 @@
 
     .material-upload-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 12px;
     }
 
@@ -721,6 +781,17 @@
 
     .material-upload-status.error {
       color: #9f2f2f;
+    }
+
+    @media (max-width: 980px) {
+      .course-profile-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .course-detail-stat {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
     }
 
     .courses-list-view[hidden],
@@ -827,76 +898,96 @@
       <section class="course-detail-view" id="course-detail-view" aria-label="Course details" hidden>
         <a class="course-back-link" href="courses.html">Back to courses</a>
 
-        <article class="course-detail-shell">
-          <section class="course-detail-hero">
-            <p class="course-detail-kicker" id="course-detail-code">Course</p>
-            <h1 id="course-detail-title">Course title</h1>
-            <p class="course-detail-department" id="course-detail-department">Department</p>
-          </section>
+        <div class="course-profile-layout">
+          <article class="course-profile-card">
+            <section class="course-detail-hero">
+              <p class="course-detail-kicker" id="course-detail-code">Course</p>
+              <h1 id="course-detail-title">Course title</h1>
+              <p class="course-detail-department" id="course-detail-department">Department</p>
+            </section>
 
-          <section class="course-detail-grid" aria-label="Course facts">
-            <div class="course-detail-stat">
-              <span>Subject</span>
-              <strong id="course-detail-subject">Subject</strong>
-            </div>
-
-            <div class="course-detail-stat">
-              <span>Level</span>
-              <strong id="course-detail-level">Level</strong>
-            </div>
-
-            <div class="course-detail-stat">
-              <span>Code</span>
-              <strong id="course-detail-full-code">Code</strong>
-            </div>
-          </section>
-
-          <p class="course-detail-note" id="course-detail-note">
-            This course page is ready for professor links, student notes, ratings, prerequisites, and review details.
-          </p>
-
-          <section class="material-upload-panel" aria-label="Upload course material">
-            <h2>Upload course material</h2>
-            <p>Share notes, slides, past exams, sheets, or other course files. Uploads are saved to ImageKit and tagged by course, professor, semester, and pending status.</p>
-
-            <form class="material-upload-form" id="material-upload-form">
-              <div class="material-upload-grid">
-                <label class="material-upload-field">
-                  <span>Professor</span>
-                  <input id="material-professor" type="text" placeholder="Professor name" required>
-                </label>
-
-                <label class="material-upload-field">
-                  <span>Semester</span>
-                  <select id="material-semester" required>
-                    <option value="">Choose semester</option>
-                    <option value="Fall 2026">Fall 2026</option>
-                    <option value="Summer 2026">Summer 2026</option>
-                    <option value="Spring 2026">Spring 2026</option>
-                    <option value="Winter 2026">Winter 2026</option>
-                    <option value="Fall 2025">Fall 2025</option>
-                    <option value="Summer 2025">Summer 2025</option>
-                    <option value="Spring 2025">Spring 2025</option>
-                    <option value="Winter 2025">Winter 2025</option>
-                  </select>
-                </label>
+            <section class="course-detail-grid" aria-label="Course facts">
+              <div class="course-detail-stat">
+                <span>Subject</span>
+                <strong id="course-detail-subject">Subject</strong>
               </div>
 
-              <label class="material-upload-field">
-                <span>Material title</span>
-                <input id="material-title" type="text" placeholder="Midterm notes, lab sheet, final review..." required>
-              </label>
+              <div class="course-detail-stat">
+                <span>Level</span>
+                <strong id="course-detail-level">Level</strong>
+              </div>
 
-              <label class="material-upload-field">
-                <span>File</span>
-                <input id="material-file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.jpg,.jpeg,.png" required>
-              </label>
+              <div class="course-detail-stat">
+                <span>Code</span>
+                <strong id="course-detail-full-code">Code</strong>
+              </div>
+            </section>
 
-              <button class="material-upload-button" id="material-upload-button" type="submit">Upload material</button>
-              <p class="material-upload-status" id="material-upload-status" aria-live="polite"></p>
-            </form>
-          </section>
-        </article>
+            <p class="course-detail-note" id="course-detail-note">
+              This course page is ready for professor links, student notes, ratings, prerequisites, and review details.
+            </p>
+          </article>
+
+          <aside class="course-action-stack">
+            <section class="course-material-summary" aria-label="Course materials">
+              <div>
+                <span>Materials library</span>
+                <h2>Course files</h2>
+              </div>
+
+              <p>No approved materials are listed yet. Uploads can be tagged by professor and semester, then reviewed before they show up here.</p>
+
+              <div class="course-material-summary-list" aria-label="Supported material types">
+                <span>Notes</span>
+                <span>Slides</span>
+                <span>Past exams</span>
+                <span>Sheets</span>
+              </div>
+            </section>
+
+            <section class="material-upload-panel" aria-label="Upload course material">
+              <h2>Upload material</h2>
+              <p>Share a useful file and tie it to the professor and semester you took this course with.</p>
+
+              <form class="material-upload-form" id="material-upload-form">
+                <div class="material-upload-grid">
+                  <label class="material-upload-field">
+                    <span>Professor</span>
+                    <input id="material-professor" type="text" placeholder="Professor name" required>
+                  </label>
+
+                  <label class="material-upload-field">
+                    <span>Semester</span>
+                    <select id="material-semester" required>
+                      <option value="">Choose semester</option>
+                      <option value="Fall 2026">Fall 2026</option>
+                      <option value="Summer 2026">Summer 2026</option>
+                      <option value="Spring 2026">Spring 2026</option>
+                      <option value="Winter 2026">Winter 2026</option>
+                      <option value="Fall 2025">Fall 2025</option>
+                      <option value="Summer 2025">Summer 2025</option>
+                      <option value="Spring 2025">Spring 2025</option>
+                      <option value="Winter 2025">Winter 2025</option>
+                    </select>
+                  </label>
+                </div>
+
+                <label class="material-upload-field">
+                  <span>Material title</span>
+                  <input id="material-title" type="text" placeholder="Midterm notes, lab sheet, final review..." required>
+                </label>
+
+                <label class="material-upload-field">
+                  <span>File</span>
+                  <input id="material-file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.jpg,.jpeg,.png" required>
+                </label>
+
+                <button class="material-upload-button" id="material-upload-button" type="submit">Upload material</button>
+                <p class="material-upload-status" id="material-upload-status" aria-live="polite"></p>
+              </form>
+            </section>
+          </aside>
+        </div>
       </section>
     </div>
   </main>
