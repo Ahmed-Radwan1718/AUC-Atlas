@@ -390,7 +390,18 @@
     };
   });
 
+  const courseProfessors = {
+    "MACT 1121": [
+      {
+        name: "Eslam Badr",
+        department: "MACT",
+        url: "professors.html?professor=eslam-badr"
+      }
+    ]
+  };
+
   window.aucAtlasCourses = courses;
+  window.aucAtlasCourseProfessors = courseProfessors;
 
   function normalize(value) {
     return String(value || "").toLowerCase().trim();
@@ -595,6 +606,155 @@
     }
   }
 
+  function renderCourseProfessors(course) {
+    const list = document.getElementById("course-professor-list");
+    const professors = courseProfessors[course.code] || [];
+
+    if (!list) {
+      return;
+    }
+
+    if (!professors.length) {
+      list.innerHTML = "<p>No professors listed for this course yet.</p>";
+      return;
+    }
+
+    list.innerHTML = professors.map(function (professor) {
+      return `
+        <a class="course-professor-link" href="${professor.url}">
+          <strong>${professor.name}</strong>
+          <span>${professor.department}</span>
+        </a>
+      `;
+    }).join("");
+  }
+
+  function closeMaterialChoiceMenus(activeChoice) {
+    document.querySelectorAll(".material-choice.open").forEach(function (choice) {
+      if (choice !== activeChoice) {
+        choice.classList.remove("open");
+
+        const button = choice.querySelector(".material-choice-button");
+
+        if (button) {
+          button.setAttribute("aria-expanded", "false");
+        }
+      }
+    });
+  }
+
+  function syncMaterialChoiceButton(choice, select) {
+    const button = choice.querySelector(".material-choice-button");
+    const selectedOption = select.options[select.selectedIndex];
+
+    if (button && selectedOption) {
+      button.textContent = selectedOption.textContent;
+    }
+
+    choice.querySelectorAll(".material-choice-option").forEach(function (optionButton) {
+      optionButton.setAttribute("aria-selected", optionButton.dataset.value === select.value ? "true" : "false");
+    });
+  }
+
+  function syncMaterialChoiceMenus(form) {
+    form.querySelectorAll("select.material-native-select").forEach(function (select) {
+      const choice = select.nextElementSibling;
+
+      if (choice && choice.classList.contains("material-choice")) {
+        syncMaterialChoiceButton(choice, select);
+      }
+    });
+  }
+
+  function setupMaterialChoiceMenus(form) {
+    form.querySelectorAll("select.material-native-select").forEach(function (select) {
+      if (select.dataset.choiceReady === "true") {
+        return;
+      }
+
+      select.dataset.choiceReady = "true";
+
+      const choice = document.createElement("div");
+      const button = document.createElement("button");
+      const menu = document.createElement("div");
+
+      choice.className = "material-choice";
+      button.type = "button";
+      button.className = "material-choice-button";
+      button.setAttribute("aria-haspopup", "listbox");
+      button.setAttribute("aria-expanded", "false");
+      menu.className = "material-choice-menu";
+      menu.setAttribute("role", "listbox");
+
+      Array.from(select.options).forEach(function (option) {
+        const optionButton = document.createElement("button");
+
+        optionButton.type = "button";
+        optionButton.className = "material-choice-option";
+        optionButton.dataset.value = option.value;
+        optionButton.textContent = option.textContent;
+        optionButton.setAttribute("role", "option");
+
+        optionButton.addEventListener("click", function () {
+          select.value = option.value;
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+          choice.classList.remove("open");
+          button.setAttribute("aria-expanded", "false");
+          syncMaterialChoiceButton(choice, select);
+        });
+
+        menu.appendChild(optionButton);
+      });
+
+      button.addEventListener("click", function () {
+        const willOpen = !choice.classList.contains("open");
+
+        closeMaterialChoiceMenus(choice);
+        choice.classList.toggle("open", willOpen);
+        button.setAttribute("aria-expanded", willOpen ? "true" : "false");
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!choice.contains(event.target)) {
+          choice.classList.remove("open");
+          button.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      select.addEventListener("change", function () {
+        syncMaterialChoiceButton(choice, select);
+      });
+
+      choice.appendChild(button);
+      choice.appendChild(menu);
+      select.insertAdjacentElement("afterend", choice);
+      syncMaterialChoiceButton(choice, select);
+    });
+  }
+
+  function setMaterialFileName(form, fileName) {
+    const fileNameElement = form.querySelector("#material-file-name");
+
+    if (fileNameElement) {
+      fileNameElement.textContent = fileName || "No file chosen";
+    }
+  }
+
+  function setupMaterialFilePicker(form) {
+    const fileInput = form.querySelector("#material-file");
+
+    if (!fileInput || fileInput.dataset.fileReady === "true") {
+      return;
+    }
+
+    fileInput.dataset.fileReady = "true";
+
+    fileInput.addEventListener("change", function () {
+      const file = fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+      setMaterialFileName(form, file ? file.name : "");
+    });
+  }
+
   function renderCourseDetail(courseCode) {
     const listView = document.getElementById("courses-list-view");
     const detailView = document.getElementById("course-detail-view");
@@ -622,6 +782,7 @@
       setCourseDetailText("course-detail-level", "Unavailable");
       setCourseDetailText("course-detail-full-code", courseCode || "Unavailable");
       setCourseDetailText("course-detail-note", "This course could not be matched to the current AUC Atlas course list.");
+      renderCourseProfessors({ code: "" });
       return true;
     }
 
@@ -633,6 +794,7 @@
     setCourseDetailText("course-detail-level", selectedCourse.level);
     setCourseDetailText("course-detail-full-code", selectedCourse.code);
     setCourseDetailText("course-detail-note", "This course page is ready for professor links, student notes, ratings, prerequisites, and review details.");
+    renderCourseProfessors(selectedCourse);
     setupMaterialUploadForm(selectedCourse);
 
     return true;
@@ -676,6 +838,9 @@
     }
 
     form.dataset.ready = "true";
+    form.noValidate = true;
+    setupMaterialChoiceMenus(form);
+    setupMaterialFilePicker(form);
 
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
@@ -751,6 +916,8 @@
         }
 
         form.reset();
+        syncMaterialChoiceMenus(form);
+        setMaterialFileName(form, "");
         setMaterialUploadStatus("Uploaded successfully. It is tagged as pending in ImageKit.", "success");
       } catch (error) {
         setMaterialUploadStatus(error.message || "Upload failed. Try again.", "error");
