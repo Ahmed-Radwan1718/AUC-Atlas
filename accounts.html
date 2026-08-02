@@ -378,8 +378,7 @@
     }
 
     .account-field input,
-    .account-field textarea,
-    .account-field select {
+    .account-field textarea {
       width: 100%;
       min-height: 50px;
       padding: 0 16px;
@@ -401,29 +400,33 @@
       line-height: 1.6;
     }
 
-    .account-field select {
-      height: 50px;
-      padding-right: 48px;
-      appearance: none;
-      -webkit-appearance: none;
-      cursor: pointer;
+    .account-major-dropdown {
+      z-index: 30;
     }
 
-    .account-major-select-wrap {
-      position: relative;
+    .account-major-dropdown.open {
+      z-index: 90;
     }
 
-    .account-major-select-wrap .chevron {
-      position: absolute;
-      top: 50%;
-      right: 18px;
-      pointer-events: none;
-      transform: translateY(-65%) rotate(45deg);
+    .account-major-dropdown .custom-select-menu {
+      max-height: 280px;
+      overflow-y: auto;
+      scrollbar-width: auto;
+    }
+
+    .account-major-dropdown .custom-select-value span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .account-major-dropdown .custom-select-option span {
+      min-width: 0;
     }
 
     .account-field input:focus,
-    .account-field textarea:focus,
-    .account-field select:focus {
+    .account-field textarea:focus {
       background: white;
       border-color: rgba(192, 154, 92, 0.84);
       box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
@@ -1690,51 +1693,57 @@
                   </div>
 
                   <div class="account-field">
-                    <label for="account-major">Major</label>
-                    <div class="account-major-select-wrap">
-                      <select id="account-major">
-                        <option value="">Select your major</option>
-                        <option value="Accounting">Accounting</option>
-                        <option value="Actuarial Science">Actuarial Science</option>
-                        <option value="Anthropology">Anthropology</option>
-                        <option value="Arabic Studies">Arabic Studies</option>
-                        <option value="Architecture">Architecture</option>
-                        <option value="Biology">Biology</option>
-                        <option value="Business and Entrepreneurship">Business and Entrepreneurship</option>
-                        <option value="Business in Finance">Business in Finance</option>
-                        <option value="Business in Marketing">Business in Marketing</option>
-                        <option value="Chemistry">Chemistry</option>
-                        <option value="Communication and Media Arts">Communication and Media Arts</option>
-                        <option value="Computer Engineering">Computer Engineering</option>
-                        <option value="Computer Science">Computer Science</option>
-                        <option value="Construction Engineering">Construction Engineering</option>
-                        <option value="Data Science">Data Science</option>
-                        <option value="Dual Degree: Political Science and International Human Rights Law">Dual Degree: Political Science and International Human Rights Law</option>
-                        <option value="Economics">Economics</option>
-                        <option value="Egyptology">Egyptology</option>
-                        <option value="Electronics and Communications Engineering">Electronics and Communications Engineering</option>
-                        <option value="English and Comparative Literature">English and Comparative Literature</option>
-                        <option value="Film">Film</option>
-                        <option value="Graphic Design">Graphic Design</option>
-                        <option value="History">History</option>
-                        <option value="Honors Program in Political Science">Honors Program in Political Science</option>
-                        <option value="Integrated Marketing Communication">Integrated Marketing Communication</option>
-                        <option value="Management of Information and Communication Technology">Management of Information and Communication Technology</option>
-                        <option value="Mathematics">Mathematics</option>
-                        <option value="Mechanical Engineering">Mechanical Engineering</option>
-                        <option value="Middle East Studies">Middle East Studies</option>
-                        <option value="Multimedia Communication and Journalism">Multimedia Communication and Journalism</option>
-                        <option value="Music">Music</option>
-                        <option value="Petroleum Engineering">Petroleum Engineering</option>
-                        <option value="Philosophy">Philosophy</option>
-                        <option value="Physics">Physics</option>
-                        <option value="Political Science">Political Science</option>
-                        <option value="Psychology">Psychology</option>
-                        <option value="Sociology">Sociology</option>
-                        <option value="Theatre">Theatre</option>
-                        <option value="Visual Arts">Visual Arts</option>
-                      </select>
-                      <span class="chevron" aria-hidden="true"></span>
+                    <label for="account-major-trigger">Major</label>
+                    <input type="hidden" id="account-major" value="">
+
+                    <div class="custom-select-dropdown account-major-dropdown" id="account-major-dropdown">
+                      <button class="custom-select-trigger" type="button" id="account-major-trigger" aria-expanded="false">
+                        <span class="custom-select-value" id="account-major-value"><span>Select your major</span></span>
+                        <span class="chevron"></span>
+                      </button>
+
+                      <div class="custom-select-menu" id="account-major-menu">
+                        <button class="custom-select-option active" type="button" data-major-value=""><span>Select your major</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Accounting"><span>Accounting</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Actuarial Science"><span>Actuarial Science</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Anthropology"><span>Anthropology</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Arabic Studies"><span>Arabic Studies</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Architecture"><span>Architecture</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Biology"><span>Biology</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Business and Entrepreneurship"><span>Business and Entrepreneurship</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Business in Finance"><span>Business in Finance</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Business in Marketing"><span>Business in Marketing</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Chemistry"><span>Chemistry</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Communication and Media Arts"><span>Communication and Media Arts</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Computer Engineering"><span>Computer Engineering</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Computer Science"><span>Computer Science</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Construction Engineering"><span>Construction Engineering</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Data Science"><span>Data Science</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Dual Degree: Political Science and International Human Rights Law"><span>Dual Degree: Political Science and International Human Rights Law</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Economics"><span>Economics</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Egyptology"><span>Egyptology</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Electronics and Communications Engineering"><span>Electronics and Communications Engineering</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="English and Comparative Literature"><span>English and Comparative Literature</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Film"><span>Film</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Graphic Design"><span>Graphic Design</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="History"><span>History</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Honors Program in Political Science"><span>Honors Program in Political Science</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Integrated Marketing Communication"><span>Integrated Marketing Communication</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Management of Information and Communication Technology"><span>Management of Information and Communication Technology</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Mathematics"><span>Mathematics</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Mechanical Engineering"><span>Mechanical Engineering</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Middle East Studies"><span>Middle East Studies</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Multimedia Communication and Journalism"><span>Multimedia Communication and Journalism</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Music"><span>Music</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Petroleum Engineering"><span>Petroleum Engineering</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Philosophy"><span>Philosophy</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Physics"><span>Physics</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Political Science"><span>Political Science</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Psychology"><span>Psychology</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Sociology"><span>Sociology</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Theatre"><span>Theatre</span></button>
+                        <button class="custom-select-option" type="button" data-major-value="Visual Arts"><span>Visual Arts</span></button>
+                      </div>
                     </div>
                   </div>
 
@@ -2003,6 +2012,9 @@
     const accountPhoneCountrySearch = document.getElementById("account-phone-country-search");
     const accountPhoneCountryOptions = document.getElementById("account-phone-country-options");
     const accountMajorInput = document.getElementById("account-major");
+    const accountMajorDropdown = document.getElementById("account-major-dropdown");
+    const accountMajorValue = document.getElementById("account-major-value");
+    const accountMajorMenu = document.getElementById("account-major-menu");
     const accountAucIdInput = document.getElementById("account-auc-id");
     const accountAucIdEditButton = document.getElementById("account-auc-id-edit-button");
     const accountAucIdNote = document.getElementById("account-auc-id-note");
@@ -2875,6 +2887,65 @@
       syncAccountPhoneCountryDropdown();
     }
 
+    function syncAccountMajorDropdown() {
+      if (!accountMajorInput || !accountMajorValue || !accountMajorMenu) {
+        return;
+      }
+
+      const currentValue = accountMajorInput.value || "";
+      let selectedOption = null;
+
+      accountMajorMenu.querySelectorAll(".custom-select-option").forEach(function (option) {
+        const isActive = option.dataset.majorValue === currentValue;
+        option.classList.toggle("active", isActive);
+
+        if (isActive) {
+          selectedOption = option;
+        }
+      });
+
+      accountMajorValue.innerHTML = "<span>" + escapeAccountHtml(selectedOption ? selectedOption.textContent.trim() : currentValue || "Select your major") + "</span>";
+    }
+
+    function initializeAccountMajorDropdown() {
+      if (!accountMajorDropdown || !accountMajorMenu || !accountMajorInput) {
+        return;
+      }
+
+      const trigger = accountMajorDropdown.querySelector(".custom-select-trigger");
+
+      if (!trigger) {
+        return;
+      }
+
+      trigger.addEventListener("click", function () {
+        const isOpen = accountMajorDropdown.classList.toggle("open");
+        trigger.setAttribute("aria-expanded", String(isOpen));
+      });
+
+      accountMajorMenu.addEventListener("click", function (event) {
+        const option = event.target.closest(".custom-select-option");
+
+        if (!option) {
+          return;
+        }
+
+        accountMajorInput.value = option.dataset.majorValue || "";
+        syncAccountMajorDropdown();
+        accountMajorDropdown.classList.remove("open");
+        trigger.setAttribute("aria-expanded", "false");
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!accountMajorDropdown.contains(event.target)) {
+          accountMajorDropdown.classList.remove("open");
+          trigger.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      syncAccountMajorDropdown();
+    }
+
     function syncTwoFactorState(twoFactor) {
       accountTwoFactor = {
         appEnabled: Boolean(twoFactor && twoFactor.appEnabled),
@@ -2916,6 +2987,7 @@
       accountEmailInput.value = user.email || "";
       hydrateAccountPhoneValue(user.phone || "");
       accountMajorInput.value = user.major || "";
+      syncAccountMajorDropdown();
 
       if (accountAucIdInput) {
         accountAucIdInput.value = savedAucId;
@@ -3538,6 +3610,7 @@
     });
 
     initializeAccountPhoneCountryDropdown();
+    initializeAccountMajorDropdown();
 
     const initialPanel = window.location.hash.replace("#", "") || "details";
 
