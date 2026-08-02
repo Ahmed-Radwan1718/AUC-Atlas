@@ -200,11 +200,25 @@
     }
 
     .professors-grid.professor-profile-grid {
-      grid-template-columns: minmax(0, 1fr);
+      width: min(100%, 1500px);
+      margin: 0 auto;
+      grid-template-columns: minmax(0, 1fr) minmax(380px, 560px);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .professors-grid.professor-profile-grid .professor-profile-card,
+    .professors-grid.professor-profile-grid .professor-review-insights {
+      width: 100%;
+      margin: 0;
+    }
+
+    .professors-grid.professor-profile-grid .professor-reviews-section {
+      grid-column: 1 / -1;
     }
 
     .professors-header.professor-profile-heading {
-      width: min(100%, 1120px);
+      width: min(100%, 1500px);
       margin: 0 auto 22px;
       align-items: center;
     }
@@ -236,7 +250,7 @@
       background: rgba(255, 255, 255, 0.78);
       box-shadow: 0 20px 54px rgba(42, 32, 20, 0.1);
       display: grid;
-      grid-template-columns: 320px minmax(0, 1fr);
+      grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
       align-items: start;
     }
 
@@ -767,28 +781,16 @@
     }
 
     .professor-review-stat-copy {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 14px;
+      display: block;
     }
 
     .professor-review-stat-copy strong {
       color: #171717;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 900;
       letter-spacing: 0.04em;
       line-height: 1.2;
       text-transform: uppercase;
-    }
-
-    .professor-review-stat-copy span {
-      color: rgba(23, 23, 23, 0.48);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      white-space: nowrap;
     }
 
     .professor-review-stat-labels {
@@ -796,7 +798,7 @@
       flex-wrap: wrap;
       gap: 6px 10px;
       color: rgba(23, 23, 23, 0.58);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
       line-height: 1.5;
     }
@@ -815,11 +817,6 @@
 
     .professor-review-stat-labels strong {
       color: #171717;
-    }
-
-    .professor-review-stat-labels em {
-      color: rgba(23, 23, 23, 0.4);
-      font-style: normal;
     }
 
     .professor-review-stat-labels .is-empty {
@@ -958,18 +955,14 @@
 
     @media (max-width: 720px) {
       .professor-review-insights-header,
-      .professors-reviews-header,
+      .professor-reviews-header,
       .professor-review-card-top {
         align-items: flex-start;
         flex-direction: column;
       }
 
-      .professor-review-stat-row {
-        grid-template-columns: 1fr;
-      }
-
-      .professor-review-stat-percent {
-        text-align: left;
+      .professor-review-stat-labels {
+        font-size: 10px;
       }
     }
 
@@ -997,6 +990,15 @@
 
       .filters-panel {
         position: static;
+      }
+
+      .professors-grid.professor-profile-grid {
+        width: min(100%, 1120px);
+        grid-template-columns: 1fr;
+      }
+
+      .professors-grid.professor-profile-grid .professor-reviews-section {
+        grid-column: auto;
       }
 
       .professor-profile-card {
@@ -1182,7 +1184,7 @@
     ];
 
     if (statsCount) {
-      statsCount.textContent = safeReviews.length ? "Based on " + safeReviews.length + " " + (safeReviews.length === 1 ? "review" : "reviews") : "No review choices yet";
+      statsCount.textContent = safeReviews.length ? "Based on review choices" : "No review choices yet";
     }
 
     if (!panel) {
@@ -1203,12 +1205,11 @@
         <div class="professor-review-stat-row">
           <div class="professor-review-stat-copy">
             <strong>${escapeHtml(row.label)}</strong>
-            <span>${escapeHtml(row.total + " " + (row.total === 1 ? "answer" : "answers"))}</span>
           </div>
 
           <div class="professor-review-stat-labels">
             ${row.answers.map(function (answer) {
-              return '<span class="' + escapeHtml(answer.count ? "" : "is-empty") + '"><strong>' + escapeHtml(answer.value.replace(/-/g, " ")) + '</strong>' + escapeHtml(answer.percent + "%") + '<em>' + escapeHtml(answer.count + " of " + row.total) + '</em></span>';
+              return '<span class="' + escapeHtml(answer.count ? "" : "is-empty") + '"><strong>' + escapeHtml(answer.value.replace(/-/g, " ")) + '</strong>' + escapeHtml(answer.percent + "%") + '</span>';
             }).join("")}
           </div>
 
