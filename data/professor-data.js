@@ -207,14 +207,25 @@
       align-items: start;
     }
 
-    .professors-grid.professor-profile-grid .professor-profile-card,
+    .professors-grid.professor-profile-grid .professor-profile-card {
+      width: 100%;
+      margin: 0;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
     .professors-grid.professor-profile-grid .professor-review-insights {
       width: 100%;
       margin: 0;
+      grid-column: 2;
+      grid-row: 1 / span 2;
     }
 
     .professors-grid.professor-profile-grid .professor-reviews-section {
-      grid-column: 1 / -1;
+      width: 100%;
+      margin: 0;
+      grid-column: 1;
+      grid-row: 2;
     }
 
     .professors-header.professor-profile-heading {
@@ -997,8 +1008,10 @@
         grid-template-columns: 1fr;
       }
 
+      .professors-grid.professor-profile-grid .professor-review-insights,
       .professors-grid.professor-profile-grid .professor-reviews-section {
         grid-column: auto;
+        grid-row: auto;
       }
 
       .professor-profile-card {
