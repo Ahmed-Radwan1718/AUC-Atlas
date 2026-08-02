@@ -511,7 +511,7 @@
 
     grid.innerHTML = shownCourses.map(function (course) {
       return `
-        <article class="course-card">
+        <a class="course-card" href="course.html?code=${encodeURIComponent(course.code)}" aria-label="Open ${course.code} course page">
           <div class="course-card-main">
             <span class="course-code">${course.code}</span>
             <h2>${course.title}</h2>
@@ -520,7 +520,7 @@
             <span>${course.department}</span>
             <span>${course.level}</span>
           </div>
-        </article>
+        </a>
       `;
     }).join("");
 
