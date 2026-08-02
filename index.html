@@ -211,44 +211,173 @@
       margin: 0 auto;
       padding: 0 0 104px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 260px;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
       gap: 42px;
-      align-items: center;
+      align-items: stretch;
     }
 
     .support-copy {
-      padding-top: 34px;
+      padding: 34px 0 0;
       border-top: 1px solid rgba(23, 23, 23, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .support-copy h2 {
-      max-width: 620px;
+      max-width: 690px;
       margin-bottom: 16px;
       color: #171717;
-      font-size: clamp(30px, 4vw, 52px);
+      font-size: clamp(32px, 4.2vw, 56px);
       font-weight: 700;
-      line-height: 1.08;
+      line-height: 1.05;
       text-transform: uppercase;
     }
 
     .support-copy p {
-      max-width: 590px;
+      max-width: 640px;
       color: rgba(23, 23, 23, 0.66);
       font-size: 16px;
       line-height: 1.75;
     }
 
+    .support-copy .home-kicker {
+      max-width: none;
+      margin-bottom: 14px;
+      color: rgba(192, 154, 92, 0.9);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
     .support-copy strong {
       color: #171717;
-      font-weight: 700;
+      font-weight: 800;
+    }
+
+    .support-cost-card {
+      max-width: 680px;
+      margin-top: 28px;
+      padding: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+    }
+
+    .support-cost-head {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .support-copy .support-cost-kicker {
+      max-width: none;
+      margin-bottom: 6px;
+      color: rgba(192, 154, 92, 0.9);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .support-cost-head h3 {
+      color: #171717;
+      font-size: 22px;
+      line-height: 1.18;
+    }
+
+    .support-cost-amount {
+      min-width: 120px;
+      text-align: right;
+    }
+
+    .support-cost-amount strong {
+      display: block;
+      color: #171717;
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .support-cost-amount span {
+      display: block;
+      margin-top: 6px;
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .support-progress {
+      height: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+    }
+
+    .support-progress-fill {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: inherit;
+      background: linear-gradient(90deg, rgba(192, 154, 92, 0.95), rgba(23, 23, 23, 0.82));
+    }
+
+    .support-progress-row {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .support-cost-breakdown {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .support-cost-item {
+      padding: 14px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 16px;
+      background: rgba(247, 244, 238, 0.78);
+    }
+
+    .support-cost-item strong {
+      display: block;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .support-cost-item span {
+      display: block;
+      margin-top: 5px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      line-height: 1.45;
     }
 
     .support-barcode {
+      width: min(100%, 300px);
+      align-self: center;
+      justify-self: end;
       padding: 14px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 24px;
-      background: rgba(255, 255, 255, 0.74);
-      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.12);
       display: grid;
       gap: 12px;
       text-align: center;
@@ -294,8 +423,18 @@
         grid-template-columns: 1fr;
       }
 
+      .support-cost-head {
+        flex-direction: column;
+      }
+
+      .support-cost-amount {
+        text-align: left;
+      }
+
       .support-barcode {
-        max-width: 260px;
+        width: min(100%, 280px);
+        max-width: 280px;
+        justify-self: start;
       }
     }
   </style>
@@ -358,10 +497,48 @@
     <section class="support-section" aria-label="Support AUC Atlas">
       <div class="support-copy">
         <p class="home-kicker">Keep AUC Atlas running</p>
-        <h2>This site costs EGP ___ / month to operate.</h2>
+        <h2>Help keep AUC Atlas free for students.</h2>
         <p>
-          AUC Atlas is built for students and kept free to use. If you want to help cover hosting, tools, and maintenance, you can donate through the Telda barcode.
+          AUC Atlas costs roughly <strong>$100/month</strong> to keep online, maintained, and useful. If it helped you choose a class, compare professors, or find material faster, a small Telda donation helps cover the monthly run cost.
         </p>
+
+        <div class="support-cost-card" aria-label="AUC Atlas monthly running cost">
+          <div class="support-cost-head">
+            <div>
+              <p class="support-cost-kicker">Monthly support goal</p>
+              <h3>Cover the running costs</h3>
+            </div>
+
+            <div class="support-cost-amount">
+              <strong>$100</strong>
+              <span>per month</span>
+            </div>
+          </div>
+
+          <div class="support-progress" aria-hidden="true">
+            <span class="support-progress-fill"></span>
+          </div>
+
+          <div class="support-progress-row">
+            <span>Running cost</span>
+            <span>$100/month</span>
+          </div>
+
+          <div class="support-cost-breakdown">
+            <div class="support-cost-item">
+              <strong>Hosting</strong>
+              <span>Servers, database, and storage.</span>
+            </div>
+            <div class="support-cost-item">
+              <strong>Tools</strong>
+              <span>Services that keep features running.</span>
+            </div>
+            <div class="support-cost-item">
+              <strong>Maintenance</strong>
+              <span>Fixes, updates, and student requests.</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="support-barcode">
