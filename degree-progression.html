@@ -172,6 +172,8 @@
       mask: url("logout-icon.png") center / contain no-repeat;
     }
 
+    .degree-content { min-width: 0; }
+
     .degree-panel {
       padding: 30px;
       border-radius: 26px;
@@ -185,6 +187,177 @@
       font-weight: 700;
       line-height: 1.12;
       text-transform: uppercase;
+    }
+
+    .degree-panel-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .degree-major-pill {
+      width: fit-content;
+      min-height: 34px;
+      padding: 0 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(192, 154, 92, 0.24);
+      background: rgba(192, 154, 92, 0.12);
+      color: rgba(126, 90, 34, 0.96);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .degree-summary-grid {
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .degree-stat-card,
+    .degree-requirement-group,
+    .degree-empty-state,
+    .degree-note {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .degree-stat-card {
+      min-height: 96px;
+      padding: 18px;
+      display: grid;
+      align-content: center;
+      gap: 8px;
+    }
+
+    .degree-stat-card span {
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .degree-stat-card strong {
+      color: #171717;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .degree-progress-track {
+      grid-column: 1 / -1;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+      overflow: hidden;
+    }
+
+    .degree-progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(192, 154, 92, 0.9);
+      transition: width 0.24s ease;
+    }
+
+    .degree-requirements-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .degree-requirement-group {
+      padding: 18px;
+    }
+
+    .degree-requirement-group-head {
+      margin-bottom: 14px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .degree-requirement-group-head span {
+      color: rgba(192, 154, 92, 0.9);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .degree-requirement-group-head h3,
+    .degree-empty-state h3 {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+
+    .degree-requirement-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .degree-requirement-item {
+      padding: 12px 13px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 16px;
+      background: rgba(247, 244, 238, 0.52);
+      color: rgba(23, 23, 23, 0.72);
+      font-size: 14px;
+      font-weight: 650;
+      line-height: 1.55;
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      gap: 11px;
+      cursor: pointer;
+    }
+
+    .degree-requirement-item input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: rgba(192, 154, 92, 0.95);
+    }
+
+    .degree-requirement-item.is-complete {
+      color: rgba(23, 23, 23, 0.46);
+      background: rgba(185, 255, 202, 0.16);
+    }
+
+    .degree-requirement-item.is-complete span {
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+    }
+
+    .degree-note,
+    .degree-empty-state {
+      padding: 18px;
+    }
+
+    .degree-note {
+      margin-top: 16px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .degree-empty-state {
+      display: grid;
+      gap: 8px;
+    }
+
+    @media (max-width: 760px) {
+      .degree-panel-header { display: grid; }
+      .degree-summary-grid { grid-template-columns: 1fr; }
     }
 
     @keyframes degreePanelEnter {
@@ -245,10 +418,46 @@
             </button>
           </aside>
 
-          <section>
+          <section class="degree-content">
             <article class="degree-panel">
-              <h2>Degree Progression</h2>
-              <p>Coming soon.</p>
+              <div class="degree-panel-header">
+                <div>
+                  <h2 id="degree-major-name">Loading Requirements</h2>
+                  <p id="degree-major-copy">Your saved major will load here.</p>
+                </div>
+
+                <span class="degree-major-pill" id="degree-major-pill">Degree audit</span>
+              </div>
+
+              <div class="degree-summary-grid" aria-label="Degree progress summary">
+                <div class="degree-stat-card">
+                  <span>Completed</span>
+                  <strong id="degree-completed-count">0</strong>
+                </div>
+
+                <div class="degree-stat-card">
+                  <span>Remaining</span>
+                  <strong id="degree-remaining-count">0</strong>
+                </div>
+
+                <div class="degree-stat-card">
+                  <span>Progress</span>
+                  <strong id="degree-progress-percent">0%</strong>
+                </div>
+
+                <div class="degree-progress-track" aria-hidden="true">
+                  <div class="degree-progress-bar" id="degree-progress-bar"></div>
+                </div>
+              </div>
+
+              <div class="degree-requirements-grid" id="degree-requirements-root" aria-live="polite">
+                <div class="degree-empty-state">
+                  <h3>Loading requirements</h3>
+                  <p>Checking your saved account major.</p>
+                </div>
+              </div>
+
+              <p class="degree-note" id="degree-plan-note" hidden></p>
             </article>
           </section>
         </div>
@@ -257,7 +466,201 @@
   </main>
 
   <script>
+    const DEGREE_REQUIREMENTS = {"core":[{"title":"Freshman Level - 22 credits in the current Core framework","items":["RHET 1010 and CORE 1010 taken as a linked learning-community pair in the first semester.","RHET 1020 or the current second rhetoric/academic writing requirement.","Scientific Thinking.","Philosophical Thinking.","LALT 1020 or the current language-and-thinking requirement.","Pathways One: a natural-science course with laboratory; School of Sciences and Engineering plans may satisfy this through in-major science.","Pathways Two: a humanities/social-science course outside the student's major field."]},{"title":"Secondary Level - 12 credits","items":["Humanities and Social Sciences - one course (3 credits).","Arab World Studies - one course (3 credits).","Egypt Studies - one course (3 credits).","Global Studies - one course (3 credits)."]},{"title":"Capstone Level - 6 credits","items":["Two approved capstone experiences/courses totaling 6 credits.","No more than 3 of these credits may normally come from the department offering the student's major.","One capstone course may be allowed to count simultaneously toward the major and the Core."]},{"title":"Arabic-language requirement","items":["Arabic placement, prior qualifications and the student's language background determine whether Arabic coursework is required or whether the requirement is satisfied by exemption/placement. The Arabic requirement is integrated with, but separate from, the Core Curriculum."]}],"majors":{"Accounting":{"required":["ACCT 2001 Financial Accounting and ACCT 2002 Managerial Accounting.","Intermediate Financial Accounting I and II; Advanced Accounting; Cost/Management Accounting.","Auditing, taxation, accounting information systems, and upper-level contemporary accounting/auditing courses.","Business foundation: microeconomics, macroeconomics, business statistics, finance, marketing, management, business law, information systems, operations, and business strategy."],"choices":["One or more approved accounting electives or advanced topical courses, depending on catalog year.","General electives sufficient to reach the degree total; a minor or second major may use part of this space."],"capstone":["Business strategy/integrative work, professional internship or assessment requirements, and the accounting program's upper-level integration courses."],"note":"Current program listing plus the official 2024-2025 catalog course structure. Business course numbers and internship rules can change by catalog year."},"Actuarial Science":{"required":["Calculus I-III, linear algebra, differential equations, discrete mathematics, numerical analysis, probability and mathematical statistics.","Actuarial mathematics: theory of interest, life contingencies, loss models, risk theory, pension/health topics and enterprise risk management.","Computing/data analysis coursework and supporting courses in economics, accounting and finance.","MACT 4950 Senior Project or MACT 4980 Senior Thesis, as allowed by the applicable plan; MACT 4990 Enterprise Risk Management appears in the current catalog."],"choices":["Approved upper-level actuarial science, mathematics, statistics, finance or risk electives.","General electives to complete the degree total."],"capstone":["Senior project or thesis, normally after the probability/statistics and actuarial sequence."],"note":"Current 2025-2026 program page/catalog snippets; exact prerequisite sequence must be checked in the student degree audit."},"Anthropology":{"required":["ANTH 2101 Cultural Anthropology.","History of Social Theory and Contemporary Anthropological Theory.","ANTH 3105 Fieldwork Methods (or the catalog-year equivalent methods course).","One culture-area course and a senior seminar/capstone.","A set of additional anthropology courses, including multiple 4000-level seminars."],"choices":["Anthropology electives across culture, migration, religion, gender, political economy, environment, development and media.","Approved collateral social-science courses and normally a five-course minor or coherent collateral field."],"capstone":["Upper-level anthropology seminar and/or research-intensive fieldwork course."],"note":"Current program presence and the official catalog structure carried forward from the 2024-2025 plan; individual elective menus rotate."},"Arabic Studies":{"required":["ARIC 2102 Modern Arabic Literature.","ARIC 2205 World of Islamic Architecture.","ARIC 2346 Survey of Arab History.","ARIC 3435 Introduction to the Study of Islam.","Additional ARIC courses, with a required number above the introductory level and courses aligned to the selected specialization."],"choices":["Specialization electives in literature/language, history, Islamic studies, or art and architecture.","General electives; the relatively compact major leaves room for a minor or second major."],"capstone":["Advanced seminar, research paper or independent study within the chosen specialization, according to the degree planner."],"note":"Current AUC program page states a 39-credit major core; named foundation courses are from the official catalog extract."},"Architecture":{"required":["A multi-semester architectural design studio sequence, progressing from foundations through integrated/contextual studios and the graduation project.","Architectural representation: freehand drawing, descriptive geometry, digital modeling, visualization and fabrication.","Architectural history and theory, including regional/Islamic and global architectural traditions.","Building construction, materials, structures, environmental control systems, sustainability and building technology.","Urban design/planning, landscape and heritage/context courses.","Professional practice, design management, building codes and construction documentation."],"choices":["A concentration package in one of the three current areas.","Architecture/engineering electives and university electives specified by the plan."],"capstone":["Senior Project I and II / graduation design project, plus required professional training or internship."],"note":"Current AUC Architecture and accreditation pages; studio labels and semester placement must be taken from the assigned catalog-year flowchart."},"Biology":{"required":["General Biology I and II with laboratories.","Cell biology, genetics, molecular biology, ecology and evolution.","Biochemistry, microbiology and organismal/physiology coursework with laboratory experience.","Quantitative foundations: chemistry sequence with labs, calculus/statistics and appropriate physics or computing courses.","Research methods, scientific communication and advanced laboratory or field courses."],"choices":["Genomics and Biotechnology examples include bioinformatics, molecular biology of the gene, cellular and molecular immunology, and tumor biology.","Ecology and Conservation Biology electives emphasize field ecology, biodiversity, conservation, environmental biology and related methods."],"capstone":["Senior research, thesis/project or advanced research seminar/lab, depending on the specialization and catalog year."],"note":"Current AUC Biology listing and the Fall 2025 announcement of the two current specializations; exact elective lists rotate."},"Business and Entrepreneurship":{"required":["Business collateral: ACCT 2001 Financial Accounting, ACCT 2002 Managerial Accounting, ECON 2011 Microeconomics, ECON 2021 Macroeconomics, business statistics and business communication.","Business core: introduction to business, finance, marketing, management, business law, information systems, operations, international business, business ethics/environment and business strategy.","Entrepreneurship core: entrepreneurship and innovation, opportunity recognition/new venture creation, entrepreneurial finance, entrepreneurial marketing, managing growth and digital strategy."],"choices":["Approved entrepreneurship electives, venture/innovation topics and cross-school electives.","General electives and optional co-op/minor coursework."],"capstone":["New-venture or entrepreneurship capstone integrated with business strategy; internship/co-op or experiential requirement where applicable."],"note":"Current degree listing and official 2024-2025 business curriculum; course numbering and co-op rules are catalog-year dependent."},"Business in Finance":{"required":["Business collateral: financial and managerial accounting, microeconomics, macroeconomics, business statistics and business communication.","Business core: marketing, management, business law, information systems, operations, international business, business environment/ethics and strategy.","Finance core: business finance, corporate finance, investment analysis, applied banking, financial markets/institutions, quantitative financial analysis and risk."],"choices":["Upper-level finance electives such as portfolio management, derivatives, international finance, financial modeling, fintech or advanced banking, as offered.","General electives, optional co-op and minor/second-major space."],"capstone":["Business strategy plus an integrative finance course/project and professional experience requirements specified by the plan."],"note":"Current degree listing and official catalog business structure; the precise seven-course finance package should be verified in the assigned catalog."},"Business in Marketing":{"required":["Business collateral: financial and managerial accounting, microeconomics, macroeconomics, business statistics and business communication.","Business core: finance, management, business law, information systems, operations, international business, business ethics/environment and strategy.","Marketing core: principles of marketing, consumer behavior, marketing research, integrated marketing communication, digital marketing and marketing strategy."],"choices":["Upper-level marketing electives such as services, international marketing, branding, retailing, sales, analytics or special topics.","General electives, optional co-op and minor/second-major space."],"capstone":["Marketing strategy/campaign work combined with the business strategy capstone and professional experience requirements."],"note":"Current degree listing and official 2024-2025 business curriculum; exact elective menus vary."},"Chemistry":{"required":["General Chemistry I and II with laboratories.","Organic Chemistry I and II with laboratories.","Analytical chemistry and instrumental analysis with laboratory work.","Physical Chemistry I and II and associated laboratory/experimental work.","Inorganic chemistry, biochemistry and advanced chemistry laboratory courses.","Supporting calculus, physics and computing/statistics requirements."],"choices":["Petrochemical electives in petroleum chemistry, polymers, industrial chemistry/processes and related analysis.","Food Chemistry electives in food analysis, biochemistry, microbiology/safety and quality topics.","Additional advanced CHEM electives and research credits."],"capstone":["Senior research project/thesis or advanced research laboratory and seminar."],"note":"Current SSE program listing confirms the Petrochemical Industry and Food Chemistry specializations; exact course packages are catalog-year controlled."},"Computer Engineering":{"required":["Programming fundamentals, object-oriented programming and data structures/algorithms.","Digital logic design with laboratory, computer organization and computer architecture.","Circuits, electronics, signals and systems, and supporting electrical engineering laboratories.","Microprocessors, embedded systems, interfacing and real-time systems.","Operating systems, computer networks, software engineering and databases.","Cybersecurity/information security and engineering mathematics/science foundations."],"choices":["Upper-level electives in embedded systems, hardware design, networks, cybersecurity, artificial intelligence, robotics or software systems.","Engineering/general electives required by the plan."],"capstone":["Two-part senior design project plus industrial training/internship."],"note":"Current program listing and ABET-style curriculum structure; use the student flowchart for exact codes and prerequisites."},"Computer Science":{"required":["Fundamentals of Computing I and II, including the programming laboratory where required.","Data structures and algorithms; discrete structures and mathematical foundations.","Computer organization/systems, operating systems and computer networks.","Database systems, software engineering and programming languages.","Theory of computation/algorithms, information security and ethical/professional computing.","Mathematics and statistics appropriate to the program."],"choices":["One specialization package in Embedded Systems, Artificial Intelligence or Cybersecurity.","Additional CSCE technical electives and general electives."],"capstone":["Culminating software/computing design project, normally in a two-course sequence, plus practical training where required."],"note":"Current AUC program page confirms the three specializations and a culminating capstone; exact course codes are catalog-year dependent."},"Construction Engineering":{"required":["Engineering mechanics: statics, dynamics and mechanics/strength of materials.","Surveying, engineering drawing/computing and construction methods/equipment.","Structural analysis and design, reinforced concrete and steel design.","Construction materials, materials testing and quality control laboratories.","Geotechnical engineering/soil mechanics, fluid mechanics/hydraulics and environmental engineering.","Construction planning, estimating, contracts, economics, project management and safety.","Transportation/highway and water/wastewater infrastructure foundations."],"choices":["A concentration package in materials/structures, management/technology or infrastructure, plus approved construction electives.","Engineering and general electives according to the flowchart."],"capstone":["Senior design/project sequence and required industrial training/internship."],"note":"Current AUC program page confirms the three concentrations and principal curriculum fields; exact course sequence is in the catalog-year flowchart."},"Data Science":{"required":["Calculus, linear algebra, probability, mathematical statistics and optimization/numerical methods.","Programming in Python/R or equivalent, data structures and algorithms.","Database systems, data management and data engineering foundations.","Statistical modeling, machine learning, data mining and visualization.","Ethics, communication and reproducible analysis for data science."],"choices":["Data-science electives in advanced machine learning, big data, natural language processing, bioinformatics, business analytics or other approved domains.","A coherent domain/collateral set chosen from science, engineering, business or social science offerings."],"capstone":["Team or individual data-science capstone/research project using a real data set; internship is strongly encouraged and may be required by the applicable plan."],"note":"Current AUC program page and official catalog extract; the exact cross-listed course set changes as the multidisciplinary program evolves."},"Economics":{"required":["ECON 2011 Introduction to Microeconomics and ECON 2021 Introduction to Macroeconomics.","ECON 2061 Mathematics for Economists I and the required statistics course.","Intermediate Microeconomics and Intermediate Macroeconomics.","Mathematics for Economists II and Introduction to Econometrics.","ECON 4031 International Trade (in the recent catalog structure)."],"choices":["Upper-level economics courses distributed across development, money/finance, public economics, international economics, economic history and applied fields.","Research/econometrics electives and general electives to reach 120 credits."],"capstone":["Advanced economics seminar or research-intensive upper-level course; requirements vary with the assigned plan."],"note":"Current Economics program page plus named courses from the official catalog extract."},"Egyptology":{"required":["EGPT 2250 Ancient Egyptian Literature in Translation.","EGPT 2251 Hieroglyphics I and the continuation sequence through advanced hieroglyphics.","History of Ancient Egypt I and II, including EGPT 3212 for the Middle Kingdom through Ptolemaic Egypt.","Art and Architecture of Ancient Egypt I and II.","Foundations in archaeology/material culture, religion and society/heritage management."],"choices":["Four or more advanced Egyptology electives in language, archaeology, art, history, religion, museum/heritage or field methods.","Approved collateral courses from archaeology, anthropology, Arabic studies, history, art history or related disciplines."],"capstone":["Advanced seminar, fieldwork, museum/heritage work or research project according to the degree planner."],"note":"Current AUC program page and current course records; exact twelve-course fixed/elective split should be checked against the catalog-year planner."},"Electronics and Communications Engineering":{"required":["Circuits I and II and electrical measurement/circuits laboratories.","Electronics I and II with electronics laboratories.","Digital logic, microprocessors/embedded systems and computer architecture foundations.","Signals and systems, probability/random processes and digital signal processing.","Electromagnetic theory, fields/waves and antennas/microwave foundations.","Analog and digital communication systems, communication networks and control systems.","Engineering mathematics, physics and programming foundations."],"choices":["Upper-level EENG electives in communication, electronics, RF/microwave, VLSI, photonics, control, robotics or signal processing.","Engineering/general electives according to the plan."],"capstone":["Two-semester senior design project and required industrial training/internship."],"note":"Current degree listing and engineering curriculum structure; exact codes/prerequisites must be read from the assigned flowchart."},"English and Comparative Literature":{"required":["ECLT 2010 Introduction to Literature or ECLT 2012 Global English Literatures.","ECLT 2011 Survey of British Literature.","One course in Ancient/Medieval literature; one in Early Modern; one in Modern; one in Modernism/Contemporary literature.","One American literature course.","ECLT 5108 History of Literary Criticism and ECLT 5109 Modern Literary Criticism."],"choices":["Additional ECLT electives across world, postcolonial, gender, genre, translation, film/media and creative/critical topics.","A collateral Arabic literature course and/or related humanities courses where specified by the catalog year."],"capstone":["Advanced seminar or research project demonstrating literary analysis and critical theory."],"note":"Named requirements are from the official 2024-2025 catalog extract; current elective menus and course renumbering should be verified."},"Film":{"required":["FILM 2120 Introduction to Film Art.","FILM 2121 Introduction to Fiction Filmmaking.","FILM 2123 Introduction to Non-Fiction and Experimental Filmmaking.","FILM 3110 World Cinema.","FILM 3130 Film Theory I and FILM 3132 Film Theory II.","Progressive production workshops in directing, cinematography, editing, sound and screenwriting."],"choices":["Three or more film theory/history/aesthetics electives and a set of advanced production electives.","Approved collateral choices from art, literature, music, theatre, anthropology, philosophy, sociology or communication."],"capstone":["Advanced film production and/or senior film project, often accompanied by a written critical component."],"note":"Current program presence and detailed requirements from the official catalog extract; production menus depend on equipment/faculty availability."},"Graphic Design":{"required":["DSGN 2200 Analogue and Digital Practices and the visual-cultures foundation.","Design foundations, drawing/visualization, typography and image-making.","Graphic design studio sequence covering identity/branding, publication/editorial design, information design and digital/web/interactivity.","Design history, theory and criticism.","Professional practice, portfolio development and production methods."],"choices":["Advanced studios/electives in animation, motion graphics, illustration, photography, interaction, Arabic typography, packaging or special topics.","Approved art/design collateral courses."],"capstone":["Senior design project and public portfolio/exhibition; internship or professional experience may be required."],"note":"Current 2025-2026 catalog page confirms the 63-credit concentration structure; exact studio titles and prerequisites are catalog-year dependent."},"History":{"required":["HIST 1000 Why History?","HIST 2000 How to Use a Time Machine? Investigating the Past.","HIST 4801 Historical Theory and Methodology.","Additional HIST courses distributed by period, region and level, including upper-level seminars."],"choices":["History electives in Middle East/Egypt, Europe, Africa, Asia, the Americas, global history and thematic fields.","Related humanities/social-science electives and general electives."],"capstone":["HIST 4801 and/or a senior research seminar with a substantial primary-source research paper."],"note":"Named current requirements are indexed from the official catalog; the distribution grid must be confirmed in the student's planner."},"Integrated Marketing Communication":{"required":["JRMC 2200 Introduction to Mass Communication.","JRMC 2201 Mass Media Writing and JRMC 2202 Multimedia Writing.","JRMC 2203 Mass Media Ethics and Responsibility.","Introduction to Visual Communication, Introduction to Advertising and Mass Communication Research.","Creative Strategy and Advertising Copywriting; Public Relations Theory and Techniques.","Integrated Marketing Communication Campaigns capstone."],"choices":["IMC electives in branding, digital/social media, media planning, consumer insight, public relations, campaigns or special topics.","Business collateral such as marketing, management, economics/statistics or approved related courses."],"capstone":["Team-based integrated campaign course, usually supported by research and professional portfolio work; internship requirements depend on catalog year."],"note":"Current program listing and the established JRMC/IMC curriculum from the official catalog extract."},"Management of Information and Communication Technology":{"required":["ACCT 2001 Financial Accounting and ACCT 2002 Managerial Accounting.","ECON 2011 Microeconomics and ECON 2021 Macroeconomics; business statistics and data-science foundations.","Business core in finance, marketing, management, business law, operations and business environment/ethics.","MOIS 2101 Introduction to Information Systems and Technology; database/MIS, e-business, human-computer interaction and systems analysis/integration.","CSCE 1001 Fundamentals of Computing I; CSCE 1101 Fundamentals of Computing II and its lab; computing systems and information security."],"choices":["Three approved CSCE courses such as database systems, programming languages, software engineering or web systems.","Two or more MOIS electives and general electives."],"capstone":["MOIS internship/project and an integrative information-systems/business course; optional School of Business co-op for eligible students."],"note":"Current 2025-2026 catalog snippet and the official catalog extract provide a detailed course block; exact electives and renamed data-science courses must be verified."},"Mathematics":{"required":["Calculus I-III, linear algebra, differential equations and discrete mathematics.","Real analysis, complex analysis and abstract/modern algebra.","Probability and mathematical statistics.","Numerical analysis and/or scientific computing.","Foundations such as logic, number theory, graph theory or optimization, according to the plan."],"choices":["Upper-level pure mathematics electives: topology, geometry, number theory, algebra, analysis and logic.","Applied electives: operations research, optimization, probability/statistics, numerical methods, data analysis and modeling."],"capstone":["Senior seminar, project or thesis; research option depends on catalog year and advising."],"note":"Current AUC Mathematics page confirms the major subject areas; exact required/elective split is controlled by the catalog-year degree plan."},"Mechanical Engineering":{"required":["Engineering mechanics: statics, dynamics, mechanics of materials and mechanical vibrations.","Thermodynamics I and II, fluid mechanics and heat transfer.","Engineering materials, manufacturing processes and manufacturing laboratory.","Machine design, CAD/engineering graphics and mechanical systems design.","Measurements/instrumentation, control systems, mechatronics and associated laboratories.","Circuits/electronics foundations and engineering mathematics/science."],"choices":["A concentration package in energy, design or industrial engineering plus approved ME electives.","Engineering and general electives required by the plan."],"capstone":["Two-part senior design project and industrial training/internship."],"note":"Current program structure and catalog snippets; exact concentration names/course lists may change and must be confirmed in the student flowchart."},"Middle East Studies":{"required":["Two 2000/3000-level courses in each of six fields: Anthropology, Arabic Studies, Economics, History, Political Science and Sociology (36 credits in the recent structure).","Three 4000-level courses selected from those fields (9 credits in the recent structure).","Non-Arabic-speaking students may have an additional Arabic-language requirement."],"choices":["Courses chosen with an adviser to produce regional, thematic and methodological coherence.","General electives and optional minor/second-major coursework."],"capstone":["One or more of the 4000-level courses should be research-intensive; a directed research project may be approved."],"note":"Official catalog structure and current program page; approved course lists and Arabic-language rules depend on placement/catalog year."},"Multimedia Communication and Journalism":{"required":["JRMC 2200 Introduction to Mass Communication.","Mass Media Writing, Multimedia Writing and Mass Media Ethics and Responsibility.","Journalism reporting/editing, photography and visual storytelling.","Audio, video/television and multimedia production laboratories.","Media law/ethics, communication research and digital/online communication.","Advanced multimedia reporting or newsroom/studio practice."],"choices":["Electives in investigative/data journalism, documentary, broadcast, podcasting, digital storytelling, media studies, design and special topics.","Approved collateral courses and general electives."],"capstone":["Multimedia journalism/communication capstone, major portfolio and/or newsroom/studio project; internship requirements are catalog-year dependent."],"note":"Current program listing; it replaced/combined older Multimedia Journalism and Communication and Media Arts structures, so students must use their assigned catalog plan."},"Music":{"required":["Shared foundation in Western music theory/aural skills and Arabic music theory/aural practice.","Music history/literature across Western, Arab and global traditions.","Ensemble participation and applied study appropriate to the student's instrument/voice or production practice.","Music technology foundations, recording/audio production and musicianship courses shared before specialization."],"choices":["Music Technology concentration: recording, sound design, production, electronic/computer music and technology electives.","Music Performance concentration: applied lessons, ensembles, performance literature, pedagogy and recital preparation."],"capstone":["Senior production/project for Music Technology or senior recital/performance project for Music Performance, plus the required written/portfolio component."],"note":"Current AUC announcement and 2025-2026 Music program listing. This is a new unified curriculum; students in older Music Technology/BMA teach-out plans follow different requirements."},"Petroleum Engineering":{"required":["Engineering mathematics, chemistry, physics, mechanics, thermodynamics and fluid mechanics foundations.","Geology for petroleum engineers and subsurface/formation evaluation.","Reservoir rock and fluid properties; petrophysics and well logging.","Reservoir Engineering I and II and reservoir simulation.","Drilling Engineering I and II and drilling fluids/well control laboratories.","Production engineering, well completion/stimulation, natural gas engineering and enhanced oil recovery.","Petroleum economics, HSE/environment and professional practice."],"choices":["Upper-level petroleum/energy electives such as unconventional resources, advanced simulation, offshore, geothermal, carbon management or special topics.","Engineering/general electives according to the flowchart."],"capstone":["Two-semester petroleum engineering design project plus field/industrial training."],"note":"Current catalog/program information identifies a 162-credit degree; exact elective availability and course sequence are catalog-year dependent."},"Philosophy":{"required":["History sequence covering Ancient, Medieval, Modern and Twentieth-Century philosophy (titles/codes may be reorganized in the current plan).","Logic/critical reasoning and philosophical methods.","Ethics/value theory and political/social philosophy.","Epistemology, metaphysics or philosophy of mind/science."],"choices":["Upper-level PHIL electives in aesthetics, religion, Islamic philosophy, existentialism, gender, law, science, language and special topics.","General electives and optional related minor/second major."],"capstone":["Advanced philosophy seminar, thesis or research paper demonstrating sustained argumentation."],"note":"Current 2025-2026 program page indicates a revised core/elective structure; older named history courses remain useful guidance but the current degree planner controls."},"Physics":{"required":["Classical Mechanics, Sound and Heat with laboratory; Electricity and Magnetism with laboratory.","Foundations of Modern Physics and Modern Physics Laboratory.","Introduction to Electronics and Electronics Laboratory.","Waves and Optics and Optics Laboratory.","Theoretical Mechanics; Electromagnetic Theory; Thermodynamics and Statistical Mechanics.","Quantum Mechanics sequence, mathematical methods and computational/experimental physics."],"choices":["Upper-level physics electives such as solid state/materials, nuclear/particle, photonics, relativity, astrophysics or advanced laboratories.","Supporting mathematics and science electives."],"capstone":["Senior research project/thesis and advanced laboratory/seminar requirements."],"note":"Current program listing and the published AUC physics course sequence; upper-level elective names rotate."},"Political Science":{"required":["Introduction to Political Science.","Political theory/the discipline and social-science research methods.","Foundational courses in comparative politics and international relations.","Courses required by the chosen specialization and at least one advanced seminar."],"choices":["Specialization electives plus additional POLS electives, including regional and thematic courses.","Collateral courses in economics, history, law, sociology or other approved fields; general electives."],"capstone":["4000-level seminar/research paper or capstone specified by the specialization."],"note":"Current AUC program page confirms the five specializations; exact common-core codes and distribution rules must be read from the assigned catalog."},"Political Science Honors Program":{"required":["The common Political Science core and specialization requirements.","POLS 4000 The Discipline and Critical Social Theory (as listed in the recent honors structure).","Honors research preparation and POLS 4090 Honors Thesis or the current catalog-year thesis sequence."],"choices":["Advanced seminars and specialization electives chosen with the honors adviser.","Collateral/general electives sufficient to reach the BA total."],"capstone":["Original honors thesis, supervised research and oral presentation/defense requirements specified by the department."],"note":"Current 2025-2026 catalog snippet for the Honors Program; admission/GPA rules and thesis sequencing must be confirmed with the department."},"Psychology":{"required":["Introduction to Psychology, statistics for psychology and research methods.","Lifespan/Developmental Psychology, Cognitive Psychology and Learning/Behavior.","Social psychology and personality theory.","Psychological Testing and Assessment.","Abnormal Psychology and Biopsychology/Behavioral Neuroscience.","History and Systems of Psychology."],"choices":["At least one additional 3000-level and several 4000-level psychology electives in areas such as clinical, organizational, health, counseling, cognition and culture.","Approved collateral courses, often including anthropology/sociology and other social-science or biological-science work."],"capstone":["Senior seminar, advanced research course, internship/practicum or thesis option according to the plan."],"note":"Established catalog structure and current program presence; exact collateral count and upper-level distribution should be verified."},"Sociology":{"required":["SOC 2101 Introduction to Sociology.","History of Social Theory and Contemporary Social Theory.","SOC 3105 Sociological Research Methods and Tools.","Quantitative/qualitative analysis and advanced substantive sociology courses.","Senior seminar/capstone."],"choices":["Sociology electives in inequality, gender, family, migration, cities, political sociology, development, health, culture and environment.","Approved collateral courses from anthropology, economics, political science, psychology, communication/computing and related fields."],"capstone":["Research-intensive senior seminar using sociological theory and methods."],"note":"Current course record confirms SOC 3105; broader structure follows the official catalog and should be checked for catalog-year collateral rules."},"Theatre":{"required":["THTR 1201 Theatre in the Making.","Introduction to Technical Theatre and production participation.","Acting I and additional performance/studio work.","Play Analysis, theatre history/literature and critical studies.","Design for Theatre and Directing I.","Advanced Theatre Practicum."],"choices":["Upper-level acting, directing, design, stage management, playwriting, movement/voice, theatre history or special-topics electives.","Required participation in department productions and approved collateral arts/humanities courses."],"capstone":["Senior production, directing/design/performance project or research project, documented in a professional portfolio."],"note":"Current program presence and detailed requirements from the official catalog extract; production-practicum rules depend on the catalog year."},"Visual Arts":{"required":["ARTV 2200 Analogue and Digital Practices.","ARTV 2113 Introduction to Visual Cultures.","ARTV 3211 Art Studio I and ARTV 3212 Art Studio II.","ARTV 3115 Art Theory.","ARTV 4211 Studio III and ARTV 4212 Studio IV.","ARTV 4269 Senior Project A and ARTV 4270 Senior Project B."],"choices":["Studio electives in drawing, painting, sculpture, installation, photography, video/new media, printmaking and special topics.","Art history/theory and approved collateral courses."],"capstone":["Two-part senior project culminating in an exhibition and written/critical component."],"note":"Named sequence is from the official catalog structure and remains the clearest current planning map; verify studio prerequisites and elective availability."},"Political Science BA / International Human Rights Law MA Dual Degree":{"required":["All Political Science BA Core, specialization, Core Curriculum and general graduation requirements.","Graduate-level law/human-rights foundation courses after formal admission to the dual-degree pathway.","International human rights law, public international law, research/methods and approved LAW/IHRL electives."],"choices":["Approved graduate electives in human rights, humanitarian law, migration/refugee law, gender, development and related fields.","Any remaining BA electives needed before transition to graduate standing."],"capstone":["Political Science BA capstone plus the MA's required thesis/research paper or other culminating requirement."],"note":"Current AUC dual-degree listing. Eligibility, double-counted credits and graduate admission timing are individually controlled and must be confirmed with both programs."}},"aliases":{"Honors Program in Political Science":"Political Science Honors Program","Dual Degree: Political Science and International Human Rights Law":"Political Science BA / International Human Rights Law MA Dual Degree"}};
+
     const logoutButton = document.getElementById("degree-logout-sidebar");
+    const degreeMajorName = document.getElementById("degree-major-name");
+    const degreeMajorCopy = document.getElementById("degree-major-copy");
+    const degreeMajorPill = document.getElementById("degree-major-pill");
+    const degreeCompletedCount = document.getElementById("degree-completed-count");
+    const degreeRemainingCount = document.getElementById("degree-remaining-count");
+    const degreeProgressPercent = document.getElementById("degree-progress-percent");
+    const degreeProgressBar = document.getElementById("degree-progress-bar");
+    const degreeRequirementsRoot = document.getElementById("degree-requirements-root");
+    const degreePlanNote = document.getElementById("degree-plan-note");
+
+    let currentDegreeStorageKey = "";
+
+    function escapeDegreeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getCanonicalDegreeMajor(major) {
+      const savedMajor = String(major || "").trim();
+      return DEGREE_REQUIREMENTS.aliases[savedMajor] || savedMajor;
+    }
+
+    function getCompletedDegreeItems(storageKey) {
+      try {
+        const savedItems = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        return new Set(Array.isArray(savedItems) ? savedItems : []);
+      } catch (error) {
+        return new Set();
+      }
+    }
+
+    function saveCompletedDegreeItems(storageKey) {
+      if (!storageKey || !degreeRequirementsRoot) {
+        return;
+      }
+
+      const completedItems = Array.from(degreeRequirementsRoot.querySelectorAll("[data-degree-item]:checked")).map(function (input) {
+        return input.dataset.degreeItem;
+      });
+
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(completedItems));
+      } catch (error) {}
+    }
+
+    function updateDegreeProgress() {
+      const items = Array.from(degreeRequirementsRoot.querySelectorAll("[data-degree-item]"));
+      const total = items.length;
+      const completed = items.filter(function (item) {
+        return item.checked;
+      }).length;
+      const remaining = Math.max(total - completed, 0);
+      const percent = total ? Math.round((completed / total) * 100) : 0;
+
+      degreeCompletedCount.textContent = String(completed);
+      degreeRemainingCount.textContent = String(remaining);
+      degreeProgressPercent.textContent = percent + "%";
+      degreeProgressBar.style.width = percent + "%";
+
+      items.forEach(function (item) {
+        const label = item.closest(".degree-requirement-item");
+        if (label) {
+          label.classList.toggle("is-complete", item.checked);
+        }
+      });
+    }
+
+    function renderDegreeEmptyState(title, message) {
+      degreeRequirementsRoot.innerHTML = `
+        <div class="degree-empty-state">
+          <h3>${escapeDegreeHtml(title)}</h3>
+          <p>${escapeDegreeHtml(message)}</p>
+        </div>
+      `;
+
+      degreePlanNote.hidden = true;
+      degreePlanNote.textContent = "";
+      updateDegreeProgress();
+    }
+
+    function getDegreeRequirementGroups(majorPlan) {
+      return DEGREE_REQUIREMENTS.core.map(function (group) {
+        return {
+          scope: "AUC Core",
+          title: group.title,
+          items: group.items
+        };
+      }).concat([
+        {
+          scope: "Major",
+          title: "Required major and supporting coursework",
+          items: majorPlan.required || []
+        },
+        {
+          scope: "Major",
+          title: "Catalog-controlled choices",
+          items: majorPlan.choices || []
+        },
+        {
+          scope: "Major",
+          title: "Capstone / professional requirement",
+          items: majorPlan.capstone || []
+        }
+      ]).filter(function (group) {
+        return group.items && group.items.length;
+      });
+    }
+
+    function renderDegreeRequirementGroup(group, groupIndex, completedItems) {
+      const itemsMarkup = group.items.map(function (item, itemIndex) {
+        const itemKey = groupIndex + "-" + itemIndex;
+        const isChecked = completedItems.has(itemKey);
+
+        return `
+          <label class="degree-requirement-item${isChecked ? " is-complete" : ""}">
+            <input type="checkbox" data-degree-item="${escapeDegreeHtml(itemKey)}"${isChecked ? " checked" : ""}>
+            <span>${escapeDegreeHtml(item)}</span>
+          </label>
+        `;
+      }).join("");
+
+      return `
+        <article class="degree-requirement-group">
+          <div class="degree-requirement-group-head">
+            <span>${escapeDegreeHtml(group.scope)}</span>
+            <h3>${escapeDegreeHtml(group.title)}</h3>
+          </div>
+
+          <div class="degree-requirement-list">
+            ${itemsMarkup}
+          </div>
+        </article>
+      `;
+    }
+
+    function renderDegreeProgression(user) {
+      const savedMajor = String((user || {}).major || "").trim();
+      const canonicalMajor = getCanonicalDegreeMajor(savedMajor);
+      const majorPlan = DEGREE_REQUIREMENTS.majors[canonicalMajor] || null;
+      const userKey = String((user || {}).uid || (user || {}).email || "student").replace(/[^A-Za-z0-9@._-]/g, "-");
+
+      degreeMajorName.textContent = savedMajor || "No Major Selected";
+      degreeMajorPill.textContent = savedMajor ? "Saved major" : "Missing major";
+      degreeMajorCopy.textContent = savedMajor
+        ? "These requirements are based on your saved account major."
+        : "Choose your major from Account Details to see a degree progression checklist.";
+
+      if (!savedMajor) {
+        currentDegreeStorageKey = "";
+        renderDegreeEmptyState("No major selected", "Go to Account Details, choose your major, then return to this page.");
+        return;
+      }
+
+      if (!majorPlan) {
+        currentDegreeStorageKey = "";
+        renderDegreeEmptyState("Requirements not found", "Requirements were not found for " + savedMajor + " yet.");
+        return;
+      }
+
+      currentDegreeStorageKey = "auc-atlas-degree-progress:" + userKey + ":" + canonicalMajor;
+      const completedItems = getCompletedDegreeItems(currentDegreeStorageKey);
+      const groups = getDegreeRequirementGroups(majorPlan);
+
+      degreeRequirementsRoot.innerHTML = groups.map(function (group, groupIndex) {
+        return renderDegreeRequirementGroup(group, groupIndex, completedItems);
+      }).join("");
+
+      if (majorPlan.note) {
+        degreePlanNote.hidden = false;
+        degreePlanNote.textContent = majorPlan.note;
+      } else {
+        degreePlanNote.hidden = true;
+        degreePlanNote.textContent = "";
+      }
+
+      updateDegreeProgress();
+    }
+
+    degreeRequirementsRoot.addEventListener("change", function (event) {
+      const checkbox = event.target.closest("[data-degree-item]");
+
+      if (!checkbox) {
+        return;
+      }
+
+      saveCompletedDegreeItems(currentDegreeStorageKey);
+      updateDegreeProgress();
+    });
 
     async function requireSignedIn() {
       try {
@@ -275,6 +678,8 @@
         if (!response.ok || !data.signedIn || !data.user) {
           throw new Error("Please log in to view degree progression.");
         }
+
+        renderDegreeProgression(data.user);
       } catch (error) {
         try {
           localStorage.setItem("auc-atlas-login-redirect", "degree-progression.html");
