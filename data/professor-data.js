@@ -701,22 +701,27 @@
       color: #9b2f2f;
     }
 
-    .professor-reviews-section {
+    .professor-review-insights {
       width: min(100%, 1120px);
       margin: 22px auto 0;
+      padding: 24px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 18px 50px rgba(42, 32, 20, 0.08);
       display: grid;
-      gap: 16px;
+      gap: 18px;
     }
 
+    .professor-review-insights-header,
     .professor-reviews-header {
-      padding: 0 4px 4px;
-      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
       display: flex;
       align-items: end;
       justify-content: space-between;
       gap: 18px;
     }
 
+    .professor-review-insights-header span,
     .professor-reviews-header span {
       color: rgba(192, 154, 92, 0.92);
       font-size: 10px;
@@ -725,6 +730,7 @@
       text-transform: uppercase;
     }
 
+    .professor-review-insights-header h2,
     .professor-reviews-header h2 {
       margin-top: 4px;
       color: #171717;
@@ -733,17 +739,82 @@
       line-height: 1.1;
     }
 
+    .professor-review-insights-header p,
     .professor-reviews-header p {
       color: rgba(23, 23, 23, 0.54);
       font-size: 12px;
       font-weight: 800;
       letter-spacing: 0.08em;
+      text-align: right;
       text-transform: uppercase;
+    }
+
+    .professor-review-stats {
+      display: grid;
+      gap: 14px;
+    }
+
+    .professor-review-stat-row {
+      display: grid;
+      grid-template-columns: minmax(190px, 280px) minmax(0, 1fr) 64px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .professor-review-stat-copy {
+      display: grid;
+      gap: 4px;
+    }
+
+    .professor-review-stat-copy strong {
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .professor-review-stat-copy span {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .professor-review-stat-track {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+    }
+
+    .professor-review-stat-track span {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, rgba(192, 154, 92, 0.95), #171717);
+      display: block;
+    }
+
+    .professor-review-stat-percent {
+      color: #171717;
+      font-size: 16px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .professor-reviews-section {
+      width: min(100%, 820px);
+      margin: 28px auto 0;
+      display: grid;
+      gap: 16px;
+    }
+
+    .professor-reviews-header {
+      padding: 0 4px 4px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
     }
 
     .professor-reviews-list {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
     }
 
@@ -759,7 +830,7 @@
 
     .professor-review-card-top {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 14px;
     }
@@ -773,9 +844,9 @@
 
     .professor-review-avatar,
     .professor-review-avatar-fallback {
-      width: 44px;
-      height: 44px;
-      flex: 0 0 44px;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
       border-radius: 14px;
       background: #171717;
       color: #fffdf8;
@@ -794,14 +865,6 @@
       line-height: 1.2;
     }
 
-    .professor-review-author span {
-      display: block;
-      margin-top: 4px;
-      color: rgba(23, 23, 23, 0.48);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
     .professor-review-rating {
       padding: 9px 11px;
       border-radius: 999px;
@@ -812,15 +875,13 @@
       white-space: nowrap;
     }
 
-    .professor-review-context,
-    .professor-review-tags {
+    .professor-review-context {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .professor-review-context span,
-    .professor-review-tags span {
+    .professor-review-context span {
       padding: 8px 10px;
       border: 1px solid rgba(23, 23, 23, 0.08);
       border-radius: 999px;
@@ -830,19 +891,13 @@
       font-weight: 800;
     }
 
-    .professor-review-tags span strong {
-      margin-right: 5px;
-      color: #171717;
-    }
-
     .professor-review-note,
-    .professor-review-reason,
     .professor-review-empty,
     .professor-review-status {
       margin: 0;
-      color: rgba(23, 23, 23, 0.64);
-      font-size: 14px;
-      line-height: 1.65;
+      color: rgba(23, 23, 23, 0.68);
+      font-size: 15px;
+      line-height: 1.68;
     }
 
     .professor-review-empty,
@@ -857,14 +912,19 @@
     }
 
     @media (max-width: 720px) {
-      .professor-reviews-header,
+      .professor-review-insights-header,
+      .professors-reviews-header,
       .professor-review-card-top {
         align-items: flex-start;
         flex-direction: column;
       }
 
-      .professor-reviews-list {
+      .professor-review-stat-row {
         grid-template-columns: 1fr;
+      }
+
+      .professor-review-stat-percent {
+        text-align: left;
       }
     }
 
@@ -1002,25 +1062,93 @@
     return '<span class="professor-review-avatar-fallback">' + escapeHtml(getReviewAuthorInitials(authorName)) + '</span>';
   }
 
-  function getReviewDetailItems(review) {
-    return [
-      ["Attendance", review.attendancePolicy],
-      ["Workload", review.workload],
-      ["Lecture", review.lectureUsefulness],
-      ["Office hours", review.officeHours],
-      ["Grading", review.gradingStyle],
-      ["Exams", review.examDifficulty],
-      ["Transparency", review.gradingTransparency],
-      ["Feedback", review.feedbackQuality]
-    ].filter(function (item) {
-      return item[1];
-    });
+  function getReviewStatRows(reviews) {
+    const safeReviews = Array.isArray(reviews) ? reviews : [];
+    const configs = [
+      {
+        key: "recommendation",
+        label: "Would take again",
+        format: function (value) {
+          if (value === "Yes") return "would take this course with this professor again";
+          if (value === "Depends") return "said it depends";
+          return "would not take this course with this professor again";
+        }
+      },
+      { key: "attendancePolicy", label: "Attendance policy", format: function (value) { return "selected " + value.toLowerCase(); } },
+      { key: "workload", label: "Workload", format: function (value) { return "selected " + value.toLowerCase(); } },
+      { key: "lectureUsefulness", label: "Lecture usefulness", format: function (value) { return "selected " + value.toLowerCase(); } },
+      { key: "officeHours", label: "Office hours/help", format: function (value) { return "selected " + value.toLowerCase(); } },
+      { key: "gradingStyle", label: "Grading style", format: function (value) { return "selected " + value.toLowerCase(); } },
+      { key: "examDifficulty", label: "Exam difficulty", format: function (value) { return "selected " + value.toLowerCase(); } },
+      { key: "gradingTransparency", label: "Grading transparency", format: function (value) { return "selected " + value.toLowerCase(); } },
+      { key: "feedbackQuality", label: "Feedback quality", format: function (value) { return "selected " + value.toLowerCase(); } }
+    ];
+
+    return configs.map(function (config) {
+      const values = safeReviews.map(function (review) {
+        return String(review[config.key] || "").trim();
+      }).filter(Boolean);
+      const counts = values.reduce(function (result, value) {
+        result[value] = (result[value] || 0) + 1;
+        return result;
+      }, {});
+      const topValue = Object.keys(counts).sort(function (a, b) {
+        return counts[b] - counts[a] || a.localeCompare(b);
+      })[0];
+
+      if (!topValue) {
+        return null;
+      }
+
+      const percent = Math.round((counts[topValue] / values.length) * 100);
+
+      return {
+        label: config.label,
+        percent: Math.max(0, Math.min(100, percent)),
+        summary: config.format(topValue)
+      };
+    }).filter(Boolean);
+  }
+
+  function renderProfessorReviewStats(reviews) {
+    const panel = document.getElementById("professor-review-stats");
+    const rows = getReviewStatRows(reviews);
+
+    if (!panel) {
+      return;
+    }
+
+    if (!rows.length) {
+      panel.innerHTML = '<p class="professor-review-status">Review stats will appear after students answer the review choices.</p>';
+      return;
+    }
+
+    panel.innerHTML = rows.map(function (row) {
+      const width = String(row.percent);
+
+      return `
+        <div class="professor-review-stat-row">
+          <div class="professor-review-stat-copy">
+            <strong>${escapeHtml(row.label)}</strong>
+            <span>${escapeHtml(row.percent + "% " + row.summary)}</span>
+          </div>
+
+          <div class="professor-review-stat-track" aria-label="${escapeHtml(row.percent + "% " + row.summary)}">
+            <span style="width: ${escapeHtml(width)}%;"></span>
+          </div>
+
+          <div class="professor-review-stat-percent">${escapeHtml(row.percent + "%")}</div>
+        </div>
+      `;
+    }).join("");
   }
 
   function renderProfessorReviews(reviews) {
     const list = document.getElementById("professor-reviews-list");
     const count = document.getElementById("professor-reviews-count");
     const safeReviews = Array.isArray(reviews) ? reviews : [];
+
+    renderProfessorReviewStats(safeReviews);
 
     if (!list) {
       return;
@@ -1038,7 +1166,6 @@
     list.innerHTML = safeReviews.map(function (review) {
       const authorUserId = review.authorUserId || review.authorUid || "";
       const rating = Number(review.rating || 0);
-      const detailItems = getReviewDetailItems(review);
 
       return `
         <article class="professor-review-card" data-author-user-id="${escapeHtml(authorUserId)}">
@@ -1047,7 +1174,6 @@
               ${renderReviewAvatar(review)}
               <div>
                 <strong>${escapeHtml(review.authorName || "AUC student")}</strong>
-                <span>${escapeHtml(getReviewDateLabel(review.createdAt))}</span>
               </div>
             </div>
 
@@ -1057,15 +1183,9 @@
           <div class="professor-review-context">
             <span>${escapeHtml(review.courseTaken || "Course not listed")}</span>
             <span>${escapeHtml(review.semesterTaken || "Semester not listed")}</span>
-            <span>${escapeHtml(review.recommendation ? "Recommend: " + review.recommendation : "Recommendation not listed")}</span>
           </div>
 
-          ${review.recommendationReason ? '<p class="professor-review-reason">' + escapeHtml(review.recommendationReason) + '</p>' : ""}
           <p class="professor-review-note">${escapeHtml(review.studentNote || "No written note.")}</p>
-
-          ${detailItems.length ? '<div class="professor-review-tags">' + detailItems.map(function (item) {
-            return '<span><strong>' + escapeHtml(item[0]) + '</strong>' + escapeHtml(item[1]) + '</span>';
-          }).join("") + '</div>' : ""}
         </article>
       `;
     }).join("");
@@ -1074,6 +1194,7 @@
   async function loadProfessorReviews(professorId) {
     const list = document.getElementById("professor-reviews-list");
     const count = document.getElementById("professor-reviews-count");
+    const stats = document.getElementById("professor-review-stats");
 
     if (list) {
       list.innerHTML = '<p class="professor-review-status">Loading reviews...</p>';
@@ -1081,6 +1202,10 @@
 
     if (count) {
       count.textContent = "Loading reviews...";
+    }
+
+    if (stats) {
+      stats.innerHTML = '<p class="professor-review-status">Loading review stats...</p>';
     }
 
     try {
@@ -1103,6 +1228,10 @@
 
       if (list) {
         list.innerHTML = '<p class="professor-review-status">Could not load reviews right now.</p>';
+      }
+
+      if (stats) {
+        stats.innerHTML = '<p class="professor-review-status">Could not load review stats right now.</p>';
       }
     }
   }
@@ -1304,6 +1433,20 @@
           </details>
         </div>
       </article>
+
+      <section class="professor-review-insights" aria-label="Review stats for ${escapeHtml(professor.name)}">
+        <div class="professor-review-insights-header">
+          <div>
+            <span>Review stats</span>
+            <h2>Class patterns</h2>
+          </div>
+          <p>Based on review choices</p>
+        </div>
+
+        <div class="professor-review-stats" id="professor-review-stats">
+          <p class="professor-review-status">Loading review stats...</p>
+        </div>
+      </section>
 
       <section class="professor-reviews-section" aria-label="Student reviews for ${escapeHtml(professor.name)}">
         <div class="professor-reviews-header">
