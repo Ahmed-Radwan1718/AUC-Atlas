@@ -811,19 +811,34 @@
 
     .professor-review-detail-toggle {
       width: fit-content;
-      min-height: 30px;
-      padding: 0 11px;
-      border-radius: 999px;
-      background: #171717;
-      color: #fffdf8;
-      font-size: 9px;
+      min-height: auto;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #171717;
+      font-size: 10px;
       font-weight: 900;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      gap: 8px;
       list-style: none;
+    }
+
+    .professor-review-detail-toggle::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.18s ease;
+    }
+
+    .professor-review-detail[open] .professor-review-detail-toggle::after {
+      transform: rotate(225deg) translate(-1px, -1px);
     }
 
     .professor-review-detail-toggle::-webkit-details-marker {
