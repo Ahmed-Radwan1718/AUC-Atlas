@@ -274,101 +274,150 @@
       box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
     }
 
-    .course-query-strip,
-    .course-chip-grid,
-    .course-filter-list {
+    .course-query-strip {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 8px;
     }
 
-    .course-query-strip {
-      justify-content: center;
+    .course-query-chip {
+      border: 0;
+      font: inherit;
+      cursor: pointer;
     }
 
-    .course-query-chip,
-    .course-filter-pill span {
+    .course-query-strip .course-query-chip {
       min-height: 40px;
       padding: 0 14px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.64);
       color: rgba(23, 23, 23, 0.62);
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
+      letter-spacing: 0;
+      text-transform: none;
       display: inline-flex;
       align-items: center;
       transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
     }
 
-    .course-query-chip:hover,
-    .course-filter-pill:hover span,
-    .course-filter-pill:has(input:checked) span {
-      border-color: rgba(192, 154, 92, 0.32);
-      background: rgba(192, 154, 92, 0.14);
-      color: #171717;
-      transform: translateY(-1px);
-    }
-
     .course-discovery {
+      overflow: hidden;
       display: grid;
-      grid-template-columns: 1.2fr 0.9fr 0.9fr;
-      gap: 14px;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.7fr);
+      gap: 0;
       align-items: stretch;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 28px 80px rgba(42, 32, 20, 0.1);
     }
 
     .course-discovery-panel {
-      padding: 20px;
-      border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.72);
-      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.08);
+      padding: 26px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .course-discovery-panel:first-child {
+      border-right: 1px solid rgba(23, 23, 23, 0.08);
     }
 
     .course-discovery-panel h2 {
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       color: #171717;
-      font-size: 18px;
-      line-height: 1.2;
+      font-size: 22px;
+      line-height: 1.15;
     }
 
     .course-discovery-panel p {
-      margin-bottom: 14px;
+      max-width: 560px;
+      margin-bottom: 18px;
       color: rgba(23, 23, 23, 0.58);
-      font-size: 13px;
-      line-height: 1.55;
+      font-size: 14px;
+      line-height: 1.65;
     }
 
-    .course-finder-stats {
+    .course-filter-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .course-filter-pill span {
+      min-height: 48px;
+      padding: 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 16px;
+      background: rgba(247, 244, 238, 0.72);
+      color: rgba(23, 23, 23, 0.72);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .course-filter-pill span::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      margin-right: 10px;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.62);
+      flex: 0 0 auto;
+    }
+
+    .course-chip-grid {
       display: grid;
       gap: 10px;
     }
 
-    .course-finder-stat {
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(247, 244, 238, 0.82);
-      border: 1px solid rgba(23, 23, 23, 0.08);
+    .course-chip-grid .course-query-chip {
+      min-height: 54px;
+      padding: 0 14px 0 16px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 16px;
+      background: rgba(247, 244, 238, 0.72);
+      color: rgba(23, 23, 23, 0.78);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
     }
 
-    .course-finder-stat strong {
-      display: block;
-      color: #171717;
-      font-size: 28px;
-      line-height: 1;
-    }
-
-    .course-finder-stat span {
-      display: block;
-      margin-top: 6px;
-      color: rgba(23, 23, 23, 0.56);
-      font-size: 11px;
+    .course-chip-grid .course-query-chip::after {
+      content: "Find";
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: rgba(23, 23, 23, 0.52);
+      font-size: 10px;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+    }
+
+    .course-query-strip .course-query-chip:hover,
+    .course-filter-pill:hover span,
+    .course-filter-pill:has(input:checked) span,
+    .course-chip-grid .course-query-chip:hover {
+      border-color: rgba(192, 154, 92, 0.34);
+      background: rgba(192, 154, 92, 0.14);
+      color: #171717;
+      transform: translateY(-1px);
     }
 
     .courses-result-count {
@@ -385,10 +434,13 @@
       min-height: 0;
       padding: 16px 18px;
       border-radius: 18px;
+      border-left: 4px solid rgba(192, 154, 92, 0.7);
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 16px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 16px 45px rgba(42, 32, 20, 0.08);
     }
 
     .course-code {
@@ -401,6 +453,23 @@
 
     .course-card-meta {
       justify-content: flex-end;
+    }
+
+    @media (max-width: 980px) {
+      .course-discovery-panel:first-child {
+        border-right: 0;
+        border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .course-discovery-panel {
+        padding: 20px;
+      }
+
+      .course-filter-list {
+        grid-template-columns: 1fr;
+      }
     }
 
     .courses-result-count[hidden],
@@ -491,12 +560,12 @@
       <section class="courses-browser" aria-label="Course search and results">
         <section class="courses-results">
           <div class="courses-search-box">
-            <input id="course-search-input" type="search" placeholder="Search CSCE, Calculus, Business, 3000 Level..." aria-label="Search courses">
+            <input id="course-search-input" type="search" placeholder="Search Computer Science, Calculus, Business, 3000 Level..." aria-label="Search courses">
           </div>
 
           <div class="course-query-strip" aria-label="Quick course searches">
-            <button class="course-query-chip" type="button" data-course-query="CSCE">CSCE</button>
-            <button class="course-query-chip" type="button" data-course-query="MACT">MACT</button>
+            <button class="course-query-chip" type="button" data-course-query="Computer Science">Computer Science</button>
+            <button class="course-query-chip" type="button" data-course-query="Mathematics">Mathematics</button>
             <button class="course-query-chip" type="button" data-course-query="Business">Business</button>
             <button class="course-query-chip" type="button" data-course-query="Engineering">Engineering</button>
             <button class="course-query-chip" type="button" data-course-query="1000 Level">1000 Level</button>
@@ -506,35 +575,20 @@
           <section class="course-discovery" id="course-discovery" aria-label="Course discovery shortcuts">
             <article class="course-discovery-panel">
               <h2>Browse by subject</h2>
-              <p>Pick a subject when you know the department but not the exact course code.</p>
+              <p>Choose a department area first, then narrow down from the results.</p>
               <div class="course-filter-list" id="course-subject-filters"></div>
             </article>
 
             <article class="course-discovery-panel">
               <h2>Fast paths</h2>
-              <p>Jump into the common ways students search during registration.</p>
+              <p>Use these when you only know the type of course you are looking for.</p>
               <div class="course-chip-grid">
-                <button class="course-query-chip" type="button" data-course-query="1000 Level">1000 Level</button>
-                <button class="course-query-chip" type="button" data-course-query="2000 Level">2000 Level</button>
-                <button class="course-query-chip" type="button" data-course-query="3000 Level">3000 Level</button>
-                <button class="course-query-chip" type="button" data-course-query="4000 Level">4000 Level</button>
+                <button class="course-query-chip" type="button" data-course-query="1000 Level">Intro courses</button>
+                <button class="course-query-chip" type="button" data-course-query="2000 Level">Mid-level courses</button>
+                <button class="course-query-chip" type="button" data-course-query="3000 Level">Upper-level courses</button>
+                <button class="course-query-chip" type="button" data-course-query="4000 Level">Advanced courses</button>
                 <button class="course-query-chip" type="button" data-course-query="Lab">Labs</button>
-                <button class="course-query-chip" type="button" data-course-query="Selected Topics">Selected Topics</button>
-              </div>
-            </article>
-
-            <article class="course-discovery-panel">
-              <h2>Atlas index</h2>
-              <p>The full list stays tucked away until someone searches for it.</p>
-              <div class="course-finder-stats">
-                <div class="course-finder-stat">
-                  <strong id="course-total-count">0</strong>
-                  <span>courses indexed</span>
-                </div>
-                <div class="course-finder-stat">
-                  <strong id="course-subject-count">0</strong>
-                  <span>subjects</span>
-                </div>
+                <button class="course-query-chip" type="button" data-course-query="Selected Topics">Selected topics</button>
               </div>
             </article>
           </section>
