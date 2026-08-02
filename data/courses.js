@@ -633,8 +633,134 @@
     setCourseDetailText("course-detail-level", selectedCourse.level);
     setCourseDetailText("course-detail-full-code", selectedCourse.code);
     setCourseDetailText("course-detail-note", "This course page is ready for professor links, student notes, ratings, prerequisites, and review details.");
+    setupMaterialUploadForm(selectedCourse);
 
     return true;
+  }
+
+  function slugifyMaterialValue(value) {
+    return String(value || "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "unknown";
+  }
+
+  function getFileExtension(fileName) {
+    const parts = String(fileName || "").split(".");
+    return parts.length > 1 ? "." + parts.pop().toLowerCase() : "";
+  }
+
+  function buildMaterialFileName(title, originalName) {
+    const extension = getFileExtension(originalName);
+    return slugifyMaterialValue(title) + extension;
+  }
+
+  function setMaterialUploadStatus(message, type) {
+    const status = document.getElementById("material-upload-status");
+
+    if (!status) {
+      return;
+    }
+
+    status.className = "material-upload-status" + (type ? " " + type : "");
+    status.textContent = message;
+  }
+
+  function setupMaterialUploadForm(course) {
+    const form = document.getElementById("material-upload-form");
+    const button = document.getElementById("material-upload-button");
+
+    if (!form || form.dataset.ready === "true") {
+      return;
+    }
+
+    form.dataset.ready = "true";
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const professorInput = document.getElementById("material-professor");
+      const semesterInput = document.getElementById("material-semester");
+      const titleInput = document.getElementById("material-title");
+      const fileInput = document.getElementById("material-file");
+      const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+      const professor = professorInput ? professorInput.value.trim() : "";
+      const semester = semesterInput ? semesterInput.value.trim() : "";
+      const title = titleInput ? titleInput.value.trim() : "";
+
+      if (!professor || !semester || !title || !file) {
+        setMaterialUploadStatus("Fill in the professor, semester, title, and file before uploading.", "error");
+        return;
+      }
+
+      if (file.size > 25 * 1024 * 1024) {
+        setMaterialUploadStatus("This file is above the 25MB free-plan upload limit.", "error");
+        return;
+      }
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Uploading...";
+      }
+
+      setMaterialUploadStatus("Preparing upload...", "");
+
+      try {
+        const authResponse = await fetch("/api/imagekit-auth");
+
+        if (!authResponse.ok) {
+          throw new Error("Could not prepare ImageKit upload.");
+        }
+
+        const auth = await authResponse.json();
+        const courseSlug = slugifyMaterialValue(course.code);
+        const professorSlug = slugifyMaterialValue(professor);
+        const semesterSlug = slugifyMaterialValue(semester);
+        const folder = "/auc-atlas/materials/" + courseSlug + "/" + professorSlug + "/" + semesterSlug;
+        const tags = [
+          "auc-atlas-material",
+          "status-pending",
+          "course-" + courseSlug,
+          "professor-" + professorSlug,
+          "semester-" + semesterSlug
+        ].join(",");
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileName", buildMaterialFileName(title, file.name));
+        formData.append("publicKey", auth.publicKey);
+        formData.append("token", auth.token);
+        formData.append("signature", auth.signature);
+        formData.append("expire", auth.expire);
+        formData.append("folder", folder);
+        formData.append("tags", tags);
+        formData.append("useUniqueFileName", "true");
+        formData.append("description", title + " | " + course.code + " | " + professor + " | " + semester);
+        formData.append("responseFields", "fileId,name,url,filePath,size,fileType,tags");
+
+        setMaterialUploadStatus("Uploading to ImageKit...", "");
+
+        const uploadResponse = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error("ImageKit rejected the upload.");
+        }
+
+        form.reset();
+        setMaterialUploadStatus("Uploaded successfully. It is tagged as pending in ImageKit.", "success");
+      } catch (error) {
+        setMaterialUploadStatus(error.message || "Upload failed. Try again.", "error");
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.textContent = "Upload material";
+        }
+      }
+    });
   }
 
   function setupCoursesPage() {
