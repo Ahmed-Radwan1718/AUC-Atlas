@@ -679,6 +679,28 @@
       cursor: pointer;
     }
 
+    .review-submit-button:disabled {
+      opacity: 0.58;
+      cursor: wait;
+    }
+
+    .review-form-message {
+      grid-column: 1 / -1;
+      min-height: 20px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .review-form-message.is-success {
+      color: #23613f;
+    }
+
+    .review-form-message.is-error {
+      color: #9b2f2f;
+    }
+
     @keyframes reviewBackdropIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -828,7 +850,7 @@
 
             <div class="review-modal-backdrop" onclick="this.closest('details').removeAttribute('open')"></div>
 
-            <form class="professor-review-form" onsubmit="event.preventDefault();" aria-label="Professor review form">
+            <form class="professor-review-form" aria-label="Professor review form">
               <div class="review-modal-header">
                 <div>
                   <span>Professor review</span>
@@ -837,18 +859,31 @@
                 <button class="review-close-button" type="button" aria-label="Close review form" onclick="this.closest('details').removeAttribute('open')">&times;</button>
               </div>
 
-              <input type="hidden" name="professor" value="${escapeHtml(professor.name)}">
+              <input type="hidden" name="professorId" value="${escapeHtml(getProfessorId(professor))}">
+              <input type="hidden" name="professorName" value="${escapeHtml(professor.name)}">
 
               <div class="review-section-heading">Course context</div>
 
               <div class="review-field">
                 <label for="review-course">Course taken</label>
-                <input id="review-course" name="courseTaken" type="text" placeholder="Example: CSCE 1101">
+                <input id="review-course" name="courseTaken" type="text" placeholder="Example: CSCE 1101" required>
               </div>
 
               <div class="review-field">
                 <label for="review-semester">Semester taken</label>
-                <input id="review-semester" name="semesterTaken" type="text" placeholder="Example: Fall 2026">
+                <input id="review-semester" name="semesterTaken" type="text" placeholder="Example: Fall 2026" required>
+              </div>
+
+              <div class="review-field">
+                <label for="review-rating">Overall rating</label>
+                <select id="review-rating" name="rating" required>
+                  <option value="" selected disabled>Choose rating</option>
+                  <option value="5">5 stars</option>
+                  <option value="4">4 stars</option>
+                  <option value="3">3 stars</option>
+                  <option value="2">2 stars</option>
+                  <option value="1">1 star</option>
+                </select>
               </div>
 
               <div class="review-field">
@@ -858,6 +893,11 @@
                   <option>Depends</option>
                   <option>No</option>
                 </select>
+              </div>
+
+              <div class="review-field full">
+                <label for="review-recommend-reason">If your answer depends, what does it depend on?</label>
+                <input id="review-recommend-reason" name="recommendationReason" type="text" maxlength="220" placeholder="Example: Great for lectures, harder for exams">
               </div>
 
               <div class="review-section-heading">Class experience</div>
@@ -949,6 +989,7 @@
               </div>
 
               <button class="review-submit-button" type="submit">Submit Review</button>
+              <p class="review-form-message" aria-live="polite"></p>
             </form>
           </details>
         </div>
@@ -1040,6 +1081,65 @@
     });
   }
 
+  async function submitProfessorReview(form, panel) {
+    const submitButton = form.querySelector(".review-submit-button");
+    const message = form.querySelector(".review-form-message");
+    const formData = new FormData(form);
+    const payload = {};
+
+    formData.forEach(function (value, key) {
+      payload[key] = value;
+    });
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
+    }
+
+    if (message) {
+      message.className = "review-form-message";
+      message.textContent = "";
+    }
+
+    try {
+      const response = await fetch("/api/professor-reviews", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not save your review. Please log in and try again.");
+      }
+
+      if (message) {
+        message.className = "review-form-message is-success";
+        message.textContent = "Review submitted. Thanks for helping other students.";
+      }
+
+      window.setTimeout(function () {
+        panel.removeAttribute("open");
+      }, 900);
+    } catch (error) {
+      if (message) {
+        message.className = "review-form-message is-error";
+        message.textContent = error.message || "Could not save your review. Please try again.";
+      }
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Review";
+      }
+    }
+  }
+
   function setupReviewModalBehavior(grid) {
     const panel = grid.querySelector(".professor-review-panel");
     const form = grid.querySelector(".professor-review-form");
@@ -1050,6 +1150,11 @@
     }
 
     setupReviewChoiceMenus(form);
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      submitProfessorReview(form, panel);
+    });
 
     function syncReviewModalLock() {
       document.body.classList.toggle("review-modal-open", panel.open);
