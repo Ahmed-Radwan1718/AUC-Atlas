@@ -2325,6 +2325,21 @@
       });
     }
 
+    function getAccountSessionBrowserIcon(session) {
+      const browserKey = String(session.browserKey || "").toLowerCase();
+      const browserName = String(session.browserName || session.browserLabel || "").toLowerCase();
+
+      if (browserKey === "safari" || browserName.includes("safari")) {
+        return "safari-icon.png";
+      }
+
+      if (browserKey === "firefox" || browserName.includes("firefox")) {
+        return "firefox-icon.png";
+      }
+
+      return "chrome-icon.png";
+    }
+
     function renderAccountLoginSessions(sessions) {
       const safeSessions = Array.isArray(sessions) ? sessions : [];
 
@@ -2349,6 +2364,7 @@
         const deviceText = [browserText, osText].filter(Boolean).join(" · ");
         const titleText = session.current ? "Current Browser" : (session.deviceLabel || browserText || "Signed-In Browser");
         const metaLabel = session.current ? "This device" : getAccountSessionDateLabel(session.lastSeenAt || session.createdAt);
+        const browserIcon = getAccountSessionBrowserIcon(session);
         const cardClass = "account-login-session-card" + (session.current ? " current" : "");
         const actions = session.current
           ? '<span class="account-login-session-current">Current</span>'
@@ -2359,7 +2375,7 @@
             <div class="account-login-session-main">
               <div class="account-login-session-head">
                 <div class="account-login-session-title">
-                  <img class="account-login-session-browser-icon" src="chrome-icon.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                  <img class="account-login-session-browser-icon" src="${escapeAccountHtml(browserIcon)}" alt="" aria-hidden="true" loading="lazy" decoding="async">
                   <h4>${escapeAccountHtml(titleText)}</h4>
                 </div>
 
