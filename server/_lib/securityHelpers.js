@@ -130,7 +130,7 @@ function getSessionDetailsFromRequest(req) {
   const browser = getSessionBrowserDetails(userAgent);
   const osName = getSessionPlatformLabel(userAgent);
   const deviceType = getSessionDeviceType(userAgent);
-  const browserLabel = browser.name + (browser.version ? " " + browser.version : "");
+  const browserLabel = browser.name;
 
   return {
     userAgent,
