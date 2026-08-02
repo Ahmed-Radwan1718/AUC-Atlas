@@ -751,11 +751,11 @@
 
     .professor-review-stats {
       display: grid;
-      gap: 18px;
+      gap: 24px;
     }
 
     .professor-review-stat-row {
-      padding-top: 16px;
+      padding-top: 18px;
       border-top: 1px solid rgba(23, 23, 23, 0.08);
       display: grid;
       gap: 10px;
@@ -776,71 +776,74 @@
     .professor-review-stat-copy strong {
       color: #171717;
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 900;
+      letter-spacing: 0.04em;
       line-height: 1.2;
+      text-transform: uppercase;
     }
 
     .professor-review-stat-copy span {
-      color: rgba(23, 23, 23, 0.54);
-      font-size: 12px;
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 11px;
       font-weight: 800;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       white-space: nowrap;
     }
 
-    .professor-review-stat-stack {
-      height: 12px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: rgba(23, 23, 23, 0.08);
-      display: flex;
-    }
-
-    .professor-review-stat-stack span {
-      min-width: 5px;
-      height: 100%;
-      background: rgba(192, 154, 92, 0.95);
-      display: block;
-    }
-
-    .professor-review-stat-stack span:nth-child(2) {
-      background: rgba(23, 23, 23, 0.84);
-    }
-
-    .professor-review-stat-stack span:nth-child(3) {
-      background: rgba(128, 113, 89, 0.72);
-    }
-
-    .professor-review-stat-stack span:nth-child(4) {
-      background: rgba(192, 154, 92, 0.48);
-    }
-
-    .professor-review-stat-options {
+    .professor-review-stat-labels {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .professor-review-stat-options span {
-      padding: 8px 10px;
-      border: 1px solid rgba(23, 23, 23, 0.08);
-      border-radius: 999px;
-      background: rgba(247, 244, 238, 0.72);
-      color: rgba(23, 23, 23, 0.62);
-      font-size: 11px;
+      gap: 6px 10px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
       font-weight: 800;
+      line-height: 1.5;
     }
 
-    .professor-review-stat-options strong {
-      margin-right: 5px;
+    .professor-review-stat-labels span {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .professor-review-stat-labels span:not(:last-child)::after {
+      content: "|";
+      margin-left: 10px;
+      color: rgba(23, 23, 23, 0.22);
+    }
+
+    .professor-review-stat-labels strong {
       color: #171717;
     }
 
-    .professor-review-stat-options em {
-      margin-left: 5px;
-      color: rgba(23, 23, 23, 0.44);
+    .professor-review-stat-labels em {
+      color: rgba(23, 23, 23, 0.4);
       font-style: normal;
+    }
+
+    .professor-review-stat-labels .is-empty {
+      opacity: 0.45;
+    }
+
+    .professor-review-stat-stack {
+      height: 18px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(23, 23, 23, 0.04);
+      display: flex;
+    }
+
+    .professor-review-stat-segment {
+      min-width: 0;
+      height: 100%;
+      display: block;
+      transition: width 0.28s ease;
+    }
+
+    .professor-review-stat-segment + .professor-review-stat-segment {
+      border-left: 2px solid rgba(255, 255, 255, 0.62);
     }
 
     .professor-reviews-section {
@@ -1109,9 +1112,9 @@
     const configs = [
       { key: "recommendation", label: "Would take again", options: ["Yes", "Depends", "No"] },
       { key: "attendancePolicy", label: "Attendance policy", options: ["Required", "Sometimes checked", "Not important", "Not sure"] },
-      { key: "workload", label: "Workload", options: ["Light", "Moderate", "Heavy"] },
-      { key: "lectureUsefulness", label: "Lecture usefulness", options: ["Essential", "Helpful", "Attending means less work at home", "Skippable", "Not lecture-based"] },
-      { key: "officeHours", label: "Office hours/help", options: ["Helpful", "Available but limited", "Hard to reach", "Did not use"] },
+      { key: "workload", label: "Workload", options: ["Very light", "Light", "Moderate", "Heavy", "Very heavy"] },
+      { key: "lectureUsefulness", label: "Lecture usefulness", options: ["Not lecture-based", "Skippable", "Helpful", "Attending means less work at home", "Essential"] },
+      { key: "officeHours", label: "Office hours/help", options: ["Did not use", "Hard to reach", "Available but limited", "Helpful"] },
       { key: "gradingStyle", label: "Grading style", options: ["Exams-heavy", "Projects-heavy", "Assignments-heavy", "Participation-heavy", "Mixed"] },
       { key: "examDifficulty", label: "Exam difficulty", options: ["Easier than class material", "Matches class material", "Harder than class material", "No exams"] },
       { key: "gradingTransparency", label: "Grading transparency", options: ["Rubrics clear", "Somewhat clear", "Unclear"] },
@@ -1139,20 +1142,17 @@
         }
       });
 
-      const answers = optionValues.map(function (value) {
+      const answers = optionValues.map(function (value, index) {
         const count = counts[value] || 0;
         const rawPercent = values.length ? (count / values.length) * 100 : 0;
 
         return {
           value,
           count,
+          colorIndex: index,
           percent: Math.round(rawPercent),
           width: Number(rawPercent.toFixed(2))
         };
-      }).filter(function (answer) {
-        return answer.count > 0;
-      }).sort(function (a, b) {
-        return b.count - a.count || a.value.localeCompare(b.value);
       });
 
       return {
@@ -1161,7 +1161,9 @@
         answers
       };
     }).filter(function (row) {
-      return row && row.answers.length;
+      return row && row.answers.some(function (answer) {
+        return answer.count > 0;
+      });
     });
   }
 
@@ -1170,6 +1172,14 @@
     const statsCount = document.getElementById("professor-review-stats-count");
     const safeReviews = Array.isArray(reviews) ? reviews : [];
     const rows = getReviewStatRows(safeReviews);
+    const colors = [
+      "rgba(192, 154, 92, 0.96)",
+      "rgba(156, 128, 82, 0.9)",
+      "rgba(93, 79, 56, 0.86)",
+      "rgba(23, 23, 23, 0.9)",
+      "rgba(118, 113, 103, 0.62)",
+      "rgba(192, 154, 92, 0.48)"
+    ];
 
     if (statsCount) {
       statsCount.textContent = safeReviews.length ? "Based on " + safeReviews.length + " " + (safeReviews.length === 1 ? "review" : "reviews") : "No review choices yet";
@@ -1185,6 +1195,10 @@
     }
 
     panel.innerHTML = rows.map(function (row) {
+      const visibleAnswers = row.answers.filter(function (answer) {
+        return answer.count > 0;
+      });
+
       return `
         <div class="professor-review-stat-row">
           <div class="professor-review-stat-copy">
@@ -1192,15 +1206,16 @@
             <span>${escapeHtml(row.total + " " + (row.total === 1 ? "answer" : "answers"))}</span>
           </div>
 
-          <div class="professor-review-stat-stack" aria-label="${escapeHtml(row.label + " review choice distribution")}">
+          <div class="professor-review-stat-labels">
             ${row.answers.map(function (answer) {
-              return '<span style="width: ' + escapeHtml(String(answer.width)) + '%;"></span>';
+              return '<span class="' + escapeHtml(answer.count ? "" : "is-empty") + '"><strong>' + escapeHtml(answer.value.replace(/-/g, " ")) + '</strong>' + escapeHtml(answer.percent + "%") + '<em>' + escapeHtml(answer.count + " of " + row.total) + '</em></span>';
             }).join("")}
           </div>
 
-          <div class="professor-review-stat-options">
-            ${row.answers.map(function (answer) {
-              return '<span><strong>' + escapeHtml(answer.percent + "%") + '</strong>' + escapeHtml(answer.value.replace(/-/g, " ")) + '<em>' + escapeHtml(answer.count + " of " + row.total) + '</em></span>';
+          <div class="professor-review-stat-stack" aria-label="${escapeHtml(row.label + " review choice distribution")}">
+            ${visibleAnswers.map(function (answer) {
+              const color = colors[answer.colorIndex % colors.length];
+              return '<span class="professor-review-stat-segment" style="width: ' + escapeHtml(String(answer.width)) + '%; background: ' + escapeHtml(color) + ';" title="' + escapeHtml(answer.value + ": " + answer.percent + "%") + '"></span>';
             }).join("")}
           </div>
         </div>
