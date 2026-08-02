@@ -200,10 +200,10 @@
     }
 
     .professors-grid.professor-profile-grid {
-      width: min(100%, 1500px);
+      width: min(100%, 1380px);
       margin: 0 auto;
-      grid-template-columns: minmax(0, 1fr) minmax(380px, 560px);
-      gap: 22px;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+      gap: 18px;
       align-items: start;
     }
 
@@ -729,13 +729,13 @@
     .professor-review-insights {
       width: min(100%, 1120px);
       margin: 22px auto 0;
-      padding: 24px;
+      padding: 16px;
       border: 1px solid rgba(23, 23, 23, 0.09);
-      border-radius: 24px;
+      border-radius: 20px;
       background: rgba(255, 255, 255, 0.72);
-      box-shadow: 0 18px 50px rgba(42, 32, 20, 0.08);
+      box-shadow: 0 14px 38px rgba(42, 32, 20, 0.07);
       display: grid;
-      gap: 18px;
+      gap: 12px;
     }
 
     .professor-review-insights-header,
@@ -743,13 +743,13 @@
       display: flex;
       align-items: end;
       justify-content: space-between;
-      gap: 18px;
+      gap: 14px;
     }
 
     .professor-review-insights-header span,
     .professor-reviews-header span {
       color: rgba(192, 154, 92, 0.92);
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -757,17 +757,17 @@
 
     .professor-review-insights-header h2,
     .professor-reviews-header h2 {
-      margin-top: 4px;
+      margin-top: 3px;
       color: #171717;
-      font-size: 26px;
+      font-size: 21px;
       font-weight: 700;
-      line-height: 1.1;
+      line-height: 1.08;
     }
 
     .professor-review-insights-header p,
     .professor-reviews-header p {
       color: rgba(23, 23, 23, 0.54);
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-align: right;
@@ -776,26 +776,29 @@
 
     .professor-review-stats {
       display: grid;
-      gap: 12px;
+      gap: 8px;
     }
 
     .professor-review-insight-card {
-      padding: 16px;
+      padding: 11px 12px;
       border: 1px solid rgba(23, 23, 23, 0.08);
-      border-radius: 20px;
-      background: rgba(247, 244, 238, 0.54);
-      display: grid;
-      gap: 14px;
-    }
-
-    .professor-review-insight-main {
+      border-radius: 16px;
+      background: rgba(247, 244, 238, 0.5);
       display: grid;
       gap: 8px;
     }
 
+    .professor-review-insight-main {
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr);
+      gap: 8px 10px;
+      align-items: center;
+    }
+
     .professor-review-insight-main span {
+      grid-column: 1 / -1;
       color: rgba(192, 154, 92, 0.92);
-      font-size: 10px;
+      font-size: 8px;
       font-weight: 900;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -803,7 +806,7 @@
 
     .professor-review-insight-main strong {
       color: #171717;
-      font-size: clamp(34px, 4vw, 48px);
+      font-size: 28px;
       font-weight: 900;
       letter-spacing: 0;
       line-height: 0.94;
@@ -812,19 +815,19 @@
     .professor-review-insight-main p {
       margin: 0;
       color: rgba(23, 23, 23, 0.66);
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 700;
-      line-height: 1.5;
+      line-height: 1.35;
     }
 
     .professor-review-detail-toggle {
       width: fit-content;
-      min-height: 36px;
-      padding: 0 14px;
+      min-height: 30px;
+      padding: 0 11px;
       border-radius: 999px;
       background: #171717;
       color: #fffdf8;
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 900;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -839,35 +842,35 @@
     }
 
     .professor-review-detail-panel {
-      margin-top: 12px;
+      margin-top: 10px;
       display: grid;
-      gap: 10px;
+      gap: 8px;
     }
 
     .professor-review-detail-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 48px;
-      gap: 10px;
+      grid-template-columns: minmax(0, 1fr) 42px;
+      gap: 8px;
       align-items: center;
     }
 
     .professor-review-detail-row > span {
       color: rgba(23, 23, 23, 0.7);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
-      line-height: 1.3;
+      line-height: 1.25;
     }
 
     .professor-review-detail-row > strong {
       color: #171717;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 900;
       text-align: right;
     }
 
     .professor-review-detail-track {
       grid-column: 1 / -1;
-      height: 8px;
+      height: 6px;
       overflow: hidden;
       border-radius: 999px;
       background: rgba(23, 23, 23, 0.08);
