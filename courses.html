@@ -282,6 +282,28 @@
       box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
     }
 
+    .courses-search-box input::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      margin-left: 14px;
+      border-radius: 10px;
+      background:
+        linear-gradient(45deg, transparent 43%, #ffffff 44%, #ffffff 56%, transparent 57%),
+        linear-gradient(-45deg, transparent 43%, #ffffff 44%, #ffffff 56%, transparent 57%),
+        #171717;
+      box-shadow: 0 10px 22px rgba(23, 23, 23, 0.18);
+      cursor: pointer;
+    }
+
+    .courses-search-box input::-webkit-search-cancel-button:hover {
+      background:
+        linear-gradient(45deg, transparent 43%, #ffffff 44%, #ffffff 56%, transparent 57%),
+        linear-gradient(-45deg, transparent 43%, #ffffff 44%, #ffffff 56%, transparent 57%),
+        #000000;
+    }
+
     .course-query-strip {
       display: flex;
       flex-wrap: wrap;
