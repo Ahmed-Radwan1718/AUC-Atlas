@@ -346,6 +346,7 @@ async function createSiteSessionRecord(decodedUser, req, res) {
   const sessionHash = getSiteSessionHash(sessionId);
 
   await saveSiteSession(decodedUser.uid, sessionHash, req, { create: true });
+  getUserSiteSessions(decodedUser.uid, sessionHash).catch(function () {});
 
   if (res) {
     setCookie(
@@ -370,9 +371,27 @@ async function ensureSiteSessionRecord(decodedUser, req, res) {
   return await createSiteSessionRecord(decodedUser, req, res);
 }
 
+function getSiteSessionDisplayKey(session) {
+  const userAgent = String(session.userAgent || "").trim().toLowerCase();
+  const ipAddress = String(session.ipAddress || "").trim().toLowerCase();
+
+  if (userAgent) {
+    return [userAgent, ipAddress].join("|");
+  }
+
+  return [
+    String(session.browserName || session.browserLabel || "Browser").trim().toLowerCase(),
+    String(session.browserVersion || "").trim().toLowerCase(),
+    String(session.osName || "Device").trim().toLowerCase(),
+    String(session.deviceType || "").trim().toLowerCase(),
+    ipAddress
+  ].join("|");
+}
+
 async function getUserSiteSessions(uid, currentSessionHash) {
   const snapshot = await admin.firestore().collection("users").doc(uid).collection("sessions").get();
   const sessions = [];
+  const sessionsByKey = new Map();
   const cleanup = [];
 
   snapshot.forEach(function (doc) {
@@ -387,7 +406,8 @@ async function getUserSiteSessions(uid, currentSessionHash) {
       return;
     }
 
-    sessions.push({
+    const lastSeenAt = data.lastSeenAt || data.createdAt;
+    const session = {
       id: doc.id,
       browserKey: data.browserKey || "chrome",
       browserName: data.browserName || "Browser",
@@ -399,23 +419,65 @@ async function getUserSiteSessions(uid, currentSessionHash) {
       ipAddress: data.ipAddress || "",
       userAgent: data.userAgent || "",
       createdAt: serializeSessionTimestamp(data.createdAt),
-      lastSeenAt: serializeSessionTimestamp(data.lastSeenAt || data.createdAt),
+      lastSeenAt: serializeSessionTimestamp(lastSeenAt),
       expiresAt: serializeSessionTimestamp(data.expiresAt),
-      current: Boolean(currentSessionHash && doc.id === currentSessionHash)
-    });
+      current: Boolean(currentSessionHash && doc.id === currentSessionHash),
+      ref: doc.ref,
+      groupKey: "",
+      lastSeenAtMs: sessionTimestampToMillis(lastSeenAt)
+    };
+
+    session.groupKey = getSiteSessionDisplayKey(session);
+
+    const existingSession = sessionsByKey.get(session.groupKey);
+
+    if (!existingSession) {
+      sessionsByKey.set(session.groupKey, session);
+      return;
+    }
+
+    const shouldReplaceExisting = session.current || (!existingSession.current && session.lastSeenAtMs > existingSession.lastSeenAtMs);
+    const duplicateSession = shouldReplaceExisting ? existingSession : session;
+
+    cleanup.push(duplicateSession.ref.delete().catch(function () {}));
+
+    if (shouldReplaceExisting) {
+      sessionsByKey.set(session.groupKey, session);
+    }
   });
 
-  await Promise.all(cleanup.slice(0, 5));
+  sessionsByKey.forEach(function (session) {
+    sessions.push(session);
+  });
+
+  await Promise.all(cleanup.slice(0, 20));
 
   sessions.sort(function (a, b) {
     if (a.current !== b.current) {
       return a.current ? -1 : 1;
     }
 
-    return sessionTimestampToMillis(b.lastSeenAt) - sessionTimestampToMillis(a.lastSeenAt);
+    return b.lastSeenAtMs - a.lastSeenAtMs;
   });
 
-  return sessions;
+  return sessions.map(function (session) {
+    return {
+      id: session.id,
+      browserKey: session.browserKey,
+      browserName: session.browserName,
+      browserVersion: session.browserVersion,
+      browserLabel: session.browserLabel,
+      osName: session.osName,
+      deviceType: session.deviceType,
+      deviceLabel: session.deviceLabel,
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent,
+      createdAt: session.createdAt,
+      lastSeenAt: session.lastSeenAt,
+      expiresAt: session.expiresAt,
+      current: session.current
+    };
+  });
 }
 
 async function revokeUserSiteSession(uid, sessionId, revokedReason) {
@@ -481,7 +543,7 @@ async function createSiteSessionFromIdToken(idToken, res, req) {
     sessionMaxAgeSeconds
   );
 
-  createSiteSessionRecord(decodedToken, req, null).catch(function () {});
+  await createSiteSessionRecord(decodedToken, req, res);
 
   return sessionCookie;
 }
