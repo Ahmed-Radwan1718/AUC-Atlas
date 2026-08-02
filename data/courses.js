@@ -529,36 +529,63 @@
     }
   }
 
-  function setupCourseQueryButtons() {
-    document.querySelectorAll("[data-course-query]").forEach(function (button) {
-      button.addEventListener("click", function () {
-        const searchInput = document.getElementById("course-search-input");
+  const courseSearchSuggestions = [
+    "Search Computer Science",
+    "Search Calculus II",
+    "Search CSCE 1101",
+    "Search Business",
+    "Search 3000 Level",
+    "Search Senior Project"
+  ];
 
-        document.querySelectorAll("[data-course-subject]").forEach(function (input) {
-          input.checked = false;
-        });
+  let courseSuggestionIndex = 0;
+  let courseCharacterIndex = 0;
+  let isDeletingCourseSuggestion = false;
 
-        if (searchInput) {
-          searchInput.value = button.dataset.courseQuery || "";
-          searchInput.focus();
-        }
+  function animateCourseSearchPlaceholder() {
+    const searchInput = document.getElementById("course-search-input");
 
-        renderCourses();
-      });
-    });
+    if (!searchInput) {
+      return;
+    }
+
+    const currentSuggestion = courseSearchSuggestions[courseSuggestionIndex];
+
+    if (searchInput.value.trim().length === 0) {
+      searchInput.placeholder = currentSuggestion.substring(0, courseCharacterIndex);
+    }
+
+    if (!isDeletingCourseSuggestion && courseCharacterIndex < currentSuggestion.length) {
+      courseCharacterIndex += 1;
+      setTimeout(animateCourseSearchPlaceholder, 70);
+      return;
+    }
+
+    if (!isDeletingCourseSuggestion && courseCharacterIndex === currentSuggestion.length) {
+      isDeletingCourseSuggestion = true;
+      setTimeout(animateCourseSearchPlaceholder, 1200);
+      return;
+    }
+
+    if (isDeletingCourseSuggestion && courseCharacterIndex > 0) {
+      courseCharacterIndex -= 1;
+      setTimeout(animateCourseSearchPlaceholder, 35);
+      return;
+    }
+
+    isDeletingCourseSuggestion = false;
+    courseSuggestionIndex = (courseSuggestionIndex + 1) % courseSearchSuggestions.length;
+    setTimeout(animateCourseSearchPlaceholder, 250);
   }
 
   function setupCoursesPage() {
-    renderSubjectFilters();
-    renderCourseStats();
-    setupCourseQueryButtons();
-
     const searchInput = document.getElementById("course-search-input");
 
     if (searchInput) {
       searchInput.addEventListener("input", renderCourses);
     }
 
+    animateCourseSearchPlaceholder();
     renderCourses();
   }
 
