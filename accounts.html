@@ -242,6 +242,7 @@
 
     .account-details-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
     }
 
     .account-field-full {
@@ -377,7 +378,8 @@
     }
 
     .account-field input,
-    .account-field textarea {
+    .account-field textarea,
+    .account-field select {
       width: 100%;
       min-height: 50px;
       padding: 0 16px;
@@ -399,8 +401,29 @@
       line-height: 1.6;
     }
 
+    .account-field select {
+      height: 50px;
+      padding-right: 48px;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .account-major-select-wrap {
+      position: relative;
+    }
+
+    .account-major-select-wrap .chevron {
+      position: absolute;
+      top: 50%;
+      right: 18px;
+      pointer-events: none;
+      transform: translateY(-65%) rotate(45deg);
+    }
+
     .account-field input:focus,
-    .account-field textarea:focus {
+    .account-field textarea:focus,
+    .account-field select:focus {
       background: white;
       border-color: rgba(192, 154, 92, 0.84);
       box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
@@ -1668,7 +1691,51 @@
 
                   <div class="account-field">
                     <label for="account-major">Major</label>
-                    <input type="text" id="account-major" placeholder="Computer Science, Business, Engineering">
+                    <div class="account-major-select-wrap">
+                      <select id="account-major">
+                        <option value="">Select your major</option>
+                        <option value="Accounting">Accounting</option>
+                        <option value="Actuarial Science">Actuarial Science</option>
+                        <option value="Anthropology">Anthropology</option>
+                        <option value="Arabic Studies">Arabic Studies</option>
+                        <option value="Architecture">Architecture</option>
+                        <option value="Biology">Biology</option>
+                        <option value="Business and Entrepreneurship">Business and Entrepreneurship</option>
+                        <option value="Business in Finance">Business in Finance</option>
+                        <option value="Business in Marketing">Business in Marketing</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Communication and Media Arts">Communication and Media Arts</option>
+                        <option value="Computer Engineering">Computer Engineering</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Construction Engineering">Construction Engineering</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="Dual Degree: Political Science and International Human Rights Law">Dual Degree: Political Science and International Human Rights Law</option>
+                        <option value="Economics">Economics</option>
+                        <option value="Egyptology">Egyptology</option>
+                        <option value="Electronics and Communications Engineering">Electronics and Communications Engineering</option>
+                        <option value="English and Comparative Literature">English and Comparative Literature</option>
+                        <option value="Film">Film</option>
+                        <option value="Graphic Design">Graphic Design</option>
+                        <option value="History">History</option>
+                        <option value="Honors Program in Political Science">Honors Program in Political Science</option>
+                        <option value="Integrated Marketing Communication">Integrated Marketing Communication</option>
+                        <option value="Management of Information and Communication Technology">Management of Information and Communication Technology</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        <option value="Middle East Studies">Middle East Studies</option>
+                        <option value="Multimedia Communication and Journalism">Multimedia Communication and Journalism</option>
+                        <option value="Music">Music</option>
+                        <option value="Petroleum Engineering">Petroleum Engineering</option>
+                        <option value="Philosophy">Philosophy</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Political Science">Political Science</option>
+                        <option value="Psychology">Psychology</option>
+                        <option value="Sociology">Sociology</option>
+                        <option value="Theatre">Theatre</option>
+                        <option value="Visual Arts">Visual Arts</option>
+                      </select>
+                      <span class="chevron" aria-hidden="true"></span>
+                    </div>
                   </div>
 
                   <div class="account-field account-display-name-field account-auc-id-field">
