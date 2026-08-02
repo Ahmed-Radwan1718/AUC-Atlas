@@ -144,6 +144,8 @@ module.exports = async function handler(req, res) {
     const decodedUser = await getSiteSessionUser(req, {
       checkRevoked: true
     });
+    await ensureVerifiedReviewAuthor(decodedUser);
+
     const body = req.body || {};
     const professorId = cleanString(body.professorId, 80);
     const professorName = cleanString(body.professorName, 120);
