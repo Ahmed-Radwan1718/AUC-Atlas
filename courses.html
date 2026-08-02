@@ -511,9 +511,114 @@
       }
     }
 
+    .course-detail-view {
+      max-width: 980px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .course-back-link {
+      width: fit-content;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .course-back-link:hover {
+      color: #171717;
+    }
+
+    .course-detail-shell {
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 28px 80px rgba(42, 32, 20, 0.1);
+    }
+
+    .course-detail-hero {
+      padding: 34px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: rgba(255, 255, 255, 0.48);
+    }
+
+    .course-detail-kicker {
+      margin-bottom: 14px;
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .course-detail-hero h1 {
+      max-width: 760px;
+      color: #171717;
+      font-size: clamp(34px, 4.8vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+    }
+
+    .course-detail-department {
+      max-width: 620px;
+      margin-top: 16px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .course-detail-grid {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .course-detail-stat {
+      min-height: 118px;
+      padding: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 20px;
+      background: rgba(247, 244, 238, 0.74);
+      display: grid;
+      align-content: space-between;
+      gap: 18px;
+    }
+
+    .course-detail-stat span {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .course-detail-stat strong {
+      color: #171717;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .course-detail-note {
+      margin: 0 22px 24px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(192, 154, 92, 0.1);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.65;
+    }
+
+    .courses-list-view[hidden],
     .courses-result-count[hidden],
     .courses-grid[hidden],
-    .course-discovery[hidden] {
+    .course-discovery[hidden],
+    .course-detail-view[hidden] {
       display: none;
     }
 
@@ -590,22 +695,57 @@
 
   <main class="courses-page">
     <div class="courses-inner">
-      <section class="courses-header">
-        <h1>Find the course without scrolling forever.</h1>
-        <p>
-          Search by course code, title, subject, department, or level. Results appear only when you need them.
-        </p>
-      </section>
-
-      <section class="courses-browser" aria-label="Course search and results">
-        <section class="courses-results">
-          <div class="courses-search-box">
-            <input id="course-search-input" type="search" placeholder="Search courses..." aria-label="Search courses">
-          </div>
-
-          <div class="courses-result-count" id="courses-result-count" hidden>0 matches</div>
-          <section class="courses-grid" id="courses-grid" aria-label="Course search results" hidden></section>
+      <div class="courses-list-view" id="courses-list-view">
+        <section class="courses-header">
+          <h1>Find the course without scrolling forever.</h1>
+          <p>
+            Search by course code, title, subject, department, or level. Results appear only when you need them.
+          </p>
         </section>
+
+        <section class="courses-browser" aria-label="Course search and results">
+          <section class="courses-results">
+            <div class="courses-search-box">
+              <input id="course-search-input" type="search" placeholder="Search courses..." aria-label="Search courses">
+            </div>
+
+            <div class="courses-result-count" id="courses-result-count" hidden>0 matches</div>
+            <section class="courses-grid" id="courses-grid" aria-label="Course search results" hidden></section>
+          </section>
+        </section>
+      </div>
+
+      <section class="course-detail-view" id="course-detail-view" aria-label="Course details" hidden>
+        <a class="course-back-link" href="courses.html">Back to courses</a>
+
+        <article class="course-detail-shell">
+          <section class="course-detail-hero">
+            <p class="course-detail-kicker" id="course-detail-code">Course</p>
+            <h1 id="course-detail-title">Course title</h1>
+            <p class="course-detail-department" id="course-detail-department">Department</p>
+          </section>
+
+          <section class="course-detail-grid" aria-label="Course facts">
+            <div class="course-detail-stat">
+              <span>Subject</span>
+              <strong id="course-detail-subject">Subject</strong>
+            </div>
+
+            <div class="course-detail-stat">
+              <span>Level</span>
+              <strong id="course-detail-level">Level</strong>
+            </div>
+
+            <div class="course-detail-stat">
+              <span>Code</span>
+              <strong id="course-detail-full-code">Code</strong>
+            </div>
+          </section>
+
+          <p class="course-detail-note" id="course-detail-note">
+            This course page is ready for professor links, student notes, ratings, prerequisites, and review details.
+          </p>
+        </article>
       </section>
     </div>
   </main>
