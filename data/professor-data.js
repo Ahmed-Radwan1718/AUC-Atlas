@@ -790,26 +790,15 @@
 
     .professor-review-insight-main {
       display: grid;
-      grid-template-columns: 58px minmax(0, 1fr);
-      gap: 8px 10px;
-      align-items: center;
+      gap: 6px;
     }
 
     .professor-review-insight-main span {
-      grid-column: 1 / -1;
       color: rgba(192, 154, 92, 0.92);
       font-size: 8px;
       font-weight: 900;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-    }
-
-    .professor-review-insight-main strong {
-      color: #171717;
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: 0;
-      line-height: 0.94;
     }
 
     .professor-review-insight-main p {
@@ -1247,7 +1236,6 @@
         <article class="professor-review-insight-card">
           <div class="professor-review-insight-main">
             <span>${escapeHtml(row.label)}</span>
-            <strong>${escapeHtml(row.topAnswer.percent + "%")}</strong>
             <p>${escapeHtml(row.summary)}</p>
           </div>
 
