@@ -2361,7 +2361,7 @@
 
       accountLoginSessionsList.innerHTML = safeSessions.map(function (session) {
         const sessionId = session.id || "";
-        const browserText = session.browserLabel || session.browserName || "Browser";
+        const browserText = session.browserName || session.browserLabel || "Browser";
         const platformText = session.platformLabel || session.osName || "Device";
         const titleText = session.deviceLabel || (browserText + " on " + platformText);
         const browserIcon = getAccountSessionBrowserIcon(session);
