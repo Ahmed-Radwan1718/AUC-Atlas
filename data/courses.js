@@ -408,9 +408,20 @@
   }
 
   function getSubjects() {
-    return Array.from(new Set(courses.map(function (course) {
-      return course.subject;
-    }))).sort();
+    const subjectsByCode = {};
+
+    courses.forEach(function (course) {
+      subjectsByCode[course.subject] = course.department;
+    });
+
+    return Object.keys(subjectsByCode).map(function (code) {
+      return {
+        code: code,
+        label: subjectsByCode[code]
+      };
+    }).sort(function (firstSubject, secondSubject) {
+      return firstSubject.label.localeCompare(secondSubject.label);
+    });
   }
 
   function renderCourseStats() {
@@ -436,8 +447,8 @@
     filtersRoot.innerHTML = getSubjects().map(function (subject) {
       return `
         <label class="course-filter-pill">
-          <input type="checkbox" value="${subject}" data-course-subject>
-          <span>${subject}</span>
+          <input type="checkbox" value="${subject.code}" data-course-subject>
+          <span>${subject.label}</span>
         </label>
       `;
     }).join("");
