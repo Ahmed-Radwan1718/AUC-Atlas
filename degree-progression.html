@@ -505,6 +505,67 @@
         .replace(/'/g, "&#39;");
     }
 
+    const DEGREE_REQUIREMENTS = {
+      "Mechanical Engineering": {
+        note: "Concentration electives require 15 credit hours selected from at least two concentrations. A minimum of nine credits must be taken from one concentration and at least one course from another concentration.",
+        groups: [
+          {
+            scope: "Engineering Core",
+            title: "Engineering Core Requirements (45 credits)",
+            items: [
+              "CHEM 1005 - General Chemistry I (3 cr.)",
+              "CHEM 1015 - General Chemistry I-Laboratory (1 cr.)",
+              "ENGR 1005 - Descriptive Geometry and Engineering Drawing (2 cr.)",
+              "ENGR 2102 - Engineering Mechanics I (Statics) (3 cr.)",
+              "ENGR 2104 - Engineering Mechanics II (Dynamics) (3 cr.)",
+              "ENGR 3202 - Engineering Analysis and Computation I (3 cr.)",
+              "ENGR 3212 - General Electrical Engineering (3 cr.)",
+              "ENGR 3222 - Engineering Economy (3 cr.)",
+              "MACT 1122 - Calculus II (3 cr.)",
+              "MACT 2123 - Calculus III (3 cr.)",
+              "MACT 2141 - Differential Equations (3 cr.)",
+              "MACT 3224 - Probability and Statistics (3 cr.)",
+              "MENG 2202 - Introduction to Computational Thinking and Programming for Engineers Lab (1 cr.)",
+              "MENG 2601 - Fluid Mechanics Fundamentals (3 cr.)",
+              "PHYS 1011 - Physics 1: Classical Mechanics, Sound and Heat (3 cr.)",
+              "PHYS 1012 - General Physics Laboratory I (1 cr.)",
+              "PHYS 1021 - Physics 2: Electricity and Magnetism (3 cr.)",
+              "PHYS 1022 - General Physics Laboratory II (1 cr.)"
+            ]
+          },
+          {
+            scope: "Concentration",
+            title: "Concentration Requirements (54 credits)",
+            description: "The student is required to spend a minimum of eight weeks in industrial training in Egypt or abroad. A minimum of 67 credits is required prior to the industrial training.",
+            items: [
+              "MENG 2112 - Strength of Materials (3 cr.)",
+              "MENG 2505 - Mechanical Engineering Drawing (1 cr.)",
+              "MENG 3207 - Engineering Materials (3 cr.)",
+              "MENG 3209 - Fundamentals of Manufacturing Processes (3 cr.)",
+              "MENG 3217 - Mechanical and Structural Behavior of Engineering Materials Lab (1 cr.)",
+              "MENG 3402 - Quality and Process Control (3 cr.)",
+              "MENG 3446 - Engineering and Project Management (2 cr.)",
+              "MENG 3502 - Mechanical Systems (3 cr.)",
+              "MENG 3505 - Mechanics of Materials (3 cr.)",
+              "MENG 3506 - Mechanical Design I (3 cr.)",
+              "MENG 3601 - Fundamentals of Thermodynamics (3 cr.)",
+              "MENG 3602 - Applied Fluid Mechanics (3 cr.)",
+              "MENG 3605 - Applied Thermodynamics (3 cr.)",
+              "MENG 3705 - System Dynamics (3 cr.)",
+              "MENG 4208 - Selection of Materials and Processes for Design (3 cr.)",
+              "MENG 4507 - Mechanical Design II (3 cr.)",
+              "MENG 4606 - Heat Transfer (4 cr.)",
+              "MENG 4950 - Industrial Training (1 cr.)",
+              "MENG 4980 - Senior Project I (1 cr.)",
+              "MENG 4981 - Senior Project II (2 cr.)",
+              "PHYS 2216 - Fundamentals of Circuits and Electronics (2 cr.)",
+              "PHYS 2217 - Fundamentals of Circuits and Electronics Lab (1 cr.)"
+            ]
+          }
+        ]
+      }
+    };
+
     function resetDegreeProgressSummary() {
       degreeCompletedCount.textContent = "0";
       degreeRemainingCount.textContent = "0";
@@ -525,22 +586,72 @@
       resetDegreeProgressSummary();
     }
 
+    function renderDegreeRequirementGroup(group, groupIndex) {
+      return `
+        <article class="degree-requirement-group">
+          <div class="degree-requirement-group-head">
+            <span>${escapeDegreeHtml(group.scope)}</span>
+            <h3>${escapeDegreeHtml(group.title)}</h3>
+            ${group.description ? `<p>${escapeDegreeHtml(group.description)}</p>` : ""}
+          </div>
+
+          <div class="degree-requirement-list">
+            ${group.items.map(function (item, itemIndex) {
+              const key = groupIndex + "-" + itemIndex;
+              return `
+                <label class="degree-requirement-item">
+                  <input type="checkbox" data-degree-item="${escapeDegreeHtml(key)}">
+                  <span class="degree-requirement-text">${escapeDegreeHtml(item)}</span>
+                </label>
+              `;
+            }).join("")}
+          </div>
+        </article>
+      `;
+    }
+
+    function updateDegreeProgress() {
+      const items = Array.from(degreeRequirementsRoot.querySelectorAll("[data-degree-item]"));
+      const total = items.length;
+      const completed = items.filter(function (item) {
+        return item.checked;
+      }).length;
+      const remaining = Math.max(total - completed, 0);
+      const percent = total ? Math.round((completed / total) * 100) : 0;
+
+      degreeCompletedCount.textContent = String(completed);
+      degreeRemainingCount.textContent = String(remaining);
+      degreeProgressPercent.textContent = percent + "%";
+      degreeProgressBar.style.width = percent + "%";
+    }
+
     function renderDegreeProgression(user) {
       const savedMajor = String((user || {}).major || "").trim();
+      const majorPlan = DEGREE_REQUIREMENTS[savedMajor] || null;
 
       degreeMajorName.textContent = savedMajor || "No Major Selected";
       degreeMajorPill.textContent = savedMajor ? "Saved major" : "Missing major";
-      degreeMajorCopy.textContent = savedMajor
-        ? "Requirements have not been added for this major yet."
-        : "Choose your major from Account Details to see degree requirements later.";
+      degreeMajorCopy.textContent = majorPlan
+        ? "Requirements loaded for your saved major."
+        : "Requirements have not been added for this major yet.";
 
       if (!savedMajor) {
         renderDegreeEmptyState("No major selected", "Go to Account Details, choose your major, then return to this page.");
         return;
       }
 
-      renderDegreeEmptyState("Requirements not found", "Requirements were not found for " + savedMajor + " yet.");
+      if (!majorPlan) {
+        renderDegreeEmptyState("Requirements not found", "Requirements were not found for " + savedMajor + " yet.");
+        return;
+      }
+
+      degreeRequirementsRoot.innerHTML = majorPlan.groups.map(renderDegreeRequirementGroup).join("");
+      degreePlanNote.hidden = !majorPlan.note;
+      degreePlanNote.textContent = majorPlan.note || "";
+      updateDegreeProgress();
     }
+
+    degreeRequirementsRoot.addEventListener("change", updateDegreeProgress);
 
     async function requireSignedIn() {
       try {
