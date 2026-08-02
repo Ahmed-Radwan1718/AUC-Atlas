@@ -15,55 +15,35 @@
       color: #171717;
     }
 
-    .faq-page,
-    .policies-page {
+    .info-page {
       min-height: 100vh;
-      padding-top: 104px;
+      padding: 126px 0 86px;
       background:
         linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
         #f7f4ee;
-      overflow-x: clip;
     }
 
-    .faq-section {
-      min-height: calc(100vh - 104px);
-      padding: 76px 44px 96px;
-    }
-
-    .faq-section-inner {
-      width: 100%;
-      max-width: 1220px;
+    .info-inner {
+      width: min(980px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 30px;
-      border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 26px;
-      background:
-        linear-gradient(135deg, rgba(192, 154, 92, 0.1), rgba(255, 255, 255, 0.58)),
-        rgba(255, 255, 255, 0.72);
-      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
     }
 
-    .faq-section-header {
-      max-width: 820px;
+    .info-header {
       margin-bottom: 28px;
+      display: grid;
+      gap: 12px;
     }
 
-    .faq-section-eyebrow,
-    .faq-category-label {
-      color: rgba(192, 154, 92, 0.92);
+    .info-kicker {
+      color: rgba(192, 154, 92, 0.84);
       font-size: 12px;
       font-weight: 800;
       letter-spacing: 0.14em;
-      line-height: 1.4;
       text-transform: uppercase;
     }
 
-    .faq-section-eyebrow {
-      margin-bottom: 12px;
-    }
-
-    .faq-section-title {
-      margin-bottom: 12px;
+    .info-header h1 {
+      max-width: 720px;
       color: #171717;
       font-size: clamp(34px, 4.8vw, 58px);
       font-weight: 700;
@@ -71,121 +51,40 @@
       text-transform: uppercase;
     }
 
-    .faq-section-header p {
-      max-width: 760px;
-      color: rgba(23, 23, 23, 0.64);
-      font-size: 16px;
-      line-height: 1.7;
-    }
-
-    .faq-accordion-list {
-      display: grid;
-      gap: 34px;
-    }
-
-    .faq-category-label {
-      margin-bottom: 14px;
-    }
-
-    .faq-accordion-item {
-      border-top: 1px solid rgba(23, 23, 23, 0.1);
-      transition: border-color 0.24s ease;
-    }
-
-    .faq-accordion-item:last-child {
-      border-bottom: 1px solid rgba(23, 23, 23, 0.1);
-    }
-
-    .faq-accordion-item:hover,
-    .faq-accordion-item[open] {
-      border-color: rgba(192, 154, 92, 0.34);
-    }
-
-    .faq-question {
-      width: 100%;
-      padding: 24px 0;
-      list-style: none;
-      color: #171717;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 24px;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .faq-question::-webkit-details-marker {
-      display: none;
-    }
-
-    .faq-question span:first-child {
-      color: #171717;
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 1.35;
-      transition: color 0.24s ease;
-    }
-
-    .faq-question:hover span:first-child,
-    .faq-accordion-item[open] .faq-question span:first-child {
-      color: rgba(192, 154, 92, 0.98);
-    }
-
-    .faq-icon {
-      color: rgba(192, 154, 92, 0.84);
-      font-size: 28px;
-      font-weight: 300;
-      line-height: 1;
-      transition: transform 0.24s ease, color 0.24s ease;
-    }
-
-    .faq-accordion-item[open] .faq-icon {
-      color: rgba(192, 154, 92, 1);
-      transform: rotate(45deg);
-    }
-
-    .faq-answer {
-      padding: 0 64px 24px 0;
+    .info-header p,
+    .info-section p,
+    .info-section li {
       color: rgba(23, 23, 23, 0.64);
       font-size: 15px;
-      line-height: 1.7;
+      line-height: 1.75;
     }
 
-    .faq-answer p,
-    .faq-answer li {
-      max-width: 760px;
-      margin-bottom: 12px;
+    .info-content {
+      padding: 28px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 28px 80px rgba(42, 32, 20, 0.1);
+      display: grid;
+      gap: 24px;
     }
 
-    .faq-answer ul {
+    .info-section h2 {
+      margin-bottom: 10px;
+      color: #171717;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .info-section ul {
       padding-left: 20px;
+      display: grid;
+      gap: 8px;
     }
 
-    @media (max-width: 700px) {
-      .faq-section {
-        padding: 46px 22px 70px;
-      }
-
-      .faq-section-inner {
-        padding: 24px;
-        border-radius: 22px;
-      }
-
-      .faq-section-title {
-        font-size: 30px;
-      }
-
-      .faq-question {
-        gap: 18px;
-        padding: 22px 0;
-      }
-
-      .faq-question span:first-child {
-        font-size: 16px;
-      }
-
-      .faq-answer {
-        padding-right: 0;
-      }
+    @media (max-width: 640px) {
+      .info-page { padding-top: 96px; }
+      .info-content { padding: 22px; border-radius: 22px; }
     }
   </style>
 </head>
@@ -194,99 +93,67 @@
   <div id="site-header-root"></div>
   <script src="site-header.js"></script>
 
-  <main class="policies-page">
-    <section class="faq-section">
-      <div class="faq-section-inner">
-        <div class="faq-section-header">
-          <p class="faq-section-eyebrow">Privacy</p>
-          <h1 class="faq-section-title">Privacy Policy</h1>
-          <p>Last updated: August 3, 2026. This page explains what AUC Atlas may collect and how it may be used.</p>
-        </div>
+  <main class="info-page">
+    <div class="info-inner">
+      <section class="info-header">
+        <p class="info-kicker">Privacy</p>
+        <h1>Privacy Policy</h1>
+        <p>Last updated: August 2, 2026. This page explains what AUC Atlas may collect and how it may be used.</p>
+      </section>
 
-        <div class="faq-accordion-list">
-          <div class="faq-category">
-            <p class="faq-category-label">Information We Collect</p>
+      <section class="info-content">
+        <article class="info-section">
+          <h2>1. Information You Provide</h2>
+          <p>AUC Atlas may collect information you submit, such as account details, professor reviews, course material metadata, uploaded files, professor names, semesters, course codes, support messages, and profile information.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Information you provide</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>AUC Atlas may collect information you submit, such as account details, professor reviews, course material metadata, uploaded files, professor names, semesters, course codes, support messages, and profile information.</p>
-              </div>
-            </details>
+        <article class="info-section">
+          <h2>2. Uploaded Files</h2>
+          <p>Course materials uploaded to AUC Atlas may be stored with a file storage provider and tied to course, professor, semester, title, file type, file size, upload time, and moderation status.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Uploaded files</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>Course materials uploaded to AUC Atlas may be stored with a file storage provider and tied to course, professor, semester, title, file type, file size, upload time, and moderation status.</p>
-              </div>
-            </details>
+        <article class="info-section">
+          <h2>3. Automatically Collected Data</h2>
+          <p>The website, hosting provider, authentication tools, and storage providers may collect basic technical information such as IP address, browser type, device information, request logs, security events, and error logs.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Automatically collected data</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>The website, hosting provider, authentication tools, and storage providers may collect basic technical information such as IP address, browser type, device information, request logs, security events, and error logs.</p>
-              </div>
-            </details>
-          </div>
+        <article class="info-section">
+          <h2>4. How Information Is Used</h2>
+          <ul>
+            <li>To run course pages, professor pages, accounts, uploads, and GPA tools.</li>
+            <li>To organize uploaded material by course, professor, and semester.</li>
+            <li>To moderate unsafe, private, copyrighted, spam, or inaccurate content.</li>
+            <li>To protect the website from abuse, fraud, security threats, and technical errors.</li>
+            <li>To improve AUC Atlas features and reliability.</li>
+          </ul>
+        </article>
 
-          <div class="faq-category">
-            <p class="faq-category-label">How Data Is Used</p>
+        <article class="info-section">
+          <h2>5. Sharing With Service Providers</h2>
+          <p>AUC Atlas may use third-party services for hosting, authentication, file storage, databases, analytics, email, or security. These providers may process information only as needed to provide their services.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>How information is used</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <ul>
-                  <li>To run course pages, professor pages, accounts, uploads, and GPA tools.</li>
-                  <li>To organize uploaded material by course, professor, and semester.</li>
-                  <li>To moderate unsafe, private, copyrighted, spam, or inaccurate content.</li>
-                  <li>To protect the website from abuse, fraud, security threats, and technical errors.</li>
-                  <li>To improve AUC Atlas features and reliability.</li>
-                </ul>
-              </div>
-            </details>
+        <article class="info-section">
+          <h2>6. Public Content</h2>
+          <p>Reviews, course material titles, professor names, semesters, course codes, and approved file links may become visible to other users. Do not upload personal, private, confidential, or identifying information that should not be public.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Sharing with service providers</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>AUC Atlas may use third-party services for hosting, authentication, file storage, databases, analytics, email, or security. These providers may process information only as needed to provide their services.</p>
-              </div>
-            </details>
+        <article class="info-section">
+          <h2>7. Cookies and Local Storage</h2>
+          <p>AUC Atlas may use cookies, local storage, or session storage for login state, account features, security, preferences, and basic website functionality.</p>
+        </article>
 
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Public content</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>Reviews, course material titles, professor names, semesters, course codes, and approved file links may become visible to other users. Do not upload personal, private, confidential, or identifying information that should not be public.</p>
-              </div>
-            </details>
-          </div>
+        <article class="info-section">
+          <h2>8. Data Removal</h2>
+          <p>You may request review or removal of content you submitted or content that includes private, unsafe, copyrighted, or incorrect information. Some records may be kept when needed for security, moderation, legal, or technical reasons.</p>
+        </article>
 
-          <div class="faq-category">
-            <p class="faq-category-label">Controls and Safety</p>
-
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Cookies and local storage</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>AUC Atlas may use cookies, local storage, or session storage for login state, account features, security, preferences, and basic website functionality.</p>
-              </div>
-            </details>
-
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Data removal</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>You may request review or removal of content you submitted or content that includes private, unsafe, copyrighted, or incorrect information. Some records may be kept when needed for security, moderation, legal, or technical reasons.</p>
-              </div>
-            </details>
-
-            <details class="faq-accordion-item">
-              <summary class="faq-question"><span>Student reminder</span><span class="faq-icon">+</span></summary>
-              <div class="faq-answer">
-                <p>Before uploading files, remove names, IDs, emails, grades, private messages, and any personal information that does not need to be shared.</p>
-              </div>
-            </details>
-          </div>
-        </div>
-      </div>
-    </section>
+        <article class="info-section">
+          <h2>9. Student Reminder</h2>
+          <p>Before uploading files, remove names, IDs, emails, grades, private messages, and any personal information that does not need to be shared.</p>
+        </article>
+      </section>
+    </div>
   </main>
 </body>
 </html>
