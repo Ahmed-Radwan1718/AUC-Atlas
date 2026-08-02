@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>FAQ | AUC Atlas</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .info-page {
+      min-height: 100vh;
+      padding: 126px 0 86px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+    }
+
+    .info-inner {
+      width: min(980px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .info-header {
+      margin-bottom: 28px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .info-kicker {
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .info-header h1 {
+      max-width: 720px;
+      color: #171717;
+      font-size: clamp(34px, 4.8vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .info-header p {
+      max-width: 680px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .info-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .info-item {
+      padding: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 18px 55px rgba(42, 32, 20, 0.08);
+    }
+
+    .info-item h2 {
+      margin-bottom: 10px;
+      color: #171717;
+      font-size: 21px;
+      line-height: 1.2;
+    }
+
+    .info-item p {
+      color: rgba(23, 23, 23, 0.64);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .info-item a {
+      color: #171717;
+      font-weight: 800;
+    }
+
+    @media (max-width: 640px) {
+      .info-page { padding-top: 96px; }
+      .info-item { border-radius: 18px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="site-header-root"></div>
+  <script src="site-header.js"></script>
+
+  <main class="info-page">
+    <div class="info-inner">
+      <section class="info-header">
+        <p class="info-kicker">Help</p>
+        <h1>Frequently Asked Questions</h1>
+        <p>Quick answers about AUC Atlas, course pages, professor information, uploaded materials, and account features.</p>
+      </section>
+
+      <section class="info-list" aria-label="Frequently asked questions">
+        <article class="info-item">
+          <h2>What is AUC Atlas?</h2>
+          <p>AUC Atlas is a student-focused website for browsing professors, courses, GPA tools, and student-uploaded academic materials in one place.</p>
+        </article>
+
+        <article class="info-item">
+          <h2>Is AUC Atlas officially affiliated with AUC?</h2>
+          <p>No. AUC Atlas is an independent student resource and is not an official American University in Cairo website.</p>
+        </article>
+
+        <article class="info-item">
+          <h2>How do course material uploads work?</h2>
+          <p>When materials are uploaded, they can be tied to a course, professor, and semester. Uploaded files may be reviewed, organized, removed, or hidden if they are unsafe, irrelevant, inaccurate, or not allowed.</p>
+        </article>
+
+        <article class="info-item">
+          <h2>What should I upload?</h2>
+          <p>Upload useful course materials such as notes, review sheets, slides, summaries, practice questions, or study files that you have permission to share.</p>
+        </article>
+
+        <article class="info-item">
+          <h2>What should I not upload?</h2>
+          <p>Do not upload copyrighted books, paid materials, private messages, exams that are not allowed to be shared, personal data, malware, or anything you do not have permission to distribute.</p>
+        </article>
+
+        <article class="info-item">
+          <h2>Can materials be removed?</h2>
+          <p>Yes. AUC Atlas may remove files or information if they are reported, inaccurate, harmful, private, copyrighted, spam, or otherwise unsuitable for the site.</p>
+        </article>
+
+        <article class="info-item">
+          <h2>Where can I read the rules?</h2>
+          <p>Read the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a> for more details.</p>
+        </article>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
