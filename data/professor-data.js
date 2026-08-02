@@ -779,6 +779,64 @@
       gap: 8px;
     }
 
+    .professor-review-insights-more,
+    .professor-review-insights-hidden {
+      display: grid;
+      gap: 8px;
+    }
+
+    .professor-review-insights-hidden {
+      margin-top: 8px;
+    }
+
+    .professor-review-insights-more-toggle {
+      width: fit-content;
+      margin-top: 2px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #171717;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .professor-review-insights-more-toggle::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.18s ease;
+    }
+
+    .professor-review-insights-more[open] .professor-review-insights-more-toggle::after {
+      transform: rotate(225deg) translate(-1px, -1px);
+    }
+
+    .professor-review-insights-more-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .professor-review-insights-more-less {
+      display: none;
+    }
+
+    .professor-review-insights-more[open] .professor-review-insights-more-more {
+      display: none;
+    }
+
+    .professor-review-insights-more[open] .professor-review-insights-more-less {
+      display: inline;
+    }
+
     .professor-review-insight-card {
       padding: 11px 12px;
       border: 1px solid rgba(23, 23, 23, 0.08);
@@ -1231,22 +1289,15 @@
     const panel = document.getElementById("professor-review-stats");
     const statsCount = document.getElementById("professor-review-stats-count");
     const safeReviews = Array.isArray(reviews) ? reviews : [];
-    const rows = getReviewStatRows(safeReviews);
+    const priorityLabels = ["Would take again", "Workload", "Exam difficulty", "Grading style", "Grading transparency", "Lecture usefulness", "Attendance policy", "Office hours/help", "Feedback quality"];
+    const rows = getReviewStatRows(safeReviews).slice().sort(function (a, b) {
+      const aPriority = priorityLabels.includes(a.label) ? priorityLabels.indexOf(a.label) : priorityLabels.length;
+      const bPriority = priorityLabels.includes(b.label) ? priorityLabels.indexOf(b.label) : priorityLabels.length;
 
-    if (statsCount) {
-      statsCount.textContent = safeReviews.length ? "Top patterns from reviews" : "No review choices yet";
-    }
+      return aPriority - bPriority || b.topAnswer.percent - a.topAnswer.percent || a.label.localeCompare(b.label);
+    });
 
-    if (!panel) {
-      return;
-    }
-
-    if (!rows.length) {
-      panel.innerHTML = '<p class="professor-review-status">Review stats will appear after students answer the review choices.</p>';
-      return;
-    }
-
-    panel.innerHTML = rows.map(function (row) {
+    function renderInsightCard(row) {
       return `
         <article class="professor-review-insight-card">
           <div class="professor-review-insight-main">
@@ -1272,7 +1323,39 @@
           </details>
         </article>
       `;
-    }).join("");
+    }
+
+    if (statsCount) {
+      statsCount.textContent = safeReviews.length ? "Top patterns from reviews" : "No review choices yet";
+    }
+
+    if (!panel) {
+      return;
+    }
+
+    if (!rows.length) {
+      panel.innerHTML = '<p class="professor-review-status">Review stats will appear after students answer the review choices.</p>';
+      return;
+    }
+
+    const visibleRows = rows.slice(0, 3);
+    const hiddenRows = rows.slice(3);
+    const hiddenMarkup = hiddenRows.length
+      ? `
+        <details class="professor-review-insights-more">
+          <summary class="professor-review-insights-more-toggle">
+            <span class="professor-review-insights-more-more">Show more</span>
+            <span class="professor-review-insights-more-less">Show less</span>
+          </summary>
+
+          <div class="professor-review-insights-hidden">
+            ${hiddenRows.map(renderInsightCard).join("")}
+          </div>
+        </details>
+      `
+      : "";
+
+    panel.innerHTML = visibleRows.map(renderInsightCard).join("") + hiddenMarkup;
   }
 
   function renderProfessorReviews(reviews) {
