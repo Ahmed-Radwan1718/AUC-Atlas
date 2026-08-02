@@ -76,7 +76,9 @@
 
     .site-header-logo-auc,
     .site-header-logo-atlas {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
       transform-origin: center;
       transition: opacity 0.24s ease, filter 0.24s ease, transform 0.36s cubic-bezier(0.2, 0.9, 0.2, 1);
     }
@@ -528,6 +530,8 @@
   const accountMenu = document.getElementById("floating-account-menu");
   const loginLink = document.getElementById("floating-login-link");
   const accountLink = document.getElementById("floating-account-link");
+  const degreeLink = document.getElementById("floating-degree-link");
+  const reviewsLink = document.getElementById("floating-reviews-link");
   const logoutButton = document.getElementById("floating-logout-button");
 
   function closeNavMenu() {
@@ -617,6 +621,14 @@
       accountLink.hidden = true;
     }
 
+    if (degreeLink) {
+      degreeLink.hidden = true;
+    }
+
+    if (reviewsLink) {
+      reviewsLink.hidden = true;
+    }
+
     if (logoutButton) {
       logoutButton.hidden = true;
     }
@@ -633,6 +645,14 @@
 
     if (accountLink) {
       accountLink.hidden = false;
+    }
+
+    if (degreeLink) {
+      degreeLink.hidden = false;
+    }
+
+    if (reviewsLink) {
+      reviewsLink.hidden = false;
     }
 
     if (logoutButton) {
