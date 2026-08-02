@@ -2315,13 +2315,15 @@
       const date = new Date(value);
 
       if (!value || Number.isNaN(date.getTime())) {
-        return "Recently active";
+        return "Not available";
       }
 
-      return "Last seen " + date.toLocaleDateString("en-US", {
-        month: "short",
+      return date.toLocaleString("en-GB", {
         day: "numeric",
-        year: "numeric"
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
       });
     }
 
@@ -2360,15 +2362,19 @@
       accountLoginSessionsList.innerHTML = safeSessions.map(function (session) {
         const sessionId = session.id || "";
         const browserText = session.browserLabel || session.browserName || "Browser";
-        const osText = session.osName || "Device";
-        const deviceText = [browserText, osText].filter(Boolean).join(" · ");
-        const titleText = session.current ? "Current Browser" : (session.deviceLabel || browserText || "Signed-In Browser");
-        const metaLabel = session.current ? "This device" : getAccountSessionDateLabel(session.lastSeenAt || session.createdAt);
+        const platformText = session.platformLabel || session.osName || "Device";
+        const titleText = session.deviceLabel || (browserText + " on " + platformText);
         const browserIcon = getAccountSessionBrowserIcon(session);
         const cardClass = "account-login-session-card" + (session.current ? " current" : "");
-        const actions = session.current
+        const currentBadge = session.current
           ? '<span class="account-login-session-current">Current</span>'
-          : '<button class="account-login-session-revoke" type="button" data-account-session-revoke="' + escapeAccountHtml(sessionId) + '">Sign out</button>';
+          : "";
+        const sessionAction = !session.current && sessionId
+          ? '<button class="account-login-session-revoke" type="button" data-account-session-revoke="' + escapeAccountHtml(sessionId) + '">SIGN OUT</button>'
+          : "";
+        const ipText = session.ipAddress
+          ? '<span>IP ' + escapeAccountHtml(session.ipAddress) + '</span>'
+          : "";
 
         return `
           <article class="${cardClass}">
@@ -2380,15 +2386,17 @@
                 </div>
 
                 <div class="account-login-session-actions">
-                  ${actions}
+                  ${currentBadge}
+                  ${sessionAction}
                 </div>
               </div>
 
-              <p>${escapeAccountHtml(deviceText)}</p>
+              <p>${escapeAccountHtml(browserText)} · ${escapeAccountHtml(platformText)}</p>
 
               <div class="account-login-session-meta">
-                <span>${escapeAccountHtml(session.deviceType || "Browser session")}</span>
-                <span>${escapeAccountHtml(metaLabel)}</span>
+                <span>Last active ${escapeAccountHtml(getAccountSessionDateLabel(session.lastSeenAt || session.createdAt))}</span>
+                <span>Signed in ${escapeAccountHtml(getAccountSessionDateLabel(session.createdAt))}</span>
+                ${ipText}
               </div>
             </div>
           </article>
