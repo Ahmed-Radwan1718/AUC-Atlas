@@ -294,24 +294,20 @@
     .courses-search-box input::-webkit-search-cancel-button {
       -webkit-appearance: none;
       appearance: none;
-      width: 28px;
-      height: 28px;
-      margin-left: 14px;
-      border: 0;
-      border-radius: 0;
-      background:
-        linear-gradient(45deg, transparent 43%, #171717 44%, #171717 56%, transparent 57%),
-        linear-gradient(-45deg, transparent 43%, #171717 44%, #171717 56%, transparent 57%);
-      box-shadow: none;
+      width: 14px;
+      height: 14px;
+      margin-left: 12px;
+      border-radius: 50%;
       cursor: pointer;
-      opacity: 0.92;
+      background:
+        linear-gradient(45deg, transparent 43%, rgba(23, 23, 23, 0.9) 44%, rgba(23, 23, 23, 0.9) 56%, transparent 57%),
+        linear-gradient(-45deg, transparent 43%, rgba(23, 23, 23, 0.9) 44%, rgba(23, 23, 23, 0.9) 56%, transparent 57%);
     }
 
     .courses-search-box input::-webkit-search-cancel-button:hover {
       background:
-        linear-gradient(45deg, transparent 43%, #000000 44%, #000000 56%, transparent 57%),
-        linear-gradient(-45deg, transparent 43%, #000000 44%, #000000 56%, transparent 57%);
-      opacity: 1;
+        linear-gradient(45deg, transparent 43%, #171717 44%, #171717 56%, transparent 57%),
+        linear-gradient(-45deg, transparent 43%, #171717 44%, #171717 56%, transparent 57%);
     }
 
     .course-query-strip {
@@ -936,7 +932,7 @@
     }
 
     .material-upload-status {
-      min-height: 22px;
+      min-height: 0;
       margin: 0;
       color: rgba(23, 23, 23, 0.62);
       font-size: 13px;
@@ -944,12 +940,156 @@
       line-height: 1.6;
     }
 
-    .material-upload-status.success {
-      color: #2f6b3f;
+    .material-upload-status:empty {
+      display: none;
     }
 
     .material-upload-status.error {
       color: #9f2f2f;
+    }
+
+    .material-upload-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2400;
+      background: rgba(247, 244, 238, 0.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: grid;
+      place-items: center;
+    }
+
+    .material-upload-overlay[hidden] {
+      display: none;
+    }
+
+    .material-upload-spinner {
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      border: 6px solid rgba(23, 23, 23, 0.12);
+      border-top-color: #171717;
+      animation: materialUploadSpin 0.82s linear infinite;
+    }
+
+    .course-material-downloads {
+      align-content: start;
+    }
+
+    .course-materials-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .course-material-card {
+      min-height: 210px;
+      padding: 16px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 18px 44px rgba(42, 32, 20, 0.08);
+      display: grid;
+      align-content: start;
+      gap: 12px;
+    }
+
+    .course-material-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .course-material-author {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .course-material-avatar,
+    .course-material-avatar-fallback {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #171717;
+      color: #fffdf8;
+      display: grid;
+      place-items: center;
+      object-fit: cover;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .course-material-author strong,
+    .course-material-title {
+      color: #171717;
+      line-height: 1.2;
+    }
+
+    .course-material-author strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .course-material-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .course-material-context {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .course-material-context span {
+      padding: 8px 10px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.72);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .course-material-download-button {
+      width: fit-content;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .course-material-status {
+      margin: 0;
+      padding: 22px;
+      border: 1px dashed rgba(23, 23, 23, 0.16);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.54);
+      color: rgba(23, 23, 23, 0.68);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @keyframes materialUploadSpin {
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     @media (max-width: 980px) {
@@ -1099,25 +1239,26 @@
               </div>
             </section>
 
-            <p class="course-detail-note" id="course-detail-note">
-              This course page is ready for professor links, student notes, ratings, prerequisites, and review details.
-            </p>
           </article>
 
           <aside class="course-action-stack">
-            <section class="course-material-summary" aria-label="Course materials">
+            <section class="course-material-summary course-material-downloads" aria-label="Course materials">
               <div>
                 <span>Materials library</span>
                 <h2>Course files</h2>
               </div>
 
-              <p>No approved materials are listed yet. Uploads can be tagged by professor and semester, then reviewed before they show up here.</p>
+              <p>Download files shared by students for this course.</p>
 
               <div class="course-material-summary-list" aria-label="Supported material types">
                 <span>Notes</span>
                 <span>Slides</span>
                 <span>Past exams</span>
                 <span>Sheets</span>
+              </div>
+
+              <div class="course-materials-list" id="course-materials-list" aria-label="Downloadable course files">
+                <p class="course-material-status">Loading course files...</p>
               </div>
             </section>
 
@@ -1164,6 +1305,10 @@
 
                 <button class="material-upload-button" id="material-upload-button" type="submit">Upload material</button>
                 <p class="material-upload-status" id="material-upload-status" aria-live="polite"></p>
+
+                <div class="material-upload-overlay" id="material-upload-overlay" hidden aria-label="Uploading material" role="status">
+                  <div class="material-upload-spinner"></div>
+                </div>
               </form>
             </section>
           </aside>
