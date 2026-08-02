@@ -402,6 +402,30 @@
     });
   }
 
+  function getCourseSearchQuery() {
+    const searchInput = document.getElementById("course-search-input");
+    return normalize(searchInput ? searchInput.value : "");
+  }
+
+  function getSubjects() {
+    return Array.from(new Set(courses.map(function (course) {
+      return course.subject;
+    }))).sort();
+  }
+
+  function renderCourseStats() {
+    const totalCount = document.getElementById("course-total-count");
+    const subjectCount = document.getElementById("course-subject-count");
+
+    if (totalCount) {
+      totalCount.textContent = courses.length;
+    }
+
+    if (subjectCount) {
+      subjectCount.textContent = getSubjects().length;
+    }
+  }
+
   function renderSubjectFilters() {
     const filtersRoot = document.getElementById("course-subject-filters");
 
@@ -409,11 +433,7 @@
       return;
     }
 
-    const subjects = Array.from(new Set(courses.map(function (course) {
-      return course.subject;
-    }))).sort();
-
-    filtersRoot.innerHTML = subjects.map(function (subject) {
+    filtersRoot.innerHTML = getSubjects().map(function (subject) {
       return `
         <label class="course-filter-pill">
           <input type="checkbox" value="${subject}" data-course-subject>
@@ -428,31 +448,60 @@
   }
 
   function courseMatches(course) {
-    const query = normalize(document.getElementById("course-search-input").value);
+    const query = getCourseSearchQuery();
     const selectedSubjects = getCheckedSubjects();
     const searchableText = normalize([course.code, course.title, course.subject, course.department, course.level].join(" "));
 
     return (!query || searchableText.includes(query)) && (!selectedSubjects.length || selectedSubjects.includes(course.subject));
   }
 
+  function setCoursesSearchState(hasActiveSearch) {
+    const discovery = document.getElementById("course-discovery");
+    const grid = document.getElementById("courses-grid");
+    const count = document.getElementById("courses-result-count");
+
+    if (discovery) {
+      discovery.hidden = hasActiveSearch;
+    }
+
+    if (grid) {
+      grid.hidden = !hasActiveSearch;
+    }
+
+    if (count) {
+      count.hidden = !hasActiveSearch;
+    }
+  }
+
   function renderCourses() {
     const grid = document.getElementById("courses-grid");
     const count = document.getElementById("courses-result-count");
+    const query = getCourseSearchQuery();
+    const selectedSubjects = getCheckedSubjects();
+    const hasActiveSearch = Boolean(query || selectedSubjects.length);
 
     if (!grid) {
       return;
     }
 
-    const visibleCourses = courses.filter(courseMatches);
+    setCoursesSearchState(hasActiveSearch);
 
-    if (count) {
-      count.textContent = visibleCourses.length + " courses";
+    if (!hasActiveSearch) {
+      grid.innerHTML = "";
+      return;
     }
 
-    grid.innerHTML = visibleCourses.map(function (course) {
+    const visibleCourses = courses.filter(courseMatches);
+    const shownCourses = visibleCourses.slice(0, 48);
+
+    if (count) {
+      count.textContent = visibleCourses.length + " matches" + (visibleCourses.length > shownCourses.length ? " · showing first " + shownCourses.length : "");
+    }
+
+    grid.innerHTML = shownCourses.map(function (course) {
       return `
         <article class="course-card">
-          <div>
+          <div class="course-card-main">
             <span class="course-code">${course.code}</span>
             <h2>${course.title}</h2>
           </div>
@@ -465,12 +514,33 @@
     }).join("");
 
     if (!visibleCourses.length) {
-      grid.innerHTML = '<p class="courses-empty">No courses match those filters.</p>';
+      grid.innerHTML = '<p class="courses-empty">No courses found. Try a course code, subject, department, or broader keyword.</p>';
     }
+  }
+
+  function setupCourseQueryButtons() {
+    document.querySelectorAll("[data-course-query]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        const searchInput = document.getElementById("course-search-input");
+
+        document.querySelectorAll("[data-course-subject]").forEach(function (input) {
+          input.checked = false;
+        });
+
+        if (searchInput) {
+          searchInput.value = button.dataset.courseQuery || "";
+          searchInput.focus();
+        }
+
+        renderCourses();
+      });
+    });
   }
 
   function setupCoursesPage() {
     renderSubjectFilters();
+    renderCourseStats();
+    setupCourseQueryButtons();
 
     const searchInput = document.getElementById("course-search-input");
 
