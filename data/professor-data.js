@@ -786,9 +786,15 @@
 
     .professor-review-insights-hidden {
       order: 1;
+      box-sizing: border-box;
       display: grid;
       gap: 8px;
       margin-top: 0;
+      overflow: hidden;
+      opacity: 1;
+      transform: translateY(0);
+      transition: height 0.28s ease, opacity 0.22s ease, transform 0.22s ease;
+      will-change: height, opacity, transform;
     }
 
     .professor-review-insights-more-toggle {
@@ -808,6 +814,7 @@
       align-items: center;
       gap: 8px;
       list-style: none;
+      transition: color 0.18s ease, transform 0.18s ease;
     }
 
     .professor-review-insights-more-toggle::after {
@@ -907,9 +914,15 @@
     }
 
     .professor-review-detail-panel {
-      margin-top: 10px;
+      box-sizing: border-box;
+      padding-top: 10px;
       display: grid;
       gap: 8px;
+      overflow: hidden;
+      opacity: 1;
+      transform: translateY(0);
+      transition: height 0.28s ease, opacity 0.22s ease, transform 0.22s ease;
+      will-change: height, opacity, transform;
     }
 
     .professor-review-detail-row {
@@ -1386,6 +1399,71 @@
       : "";
 
     panel.innerHTML = visibleRows.map(renderInsightCard).join("") + hiddenMarkup;
+    panel.querySelectorAll(".professor-review-detail, .professor-review-insights-more").forEach(setupProfessorReviewDetailAnimation);
+  }
+
+  function setupProfessorReviewDetailAnimation(details) {
+    const summary = details.querySelector("summary");
+    const content = details.classList.contains("professor-review-insights-more")
+      ? details.querySelector(".professor-review-insights-hidden")
+      : details.querySelector(".professor-review-detail-panel");
+
+    if (!summary || !content || details.dataset.reviewAnimationReady === "true") {
+      return;
+    }
+
+    let closeTimer = null;
+    details.dataset.reviewAnimationReady = "true";
+
+    if (!details.open) {
+      content.style.height = "0px";
+      content.style.opacity = "0";
+      content.style.transform = "translateY(-6px)";
+    }
+
+    summary.addEventListener("click", function (event) {
+      event.preventDefault();
+
+      if (closeTimer) {
+        window.clearTimeout(closeTimer);
+        closeTimer = null;
+      }
+
+      if (details.open) {
+        content.style.height = content.scrollHeight + "px";
+        content.style.opacity = "1";
+        content.style.transform = "translateY(0)";
+
+        window.requestAnimationFrame(function () {
+          content.style.height = "0px";
+          content.style.opacity = "0";
+          content.style.transform = "translateY(-6px)";
+        });
+
+        closeTimer = window.setTimeout(function () {
+          details.open = false;
+        }, 280);
+
+        return;
+      }
+
+      details.open = true;
+      content.style.height = "0px";
+      content.style.opacity = "0";
+      content.style.transform = "translateY(-6px)";
+
+      window.requestAnimationFrame(function () {
+        content.style.height = content.scrollHeight + "px";
+        content.style.opacity = "1";
+        content.style.transform = "translateY(0)";
+      });
+    });
+
+    content.addEventListener("transitionend", function (event) {
+      if (event.propertyName === "height" && details.open) {
+        content.style.height = "auto";
+      }
+    });
   }
 
   function renderReviewStars(rating) {
