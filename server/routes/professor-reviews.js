@@ -46,6 +46,7 @@ function getTimestampMillis(value) {
 function serializeReview(doc) {
   const data = doc.data() || {};
   const createdAtMillis = getTimestampMillis(data.createdAt);
+  const authorUid = data.authorUid || data.authorUserId || "";
 
   return {
     id: doc.id,
@@ -65,6 +66,8 @@ function serializeReview(doc) {
     gradingTransparency: data.gradingTransparency || "",
     feedbackQuality: data.feedbackQuality || "",
     studentNote: data.studentNote || "",
+    authorUid,
+    authorUserId: authorUid,
     authorName: data.authorName || "AUC student",
     authorPhotoURL: data.authorPhotoURL || "",
     createdAt: createdAtMillis ? new Date(createdAtMillis).toISOString() : (data.createdAtIso || "")
@@ -183,6 +186,7 @@ module.exports = async function handler(req, res) {
       feedbackQuality: cleanChoice(body.feedbackQuality, "feedbackQuality"),
       studentNote,
       authorUid: decodedUser.uid,
+      authorUserId: decodedUser.uid,
       authorName: authorProfile.authorName,
       authorPhotoURL: authorProfile.authorPhotoURL,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
