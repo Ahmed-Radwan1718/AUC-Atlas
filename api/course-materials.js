@@ -11,6 +11,26 @@ function cleanUrl(value) {
   return /^https?:\/\//i.test(url) ? url : "";
 }
 
+const MATERIAL_TYPE_CHOICES = [
+  "Notes",
+  "Slides",
+  "Past exam",
+  "Practice sheet",
+  "Lab file",
+  "Assignment",
+  "Project",
+  "Review sheet"
+];
+
+const MATERIAL_TYPE_LOOKUP = MATERIAL_TYPE_CHOICES.reduce(function (lookup, materialType) {
+  lookup[materialType.toLowerCase()] = materialType;
+  return lookup;
+}, {});
+
+function cleanMaterialType(value) {
+  return MATERIAL_TYPE_LOOKUP[cleanString(value, 80).toLowerCase()] || "";
+}
+
 function getTimestampMillis(value) {
   if (!value) return 0;
   if (typeof value.toDate === "function") return value.toDate().getTime();
@@ -30,11 +50,13 @@ function serializeMaterialData(id, data) {
     courseTitle: data.courseTitle || "",
     professor: data.professor || "",
     semester: data.semester || "",
+    materialType: data.materialType || data.type || data.category || "",
     title: data.title || "",
     fileName: data.fileName || "",
-    fileUrl: data.fileUrl || "",
-    filePath: data.filePath || "",
-    fileId: data.fileId || "",
+    fileUrl: "",
+    downloadUrl: id ? "/api/course-material-download?id=" + encodeURIComponent(id) : "",
+    filePath: "",
+    fileId: "",
     size: Number(data.size || 0),
     fileType: data.fileType || "",
     status: data.status || "pending",
@@ -55,11 +77,12 @@ function createMaterialError(message, statusCode) {
   return error;
 }
 
-async function ensureVerifiedUploader(decodedUser) {
+async function ensureVerifiedMaterialUser(decodedUser, action) {
   const userRecord = await admin.auth().getUser(decodedUser.uid);
+  const email = String(userRecord.email || decodedUser.email || "").trim().toLowerCase();
 
-  if (!userRecord.emailVerified) {
-    throw createMaterialError("Please verify your email address before uploading materials.", 403);
+  if (!userRecord.emailVerified || !email.endsWith("@aucegypt.edu")) {
+    throw createMaterialError("Please verify your AUC email address before " + (action || "accessing course materials") + ".", 403);
   }
 
   return userRecord;
@@ -117,6 +140,12 @@ function getRequestBody(req) {
 module.exports = async function handler(req, res) {
   try {
     if (req.method === "GET") {
+      const decodedUser = await getSiteSessionUser(req, {
+        checkRevoked: true
+      });
+
+      await ensureVerifiedMaterialUser(decodedUser, "accessing course materials");
+
       const courseCode = cleanString((req.query || {}).courseCode, 40).toUpperCase();
 
       if (!courseCode) {
@@ -137,7 +166,7 @@ module.exports = async function handler(req, res) {
     const decodedUser = await getSiteSessionUser(req, {
       checkRevoked: true
     });
-    const userRecord = await ensureVerifiedUploader(decodedUser);
+    const userRecord = await ensureVerifiedMaterialUser(decodedUser, "uploading materials");
     const uploader = await getUploaderProfile(decodedUser, userRecord);
     const body = getRequestBody(req);
 
@@ -145,6 +174,7 @@ module.exports = async function handler(req, res) {
     const courseTitle = cleanString(body.courseTitle, 160);
     const professor = cleanString(body.professor, 120);
     const semester = cleanString(body.semester, 80);
+    const materialType = cleanMaterialType(body.materialType || body.type || body.category);
     const title = cleanString(body.title, 160);
     const fileName = cleanString(body.fileName, 240);
     const fileUrl = cleanUrl(body.fileUrl);
@@ -154,7 +184,7 @@ module.exports = async function handler(req, res) {
     const fileType = cleanString(body.fileType, 80);
     const createdAtIso = new Date().toISOString();
 
-    if (!courseCode || !title || !fileUrl) {
+    if (!courseCode || !title || !materialType || !filePath) {
       throw createMaterialError("Could not save this course material.", 400);
     }
 
@@ -163,6 +193,7 @@ module.exports = async function handler(req, res) {
       courseTitle,
       professor,
       semester,
+      materialType,
       title,
       fileName,
       fileUrl,
