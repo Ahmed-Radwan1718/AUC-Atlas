@@ -677,6 +677,8 @@
       const choice = document.createElement("div");
       const button = document.createElement("button");
       const menu = document.createElement("div");
+      const isProfessorSelect = select.id === "material-professor";
+      let searchInput = null;
 
       choice.className = "material-choice";
       button.type = "button";
@@ -685,6 +687,63 @@
       button.setAttribute("aria-expanded", "false");
       menu.className = "material-choice-menu";
       menu.setAttribute("role", "listbox");
+
+      function filterChoiceOptions(query) {
+        const terms = String(query || "")
+          .toLowerCase()
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
+
+        menu.querySelectorAll(".material-choice-option").forEach(function (optionButton) {
+          const optionText = optionButton.textContent.toLowerCase();
+          const hasValue = Boolean(optionButton.dataset.value);
+          const matches = !terms.length || (hasValue && terms.every(function (term) {
+            return optionText.indexOf(term) !== -1;
+          }));
+
+          optionButton.hidden = !matches;
+        });
+      }
+
+      function clearChoiceSearch() {
+        if (searchInput) {
+          searchInput.value = "";
+          filterChoiceOptions("");
+        }
+      }
+
+      if (isProfessorSelect) {
+        const searchWrap = document.createElement("div");
+
+        searchInput = document.createElement("input");
+        searchInput.type = "search";
+        searchInput.className = "material-choice-search";
+        searchInput.placeholder = "Search professors";
+        searchInput.setAttribute("aria-label", "Search professors");
+        searchInput.setAttribute("autocomplete", "new-password");
+        searchInput.setAttribute("autocorrect", "off");
+        searchInput.setAttribute("autocapitalize", "none");
+        searchInput.setAttribute("spellcheck", "false");
+        searchInput.setAttribute("data-lpignore", "true");
+        searchInput.setAttribute("data-form-type", "other");
+
+        searchWrap.className = "material-choice-search-wrap";
+        searchWrap.appendChild(searchInput);
+        menu.appendChild(searchWrap);
+
+        searchInput.addEventListener("input", function () {
+          filterChoiceOptions(searchInput.value);
+        });
+
+        searchInput.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            clearChoiceSearch();
+            searchInput.blur();
+          }
+        });
+      }
 
       Array.from(select.options).forEach(function (option) {
         const optionButton = document.createElement("button");
@@ -700,6 +759,7 @@
           select.dispatchEvent(new Event("change", { bubbles: true }));
           choice.classList.remove("open");
           button.setAttribute("aria-expanded", "false");
+          clearChoiceSearch();
           syncMaterialChoiceButton(choice, select);
         });
 
@@ -712,12 +772,21 @@
         closeMaterialChoiceMenus(choice);
         choice.classList.toggle("open", willOpen);
         button.setAttribute("aria-expanded", willOpen ? "true" : "false");
+
+        if (willOpen && searchInput) {
+          window.setTimeout(function () {
+            searchInput.focus();
+          }, 0);
+        } else {
+          clearChoiceSearch();
+        }
       });
 
       document.addEventListener("click", function (event) {
         if (!choice.contains(event.target)) {
           choice.classList.remove("open");
           button.setAttribute("aria-expanded", "false");
+          clearChoiceSearch();
         }
       });
 
