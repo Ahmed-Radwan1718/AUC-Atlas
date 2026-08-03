@@ -824,6 +824,111 @@
     });
   }
 
+  function escapeMaterialText(value) {
+    return String(value || "").replace(/[&<>"']/g, function (character) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      }[character];
+    });
+  }
+
+  function getMaterialInitials(name) {
+    return String(name || "AUC student")
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map(function (part) {
+        return part.charAt(0).toUpperCase();
+      })
+      .join("") || "A";
+  }
+
+  function renderCourseMaterials(materials) {
+    const list = document.getElementById("course-materials-list");
+
+    if (!list) {
+      return;
+    }
+
+    if (!materials.length) {
+      list.innerHTML = '<p class="course-material-status">No course files shared yet.</p>';
+      return;
+    }
+
+    list.innerHTML = materials.map(function (material) {
+      const uploaderName = escapeMaterialText(material.uploaderDisplayName || "AUC student");
+      const uploaderPhoto = escapeMaterialText(material.uploaderPhotoURL || "");
+      const avatar = uploaderPhoto
+        ? '<img class="course-material-avatar" src="' + uploaderPhoto + '" alt="">'
+        : '<span class="course-material-avatar-fallback">' + escapeMaterialText(getMaterialInitials(uploaderName)) + '</span>';
+
+      return `
+        <article class="course-material-card">
+          <div class="course-material-card-top">
+            <div class="course-material-author">
+              ${avatar}
+              <strong>${uploaderName}</strong>
+            </div>
+          </div>
+
+          <h3 class="course-material-title">${escapeMaterialText(material.title || "Course material")}</h3>
+
+          <div class="course-material-context">
+            <span>${escapeMaterialText(material.materialType || "Material")}</span>
+            <span>${escapeMaterialText(material.professor || "Professor not listed")}</span>
+            <span>${escapeMaterialText(material.semester || "Semester not listed")}</span>
+          </div>
+
+          <a class="course-material-download-button" href="${escapeMaterialText(material.downloadUrl || "#")}">Download</a>
+        </article>
+      `;
+    }).join("");
+  }
+
+  async function loadCourseMaterials(course) {
+    const access = document.getElementById("course-materials-access");
+    const list = document.getElementById("course-materials-list");
+
+    if (list) {
+      list.innerHTML = '<p class="course-material-status">Loading course files...</p>';
+    }
+
+    try {
+      const response = await fetch("/api/course-materials?courseCode=" + encodeURIComponent(course.code), {
+        credentials: "same-origin"
+      });
+
+      if (!response.ok) {
+        if (access) {
+          access.hidden = true;
+        }
+
+        return;
+      }
+
+      const data = await response.json();
+
+      if (access) {
+        access.hidden = false;
+      }
+
+      renderCourseMaterials(Array.isArray(data.materials) ? data.materials : []);
+    } catch (error) {
+      if (access) {
+        access.hidden = true;
+      }
+    }
+  }
+
+  function setupCourseMaterialsAccess(course) {
+    setupMaterialUploadForm(course);
+    loadCourseMaterials(course);
+  }
+
   function renderCourseDetail(courseCode) {
     const listView = document.getElementById("courses-list-view");
     const detailView = document.getElementById("course-detail-view");
@@ -864,12 +969,7 @@
     setCourseDetailText("course-detail-full-code", selectedCourse.code);
     setCourseDetailText("course-detail-note", "This course page is ready for professor links, student notes, ratings, prerequisites, and review details.");
     renderCourseProfessors(selectedCourse);
-
-    if (typeof loadCourseMaterials === "function") {
-      loadCourseMaterials(selectedCourse);
-    }
-
-    setupMaterialUploadForm(selectedCourse);
+    setupCourseMaterialsAccess(selectedCourse);
 
     return true;
   }
