@@ -830,6 +830,56 @@
     status.textContent = message;
   }
 
+  function getMaterialProfessorOptions() {
+    const source = Array.isArray(window.aucAtlasProfessors) ? window.aucAtlasProfessors : [];
+    const seen = {};
+    const names = [];
+
+    source.forEach(function (professor) {
+      const name = String(professor && professor.name ? professor.name : "").trim();
+      const key = name.toLowerCase().replace(/\s+/g, " ");
+
+      if (name && !seen[key]) {
+        seen[key] = true;
+        names.push(name);
+      }
+    });
+
+    return names.sort(function (firstName, secondName) {
+      return firstName.localeCompare(secondName);
+    });
+  }
+
+  function populateMaterialProfessorSelect(form) {
+    const select = form.querySelector("#material-professor");
+
+    if (!select || select.dataset.professorOptionsReady === "true") {
+      return;
+    }
+
+    const currentValue = select.value;
+    const professorNames = getMaterialProfessorOptions();
+    const placeholder = document.createElement("option");
+
+    select.dataset.professorOptionsReady = "true";
+    select.innerHTML = "";
+    placeholder.value = "";
+    placeholder.textContent = "Choose professor";
+    select.appendChild(placeholder);
+
+    professorNames.forEach(function (name) {
+      const option = document.createElement("option");
+
+      option.value = name;
+      option.textContent = name;
+      select.appendChild(option);
+    });
+
+    if (currentValue && professorNames.includes(currentValue)) {
+      select.value = currentValue;
+    }
+  }
+
   function setupMaterialUploadForm(course) {
     const form = document.getElementById("material-upload-form");
     const button = document.getElementById("material-upload-button");
@@ -840,6 +890,7 @@
 
     form.dataset.ready = "true";
     form.noValidate = true;
+    populateMaterialProfessorSelect(form);
     setupMaterialChoiceMenus(form);
     setupMaterialFilePicker(form);
 
