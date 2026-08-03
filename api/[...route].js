@@ -1,6 +1,7 @@
 const routeLoaders = {
   "authenticator": function () { return require("../server/routes/authenticator"); },
   "change-password": function () { return require("../server/routes/change-password"); },
+  "course-material-download": function () { return require("../server/routes/course-material-download"); },
   "login": function () { return require("../server/routes/login"); },
   "logout": function () { return require("../server/routes/logout"); },
   "me": function () { return require("../server/routes/me"); },
