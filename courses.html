@@ -1270,7 +1270,9 @@
                 <div class="material-upload-grid">
                   <label class="material-upload-field">
                     <span>Professor</span>
-                    <input id="material-professor" type="text" placeholder="Professor name" required>
+                    <select class="material-native-select" id="material-professor" required>
+                      <option value="">Choose professor</option>
+                    </select>
                   </label>
 
                   <label class="material-upload-field">
@@ -1317,6 +1319,7 @@
     </div>
   </main>
 
+  <script src="data/professor-data.js"></script>
   <script src="data/courses.js"></script>
 </body>
 </html>
