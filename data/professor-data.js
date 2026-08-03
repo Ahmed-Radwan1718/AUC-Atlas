@@ -93,6 +93,8 @@
     })
   ];
 
+  window.aucAtlasProfessors = professors;
+
   const style = document.createElement("style");
   style.textContent = `
     .professors-browser {
