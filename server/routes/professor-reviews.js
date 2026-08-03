@@ -10,7 +10,7 @@ const allowedValues = {
   officeHours: ["Helpful", "Available but limited", "Hard to reach", "Did not use"],
   gradingStyle: ["Exams-heavy", "Projects-heavy", "Assignments-heavy", "Participation-heavy", "Mixed"],
   examDifficulty: ["Easier than class material", "Matches class material", "Harder than class material", "No exams"],
-  gradingTransparency: ["Rubrics clear", "Somewhat clear", "Unclear"],
+  gradingTransparency: ["Rubric is clear", "Somewhat clear", "Unclear"],
   feedbackQuality: ["Helpful", "Minimal", "None", "Not applicable"]
 };
 
@@ -24,7 +24,11 @@ function cleanNote(value, maxLength) {
 
 function cleanChoice(value, key) {
   const cleanedValue = cleanString(value, 80);
-  return allowedValues[key].includes(cleanedValue) ? cleanedValue : "";
+  const normalizedValue = key === "gradingTransparency" && cleanedValue === "Rubrics clear"
+    ? "Rubric is clear"
+    : cleanedValue;
+
+  return allowedValues[key].includes(normalizedValue) ? normalizedValue : "";
 }
 
 function createReviewError(message, statusCode) {
@@ -63,7 +67,7 @@ function serializeReview(doc) {
     officeHours: data.officeHours || "",
     gradingStyle: data.gradingStyle || "",
     examDifficulty: data.examDifficulty || "",
-    gradingTransparency: data.gradingTransparency || "",
+    gradingTransparency: data.gradingTransparency === "Rubrics clear" ? "Rubric is clear" : (data.gradingTransparency || ""),
     feedbackQuality: data.feedbackQuality || "",
     studentNote: data.studentNote || "",
     authorUid,
