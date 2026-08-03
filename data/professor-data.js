@@ -725,6 +725,38 @@
       transform: translateY(0);
     }
 
+    .review-choice-search-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 0 0 6px;
+      background: rgba(255, 255, 255, 0.98);
+    }
+
+    .review-choice-search {
+      width: 100%;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 12px;
+      background: rgba(247, 244, 238, 0.74);
+      color: #171717;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 400;
+      outline: none;
+    }
+
+    .review-choice-search:focus {
+      border-color: rgba(192, 154, 92, 0.5);
+      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.1);
+    }
+
+    .review-field[hidden],
+    .review-choice-option[hidden] {
+      display: none;
+    }
+
     .review-choice-option {
       width: 100%;
       min-height: 38px;
@@ -1357,7 +1389,7 @@
       { key: "officeHours", label: "Office hours/help", options: ["Helpful", "Available but limited", "Hard to reach", "Did not use"], sentence: function (answer) { return answer.percent + "% of students report office hours/help is " + answer.value.toLowerCase() + "."; } },
       { key: "gradingStyle", label: "Grading style", options: ["Exams-heavy", "Projects-heavy", "Assignments-heavy", "Participation-heavy", "Mixed"], sentence: function (answer) { return answer.percent + "% of students report grading style is " + answer.value.replace(/-/g, " ").toLowerCase() + "."; } },
       { key: "examDifficulty", label: "Exam difficulty", options: ["Easier than class material", "Matches class material", "Harder than class material", "No exams"], sentence: function (answer) { return answer.percent + "% of students report exam difficulty is " + answer.value.toLowerCase() + "."; } },
-      { key: "gradingTransparency", label: "Grading transparency", options: ["Rubrics clear", "Somewhat clear", "Unclear"], sentence: function (answer) { return answer.percent + "% of students report grading transparency is " + answer.value.toLowerCase() + "."; } },
+      { key: "gradingTransparency", label: "Grading transparency", options: ["Rubric is clear", "Somewhat clear", "Unclear"], sentence: function (answer) { return answer.percent + "% of students report grading transparency is " + answer.value.toLowerCase() + "."; } },
       { key: "feedbackQuality", label: "Feedback quality", options: ["Helpful", "Minimal", "None", "Not applicable"], sentence: function (answer) { return answer.percent + "% of students report feedback quality is " + answer.value.toLowerCase() + "."; } }
     ];
 
@@ -1737,12 +1769,28 @@
 
               <div class="review-field">
                 <label for="review-course">Course taken</label>
-                <input id="review-course" name="courseTaken" type="text" placeholder="Example: CSCE 1101" required>
+                <select id="review-course" name="courseTaken" required>
+                  <option value="" selected disabled>Choose course</option>
+                </select>
               </div>
 
               <div class="review-field">
                 <label for="review-semester">Semester taken</label>
-                <input id="review-semester" name="semesterTaken" type="text" placeholder="Example: Fall 2026" required>
+                <select id="review-semester" name="semesterTaken" required>
+                  <option value="" selected disabled>Choose semester</option>
+                  <option>Fall 2026</option>
+                  <option>Summer 2026</option>
+                  <option>Spring 2026</option>
+                  <option>Winter 2026</option>
+                  <option>Fall 2025</option>
+                  <option>Summer 2025</option>
+                  <option>Spring 2025</option>
+                  <option>Winter 2025</option>
+                  <option>Fall 2024</option>
+                  <option>Summer 2024</option>
+                  <option>Spring 2024</option>
+                  <option>Winter 2024</option>
+                </select>
               </div>
 
               <div class="review-field">
@@ -1766,7 +1814,7 @@
                 </select>
               </div>
 
-              <div class="review-field full">
+              <div class="review-field full" data-depends-reason hidden>
                 <label for="review-recommend-reason">If your answer depends, what does it depend on?</label>
                 <input id="review-recommend-reason" name="recommendationReason" type="text" maxlength="220" placeholder="Example: Great for lectures, harder for exams">
               </div>
@@ -1838,7 +1886,7 @@
               <div class="review-field">
                 <label for="review-transparency">Grading transparency</label>
                 <select id="review-transparency" name="gradingTransparency">
-                  <option>Rubrics clear</option>
+                  <option>Rubric is clear</option>
                   <option>Somewhat clear</option>
                   <option>Unclear</option>
                 </select>
@@ -1855,7 +1903,7 @@
               </div>
 
               <div class="review-field full">
-                <label for="review-note">What should a student know before taking this professor?</label>
+                <label for="review-note">Additional comments</label>
                 <textarea id="review-note" name="studentNote" maxlength="360" required></textarea>
               </div>
 
@@ -1899,11 +1947,88 @@
     loadProfessorReviews(getProfessorId(professor));
   }
 
+  function populateReviewCourseSelect(form) {
+    const select = form.querySelector("#review-course");
+    const courses = Array.isArray(window.aucAtlasCourses) ? window.aucAtlasCourses : [];
+
+    if (!select || select.dataset.courseOptionsReady === "true") {
+      return;
+    }
+
+    const currentValue = select.value;
+    const placeholder = document.createElement("option");
+
+    select.dataset.courseOptionsReady = "true";
+    select.innerHTML = "";
+    placeholder.value = "";
+    placeholder.textContent = "Choose course";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
+    courses.forEach(function (course) {
+      const code = String(course && course.code ? course.code : "").trim();
+      const title = String(course && course.title ? course.title : "").trim();
+
+      if (!code) {
+        return;
+      }
+
+      const option = document.createElement("option");
+
+      option.value = code;
+      option.textContent = code + (title ? " - " + title : "");
+      select.appendChild(option);
+    });
+
+    if (currentValue) {
+      select.value = currentValue;
+    }
+  }
+
+  function setupReviewDependsField(form) {
+    const select = form.querySelector("#review-recommend");
+    const field = form.querySelector("[data-depends-reason]");
+    const input = form.querySelector("#review-recommend-reason");
+
+    if (!select || !field || field.dataset.dependsReady === "true") {
+      return;
+    }
+
+    field.dataset.dependsReady = "true";
+
+    function syncDependsField() {
+      const shouldShow = select.value === "Depends";
+
+      field.hidden = !shouldShow;
+
+      if (!shouldShow && input) {
+        input.value = "";
+      }
+    }
+
+    select.addEventListener("change", syncDependsField);
+    syncDependsField();
+  }
+
   function setupReviewChoiceMenus(form) {
+    function resetChoiceSearch(choice) {
+      const searchInput = choice.querySelector(".review-choice-search");
+
+      if (searchInput) {
+        searchInput.value = "";
+      }
+
+      choice.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+        optionButton.hidden = false;
+      });
+    }
+
     function closeChoices(exceptChoice) {
       form.querySelectorAll(".review-choice.open").forEach(function (choice) {
         if (choice !== exceptChoice) {
           choice.classList.remove("open");
+          resetChoiceSearch(choice);
         }
       });
     }
@@ -1920,6 +2045,8 @@
       const button = document.createElement("button");
       const label = document.createElement("span");
       const menu = document.createElement("div");
+      const isSearchable = select.id === "review-course";
+      let searchInput = null;
 
       choice.className = "review-choice";
       button.className = "review-choice-button";
@@ -1932,11 +2059,68 @@
         label.textContent = selectedOption ? selectedOption.textContent : "";
       }
 
+      function syncSelectedOption() {
+        menu.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+          optionButton.classList.toggle("is-selected", optionButton.dataset.choiceValue === select.value);
+        });
+      }
+
+      function filterChoiceOptions(query) {
+        const terms = String(query || "")
+          .toLowerCase()
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
+
+        menu.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+          const searchText = optionButton.dataset.choiceSearchText || "";
+          const hasValue = Boolean(optionButton.dataset.choiceValue);
+          const matches = !terms.length || (hasValue && terms.every(function (term) {
+            return searchText.indexOf(term) !== -1;
+          }));
+
+          optionButton.hidden = !matches;
+        });
+      }
+
+      if (isSearchable) {
+        const searchWrap = document.createElement("div");
+
+        searchInput = document.createElement("input");
+        searchInput.type = "search";
+        searchInput.className = "review-choice-search";
+        searchInput.placeholder = "Search courses";
+        searchInput.setAttribute("aria-label", "Search courses");
+        searchInput.setAttribute("autocomplete", "new-password");
+        searchInput.setAttribute("autocorrect", "off");
+        searchInput.setAttribute("autocapitalize", "none");
+        searchInput.setAttribute("spellcheck", "false");
+
+        searchWrap.className = "review-choice-search-wrap";
+        searchWrap.appendChild(searchInput);
+        menu.appendChild(searchWrap);
+
+        searchInput.addEventListener("input", function () {
+          filterChoiceOptions(searchInput.value);
+        });
+
+        searchInput.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            resetChoiceSearch(choice);
+            choice.classList.remove("open");
+          }
+        });
+      }
+
       Array.from(select.options).forEach(function (option) {
         const optionButton = document.createElement("button");
+
         optionButton.className = "review-choice-option";
         optionButton.type = "button";
+        optionButton.disabled = option.disabled;
         optionButton.dataset.choiceValue = option.value;
+        optionButton.dataset.choiceSearchText = (option.value + " " + option.textContent).toLowerCase();
         optionButton.textContent = option.textContent;
         menu.appendChild(optionButton);
       });
@@ -1946,31 +2130,42 @@
       choice.appendChild(menu);
       select.insertAdjacentElement("afterend", choice);
       syncLabel();
+      syncSelectedOption();
 
       button.addEventListener("click", function (event) {
+        const willOpen = !choice.classList.contains("open");
+
         event.stopPropagation();
         closeChoices(choice);
-        choice.classList.toggle("open");
+        choice.classList.toggle("open", willOpen);
+
+        if (willOpen && searchInput) {
+          window.setTimeout(function () {
+            searchInput.focus();
+          }, 0);
+        } else {
+          resetChoiceSearch(choice);
+        }
       });
 
       menu.addEventListener("click", function (event) {
         const optionButton = event.target.closest("[data-choice-value]");
 
-        if (!optionButton) {
+        if (!optionButton || optionButton.disabled) {
           return;
         }
 
         select.value = optionButton.dataset.choiceValue;
         syncLabel();
-        menu.querySelectorAll(".review-choice-option").forEach(function (button) {
-          button.classList.toggle("is-selected", button.dataset.choiceValue === select.value);
-        });
+        syncSelectedOption();
         choice.classList.remove("open");
+        resetChoiceSearch(choice);
         select.dispatchEvent(new Event("change", { bubbles: true }));
       });
 
-      menu.querySelectorAll(".review-choice-option").forEach(function (button) {
-        button.classList.toggle("is-selected", button.dataset.choiceValue === select.value);
+      select.addEventListener("change", function () {
+        syncLabel();
+        syncSelectedOption();
       });
     });
 
@@ -2055,7 +2250,9 @@
       return;
     }
 
+    populateReviewCourseSelect(form);
     setupReviewChoiceMenus(form);
+    setupReviewDependsField(form);
 
     form.addEventListener("submit", function (event) {
       event.preventDefault();
