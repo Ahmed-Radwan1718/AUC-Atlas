@@ -678,7 +678,11 @@
 
     .course-action-stack {
       display: grid;
-      gap: 18px;
+      gap: 20px;
+    }
+
+    .course-action-stack[hidden] {
+      display: none;
     }
 
     .course-material-summary {
@@ -746,13 +750,13 @@
 
     .material-upload-form {
       display: grid;
-      gap: 12px;
+      gap: 16px;
     }
 
     .material-upload-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 12px;
+      gap: 14px;
     }
 
     .material-upload-field {
@@ -839,7 +843,7 @@
       top: calc(100% + 8px);
       right: 0;
       left: 0;
-      max-height: 240px;
+      max-height: min(260px, 52vh);
       overflow: auto;
       padding: 6px;
       border: 1px solid rgba(23, 23, 23, 0.1);
@@ -852,6 +856,33 @@
     .material-choice.open .material-choice-menu {
       display: grid;
       gap: 4px;
+    }
+
+    .material-choice-search-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 2px 2px 6px;
+      background: #ffffff;
+    }
+
+    .material-choice-search {
+      min-height: 42px;
+      width: 100%;
+      padding: 0 12px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 12px;
+      background: rgba(247, 244, 238, 0.74);
+      color: #171717;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .material-choice-search:focus {
+      border-color: rgba(192, 154, 92, 0.58);
+      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.12);
     }
 
     .material-choice-option {
@@ -1241,7 +1272,7 @@
 
           </article>
 
-          <aside class="course-action-stack">
+          <aside class="course-action-stack" id="course-materials-access" hidden>
             <section class="course-material-summary course-material-downloads" aria-label="Course materials">
               <div>
                 <span>Materials library</span>
@@ -1272,6 +1303,21 @@
                     <span>Professor</span>
                     <select class="material-native-select" id="material-professor" required>
                       <option value="">Choose professor</option>
+                    </select>
+                  </label>
+
+                  <label class="material-upload-field">
+                    <span>Material type</span>
+                    <select class="material-native-select" id="material-type" required>
+                      <option value="">Choose material type</option>
+                      <option value="Notes">Notes</option>
+                      <option value="Slides">Slides</option>
+                      <option value="Past exam">Past exam</option>
+                      <option value="Practice sheet">Practice sheet</option>
+                      <option value="Lab file">Lab file</option>
+                      <option value="Assignment">Assignment</option>
+                      <option value="Project">Project</option>
+                      <option value="Review sheet">Review sheet</option>
                     </select>
                   </label>
 
