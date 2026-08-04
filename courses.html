@@ -689,6 +689,69 @@
       display: none;
     }
 
+    .course-materials-loading {
+      min-height: 420px;
+      padding: 32px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 20px 54px rgba(42, 32, 20, 0.1);
+      color: rgba(23, 23, 23, 0.58);
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .course-materials-loading[hidden] {
+      display: none;
+    }
+
+    .course-materials-loading-spinner {
+      width: 46px;
+      height: 46px;
+      border: 4px solid rgba(23, 23, 23, 0.1);
+      border-top-color: rgba(192, 154, 92, 0.92);
+      border-radius: 999px;
+      animation: courseMaterialsLoadingSpin 0.8s linear infinite;
+    }
+
+    .course-materials-loading p {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .course-action-stack.is-loading > .course-material-summary,
+    .course-action-stack.is-loading > .material-upload-panel {
+      display: none;
+    }
+
+    .course-action-stack:not(.is-loading) > .course-material-summary,
+    .course-action-stack:not(.is-loading) > .material-upload-panel {
+      animation: courseMaterialsReady 0.28s ease both;
+    }
+
+    @keyframes courseMaterialsLoadingSpin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes courseMaterialsReady {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .course-material-summary {
       padding: 22px;
       display: grid;
@@ -1279,7 +1342,12 @@
 
           </article>
 
-          <aside class="course-action-stack" id="course-materials-access" hidden>
+          <aside class="course-action-stack is-loading" id="course-materials-access" aria-busy="true">
+            <div class="course-materials-loading" id="course-materials-loading" role="status" aria-live="polite">
+              <div class="course-materials-loading-spinner" aria-hidden="true"></div>
+              <p>Loading course materials</p>
+            </div>
+
             <section class="course-material-summary course-material-downloads" aria-label="Course materials">
               <div>
                 <span>Materials library</span>
