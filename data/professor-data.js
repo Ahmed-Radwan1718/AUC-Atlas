@@ -1711,19 +1711,13 @@
     row.hidden = !reviewedCourses.length;
 
     if (!reviewedCourses.length) {
-      list.innerHTML = "";
+      list.textContent = "";
       return;
     }
 
-    list.innerHTML = reviewedCourses.map(function (course) {
-      const courseLabel = course.code + (course.title ? " - " + course.title : "");
-
-      return `
-        <a class="professor-profile-course-link" href="courses.html?course=${encodeURIComponent(course.code)}">
-          ${escapeHtml(courseLabel)}
-        </a>
-      `;
-    }).join("");
+    list.textContent = reviewedCourses.map(function (course) {
+      return course.title || course.code;
+    }).join(", ");
   }
 
   function renderProfessorReviews(reviews) {
