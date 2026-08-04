@@ -532,8 +532,24 @@
     .course-profile-layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(330px, 410px);
+      grid-template-areas:
+        "course upload"
+        "materials upload";
       gap: 18px;
       align-items: start;
+    }
+
+    .course-profile-card {
+      grid-area: course;
+    }
+
+    .course-materials-loading,
+    .course-material-summary {
+      grid-area: materials;
+    }
+
+    .material-upload-panel {
+      grid-area: upload;
     }
 
     .course-profile-card,
@@ -681,8 +697,7 @@
     }
 
     .course-action-stack {
-      display: grid;
-      gap: 20px;
+      display: contents;
     }
 
     .course-action-stack[hidden] {
@@ -1315,6 +1330,10 @@
     @media (max-width: 980px) {
       .course-profile-layout {
         grid-template-columns: 1fr;
+        grid-template-areas:
+          "course"
+          "materials"
+          "upload";
       }
 
       .course-detail-stat {
