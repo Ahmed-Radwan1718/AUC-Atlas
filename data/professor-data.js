@@ -1,6 +1,6 @@
 (function () {
   const professors = [
-    { id: "eslam-badr", name: "Eslam Badr", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Calculus 1, Linear Algebra", hideCourse: true, group: "A-F",, email: "eslammath@aucegypt.edu", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
+    { id: "eslam-badr", name: "Eslam Badr", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Calculus 1, Linear Algebra", group: "A-F", email: "eslammath@aucegypt.edu", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
     { id: "kate-ellis", name: "Kate Ellis", department: "Psychology", displayDepartment: "PSYC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "kate.ellis@aucegypt.edu", bio: "Kate Ellis is an associate professor and clinical psychologist at AUC. Her work focuses on refugees, trauma, youth exposed to violence, and accessible mental health interventions for conflict-affected communities.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785765918/Kate_Ellis_dhynm1.png" },
     { id: "aya-musmar", name: "Aya Musmar", department: "Architecture", displayDepartment: "ARCH", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "aya.musmar@aucegypt.edu", bio: "Aya Musmar is an assistant professor of humanities in architecture at AUC. Her work focuses on forced displacement, refugee camps, injustice, climate change, heritage, and architecture as a form of testimony.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785765917/Aya_Musmar_fistv7.png" },
     { id: "tamir-el-khouly", name: "Tamir El-Khouly", department: "Architecture", displayDepartment: "ARCH", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "t.el-khouly@aucegypt.edu", bio: "Tamir El-Khouly earned his PhD in the built environment from UCL before joining AUC. His work focuses on architectural computing, BIM, machine learning, design thinking, and parametric design.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785765913/Tamir_El-Khouly_r80cnx.png" },
@@ -425,6 +425,35 @@
 
     .professor-profile-email.is-empty {
       color: rgba(23, 23, 23, 0.48);
+    }
+
+    .professor-profile-course-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .professor-profile-course-link {
+      min-height: 32px;
+      padding: 0 10px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.72);
+      color: rgba(23, 23, 23, 0.7);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.3;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .professor-profile-course-link:hover {
+      border-color: rgba(192, 154, 92, 0.34);
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+      transform: translateY(-1px);
     }
 
     .professor-profile-bio {
@@ -1633,12 +1662,77 @@
     return '<span class="professor-review-stars" aria-label="' + safeRating + ' out of 5 stars">' + stars + '</span>';
   }
 
+  function getReviewedProfessorCourses(reviews) {
+    const safeReviews = Array.isArray(reviews) ? reviews : [];
+    const availableCourses = Array.isArray(window.aucAtlasCourses)
+      ? window.aucAtlasCourses
+      : [];
+    const coursesByCode = new Map();
+    const reviewedCourses = new Map();
+
+    availableCourses.forEach(function (course) {
+      const courseCode = String(course && course.code ? course.code : "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toUpperCase();
+
+      if (courseCode) {
+        coursesByCode.set(courseCode, course);
+      }
+    });
+
+    safeReviews.forEach(function (review) {
+      const courseCode = String(review.courseCode || review.courseTaken || "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toUpperCase();
+      const course = coursesByCode.get(courseCode);
+
+      if (course) {
+        reviewedCourses.set(courseCode, course);
+      }
+    });
+
+    return Array.from(reviewedCourses.values()).sort(function (firstCourse, secondCourse) {
+      return firstCourse.code.localeCompare(secondCourse.code);
+    });
+  }
+
+  function renderProfessorCourses(reviews) {
+    const row = document.getElementById("professor-teaches-row");
+    const list = document.getElementById("professor-teaches-list");
+
+    if (!row || !list) {
+      return;
+    }
+
+    const reviewedCourses = getReviewedProfessorCourses(reviews);
+
+    row.hidden = !reviewedCourses.length;
+
+    if (!reviewedCourses.length) {
+      list.innerHTML = "";
+      return;
+    }
+
+    list.innerHTML = reviewedCourses.map(function (course) {
+      const courseLabel = course.code + (course.title ? " - " + course.title : "");
+
+      return `
+        <a class="professor-profile-course-link" href="courses.html?course=${encodeURIComponent(course.code)}">
+          ${escapeHtml(courseLabel)}
+        </a>
+      `;
+    }).join("");
+  }
+
   function renderProfessorReviews(reviews) {
     const list = document.getElementById("professor-reviews-list");
     const count = document.getElementById("professor-reviews-count");
     const safeReviews = Array.isArray(reviews) ? reviews : [];
 
     renderProfessorReviewStats(safeReviews);
+    renderProfessorCourses(safeReviews);
 
     if (!list) {
       return;
@@ -1733,14 +1827,6 @@
     const professorEmailMarkup = professorEmail
       ? '<span class="professor-profile-email">' + escapeHtml(professorEmail) + '</span>'
       : '<span class="professor-profile-email is-empty">Email coming soon</span>';
-    const professorCourseMarkup = professor.hideCourse
-      ? ""
-      : `
-          <div>
-            <span>Teaches</span>
-            <span class="professor-profile-value">${escapeHtml(professor.course || "Courses coming soon")}</span>
-          </div>
-        `;
     const pageHeader = document.querySelector(".professors-header");
 
     if (pageHeader) {
@@ -1774,7 +1860,10 @@
               ${professorEmailMarkup}
             </div>
 
-            ${professorCourseMarkup}
+            <div id="professor-teaches-row" hidden>
+              <span>Teaches</span>
+              <span class="professor-profile-value professor-profile-course-list" id="professor-teaches-list"></span>
+            </div>
           </div>
 
           <p class="professor-profile-bio">${escapeHtml(professor.bio || "Bio coming soon.")}</p>
