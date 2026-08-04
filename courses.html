@@ -1213,19 +1213,18 @@
 
     .course-materials-list {
       display: grid;
-      gap: 14px;
+      gap: 16px;
     }
 
     .course-material-card {
-      min-height: 210px;
-      padding: 16px;
+      padding: 18px;
       border: 1px solid rgba(23, 23, 23, 0.09);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.76);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.8);
       box-shadow: 0 18px 44px rgba(42, 32, 20, 0.08);
       display: grid;
       align-content: start;
-      gap: 12px;
+      gap: 16px;
     }
 
     .course-material-card-top {
@@ -1244,9 +1243,9 @@
 
     .course-material-avatar,
     .course-material-avatar-fallback {
-      width: 44px;
-      height: 44px;
-      flex: 0 0 44px;
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
       border-radius: 999px;
       overflow: hidden;
       background: #171717;
@@ -1259,21 +1258,144 @@
       letter-spacing: 0.04em;
     }
 
-    .course-material-author strong,
-    .course-material-title {
-      color: #171717;
-      line-height: 1.2;
+    .course-material-author-copy {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
     }
 
-    .course-material-author strong {
-      display: block;
+    .course-material-author-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .course-material-author-name-row strong {
+      color: #171717;
       font-size: 14px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .course-material-verified-badge {
+      padding: 5px 7px;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.14);
+      color: rgba(145, 101, 35, 0.96);
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .course-material-upload-date {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.4;
     }
 
     .course-material-title {
       margin: 0;
-      font-size: 17px;
+      color: #171717;
+      font-size: 19px;
       font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .course-material-preview-tile {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 18px;
+      background: rgba(247, 244, 238, 0.62);
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      display: grid;
+      grid-template-columns: 62px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    button.course-material-preview-tile {
+      cursor: pointer;
+    }
+
+    .course-material-preview-tile:not(.is-disabled):hover,
+    .course-material-preview-tile:not(.is-disabled):focus-visible {
+      border-color: rgba(192, 154, 92, 0.42);
+      background: rgba(255, 255, 255, 0.94);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-material-file-icon {
+      width: 62px;
+      height: 76px;
+      padding: 8px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 12px;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.98),
+          rgba(237, 231, 220, 0.96)
+        );
+      color: rgba(145, 101, 35, 0.96);
+      display: grid;
+      place-items: end center;
+      box-shadow: 0 10px 24px rgba(42, 32, 20, 0.08);
+    }
+
+    .course-material-file-icon strong {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .course-material-file-copy {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .course-material-file-copy strong {
+      overflow: hidden;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-material-file-copy small {
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .course-material-preview-hint {
+      color: rgba(145, 101, 35, 0.96);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .course-material-preview-tile.is-disabled
+      .course-material-preview-hint {
+      color: rgba(23, 23, 23, 0.42);
     }
 
     .course-material-context {
@@ -1292,15 +1414,224 @@
       font-weight: 800;
     }
 
+    .course-material-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .course-material-preview-button,
+    .course-material-download-button,
+    .course-material-preview-unavailable {
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .course-material-preview-button {
+      border: 1px solid #171717;
+      background: #171717;
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    .course-material-preview-button:hover,
+    .course-material-preview-button:focus-visible {
+      background: rgba(23, 23, 23, 0.84);
+      outline: none;
+    }
+
     .course-material-download-button {
-      width: fit-content;
-      min-height: 40px;
-      padding: 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.14);
+      background: rgba(255, 255, 255, 0.7);
+      color: #171717;
+    }
+
+    .course-material-download-button:hover,
+    .course-material-download-button:focus-visible {
+      border-color: rgba(23, 23, 23, 0.38);
+      background: #ffffff;
+      outline: none;
+    }
+
+    .course-material-preview-unavailable {
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      background: rgba(247, 244, 238, 0.7);
+      color: rgba(23, 23, 23, 0.42);
+    }
+
+    body.material-preview-open {
+      overflow: hidden;
+    }
+
+    .course-material-preview-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .course-material-preview-modal[hidden] {
+      display: none;
+    }
+
+    .course-material-preview-backdrop {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: rgba(23, 23, 23, 0.66);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor: pointer;
+    }
+
+    .course-material-preview-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(1100px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 26px;
+      background: #f7f4ee;
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.34);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+
+    .course-material-preview-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .course-material-preview-header-copy {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .course-material-preview-header h2 {
+      overflow: hidden;
+      color: #171717;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-material-preview-header p {
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .course-material-preview-close {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.86);
+      color: #171717;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .course-material-preview-viewer {
+      position: relative;
+      min-height: min(68vh, 720px);
+      overflow: auto;
+      background: #e9e5de;
+      display: grid;
+      place-items: center;
+    }
+
+    .course-material-preview-frame,
+    .course-material-preview-image {
+      width: 100%;
+      height: min(68vh, 720px);
+      border: 0;
+      background: #ffffff;
+      display: block;
+    }
+
+    .course-material-preview-image {
+      padding: 20px;
+      object-fit: contain;
+      background: #171717;
+    }
+
+    .course-material-preview-frame[hidden],
+    .course-material-preview-image[hidden],
+    .course-material-preview-loading[hidden],
+    .course-material-preview-fallback[hidden] {
+      display: none;
+    }
+
+    .course-material-preview-loading,
+    .course-material-preview-fallback {
+      max-width: 480px;
+      padding: 28px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .course-material-preview-loading {
+      display: grid;
+      place-items: center;
+      gap: 14px;
+    }
+
+    .course-material-preview-loading::before {
+      content: "";
+      width: 38px;
+      height: 38px;
+      border: 4px solid rgba(23, 23, 23, 0.12);
+      border-top-color: #171717;
+      border-radius: 999px;
+      animation: materialUploadSpin 0.8s linear infinite;
+    }
+
+    .course-material-preview-footer {
+      padding: 14px 20px;
+      border-top: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .course-material-preview-download {
+      min-height: 42px;
+      padding: 0 16px;
       border-radius: 999px;
       background: #171717;
       color: #ffffff;
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: 0.08em;
       text-decoration: none;
       text-transform: uppercase;
@@ -1319,6 +1650,37 @@
       font-weight: 700;
       line-height: 1.5;
       text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .course-material-preview-tile {
+        grid-template-columns: 52px minmax(0, 1fr);
+      }
+
+      .course-material-file-icon {
+        width: 52px;
+        height: 66px;
+      }
+
+      .course-material-preview-hint {
+        grid-column: 1 / -1;
+      }
+
+      .course-material-preview-modal {
+        padding: 10px;
+      }
+
+      .course-material-preview-dialog {
+        max-height: calc(100vh - 20px);
+        border-radius: 20px;
+      }
+
+      .course-material-preview-viewer,
+      .course-material-preview-frame,
+      .course-material-preview-image {
+        min-height: 62vh;
+        height: 62vh;
+      }
     }
 
     @keyframes materialUploadSpin {
@@ -1492,7 +1854,7 @@
                 <h2>Course files</h2>
               </div>
 
-              <p>Download files shared by students for this course.</p>
+              <p>Preview files, verify their details, and only download what you trust.</p>
 
               <div class="course-material-summary-list" aria-label="Supported material types">
                 <span>Notes</span>
@@ -1610,6 +1972,80 @@
       </section>
     </div>
   </main>
+
+  <div
+    class="course-material-preview-modal"
+    id="course-material-preview-modal"
+    hidden
+  >
+    <button
+      class="course-material-preview-backdrop"
+      type="button"
+      aria-label="Close file preview"
+      data-close-material-preview
+    ></button>
+
+    <section
+      class="course-material-preview-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="course-material-preview-title"
+    >
+      <header class="course-material-preview-header">
+        <div class="course-material-preview-header-copy">
+          <h2 id="course-material-preview-title">File preview</h2>
+          <p id="course-material-preview-meta">Preparing preview</p>
+        </div>
+
+        <button
+          class="course-material-preview-close"
+          id="course-material-preview-close"
+          type="button"
+          aria-label="Close file preview"
+          data-close-material-preview
+        >×</button>
+      </header>
+
+      <div class="course-material-preview-viewer">
+        <div
+          class="course-material-preview-loading"
+          id="course-material-preview-loading"
+        >
+          Preparing a secure preview...
+        </div>
+
+        <iframe
+          class="course-material-preview-frame"
+          id="course-material-preview-frame"
+          title="Course material preview"
+          hidden
+        ></iframe>
+
+        <img
+          class="course-material-preview-image"
+          id="course-material-preview-image"
+          alt="Course material preview"
+          hidden
+        >
+
+        <div
+          class="course-material-preview-fallback"
+          id="course-material-preview-fallback"
+          hidden
+        ></div>
+      </div>
+
+      <footer class="course-material-preview-footer">
+        <a
+          class="course-material-preview-download"
+          id="course-material-preview-download"
+          href="#"
+          target="_blank"
+          rel="noopener"
+        >Download original</a>
+      </footer>
+    </section>
+  </div>
 
   <script src="data/professor-data.js"></script>
   <script src="data/courses.js"></script>
