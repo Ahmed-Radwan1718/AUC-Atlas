@@ -101,6 +101,133 @@ async function getUploaderProfile(decodedUser, userRecord) {
   };
 }
 
+function slugifyMaterialValue(value) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "unknown";
+}
+
+function getImageKitDescriptionParts(file) {
+  return String(file && file.description ? file.description : "")
+    .split(" | ")
+    .map(function (part) {
+      return cleanString(part, 240);
+    });
+}
+
+function getImageKitMaterialType(file, descriptionParts) {
+  const descriptionType = cleanMaterialType(descriptionParts[4]);
+
+  if (descriptionType) {
+    return descriptionType;
+  }
+
+  const tags = Array.isArray(file && file.tags) ? file.tags : [];
+  const typeTag = tags.find(function (tag) {
+    return String(tag || "").indexOf("material-type-") === 0;
+  });
+
+  if (!typeTag) {
+    return "Material";
+  }
+
+  const normalizedType = String(typeTag)
+    .replace(/^material-type-/, "")
+    .replace(/-/g, " ");
+
+  return cleanMaterialType(normalizedType) || "Material";
+}
+
+async function getImageKitCourseMaterials(courseCode) {
+  const privateKey = String(
+    process.env.IMAGEKIT_PRIVATE_KEY || ""
+  ).trim();
+
+  if (!privateKey) {
+    return [];
+  }
+
+  const courseTag = "course-" + slugifyMaterialValue(courseCode);
+  const query = new URLSearchParams({
+    tags: courseTag,
+    type: "file",
+    limit: "1000",
+    sort: "DESC_CREATED"
+  });
+
+  const response = await fetch(
+    "https://api.imagekit.io/v1/files?" + query.toString(),
+    {
+      headers: {
+        Accept: "application/json",
+        Authorization:
+          "Basic " +
+          Buffer.from(privateKey + ":").toString("base64")
+      }
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Could not load ImageKit course materials.");
+  }
+
+  const files = await response.json();
+
+  if (!Array.isArray(files)) {
+    return [];
+  }
+
+  return files.map(function (file) {
+    const descriptionParts = getImageKitDescriptionParts(file);
+    const fileName = cleanString(file && file.name, 240);
+    const filePath = cleanString(file && file.filePath, 500);
+    const titleFromName = fileName
+      .replace(/\.[^.]+$/, "")
+      .replace(/[-_]+/g, " ")
+      .trim();
+
+    return {
+      id:
+        "imagekit-" +
+        cleanString(file && file.fileId, 160),
+      courseCode,
+      courseTitle: "",
+      professor:
+        descriptionParts[2] || "Professor not listed",
+      semester:
+        descriptionParts[3] || "Semester not listed",
+      materialType: getImageKitMaterialType(
+        file,
+        descriptionParts
+      ),
+      title:
+        descriptionParts[0] ||
+        titleFromName ||
+        "Course material",
+      fileName,
+      fileUrl: "",
+      downloadUrl: filePath
+        ? "/api/course-material-download?path=" +
+          encodeURIComponent(filePath)
+        : "",
+      filePath: "",
+      fileId: "",
+      size: Number((file && file.size) || 0),
+      fileType: cleanString(
+        file && (file.mime || file.fileType),
+        80
+      ),
+      status: "pending",
+      uploaderUid: "",
+      uploaderDisplayName: "AUC student",
+      uploaderPhotoURL: "",
+      createdAt: cleanString(file && file.createdAt, 80)
+    };
+  });
+}
+
 async function getCourseMaterials(courseCode) {
   const snapshot = await admin.firestore()
     .collection("courseMaterials")
@@ -118,8 +245,42 @@ async function getCourseMaterials(courseCode) {
     }
   });
 
+  try {
+    const imageKitMaterials =
+      await getImageKitCourseMaterials(courseCode);
+    const knownFileNames = new Set(
+      materials
+        .map(function (material) {
+          return cleanString(
+            material.fileName,
+            240
+          ).toLowerCase();
+        })
+        .filter(Boolean)
+    );
+
+    imageKitMaterials.forEach(function (material) {
+      const fileName = cleanString(
+        material.fileName,
+        240
+      ).toLowerCase();
+
+      if (!fileName || knownFileNames.has(fileName)) {
+        return;
+      }
+
+      knownFileNames.add(fileName);
+      materials.push(material);
+    });
+  } catch (error) {
+    // Firestore materials remain available if ImageKit is unavailable.
+  }
+
   materials.sort(function (a, b) {
-    return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
+    return (
+      getTimestampMillis(b.createdAt) -
+      getTimestampMillis(a.createdAt)
+    );
   });
 
   return materials;
