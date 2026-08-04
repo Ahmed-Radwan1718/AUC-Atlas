@@ -1,6 +1,7 @@
 (function () {
   const footerHiddenPages = new Set([
     "accounts",
+    "degree-progression",
     "login",
     "signup",
     "forgot-password",
