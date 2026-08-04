@@ -960,6 +960,17 @@
   async function loadCourseMaterials(course) {
     const access = document.getElementById("course-materials-access");
     const list = document.getElementById("course-materials-list");
+    const loading = document.getElementById("course-materials-loading");
+
+    if (access) {
+      access.hidden = false;
+      access.classList.add("is-loading");
+      access.setAttribute("aria-busy", "true");
+    }
+
+    if (loading) {
+      loading.hidden = false;
+    }
 
     if (list) {
       list.innerHTML = '<p class="course-material-status">Loading course files...</p>';
@@ -971,22 +982,29 @@
       });
 
       if (!response.ok) {
-        if (access) {
-          access.hidden = true;
-        }
-
-        return;
+        throw new Error("Could not load course materials.");
       }
 
       const data = await response.json();
 
-      if (access) {
-        access.hidden = false;
+      renderCourseMaterials(Array.isArray(data.materials) ? data.materials : []);
+
+      if (loading) {
+        loading.hidden = true;
       }
 
-      renderCourseMaterials(Array.isArray(data.materials) ? data.materials : []);
-    } catch (error) {
       if (access) {
+        access.classList.remove("is-loading");
+        access.removeAttribute("aria-busy");
+      }
+    } catch (error) {
+      if (loading) {
+        loading.hidden = true;
+      }
+
+      if (access) {
+        access.classList.remove("is-loading");
+        access.removeAttribute("aria-busy");
         access.hidden = true;
       }
     }
