@@ -1825,6 +1825,156 @@
       cursor: not-allowed;
     }
 
+    #security-access-modal .account-authenticator-modal-backdrop {
+      background: rgba(23, 23, 23, 0.38);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .security-access-card {
+      width: min(500px, calc(100vw - 48px));
+      padding: 30px;
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 28px 70px rgba(42, 32, 20, 0.22);
+      display: block;
+    }
+
+    .security-access-header {
+      margin-bottom: 24px;
+    }
+
+    .security-access-eyebrow {
+      margin-bottom: 14px;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .security-access-header h2 {
+      margin-bottom: 12px;
+      color: #171717;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .security-access-header > p:last-child {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .security-access-form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .security-access-field {
+      display: grid;
+      gap: 10px;
+    }
+
+    .security-access-field label {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .security-access-code-inputs {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .security-access-code-input {
+      width: 100%;
+      min-width: 0;
+      min-height: 58px;
+      padding: 0;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      font-family: inherit;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-align: center;
+      outline: none;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .security-access-code-input:focus {
+      background: white;
+      border-color: rgba(192, 154, 92, 0.84);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
+    }
+
+    .security-access-actions {
+      display: grid;
+      gap: 12px;
+    }
+
+    .security-access-submit {
+      width: 100%;
+      min-height: 52px;
+      margin-top: 4px;
+      border: 1px solid rgba(192, 154, 92, 0.84);
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.84);
+      color: white;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .security-access-submit:hover {
+      background: rgba(171, 132, 70, 0.92);
+      border-color: rgba(171, 132, 70, 0.92);
+    }
+
+    .security-access-submit:active {
+      transform: translateY(1px);
+    }
+
+    .security-access-submit:disabled {
+      opacity: 0.58;
+      cursor: wait;
+    }
+
+    .security-access-cancel {
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.58);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .security-access-cancel:hover {
+      opacity: 0.72;
+    }
+
     @media (max-width: 620px) {
       .account-authenticator-setup-grid {
         grid-template-columns: 1fr;
@@ -1844,6 +1994,25 @@
         height: 52px;
         border-radius: 16px;
         font-size: 22px;
+      }
+
+      .security-access-card {
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      .security-access-header h2 {
+        font-size: 24px;
+      }
+
+      .security-access-code-inputs {
+        gap: 7px;
+      }
+
+      .security-access-code-input {
+        min-height: 50px;
+        border-radius: 14px;
+        font-size: 20px;
       }
     }
 
@@ -2439,31 +2608,35 @@
   <div class="account-authenticator-modal" id="security-access-modal" hidden>
     <div class="account-authenticator-modal-backdrop" id="security-access-modal-backdrop"></div>
 
-    <div class="account-authenticator-modal-card" role="dialog" aria-modal="true" aria-labelledby="security-access-modal-title">
-      <button class="account-authenticator-modal-close" type="button" id="security-access-modal-close" aria-label="Close security verification">×</button>
-
-      <div class="account-authenticator-modal-header">
-        <h2 id="security-access-modal-title">Verify security access</h2>
-        <p>Enter the current 6-digit code from your authenticator app to open the Security panel.</p>
+    <div class="account-authenticator-modal-card security-access-card" role="dialog" aria-modal="true" aria-labelledby="security-access-modal-title">
+      <div class="security-access-header">
+        <p class="security-access-eyebrow">Two-Factor Authentication</p>
+        <h2 id="security-access-modal-title">Enter Authenticator Code</h2>
+        <p>Open your authenticator app and enter the 6-digit code for AUC Atlas.</p>
       </div>
 
-      <form class="account-form" id="security-access-form">
-        <div class="account-field">
-          <label for="security-access-code">Authenticator Code</label>
-          <input
-            type="text"
-            id="security-access-code"
-            inputmode="numeric"
-            autocomplete="one-time-code"
-            maxlength="6"
-            pattern="[0-9]{6}"
-            required
-          >
+      <form class="security-access-form" id="security-access-form">
+        <div class="security-access-field">
+          <label for="security-access-code-digit-1">Authenticator Code</label>
+
+          <div class="security-access-code-inputs" aria-label="Authenticator code">
+            <input class="security-access-code-input" type="text" id="security-access-code-digit-1" inputmode="numeric" autocomplete="one-time-code" maxlength="1" data-security-access-code-input aria-label="Digit 1">
+            <input class="security-access-code-input" type="text" inputmode="numeric" maxlength="1" data-security-access-code-input aria-label="Digit 2">
+            <input class="security-access-code-input" type="text" inputmode="numeric" maxlength="1" data-security-access-code-input aria-label="Digit 3">
+            <input class="security-access-code-input" type="text" inputmode="numeric" maxlength="1" data-security-access-code-input aria-label="Digit 4">
+            <input class="security-access-code-input" type="text" inputmode="numeric" maxlength="1" data-security-access-code-input aria-label="Digit 5">
+            <input class="security-access-code-input" type="text" inputmode="numeric" maxlength="1" data-security-access-code-input aria-label="Digit 6">
+          </div>
         </div>
 
-        <div class="account-authenticator-modal-actions">
-          <button class="account-secondary-button" type="button" id="security-access-modal-cancel">Cancel</button>
-          <button class="account-primary-button" type="submit" id="security-access-submit">Verify and Open</button>
+        <div class="security-access-actions">
+          <button class="security-access-submit" type="submit" id="security-access-submit">
+            Verify Code
+          </button>
+
+          <button class="security-access-cancel" type="button" id="security-access-modal-cancel">
+            Cancel
+          </button>
         </div>
 
         <p class="account-message" id="security-access-message" aria-live="polite"></p>
@@ -2529,10 +2702,9 @@
     const authenticatorMessage = document.getElementById("authenticator-message");
     const securityAccessModal = document.getElementById("security-access-modal");
     const securityAccessModalBackdrop = document.getElementById("security-access-modal-backdrop");
-    const securityAccessModalClose = document.getElementById("security-access-modal-close");
     const securityAccessModalCancel = document.getElementById("security-access-modal-cancel");
     const securityAccessForm = document.getElementById("security-access-form");
-    const securityAccessCodeInput = document.getElementById("security-access-code");
+    const securityAccessCodeInputs = Array.from(document.querySelectorAll("[data-security-access-code-input]"));
     const securityAccessSubmit = document.getElementById("security-access-submit");
     const securityAccessMessage = document.getElementById("security-access-message");
     const accountReviewList = document.getElementById("account-review-list");
@@ -4245,6 +4417,41 @@
       });
     });
 
+    function getSecurityAccessCodeValue() {
+      return securityAccessCodeInputs.map(function (input) {
+        return input.value.trim();
+      }).join("").replace(/\D/g, "").slice(0, 6);
+    }
+
+    function clearSecurityAccessCodeInputs() {
+      securityAccessCodeInputs.forEach(function (input) {
+        input.value = "";
+      });
+    }
+
+    function focusFirstSecurityAccessCodeInput() {
+      if (securityAccessCodeInputs[0]) {
+        securityAccessCodeInputs[0].focus();
+      }
+    }
+
+    function fillSecurityAccessCodeInputs(value) {
+      const digits = String(value || "")
+        .replace(/\D/g, "")
+        .slice(0, 6);
+
+      securityAccessCodeInputs.forEach(function (input, index) {
+        input.value = digits.charAt(index) || "";
+      });
+
+      const focusIndex =
+        Math.min(digits.length, securityAccessCodeInputs.length) - 1;
+
+      if (focusIndex >= 0 && securityAccessCodeInputs[focusIndex]) {
+        securityAccessCodeInputs[focusIndex].focus();
+      }
+    }
+
     function closeSecurityAccessModal(accessGranted) {
       if (!securityAccessModal) {
         return;
@@ -4256,9 +4463,11 @@
         securityAccessForm.reset();
       }
 
+      clearSecurityAccessCodeInputs();
+
       if (securityAccessSubmit) {
         securityAccessSubmit.disabled = false;
-        securityAccessSubmit.textContent = "Verify and Open";
+        securityAccessSubmit.textContent = "Verify Code";
       }
 
       showMessage(securityAccessMessage, "", "");
@@ -4279,7 +4488,7 @@
       if (
         !securityAccessModal ||
         !securityAccessForm ||
-        !securityAccessCodeInput
+        !securityAccessCodeInputs.length
       ) {
         showMessage(
           securityMessage,
@@ -4296,6 +4505,7 @@
 
       securityPanelAccessToken = "";
       securityAccessForm.reset();
+      clearSecurityAccessCodeInputs();
       showMessage(securityAccessMessage, "", "");
       securityAccessModal.hidden = false;
 
@@ -4303,37 +4513,69 @@
         securityAccessResolver = resolve;
 
         window.setTimeout(function () {
-          securityAccessCodeInput.focus();
+          focusFirstSecurityAccessCodeInput();
         }, 50);
       });
     }
 
-    if (securityAccessCodeInput) {
-      securityAccessCodeInput.addEventListener("input", function () {
-        securityAccessCodeInput.value = String(
-          securityAccessCodeInput.value || ""
-        ).replace(/\D/g, "").slice(0, 6);
+    securityAccessCodeInputs.forEach(function (input, index) {
+      input.addEventListener("input", function () {
+        const digits = String(input.value || "").replace(/\D/g, "");
 
+        if (digits.length > 1) {
+          fillSecurityAccessCodeInputs(digits);
+          showMessage(securityAccessMessage, "", "");
+          return;
+        }
+
+        input.value = digits.slice(0, 1);
+        showMessage(securityAccessMessage, "", "");
+
+        if (input.value && securityAccessCodeInputs[index + 1]) {
+          securityAccessCodeInputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener("keydown", function (event) {
+        if (
+          event.key === "Backspace" &&
+          !input.value &&
+          securityAccessCodeInputs[index - 1]
+        ) {
+          securityAccessCodeInputs[index - 1].focus();
+        }
+      });
+
+      input.addEventListener("paste", function (event) {
+        const pastedCode = event.clipboardData
+          .getData("text")
+          .replace(/\D/g, "")
+          .slice(0, 6);
+
+        if (!pastedCode) {
+          return;
+        }
+
+        event.preventDefault();
+        fillSecurityAccessCodeInputs(pastedCode);
         showMessage(securityAccessMessage, "", "");
       });
-    }
+    });
 
     if (securityAccessForm) {
       securityAccessForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
-        const code = String(
-          securityAccessCodeInput.value || ""
-        ).replace(/\D/g, "").slice(0, 6);
+        const code = getSecurityAccessCodeValue();
 
         if (!/^\d{6}$/.test(code)) {
           showMessage(
             securityAccessMessage,
-            "Please enter the 6-digit authenticator code.",
+            "Please enter your 6-digit authenticator code.",
             "error"
           );
 
-          securityAccessCodeInput.focus();
+          focusFirstSecurityAccessCodeInput();
           return;
         }
 
@@ -4369,17 +4611,17 @@
             "error"
           );
 
-          securityAccessCodeInput.select();
+          clearSecurityAccessCodeInputs();
+          focusFirstSecurityAccessCodeInput();
         } finally {
           securityAccessSubmit.disabled = false;
-          securityAccessSubmit.textContent = "Verify and Open";
+          securityAccessSubmit.textContent = "Verify Code";
         }
       });
     }
 
     [
       securityAccessModalBackdrop,
-      securityAccessModalClose,
       securityAccessModalCancel
     ].forEach(function (control) {
       if (control) {
