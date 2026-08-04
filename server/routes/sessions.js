@@ -4,6 +4,7 @@ const {
   getCurrentSiteSessionHash,
   getSiteSessionUser,
   getUserSiteSessions,
+  requireSecurityPanelAccess,
   revokeUserSiteSession
 } = require("../_lib/securityHelpers");
 
@@ -32,6 +33,8 @@ module.exports = async function handler(req, res) {
     const decodedUser = await getSiteSessionUser(req, {
       checkRevoked: true
     });
+
+    await requireSecurityPanelAccess(req, decodedUser);
 
     if (req.method === "GET") {
       const currentSession = await ensureSiteSessionRecord(decodedUser, req, res);
