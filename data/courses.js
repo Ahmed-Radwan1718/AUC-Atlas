@@ -1361,6 +1361,32 @@
           }
 
           const auth = await authResponse.json();
+          const uploader =
+            auth && auth.uploader
+              ? auth.uploader
+              : {};
+          const uploaderName = String(
+            uploader.displayName || "AUC student"
+          )
+            .replace(/\s*\|\s*/g, " ")
+            .trim();
+          const uploaderPhotoURL = String(
+            uploader.photoURL || ""
+          ).trim();
+          const uploaderUid = String(
+            uploader.uid || ""
+          ).trim();
+          const uploadTags = [
+            tags,
+            "material-type-" +
+              slugifyMaterialValue(materialType),
+            uploaderUid
+              ? "uploader-" +
+                slugifyMaterialValue(uploaderUid)
+              : ""
+          ]
+            .filter(Boolean)
+            .join(",");
           const formData = new FormData();
 
           formData.append("file", file);
@@ -1373,7 +1399,7 @@
           formData.append("signature", auth.signature);
           formData.append("expire", auth.expire);
           formData.append("folder", folder);
-          formData.append("tags", tags);
+          formData.append("tags", uploadTags);
           formData.append("useUniqueFileName", "true");
           formData.append(
             "description",
@@ -1383,7 +1409,15 @@
               " | " +
               professor +
               " | " +
-              semester
+              semester +
+              " | " +
+              materialType +
+              " | " +
+              uploaderName +
+              " | " +
+              uploaderPhotoURL +
+              " | " +
+              uploaderUid
           );
           formData.append(
             "responseFields",
