@@ -2436,6 +2436,41 @@
     </div>
   </div>
 
+  <div class="account-authenticator-modal" id="security-access-modal" hidden>
+    <div class="account-authenticator-modal-backdrop" id="security-access-modal-backdrop"></div>
+
+    <div class="account-authenticator-modal-card" role="dialog" aria-modal="true" aria-labelledby="security-access-modal-title">
+      <button class="account-authenticator-modal-close" type="button" id="security-access-modal-close" aria-label="Close security verification">×</button>
+
+      <div class="account-authenticator-modal-header">
+        <h2 id="security-access-modal-title">Verify security access</h2>
+        <p>Enter the current 6-digit code from your authenticator app to open the Security panel.</p>
+      </div>
+
+      <form class="account-form" id="security-access-form">
+        <div class="account-field">
+          <label for="security-access-code">Authenticator Code</label>
+          <input
+            type="text"
+            id="security-access-code"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            required
+          >
+        </div>
+
+        <div class="account-authenticator-modal-actions">
+          <button class="account-secondary-button" type="button" id="security-access-modal-cancel">Cancel</button>
+          <button class="account-primary-button" type="submit" id="security-access-submit">Verify and Open</button>
+        </div>
+
+        <p class="account-message" id="security-access-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
   <script src="data/professor-data.js"></script>
 
   <script>
@@ -2492,6 +2527,14 @@
     const authenticatorCodeInputs = Array.from(document.querySelectorAll("[data-authenticator-code-input]"));
     const authenticatorSetupConfirm = document.getElementById("authenticator-setup-confirm");
     const authenticatorMessage = document.getElementById("authenticator-message");
+    const securityAccessModal = document.getElementById("security-access-modal");
+    const securityAccessModalBackdrop = document.getElementById("security-access-modal-backdrop");
+    const securityAccessModalClose = document.getElementById("security-access-modal-close");
+    const securityAccessModalCancel = document.getElementById("security-access-modal-cancel");
+    const securityAccessForm = document.getElementById("security-access-form");
+    const securityAccessCodeInput = document.getElementById("security-access-code");
+    const securityAccessSubmit = document.getElementById("security-access-submit");
+    const securityAccessMessage = document.getElementById("security-access-message");
     const accountReviewList = document.getElementById("account-review-list");
     const reviewsMessage = document.getElementById("reviews-message");
     const accountReviewEditor = document.getElementById("account-review-editor");
@@ -2510,6 +2553,8 @@
 
     let accountCurrentUser = null;
     let accountTwoFactor = { appEnabled: false, emailEnabled: false };
+    let securityPanelAccessToken = "";
+    let securityAccessResolver = null;
     let activePhotoPreviewUrl = "";
     let originalDisplayName = "";
     let originalAucId = "";
@@ -2811,7 +2856,7 @@
       }
     }
 
-    function showPanel(panelName) {
+    function activateAccountPanel(panelName) {
       sidebarLinks.forEach(function (link) {
         link.classList.toggle("active", link.dataset.accountPanel === panelName);
       });
@@ -2829,6 +2874,27 @@
       if (panelName === "reviews") {
         loadAccountReviewHistory();
       }
+    }
+
+    async function showPanel(panelName) {
+      if (panelName === "security") {
+        if (!accountCurrentUser) {
+          return false;
+        }
+
+        if (accountTwoFactor.appEnabled) {
+          const accessGranted = await requestSecurityPanelAccess();
+
+          if (!accessGranted) {
+            return false;
+          }
+        }
+      } else {
+        securityPanelAccessToken = "";
+      }
+
+      activateAccountPanel(panelName);
+      return true;
     }
 
     function showMessage(element, message, type) {
@@ -2962,7 +3028,8 @@
           credentials: "same-origin",
           cache: "no-store",
           headers: {
-            "Accept": "application/json"
+            "Accept": "application/json",
+            "X-AUC-Security-Access": securityPanelAccessToken
           }
         });
         const data = await response.json().catch(function () {
@@ -3004,7 +3071,8 @@
           credentials: "same-origin",
           headers: {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-AUC-Security-Access": securityPanelAccessToken
           },
           body: JSON.stringify({
             sessionId: sessionId
@@ -3675,6 +3743,10 @@
         emailEnabled: Boolean(twoFactor && twoFactor.emailEnabled)
       };
 
+      if (!accountTwoFactor.appEnabled) {
+        securityPanelAccessToken = "";
+      }
+
       if (twoFactorAppStatus) {
         twoFactorAppStatus.textContent = accountTwoFactor.appEnabled ? "On" : "Off";
         twoFactorAppStatus.classList.toggle("enabled", accountTwoFactor.appEnabled);
@@ -3756,12 +3828,14 @@
         }
 
         hydrateAccountDetails(data.user);
+        return true;
       } catch (error) {
         try {
           localStorage.setItem("auc-atlas-login-redirect", "accounts.html");
         } catch (storageError) {}
 
         window.location.href = "login.html";
+        return false;
       }
     }
 
@@ -3880,7 +3954,8 @@
             credentials: "same-origin",
             headers: {
               "Accept": "application/json",
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
+              "X-AUC-Security-Access": securityPanelAccessToken
             },
             body: JSON.stringify({
               currentPassword,
@@ -4170,13 +4245,158 @@
       });
     });
 
+    function closeSecurityAccessModal(accessGranted) {
+      if (!securityAccessModal) {
+        return;
+      }
+
+      securityAccessModal.hidden = true;
+
+      if (securityAccessForm) {
+        securityAccessForm.reset();
+      }
+
+      if (securityAccessSubmit) {
+        securityAccessSubmit.disabled = false;
+        securityAccessSubmit.textContent = "Verify and Open";
+      }
+
+      showMessage(securityAccessMessage, "", "");
+
+      const resolveAccess = securityAccessResolver;
+      securityAccessResolver = null;
+
+      if (resolveAccess) {
+        resolveAccess(Boolean(accessGranted));
+      }
+    }
+
+    function requestSecurityPanelAccess() {
+      if (!accountTwoFactor.appEnabled) {
+        return Promise.resolve(true);
+      }
+
+      if (
+        !securityAccessModal ||
+        !securityAccessForm ||
+        !securityAccessCodeInput
+      ) {
+        showMessage(
+          securityMessage,
+          "Could not open security verification.",
+          "error"
+        );
+
+        return Promise.resolve(false);
+      }
+
+      if (!securityAccessModal.hidden) {
+        return Promise.resolve(false);
+      }
+
+      securityPanelAccessToken = "";
+      securityAccessForm.reset();
+      showMessage(securityAccessMessage, "", "");
+      securityAccessModal.hidden = false;
+
+      return new Promise(function (resolve) {
+        securityAccessResolver = resolve;
+
+        window.setTimeout(function () {
+          securityAccessCodeInput.focus();
+        }, 50);
+      });
+    }
+
+    if (securityAccessCodeInput) {
+      securityAccessCodeInput.addEventListener("input", function () {
+        securityAccessCodeInput.value = String(
+          securityAccessCodeInput.value || ""
+        ).replace(/\D/g, "").slice(0, 6);
+
+        showMessage(securityAccessMessage, "", "");
+      });
+    }
+
+    if (securityAccessForm) {
+      securityAccessForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const code = String(
+          securityAccessCodeInput.value || ""
+        ).replace(/\D/g, "").slice(0, 6);
+
+        if (!/^\d{6}$/.test(code)) {
+          showMessage(
+            securityAccessMessage,
+            "Please enter the 6-digit authenticator code.",
+            "error"
+          );
+
+          securityAccessCodeInput.focus();
+          return;
+        }
+
+        securityAccessSubmit.disabled = true;
+        securityAccessSubmit.textContent = "Verifying...";
+        showMessage(securityAccessMessage, "", "");
+
+        try {
+          const data = await requestAuthenticatorAction(
+            "verify-security-panel",
+            { code: code }
+          );
+
+          if (
+            data.securityAccessRequired &&
+            !data.securityAccessToken
+          ) {
+            throw new Error(
+              "Could not verify access to the Security panel."
+            );
+          }
+
+          securityPanelAccessToken =
+            data.securityAccessToken || "";
+
+          closeSecurityAccessModal(true);
+        } catch (error) {
+          securityPanelAccessToken = "";
+
+          showMessage(
+            securityAccessMessage,
+            error.message || "Invalid authenticator code.",
+            "error"
+          );
+
+          securityAccessCodeInput.select();
+        } finally {
+          securityAccessSubmit.disabled = false;
+          securityAccessSubmit.textContent = "Verify and Open";
+        }
+      });
+    }
+
+    [
+      securityAccessModalBackdrop,
+      securityAccessModalClose,
+      securityAccessModalCancel
+    ].forEach(function (control) {
+      if (control) {
+        control.addEventListener("click", function () {
+          closeSecurityAccessModal(false);
+        });
+      }
+    });
+
     async function requestAuthenticatorAction(action, payload) {
       const response = await fetch("/api/authenticator", {
         method: "POST",
         credentials: "same-origin",
         headers: {
           "Accept": "application/json",
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-AUC-Security-Access": securityPanelAccessToken
         },
         body: JSON.stringify(Object.assign({ action: action }, payload || {}))
       });
@@ -4269,6 +4489,9 @@
             code: code
           });
 
+          securityPanelAccessToken =
+            data.securityAccessToken || securityPanelAccessToken;
+
           syncTwoFactorState(data.twoFactor || { appEnabled: true });
           closeAuthenticatorModal();
           showMessage(securityMessage, "Authenticator app enabled.", "success");
@@ -4335,7 +4558,21 @@
     });
 
     document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && accountReviewEditor && !accountReviewEditor.hidden) {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      if (securityAccessModal && !securityAccessModal.hidden) {
+        closeSecurityAccessModal(false);
+        return;
+      }
+
+      if (authenticatorModal && !authenticatorModal.hidden) {
+        closeAuthenticatorModal();
+        return;
+      }
+
+      if (accountReviewEditor && !accountReviewEditor.hidden) {
         closeAccountReviewEditor();
       }
     });
@@ -4372,16 +4609,27 @@
       window.location.href = "login.html";
     });
 
-    initializeAccountPhoneCountryDropdown();
-    initializeAccountMajorDropdown();
+    async function initializeAccountPage() {
+      initializeAccountPhoneCountryDropdown();
+      initializeAccountMajorDropdown();
 
-    const initialPanel = window.location.hash.replace("#", "") || "details";
+      const accountLoaded = await loadAccountDetails();
 
-    if (document.getElementById("account-panel-" + initialPanel)) {
-      showPanel(initialPanel);
+      if (!accountLoaded) {
+        return;
+      }
+
+      const initialPanel =
+        window.location.hash.replace("#", "") || "details";
+
+      if (document.getElementById("account-panel-" + initialPanel)) {
+        await showPanel(initialPanel);
+      } else {
+        await showPanel("details");
+      }
     }
 
-    loadAccountDetails();
+    initializeAccountPage();
   </script>
 </body>
 </html>
