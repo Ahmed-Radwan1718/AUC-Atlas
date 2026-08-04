@@ -133,6 +133,16 @@ async function getProfessorReviews(professorId) {
   return reviews;
 }
 
+async function getProfessorReviewCount(professorId) {
+  const snapshot = await admin.firestore()
+    .collection("professorReviews")
+    .where("professorId", "==", professorId)
+    .count()
+    .get();
+
+  return Number(snapshot.data().count || 0);
+}
+
 async function getCourseReviews(courseCode) {
   const normalizedCourseCode = normalizeCourseCode(courseCode);
   const reviewsById = new Map();
@@ -311,6 +321,11 @@ module.exports = async function handler(req, res) {
 
       if (!professorId) {
         throw createReviewError("Professor or course not found.", 400);
+      }
+
+      if (cleanString(query.countOnly, 20) === "true") {
+        const reviewCount = await getProfessorReviewCount(professorId);
+        return res.status(200).json({ reviewCount });
       }
 
       const reviews = await getProfessorReviews(professorId);
