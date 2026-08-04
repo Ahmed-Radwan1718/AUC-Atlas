@@ -1237,6 +1237,223 @@
       text-transform: uppercase;
     }
 
+    .account-review-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .account-review-action-button {
+      min-height: 34px;
+      padding: 0 13px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.86);
+      color: #171717;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .account-review-action-button:hover {
+      border-color: rgba(192, 154, 92, 0.36);
+      background: rgba(192, 154, 92, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .account-review-action-button.is-danger {
+      border-color: rgba(199, 54, 54, 0.22);
+      background: rgba(199, 54, 54, 0.08);
+      color: #c73636;
+    }
+
+    .account-review-action-button.is-danger:hover {
+      border-color: rgba(199, 54, 54, 0.38);
+      background: rgba(199, 54, 54, 0.14);
+    }
+
+    .account-review-action-button:disabled {
+      opacity: 0.48;
+      cursor: wait;
+      transform: none;
+    }
+
+    body.account-review-editor-open {
+      overflow: hidden;
+    }
+
+    .account-review-editor[hidden] {
+      display: none;
+    }
+
+    .account-review-editor {
+      position: fixed;
+      inset: 0;
+      z-index: 130;
+      width: 100vw;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 24px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      isolation: isolate;
+    }
+
+    .account-review-editor-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: rgba(23, 23, 23, 0.56);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .account-review-editor-card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 1;
+      width: min(calc(100vw - 48px), 900px);
+      max-height: calc(100dvh - 48px);
+      padding: 26px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 28px 70px rgba(23, 23, 23, 0.28);
+      overflow-y: auto;
+      transform: translate(-50%, -50%);
+    }
+
+    .account-review-editor-header {
+      margin-bottom: 22px;
+      padding-right: 48px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .account-review-editor-header span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .account-review-editor-header h2 {
+      color: #171717;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .account-review-editor-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: white;
+      color: #171717;
+      font-family: inherit;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .account-review-editor-form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .account-review-editor-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .account-review-editor-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-review-editor-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .account-review-editor-field label {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .account-review-editor-field input,
+    .account-review-editor-field select,
+    .account-review-editor-field textarea {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 15px;
+      background: rgba(247, 244, 238, 0.52);
+      color: #171717;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .account-review-editor-field textarea {
+      min-height: 110px;
+      padding: 14px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .account-review-editor-field input:focus,
+    .account-review-editor-field select:focus,
+    .account-review-editor-field textarea:focus {
+      border-color: rgba(192, 154, 92, 0.72);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .account-review-editor-actions {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    @media (max-width: 700px) {
+      .account-review-editor {
+        padding: 16px;
+      }
+
+      .account-review-editor-card {
+        width: calc(100vw - 32px);
+        max-height: calc(100dvh - 32px);
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      .account-review-editor-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .account-review-editor-field.full {
+        grid-column: auto;
+      }
+    }
+
     .account-badge {
       width: fit-content;
       margin-top: 12px;
@@ -1940,6 +2157,162 @@
     </section>
   </main>
 
+  <div class="account-review-editor" id="account-review-editor" hidden>
+    <div class="account-review-editor-backdrop" id="account-review-editor-backdrop"></div>
+
+    <div class="account-review-editor-card" role="dialog" aria-modal="true" aria-labelledby="account-review-editor-title">
+      <button class="account-review-editor-close" type="button" id="account-review-editor-close" aria-label="Close review editor">×</button>
+
+      <div class="account-review-editor-header">
+        <span>Edit review</span>
+        <h2 id="account-review-editor-title">Professor Review</h2>
+      </div>
+
+      <form class="account-review-editor-form" id="account-review-editor-form">
+        <input type="hidden" name="reviewId">
+
+        <div class="account-review-editor-grid">
+          <div class="account-review-editor-field">
+            <label for="account-review-course">Course Taken</label>
+            <input type="text" id="account-review-course" name="courseTaken" maxlength="60" required>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-semester">Semester Taken</label>
+            <input type="text" id="account-review-semester" name="semesterTaken" maxlength="60" required>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-rating">Rating</label>
+            <select id="account-review-rating" name="rating" required>
+              <option value="">Choose a rating</option>
+              <option value="5">5 / 5</option>
+              <option value="4">4 / 5</option>
+              <option value="3">3 / 5</option>
+              <option value="2">2 / 5</option>
+              <option value="1">1 / 5</option>
+            </select>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-recommendation">Recommendation</label>
+            <select id="account-review-recommendation" name="recommendation" required>
+              <option value="">Choose an option</option>
+              <option value="Yes">Yes</option>
+              <option value="Depends">Depends</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+
+          <div class="account-review-editor-field full">
+            <label for="account-review-recommendation-reason">Recommendation Reason</label>
+            <textarea id="account-review-recommendation-reason" name="recommendationReason" maxlength="220" placeholder="Required when the recommendation is Depends"></textarea>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-attendance">Attendance Policy</label>
+            <select id="account-review-attendance" name="attendancePolicy">
+              <option value="">Not specified</option>
+              <option value="Required">Required</option>
+              <option value="Sometimes checked">Sometimes checked</option>
+              <option value="Not important">Not important</option>
+              <option value="Not sure">Not sure</option>
+            </select>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-workload">Workload</label>
+            <select id="account-review-workload" name="workload">
+              <option value="">Not specified</option>
+              <option value="Light">Light</option>
+              <option value="Moderate">Moderate</option>
+              <option value="Heavy">Heavy</option>
+            </select>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-lectures">Lecture Usefulness</label>
+            <select id="account-review-lectures" name="lectureUsefulness">
+              <option value="">Not specified</option>
+              <option value="Essential">Essential</option>
+              <option value="Helpful">Helpful</option>
+              <option value="Attending means less work at home">Attending means less work at home</option>
+              <option value="Skippable">Skippable</option>
+              <option value="Not lecture-based">Not lecture-based</option>
+            </select>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-office-hours">Office Hours</label>
+            <select id="account-review-office-hours" name="officeHours">
+              <option value="">Not specified</option>
+              <option value="Helpful">Helpful</option>
+              <option value="Available but limited">Available but limited</option>
+              <option value="Hard to reach">Hard to reach</option>
+              <option value="Did not use">Did not use</option>
+            </select>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-grading-style">Grading Style</label>
+            <select id="account-review-grading-style" name="gradingStyle">
+              <option value="">Not specified</option>
+              <option value="Exams-heavy">Exams-heavy</option>
+              <option value="Projects-heavy">Projects-heavy</option>
+              <option value="Assignments-heavy">Assignments-heavy</option>
+              <option value="Participation-heavy">Participation-heavy</option>
+              <option value="Mixed">Mixed</option>
+            </select>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-exams">Exam Difficulty</label>
+            <select id="account-review-exams" name="examDifficulty">
+              <option value="">Not specified</option>
+              <option value="Easier than class material">Easier than class material</option>
+              <option value="Matches class material">Matches class material</option>
+              <option value="Harder than class material">Harder than class material</option>
+              <option value="No exams">No exams</option>
+            </select>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-transparency">Grading Transparency</label>
+            <select id="account-review-transparency" name="gradingTransparency">
+              <option value="">Not specified</option>
+              <option value="Rubric is clear">Rubric is clear</option>
+              <option value="Somewhat clear">Somewhat clear</option>
+              <option value="Unclear">Unclear</option>
+            </select>
+          </div>
+
+          <div class="account-review-editor-field">
+            <label for="account-review-feedback">Feedback Quality</label>
+            <select id="account-review-feedback" name="feedbackQuality">
+              <option value="">Not specified</option>
+              <option value="Helpful">Helpful</option>
+              <option value="Minimal">Minimal</option>
+              <option value="None">None</option>
+              <option value="Not applicable">Not applicable</option>
+            </select>
+          </div>
+
+          <div class="account-review-editor-field full">
+            <label for="account-review-note">Student Note</label>
+            <textarea id="account-review-note" name="studentNote" maxlength="360" required></textarea>
+          </div>
+        </div>
+
+        <div class="account-review-editor-actions">
+          <button class="account-secondary-button" type="button" id="account-review-editor-cancel">Cancel</button>
+          <button class="account-primary-button" type="submit" id="account-review-editor-submit">Save Changes</button>
+        </div>
+
+        <p class="account-message" id="account-review-editor-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
   <div class="account-authenticator-modal" id="authenticator-modal" hidden>
     <div class="account-authenticator-modal-backdrop" id="authenticator-modal-backdrop"></div>
 
@@ -2044,6 +2417,14 @@
     const authenticatorMessage = document.getElementById("authenticator-message");
     const accountReviewList = document.getElementById("account-review-list");
     const reviewsMessage = document.getElementById("reviews-message");
+    const accountReviewEditor = document.getElementById("account-review-editor");
+    const accountReviewEditorBackdrop = document.getElementById("account-review-editor-backdrop");
+    const accountReviewEditorClose = document.getElementById("account-review-editor-close");
+    const accountReviewEditorCancel = document.getElementById("account-review-editor-cancel");
+    const accountReviewEditorForm = document.getElementById("account-review-editor-form");
+    const accountReviewEditorTitle = document.getElementById("account-review-editor-title");
+    const accountReviewEditorSubmit = document.getElementById("account-review-editor-submit");
+    const accountReviewEditorMessage = document.getElementById("account-review-editor-message");
 
     const PROFILE_PHOTO_MAX_SIZE = 4 * 1024 * 1024;
     const PROFILE_PHOTO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -2059,6 +2440,8 @@
     let aucIdLastChangedAt = null;
     let displayNameEditMode = false;
     let aucIdEditMode = false;
+    let accountReviewHistory = [];
+    let activeAccountReviewId = "";
 
     function getAccountDateFromValue(value) {
       if (!value) {
@@ -2589,8 +2972,206 @@
       });
     }
 
+    function getAccountReviewById(reviewId) {
+      return accountReviewHistory.find(function (review) {
+        return String(review.id || "") === String(reviewId || "");
+      }) || null;
+    }
+
+    function getAccountReviewEditorField(name) {
+      return accountReviewEditorForm
+        ? accountReviewEditorForm.elements.namedItem(name)
+        : null;
+    }
+
+    function setAccountReviewEditorValue(name, value) {
+      const field = getAccountReviewEditorField(name);
+
+      if (field) {
+        field.value = value === undefined || value === null ? "" : String(value);
+      }
+    }
+
+    function closeAccountReviewEditor() {
+      if (!accountReviewEditor) {
+        return;
+      }
+
+      accountReviewEditor.hidden = true;
+      document.body.classList.remove("account-review-editor-open");
+      activeAccountReviewId = "";
+
+      if (accountReviewEditorForm) {
+        accountReviewEditorForm.reset();
+      }
+
+      showMessage(accountReviewEditorMessage, "", "");
+    }
+
+    function openAccountReviewEditor(reviewId) {
+      const review = getAccountReviewById(reviewId);
+
+      if (!review || !accountReviewEditor || !accountReviewEditorForm) {
+        showMessage(reviewsMessage, "Review not found.", "error");
+        return;
+      }
+
+      activeAccountReviewId = String(review.id || "");
+      accountReviewEditorForm.reset();
+
+      setAccountReviewEditorValue("reviewId", activeAccountReviewId);
+      setAccountReviewEditorValue("courseTaken", review.courseTaken);
+      setAccountReviewEditorValue("semesterTaken", review.semesterTaken);
+      setAccountReviewEditorValue("rating", review.rating);
+      setAccountReviewEditorValue("recommendation", review.recommendation);
+      setAccountReviewEditorValue("recommendationReason", review.recommendationReason);
+      setAccountReviewEditorValue("attendancePolicy", review.attendancePolicy);
+      setAccountReviewEditorValue("workload", review.workload);
+      setAccountReviewEditorValue("lectureUsefulness", review.lectureUsefulness);
+      setAccountReviewEditorValue("officeHours", review.officeHours);
+      setAccountReviewEditorValue("gradingStyle", review.gradingStyle);
+      setAccountReviewEditorValue("examDifficulty", review.examDifficulty);
+      setAccountReviewEditorValue("gradingTransparency", review.gradingTransparency);
+      setAccountReviewEditorValue("feedbackQuality", review.feedbackQuality);
+      setAccountReviewEditorValue("studentNote", review.studentNote);
+
+      accountReviewEditorTitle.textContent = review.professorName || "Professor Review";
+      showMessage(accountReviewEditorMessage, "", "");
+      accountReviewEditor.hidden = false;
+      document.body.classList.add("account-review-editor-open");
+
+      window.setTimeout(function () {
+        const courseField = getAccountReviewEditorField("courseTaken");
+
+        if (courseField) {
+          courseField.focus();
+        }
+      }, 50);
+    }
+
+    function getAccountReviewEditorPayload() {
+      const formData = new FormData(accountReviewEditorForm);
+
+      return {
+        reviewId: String(formData.get("reviewId") || activeAccountReviewId || ""),
+        courseTaken: String(formData.get("courseTaken") || "").trim(),
+        semesterTaken: String(formData.get("semesterTaken") || "").trim(),
+        rating: Number(formData.get("rating") || 0),
+        recommendation: String(formData.get("recommendation") || ""),
+        recommendationReason: String(formData.get("recommendationReason") || "").trim(),
+        attendancePolicy: String(formData.get("attendancePolicy") || ""),
+        workload: String(formData.get("workload") || ""),
+        lectureUsefulness: String(formData.get("lectureUsefulness") || ""),
+        officeHours: String(formData.get("officeHours") || ""),
+        gradingStyle: String(formData.get("gradingStyle") || ""),
+        examDifficulty: String(formData.get("examDifficulty") || ""),
+        gradingTransparency: String(formData.get("gradingTransparency") || ""),
+        feedbackQuality: String(formData.get("feedbackQuality") || ""),
+        studentNote: String(formData.get("studentNote") || "").trim()
+      };
+    }
+
+    async function saveAccountReviewChanges() {
+      const payload = getAccountReviewEditorPayload();
+
+      if (payload.recommendation === "Depends" && !payload.recommendationReason) {
+        showMessage(accountReviewEditorMessage, "Please explain what the recommendation depends on.", "error");
+        return;
+      }
+
+      accountReviewEditorSubmit.disabled = true;
+      accountReviewEditorSubmit.textContent = "Saving...";
+      showMessage(accountReviewEditorMessage, "", "");
+
+      try {
+        const response = await fetch("/api/professor-reviews", {
+          method: "PATCH",
+          credentials: "same-origin",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Could not update your review.");
+        }
+
+        renderAccountReviewHistory(data.reviews || []);
+        closeAccountReviewEditor();
+        showMessage(reviewsMessage, "Review updated.", "success");
+      } catch (error) {
+        showMessage(accountReviewEditorMessage, error.message || "Could not update your review.", "error");
+      } finally {
+        accountReviewEditorSubmit.disabled = false;
+        accountReviewEditorSubmit.textContent = "Save Changes";
+      }
+    }
+
+    async function deleteAccountReview(reviewId, button) {
+      const review = getAccountReviewById(reviewId);
+
+      if (!review) {
+        showMessage(reviewsMessage, "Review not found.", "error");
+        return;
+      }
+
+      const confirmed = window.confirm(
+        "Delete your review for " + (review.professorName || "this professor") + "? This cannot be undone."
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Deleting...";
+      }
+
+      showMessage(reviewsMessage, "", "");
+
+      try {
+        const response = await fetch("/api/professor-reviews", {
+          method: "DELETE",
+          credentials: "same-origin",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            reviewId: reviewId
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Could not delete your review.");
+        }
+
+        renderAccountReviewHistory(data.reviews || []);
+        showMessage(reviewsMessage, "Review deleted.", "success");
+      } catch (error) {
+        if (button) {
+          button.disabled = false;
+          button.textContent = "Delete";
+        }
+
+        showMessage(reviewsMessage, error.message || "Could not delete your review.", "error");
+      }
+    }
+
     function renderAccountReviewHistory(reviews) {
       const safeReviews = Array.isArray(reviews) ? reviews : [];
+      accountReviewHistory = safeReviews.slice();
 
       if (!accountReviewList) {
         return;
@@ -2607,8 +3188,18 @@
       }
 
       accountReviewList.innerHTML = safeReviews.map(function (review) {
+        const reviewId = String(review.id || "");
         const professorId = review.professorId || "";
         const rating = Number(review.rating || 0);
+        const openProfessorLink = professorId
+          ? '<a class="account-review-link" href="professors.html?id=' + encodeURIComponent(professorId) + '">Open professor</a>'
+          : "";
+        const reviewActions = reviewId
+          ? `
+              <button class="account-review-action-button" type="button" data-account-review-edit="${escapeAccountHtml(reviewId)}">Edit</button>
+              <button class="account-review-action-button is-danger" type="button" data-account-review-delete="${escapeAccountHtml(reviewId)}">Delete</button>
+            `
+          : "";
 
         return `
           <article class="account-review-item">
@@ -2627,13 +3218,59 @@
             </div>
 
             <p class="account-review-copy">${escapeAccountHtml(review.studentNote || "No written note.")}</p>
-            ${professorId ? '<a class="account-review-link" href="professors.html?id=' + encodeURIComponent(professorId) + '">Open professor</a>' : ""}
+
+            <div class="account-review-actions">
+              ${openProfessorLink}
+              ${reviewActions}
+            </div>
           </article>
         `;
       }).join("");
     }
 
     async function loadAccountReviewHistory() {
+      if (!accountReviewList) {
+        return;
+      }
+
+      showMessage(reviewsMessage, "", "");
+      accountReviewList.innerHTML = `
+        <div class="account-empty-state">
+          <h3>Loading reviews</h3>
+          <p>Checking the reviews submitted from your account.</p>
+        </div>
+      `;
+
+      try {
+        const response = await fetch("/api/professor-reviews?mine=true", {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not load your reviews.");
+        }
+
+        renderAccountReviewHistory(data.reviews || []);
+      } catch (error) {
+        accountReviewHistory = [];
+        accountReviewList.innerHTML = `
+          <div class="account-empty-state">
+            <h3>Could not load reviews</h3>
+            <p>Your review history could not be loaded right now.</p>
+          </div>
+        `;
+        showMessage(reviewsMessage, error.message || "Could not load your reviews.", "error");
+      }
+    }
       if (!accountReviewList) {
         return;
       }
@@ -3576,6 +4213,46 @@
         revokeAccountLoginSession(button.dataset.accountSessionRevoke || "", button);
       });
     }
+
+    if (accountReviewList) {
+      accountReviewList.addEventListener("click", function (event) {
+        const editButton = event.target.closest("[data-account-review-edit]");
+        const deleteButton = event.target.closest("[data-account-review-delete]");
+
+        if (editButton) {
+          openAccountReviewEditor(editButton.dataset.accountReviewEdit || "");
+          return;
+        }
+
+        if (deleteButton) {
+          deleteAccountReview(deleteButton.dataset.accountReviewDelete || "", deleteButton);
+        }
+      });
+    }
+
+    if (accountReviewEditorForm) {
+      accountReviewEditorForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        if (!accountReviewEditorForm.reportValidity()) {
+          return;
+        }
+
+        saveAccountReviewChanges();
+      });
+    }
+
+    [accountReviewEditorBackdrop, accountReviewEditorClose, accountReviewEditorCancel].forEach(function (control) {
+      if (control) {
+        control.addEventListener("click", closeAccountReviewEditor);
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && accountReviewEditor && !accountReviewEditor.hidden) {
+        closeAccountReviewEditor();
+      }
+    });
 
     document.querySelectorAll("[data-account-action]").forEach(function (button) {
       if (button.id === "two-factor-app-button") {
