@@ -151,6 +151,108 @@ async function getAuthorReviews(authorUid) {
   return reviews;
 }
 
+function getReviewOwnerUid(reviewData) {
+  return reviewData.authorUid || reviewData.authorUserId || "";
+}
+
+function getReviewId(req) {
+  const body = req.body || {};
+  const query = req.query || {};
+  const reviewId = cleanString(body.reviewId || query.reviewId, 120);
+
+  if (!reviewId || !/^[A-Za-z0-9_-]+$/.test(reviewId)) {
+    throw createReviewError("Review not found.", 400);
+  }
+
+  return reviewId;
+}
+
+async function getOwnedReview(reviewId, authorUid) {
+  const reviewRef = admin.firestore().collection("professorReviews").doc(reviewId);
+  const reviewDoc = await reviewRef.get();
+
+  if (!reviewDoc.exists) {
+    throw createReviewError("Review not found.", 404);
+  }
+
+  const reviewData = reviewDoc.data() || {};
+
+  if (getReviewOwnerUid(reviewData) !== authorUid) {
+    throw createReviewError("You cannot change this review.", 403);
+  }
+
+  return {
+    ref: reviewRef,
+    doc: reviewDoc,
+    data: reviewData
+  };
+}
+
+function buildReviewFields(body, existingData) {
+  const source = body || {};
+  const existing = existingData || {};
+
+  function getValue(key) {
+    return Object.prototype.hasOwnProperty.call(source, key)
+      ? source[key]
+      : existing[key];
+  }
+
+  const recommendation = cleanChoice(getValue("recommendation"), "recommendation");
+  const recommendationReason = recommendation === "Depends"
+    ? cleanNote(getValue("recommendationReason"), 220)
+    : "";
+
+  return {
+    professorId: cleanString(existing.professorId || source.professorId, 80),
+    professorName: cleanString(existing.professorName || source.professorName, 120),
+    courseTaken: cleanString(getValue("courseTaken"), 60),
+    semesterTaken: cleanString(getValue("semesterTaken"), 60),
+    rating: Number(getValue("rating") || 0),
+    recommendation,
+    recommendationReason,
+    attendancePolicy: cleanChoice(getValue("attendancePolicy"), "attendancePolicy"),
+    workload: cleanChoice(getValue("workload"), "workload"),
+    lectureUsefulness: cleanChoice(getValue("lectureUsefulness"), "lectureUsefulness"),
+    officeHours: cleanChoice(getValue("officeHours"), "officeHours"),
+    gradingStyle: cleanChoice(getValue("gradingStyle"), "gradingStyle"),
+    examDifficulty: cleanChoice(getValue("examDifficulty"), "examDifficulty"),
+    gradingTransparency: cleanChoice(getValue("gradingTransparency"), "gradingTransparency"),
+    feedbackQuality: cleanChoice(getValue("feedbackQuality"), "feedbackQuality"),
+    studentNote: cleanNote(getValue("studentNote"), 360)
+  };
+}
+
+function validateReviewFields(reviewFields) {
+  if (!reviewFields.professorId || !reviewFields.professorName) {
+    throw createReviewError("Professor not found.", 400);
+  }
+
+  if (!reviewFields.courseTaken) {
+    throw createReviewError("Please enter the course taken.", 400);
+  }
+
+  if (!reviewFields.semesterTaken) {
+    throw createReviewError("Please enter the semester taken.", 400);
+  }
+
+  if (!Number.isInteger(reviewFields.rating) || reviewFields.rating < 1 || reviewFields.rating > 5) {
+    throw createReviewError("Please choose a star rating.", 400);
+  }
+
+  if (!reviewFields.recommendation) {
+    throw createReviewError("Please choose a recommendation.", 400);
+  }
+
+  if (reviewFields.recommendation === "Depends" && !reviewFields.recommendationReason) {
+    throw createReviewError("Please explain what it depends on.", 400);
+  }
+
+  if (!reviewFields.studentNote) {
+    throw createReviewError("Please add a short note for students.", 400);
+  }
+}
+
 module.exports = async function handler(req, res) {
   try {
     if (req.method === "GET") {
@@ -175,86 +277,84 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ reviews });
     }
 
-    if (req.method !== "POST") {
+    if (!["POST", "PATCH", "DELETE"].includes(req.method)) {
       return res.status(405).json({ error: "Method not allowed" });
     }
 
     const decodedUser = await getSiteSessionUser(req, {
       checkRevoked: true
     });
+
+    if (req.method === "DELETE") {
+      const reviewId = getReviewId(req);
+      const ownedReview = await getOwnedReview(reviewId, decodedUser.uid);
+
+      await ownedReview.ref.delete();
+
+      const reviews = await getAuthorReviews(decodedUser.uid);
+
+      return res.status(200).json({
+        success: true,
+        reviews
+      });
+    }
+
     await ensureVerifiedReviewAuthor(decodedUser);
 
     const body = req.body || {};
-    const professorId = cleanString(body.professorId, 80);
-    const professorName = cleanString(body.professorName, 120);
-    const courseTaken = cleanString(body.courseTaken, 60);
-    const semesterTaken = cleanString(body.semesterTaken, 60);
-    const rating = Number(body.rating || 0);
-    const recommendation = cleanChoice(body.recommendation, "recommendation");
-    const recommendationReason = cleanNote(body.recommendationReason, 220);
-    const studentNote = cleanNote(body.studentNote, 360);
 
-    if (!professorId || !professorName) {
-      throw createReviewError("Professor not found.", 400);
+    if (req.method === "PATCH") {
+      const reviewId = getReviewId(req);
+      const ownedReview = await getOwnedReview(reviewId, decodedUser.uid);
+      const reviewFields = buildReviewFields(body, ownedReview.data);
+
+      validateReviewFields(reviewFields);
+
+      const authorProfile = await getAuthorProfile(decodedUser);
+      const updatedAtIso = new Date().toISOString();
+      const updateData = Object.assign({}, reviewFields, {
+        authorUid: decodedUser.uid,
+        authorUserId: decodedUser.uid,
+        authorName: authorProfile.authorName,
+        authorPhotoURL: authorProfile.authorPhotoURL,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAtIso
+      });
+
+      await ownedReview.ref.update(updateData);
+
+      const updatedReviewDoc = await ownedReview.ref.get();
+      const reviews = await getAuthorReviews(decodedUser.uid);
+
+      return res.status(200).json({
+        success: true,
+        review: serializeReview(updatedReviewDoc),
+        reviews
+      });
     }
 
-    if (!courseTaken) {
-      throw createReviewError("Please enter the course taken.", 400);
-    }
+    const reviewFields = buildReviewFields(body);
 
-    if (!semesterTaken) {
-      throw createReviewError("Please enter the semester taken.", 400);
-    }
-
-    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-      throw createReviewError("Please choose a star rating.", 400);
-    }
-
-    if (!recommendation) {
-      throw createReviewError("Please choose a recommendation.", 400);
-    }
-
-    if (recommendation === "Depends" && !recommendationReason) {
-      throw createReviewError("Please explain what it depends on.", 400);
-    }
-
-    if (!studentNote) {
-      throw createReviewError("Please add a short note for students.", 400);
-    }
+    validateReviewFields(reviewFields);
 
     const authorProfile = await getAuthorProfile(decodedUser);
     const createdAtIso = new Date().toISOString();
-    const reviewData = {
-      professorId,
-      professorName,
-      courseTaken,
-      semesterTaken,
-      rating,
-      recommendation,
-      recommendationReason,
-      attendancePolicy: cleanChoice(body.attendancePolicy, "attendancePolicy"),
-      workload: cleanChoice(body.workload, "workload"),
-      lectureUsefulness: cleanChoice(body.lectureUsefulness, "lectureUsefulness"),
-      officeHours: cleanChoice(body.officeHours, "officeHours"),
-      gradingStyle: cleanChoice(body.gradingStyle, "gradingStyle"),
-      examDifficulty: cleanChoice(body.examDifficulty, "examDifficulty"),
-      gradingTransparency: cleanChoice(body.gradingTransparency, "gradingTransparency"),
-      feedbackQuality: cleanChoice(body.feedbackQuality, "feedbackQuality"),
-      studentNote,
+    const reviewData = Object.assign({}, reviewFields, {
       authorUid: decodedUser.uid,
       authorUserId: decodedUser.uid,
       authorName: authorProfile.authorName,
       authorPhotoURL: authorProfile.authorPhotoURL,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       createdAtIso
-    };
+    });
 
     const reviewRef = await admin.firestore().collection("professorReviews").add(reviewData);
-    const reviews = await getProfessorReviews(professorId);
+    const createdReviewDoc = await reviewRef.get();
+    const reviews = await getProfessorReviews(reviewFields.professorId);
 
     return res.status(201).json({
       success: true,
-      review: Object.assign({ id: reviewRef.id, createdAt: createdAtIso }, reviewData),
+      review: serializeReview(createdReviewDoc),
       reviews
     });
   } catch (error) {
