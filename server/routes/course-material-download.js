@@ -87,25 +87,70 @@ module.exports = async function handler(req, res) {
 
     await ensureVerifiedAucUser(req);
 
-    const materialId = cleanString(getQueryValue(req, "id"), 160);
+    const requestedPath = cleanString(
+      getQueryValue(req, "path"),
+      800
+    );
 
-    if (!/^[A-Za-z0-9_-]{6,160}$/.test(materialId)) {
-      throw createDownloadError("Course material file not found.", 404);
+    let filePath = "";
+
+    if (requestedPath) {
+      const normalizedPath =
+        requestedPath.charAt(0) === "/"
+          ? requestedPath
+          : "/" + requestedPath;
+
+      if (
+        normalizedPath.indexOf("/auc-atlas/materials/") !== 0 ||
+        normalizedPath.indexOf("..") !== -1 ||
+        normalizedPath.indexOf("\\") !== -1
+      ) {
+        throw createDownloadError(
+          "Course material file not found.",
+          404
+        );
+      }
+
+      filePath = normalizedPath;
+    } else {
+      const materialId = cleanString(
+        getQueryValue(req, "id"),
+        160
+      );
+
+      if (!/^[A-Za-z0-9_-]{6,160}$/.test(materialId)) {
+        throw createDownloadError(
+          "Course material file not found.",
+          404
+        );
+      }
+
+      const materialDoc = await admin
+        .firestore()
+        .collection("courseMaterials")
+        .doc(materialId)
+        .get();
+
+      if (!materialDoc.exists) {
+        throw createDownloadError(
+          "Course material file not found.",
+          404
+        );
+      }
+
+      const material = materialDoc.data() || {};
+
+      if (material.status === "rejected") {
+        throw createDownloadError(
+          "Course material file not found.",
+          404
+        );
+      }
+
+      filePath = getImageKitPath(material);
     }
 
-    const materialDoc = await admin.firestore().collection("courseMaterials").doc(materialId).get();
-
-    if (!materialDoc.exists) {
-      throw createDownloadError("Course material file not found.", 404);
-    }
-
-    const material = materialDoc.data() || {};
-
-    if (material.status === "rejected") {
-      throw createDownloadError("Course material file not found.", 404);
-    }
-
-    const signedUrl = getSignedImageKitUrl(getImageKitPath(material));
+    const signedUrl = getSignedImageKitUrl(filePath);
 
     res.setHeader("Cache-Control", "no-store");
     res.statusCode = 302;
