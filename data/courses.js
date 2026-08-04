@@ -1209,12 +1209,26 @@
       });
 
       request.addEventListener("load", function () {
+        let responseData = {};
+
+        try {
+          responseData = JSON.parse(request.responseText || "{}");
+        } catch (error) {
+          responseData = {};
+        }
+
         if (request.status >= 200 && request.status < 300) {
-          resolve();
+          resolve(responseData);
           return;
         }
 
-        reject(new Error("ImageKit rejected the upload."));
+        reject(
+          new Error(
+            responseData.message ||
+              responseData.error ||
+              "ImageKit rejected the upload."
+          )
+        );
       });
 
       request.addEventListener("error", function () {
@@ -1247,6 +1261,7 @@
       event.preventDefault();
 
       const professorInput = document.getElementById("material-professor");
+      const materialTypeInput = document.getElementById("material-type");
       const semesterInput = document.getElementById("material-semester");
       const titleInput = document.getElementById("material-title");
       const fileInput = document.getElementById("material-file");
@@ -1254,12 +1269,21 @@
         ? Array.from(fileInput.files)
         : [];
       const professor = professorInput ? professorInput.value.trim() : "";
+      const materialType = materialTypeInput
+        ? materialTypeInput.value.trim()
+        : "";
       const semester = semesterInput ? semesterInput.value.trim() : "";
       const title = titleInput ? titleInput.value.trim() : "";
 
-      if (!professor || !semester || !title || !files.length) {
+      if (
+        !professor ||
+        !materialType ||
+        !semester ||
+        !title ||
+        !files.length
+      ) {
         setMaterialUploadStatus(
-          "Fill in the professor, semester, title, and choose at least one file.",
+          "Fill in the professor, material type, semester, title, and choose at least one file.",
           "error"
         );
         return;
@@ -1366,20 +1390,62 @@
             "fileId,name,url,filePath,size,fileType,tags"
           );
 
-          await uploadMaterialFormData(formData, function (fileProgress) {
-            const uploadedBytes =
-              completedBytes + file.size * fileProgress;
-            const overallProgress =
-              totalBytes > 0
-                ? (uploadedBytes / totalBytes) * 100
-                : 0;
+          const uploadedFile = await uploadMaterialFormData(
+            formData,
+            function (fileProgress) {
+              const uploadedBytes =
+                completedBytes + file.size * fileProgress;
+              const overallProgress =
+                totalBytes > 0
+                  ? (uploadedBytes / totalBytes) * 100
+                  : 0;
 
-            setMaterialUploadProgress(
-              overallProgress,
-              progressLabel,
-              true
-            );
+              setMaterialUploadProgress(
+                overallProgress,
+                progressLabel,
+                true
+              );
+            }
+          );
+
+          const saveResponse = await fetch("/api/course-materials", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              courseCode: course.code,
+              courseTitle: course.title || "",
+              professor: professor,
+              semester: semester,
+              materialType: materialType,
+              title: uploadTitle,
+              fileName:
+                uploadedFile.name ||
+                buildMaterialFileName(uploadTitle, file.name),
+              fileUrl: uploadedFile.url || "",
+              filePath: uploadedFile.filePath || "",
+              fileId: uploadedFile.fileId || "",
+              size: Number(uploadedFile.size || file.size || 0),
+              fileType: uploadedFile.fileType || file.type || ""
+            })
           });
+
+          let saveData = {};
+
+          try {
+            saveData = await saveResponse.json();
+          } catch (error) {
+            saveData = {};
+          }
+
+          if (!saveResponse.ok) {
+            throw new Error(
+              saveData.error ||
+                "The file uploaded, but its course-material record could not be saved."
+            );
+          }
 
           completedBytes += file.size;
           uploadedCount += 1;
@@ -1396,13 +1462,14 @@
         form.reset();
         syncMaterialChoiceMenus(form);
         setMaterialFileSelection(form, []);
+        await loadCourseMaterials(course);
         setMaterialUploadProgress(100, "Upload complete", true);
 
         setMaterialUploadStatus(
           files.length === 1
-            ? "File uploaded successfully. It is tagged as pending in ImageKit."
+            ? "File uploaded successfully and added to the course materials library."
             : files.length +
-                " files uploaded successfully. They are tagged as pending in ImageKit.",
+                " files uploaded successfully and added to the course materials library.",
           "success"
         );
 
