@@ -117,6 +117,10 @@
 
   window.aucAtlasProfessors = professors;
 
+  if (!document.getElementById("professors-grid")) {
+    return;
+  }
+
   const style = document.createElement("style");
   style.textContent = `
     .professors-browser {
