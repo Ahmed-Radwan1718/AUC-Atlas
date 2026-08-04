@@ -869,12 +869,35 @@
     });
   }
 
-  function setMaterialFileName(form, fileName) {
-    const fileNameElement = form.querySelector("#material-file-name");
+  function formatMaterialFileSize(fileSize) {
+    const bytes = Number(fileSize) || 0;
 
-    if (fileNameElement) {
-      fileNameElement.textContent = fileName || "No file chosen";
+    if (bytes >= 1024 * 1024) {
+      const megabytes = bytes / (1024 * 1024);
+      return megabytes.toFixed(megabytes >= 10 ? 0 : 1) + " MB";
     }
+
+    return Math.max(1, Math.round(bytes / 1024)) + " KB";
+  }
+
+  function setMaterialFileSelection(form, files) {
+    const selection = form.querySelector("#material-file-selection");
+    const selectedFiles = Array.from(files || []);
+
+    if (!selection) {
+      return;
+    }
+
+    selection.hidden = !selectedFiles.length;
+
+    selection.innerHTML = selectedFiles.map(function (file) {
+      return `
+        <div class="material-file-item">
+          <strong>${escapeMaterialText(file.name)}</strong>
+          <span>${formatMaterialFileSize(file.size)}</span>
+        </div>
+      `;
+    }).join("");
   }
 
   function setupMaterialFilePicker(form) {
@@ -887,8 +910,7 @@
     fileInput.dataset.fileReady = "true";
 
     fileInput.addEventListener("change", function () {
-      const file = fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
-      setMaterialFileName(form, file ? file.name : "");
+      setMaterialFileSelection(form, fileInput.files);
     });
   }
 
@@ -1160,78 +1182,152 @@
       const semesterInput = document.getElementById("material-semester");
       const titleInput = document.getElementById("material-title");
       const fileInput = document.getElementById("material-file");
-      const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+      const files = fileInput && fileInput.files
+        ? Array.from(fileInput.files)
+        : [];
       const professor = professorInput ? professorInput.value.trim() : "";
       const semester = semesterInput ? semesterInput.value.trim() : "";
       const title = titleInput ? titleInput.value.trim() : "";
 
-      if (!professor || !semester || !title || !file) {
-        setMaterialUploadStatus("Fill in the professor, semester, title, and file before uploading.", "error");
+      if (!professor || !semester || !title || !files.length) {
+        setMaterialUploadStatus(
+          "Fill in the professor, semester, title, and choose at least one file.",
+          "error"
+        );
         return;
       }
 
-      if (file.size > 25 * 1024 * 1024) {
-        setMaterialUploadStatus("This file is above the 25MB free-plan upload limit.", "error");
+      const oversizedFile = files.find(function (file) {
+        return file.size > 25 * 1024 * 1024;
+      });
+
+      if (oversizedFile) {
+        setMaterialUploadStatus(
+          oversizedFile.name + " is above the 25MB upload limit.",
+          "error"
+        );
         return;
       }
 
       if (button) {
         button.disabled = true;
-        button.textContent = "Uploading...";
       }
 
-      setMaterialUploadStatus("Preparing upload...", "");
+      const courseSlug = slugifyMaterialValue(course.code);
+      const professorSlug = slugifyMaterialValue(professor);
+      const semesterSlug = slugifyMaterialValue(semester);
+      const folder =
+        "/auc-atlas/materials/" +
+        courseSlug +
+        "/" +
+        professorSlug +
+        "/" +
+        semesterSlug;
+      const tags = [
+        "auc-atlas-material",
+        "status-pending",
+        "course-" + courseSlug,
+        "professor-" + professorSlug,
+        "semester-" + semesterSlug
+      ].join(",");
+
+      let uploadedCount = 0;
 
       try {
-        const authResponse = await fetch("/api/imagekit-auth");
+        for (let index = 0; index < files.length; index += 1) {
+          const file = files[index];
+          const originalTitle = file.name.replace(/\.[^.]+$/, "");
+          const uploadTitle = files.length > 1
+            ? title + " - " + originalTitle
+            : title;
 
-        if (!authResponse.ok) {
-          throw new Error("Could not prepare ImageKit upload.");
-        }
+          if (button) {
+            button.textContent =
+              files.length > 1
+                ? "Uploading " + (index + 1) + " of " + files.length + "..."
+                : "Uploading...";
+          }
 
-        const auth = await authResponse.json();
-        const courseSlug = slugifyMaterialValue(course.code);
-        const professorSlug = slugifyMaterialValue(professor);
-        const semesterSlug = slugifyMaterialValue(semester);
-        const folder = "/auc-atlas/materials/" + courseSlug + "/" + professorSlug + "/" + semesterSlug;
-        const tags = [
-          "auc-atlas-material",
-          "status-pending",
-          "course-" + courseSlug,
-          "professor-" + professorSlug,
-          "semester-" + semesterSlug
-        ].join(",");
+          setMaterialUploadStatus(
+            files.length > 1
+              ? "Uploading file " + (index + 1) + " of " + files.length + "..."
+              : "Uploading file...",
+            ""
+          );
 
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("fileName", buildMaterialFileName(title, file.name));
-        formData.append("publicKey", auth.publicKey);
-        formData.append("token", auth.token);
-        formData.append("signature", auth.signature);
-        formData.append("expire", auth.expire);
-        formData.append("folder", folder);
-        formData.append("tags", tags);
-        formData.append("useUniqueFileName", "true");
-        formData.append("description", title + " | " + course.code + " | " + professor + " | " + semester);
-        formData.append("responseFields", "fileId,name,url,filePath,size,fileType,tags");
+          const authResponse = await fetch("/api/imagekit-auth", {
+            cache: "no-store"
+          });
 
-        setMaterialUploadStatus("Uploading to ImageKit...", "");
+          if (!authResponse.ok) {
+            throw new Error("Could not prepare the next file upload.");
+          }
 
-        const uploadResponse = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
-          method: "POST",
-          body: formData
-        });
+          const auth = await authResponse.json();
+          const formData = new FormData();
 
-        if (!uploadResponse.ok) {
-          throw new Error("ImageKit rejected the upload.");
+          formData.append("file", file);
+          formData.append(
+            "fileName",
+            buildMaterialFileName(uploadTitle, file.name)
+          );
+          formData.append("publicKey", auth.publicKey);
+          formData.append("token", auth.token);
+          formData.append("signature", auth.signature);
+          formData.append("expire", auth.expire);
+          formData.append("folder", folder);
+          formData.append("tags", tags);
+          formData.append("useUniqueFileName", "true");
+          formData.append(
+            "description",
+            uploadTitle +
+              " | " +
+              course.code +
+              " | " +
+              professor +
+              " | " +
+              semester
+          );
+          formData.append(
+            "responseFields",
+            "fileId,name,url,filePath,size,fileType,tags"
+          );
+
+          const uploadResponse = await fetch(
+            "https://upload.imagekit.io/api/v1/files/upload",
+            {
+              method: "POST",
+              body: formData
+            }
+          );
+
+          if (!uploadResponse.ok) {
+            throw new Error("ImageKit rejected " + file.name + ".");
+          }
+
+          uploadedCount += 1;
         }
 
         form.reset();
         syncMaterialChoiceMenus(form);
-        setMaterialFileName(form, "");
-        setMaterialUploadStatus("Uploaded successfully. It is tagged as pending in ImageKit.", "success");
+        setMaterialFileSelection(form, []);
+
+        setMaterialUploadStatus(
+          files.length === 1
+            ? "File uploaded successfully. It is tagged as pending in ImageKit."
+            : files.length +
+                " files uploaded successfully. They are tagged as pending in ImageKit.",
+          "success"
+        );
       } catch (error) {
-        setMaterialUploadStatus(error.message || "Upload failed. Try again.", "error");
+        const progressMessage = uploadedCount
+          ? uploadedCount + " of " + files.length + " files uploaded. "
+          : "";
+
+        setMaterialUploadStatus(
+          progressMessage + (error.message || "Upload failed. Try again."),
+          "error"
+        );
       } finally {
         if (button) {
           button.disabled = false;
