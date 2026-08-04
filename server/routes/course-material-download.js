@@ -151,8 +151,19 @@ module.exports = async function handler(req, res) {
     }
 
     const signedUrl = getSignedImageKitUrl(filePath);
+    const responseFormat = cleanString(
+      getQueryValue(req, "format"),
+      20
+    ).toLowerCase();
 
     res.setHeader("Cache-Control", "no-store");
+
+    if (responseFormat === "json") {
+      return res.status(200).json({
+        url: signedUrl
+      });
+    }
+
     res.statusCode = 302;
     res.setHeader("Location", signedUrl);
     return res.end();
