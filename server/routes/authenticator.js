@@ -4,7 +4,9 @@ const { authenticator } = require("otplib");
 
 const {
   getSiteSessionUser,
-  getAuthenticatorSecret
+  getAuthenticatorSecret,
+  issueSecurityPanelAccess,
+  requireSecurityPanelAccess
 } = require("../_lib/securityHelpers");
 
 const SETUP_EXPIRES_MS = 10 * 60 * 1000;
@@ -121,12 +123,64 @@ async function handleVerifySetup(req, res, decodedUser) {
 
   await setupRef.delete().catch(function () {});
 
+  const securityAccess = await issueSecurityPanelAccess(
+    decodedUser
+  );
+
   return res.status(200).json({
     success: true,
     twoFactor: {
       appEnabled: true,
       emailEnabled: Boolean(nextTwoFactor.emailEnabled)
-    }
+    },
+    securityAccessToken: securityAccess.token,
+    securityAccessExpiresAt: securityAccess.expiresAt
+  });
+}
+
+async function handleVerifySecurityPanel(req, res, decodedUser) {
+  const code = cleanCode((req.body || {}).code);
+  const state = await getTwoFactorState(decodedUser.uid);
+
+  if (!state.twoFactor.appEnabled) {
+    return res.status(200).json({
+      success: true,
+      securityAccessRequired: false,
+      securityAccessToken: ""
+    });
+  }
+
+  if (!/^\d{6}$/.test(code)) {
+    return res.status(400).json({
+      error: "Please enter your 6-digit authenticator code."
+    });
+  }
+
+  const secret = await getAuthenticatorSecret(decodedUser.uid);
+
+  if (!secret) {
+    return res.status(400).json({
+      error: "Authenticator app is not configured correctly."
+    });
+  }
+
+  authenticator.options = { window: 1 };
+
+  if (!authenticator.check(code, secret)) {
+    return res.status(401).json({
+      error: "Invalid authenticator code."
+    });
+  }
+
+  const securityAccess = await issueSecurityPanelAccess(
+    decodedUser
+  );
+
+  return res.status(200).json({
+    success: true,
+    securityAccessRequired: true,
+    securityAccessToken: securityAccess.token,
+    securityAccessExpiresAt: securityAccess.expiresAt
   });
 }
 
@@ -198,7 +252,16 @@ module.exports = async function handler(req, res) {
       return await handleVerifySetup(req, res, decodedUser);
     }
 
+    if (action === "verify-security-panel") {
+      return await handleVerifySecurityPanel(
+        req,
+        res,
+        decodedUser
+      );
+    }
+
     if (action === "disable") {
+      await requireSecurityPanelAccess(req, decodedUser);
       return await handleDisable(req, res, decodedUser);
     }
 
