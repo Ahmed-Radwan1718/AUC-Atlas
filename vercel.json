@@ -1,6 +1,6 @@
 {
   "cleanUrls": true,
   "git": {
-    "deploymentEnabled": true
+    "deploymentEnabled": false
   }
 }
