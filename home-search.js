@@ -69,13 +69,75 @@
     return score;
   }
 
+  const professorReviewCountCache = new Map();
+  const professorReviewCountRequests = new Map();
+
+  function getReviewCountLabel(count) {
+    return count + " " + (count === 1 ? "review" : "reviews");
+  }
+
+  function getProfessorMeta(result, reviewCount) {
+    const reviewLabel = Number.isInteger(reviewCount)
+      ? getReviewCountLabel(reviewCount)
+      : "Loading reviews...";
+
+    return [
+      result.department,
+      result.courses,
+      reviewLabel
+    ].filter(Boolean).join(" · ");
+  }
+
+  function loadProfessorReviewCount(professorId) {
+    if (professorReviewCountCache.has(professorId)) {
+      return Promise.resolve(professorReviewCountCache.get(professorId));
+    }
+
+    if (professorReviewCountRequests.has(professorId)) {
+      return professorReviewCountRequests.get(professorId);
+    }
+
+    const request = fetch(
+      "/api/professor-reviews?professorId=" +
+        encodeURIComponent(professorId) +
+        "&countOnly=true",
+      {
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: {
+          Accept: "application/json"
+        }
+      }
+    ).then(function (response) {
+      if (!response.ok) {
+        throw new Error("Could not load review count.");
+      }
+
+      return response.json();
+    }).then(function (data) {
+      const reviewCount = Number(data.reviewCount || 0);
+
+      professorReviewCountCache.set(professorId, reviewCount);
+      return reviewCount;
+    }).catch(function () {
+      return null;
+    }).finally(function () {
+      professorReviewCountRequests.delete(professorId);
+    });
+
+    professorReviewCountRequests.set(professorId, request);
+    return request;
+  }
+
   function getProfessorResults(query) {
     const professors = Array.isArray(window.aucAtlasProfessors)
       ? window.aucAtlasProfessors
       : [];
 
     return professors.map(function (professor) {
+      const professorId = professor.id || "";
       const department = professor.displayDepartment || professor.department || "AUC";
+      const courses = professor.course || "Courses coming soon";
       const score = getMatchScore(query, professor.name, [
         professor.name,
         professor.id,
@@ -85,18 +147,23 @@
         professor.course,
         professor.bio
       ]);
-
-      return {
+      const result = {
         type: "Professor",
         title: professor.name,
-        meta: department + (
-          professor.department && professor.department !== department
-            ? " · " + professor.department
-            : ""
-        ),
-        href: "professors.html?id=" + encodeURIComponent(professor.id || ""),
+        professorId,
+        department,
+        courses,
+        meta: "",
+        href: "professors.html?id=" + encodeURIComponent(professorId),
         score
       };
+
+      result.meta = getProfessorMeta(
+        result,
+        professorReviewCountCache.get(professorId)
+      );
+
+      return result;
     }).filter(function (result) {
       return result.score >= 0;
     }).sort(function (firstResult, secondResult) {
@@ -176,6 +243,22 @@
     copy.appendChild(meta);
     link.appendChild(type);
     link.appendChild(copy);
+
+    if (result.type === "Professor" && result.professorId) {
+      loadProfessorReviewCount(result.professorId).then(function (reviewCount) {
+        if (!link.isConnected) {
+          return;
+        }
+
+        meta.textContent = reviewCount === null
+          ? [
+              result.department,
+              result.courses,
+              "Reviews unavailable"
+            ].filter(Boolean).join(" · ")
+          : getProfessorMeta(result, reviewCount);
+      });
+    }
 
     link.addEventListener("mouseenter", function () {
       setActiveResult(resultLinks.indexOf(link));
