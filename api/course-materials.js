@@ -220,9 +220,10 @@ async function getImageKitCourseMaterials(courseCode) {
         80
       ),
       status: "pending",
-      uploaderUid: "",
-      uploaderDisplayName: "AUC student",
-      uploaderPhotoURL: "",
+      uploaderUid: descriptionParts[7] || "",
+      uploaderDisplayName:
+        descriptionParts[5] || "AUC student",
+      uploaderPhotoURL: cleanUrl(descriptionParts[6]),
       createdAt: cleanString(file && file.createdAt, 80)
     };
   });
@@ -248,6 +249,21 @@ async function getCourseMaterials(courseCode) {
   try {
     const imageKitMaterials =
       await getImageKitCourseMaterials(courseCode);
+
+    function getMaterialIdentity(material) {
+      return [
+        cleanString(material.title, 160).toLowerCase(),
+        cleanString(
+          material.professor,
+          120
+        ).toLowerCase(),
+        cleanString(
+          material.semester,
+          80
+        ).toLowerCase()
+      ].join("|");
+    }
+
     const knownFileNames = new Set(
       materials
         .map(function (material) {
@@ -258,18 +274,32 @@ async function getCourseMaterials(courseCode) {
         })
         .filter(Boolean)
     );
+    const knownMaterialIdentities = new Set(
+      materials
+        .map(getMaterialIdentity)
+        .filter(Boolean)
+    );
 
     imageKitMaterials.forEach(function (material) {
       const fileName = cleanString(
         material.fileName,
         240
       ).toLowerCase();
+      const materialIdentity =
+        getMaterialIdentity(material);
 
-      if (!fileName || knownFileNames.has(fileName)) {
+      if (
+        (fileName && knownFileNames.has(fileName)) ||
+        knownMaterialIdentities.has(materialIdentity)
+      ) {
         return;
       }
 
-      knownFileNames.add(fileName);
+      if (fileName) {
+        knownFileNames.add(fileName);
+      }
+
+      knownMaterialIdentities.add(materialIdentity);
       materials.push(material);
     });
   } catch (error) {
