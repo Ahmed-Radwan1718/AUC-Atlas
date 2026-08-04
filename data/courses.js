@@ -390,15 +390,7 @@
     };
   });
 
-  const courseProfessors = {
-    "MACT 1121": [
-      {
-        name: "Eslam Badr",
-        department: "MACT",
-        url: "professors.html?professor=eslam-badr"
-      }
-    ]
-  };
+  const courseProfessors = {};
 
   window.aucAtlasCourses = courses;
   window.aucAtlasCourseProfessors = courseProfessors;
@@ -611,6 +603,18 @@
     const professors = courseProfessors[course.code] || [];
 
     if (!list) {
+      return;
+    }
+
+    const professorRow = list.closest(".course-detail-professors");
+    const shouldHideProfessorRow = course.code === "MACT 1121";
+
+    if (professorRow) {
+      professorRow.hidden = shouldHideProfessorRow;
+    }
+
+    if (shouldHideProfessorRow) {
+      list.innerHTML = "";
       return;
     }
 
