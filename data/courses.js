@@ -598,39 +598,104 @@
     }
   }
 
-  function renderCourseProfessors(course) {
+  function getReviewedCourseProfessor(review) {
+    const professorId = String(review && review.professorId ? review.professorId : "").trim();
+    const professorName = String(review && review.professorName ? review.professorName : "").trim();
+    const professorSource = Array.isArray(window.aucAtlasProfessors)
+      ? window.aucAtlasProfessors
+      : [];
+    const knownProfessor = professorSource.find(function (professor) {
+      return String(professor && professor.id ? professor.id : "").trim().toLowerCase() === professorId.toLowerCase();
+    });
+
+    return {
+      id: knownProfessor ? knownProfessor.id : professorId,
+      name: knownProfessor ? knownProfessor.name : professorName,
+      department: knownProfessor
+        ? (knownProfessor.displayDepartment || knownProfessor.department || "AUC")
+        : "AUC"
+    };
+  }
+
+  function renderCourseProfessors(course, reviews) {
     const list = document.getElementById("course-professor-list");
-    const professors = courseProfessors[course.code] || [];
 
     if (!list) {
       return;
     }
 
     const professorRow = list.closest(".course-detail-professors");
-    const shouldHideProfessorRow = course.code === "MACT 1121";
+    const professorsById = new Map();
+    const safeReviews = Array.isArray(reviews) ? reviews : [];
+
+    safeReviews.forEach(function (review) {
+      const professor = getReviewedCourseProfessor(review);
+      const professorKey = String(professor.id || professor.name || "").trim().toLowerCase();
+
+      if (professorKey && professor.name) {
+        professorsById.set(professorKey, professor);
+      }
+    });
+
+    const professors = Array.from(professorsById.values()).sort(function (firstProfessor, secondProfessor) {
+      return firstProfessor.name.localeCompare(secondProfessor.name);
+    });
 
     if (professorRow) {
-      professorRow.hidden = shouldHideProfessorRow;
-    }
-
-    if (shouldHideProfessorRow) {
-      list.innerHTML = "";
-      return;
+      professorRow.hidden = !professors.length;
     }
 
     if (!professors.length) {
-      list.innerHTML = "<p>No professors listed for this course yet.</p>";
+      list.innerHTML = "";
       return;
     }
 
     list.innerHTML = professors.map(function (professor) {
       return `
-        <a class="course-professor-link" href="${professor.url}">
-          <strong>${professor.name}</strong>
-          <span>${professor.department}</span>
+        <a class="course-professor-link" href="professors.html?id=${encodeURIComponent(professor.id)}">
+          <strong>${escapeMaterialText(professor.name)}</strong>
+          <span>${escapeMaterialText(professor.department)}</span>
         </a>
       `;
     }).join("");
+  }
+
+  async function loadCourseProfessors(course) {
+    const list = document.getElementById("course-professor-list");
+    const professorRow = list ? list.closest(".course-detail-professors") : null;
+
+    if (professorRow) {
+      professorRow.hidden = true;
+    }
+
+    if (list) {
+      list.innerHTML = "";
+    }
+
+    try {
+      const response = await fetch(
+        "/api/professor-reviews?courseCode=" + encodeURIComponent(course.code),
+        {
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            "Accept": "application/json"
+          }
+        }
+      );
+
+      const data = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not load course professors.");
+      }
+
+      renderCourseProfessors(course, data.reviews || []);
+    } catch (error) {
+      renderCourseProfessors(course, []);
+    }
   }
 
   function closeMaterialChoiceMenus(activeChoice) {
@@ -960,7 +1025,7 @@
       setCourseDetailText("course-detail-level", "Unavailable");
       setCourseDetailText("course-detail-full-code", courseCode || "Unavailable");
       setCourseDetailText("course-detail-note", "This course could not be matched to the current AUC Atlas course list.");
-      renderCourseProfessors({ code: "" });
+      renderCourseProfessors({ code: "" }, []);
       return true;
     }
 
@@ -972,7 +1037,7 @@
     setCourseDetailText("course-detail-level", selectedCourse.level);
     setCourseDetailText("course-detail-full-code", selectedCourse.code);
     setCourseDetailText("course-detail-note", "This course page is ready for professor links, student notes, ratings, prerequisites, and review details.");
-    renderCourseProfessors(selectedCourse);
+    loadCourseProfessors(selectedCourse);
     setupCourseMaterialsAccess(selectedCourse);
 
     return true;
