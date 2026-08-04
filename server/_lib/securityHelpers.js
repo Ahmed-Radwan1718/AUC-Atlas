@@ -19,6 +19,7 @@ const LOGIN_CHALLENGE_COOKIE_NAME = IS_PRODUCTION
 const SITE_SESSION_EXPIRES_MS = 5 * 24 * 60 * 60 * 1000;
 const SITE_SESSION_TOUCH_COOLDOWN_MS = 5 * 60 * 1000;
 const LOGIN_CHALLENGE_EXPIRES_MS = 10 * 60 * 1000;
+const SECURITY_PANEL_ACCESS_EXPIRES_MS = 15 * 60 * 1000;
 const ALLOWED_AUC_EMAIL_DOMAIN = "aucegypt.edu";
 
 function getSecuritySecret() {
@@ -46,6 +47,13 @@ function getSiteSessionHash(sessionId) {
   return crypto
     .createHmac("sha256", getSecuritySecret())
     .update("site-session:" + sessionId)
+    .digest("hex");
+}
+
+function getSecurityPanelAccessHash(uid, siteSessionId, token) {
+  return crypto
+    .createHmac("sha256", getSecuritySecret())
+    .update("security-panel:" + uid + ":" + siteSessionId + ":" + token)
     .digest("hex");
 }
 
@@ -731,6 +739,138 @@ async function getAuthenticatorSecret(uid) {
   return twoFactor.appSecret || "";
 }
 
+function getSecurityPanelAccessDocumentId(decodedUser) {
+  const siteSessionId = String(
+    decodedUser && decodedUser.siteSessionId
+      ? decodedUser.siteSessionId
+      : ""
+  );
+
+  return siteSessionId
+    .replace(/[^a-zA-Z0-9_-]/g, "")
+    .slice(0, 180) || "legacy-session";
+}
+
+function createSecurityPanelAccessError(message) {
+  const error = new Error(
+    message || "Enter your authenticator code to open the Security panel."
+  );
+
+  error.statusCode = 403;
+  return error;
+}
+
+async function issueSecurityPanelAccess(decodedUser) {
+  if (!decodedUser || !decodedUser.uid) {
+    throw createSecurityPanelAccessError("Please log in again.");
+  }
+
+  const token = createRandomToken();
+  const siteSessionId = String(decodedUser.siteSessionId || "");
+  const expiresAt = new Date(
+    Date.now() + SECURITY_PANEL_ACCESS_EXPIRES_MS
+  );
+
+  const accessRef = admin.firestore()
+    .collection("users")
+    .doc(decodedUser.uid)
+    .collection("securityPanelAccess")
+    .doc(getSecurityPanelAccessDocumentId(decodedUser));
+
+  await accessRef.set({
+    tokenHash: getSecurityPanelAccessHash(
+      decodedUser.uid,
+      siteSessionId,
+      token
+    ),
+    siteSessionId,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    expiresAt: admin.firestore.Timestamp.fromDate(expiresAt)
+  });
+
+  return {
+    token,
+    expiresAt: expiresAt.toISOString()
+  };
+}
+
+async function requireSecurityPanelAccess(req, decodedUser) {
+  if (!decodedUser || !decodedUser.uid) {
+    throw createSecurityPanelAccessError("Please log in again.");
+  }
+
+  const userRef = admin.firestore()
+    .collection("users")
+    .doc(decodedUser.uid);
+
+  const userDoc = await userRef.get();
+  const userData = userDoc.exists ? userDoc.data() || {} : {};
+  const twoFactor = userData.twoFactor &&
+    typeof userData.twoFactor === "object"
+    ? userData.twoFactor
+    : {};
+
+  if (!twoFactor.appEnabled) {
+    return true;
+  }
+
+  const token = getRequestHeader(
+    req,
+    "x-auc-security-access"
+  ).trim();
+
+  if (!token) {
+    throw createSecurityPanelAccessError();
+  }
+
+  const siteSessionId = String(decodedUser.siteSessionId || "");
+  const accessRef = userRef
+    .collection("securityPanelAccess")
+    .doc(getSecurityPanelAccessDocumentId(decodedUser));
+
+  const accessDoc = await accessRef.get();
+
+  if (!accessDoc.exists) {
+    throw createSecurityPanelAccessError();
+  }
+
+  const accessData = accessDoc.data() || {};
+
+  if (isExpired(accessData.expiresAt)) {
+    await accessRef.delete().catch(function () {});
+    throw createSecurityPanelAccessError(
+      "Security access expired. Enter a new authenticator code."
+    );
+  }
+
+  if (
+    String(accessData.siteSessionId || "") !==
+    siteSessionId
+  ) {
+    throw createSecurityPanelAccessError();
+  }
+
+  const savedHash = String(accessData.tokenHash || "");
+  const submittedHash = getSecurityPanelAccessHash(
+    decodedUser.uid,
+    siteSessionId,
+    token
+  );
+
+  const savedBuffer = Buffer.from(savedHash, "hex");
+  const submittedBuffer = Buffer.from(submittedHash, "hex");
+
+  if (
+    !savedHash ||
+    savedBuffer.length !== submittedBuffer.length ||
+    !crypto.timingSafeEqual(savedBuffer, submittedBuffer)
+  ) {
+    throw createSecurityPanelAccessError();
+  }
+
+  return true;
+}
+
 module.exports = {
   isAllowedAucEmail,
   ensureAllowedAucEmail,
@@ -749,5 +889,7 @@ module.exports = {
   createLoginChallenge,
   getLoginChallenge,
   clearLoginChallenge,
-  getAuthenticatorSecret
+  getAuthenticatorSecret,
+  issueSecurityPanelAccess,
+  requireSecurityPanelAccess
 };
