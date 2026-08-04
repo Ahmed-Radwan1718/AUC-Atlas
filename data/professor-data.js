@@ -1,6 +1,6 @@
 (function () {
   const professors = [
-    { id: "eslam-badr", name: "Eslam Badr", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Calculus 1, Linear Algebra", group: "A-F", email: "eslammath@aucegypt.edu", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
+    { id: "eslam-badr", name: "Eslam Badr", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Calculus 1, Linear Algebra", hideCourse: true, group: "A-F",, email: "eslammath@aucegypt.edu", bio: "Eslam Badr earned his PhD from UAB before joining AUC. His work focuses on algebraic geometry and arithmetic, including plane curves, moduli spaces, automorphism groups, twisting theory, quadratic points, and Weierstrass points.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785248610/ChatGPT_Image_Jul_28_2026_05_23_19_PM_xfec1d.png" },
     { id: "kate-ellis", name: "Kate Ellis", department: "Psychology", displayDepartment: "PSYC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "kate.ellis@aucegypt.edu", bio: "Kate Ellis is an associate professor and clinical psychologist at AUC. Her work focuses on refugees, trauma, youth exposed to violence, and accessible mental health interventions for conflict-affected communities.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785765918/Kate_Ellis_dhynm1.png" },
     { id: "aya-musmar", name: "Aya Musmar", department: "Architecture", displayDepartment: "ARCH", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "aya.musmar@aucegypt.edu", bio: "Aya Musmar is an assistant professor of humanities in architecture at AUC. Her work focuses on forced displacement, refugee camps, injustice, climate change, heritage, and architecture as a form of testimony.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785765917/Aya_Musmar_fistv7.png" },
     { id: "tamir-el-khouly", name: "Tamir El-Khouly", department: "Architecture", displayDepartment: "ARCH", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "t.el-khouly@aucegypt.edu", bio: "Tamir El-Khouly earned his PhD in the built environment from UCL before joining AUC. His work focuses on architectural computing, BIM, machine learning, design thinking, and parametric design.", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785765913/Tamir_El-Khouly_r80cnx.png" },
@@ -1733,6 +1733,14 @@
     const professorEmailMarkup = professorEmail
       ? '<span class="professor-profile-email">' + escapeHtml(professorEmail) + '</span>'
       : '<span class="professor-profile-email is-empty">Email coming soon</span>';
+    const professorCourseMarkup = professor.hideCourse
+      ? ""
+      : `
+          <div>
+            <span>Teaches</span>
+            <span class="professor-profile-value">${escapeHtml(professor.course || "Courses coming soon")}</span>
+          </div>
+        `;
     const pageHeader = document.querySelector(".professors-header");
 
     if (pageHeader) {
@@ -1766,10 +1774,7 @@
               ${professorEmailMarkup}
             </div>
 
-            <div>
-              <span>Teaches</span>
-              <span class="professor-profile-value">${escapeHtml(professor.course || "Courses coming soon")}</span>
-            </div>
+            ${professorCourseMarkup}
           </div>
 
           <p class="professor-profile-bio">${escapeHtml(professor.bio || "Bio coming soon.")}</p>
