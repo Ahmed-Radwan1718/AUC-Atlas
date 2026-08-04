@@ -14,11 +14,52 @@ async function ensureVerifiedAucUser(req) {
     checkRevoked: true
   });
   const userRecord = await admin.auth().getUser(decodedUser.uid);
-  const email = String(userRecord.email || decodedUser.email || "").trim().toLowerCase();
+  const email = String(
+    userRecord.email ||
+    decodedUser.email ||
+    ""
+  ).trim().toLowerCase();
 
-  if (!userRecord.emailVerified || !email.endsWith("@aucegypt.edu")) {
-    throw createImageKitAuthError("Please verify your AUC email address before uploading materials.", 403);
+  if (
+    !userRecord.emailVerified ||
+    !email.endsWith("@aucegypt.edu")
+  ) {
+    throw createImageKitAuthError(
+      "Please verify your AUC email address before uploading materials.",
+      403
+    );
   }
+
+  const userDoc = await admin
+    .firestore()
+    .collection("users")
+    .doc(decodedUser.uid)
+    .get();
+  const userData = userDoc.exists
+    ? userDoc.data() || {}
+    : {};
+  const displayName = String(
+    userData.fullName ||
+    userRecord.displayName ||
+    email.split("@")[0] ||
+    "AUC student"
+  )
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, 80);
+  const photoURL = String(
+    userData.photoURL ||
+    userRecord.photoURL ||
+    ""
+  )
+    .trim()
+    .slice(0, 500);
+
+  return {
+    uid: decodedUser.uid,
+    displayName: displayName || "AUC student",
+    photoURL
+  };
 }
 
 module.exports = async function handler(req, res) {
@@ -28,7 +69,7 @@ module.exports = async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed" });
     }
 
-    await ensureVerifiedAucUser(req);
+    const uploader = await ensureVerifiedAucUser(req);
 
     const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
     const publicKey = process.env.IMAGEKIT_PUBLIC_KEY;
@@ -51,7 +92,8 @@ module.exports = async function handler(req, res) {
       expire,
       signature,
       publicKey,
-      urlEndpoint
+      urlEndpoint,
+      uploader
     });
   } catch (error) {
     res.setHeader("Cache-Control", "no-store");
