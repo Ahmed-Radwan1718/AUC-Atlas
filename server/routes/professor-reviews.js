@@ -18,6 +18,10 @@ function cleanString(value, maxLength) {
   return String(value || "").trim().replace(/\s+/g, " ").slice(0, maxLength);
 }
 
+function normalizeCourseCode(value) {
+  return cleanString(value, 60).toUpperCase();
+}
+
 function cleanNote(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
 }
@@ -56,7 +60,8 @@ function serializeReview(doc) {
     id: doc.id,
     professorId: data.professorId || "",
     professorName: data.professorName || "",
-    courseTaken: data.courseTaken || "",
+    courseTaken: normalizeCourseCode(data.courseCode || data.courseTaken),
+    courseCode: normalizeCourseCode(data.courseCode || data.courseTaken),
     semesterTaken: data.semesterTaken || "",
     rating: Number(data.rating || 0),
     recommendation: data.recommendation || "",
@@ -120,6 +125,30 @@ async function getProfessorReviews(professorId) {
   snapshot.forEach(function (doc) {
     reviews.push(serializeReview(doc));
   });
+
+  reviews.sort(function (a, b) {
+    return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
+  });
+
+  return reviews;
+}
+
+async function getCourseReviews(courseCode) {
+  const normalizedCourseCode = normalizeCourseCode(courseCode);
+  const reviewsById = new Map();
+  const collection = admin.firestore().collection("professorReviews");
+  const snapshots = await Promise.all([
+    collection.where("courseCode", "==", normalizedCourseCode).limit(100).get(),
+    collection.where("courseTaken", "==", normalizedCourseCode).limit(100).get()
+  ]);
+
+  snapshots.forEach(function (snapshot) {
+    snapshot.forEach(function (doc) {
+      reviewsById.set(doc.id, serializeReview(doc));
+    });
+  });
+
+  const reviews = Array.from(reviewsById.values());
 
   reviews.sort(function (a, b) {
     return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
@@ -202,11 +231,15 @@ function buildReviewFields(body, existingData) {
   const recommendationReason = recommendation === "Depends"
     ? cleanNote(getValue("recommendationReason"), 220)
     : "";
+  const courseCode = normalizeCourseCode(
+    getValue("courseCode") || getValue("courseTaken")
+  );
 
   return {
     professorId: cleanString(existing.professorId || source.professorId, 80),
     professorName: cleanString(existing.professorName || source.professorName, 120),
-    courseTaken: cleanString(getValue("courseTaken"), 60),
+    courseTaken: courseCode,
+    courseCode,
     semesterTaken: cleanString(getValue("semesterTaken"), 60),
     rating: Number(getValue("rating") || 0),
     recommendation,
@@ -267,10 +300,17 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({ reviews });
       }
 
+      const courseCode = normalizeCourseCode(query.courseCode || query.courseTaken);
+
+      if (courseCode) {
+        const reviews = await getCourseReviews(courseCode);
+        return res.status(200).json({ reviews });
+      }
+
       const professorId = cleanString(query.professorId, 80);
 
       if (!professorId) {
-        throw createReviewError("Professor not found.", 400);
+        throw createReviewError("Professor or course not found.", 400);
       }
 
       const reviews = await getProfessorReviews(professorId);
