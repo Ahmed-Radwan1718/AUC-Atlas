@@ -3271,46 +3271,6 @@
         showMessage(reviewsMessage, error.message || "Could not load your reviews.", "error");
       }
     }
-      if (!accountReviewList) {
-        return;
-      }
-
-      showMessage(reviewsMessage, "", "");
-      accountReviewList.innerHTML = `
-        <div class="account-empty-state">
-          <h3>Loading reviews</h3>
-          <p>Checking the reviews submitted from your account.</p>
-        </div>
-      `;
-
-      try {
-        const response = await fetch("/api/professor-reviews?mine=true", {
-          method: "GET",
-          credentials: "same-origin",
-          cache: "no-store",
-          headers: {
-            "Accept": "application/json"
-          }
-        });
-        const data = await response.json().catch(function () {
-          return {};
-        });
-
-        if (!response.ok) {
-          throw new Error(data.error || "Could not load your reviews.");
-        }
-
-        renderAccountReviewHistory(data.reviews || []);
-      } catch (error) {
-        accountReviewList.innerHTML = `
-          <div class="account-empty-state">
-            <h3>Could not load reviews</h3>
-            <p>Your review history could not be loaded right now.</p>
-          </div>
-        `;
-        showMessage(reviewsMessage, error.message || "Could not load your reviews.", "error");
-      }
-    }
 
     function getAccountInitials(user) {
       const name = String(user.fullName || user.displayName || "").trim();
