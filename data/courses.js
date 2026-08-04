@@ -937,6 +937,284 @@
       .join("") || "A";
   }
 
+  function getMaterialFileExtension(fileName, fileType) {
+    const name = String(fileName || "").trim().toLowerCase();
+    const extensionMatch = name.match(/\.([a-z0-9]{1,8})$/);
+
+    if (extensionMatch) {
+      return extensionMatch[1];
+    }
+
+    const type = String(fileType || "").toLowerCase();
+
+    if (type.indexOf("pdf") !== -1) return "pdf";
+    if (type.indexOf("word") !== -1) return "docx";
+    if (type.indexOf("presentation") !== -1) return "pptx";
+    if (type.indexOf("spreadsheet") !== -1) return "xlsx";
+    if (type.indexOf("jpeg") !== -1) return "jpg";
+    if (type.indexOf("png") !== -1) return "png";
+    if (type.indexOf("webp") !== -1) return "webp";
+
+    return "file";
+  }
+
+  function getMaterialFileLabel(extension) {
+    const labels = {
+      pdf: "PDF document",
+      doc: "Word document",
+      docx: "Word document",
+      ppt: "PowerPoint presentation",
+      pptx: "PowerPoint presentation",
+      xls: "Excel spreadsheet",
+      xlsx: "Excel spreadsheet",
+      jpg: "Image",
+      jpeg: "Image",
+      png: "Image",
+      webp: "Image",
+      gif: "Image",
+      zip: "ZIP archive"
+    };
+
+    return labels[extension] ||
+      extension.toUpperCase() + " file";
+  }
+
+  function formatMaterialUploadDate(value) {
+    const date = new Date(value || "");
+
+    if (Number.isNaN(date.getTime())) {
+      return "Upload date unavailable";
+    }
+
+    return "Uploaded " + date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
+
+  function isMaterialPreviewable(extension) {
+    return [
+      "pdf",
+      "doc",
+      "docx",
+      "ppt",
+      "pptx",
+      "xls",
+      "xlsx",
+      "jpg",
+      "jpeg",
+      "png",
+      "webp",
+      "gif"
+    ].includes(extension);
+  }
+
+  function appendMaterialQueryParameter(url, name, value) {
+    const separator = String(url || "").indexOf("?") === -1
+      ? "?"
+      : "&";
+
+    return String(url || "") +
+      separator +
+      encodeURIComponent(name) +
+      "=" +
+      encodeURIComponent(value);
+  }
+
+  function setupCourseMaterialPreview() {
+    const list = document.getElementById("course-materials-list");
+    const modal = document.getElementById("course-material-preview-modal");
+    const frame = document.getElementById("course-material-preview-frame");
+    const image = document.getElementById("course-material-preview-image");
+    const loading = document.getElementById("course-material-preview-loading");
+    const fallback = document.getElementById("course-material-preview-fallback");
+    const title = document.getElementById("course-material-preview-title");
+    const meta = document.getElementById("course-material-preview-meta");
+    const download = document.getElementById("course-material-preview-download");
+    const closeButton = document.getElementById("course-material-preview-close");
+
+    if (
+      !list ||
+      !modal ||
+      !frame ||
+      !image ||
+      !loading ||
+      !fallback ||
+      !title ||
+      !meta ||
+      !download ||
+      modal.dataset.ready === "true"
+    ) {
+      return;
+    }
+
+    modal.dataset.ready = "true";
+
+    let lastTrigger = null;
+
+    function resetPreview() {
+      frame.hidden = true;
+      frame.removeAttribute("src");
+      image.hidden = true;
+      image.removeAttribute("src");
+      fallback.hidden = true;
+      fallback.textContent = "";
+      loading.hidden = false;
+    }
+
+    function showPreviewFallback(message) {
+      frame.hidden = true;
+      frame.removeAttribute("src");
+      image.hidden = true;
+      image.removeAttribute("src");
+      loading.hidden = true;
+      fallback.textContent = message;
+      fallback.hidden = false;
+    }
+
+    function closePreview() {
+      modal.hidden = true;
+      document.body.classList.remove("material-preview-open");
+      resetPreview();
+
+      if (lastTrigger) {
+        lastTrigger.focus();
+      }
+    }
+
+    async function openPreview(button) {
+      const downloadUrl = button.dataset.downloadUrl || "";
+      const fileName = button.dataset.fileName || "Course material";
+      const extension = button.dataset.fileExtension || "file";
+      const fileLabel = button.dataset.fileLabel || "File";
+      const fileSize = button.dataset.fileSize || "Size unavailable";
+
+      if (!downloadUrl) {
+        return;
+      }
+
+      lastTrigger = button;
+      resetPreview();
+
+      title.textContent = fileName;
+      meta.textContent = fileLabel + " · " + fileSize;
+      download.href = downloadUrl;
+
+      modal.hidden = false;
+      document.body.classList.add("material-preview-open");
+
+      if (closeButton) {
+        closeButton.focus();
+      }
+
+      try {
+        const response = await fetch(
+          appendMaterialQueryParameter(
+            downloadUrl,
+            "format",
+            "json"
+          ),
+          {
+            credentials: "same-origin",
+            cache: "no-store"
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Could not prepare this preview.");
+        }
+
+        const data = await response.json();
+        const signedUrl = String(data.url || "");
+
+        if (!signedUrl) {
+          throw new Error("The secure preview URL is missing.");
+        }
+
+        if (
+          ["jpg", "jpeg", "png", "webp", "gif"].includes(extension)
+        ) {
+          image.src = signedUrl;
+          image.hidden = false;
+          return;
+        }
+
+        if (extension === "pdf") {
+          frame.src =
+            signedUrl +
+            "#toolbar=1&navpanes=0&view=FitH";
+          frame.hidden = false;
+          return;
+        }
+
+        if (
+          [
+            "doc",
+            "docx",
+            "ppt",
+            "pptx",
+            "xls",
+            "xlsx"
+          ].includes(extension)
+        ) {
+          frame.src =
+            "https://view.officeapps.live.com/op/embed.aspx?src=" +
+            encodeURIComponent(signedUrl);
+          frame.hidden = false;
+          return;
+        }
+
+        showPreviewFallback(
+          "A browser preview is not available for this file type. Review the uploader, filename, size, course, professor, and semester before downloading."
+        );
+      } catch (error) {
+        showPreviewFallback(
+          error.message ||
+          "The preview could not be prepared. You can still download the original file."
+        );
+      }
+    }
+
+    frame.addEventListener("load", function () {
+      loading.hidden = true;
+    });
+
+    image.addEventListener("load", function () {
+      loading.hidden = true;
+    });
+
+    image.addEventListener("error", function () {
+      showPreviewFallback(
+        "The image preview could not be displayed. You can still download the original file."
+      );
+    });
+
+    list.addEventListener("click", function (event) {
+      const button = event.target.closest(
+        ".course-material-preview-trigger"
+      );
+
+      if (!button || !list.contains(button)) {
+        return;
+      }
+
+      openPreview(button);
+    });
+
+    modal
+      .querySelectorAll("[data-close-material-preview]")
+      .forEach(function (button) {
+        button.addEventListener("click", closePreview);
+      });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !modal.hidden) {
+        closePreview();
+      }
+    });
+  }
+
   function renderCourseMaterials(materials) {
     const list = document.getElementById("course-materials-list");
 
@@ -945,35 +1223,172 @@
     }
 
     if (!materials.length) {
-      list.innerHTML = '<p class="course-material-status">No course files shared yet.</p>';
+      list.innerHTML =
+        '<p class="course-material-status">No course files shared yet.</p>';
       return;
     }
 
     list.innerHTML = materials.map(function (material) {
-      const uploaderName = escapeMaterialText(material.uploaderDisplayName || "AUC student");
-      const uploaderPhoto = escapeMaterialText(material.uploaderPhotoURL || "");
+      const rawUploaderName =
+        material.uploaderDisplayName || "AUC student";
+      const uploaderName =
+        escapeMaterialText(rawUploaderName);
+      const uploaderPhoto =
+        escapeMaterialText(material.uploaderPhotoURL || "");
       const avatar = uploaderPhoto
-        ? '<img class="course-material-avatar" src="' + uploaderPhoto + '" alt="">'
-        : '<span class="course-material-avatar-fallback">' + escapeMaterialText(getMaterialInitials(uploaderName)) + '</span>';
+        ? '<img class="course-material-avatar" src="' +
+          uploaderPhoto +
+          '" alt="">'
+        : '<span class="course-material-avatar-fallback">' +
+          escapeMaterialText(
+            getMaterialInitials(rawUploaderName)
+          ) +
+          "</span>";
+
+      const rawFileName =
+        material.fileName ||
+        material.title ||
+        "Course material";
+      const extension = getMaterialFileExtension(
+        rawFileName,
+        material.fileType
+      );
+      const fileLabel = getMaterialFileLabel(extension);
+      const fileSize = Number(material.size) > 0
+        ? formatMaterialFileSize(material.size)
+        : "Size unavailable";
+      const uploadDate = formatMaterialUploadDate(
+        material.createdAt
+      );
+      const rawDownloadUrl = material.downloadUrl || "";
+      const previewable =
+        Boolean(rawDownloadUrl) &&
+        isMaterialPreviewable(extension);
+
+      const fileName = escapeMaterialText(rawFileName);
+      const safeFileLabel = escapeMaterialText(fileLabel);
+      const safeFileSize = escapeMaterialText(fileSize);
+      const safeDownloadUrl = escapeMaterialText(
+        rawDownloadUrl || "#"
+      );
+      const safeExtension = escapeMaterialText(extension);
+      const extensionLabel = escapeMaterialText(
+        extension === "file"
+          ? "FILE"
+          : extension.toUpperCase()
+      );
+
+      const previewDataAttributes = [
+        'data-download-url="' + safeDownloadUrl + '"',
+        'data-file-name="' + fileName + '"',
+        'data-file-extension="' + safeExtension + '"',
+        'data-file-label="' + safeFileLabel + '"',
+        'data-file-size="' + safeFileSize + '"'
+      ].join(" ");
+
+      const previewTile = previewable
+        ? `
+          <button
+            class="course-material-preview-tile course-material-preview-trigger"
+            type="button"
+            ${previewDataAttributes}
+            aria-label="Preview ${fileName}"
+          >
+            <span class="course-material-file-icon" aria-hidden="true">
+              <strong>${extensionLabel}</strong>
+            </span>
+
+            <span class="course-material-file-copy">
+              <strong>${fileName}</strong>
+              <small>${safeFileLabel} · ${safeFileSize}</small>
+            </span>
+
+            <span class="course-material-preview-hint">Open preview</span>
+          </button>
+        `
+        : `
+          <div class="course-material-preview-tile is-disabled">
+            <span class="course-material-file-icon" aria-hidden="true">
+              <strong>${extensionLabel}</strong>
+            </span>
+
+            <span class="course-material-file-copy">
+              <strong>${fileName}</strong>
+              <small>${safeFileLabel} · ${safeFileSize}</small>
+            </span>
+
+            <span class="course-material-preview-hint">No browser preview</span>
+          </div>
+        `;
+
+      const previewAction = previewable
+        ? `
+          <button
+            class="course-material-preview-button course-material-preview-trigger"
+            type="button"
+            ${previewDataAttributes}
+          >Preview file</button>
+        `
+        : `
+          <span class="course-material-preview-unavailable">
+            Preview unavailable
+          </span>
+        `;
 
       return `
         <article class="course-material-card">
           <div class="course-material-card-top">
             <div class="course-material-author">
               ${avatar}
-              <strong>${uploaderName}</strong>
+
+              <div class="course-material-author-copy">
+                <div class="course-material-author-name-row">
+                  <strong>${uploaderName}</strong>
+                  <span
+                    class="course-material-verified-badge"
+                    title="Uploaded by a verified AUC account"
+                  >Verified AUC</span>
+                </div>
+
+                <small class="course-material-upload-date">
+                  ${escapeMaterialText(uploadDate)}
+                </small>
+              </div>
             </div>
           </div>
 
-          <h3 class="course-material-title">${escapeMaterialText(material.title || "Course material")}</h3>
+          <h3 class="course-material-title">
+            ${escapeMaterialText(
+              material.title || "Course material"
+            )}
+          </h3>
+
+          ${previewTile}
 
           <div class="course-material-context">
-            <span>${escapeMaterialText(material.materialType || "Material")}</span>
-            <span>${escapeMaterialText(material.professor || "Professor not listed")}</span>
-            <span>${escapeMaterialText(material.semester || "Semester not listed")}</span>
+            <span>${escapeMaterialText(
+              material.materialType || "Material"
+            )}</span>
+            <span>${escapeMaterialText(
+              material.professor ||
+              "Professor not listed"
+            )}</span>
+            <span>${escapeMaterialText(
+              material.semester ||
+              "Semester not listed"
+            )}</span>
           </div>
 
-          <a class="course-material-download-button" href="${escapeMaterialText(material.downloadUrl || "#")}">Download</a>
+          <div class="course-material-actions">
+            ${previewAction}
+
+            <a
+              class="course-material-download-button"
+              href="${safeDownloadUrl}"
+              target="_blank"
+              rel="noopener"
+            >Download</a>
+          </div>
         </article>
       `;
     }).join("");
@@ -1034,6 +1449,7 @@
 
   function setupCourseMaterialsAccess(course) {
     setupMaterialUploadForm(course);
+    setupCourseMaterialPreview();
     loadCourseMaterials(course);
   }
 
