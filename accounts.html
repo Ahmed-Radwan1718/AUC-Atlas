@@ -1238,12 +1238,18 @@
     }
 
     .account-review-rating {
-      padding-top: 2px;
-      flex-shrink: 0;
+      position: absolute;
+      top: 50%;
+      right: 18px;
+      width: 126px;
       color: #c09a5c;
       font-size: 17px;
       line-height: 1;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateY(-50%);
     }
 
     .account-review-stars {
@@ -1291,14 +1297,14 @@
 
     .account-review-actions {
       position: absolute;
-      top: 50%;
       right: 18px;
+      bottom: 18px;
+      width: 126px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-wrap: nowrap;
       gap: 9px;
-      transform: translateY(-50%);
     }
 
     .account-review-action-button {
@@ -1358,9 +1364,9 @@
 
       .account-review-actions {
         position: static;
+        width: auto;
         justify-content: flex-start;
         flex-wrap: wrap;
-        transform: none;
       }
 
       .account-review-head {
@@ -1372,7 +1378,11 @@
       }
 
       .account-review-rating {
+        position: static;
+        width: auto;
         font-size: 14px;
+        display: block;
+        transform: none;
       }
     }
 
