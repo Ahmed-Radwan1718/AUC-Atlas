@@ -1168,6 +1168,38 @@
 
     .account-review-item {
       display: grid;
+      grid-template-columns: 82px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .account-review-professor-photo {
+      width: 82px;
+      height: 82px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 18px;
+      background: rgba(23, 23, 23, 0.04);
+      display: block;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .account-review-professor-photo:hover {
+      border-color: rgba(192, 154, 92, 0.42);
+      transform: translateY(-2px);
+    }
+
+    .account-review-professor-photo img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center 18%;
+    }
+
+    .account-review-body {
+      min-width: 0;
+      display: grid;
       gap: 14px;
     }
 
@@ -1179,30 +1211,57 @@
     }
 
     .account-review-head h3 {
+      min-width: 0;
       color: #171717;
       font-size: 18px;
-      font-weight: 800;
-      line-height: 1.2;
-      text-transform: uppercase;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+
+    .account-review-professor-name {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .account-review-professor-name:hover {
+      color: rgba(154, 112, 48, 0.96);
     }
 
     .account-review-head p {
       margin-top: 5px;
-      color: rgba(23, 23, 23, 0.5);
+      color: rgba(23, 23, 23, 0.48);
       font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-weight: 400;
+      letter-spacing: 0.02em;
     }
 
     .account-review-rating {
-      padding: 8px 11px;
-      border-radius: 999px;
-      background: #171717;
-      color: #fffdf8;
-      font-size: 12px;
-      font-weight: 800;
+      padding-top: 2px;
+      flex-shrink: 0;
+      color: #c09a5c;
+      font-size: 17px;
+      line-height: 1;
       white-space: nowrap;
+    }
+
+    .account-review-stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .account-review-star {
+      color: rgba(23, 23, 23, 0.16);
+    }
+
+    .account-review-star.is-filled {
+      color: #c09a5c;
+    }
+
+    .account-review-rating-text {
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 12px;
+      font-weight: 500;
     }
 
     .account-review-meta {
@@ -1218,44 +1277,34 @@
       background: rgba(247, 244, 238, 0.72);
       color: rgba(23, 23, 23, 0.62);
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 500;
     }
 
     .account-review-copy {
       color: rgba(23, 23, 23, 0.66);
       font-size: 14px;
+      font-weight: 400;
       line-height: 1.65;
-    }
-
-    .account-review-link {
-      width: fit-content;
-      color: #171717;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-decoration: none;
-      text-transform: uppercase;
     }
 
     .account-review-actions {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 9px;
     }
 
     .account-review-action-button {
       min-height: 34px;
-      padding: 0 13px;
+      padding: 0 14px;
       border: 1px solid rgba(23, 23, 23, 0.12);
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.86);
-      color: #171717;
+      color: rgba(23, 23, 23, 0.76);
       font-family: inherit;
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
       cursor: pointer;
       transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
@@ -1263,24 +1312,50 @@
     .account-review-action-button:hover {
       border-color: rgba(192, 154, 92, 0.36);
       background: rgba(192, 154, 92, 0.12);
+      color: #171717;
       transform: translateY(-1px);
     }
 
     .account-review-action-button.is-danger {
       border-color: rgba(199, 54, 54, 0.22);
-      background: rgba(199, 54, 54, 0.08);
-      color: #c73636;
+      background: rgba(199, 54, 54, 0.07);
+      color: #b73030;
     }
 
     .account-review-action-button.is-danger:hover {
       border-color: rgba(199, 54, 54, 0.38);
-      background: rgba(199, 54, 54, 0.14);
+      background: rgba(199, 54, 54, 0.13);
     }
 
     .account-review-action-button:disabled {
       opacity: 0.48;
       cursor: wait;
       transform: none;
+    }
+
+    @media (max-width: 620px) {
+      .account-review-item {
+        grid-template-columns: 58px minmax(0, 1fr);
+        gap: 13px;
+      }
+
+      .account-review-professor-photo {
+        width: 58px;
+        height: 58px;
+        border-radius: 15px;
+      }
+
+      .account-review-head {
+        gap: 10px;
+      }
+
+      .account-review-head h3 {
+        font-size: 16px;
+      }
+
+      .account-review-rating {
+        font-size: 14px;
+      }
     }
 
     body.account-review-editor-open {
@@ -2361,6 +2436,8 @@
     </div>
   </div>
 
+  <script src="data/professor-data.js"></script>
+
   <script>
     const sidebarLinks = document.querySelectorAll("[data-account-panel]");
     const accountPanels = document.querySelectorAll(".account-panel");
@@ -2972,6 +3049,37 @@
       });
     }
 
+    function getAccountReviewProfessor(professorId) {
+      const professors = Array.isArray(window.aucAtlasProfessors)
+        ? window.aucAtlasProfessors
+        : [];
+      const normalizedProfessorId = String(professorId || "").trim().toLowerCase();
+
+      return professors.find(function (professor) {
+        return String(professor.id || "").trim().toLowerCase() === normalizedProfessorId;
+      }) || null;
+    }
+
+    function getAccountReviewProfessorUrl(professorId) {
+      return professorId
+        ? "professors.html?id=" + encodeURIComponent(professorId)
+        : "";
+    }
+
+    function renderAccountReviewStars(rating) {
+      const safeRating = Math.max(0, Math.min(5, Math.round(Number(rating || 0))));
+
+      if (!safeRating) {
+        return '<span class="account-review-rating-text">Not rated</span>';
+      }
+
+      const stars = Array.from({ length: 5 }, function (_, index) {
+        return '<span class="account-review-star' + (index < safeRating ? ' is-filled' : '') + '">&#9733;</span>';
+      }).join("");
+
+      return '<span class="account-review-stars" aria-label="' + safeRating + ' out of 5 stars">' + stars + '</span>';
+    }
+
     function getAccountReviewById(reviewId) {
       return accountReviewHistory.find(function (review) {
         return String(review.id || "") === String(reviewId || "");
@@ -3189,11 +3297,26 @@
 
       accountReviewList.innerHTML = safeReviews.map(function (review) {
         const reviewId = String(review.id || "");
-        const professorId = review.professorId || "";
+        const professorId = String(review.professorId || "");
+        const professor = getAccountReviewProfessor(professorId);
+        const professorName = review.professorName || (professor && professor.name) || "Professor review";
+        const professorImage = professor && professor.image ? professor.image : "user.png";
+        const professorUrl = getAccountReviewProfessorUrl(professorId);
         const rating = Number(review.rating || 0);
-        const openProfessorLink = professorId
-          ? '<a class="account-review-link" href="professors.html?id=' + encodeURIComponent(professorId) + '">Open professor</a>'
-          : "";
+        const professorPhoto = professorUrl
+          ? `
+              <a class="account-review-professor-photo" href="${escapeAccountHtml(professorUrl)}" aria-label="Open ${escapeAccountHtml(professorName)} profile">
+                <img src="${escapeAccountHtml(professorImage)}" alt="${escapeAccountHtml(professorName)}">
+              </a>
+            `
+          : `
+              <div class="account-review-professor-photo">
+                <img src="${escapeAccountHtml(professorImage)}" alt="${escapeAccountHtml(professorName)}">
+              </div>
+            `;
+        const professorNameMarkup = professorUrl
+          ? `<a class="account-review-professor-name" href="${escapeAccountHtml(professorUrl)}">${escapeAccountHtml(professorName)}</a>`
+          : escapeAccountHtml(professorName);
         const reviewActions = reviewId
           ? `
               <button class="account-review-action-button" type="button" data-account-review-edit="${escapeAccountHtml(reviewId)}">Edit</button>
@@ -3203,25 +3326,28 @@
 
         return `
           <article class="account-review-item">
-            <div class="account-review-head">
-              <div>
-                <h3>${escapeAccountHtml(review.professorName || "Professor review")}</h3>
-                <p>${escapeAccountHtml(getAccountReviewDateLabel(review.createdAt))}</p>
+            ${professorPhoto}
+
+            <div class="account-review-body">
+              <div class="account-review-head">
+                <div>
+                  <h3>${professorNameMarkup}</h3>
+                  <p>${escapeAccountHtml(getAccountReviewDateLabel(review.createdAt))}</p>
+                </div>
+
+                <span class="account-review-rating">${renderAccountReviewStars(rating)}</span>
               </div>
 
-              <span class="account-review-rating">${escapeAccountHtml(rating ? rating + " / 5" : "Not rated")}</span>
-            </div>
+              <div class="account-review-meta">
+                <span>${escapeAccountHtml(review.courseTaken || "Course not listed")}</span>
+                <span>${escapeAccountHtml(review.semesterTaken || "Semester not listed")}</span>
+              </div>
 
-            <div class="account-review-meta">
-              <span>${escapeAccountHtml(review.courseTaken || "Course not listed")}</span>
-              <span>${escapeAccountHtml(review.semesterTaken || "Semester not listed")}</span>
-            </div>
+              <p class="account-review-copy">${escapeAccountHtml(review.studentNote || "No written note.")}</p>
 
-            <p class="account-review-copy">${escapeAccountHtml(review.studentNote || "No written note.")}</p>
-
-            <div class="account-review-actions">
-              ${openProfessorLink}
-              ${reviewActions}
+              <div class="account-review-actions">
+                ${reviewActions}
+              </div>
             </div>
           </article>
         `;
