@@ -1450,22 +1450,51 @@
     .account-review-editor-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
+      gap: 14px;
+    }
+
+    .account-review-editor-section-heading {
+      grid-column: 1 / -1;
+      margin-top: 4px;
+      color: rgba(192, 154, 92, 0.86);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .account-review-editor-section-heading::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: rgba(23, 23, 23, 0.08);
+    }
+
+    .account-review-editor-section-heading:first-of-type {
+      margin-top: 0;
     }
 
     .account-review-editor-field {
+      min-width: 0;
       display: grid;
-      gap: 8px;
+      gap: 7px;
     }
 
     .account-review-editor-field.full {
       grid-column: 1 / -1;
     }
 
+    .account-review-editor-field[hidden] {
+      display: none;
+    }
+
     .account-review-editor-field label {
       color: rgba(23, 23, 23, 0.58);
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
@@ -1474,31 +1503,35 @@
     .account-review-editor-field select,
     .account-review-editor-field textarea {
       width: 100%;
-      min-height: 48px;
+      min-height: 46px;
       padding: 0 14px;
-      border: 1px solid rgba(23, 23, 23, 0.12);
-      border-radius: 15px;
-      background: rgba(247, 244, 238, 0.52);
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.58);
       color: #171717;
-      font-family: inherit;
+      font: inherit;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 400;
       outline: none;
     }
 
     .account-review-editor-field textarea {
-      min-height: 110px;
-      padding: 14px;
+      min-height: 112px;
+      padding: 13px 14px;
       resize: vertical;
       line-height: 1.6;
+    }
+
+    .account-review-editor-field input::placeholder,
+    .account-review-editor-field textarea::placeholder {
+      color: rgba(23, 23, 23, 0.38);
     }
 
     .account-review-editor-field input:focus,
     .account-review-editor-field select:focus,
     .account-review-editor-field textarea:focus {
-      border-color: rgba(192, 154, 92, 0.72);
-      background: white;
-      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+      border-color: rgba(192, 154, 92, 0.5);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.1);
     }
 
     .account-review-editor .review-native-select {
@@ -1511,26 +1544,22 @@
     }
 
     .account-review-editor .review-choice-button {
-      position: relative;
       width: 100%;
-      min-height: 48px;
-      padding: 0 42px 0 14px;
-      border: 1px solid rgba(23, 23, 23, 0.12);
-      border-radius: 15px;
-      background: rgba(247, 244, 238, 0.52);
+      min-height: 46px;
+      padding: 0 40px 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.58);
       color: #171717;
-      font-family: inherit;
+      font: inherit;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 400;
       text-align: left;
       cursor: pointer;
       display: flex;
       align-items: center;
-      outline: none;
-      transition:
-        border-color 0.2s ease,
-        background 0.2s ease,
-        box-shadow 0.2s ease;
+      justify-content: space-between;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
     }
 
     .account-review-editor .review-choice-label {
@@ -1543,26 +1572,21 @@
     .account-review-editor .review-choice-button::after {
       content: "";
       position: absolute;
-      top: 50%;
-      right: 17px;
+      right: 16px;
       width: 8px;
       height: 8px;
       border-right: 1.5px solid rgba(23, 23, 23, 0.58);
       border-bottom: 1.5px solid rgba(23, 23, 23, 0.58);
+      transform: rotate(45deg) translateY(-2px);
       pointer-events: none;
-      transform: translateY(-70%) rotate(45deg);
-      transition: transform 0.18s ease;
-    }
-
-    .account-review-editor .review-choice.open .review-choice-button::after {
-      transform: translateY(-30%) rotate(225deg);
     }
 
     .account-review-editor .review-choice.open .review-choice-button,
     .account-review-editor .review-choice-button:focus-visible {
-      border-color: rgba(192, 154, 92, 0.72);
-      background: white;
-      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+      border-color: rgba(192, 154, 92, 0.5);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.1);
+      outline: none;
     }
 
     .account-review-editor .review-choice-menu {
@@ -1571,27 +1595,22 @@
       left: 0;
       right: 0;
       z-index: 20;
-      max-height: 260px;
-      padding: 7px;
+      max-height: 230px;
+      padding: 6px;
       overflow-y: auto;
       overscroll-behavior: contain;
-      border: 1px solid rgba(23, 23, 23, 0.12);
+      border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 16px;
-      background: rgba(255, 255, 255, 0.99);
-      box-shadow: 0 18px 45px rgba(42, 32, 20, 0.18);
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 18px 45px rgba(42, 32, 20, 0.16);
       opacity: 0;
-      visibility: hidden;
       pointer-events: none;
       transform: translateY(-6px);
-      transition:
-        opacity 0.18s ease,
-        visibility 0.18s ease,
-        transform 0.18s ease;
+      transition: opacity 0.18s ease, transform 0.18s ease;
     }
 
     .account-review-editor .review-choice.open .review-choice-menu {
       opacity: 1;
-      visibility: visible;
       pointer-events: auto;
       transform: translateY(0);
     }
@@ -1600,45 +1619,42 @@
       position: sticky;
       top: 0;
       z-index: 1;
-      padding-bottom: 7px;
-      background: rgba(255, 255, 255, 0.99);
+      padding: 0 0 6px;
+      background: rgba(255, 255, 255, 0.98);
     }
 
     .account-review-editor .review-choice-search {
       width: 100%;
-      min-height: 40px;
+      min-height: 38px;
       padding: 0 12px;
-      border: 1px solid rgba(23, 23, 23, 0.12);
+      border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 12px;
       background: rgba(247, 244, 238, 0.74);
       color: #171717;
-      font-family: inherit;
+      font: inherit;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 400;
       outline: none;
     }
 
     .account-review-editor .review-choice-search:focus {
-      border-color: rgba(192, 154, 92, 0.72);
-      background: white;
-      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.12);
+      border-color: rgba(192, 154, 92, 0.5);
+      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.1);
     }
 
     .account-review-editor .review-choice-option {
       width: 100%;
-      min-height: 40px;
-      padding: 8px 12px;
+      min-height: 38px;
+      padding: 0 12px;
       border: 0;
       border-radius: 12px;
       background: transparent;
       color: rgba(23, 23, 23, 0.72);
-      font-family: inherit;
+      font: inherit;
       font-size: 14px;
-      font-weight: 600;
-      line-height: 1.35;
+      font-weight: 400;
       text-align: left;
       cursor: pointer;
-      display: block;
     }
 
     .account-review-editor .review-choice-option:hover,
@@ -2566,136 +2582,157 @@
         <input type="hidden" name="reviewId">
 
         <div class="account-review-editor-grid">
-          <div class="account-review-editor-field">
-            <label for="account-review-course">Course Taken</label>
+          <div class="account-review-editor-section-heading">Course context</div>
 
-            <select class="review-native-select" id="account-review-course" name="courseTaken">
+          <div class="account-review-editor-field">
+            <label for="account-review-course">Course taken</label>
+
+            <select id="account-review-course" name="courseTaken" required>
               <option value="" selected disabled>Choose course</option>
             </select>
           </div>
 
           <div class="account-review-editor-field">
-            <label for="account-review-semester">Semester Taken</label>
-            <input type="text" id="account-review-semester" name="semesterTaken" maxlength="60" required>
+            <label for="account-review-semester">Semester taken</label>
+
+            <select id="account-review-semester" name="semesterTaken" required>
+              <option value="" selected disabled>Choose semester</option>
+              <option>Fall 2026</option>
+              <option>Summer 2026</option>
+              <option>Spring 2026</option>
+              <option>Winter 2026</option>
+              <option>Fall 2025</option>
+              <option>Summer 2025</option>
+              <option>Spring 2025</option>
+              <option>Winter 2025</option>
+              <option>Fall 2024</option>
+              <option>Summer 2024</option>
+              <option>Spring 2024</option>
+              <option>Winter 2024</option>
+            </select>
           </div>
 
           <div class="account-review-editor-field">
-            <label for="account-review-rating">Rating</label>
+            <label for="account-review-rating">Overall rating</label>
+
             <select id="account-review-rating" name="rating" required>
-              <option value="">Choose a rating</option>
-              <option value="5">5 / 5</option>
-              <option value="4">4 / 5</option>
-              <option value="3">3 / 5</option>
-              <option value="2">2 / 5</option>
-              <option value="1">1 / 5</option>
+              <option value="" selected disabled>Choose rating</option>
+              <option value="5">5 stars</option>
+              <option value="4">4 stars</option>
+              <option value="3">3 stars</option>
+              <option value="2">2 stars</option>
+              <option value="1">1 star</option>
             </select>
           </div>
 
           <div class="account-review-editor-field">
-            <label for="account-review-recommendation">Recommendation</label>
-            <select id="account-review-recommendation" name="recommendation" required>
-              <option value="">Choose an option</option>
-              <option value="Yes">Yes</option>
-              <option value="Depends">Depends</option>
-              <option value="No">No</option>
+            <label for="account-review-recommendation">Would you recommend for this course?</label>
+
+            <select id="account-review-recommendation" name="recommendation">
+              <option>Yes</option>
+              <option>Depends</option>
+              <option>No</option>
             </select>
           </div>
 
-          <div class="account-review-editor-field full">
-            <label for="account-review-recommendation-reason">Recommendation Reason</label>
-            <textarea id="account-review-recommendation-reason" name="recommendationReason" maxlength="220" placeholder="Required when the recommendation is Depends"></textarea>
+          <div class="account-review-editor-field full" data-account-review-depends-reason hidden>
+            <label for="account-review-recommendation-reason">If your answer depends, what does it depend on?</label>
+            <input id="account-review-recommendation-reason" name="recommendationReason" type="text" maxlength="220" placeholder="Example: Great for lectures, harder for exams">
           </div>
 
+          <div class="account-review-editor-section-heading">Class experience</div>
+
           <div class="account-review-editor-field">
-            <label for="account-review-attendance">Attendance Policy</label>
+            <label for="account-review-attendance">Attendance policy</label>
+
             <select id="account-review-attendance" name="attendancePolicy">
-              <option value="">Not specified</option>
-              <option value="Required">Required</option>
-              <option value="Sometimes checked">Sometimes checked</option>
-              <option value="Not important">Not important</option>
-              <option value="Not sure">Not sure</option>
+              <option>Required</option>
+              <option>Sometimes checked</option>
+              <option>Not important</option>
+              <option>Not sure</option>
             </select>
           </div>
 
           <div class="account-review-editor-field">
             <label for="account-review-workload">Workload</label>
+
             <select id="account-review-workload" name="workload">
-              <option value="">Not specified</option>
-              <option value="Light">Light</option>
-              <option value="Moderate">Moderate</option>
-              <option value="Heavy">Heavy</option>
+              <option>Light</option>
+              <option>Moderate</option>
+              <option>Heavy</option>
             </select>
           </div>
 
           <div class="account-review-editor-field">
-            <label for="account-review-lectures">Lecture Usefulness</label>
+            <label for="account-review-lectures">Lecture usefulness</label>
+
             <select id="account-review-lectures" name="lectureUsefulness">
-              <option value="">Not specified</option>
-              <option value="Essential">Essential</option>
-              <option value="Helpful">Helpful</option>
-              <option value="Attending means less work at home">Attending means less work at home</option>
-              <option value="Skippable">Skippable</option>
-              <option value="Not lecture-based">Not lecture-based</option>
+              <option>Essential</option>
+              <option>Helpful</option>
+              <option>Skippable</option>
+              <option>Not lecture-based</option>
             </select>
           </div>
 
           <div class="account-review-editor-field">
-            <label for="account-review-office-hours">Office Hours</label>
+            <label for="account-review-office-hours">Office hours/help</label>
+
             <select id="account-review-office-hours" name="officeHours">
-              <option value="">Not specified</option>
-              <option value="Helpful">Helpful</option>
-              <option value="Available but limited">Available but limited</option>
-              <option value="Hard to reach">Hard to reach</option>
-              <option value="Did not use">Did not use</option>
+              <option>Helpful</option>
+              <option>Available but limited</option>
+              <option>Hard to reach</option>
+              <option>Did not use</option>
             </select>
           </div>
 
+          <div class="account-review-editor-section-heading">Grading and advice</div>
+
           <div class="account-review-editor-field">
-            <label for="account-review-grading-style">Grading Style</label>
+            <label for="account-review-grading-style">Grading style</label>
+
             <select id="account-review-grading-style" name="gradingStyle">
-              <option value="">Not specified</option>
-              <option value="Exams-heavy">Exams-heavy</option>
-              <option value="Projects-heavy">Projects-heavy</option>
-              <option value="Assignments-heavy">Assignments-heavy</option>
-              <option value="Participation-heavy">Participation-heavy</option>
-              <option value="Mixed">Mixed</option>
+              <option>Exams-heavy</option>
+              <option>Projects-heavy</option>
+              <option>Assignments-heavy</option>
+              <option>Participation-heavy</option>
+              <option>Mixed</option>
             </select>
           </div>
 
           <div class="account-review-editor-field">
-            <label for="account-review-exams">Exam Difficulty</label>
+            <label for="account-review-exams">Exam difficulty</label>
+
             <select id="account-review-exams" name="examDifficulty">
-              <option value="">Not specified</option>
-              <option value="Easier than class material">Easier than class material</option>
-              <option value="Matches class material">Matches class material</option>
-              <option value="Harder than class material">Harder than class material</option>
-              <option value="No exams">No exams</option>
+              <option>Easier than class material</option>
+              <option>Matches class material</option>
+              <option>Harder than class material</option>
+              <option>No exams</option>
             </select>
           </div>
 
           <div class="account-review-editor-field">
-            <label for="account-review-transparency">Grading Transparency</label>
+            <label for="account-review-transparency">Grading transparency</label>
+
             <select id="account-review-transparency" name="gradingTransparency">
-              <option value="">Not specified</option>
-              <option value="Rubric is clear">Rubric is clear</option>
-              <option value="Somewhat clear">Somewhat clear</option>
-              <option value="Unclear">Unclear</option>
+              <option>Rubric is clear</option>
+              <option>Somewhat clear</option>
+              <option>Unclear</option>
             </select>
           </div>
 
           <div class="account-review-editor-field">
-            <label for="account-review-feedback">Feedback Quality</label>
+            <label for="account-review-feedback">Feedback quality</label>
+
             <select id="account-review-feedback" name="feedbackQuality">
-              <option value="">Not specified</option>
-              <option value="Helpful">Helpful</option>
-              <option value="Minimal">Minimal</option>
-              <option value="None">None</option>
-              <option value="Not applicable">Not applicable</option>
+              <option>Helpful</option>
+              <option>Minimal</option>
+              <option>None</option>
+              <option>Not applicable</option>
             </select>
           </div>
 
           <div class="account-review-editor-field full">
-            <label for="account-review-note">Student Note</label>
+            <label for="account-review-note">Additional comments</label>
             <textarea id="account-review-note" name="studentNote" maxlength="360" required></textarea>
           </div>
         </div>
@@ -3694,6 +3731,149 @@
       choice.appendChild(menu);
       select.insertAdjacentElement("afterend", choice);
       syncChoice();
+
+      setupAccountReviewAdditionalChoices();
+      syncAccountReviewRecommendationReason();
+    }
+
+    function syncAccountReviewRecommendationReason() {
+      if (!accountReviewEditorForm) {
+        return;
+      }
+
+      const recommendationSelect = getAccountReviewEditorField("recommendation");
+      const reasonField = accountReviewEditorForm.querySelector(
+        "[data-account-review-depends-reason]"
+      );
+      const reasonInput = getAccountReviewEditorField("recommendationReason");
+
+      if (!recommendationSelect || !reasonField) {
+        return;
+      }
+
+      const shouldShow = recommendationSelect.value === "Depends";
+
+      reasonField.hidden = !shouldShow;
+
+      if (!shouldShow && reasonInput) {
+        reasonInput.value = "";
+      }
+    }
+
+    function setupAccountReviewAdditionalChoices() {
+      if (!accountReviewEditorForm) {
+        return;
+      }
+
+      accountReviewEditorForm.querySelectorAll("select").forEach(function (select) {
+        if (
+          select.name === "courseTaken" ||
+          select.dataset.accountReviewChoiceReady === "true"
+        ) {
+          return;
+        }
+
+        select.dataset.accountReviewChoiceReady = "true";
+        select.classList.add("review-native-select");
+
+        const choice = document.createElement("div");
+        const button = document.createElement("button");
+        const label = document.createElement("span");
+        const menu = document.createElement("div");
+
+        choice.className = "review-choice";
+        choice.setAttribute("data-account-review-choice", "");
+
+        button.className = "review-choice-button";
+        button.type = "button";
+        button.setAttribute("aria-haspopup", "listbox");
+        button.setAttribute("aria-expanded", "false");
+
+        label.className = "review-choice-label";
+
+        menu.className = "review-choice-menu";
+        menu.setAttribute("role", "listbox");
+
+        function syncChoice() {
+          const selectedOption = select.options[select.selectedIndex];
+
+          label.textContent = selectedOption
+            ? selectedOption.textContent
+            : "Choose an option";
+
+          menu.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+            optionButton.classList.toggle(
+              "is-selected",
+              optionButton.dataset.choiceValue === select.value
+            );
+          });
+        }
+
+        function closeChoice() {
+          choice.classList.remove("open");
+          button.setAttribute("aria-expanded", "false");
+        }
+
+        Array.from(select.options).forEach(function (option) {
+          const optionButton = document.createElement("button");
+
+          optionButton.className = "review-choice-option";
+          optionButton.type = "button";
+          optionButton.disabled = option.disabled;
+          optionButton.dataset.choiceValue = option.value;
+          optionButton.textContent = option.textContent;
+          optionButton.setAttribute("role", "option");
+
+          optionButton.addEventListener("click", function () {
+            if (option.disabled) {
+              return;
+            }
+
+            select.value = option.value;
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+            closeChoice();
+            button.focus();
+          });
+
+          menu.appendChild(optionButton);
+        });
+
+        button.addEventListener("click", function () {
+          const shouldOpen = !choice.classList.contains("open");
+
+          choice.classList.toggle("open", shouldOpen);
+          button.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!choice.contains(event.target)) {
+            closeChoice();
+          }
+        });
+
+        select.addEventListener("change", syncChoice);
+
+        button.appendChild(label);
+        choice.appendChild(button);
+        choice.appendChild(menu);
+        select.insertAdjacentElement("afterend", choice);
+        syncChoice();
+      });
+
+      const recommendationSelect = getAccountReviewEditorField("recommendation");
+
+      if (
+        recommendationSelect &&
+        recommendationSelect.dataset.accountReviewDependsReady !== "true"
+      ) {
+        recommendationSelect.dataset.accountReviewDependsReady = "true";
+        recommendationSelect.addEventListener(
+          "change",
+          syncAccountReviewRecommendationReason
+        );
+      }
+
+      syncAccountReviewRecommendationReason();
     }
 
     function resetAccountReviewCourseChoice() {
@@ -3701,30 +3881,30 @@
         return;
       }
 
-      const choice = accountReviewEditorForm.querySelector(
-        "[data-account-review-course-choice]"
-      );
+      accountReviewEditorForm.querySelectorAll(".review-choice").forEach(function (choice) {
+        choice.classList.remove("open");
 
-      if (!choice) {
-        return;
-      }
+        const button = choice.querySelector(".review-choice-button");
+        const searchInput = choice.querySelector(".review-choice-search");
 
-      choice.classList.remove("open");
+        if (button) {
+          button.setAttribute("aria-expanded", "false");
+        }
 
-      const button = choice.querySelector(".review-choice-button");
-      const searchInput = choice.querySelector(".review-choice-search");
+        if (searchInput) {
+          searchInput.value = "";
+        }
 
-      if (button) {
-        button.setAttribute("aria-expanded", "false");
-      }
-
-      if (searchInput) {
-        searchInput.value = "";
-      }
-
-      choice.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
-        optionButton.hidden = false;
+        choice.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+          optionButton.hidden = false;
+        });
       });
+
+      accountReviewEditorForm.querySelectorAll("select").forEach(function (select) {
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+
+      syncAccountReviewRecommendationReason();
     }
 
     function isValidAccountReviewCourse(courseCode) {
@@ -3796,8 +3976,8 @@
       setAccountReviewEditorValue("courseTaken", review.courseTaken);
       setAccountReviewEditorValue("semesterTaken", review.semesterTaken);
       setAccountReviewEditorValue("rating", review.rating);
-      setAccountReviewEditorValue("recommendation", review.recommendation);
       setAccountReviewEditorValue("recommendationReason", review.recommendationReason);
+      setAccountReviewEditorValue("recommendation", review.recommendation);
       setAccountReviewEditorValue("attendancePolicy", review.attendancePolicy);
       setAccountReviewEditorValue("workload", review.workload);
       setAccountReviewEditorValue("lectureUsefulness", review.lectureUsefulness);
