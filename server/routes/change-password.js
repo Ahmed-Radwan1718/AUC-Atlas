@@ -3,7 +3,8 @@ const admin = require("../_lib/firebaseAdmin");
 const {
   getSiteSessionUser,
   signInWithPassword,
-  createSiteSessionForUid
+  createSiteSessionForUid,
+  requireSecurityPanelAccess
 } = require("../_lib/securityHelpers");
 
 function isStrongPassword(password) {
@@ -25,6 +26,8 @@ module.exports = async function handler(req, res) {
     const decodedUser = await getSiteSessionUser(req, {
       checkRevoked: true
     });
+
+    await requireSecurityPanelAccess(req, decodedUser);
 
     const currentPassword = String((req.body || {}).currentPassword || "");
     const newPassword = String((req.body || {}).newPassword || "");
