@@ -654,7 +654,6 @@
       return `
         <a class="course-professor-link" href="professors.html?id=${encodeURIComponent(professor.id)}">
           <strong>${escapeMaterialText(professor.name)}</strong>
-          <span>${escapeMaterialText(professor.department)}</span>
         </a>
       `;
     }).join("");
