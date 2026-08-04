@@ -1106,6 +1106,51 @@
       opacity: 0.58;
     }
 
+    .material-upload-progress {
+      width: 100%;
+      display: grid;
+      gap: 8px;
+    }
+
+    .material-upload-progress[hidden] {
+      display: none;
+    }
+
+    .material-upload-progress-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .material-upload-progress-head strong {
+      color: #171717;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .material-upload-progress-track {
+      width: 100%;
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.1);
+    }
+
+    .material-upload-progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: #c09a5c;
+      display: block;
+      transition: width 0.18s ease;
+    }
+
     .material-upload-status {
       min-height: 0;
       margin: 0;
@@ -1514,6 +1559,26 @@
                 <div class="material-file-selection" id="material-file-selection" hidden aria-live="polite"></div>
 
                 <button class="material-upload-button" id="material-upload-button" type="submit">Upload material</button>
+
+                <div class="material-upload-progress" id="material-upload-progress" hidden>
+                  <div class="material-upload-progress-head">
+                    <span id="material-upload-progress-label">Uploading files</span>
+                    <strong id="material-upload-progress-value">0%</strong>
+                  </div>
+
+                  <div
+                    class="material-upload-progress-track"
+                    id="material-upload-progress-track"
+                    role="progressbar"
+                    aria-label="Material upload progress"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                  >
+                    <span class="material-upload-progress-fill" id="material-upload-progress-fill"></span>
+                  </div>
+                </div>
+
                 <p class="material-upload-status" id="material-upload-status" aria-live="polite"></p>
 
                 <div class="material-upload-overlay" id="material-upload-overlay" hidden aria-label="Uploading material" role="status">
