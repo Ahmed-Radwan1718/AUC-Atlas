@@ -1161,6 +1161,74 @@
     }
   }
 
+  function setMaterialUploadProgress(percent, label, isVisible) {
+    const progress = document.getElementById("material-upload-progress");
+    const progressTrack = document.getElementById("material-upload-progress-track");
+    const progressFill = document.getElementById("material-upload-progress-fill");
+    const progressValue = document.getElementById("material-upload-progress-value");
+    const progressLabel = document.getElementById("material-upload-progress-label");
+    const safePercent = Math.max(
+      0,
+      Math.min(100, Math.round(Number(percent) || 0))
+    );
+
+    if (progress) {
+      progress.hidden = !isVisible;
+    }
+
+    if (progressTrack) {
+      progressTrack.setAttribute("aria-valuenow", String(safePercent));
+    }
+
+    if (progressFill) {
+      progressFill.style.width = safePercent + "%";
+    }
+
+    if (progressValue) {
+      progressValue.textContent = safePercent + "%";
+    }
+
+    if (progressLabel && label) {
+      progressLabel.textContent = label;
+    }
+  }
+
+  function uploadMaterialFormData(formData, onProgress) {
+    return new Promise(function (resolve, reject) {
+      const request = new XMLHttpRequest();
+
+      request.open(
+        "POST",
+        "https://upload.imagekit.io/api/v1/files/upload"
+      );
+
+      request.upload.addEventListener("progress", function (event) {
+        if (event.lengthComputable && typeof onProgress === "function") {
+          onProgress(event.loaded / event.total);
+        }
+      });
+
+      request.addEventListener("load", function () {
+        if (request.status >= 200 && request.status < 300) {
+          resolve();
+          return;
+        }
+
+        reject(new Error("ImageKit rejected the upload."));
+      });
+
+      request.addEventListener("error", function () {
+        reject(new Error("The upload connection failed."));
+      });
+
+      request.addEventListener("abort", function () {
+        reject(new Error("The upload was cancelled."));
+      });
+
+      request.send(formData);
+    });
+  }
+
   function setupMaterialUploadForm(course) {
     const form = document.getElementById("material-upload-form");
     const button = document.getElementById("material-upload-button");
@@ -1230,8 +1298,14 @@
         "professor-" + professorSlug,
         "semester-" + semesterSlug
       ].join(",");
+      const totalBytes = files.reduce(function (total, file) {
+        return total + file.size;
+      }, 0);
 
       let uploadedCount = 0;
+      let completedBytes = 0;
+
+      setMaterialUploadProgress(0, "Preparing upload", true);
 
       try {
         for (let index = 0; index < files.length; index += 1) {
@@ -1240,6 +1314,10 @@
           const uploadTitle = files.length > 1
             ? title + " - " + originalTitle
             : title;
+          const progressLabel =
+            files.length > 1
+              ? "Uploading file " + (index + 1) + " of " + files.length
+              : "Uploading file";
 
           if (button) {
             button.textContent =
@@ -1248,12 +1326,7 @@
                 : "Uploading...";
           }
 
-          setMaterialUploadStatus(
-            files.length > 1
-              ? "Uploading file " + (index + 1) + " of " + files.length + "..."
-              : "Uploading file...",
-            ""
-          );
+          setMaterialUploadStatus(progressLabel + "...", "");
 
           const authResponse = await fetch("/api/imagekit-auth", {
             cache: "no-store"
@@ -1293,24 +1366,37 @@
             "fileId,name,url,filePath,size,fileType,tags"
           );
 
-          const uploadResponse = await fetch(
-            "https://upload.imagekit.io/api/v1/files/upload",
-            {
-              method: "POST",
-              body: formData
-            }
-          );
+          await uploadMaterialFormData(formData, function (fileProgress) {
+            const uploadedBytes =
+              completedBytes + file.size * fileProgress;
+            const overallProgress =
+              totalBytes > 0
+                ? (uploadedBytes / totalBytes) * 100
+                : 0;
 
-          if (!uploadResponse.ok) {
-            throw new Error("ImageKit rejected " + file.name + ".");
-          }
+            setMaterialUploadProgress(
+              overallProgress,
+              progressLabel,
+              true
+            );
+          });
 
+          completedBytes += file.size;
           uploadedCount += 1;
+
+          setMaterialUploadProgress(
+            totalBytes > 0
+              ? (completedBytes / totalBytes) * 100
+              : 100,
+            progressLabel,
+            true
+          );
         }
 
         form.reset();
         syncMaterialChoiceMenus(form);
         setMaterialFileSelection(form, []);
+        setMaterialUploadProgress(100, "Upload complete", true);
 
         setMaterialUploadStatus(
           files.length === 1
@@ -1319,10 +1405,16 @@
                 " files uploaded successfully. They are tagged as pending in ImageKit.",
           "success"
         );
+
+        window.setTimeout(function () {
+          setMaterialUploadProgress(0, "Uploading files", false);
+        }, 900);
       } catch (error) {
         const progressMessage = uploadedCount
           ? uploadedCount + " of " + files.length + " files uploaded. "
           : "";
+
+        setMaterialUploadProgress(0, "Uploading files", false);
 
         setMaterialUploadStatus(
           progressMessage + (error.message || "Upload failed. Try again."),
