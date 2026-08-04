@@ -279,7 +279,8 @@
 
             <div class="auth-field">
               <label for="signup-auc-id">AUC ID Number</label>
-              <input type="text" id="signup-auc-id" inputmode="numeric" autocomplete="off" maxlength="9" placeholder="900123456">
+              <input type="text" id="signup-auc-id" inputmode="numeric" autocomplete="off" maxlength="9">
+            </div>
             </div>
 
             <div class="auth-field">
@@ -395,7 +396,7 @@
       }
 
       if (!/^900\d{6}$/.test(aucId)) {
-        showMessage("AUC ID number must start with 900 and be 9 digits total.", "error");
+        showMessage("Incorrect ID number.", "error");
         return;
       }
 
