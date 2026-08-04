@@ -2418,7 +2418,10 @@
         <div class="account-review-editor-grid">
           <div class="account-review-editor-field">
             <label for="account-review-course">Course Taken</label>
-            <input type="text" id="account-review-course" name="courseTaken" maxlength="60" required>
+
+            <select class="review-native-select" id="account-review-course" name="courseTaken">
+              <option value="" selected disabled>Choose course</option>
+            </select>
           </div>
 
           <div class="account-review-editor-field">
@@ -2644,6 +2647,7 @@
     </div>
   </div>
 
+  <script src="data/courses.js"></script>
   <script src="data/professor-data.js"></script>
 
   <script>
@@ -3332,11 +3336,278 @@
         : null;
     }
 
+    function populateAccountReviewCourseSelect() {
+      const select = getAccountReviewEditorField("courseTaken");
+      const courses = Array.isArray(window.aucAtlasCourses)
+        ? window.aucAtlasCourses.slice()
+        : [];
+
+      if (!select || select.dataset.courseOptionsReady === "true") {
+        return;
+      }
+
+      courses.sort(function (firstCourse, secondCourse) {
+        return String(firstCourse.code || "").localeCompare(
+          String(secondCourse.code || "")
+        );
+      });
+
+      select.innerHTML = "";
+
+      const placeholder = document.createElement("option");
+
+      placeholder.value = "";
+      placeholder.textContent = "Choose course";
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      select.appendChild(placeholder);
+
+      courses.forEach(function (course) {
+        const code = String(course && course.code ? course.code : "").trim();
+        const title = String(course && course.title ? course.title : "").trim();
+
+        if (!code) {
+          return;
+        }
+
+        const option = document.createElement("option");
+
+        option.value = code;
+        option.textContent = code + (title ? " - " + title : "");
+        select.appendChild(option);
+      });
+
+      select.dataset.courseOptionsReady = "true";
+    }
+
+    function setupAccountReviewCourseChoice() {
+      populateAccountReviewCourseSelect();
+
+      const select = getAccountReviewEditorField("courseTaken");
+
+      if (
+        !select ||
+        select.dataset.accountReviewCourseChoiceReady === "true"
+      ) {
+        return;
+      }
+
+      select.dataset.accountReviewCourseChoiceReady = "true";
+      select.classList.add("review-native-select");
+
+      const choice = document.createElement("div");
+      const button = document.createElement("button");
+      const label = document.createElement("span");
+      const menu = document.createElement("div");
+      const searchWrap = document.createElement("div");
+      const searchInput = document.createElement("input");
+
+      choice.className = "review-choice";
+      choice.setAttribute("data-account-review-course-choice", "");
+
+      button.className = "review-choice-button";
+      button.type = "button";
+      button.setAttribute("aria-haspopup", "listbox");
+      button.setAttribute("aria-expanded", "false");
+      button.setAttribute("data-account-review-course-button", "");
+
+      label.className = "review-choice-label";
+
+      menu.className = "review-choice-menu";
+      menu.setAttribute("role", "listbox");
+
+      searchWrap.className = "review-choice-search-wrap";
+
+      searchInput.type = "search";
+      searchInput.className = "review-choice-search";
+      searchInput.placeholder = "Search courses";
+      searchInput.setAttribute("aria-label", "Search courses");
+      searchInput.setAttribute("autocomplete", "new-password");
+      searchInput.setAttribute("autocorrect", "off");
+      searchInput.setAttribute("autocapitalize", "none");
+      searchInput.setAttribute("spellcheck", "false");
+      searchInput.setAttribute("data-lpignore", "true");
+      searchInput.setAttribute("data-form-type", "other");
+
+      function syncChoice() {
+        const selectedOption = select.options[select.selectedIndex];
+
+        label.textContent = selectedOption
+          ? selectedOption.textContent
+          : "Choose course";
+
+        menu.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+          optionButton.classList.toggle(
+            "is-selected",
+            optionButton.dataset.choiceValue === select.value
+          );
+        });
+      }
+
+      function filterOptions(query) {
+        const terms = String(query || "")
+          .toLowerCase()
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
+
+        menu.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+          const searchText = optionButton.dataset.choiceSearchText || "";
+          const hasValue = Boolean(optionButton.dataset.choiceValue);
+          const matches =
+            !terms.length ||
+            (
+              hasValue &&
+              terms.every(function (term) {
+                return searchText.indexOf(term) !== -1;
+              })
+            );
+
+          optionButton.hidden = !matches;
+        });
+      }
+
+      function closeChoice() {
+        choice.classList.remove("open");
+        button.setAttribute("aria-expanded", "false");
+        searchInput.value = "";
+        filterOptions("");
+      }
+
+      searchWrap.appendChild(searchInput);
+      menu.appendChild(searchWrap);
+
+      Array.from(select.options).forEach(function (option) {
+        const optionButton = document.createElement("button");
+
+        optionButton.className = "review-choice-option";
+        optionButton.type = "button";
+        optionButton.disabled = option.disabled;
+        optionButton.dataset.choiceValue = option.value;
+        optionButton.dataset.choiceSearchText = (
+          option.value + " " + option.textContent
+        ).toLowerCase();
+        optionButton.textContent = option.textContent;
+        optionButton.setAttribute("role", "option");
+
+        optionButton.addEventListener("click", function () {
+          if (option.disabled) {
+            return;
+          }
+
+          select.value = option.value;
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+          closeChoice();
+          button.focus();
+        });
+
+        menu.appendChild(optionButton);
+      });
+
+      searchInput.addEventListener("input", function () {
+        filterOptions(searchInput.value);
+      });
+
+      searchInput.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeChoice();
+          button.focus();
+        }
+      });
+
+      button.addEventListener("click", function () {
+        const shouldOpen = !choice.classList.contains("open");
+
+        choice.classList.toggle("open", shouldOpen);
+        button.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+
+        if (shouldOpen) {
+          window.setTimeout(function () {
+            searchInput.focus();
+          }, 0);
+        } else {
+          closeChoice();
+        }
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!choice.contains(event.target)) {
+          closeChoice();
+        }
+      });
+
+      select.addEventListener("change", syncChoice);
+
+      button.appendChild(label);
+      choice.appendChild(button);
+      choice.appendChild(menu);
+      select.insertAdjacentElement("afterend", choice);
+      syncChoice();
+    }
+
+    function resetAccountReviewCourseChoice() {
+      if (!accountReviewEditorForm) {
+        return;
+      }
+
+      const choice = accountReviewEditorForm.querySelector(
+        "[data-account-review-course-choice]"
+      );
+
+      if (!choice) {
+        return;
+      }
+
+      choice.classList.remove("open");
+
+      const button = choice.querySelector(".review-choice-button");
+      const searchInput = choice.querySelector(".review-choice-search");
+
+      if (button) {
+        button.setAttribute("aria-expanded", "false");
+      }
+
+      if (searchInput) {
+        searchInput.value = "";
+      }
+
+      choice.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+        optionButton.hidden = false;
+      });
+    }
+
+    function isValidAccountReviewCourse(courseCode) {
+      const normalizedCode = String(courseCode || "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toUpperCase();
+      const courses = Array.isArray(window.aucAtlasCourses)
+        ? window.aucAtlasCourses
+        : [];
+
+      return courses.some(function (course) {
+        return String(course && course.code ? course.code : "")
+          .replace(/\s+/g, " ")
+          .trim()
+          .toUpperCase() === normalizedCode;
+      });
+    }
+
     function setAccountReviewEditorValue(name, value) {
       const field = getAccountReviewEditorField(name);
 
-      if (field) {
-        field.value = value === undefined || value === null ? "" : String(value);
+      if (!field) {
+        return;
+      }
+
+      field.value =
+        value === undefined || value === null
+          ? ""
+          : String(value);
+
+      if (field.tagName === "SELECT") {
+        field.dispatchEvent(new Event("change", { bubbles: true }));
       }
     }
 
@@ -3353,6 +3624,7 @@
         accountReviewEditorForm.reset();
       }
 
+      resetAccountReviewCourseChoice();
       showMessage(accountReviewEditorMessage, "", "");
     }
 
@@ -3364,8 +3636,11 @@
         return;
       }
 
+      setupAccountReviewCourseChoice();
+
       activeAccountReviewId = String(review.id || "");
       accountReviewEditorForm.reset();
+      resetAccountReviewCourseChoice();
 
       setAccountReviewEditorValue("reviewId", activeAccountReviewId);
       setAccountReviewEditorValue("courseTaken", review.courseTaken);
@@ -3383,16 +3658,20 @@
       setAccountReviewEditorValue("feedbackQuality", review.feedbackQuality);
       setAccountReviewEditorValue("studentNote", review.studentNote);
 
-      accountReviewEditorTitle.textContent = review.professorName || "Professor Review";
+      accountReviewEditorTitle.textContent =
+        review.professorName || "Professor Review";
+
       showMessage(accountReviewEditorMessage, "", "");
       accountReviewEditor.hidden = false;
       document.body.classList.add("account-review-editor-open");
 
       window.setTimeout(function () {
-        const courseField = getAccountReviewEditorField("courseTaken");
+        const courseButton = accountReviewEditorForm.querySelector(
+          "[data-account-review-course-button]"
+        );
 
-        if (courseField) {
-          courseField.focus();
+        if (courseButton) {
+          courseButton.focus();
         }
       }, 50);
     }
@@ -3421,6 +3700,24 @@
 
     async function saveAccountReviewChanges() {
       const payload = getAccountReviewEditorPayload();
+
+      if (!isValidAccountReviewCourse(payload.courseTaken)) {
+        showMessage(
+          accountReviewEditorMessage,
+          "Please choose a course from the course list.",
+          "error"
+        );
+
+        const courseButton = accountReviewEditorForm.querySelector(
+          "[data-account-review-course-button]"
+        );
+
+        if (courseButton) {
+          courseButton.focus();
+        }
+
+        return;
+      }
 
       if (payload.recommendation === "Depends" && !payload.recommendationReason) {
         showMessage(accountReviewEditorMessage, "Please explain what the recommendation depends on.", "error");
