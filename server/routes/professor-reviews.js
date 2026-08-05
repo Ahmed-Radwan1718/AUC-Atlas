@@ -40,6 +40,14 @@ function cleanChoice(value, key) {
   return allowedValues[key].includes(normalizedValue) ? normalizedValue : "";
 }
 
+function cleanBoolean(value) {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  return cleanString(value, 10).toLowerCase() === "true";
+}
+
 function createReviewError(message, statusCode) {
   const error = new Error(message);
   error.statusCode = statusCode;
@@ -260,7 +268,9 @@ async function createReviewWithSubmissionLimits(
 function serializeReview(doc) {
   const data = doc.data() || {};
   const createdAtMillis = getTimestampMillis(data.createdAt);
-  const authorUid = data.authorUid || data.authorUserId || "";
+  const isAnonymous = cleanBoolean(data.isAnonymous);
+  const savedAuthorUid = data.authorUid || data.authorUserId || "";
+  const authorUid = isAnonymous ? "" : savedAuthorUid;
 
   return {
     id: doc.id,
@@ -281,10 +291,11 @@ function serializeReview(doc) {
     gradingTransparency: data.gradingTransparency === "Rubrics clear" ? "Rubric is clear" : (data.gradingTransparency || ""),
     feedbackQuality: data.feedbackQuality || "",
     studentNote: data.studentNote || "",
+    isAnonymous,
     authorUid,
     authorUserId: authorUid,
-    authorName: data.authorName || "AUC student",
-    authorPhotoURL: data.authorPhotoURL || "",
+    authorName: isAnonymous ? "Anonymous student" : (data.authorName || "AUC student"),
+    authorPhotoURL: isAnonymous ? "" : (data.authorPhotoURL || ""),
     createdAt: createdAtMillis ? new Date(createdAtMillis).toISOString() : (data.createdAtIso || "")
   };
 }
@@ -457,6 +468,7 @@ function buildReviewFields(body, existingData) {
     courseTaken: courseCode,
     courseCode,
     semesterTaken: cleanString(getValue("semesterTaken"), 60),
+    isAnonymous: cleanBoolean(getValue("isAnonymous")),
     rating: Number(getValue("rating") || 0),
     recommendation,
     recommendationReason,
