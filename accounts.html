@@ -2452,6 +2452,112 @@
       .account-panel { padding: 22px; border-radius: 22px; }
       .account-panel-subheader { display: grid; }
       .account-profile-photo-section { align-items: flex-start; }
+
+      .account-display-name-input-wrap input {
+        padding-right: 60px;
+      }
+
+      .account-display-name-info-button {
+        right: 4px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .account-display-name-tooltip {
+        right: 0;
+        width: min(238px, calc(100vw - 64px));
+      }
+
+      .account-display-name-info-button:active .account-display-name-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .account-review-action-button,
+      .account-upload-download-button,
+      .account-login-session-revoke,
+      .account-activity-tab,
+      .security-access-cancel {
+        min-height: 44px;
+      }
+
+      .account-upload-download-button {
+        line-height: 42px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .security-access-cancel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .account-review-editor-close,
+      .account-authenticator-modal-close {
+        width: 44px;
+        height: 44px;
+      }
+
+      .account-authenticator-modal-header h2 {
+        padding-right: 54px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .account-section {
+        padding-right: 12px;
+        padding-left: 12px;
+      }
+
+      .account-panel {
+        padding: 18px;
+      }
+
+      .account-profile-photo-section {
+        flex-direction: column;
+      }
+
+      .account-profile-photo-actions,
+      .account-profile-photo-button-row {
+        width: 100%;
+      }
+
+      .account-profile-photo-button-row > * {
+        width: 100%;
+        flex: 1 1 100%;
+      }
+
+      .account-review-editor,
+      .account-authenticator-modal {
+        padding: 12px;
+      }
+
+      .account-review-editor-card,
+      .account-authenticator-modal-card {
+        width: calc(100vw - 24px);
+        max-height: calc(100dvh - 24px);
+        padding: 18px;
+        overflow-x: hidden;
+      }
+
+      .account-review-editor .review-choice-menu {
+        position: static;
+        display: none;
+        max-height: min(240px, 38dvh);
+        margin-top: 8px;
+        opacity: 1;
+        pointer-events: none;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .account-review-editor .review-choice.open .review-choice-menu {
+        display: grid;
+        pointer-events: auto;
+        transform: none;
+      }
     }
   </style>
 </head>
