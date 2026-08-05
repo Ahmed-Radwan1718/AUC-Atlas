@@ -250,13 +250,24 @@ async function getCourseMaterials(courseCode) {
     .get();
 
   const materials = [];
+  const suppressedFileNames = new Set();
 
   snapshot.forEach(function (doc) {
     const material = serializeMaterial(doc);
+    const fileName = cleanString(
+      material.fileName,
+      240
+    ).toLowerCase();
 
-    if (material.status !== "rejected") {
-      materials.push(material);
+    if (material.status === "rejected") {
+      if (fileName) {
+        suppressedFileNames.add(fileName);
+      }
+
+      return;
     }
+
+    materials.push(material);
   });
 
   try {
@@ -302,6 +313,7 @@ async function getCourseMaterials(courseCode) {
         getMaterialIdentity(material);
 
       if (
+        (fileName && suppressedFileNames.has(fileName)) ||
         (fileName && knownFileNames.has(fileName)) ||
         knownMaterialIdentities.has(materialIdentity)
       ) {
@@ -329,6 +341,184 @@ async function getCourseMaterials(courseCode) {
   return materials;
 }
 
+function getImageKitAuthorizationHeader() {
+  const privateKey = cleanString(
+    process.env.IMAGEKIT_PRIVATE_KEY,
+    500
+  );
+
+  return privateKey
+    ? "Basic " + Buffer.from(privateKey + ":").toString("base64")
+    : "";
+}
+
+function cleanImageKitDescriptionPart(value, maxLength) {
+  return cleanString(value, maxLength)
+    .replace(/\s*\|\s*/g, " ");
+}
+
+function buildImageKitMaterialDescription(data) {
+  return [
+    cleanImageKitDescriptionPart(data.title, 160),
+    cleanImageKitDescriptionPart(data.courseCode, 40),
+    cleanImageKitDescriptionPart(data.professor, 120),
+    cleanImageKitDescriptionPart(data.semester, 80),
+    cleanImageKitDescriptionPart(data.materialType, 80),
+    cleanImageKitDescriptionPart(data.uploaderDisplayName, 80),
+    cleanImageKitDescriptionPart(data.uploaderPhotoURL, 500),
+    cleanImageKitDescriptionPart(data.uploaderUid, 160),
+    cleanImageKitDescriptionPart(data.fileName, 240)
+  ].join(" | ");
+}
+
+function buildImageKitMaterialTags(data) {
+  return [
+    "auc-atlas-material",
+    "status-" + slugifyMaterialValue(data.status || "pending"),
+    data.courseCode
+      ? "course-" + slugifyMaterialValue(data.courseCode)
+      : "",
+    data.professor
+      ? "professor-" + slugifyMaterialValue(data.professor)
+      : "",
+    data.semester
+      ? "semester-" + slugifyMaterialValue(data.semester)
+      : "",
+    data.materialType
+      ? "material-type-" + slugifyMaterialValue(data.materialType)
+      : "",
+    data.uploaderUid
+      ? "uploader-" + slugifyMaterialValue(data.uploaderUid)
+      : ""
+  ].filter(Boolean);
+}
+
+async function updateImageKitMaterial(fileId, data) {
+  const authorization = getImageKitAuthorizationHeader();
+  const safeFileId = cleanString(fileId, 160);
+
+  if (!authorization || !safeFileId) {
+    return;
+  }
+
+  const response = await fetch(
+    "https://api.imagekit.io/v1/files/" +
+      encodeURIComponent(safeFileId) +
+      "/details",
+    {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        Authorization: authorization,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        description: buildImageKitMaterialDescription(data),
+        tags: buildImageKitMaterialTags(data)
+      })
+    }
+  );
+
+  if (!response.ok) {
+    throw createMaterialError(
+      "Could not update the stored course material.",
+      502
+    );
+  }
+}
+
+async function deleteImageKitMaterial(fileId) {
+  const authorization = getImageKitAuthorizationHeader();
+  const safeFileId = cleanString(fileId, 160);
+
+  if (!authorization || !safeFileId) {
+    return;
+  }
+
+  const response = await fetch(
+    "https://api.imagekit.io/v1/files/" +
+      encodeURIComponent(safeFileId),
+    {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        Authorization: authorization
+      }
+    }
+  );
+
+  if (!response.ok && response.status !== 404) {
+    throw createMaterialError(
+      "Could not delete the stored course material.",
+      502
+    );
+  }
+}
+
+async function getUserMaterials(uploaderUid) {
+  const snapshot = await admin.firestore()
+    .collection("courseMaterials")
+    .where("uploaderUid", "==", uploaderUid)
+    .limit(200)
+    .get();
+  const materials = [];
+
+  snapshot.forEach(function (doc) {
+    const material = serializeMaterial(doc);
+
+    if (material.status !== "rejected") {
+      materials.push(material);
+    }
+  });
+
+  materials.sort(function (a, b) {
+    return (
+      getTimestampMillis(b.createdAt) -
+      getTimestampMillis(a.createdAt)
+    );
+  });
+
+  return materials;
+}
+
+async function getOwnedMaterial(materialId, uploaderUid) {
+  const safeMaterialId = cleanString(materialId, 160);
+
+  if (!safeMaterialId) {
+    throw createMaterialError("Course material not found.", 404);
+  }
+
+  const materialRef = admin.firestore()
+    .collection("courseMaterials")
+    .doc(safeMaterialId);
+  const materialDoc = await materialRef.get();
+
+  if (!materialDoc.exists) {
+    throw createMaterialError("Course material not found.", 404);
+  }
+
+  const materialData = materialDoc.data() || {};
+
+  if (
+    cleanString(materialData.uploaderUid, 160) !==
+    cleanString(uploaderUid, 160)
+  ) {
+    throw createMaterialError(
+      "You cannot manage this course material.",
+      403
+    );
+  }
+
+  if (materialData.status === "rejected") {
+    throw createMaterialError("Course material not found.", 404);
+  }
+
+  return {
+    ref: materialRef,
+    data: materialData
+  };
+}
+
 function getRequestBody(req) {
   if (typeof req.body === "string") {
     try {
@@ -343,42 +533,148 @@ function getRequestBody(req) {
 
 module.exports = async function handler(req, res) {
   try {
-    if (req.method === "GET") {
-      const decodedUser = await getSiteSessionUser(req, {
-        checkRevoked: true
-      });
+    const allowedMethods = ["GET", "POST", "PATCH", "DELETE"];
 
-      await ensureVerifiedMaterialUser(decodedUser, "accessing course materials");
-
-      const courseCode = cleanString((req.query || {}).courseCode, 40).toUpperCase();
-
-      if (!courseCode) {
-        throw createMaterialError("Course not found.", 400);
-      }
-
-      res.setHeader("Cache-Control", "no-store");
-      return res.status(200).json({
-        materials: await getCourseMaterials(courseCode)
-      });
-    }
-
-    if (req.method !== "POST") {
-      res.setHeader("Allow", "GET, POST");
+    if (!allowedMethods.includes(req.method)) {
+      res.setHeader("Allow", allowedMethods.join(", "));
       return res.status(405).json({ error: "Method not allowed" });
     }
 
     const decodedUser = await getSiteSessionUser(req, {
       checkRevoked: true
     });
-    const userRecord = await ensureVerifiedMaterialUser(decodedUser, "uploading materials");
-    const uploader = await getUploaderProfile(decodedUser, userRecord);
+    const userRecord = await ensureVerifiedMaterialUser(
+      decodedUser,
+      req.method === "POST"
+        ? "uploading materials"
+        : "managing course materials"
+    );
+
+    res.setHeader("Cache-Control", "no-store");
+
+    if (req.method === "GET") {
+      const query = req.query || {};
+      const mine = String(query.mine || "").toLowerCase() === "true";
+
+      if (mine) {
+        return res.status(200).json({
+          materials: await getUserMaterials(decodedUser.uid)
+        });
+      }
+
+      const courseCode = cleanString(
+        query.courseCode,
+        40
+      ).toUpperCase();
+
+      if (!courseCode) {
+        throw createMaterialError("Course not found.", 400);
+      }
+
+      return res.status(200).json({
+        materials: await getCourseMaterials(courseCode)
+      });
+    }
+
     const body = getRequestBody(req);
 
-    const courseCode = cleanString(body.courseCode, 40).toUpperCase();
+    if (req.method === "PATCH") {
+      const materialId = cleanString(body.materialId, 160);
+      const title = cleanString(body.title, 160);
+      const materialType = cleanMaterialType(
+        body.materialType ||
+        body.type ||
+        body.category
+      );
+
+      if (!materialId || !title || !materialType) {
+        throw createMaterialError(
+          "Enter a material name and choose a valid category.",
+          400
+        );
+      }
+
+      const ownedMaterial = await getOwnedMaterial(
+        materialId,
+        decodedUser.uid
+      );
+      const updatedAtIso = new Date().toISOString();
+      const updatedData = Object.assign(
+        {},
+        ownedMaterial.data,
+        {
+          title,
+          materialType,
+          updatedAtIso
+        }
+      );
+
+      await ownedMaterial.ref.update({
+        title,
+        materialType,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAtIso
+      });
+
+      try {
+        await updateImageKitMaterial(
+          ownedMaterial.data.fileId,
+          updatedData
+        );
+      } catch (error) {
+        // The Firestore record remains the source used by the site.
+      }
+
+      return res.status(200).json({
+        success: true,
+        materials: await getUserMaterials(decodedUser.uid)
+      });
+    }
+
+    if (req.method === "DELETE") {
+      const materialId = cleanString(body.materialId, 160);
+      const ownedMaterial = await getOwnedMaterial(
+        materialId,
+        decodedUser.uid
+      );
+      const deletedAtIso = new Date().toISOString();
+
+      try {
+        await deleteImageKitMaterial(
+          ownedMaterial.data.fileId
+        );
+      } catch (error) {
+        // The rejected Firestore record prevents the file from returning.
+      }
+
+      await ownedMaterial.ref.update({
+        status: "rejected",
+        deletedAt: admin.firestore.FieldValue.serverTimestamp(),
+        deletedAtIso
+      });
+
+      return res.status(200).json({
+        success: true,
+        materials: await getUserMaterials(decodedUser.uid)
+      });
+    }
+
+    const uploader = await getUploaderProfile(
+      decodedUser,
+      userRecord
+    );
+    const courseCode = cleanString(
+      body.courseCode,
+      40
+    ).toUpperCase();
     const courseTitle = cleanString(body.courseTitle, 160);
     const professor = cleanString(body.professor, 120);
     const semester = cleanString(body.semester, 80);
-    const materialType = cleanMaterialType(body.materialType || body.type || body.category);
+    const materialType = cleanMaterialType(
+      body.materialType ||
+      body.type ||
+      body.category
+    );
     const title = cleanString(body.title, 160);
     const fileName = cleanString(body.fileName, 240);
     const fileUrl = cleanUrl(body.fileUrl);
@@ -389,7 +685,10 @@ module.exports = async function handler(req, res) {
     const createdAtIso = new Date().toISOString();
 
     if (!courseCode || !title || !materialType || !filePath) {
-      throw createMaterialError("Could not save this course material.", 400);
+      throw createMaterialError(
+        "Could not save this course material.",
+        400
+      );
     }
 
     const materialData = {
@@ -413,14 +712,21 @@ module.exports = async function handler(req, res) {
       createdAtIso
     };
 
-    const materialRef = await admin.firestore().collection("courseMaterials").add(materialData);
+    const materialRef = await admin.firestore()
+      .collection("courseMaterials")
+      .add(materialData);
 
     return res.status(201).json({
-      material: serializeMaterialData(materialRef.id, materialData)
+      material: serializeMaterialData(
+        materialRef.id,
+        materialData
+      )
     });
   } catch (error) {
     return res.status(error.statusCode || 500).json({
-      error: error.message || "Could not load course materials."
+      error:
+        error.message ||
+        "Could not load course materials."
     });
   }
 };
