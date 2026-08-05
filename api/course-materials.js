@@ -255,86 +255,20 @@ async function getCourseMaterials(courseCode) {
     .get();
 
   const materials = [];
-  const suppressedFileNames = new Set();
 
   snapshot.forEach(function (doc) {
     const material = serializeMaterial(doc);
-    const fileName = cleanString(
-      material.fileName,
-      240
+    const status = cleanString(
+      material.status,
+      40
     ).toLowerCase();
 
-    if (material.status === "rejected") {
-      if (fileName) {
-        suppressedFileNames.add(fileName);
-      }
-
+    if (status !== "approved") {
       return;
     }
 
     materials.push(material);
   });
-
-  try {
-    const imageKitMaterials =
-      await getImageKitCourseMaterials(courseCode);
-
-    function getMaterialIdentity(material) {
-      return [
-        cleanString(material.title, 160).toLowerCase(),
-        cleanString(
-          material.professor,
-          120
-        ).toLowerCase(),
-        cleanString(
-          material.semester,
-          80
-        ).toLowerCase()
-      ].join("|");
-    }
-
-    const knownFileNames = new Set(
-      materials
-        .map(function (material) {
-          return cleanString(
-            material.fileName,
-            240
-          ).toLowerCase();
-        })
-        .filter(Boolean)
-    );
-    const knownMaterialIdentities = new Set(
-      materials
-        .map(getMaterialIdentity)
-        .filter(Boolean)
-    );
-
-    imageKitMaterials.forEach(function (material) {
-      const fileName = cleanString(
-        material.fileName,
-        240
-      ).toLowerCase();
-      const materialIdentity =
-        getMaterialIdentity(material);
-
-      if (
-        (fileName && suppressedFileNames.has(fileName)) ||
-        (fileName && knownFileNames.has(fileName)) ||
-        knownMaterialIdentities.has(materialIdentity)
-      ) {
-        return;
-      }
-
-      if (fileName) {
-        knownFileNames.add(fileName);
-      }
-
-      knownMaterialIdentities.add(materialIdentity);
-      materials.push(material);
-    });
-  } catch (error) {
-    // Firestore materials remain available if ImageKit is unavailable.
-  }
 
   materials.sort(function (a, b) {
     return (
@@ -892,22 +826,47 @@ module.exports = async function handler(req, res) {
         decodedUser.uid
       );
       const updatedAtIso = new Date().toISOString();
+      const currentStatus =
+        cleanString(
+          ownedMaterial.data.status || "pending",
+          40
+        ).toLowerCase() || "pending";
+      const nextStatus =
+        currentStatus === "approved"
+          ? "pending"
+          : currentStatus;
       const updatedData = Object.assign(
         {},
         ownedMaterial.data,
         {
           title,
           materialType,
+          status: nextStatus,
           updatedAtIso
         }
       );
-
-      await ownedMaterial.ref.update({
+      const firestoreUpdate = {
         title,
         materialType,
+        status: nextStatus,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         updatedAtIso
-      });
+      };
+
+      if (currentStatus === "approved") {
+        firestoreUpdate.approvedAt =
+          admin.firestore.FieldValue.delete();
+        firestoreUpdate.approvedAtIso =
+          admin.firestore.FieldValue.delete();
+        firestoreUpdate.approvedByAdminUid =
+          admin.firestore.FieldValue.delete();
+        firestoreUpdate.approvedByAdminEmail =
+          admin.firestore.FieldValue.delete();
+      }
+
+      await ownedMaterial.ref.update(
+        firestoreUpdate
+      );
 
       try {
         await updateImageKitMaterial(
