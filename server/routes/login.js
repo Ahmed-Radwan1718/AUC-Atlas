@@ -6,6 +6,16 @@ const {
   createLoginChallenge,
   ensureAllowedAucEmail
 } = require("../_lib/securityHelpers");
+const {
+  getRequestIp,
+  consumeSecurityRateLimit,
+  clearSecurityRateLimit
+} = require("../_lib/securityRateLimits");
+
+const LOGIN_RATE_LIMIT_WINDOW_MS =
+  15 * 60 * 1000;
+const LOGIN_MAX_ACCOUNT_ATTEMPTS = 8;
+const LOGIN_MAX_IP_ATTEMPTS = 100;
 
 function cleanEmail(value) {
   return String(value || "").trim().toLowerCase();
@@ -30,15 +40,48 @@ module.exports = async function handler(req, res) {
 
     ensureAllowedAucEmail(email, "log in");
 
+    await consumeSecurityRateLimit({
+      scope: "login-ip",
+      identifier: getRequestIp(req),
+      maxAttempts: LOGIN_MAX_IP_ATTEMPTS,
+      windowMs: LOGIN_RATE_LIMIT_WINDOW_MS,
+      message:
+        "Too many login attempts from this connection. Please try again later."
+    });
+
+    await consumeSecurityRateLimit({
+      scope: "login-account",
+      identifier: email,
+      maxAttempts:
+        LOGIN_MAX_ACCOUNT_ATTEMPTS,
+      windowMs:
+        LOGIN_RATE_LIMIT_WINDOW_MS,
+      message:
+        "Too many login attempts for this account. Please try again later."
+    });
+
     let loginResult;
 
     try {
-      loginResult = await signInWithPassword(email, password);
+      loginResult = await signInWithPassword(
+        email,
+        password
+      );
     } catch (error) {
-      return res.status(401).json({ error: "Incorrect email or password." });
+      return res.status(401).json({
+        error:
+          "Incorrect email or password."
+      });
     }
 
-    const uid = loginResult.localId || loginResult.uid;
+    await clearSecurityRateLimit(
+      "login-account",
+      email
+    );
+
+    const uid =
+      loginResult.localId ||
+      loginResult.uid;
 
     if (!uid || !loginResult.idToken) {
       return res.status(500).json({ error: "Could not start login session." });
@@ -85,6 +128,13 @@ module.exports = async function handler(req, res) {
       }
     });
   } catch (error) {
+    if (error.retryAfterSeconds) {
+      res.setHeader(
+        "Retry-After",
+        String(error.retryAfterSeconds)
+      );
+    }
+
     return res.status(error.statusCode || 500).json({
       error: error.message || "Could not log in."
     });
