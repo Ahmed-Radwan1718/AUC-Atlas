@@ -6,6 +6,19 @@ const {
 } = require("../_lib/securityHelpers");
 
 const PROFILE_PHOTO_PUBLIC_ID_PREFIX = "auc-atlas/profile-photos";
+const PROFILE_PHOTO_UPLOAD_PRESET = String(
+  process.env.CLOUDINARY_PROFILE_PHOTO_UPLOAD_PRESET ||
+  "auc_atlas_profile_photos"
+).trim();
+const PROFILE_PHOTO_MAX_BYTES = 4 * 1024 * 1024;
+const PROFILE_PHOTO_ALLOWED_FORMATS = [
+  "jpg",
+  "jpeg",
+  "png",
+  "webp"
+];
+const PROFILE_PHOTO_UPLOADS_PER_HOUR = 5;
+const PROFILE_PHOTO_UPLOAD_WINDOW_MS = 60 * 60 * 1000;
 
 function getFirstName(fullName, email) {
   const name = String(fullName || "").trim();
@@ -46,12 +59,62 @@ function createProfilePhotoError(message, statusCode) {
   return error;
 }
 
+function createProfilePhotoRateLimitError(retryAfterSeconds) {
+  const safeRetryAfterSeconds = Math.max(
+    1,
+    Math.ceil(Number(retryAfterSeconds) || 1)
+  );
+  const retryAfterMinutes = Math.max(
+    1,
+    Math.ceil(safeRetryAfterSeconds / 60)
+  );
+  const error = createProfilePhotoError(
+    "Too many profile-photo uploads. Try again in " +
+      retryAfterMinutes +
+      (retryAfterMinutes === 1 ? " minute." : " minutes."),
+    429
+  );
+
+  error.retryAfterSeconds = safeRetryAfterSeconds;
+  return error;
+}
+
+function getTimestampMillis(value) {
+  if (!value) return 0;
+  if (typeof value.toDate === "function") return value.toDate().getTime();
+  if (typeof value.seconds === "number") return value.seconds * 1000;
+  if (typeof value._seconds === "number") return value._seconds * 1000;
+
+  const parsedDate = new Date(value);
+  return Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
+}
+
 function getSafePublicIdPart(value) {
   return String(value || "").replace(/[^\w-]/g, "_");
 }
 
-function getProfilePhotoPublicId(uid) {
+function getProfilePhotoPublicIdPrefix(uid) {
   return PROFILE_PHOTO_PUBLIC_ID_PREFIX + "/" + getSafePublicIdPart(uid);
+}
+
+function createProfilePhotoPublicId(uid) {
+  return (
+    getProfilePhotoPublicIdPrefix(uid) +
+    "/" +
+    Date.now() +
+    "-" +
+    crypto.randomBytes(8).toString("hex")
+  );
+}
+
+function isExpectedProfilePhotoPublicId(uid, publicId) {
+  const prefix = getProfilePhotoPublicIdPrefix(uid) + "/";
+  const suffix = String(publicId || "").slice(prefix.length);
+
+  return (
+    String(publicId || "").indexOf(prefix) === 0 &&
+    /^\d{10,16}-[a-f0-9]{16}$/i.test(suffix)
+  );
 }
 
 function signCloudinaryParams(params, apiSecret) {
@@ -60,6 +123,62 @@ function signCloudinaryParams(params, apiSecret) {
   }).join("&");
 
   return crypto.createHash("sha1").update(signatureBase + apiSecret).digest("hex");
+}
+
+async function consumeProfilePhotoUploadAttempt(uid) {
+  const db = admin.firestore();
+  const limitRef = db
+    .collection("profilePhotoUploadLimits")
+    .doc(uid);
+  const nowMs = Date.now();
+
+  await db.runTransaction(async function (transaction) {
+    const limitDoc = await transaction.get(limitRef);
+    const data = limitDoc.exists
+      ? limitDoc.data() || {}
+      : {};
+    const windowStartedAtMs = getTimestampMillis(
+      data.windowStartedAt
+    );
+    const hasActiveWindow =
+      windowStartedAtMs > 0 &&
+      nowMs <
+        windowStartedAtMs +
+          PROFILE_PHOTO_UPLOAD_WINDOW_MS;
+    const uploadCount = hasActiveWindow
+      ? Math.max(0, Number(data.uploadCount) || 0)
+      : 0;
+    const activeWindowStartedAtMs = hasActiveWindow
+      ? windowStartedAtMs
+      : nowMs;
+
+    if (uploadCount >= PROFILE_PHOTO_UPLOADS_PER_HOUR) {
+      throw createProfilePhotoRateLimitError(
+        Math.ceil(
+          (
+            activeWindowStartedAtMs +
+            PROFILE_PHOTO_UPLOAD_WINDOW_MS -
+            nowMs
+          ) / 1000
+        )
+      );
+    }
+
+    transaction.set(
+      limitRef,
+      {
+        uid,
+        uploadCount: uploadCount + 1,
+        windowStartedAt:
+          admin.firestore.Timestamp.fromDate(
+            new Date(activeWindowStartedAtMs)
+          ),
+        updatedAt:
+          admin.firestore.FieldValue.serverTimestamp()
+      },
+      { merge: true }
+    );
+  });
 }
 
 function isExpectedCloudinaryPhotoUrl(photoURL, config, publicId) {
@@ -76,6 +195,82 @@ function isExpectedCloudinaryPhotoUrl(photoURL, config, publicId) {
   } catch (error) {
     return false;
   }
+}
+
+async function getCloudinaryPhotoDetails(config, publicId) {
+  const response = await fetch(
+    "https://api.cloudinary.com/v1_1/" +
+      encodeURIComponent(config.cloudName) +
+      "/resources/image/upload/" +
+      encodeURIComponent(publicId),
+    {
+      headers: {
+        Accept: "application/json",
+        Authorization:
+          "Basic " +
+          Buffer.from(
+            config.apiKey + ":" + config.apiSecret
+          ).toString("base64")
+      }
+    }
+  );
+
+  if (response.status === 404) {
+    throw createProfilePhotoError(
+      "Could not verify uploaded profile photo.",
+      400
+    );
+  }
+
+  if (!response.ok) {
+    throw createProfilePhotoError(
+      "Could not verify the stored profile photo.",
+      502
+    );
+  }
+
+  return response.json().catch(function () {
+    return {};
+  });
+}
+
+async function verifyCloudinaryPhoto(
+  config,
+  publicId,
+  submittedVersion
+) {
+  const asset = await getCloudinaryPhotoDetails(
+    config,
+    publicId
+  );
+  const format = String(asset.format || "")
+    .trim()
+    .toLowerCase();
+  const bytes = Math.max(0, Number(asset.bytes) || 0);
+  const version = Number(asset.version);
+  const isValid =
+    asset.public_id === publicId &&
+    asset.resource_type === "image" &&
+    asset.type === "upload" &&
+    PROFILE_PHOTO_ALLOWED_FORMATS.includes(format) &&
+    bytes > 0 &&
+    bytes <= PROFILE_PHOTO_MAX_BYTES &&
+    Number.isSafeInteger(version) &&
+    version === Number(submittedVersion) &&
+    isExpectedCloudinaryPhotoUrl(
+      asset.secure_url,
+      config,
+      publicId
+    );
+
+  if (!isValid) {
+    throw createProfilePhotoError(
+      "The uploaded profile photo type or size is not allowed.",
+      400
+    );
+  }
+
+  return String(asset.secure_url || "").trim();
 }
 
 async function destroyCloudinaryPhoto(config, publicId) {
@@ -127,8 +322,24 @@ async function getAccountUser(uid, fallbackEmail) {
   };
 }
 
-async function saveProfilePhoto(uid, decodedUser, photoURL, publicId) {
+async function saveProfilePhoto(
+  uid,
+  decodedUser,
+  photoURL,
+  publicId,
+  config
+) {
   const userRef = admin.firestore().collection("users").doc(uid);
+  const userDoc = await userRef.get();
+  const userData = userDoc.exists
+    ? userDoc.data() || {}
+    : {};
+  const previousPublicId = String(
+    userData.photoPublicId ||
+    (userData.photoURL
+      ? getProfilePhotoPublicIdPrefix(uid)
+      : "")
+  ).trim();
   const now = admin.firestore.FieldValue.serverTimestamp();
 
   await admin.auth().updateUser(uid, {
@@ -142,13 +353,32 @@ async function saveProfilePhoto(uid, decodedUser, photoURL, publicId) {
     updatedAt: now
   }, { merge: true });
 
+  if (
+    previousPublicId &&
+    previousPublicId !== publicId
+  ) {
+    await destroyCloudinaryPhoto(
+      config,
+      previousPublicId
+    );
+  }
+
   return getAccountUser(uid, decodedUser.email || "");
 }
 
-async function removeProfilePhoto(uid, decodedUser, publicId, config) {
+async function removeProfilePhoto(uid, decodedUser, config) {
+  const userRef = admin.firestore().collection("users").doc(uid);
+  const userDoc = await userRef.get();
+  const userData = userDoc.exists
+    ? userDoc.data() || {}
+    : {};
+  const publicId = String(
+    userData.photoPublicId ||
+    getProfilePhotoPublicIdPrefix(uid)
+  ).trim();
+
   await destroyCloudinaryPhoto(config, publicId);
 
-  const userRef = admin.firestore().collection("users").doc(uid);
   const now = admin.firestore.FieldValue.serverTimestamp();
 
   await admin.auth().updateUser(uid, {
@@ -177,15 +407,27 @@ module.exports = async function handler(req, res) {
     const body = req.body || {};
     const action = String(body.action || "").trim();
     const config = getCloudinaryConfig();
-    const publicId = getProfilePhotoPublicId(decodedUser.uid);
+
+    res.setHeader("Cache-Control", "no-store");
 
     if (action === "signature") {
+      await consumeProfilePhotoUploadAttempt(
+        decodedUser.uid
+      );
+
       const timestamp = String(Math.floor(Date.now() / 1000));
+      const publicId = createProfilePhotoPublicId(
+        decodedUser.uid
+      );
+      const allowedFormats =
+        PROFILE_PHOTO_ALLOWED_FORMATS.join(",");
       const signedParams = {
+        allowed_formats: allowedFormats,
         invalidate: "true",
-        overwrite: "true",
+        overwrite: "false",
         public_id: publicId,
-        timestamp
+        timestamp,
+        upload_preset: PROFILE_PHOTO_UPLOAD_PRESET
       };
 
       return res.status(200).json({
@@ -194,21 +436,49 @@ module.exports = async function handler(req, res) {
         apiKey: config.apiKey,
         timestamp,
         publicId,
-        overwrite: "true",
+        overwrite: "false",
         invalidate: "true",
-        signature: signCloudinaryParams(signedParams, config.apiSecret)
+        allowedFormats,
+        uploadPreset: PROFILE_PHOTO_UPLOAD_PRESET,
+        signature: signCloudinaryParams(
+          signedParams,
+          config.apiSecret
+        )
       });
     }
 
     if (action === "save") {
-      const photoURL = String(body.photoURL || "").trim();
-      const submittedPublicId = String(body.publicId || "").trim();
+      const submittedPublicId = String(
+        body.publicId || ""
+      ).trim();
+      const submittedVersion = Number(body.version);
 
-      if (submittedPublicId !== publicId || !isExpectedCloudinaryPhotoUrl(photoURL, config, publicId)) {
-        throw createProfilePhotoError("Could not verify uploaded profile photo.", 400);
+      if (
+        !isExpectedProfilePhotoPublicId(
+          decodedUser.uid,
+          submittedPublicId
+        ) ||
+        !Number.isSafeInteger(submittedVersion) ||
+        submittedVersion <= 0
+      ) {
+        throw createProfilePhotoError(
+          "Could not verify uploaded profile photo.",
+          400
+        );
       }
 
-      const user = await saveProfilePhoto(decodedUser.uid, decodedUser, photoURL, publicId);
+      const photoURL = await verifyCloudinaryPhoto(
+        config,
+        submittedPublicId,
+        submittedVersion
+      );
+      const user = await saveProfilePhoto(
+        decodedUser.uid,
+        decodedUser,
+        photoURL,
+        submittedPublicId,
+        config
+      );
 
       return res.status(200).json({
         success: true,
@@ -217,7 +487,11 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === "remove") {
-      const user = await removeProfilePhoto(decodedUser.uid, decodedUser, publicId, config);
+      const user = await removeProfilePhoto(
+        decodedUser.uid,
+        decodedUser,
+        config
+      );
 
       return res.status(200).json({
         success: true,
@@ -227,6 +501,15 @@ module.exports = async function handler(req, res) {
 
     throw createProfilePhotoError("Unsupported profile photo action.", 400);
   } catch (error) {
+    res.setHeader("Cache-Control", "no-store");
+
+    if (error.retryAfterSeconds) {
+      res.setHeader(
+        "Retry-After",
+        String(error.retryAfterSeconds)
+      );
+    }
+
     return res.status(error.statusCode || 500).json({
       error: error.message || "Could not update profile photo."
     });
