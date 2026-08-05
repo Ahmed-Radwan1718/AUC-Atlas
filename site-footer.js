@@ -101,6 +101,17 @@
           grid-template-columns: 1fr;
           gap: 26px;
         }
+
+        .site-footer-links {
+          gap: 2px;
+        }
+
+        .site-footer-links a,
+        .site-footer-links a:visited {
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+        }
       }
     `;
     document.head.appendChild(footerStyles);
