@@ -292,8 +292,8 @@
     }
 
     .professors-search-box {
-      max-width: 560px;
-      margin-bottom: 18px;
+      width: min(100%, 560px);
+      margin: 0 auto 24px;
     }
 
     .professors-search-box input {
@@ -308,11 +308,20 @@
       font-size: 15px;
       font-weight: 600;
       outline: none;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
     }
 
     .professors-search-box input:focus {
       border-color: rgba(192, 154, 92, 0.58);
-      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow:
+        0 0 0 4px rgba(192, 154, 92, 0.12),
+        0 14px 36px rgba(42, 32, 20, 0.08);
+      transform: translateY(-1px);
     }
 
     .professor-card {
@@ -2693,7 +2702,7 @@
 
     if (searchInput) {
       searchInput.addEventListener("input", function () {
-        renderProfessors(false);
+        renderProfessors(true);
       });
     }
 
