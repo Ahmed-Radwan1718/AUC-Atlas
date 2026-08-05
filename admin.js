@@ -6,6 +6,7 @@
     busy: false,
     authenticationBusy: false,
     requiresTwoFactor: false,
+    adminChallengeToken: "",
     adminAccessToken: "",
     adminAccessExpiresAt: ""
   };
@@ -26,14 +27,6 @@
     document.getElementById(
       "admin-auth-password"
     );
-  const authCodeField =
-    document.getElementById(
-      "admin-auth-code-field"
-    );
-  const authCodeInput =
-    document.getElementById(
-      "admin-auth-code"
-    );
   const authSubmitButton =
     document.getElementById(
       "admin-auth-submit"
@@ -41,6 +34,32 @@
   const authMessage =
     document.getElementById(
       "admin-auth-message"
+    );
+  const twoFactorPanel =
+    document.getElementById(
+      "admin-two-factor-panel"
+    );
+  const twoFactorForm =
+    document.getElementById(
+      "admin-two-factor-form"
+    );
+  const twoFactorCodeInputs =
+    Array.from(
+      document.querySelectorAll(
+        "[data-admin-two-factor-input]"
+      )
+    );
+  const twoFactorSubmit =
+    document.getElementById(
+      "admin-two-factor-submit"
+    );
+  const twoFactorCancel =
+    document.getElementById(
+      "admin-two-factor-cancel"
+    );
+  const twoFactorMessage =
+    document.getElementById(
+      "admin-two-factor-message"
     );
   const deniedState =
     document.getElementById(
@@ -225,9 +244,74 @@
     }
   }
 
+  function clearTwoFactorCodeInputs() {
+    twoFactorCodeInputs.forEach(
+      function (input) {
+        input.value = "";
+      }
+    );
+  }
+
+  function getTwoFactorCodeValue() {
+    return twoFactorCodeInputs
+      .map(function (input) {
+        return input.value.trim();
+      })
+      .join("");
+  }
+
+  function focusFirstTwoFactorInput() {
+    if (twoFactorCodeInputs[0]) {
+      twoFactorCodeInputs[0].focus();
+    }
+  }
+
+  function closeTwoFactorPanel() {
+    twoFactorPanel.hidden = true;
+    clearTwoFactorCodeInputs();
+
+    twoFactorSubmit.disabled = false;
+    twoFactorSubmit.textContent =
+      "Verify Code";
+
+    setMessage(
+      twoFactorMessage,
+      "",
+      ""
+    );
+  }
+
+  function openTwoFactorPanel() {
+    clearTwoFactorCodeInputs();
+
+    setMessage(
+      authMessage,
+      "",
+      ""
+    );
+    setMessage(
+      twoFactorMessage,
+      "",
+      ""
+    );
+
+    twoFactorPanel.hidden = false;
+    twoFactorSubmit.disabled = false;
+    twoFactorSubmit.textContent =
+      "Verify Code";
+
+    window.setTimeout(
+      focusFirstTwoFactorInput,
+      50
+    );
+  }
+
   function showDenied(message) {
+    state.adminChallengeToken = "";
     state.adminAccessToken = "";
     state.adminAccessExpiresAt = "";
+
+    closeTwoFactorPanel();
 
     loadingState.hidden = true;
     authState.hidden = true;
@@ -241,21 +325,18 @@
   function showAuthenticationGate(
     message
   ) {
+    state.adminChallengeToken = "";
     state.adminAccessToken = "";
     state.adminAccessExpiresAt = "";
+
+    closeTwoFactorPanel();
 
     loadingState.hidden = true;
     deniedState.hidden = true;
     app.hidden = true;
     authState.hidden = false;
 
-    authCodeField.hidden =
-      !state.requiresTwoFactor;
-    authCodeInput.required =
-      state.requiresTwoFactor;
-
     authPasswordInput.value = "";
-    authCodeInput.value = "";
 
     setMessage(
       authMessage,
@@ -409,6 +490,45 @@
     });
   }
 
+  async function completeAdminAuthentication(
+    data
+  ) {
+    const accessToken = String(
+      data.adminAccessToken || ""
+    );
+
+    if (
+      !/^[a-f0-9]{64}$/i.test(
+        accessToken
+      )
+    ) {
+      throw new Error(
+        "Administrator access could not be created."
+      );
+    }
+
+    state.adminChallengeToken = "";
+    state.adminAccessToken =
+      accessToken;
+    state.adminAccessExpiresAt =
+      String(
+        data.adminAccessExpiresAt ||
+        ""
+      );
+    state.requiresTwoFactor =
+      Boolean(
+        data.requiresTwoFactor
+      );
+
+    authPasswordInput.value = "";
+    closeTwoFactorPanel();
+
+    authState.hidden = true;
+    loadingState.hidden = false;
+
+    await loadDashboard();
+  }
+
   authForm.addEventListener(
     "submit",
     async function (event) {
@@ -420,10 +540,6 @@
 
       const password =
         authPasswordInput.value;
-      const authenticatorCode =
-        authCodeInput.value
-          .replace(/\D/g, "")
-          .slice(0, 6);
 
       if (!password) {
         setMessage(
@@ -435,21 +551,6 @@
         return;
       }
 
-      if (
-        state.requiresTwoFactor &&
-        !/^\d{6}$/.test(
-          authenticatorCode
-        )
-      ) {
-        setMessage(
-          authMessage,
-          "Enter your 6-digit authenticator code.",
-          "error"
-        );
-        authCodeInput.focus();
-        return;
-      }
-
       state.authenticationBusy = true;
 
       const originalText =
@@ -457,11 +558,11 @@
 
       authSubmitButton.disabled = true;
       authSubmitButton.textContent =
-        "Authenticating...";
+        "Checking password...";
 
       setMessage(
         authMessage,
-        "Verifying administrator credentials...",
+        "Verifying administrator password...",
         ""
       );
 
@@ -478,44 +579,43 @@
             },
             body: JSON.stringify({
               action:
-                "authenticateAdmin",
-              password,
-              authenticatorCode:
-                state.requiresTwoFactor
-                  ? authenticatorCode
-                  : ""
+                "authenticateAdminPassword",
+              password
             })
           }
         );
 
-        state.adminAccessToken =
-          String(
-            data.adminAccessToken ||
-            ""
-          );
-        state.adminAccessExpiresAt =
-          String(
-            data.adminAccessExpiresAt ||
-            ""
-          );
-        state.requiresTwoFactor =
-          Boolean(
-            data.requiresTwoFactor
-          );
-
         authPasswordInput.value = "";
-        authCodeInput.value = "";
-        authState.hidden = true;
-        loadingState.hidden = false;
 
-        await loadDashboard();
-      } catch (error) {
-        if (error.requiresTwoFactor) {
+        if (data.requiresTwoFactor) {
+          const challengeToken =
+            String(
+              data.adminChallengeToken ||
+              ""
+            );
+
+          if (
+            !/^[a-f0-9]{64}$/i.test(
+              challengeToken
+            )
+          ) {
+            throw new Error(
+              "Authenticator verification could not be started."
+            );
+          }
+
           state.requiresTwoFactor = true;
-          authCodeField.hidden = false;
-          authCodeInput.required = true;
+          state.adminChallengeToken =
+            challengeToken;
+
+          openTwoFactorPanel();
+          return;
         }
 
+        await completeAdminAuthentication(
+          data
+        );
+      } catch (error) {
         setMessage(
           authMessage,
           error.message ||
@@ -523,20 +623,210 @@
           "error"
         );
 
-        if (
-          error.requiresTwoFactor &&
-          password
-        ) {
-          authCodeInput.focus();
-        } else {
-          authPasswordInput.focus();
-        }
+        authPasswordInput.focus();
       } finally {
         state.authenticationBusy = false;
         authSubmitButton.disabled = false;
         authSubmitButton.textContent =
           originalText;
       }
+    }
+  );
+
+  twoFactorCodeInputs.forEach(
+    function (input, index) {
+      input.addEventListener(
+        "input",
+        function () {
+          input.value = input.value
+            .replace(/\D/g, "")
+            .slice(0, 1);
+
+          if (
+            input.value &&
+            twoFactorCodeInputs[
+              index + 1
+            ]
+          ) {
+            twoFactorCodeInputs[
+              index + 1
+            ].focus();
+          }
+        }
+      );
+
+      input.addEventListener(
+        "keydown",
+        function (event) {
+          if (
+            event.key === "Backspace" &&
+            !input.value &&
+            twoFactorCodeInputs[
+              index - 1
+            ]
+          ) {
+            twoFactorCodeInputs[
+              index - 1
+            ].focus();
+          }
+        }
+      );
+
+      input.addEventListener(
+        "paste",
+        function (event) {
+          const pastedCode =
+            event.clipboardData
+              .getData("text")
+              .replace(/\D/g, "")
+              .slice(0, 6);
+
+          if (!pastedCode) {
+            return;
+          }
+
+          event.preventDefault();
+
+          twoFactorCodeInputs.forEach(
+            function (
+              codeInput,
+              codeIndex
+            ) {
+              codeInput.value =
+                pastedCode.charAt(
+                  codeIndex
+                ) || "";
+            }
+          );
+
+          const focusIndex =
+            Math.min(
+              pastedCode.length,
+              twoFactorCodeInputs.length
+            ) - 1;
+
+          if (
+            twoFactorCodeInputs[
+              focusIndex
+            ]
+          ) {
+            twoFactorCodeInputs[
+              focusIndex
+            ].focus();
+          }
+        }
+      );
+    }
+  );
+
+  twoFactorForm.addEventListener(
+    "submit",
+    async function (event) {
+      event.preventDefault();
+
+      if (state.authenticationBusy) {
+        return;
+      }
+
+      const authenticatorCode =
+        getTwoFactorCodeValue();
+
+      if (
+        !/^\d{6}$/.test(
+          authenticatorCode
+        )
+      ) {
+        setMessage(
+          twoFactorMessage,
+          "Enter your 6-digit authenticator code.",
+          "error"
+        );
+        focusFirstTwoFactorInput();
+        return;
+      }
+
+      if (
+        !/^[a-f0-9]{64}$/i.test(
+          state.adminChallengeToken
+        )
+      ) {
+        showAuthenticationGate(
+          "Administrator verification expired. Enter your password again."
+        );
+        return;
+      }
+
+      state.authenticationBusy = true;
+      twoFactorSubmit.disabled = true;
+      twoFactorSubmit.textContent =
+        "Verifying...";
+
+      setMessage(
+        twoFactorMessage,
+        "",
+        ""
+      );
+
+      try {
+        const data = await requestJson(
+          "/api/admin",
+          {
+            method: "POST",
+            headers: {
+              Accept:
+                "application/json",
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              action:
+                "verifyAdminAuthenticator",
+              adminChallengeToken:
+                state.adminChallengeToken,
+              authenticatorCode
+            })
+          }
+        );
+
+        await completeAdminAuthentication(
+          data
+        );
+      } catch (error) {
+        if (
+          error.code ===
+          "admin-auth-challenge-invalid"
+        ) {
+          showAuthenticationGate(
+            error.message ||
+            "Administrator verification expired. Enter your password again."
+          );
+          return;
+        }
+
+        setMessage(
+          twoFactorMessage,
+          error.message ||
+          "The authenticator code is incorrect.",
+          "error"
+        );
+
+        clearTwoFactorCodeInputs();
+        focusFirstTwoFactorInput();
+      } finally {
+        state.authenticationBusy = false;
+        twoFactorSubmit.disabled = false;
+        twoFactorSubmit.textContent =
+          "Verify Code";
+      }
+    }
+  );
+
+  twoFactorCancel.addEventListener(
+    "click",
+    function () {
+      showAuthenticationGate(
+        "Administrator authentication cancelled."
+      );
     }
   );
 
