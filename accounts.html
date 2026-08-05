@@ -802,7 +802,7 @@
 
     .account-connected-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: minmax(0, 1fr);
       gap: 14px;
     }
 
@@ -905,27 +905,6 @@
       border: 1px solid rgba(47, 146, 85, 0.28);
       background: rgba(185, 255, 202, 0.28);
       color: rgba(27, 112, 62, 0.96);
-    }
-
-    .account-connected-badge.is-not-connected {
-      border: 1px solid rgba(23, 23, 23, 0.12);
-      background: rgba(23, 23, 23, 0.04);
-      color: rgba(23, 23, 23, 0.56);
-    }
-
-    .account-connected-action-button {
-      min-height: 32px;
-      padding: 0 13px;
-      border-radius: 999px;
-      border: 1px solid rgba(23, 23, 23, 0.12);
-      background: rgba(255, 255, 255, 0.9);
-      color: #171717;
-      font-family: inherit;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
     }
 
     .account-login-session-card {
@@ -2631,22 +2610,6 @@
 
                     <div class="account-connected-actions">
                       <span class="account-connected-badge is-connected">Connected</span>
-                    </div>
-                  </div>
-
-                  <div class="account-connected-account-card" id="connected-google-card">
-                    <div class="account-connected-account-main">
-                      <div class="account-connected-title">
-                        <img class="account-connected-icon" src="google-logo.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
-                        <span>Google</span>
-                      </div>
-                      <strong>Not connected</strong>
-                      <p>Use your Google account to sign in faster.</p>
-                    </div>
-
-                    <div class="account-connected-actions">
-                      <span class="account-connected-badge is-not-connected">Not connected</span>
-                      <button class="account-connected-action-button" type="button" id="connected-google-action" data-provider="google" hidden>Connect</button>
                     </div>
                   </div>
                 </div>
