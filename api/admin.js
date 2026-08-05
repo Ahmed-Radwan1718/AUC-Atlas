@@ -4,7 +4,8 @@ const {
   ensureAdminUser,
   isAdminUid,
   getAdminAuthenticationRequirements,
-  authenticateAdminUser,
+  authenticateAdminPassword,
+  verifyAdminAuthenticator,
   requireFreshAdminAccess
 } = require("../server/_lib/adminHelpers");
 
@@ -755,12 +756,26 @@ module.exports = async function handler(req, res) {
 
     if (
       req.method === "POST" &&
-      action === "authenticateAdmin"
+      action ===
+        "authenticateAdminPassword"
     ) {
       return res.status(200).json(
-        await authenticateAdminUser(
+        await authenticateAdminPassword(
           actor,
-          body.password,
+          body.password
+        )
+      );
+    }
+
+    if (
+      req.method === "POST" &&
+      action ===
+        "verifyAdminAuthenticator"
+    ) {
+      return res.status(200).json(
+        await verifyAdminAuthenticator(
+          actor,
+          body.adminChallengeToken,
           body.authenticatorCode
         )
       );
