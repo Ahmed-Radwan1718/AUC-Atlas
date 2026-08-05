@@ -318,8 +318,22 @@
   }
 
   function setStatus(message) {
+    const isLoading =
+      message ===
+      "Searching course materials...";
+
     status.textContent = message;
     status.hidden = !message;
+
+    status.classList.toggle(
+      "is-loading",
+      isLoading
+    );
+
+    form.classList.toggle(
+      "is-searching",
+      isLoading
+    );
   }
 
   function openPanel() {
