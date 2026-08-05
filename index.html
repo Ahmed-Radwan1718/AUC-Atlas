@@ -1926,14 +1926,82 @@
       }
 
       function formatHomeCount(value) {
-        const number = Math.max(0, Number(value) || 0);
+        const number = Math.max(
+          0,
+          Math.round(Number(value) || 0)
+        );
+
         return number.toLocaleString("en-US");
       }
 
+      function prefersReducedHomeMotion() {
+        return window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+      }
+
       function setHomeCount(element, value) {
-        if (element) {
-          element.textContent = formatHomeCount(value);
+        if (!element) {
+          return;
         }
+
+        const currentValue = Math.max(
+          0,
+          Number(
+            String(element.textContent || "")
+              .replace(/,/g, "")
+          ) || 0
+        );
+        const nextValue = Math.max(
+          0,
+          Math.round(Number(value) || 0)
+        );
+
+        if (
+          prefersReducedHomeMotion() ||
+          currentValue === nextValue
+        ) {
+          element.textContent =
+            formatHomeCount(nextValue);
+          return;
+        }
+
+        if (element.homeCountAnimationFrame) {
+          cancelAnimationFrame(
+            element.homeCountAnimationFrame
+          );
+        }
+
+        const startTime = performance.now();
+        const duration = 520;
+
+        function updateFrame(now) {
+          const progress = Math.min(
+            (now - startTime) / duration,
+            1
+          );
+          const easedProgress =
+            1 - Math.pow(1 - progress, 3);
+          const displayedValue =
+            currentValue +
+            (nextValue - currentValue) *
+              easedProgress;
+
+          element.textContent = formatHomeCount(
+            displayedValue
+          );
+
+          if (progress < 1) {
+            element.homeCountAnimationFrame =
+              requestAnimationFrame(updateFrame);
+          } else {
+            element.textContent =
+              formatHomeCount(nextValue);
+          }
+        }
+
+        element.homeCountAnimationFrame =
+          requestAnimationFrame(updateFrame);
       }
 
       function formatHomeDate(value) {
