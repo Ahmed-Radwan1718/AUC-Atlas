@@ -418,6 +418,93 @@ async function handleDeleteReview(actor, body) {
   return { success: true };
 }
 
+async function handleApproveMaterial(actor, body) {
+  const materialId = cleanString(
+    body.materialId,
+    180
+  );
+
+  if (
+    !materialId ||
+    !/^[A-Za-z0-9_-]{6,180}$/.test(
+      materialId
+    )
+  ) {
+    throw createAdminError(
+      "Course material not found.",
+      400
+    );
+  }
+
+  const materialRef = admin.firestore()
+    .collection("courseMaterials")
+    .doc(materialId);
+  const materialDoc =
+    await materialRef.get();
+
+  if (!materialDoc.exists) {
+    throw createAdminError(
+      "Course material not found.",
+      404
+    );
+  }
+
+  const materialData =
+    materialDoc.data() || {};
+  const status =
+    cleanString(
+      materialData.status || "pending",
+      40
+    ).toLowerCase() || "pending";
+  const fileId = cleanString(
+    materialData.fileId,
+    160
+  );
+
+  if (status === "approved") {
+    return { success: true };
+  }
+
+  if (
+    status !== "pending" ||
+    !/^[A-Za-z0-9_-]{6,160}$/.test(
+      fileId
+    )
+  ) {
+    throw createAdminError(
+      "Only valid pending materials can be approved.",
+      409
+    );
+  }
+
+  const approvedAtIso =
+    new Date().toISOString();
+
+  await materialRef.set({
+    status: "approved",
+    approvedAt:
+      admin.firestore.FieldValue.serverTimestamp(),
+    approvedAtIso,
+    approvedByAdminUid: actor.uid,
+    approvedByAdminEmail: actor.email
+  }, { merge: true });
+
+  await writeAuditLog(actor, {
+    action: "approve_material",
+    targetType: "course_material",
+    targetId: materialId,
+    targetLabel: cleanString(
+      materialData.title ||
+        materialData.fileName ||
+        "Course material",
+      240
+    ),
+    reason: ""
+  });
+
+  return { success: true };
+}
+
 async function handleDeleteMaterial(actor, body) {
   const source = body.source === "imagekit" ? "imagekit" : "firestore";
   const materialId = cleanString(body.materialId, 180);
@@ -718,6 +805,14 @@ module.exports = async function handler(req, res) {
     ) {
       result =
         await handleDeleteReview(
+          actor,
+          body
+        );
+    } else if (
+      action === "approveMaterial"
+    ) {
+      result =
+        await handleApproveMaterial(
           actor,
           body
         );
