@@ -1771,6 +1771,463 @@
         border-radius: 22px;
       }
     }
+
+    .courses-inner {
+      width: min(1680px, calc(100% - 32px));
+    }
+
+    .courses-header {
+      max-width: none;
+      margin: 0 0 34px;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 28px;
+      align-items: end;
+    }
+
+    .courses-header h1 {
+      max-width: 640px;
+      margin: 0;
+      font-size: clamp(34px, 4.8vw, 58px);
+      line-height: 1.08;
+    }
+
+    .courses-header p {
+      max-width: 420px;
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.7;
+      text-align: left;
+    }
+
+    .courses-browser {
+      max-width: none;
+      margin: 0;
+    }
+
+    .courses-results {
+      gap: 30px;
+    }
+
+    .courses-search-box {
+      width: min(100%, 560px);
+      margin: 0 auto;
+    }
+
+    .courses-search-box input {
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-size: 15px;
+      box-shadow: 0 18px 50px rgba(42, 32, 20, 0.08);
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .courses-search-box input:focus {
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow:
+        0 0 0 4px rgba(192, 154, 92, 0.12),
+        0 18px 50px rgba(42, 32, 20, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .courses-home-content {
+      margin-top: 8px;
+      display: grid;
+      gap: 56px;
+    }
+
+    .courses-home-content[hidden] {
+      display: none;
+    }
+
+    .course-home-section {
+      padding-top: 34px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .course-section-heading {
+      max-width: 720px;
+      margin-bottom: 24px;
+    }
+
+    .course-section-kicker {
+      margin-bottom: 10px;
+      color: rgba(192, 154, 92, 0.9);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .course-section-heading h2 {
+      margin-bottom: 10px;
+      color: #171717;
+      font-size: clamp(26px, 3vw, 40px);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .course-section-heading p {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .course-department-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .course-department-button {
+      min-height: 88px;
+      padding: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 18px 48px rgba(42, 32, 20, 0.07);
+      color: #171717;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 9px;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .course-department-button span {
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .course-department-button strong {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .course-department-button:hover,
+    .course-department-button:focus-visible {
+      outline: none;
+      border-color: rgba(192, 154, 92, 0.36);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 24px 60px rgba(42, 32, 20, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .course-popular-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .course-feature-card,
+    .course-recent-card {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      color: inherit;
+      text-decoration: none;
+      animation: courseCardIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .course-feature-card {
+      min-height: 220px;
+      padding: 22px;
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .course-feature-code,
+    .course-recent-type {
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .course-feature-card h3,
+    .course-recent-card h3 {
+      color: #171717;
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .course-feature-meta,
+    .course-recent-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .course-feature-meta span,
+    .course-recent-meta span {
+      padding: 7px 9px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.74);
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .course-feature-card:hover,
+    .course-feature-card:focus-visible,
+    .course-recent-card:hover,
+    .course-recent-card:focus-visible {
+      outline: none;
+      border-color: rgba(192, 154, 92, 0.36);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 30px 80px rgba(42, 32, 20, 0.14);
+      transform: translateY(-3px);
+    }
+
+    .course-recent-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .course-recent-card {
+      min-height: 240px;
+      padding: 22px;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .course-recent-card p {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .course-recent-card small {
+      margin-top: auto;
+      color: rgba(23, 23, 23, 0.46);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .course-recent-status {
+      grid-column: 1 / -1;
+      padding: 28px;
+      border: 1px dashed rgba(23, 23, 23, 0.16);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.54);
+      text-align: center;
+    }
+
+    .course-recent-status strong {
+      display: block;
+      color: #171717;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .course-recent-status p {
+      margin-top: 7px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .course-recent-status a {
+      margin-top: 14px;
+      color: rgba(154, 112, 48, 0.96);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+    }
+
+    .course-contribute {
+      padding-top: 34px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .course-contribute-copy {
+      max-width: 720px;
+    }
+
+    .course-contribute-copy h2 {
+      margin-bottom: 10px;
+      color: #171717;
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .course-contribute-copy p {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .course-upload-start {
+      min-height: 50px;
+      padding: 0 20px;
+      border: 0;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .course-upload-start:hover,
+    .course-upload-start:focus-visible {
+      outline: none;
+      background: rgba(154, 112, 48, 0.96);
+      box-shadow: 0 14px 34px rgba(42, 32, 20, 0.16);
+      transform: translateY(-2px);
+    }
+
+    .courses-result-count {
+      margin: 0;
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .course-card {
+      min-height: 220px;
+      padding: 22px;
+      border-radius: 28px;
+      border-left: 1px solid rgba(23, 23, 23, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+      gap: 24px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+    }
+
+    .course-card-meta {
+      justify-content: flex-start;
+    }
+
+    .courses-empty {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 1240px) {
+      .course-department-grid,
+      .course-popular-grid,
+      .courses-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .course-recent-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .courses-header {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .courses-header p {
+        max-width: 620px;
+      }
+
+      .course-department-grid,
+      .course-popular-grid,
+      .courses-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .course-contribute {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .course-upload-start {
+        width: fit-content;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .courses-home-content {
+        gap: 42px;
+      }
+
+      .course-department-grid,
+      .course-popular-grid,
+      .course-recent-grid,
+      .courses-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .course-feature-card,
+      .course-recent-card,
+      .course-card {
+        border-radius: 22px;
+      }
+
+      .course-upload-start {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-feature-card,
+      .course-recent-card {
+        animation: none;
+      }
+    }
   </style>
 </head>
 
@@ -1782,20 +2239,106 @@
     <div class="courses-inner">
       <div class="courses-list-view" id="courses-list-view">
         <section class="courses-header">
-          <h1>Find your coruse material.</h1>
+          <h1>Find your course material.</h1>
+
           <p>
             Search by course code, title, subject, department, or level.
           </p>
         </section>
 
-        <section class="courses-browser" aria-label="Course search and results">
+        <section class="courses-browser" aria-label="Course search and discovery">
           <section class="courses-results">
             <div class="courses-search-box">
-              <input id="course-search-input" type="search" placeholder="Search courses..." aria-label="Search courses">
+              <input
+                id="course-search-input"
+                type="search"
+                placeholder="Search courses..."
+                aria-label="Search courses"
+              >
             </div>
 
-            <div class="courses-result-count" id="courses-result-count" hidden>0 matches</div>
-            <section class="courses-grid" id="courses-grid" aria-label="Course search results" hidden></section>
+            <div class="courses-result-count" id="courses-result-count" hidden>
+              0 matches
+            </div>
+
+            <section
+              class="courses-grid"
+              id="courses-grid"
+              aria-label="Course search results"
+              hidden
+            ></section>
+
+            <div class="courses-home-content" id="courses-home-content">
+              <section class="course-home-section" aria-labelledby="course-departments-title">
+                <div class="course-section-heading">
+                  <p class="course-section-kicker">Course directory</p>
+                  <h2 id="course-departments-title">Browse by department</h2>
+                  <p>
+                    Choose a department to view its available courses and course-material pages.
+                  </p>
+                </div>
+
+                <div
+                  class="course-department-grid"
+                  id="course-subject-filters"
+                  aria-label="Course departments"
+                ></div>
+              </section>
+
+              <section class="course-home-section" aria-labelledby="popular-courses-title">
+                <div class="course-section-heading">
+                  <p class="course-section-kicker">Start here</p>
+                  <h2 id="popular-courses-title">Popular courses</h2>
+                  <p>
+                    Quick access to foundational courses across AUC.
+                  </p>
+                </div>
+
+                <div
+                  class="course-popular-grid"
+                  id="course-popular-grid"
+                  aria-label="Popular courses"
+                ></div>
+              </section>
+
+              <section class="course-home-section" aria-labelledby="recent-materials-title">
+                <div class="course-section-heading">
+                  <p class="course-section-kicker">New on AUC Atlas</p>
+                  <h2 id="recent-materials-title">Recently added materials</h2>
+                  <p>
+                    See the newest approved notes, review sheets, slides, and practice files.
+                  </p>
+                </div>
+
+                <div
+                  class="course-recent-grid"
+                  id="course-recent-materials"
+                  aria-live="polite"
+                >
+                  <div class="course-recent-status">
+                    <strong>Loading recent materials...</strong>
+                  </div>
+                </div>
+              </section>
+
+              <section class="course-contribute" aria-labelledby="course-contribute-title">
+                <div class="course-contribute-copy">
+                  <p class="course-section-kicker">Help another student</p>
+                  <h2 id="course-contribute-title">Have useful course material?</h2>
+                  <p>
+                    Find the course, open its page, and upload lecture notes, review sheets, assignments, slides, or practice material.
+                  </p>
+                </div>
+
+                <button
+                  class="course-upload-start"
+                  id="course-upload-start"
+                  type="button"
+                >
+                  Find a course to upload
+                </button>
+              </section>
+            </div>
           </section>
         </section>
       </div>
