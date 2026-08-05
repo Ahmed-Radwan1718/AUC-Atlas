@@ -6,9 +6,18 @@ const {
   signInWithCustomToken,
   ensureAllowedAucEmail
 } = require("../_lib/securityHelpers");
+const {
+  getRequestIp,
+  consumeSecurityRateLimit
+} = require("../_lib/securityRateLimits");
 
-const WINDOW_MS = 30 * 60 * 1000;
-const MAX_ATTEMPTS = 5;
+const SIGNUP_RATE_LIMIT_WINDOW_MS =
+  30 * 60 * 1000;
+const SIGNUP_MAX_EMAIL_ATTEMPTS = 5;
+const SIGNUP_MAX_IP_ATTEMPTS = 20;
+const PROVIDER_REQUEST_WINDOW_MS =
+  15 * 60 * 1000;
+const PROVIDER_MAX_IP_ATTEMPTS = 100;
 
 function cleanString(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
@@ -181,34 +190,46 @@ async function reserveAccountAucId(aucId, uid) {
   return { aucIdLookupKey, aucIdRef };
 }
 
-function timestampToMillis(value) {
-  if (!value) return 0;
-  if (typeof value.toMillis === "function") return value.toMillis();
-  if (typeof value.toDate === "function") return value.toDate().getTime();
+async function consumeSignupRateLimits(
+  req,
+  email
+) {
+  await consumeSecurityRateLimit({
+    scope: "signup-ip",
+    identifier: getRequestIp(req),
+    maxAttempts:
+      SIGNUP_MAX_IP_ATTEMPTS,
+    windowMs:
+      SIGNUP_RATE_LIMIT_WINDOW_MS,
+    message:
+      "Too many signup attempts from this connection. Please try again later."
+  });
 
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+  await consumeSecurityRateLimit({
+    scope: "signup-email",
+    identifier: email,
+    maxAttempts:
+      SIGNUP_MAX_EMAIL_ATTEMPTS,
+    windowMs:
+      SIGNUP_RATE_LIMIT_WINDOW_MS,
+    message:
+      "Too many signup attempts for this email. Please try again later."
+  });
 }
 
-async function checkSignupRateLimit(email) {
-  const safeId = email.replace(/[^\w.-]/g, "_");
-  const ref = admin.firestore().collection("signupAttempts").doc(safeId);
-  const doc = await ref.get();
-  const data = doc.exists ? doc.data() || {} : {};
-  const windowStartedAtMs = timestampToMillis(data.windowStartedAt);
-  const oldWindow = !windowStartedAtMs || Date.now() - windowStartedAtMs >= WINDOW_MS;
-
-  if (!oldWindow && Number(data.count || 0) >= MAX_ATTEMPTS) {
-    const error = new Error("Too many signup attempts. Please try again later.");
-    error.statusCode = 429;
-    throw error;
-  }
-
-  await ref.set({
-    count: oldWindow ? 1 : Number(data.count || 0) + 1,
-    windowStartedAt: oldWindow ? admin.firestore.FieldValue.serverTimestamp() : data.windowStartedAt,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
+async function consumeProviderRequestRateLimit(
+  req
+) {
+  await consumeSecurityRateLimit({
+    scope: "provider-auth-ip",
+    identifier: getRequestIp(req),
+    maxAttempts:
+      PROVIDER_MAX_IP_ATTEMPTS,
+    windowMs:
+      PROVIDER_REQUEST_WINDOW_MS,
+    message:
+      "Too many provider sign-in attempts from this connection. Please try again later."
+  });
 }
 
 async function ensureEmailCanCreateAccount(email) {
@@ -303,9 +324,14 @@ module.exports = async function handler(req, res) {
         authProvider: "facebook"
       }
     };
-    const providerConfig = providerConfigs[provider];
+    const providerConfig =
+      providerConfigs[provider];
 
     if (providerConfig) {
+      await consumeProviderRequestRateLimit(
+        req
+      );
+
       if (!idToken) {
         return res.status(400).json({ error: providerConfig.name + " sign-in could not be verified." });
       }
@@ -334,10 +360,24 @@ module.exports = async function handler(req, res) {
 
       ensureAllowedAucEmail(email, "create an account");
 
-      const userRef = admin.firestore().collection("users").doc(decodedToken.uid);
+      const userRef = admin.firestore()
+        .collection("users")
+        .doc(decodedToken.uid);
       const userDoc = await userRef.get();
-      const existingUser = userDoc.exists ? userDoc.data() || {} : {};
-      const emailVerified = Boolean(userRecord.emailVerified || decodedToken.email_verified);
+      const existingUser = userDoc.exists
+        ? userDoc.data() || {}
+        : {};
+      const emailVerified = Boolean(
+        userRecord.emailVerified ||
+        decodedToken.email_verified
+      );
+
+      if (!userDoc.exists) {
+        await consumeSignupRateLimits(
+          req,
+          email
+        );
+      }
 
       await userRef.set({
         fullName: existingUser.fullName || fullName,
@@ -396,7 +436,10 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: "Password must be 10 to 48 characters and include uppercase, lowercase, special, and numeric characters." });
     }
 
-    await checkSignupRateLimit(email);
+    await consumeSignupRateLimits(
+      req,
+      email
+    );
     await ensureAucIdCanCreateAccount(aucId);
     await ensurePhoneCanCreateAccount(phone);
     await ensureEmailCanCreateAccount(email);
@@ -459,8 +502,21 @@ module.exports = async function handler(req, res) {
       }
     });
   } catch (error) {
-    if (error.code === "auth/email-already-exists") {
-      return res.status(409).json({ error: "This email is already used by another account." });
+    if (
+      error.code ===
+      "auth/email-already-exists"
+    ) {
+      return res.status(409).json({
+        error:
+          "This email is already used by another account."
+      });
+    }
+
+    if (error.retryAfterSeconds) {
+      res.setHeader(
+        "Retry-After",
+        String(error.retryAfterSeconds)
+      );
     }
 
     return res.status(error.statusCode || 500).json({
