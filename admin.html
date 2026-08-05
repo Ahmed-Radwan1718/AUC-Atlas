@@ -87,6 +87,20 @@
       justify-content: center;
     }
 
+    .admin-auth-form {
+      width: min(420px, 100%);
+      margin: 24px auto 0;
+      text-align: left;
+    }
+
+    .admin-auth-submit {
+      width: 100%;
+    }
+
+    .admin-auth-form .admin-message {
+      text-align: center;
+    }
+
     .admin-header {
       margin-bottom: 30px;
       display: flex;
@@ -650,7 +664,52 @@
       <section class="admin-state-card" id="admin-loading">
         <p class="admin-kicker">AUC Atlas administration</p>
         <h1>Checking access</h1>
-        <p>Verifying your administrator session and loading the live moderation data.</p>
+        <p>Verifying your administrator session before opening the secure dashboard.</p>
+      </section>
+
+      <section class="admin-state-card" id="admin-auth" hidden>
+        <p class="admin-kicker">Fresh authentication required</p>
+        <h1>Verify access</h1>
+        <p>Enter the current password for your administrator account. Your authenticator-app code is also required when app-based two-factor authentication is enabled.</p>
+
+        <form class="admin-form admin-auth-form" id="admin-auth-form">
+          <div class="admin-field">
+            <label for="admin-auth-password">Administrator password</label>
+            <input
+              id="admin-auth-password"
+              name="password"
+              type="password"
+              maxlength="1024"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+
+          <div class="admin-field" id="admin-auth-code-field" hidden>
+            <label for="admin-auth-code">Authenticator code</label>
+            <input
+              id="admin-auth-code"
+              name="authenticatorCode"
+              type="text"
+              maxlength="6"
+              inputmode="numeric"
+              pattern="[0-9]{6}"
+              autocomplete="one-time-code"
+            >
+          </div>
+
+          <button
+            class="admin-button primary admin-auth-submit"
+            id="admin-auth-submit"
+            type="submit"
+          >Open admin dashboard</button>
+
+          <p
+            class="admin-message"
+            id="admin-auth-message"
+            aria-live="polite"
+          ></p>
+        </form>
       </section>
 
       <section class="admin-state-card" id="admin-denied" hidden>
