@@ -3469,8 +3469,22 @@
       uploadForm.append("api_key", signatureData.apiKey);
       uploadForm.append("timestamp", signatureData.timestamp);
       uploadForm.append("public_id", signatureData.publicId);
-      uploadForm.append("overwrite", signatureData.overwrite || "true");
-      uploadForm.append("invalidate", signatureData.invalidate || "true");
+      uploadForm.append(
+        "overwrite",
+        signatureData.overwrite || "false"
+      );
+      uploadForm.append(
+        "invalidate",
+        signatureData.invalidate || "true"
+      );
+      uploadForm.append(
+        "allowed_formats",
+        signatureData.allowedFormats || "jpg,jpeg,png,webp"
+      );
+      uploadForm.append(
+        "upload_preset",
+        signatureData.uploadPreset
+      );
       uploadForm.append("signature", signatureData.signature);
 
       const cloudinaryResponse = await fetch("https://api.cloudinary.com/v1_1/" + encodeURIComponent(signatureData.cloudName) + "/image/upload", {
@@ -3481,15 +3495,25 @@
       const cloudinaryData = await cloudinaryResponse.json().catch(function () {
         return {};
       });
+      const uploadedVersion = Number(
+        cloudinaryData.version
+      );
 
-      if (!cloudinaryResponse.ok || !cloudinaryData.secure_url || !cloudinaryData.public_id) {
+      if (
+        !cloudinaryResponse.ok ||
+        !cloudinaryData.secure_url ||
+        cloudinaryData.public_id !==
+          signatureData.publicId ||
+        !Number.isSafeInteger(uploadedVersion) ||
+        uploadedVersion <= 0
+      ) {
         throw new Error(cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : "Could not upload profile photo.");
       }
 
       return requestProfilePhotoAction({
         action: "save",
-        photoURL: cloudinaryData.secure_url,
-        publicId: cloudinaryData.public_id
+        publicId: cloudinaryData.public_id,
+        version: uploadedVersion
       });
     }
 
