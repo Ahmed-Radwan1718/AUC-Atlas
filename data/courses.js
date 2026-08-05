@@ -449,15 +449,203 @@
 
     filtersRoot.innerHTML = getSubjects().map(function (subject) {
       return `
-        <label class="course-filter-pill">
-          <input type="checkbox" value="${subject.code}" data-course-subject>
-          <span>${subject.label}</span>
-        </label>
+        <button
+          class="course-department-button"
+          type="button"
+          data-course-department="${subject.label}"
+        >
+          <span>${subject.code}</span>
+          <strong>${subject.label}</strong>
+        </button>
       `;
     }).join("");
 
-    filtersRoot.querySelectorAll("input").forEach(function (input) {
-      input.addEventListener("change", renderCourses);
+    filtersRoot.querySelectorAll("[data-course-department]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        const searchInput = document.getElementById("course-search-input");
+
+        if (!searchInput) {
+          return;
+        }
+
+        searchInput.value = button.dataset.courseDepartment || "";
+        renderCourses();
+
+        searchInput.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      });
+    });
+  }
+
+  const popularCourseCodes = [
+    "MACT 1121",
+    "CSCE 1001",
+    "PHYS 1011",
+    "CHEM 1005",
+    "ACCT 2001",
+    "ECON 2011",
+    "MKTG 2101",
+    "BADM 2001"
+  ];
+
+  function getCourseByCode(courseCode) {
+    const normalizedCode = normalizeCourseCode(courseCode);
+
+    return courses.find(function (course) {
+      return normalizeCourseCode(course.code) === normalizedCode;
+    });
+  }
+
+  function renderPopularCourses() {
+    const root = document.getElementById("course-popular-grid");
+
+    if (!root) {
+      return;
+    }
+
+    const popularCourses = popularCourseCodes
+      .map(getCourseByCode)
+      .filter(Boolean);
+
+    root.innerHTML = popularCourses.map(function (course) {
+      return `
+        <a
+          class="course-feature-card"
+          href="courses.html?course=${encodeURIComponent(course.code)}"
+          aria-label="Open ${escapeMaterialText(course.code)} course page"
+        >
+          <span class="course-feature-code">${escapeMaterialText(course.code)}</span>
+          <h3>${escapeMaterialText(course.title)}</h3>
+
+          <div class="course-feature-meta">
+            <span>${escapeMaterialText(course.department)}</span>
+            <span>${escapeMaterialText(course.level)}</span>
+          </div>
+        </a>
+      `;
+    }).join("");
+  }
+
+  function renderRecentMaterials(materials) {
+    const root = document.getElementById("course-recent-materials");
+    const safeMaterials = Array.isArray(materials)
+      ? materials.slice(0, 6)
+      : [];
+
+    if (!root) {
+      return;
+    }
+
+    if (!safeMaterials.length) {
+      root.innerHTML = `
+        <div class="course-recent-status">
+          <strong>No approved course materials yet.</strong>
+          <p>New uploads will appear here after they are reviewed.</p>
+        </div>
+      `;
+      return;
+    }
+
+    root.innerHTML = safeMaterials.map(function (material) {
+      const courseCode = String(material.courseCode || "").trim();
+      const courseTitle = String(material.courseTitle || "").trim();
+      const courseLabel = [courseCode, courseTitle]
+        .filter(Boolean)
+        .join(" — ");
+      const href = courseCode
+        ? "courses.html?course=" +
+          encodeURIComponent(courseCode) +
+          "#course-materials-access"
+        : "courses.html";
+
+      return `
+        <a class="course-recent-card" href="${href}">
+          <span class="course-recent-type">
+            ${escapeMaterialText(material.materialType || "Course material")}
+          </span>
+
+          <h3>${escapeMaterialText(material.title || "Course material")}</h3>
+          <p>${escapeMaterialText(courseLabel || "AUC course material")}</p>
+
+          <div class="course-recent-meta">
+            <span>${escapeMaterialText(material.professor || "Professor not listed")}</span>
+            <span>${escapeMaterialText(material.semester || "Semester not listed")}</span>
+          </div>
+
+          <small>${escapeMaterialText(formatMaterialUploadDate(material.createdAt))}</small>
+        </a>
+      `;
+    }).join("");
+  }
+
+  async function loadRecentMaterials() {
+    const root = document.getElementById("course-recent-materials");
+
+    if (!root) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "/api/course-materials?recent=true&limit=6",
+        {
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            Accept: "application/json"
+          }
+        }
+      );
+
+      const data = await response.json().catch(function () {
+        return {};
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        root.innerHTML = `
+          <div class="course-recent-status">
+            <strong>Sign in to view recent materials.</strong>
+            <p>Course files are available to students with a verified AUC email.</p>
+            <a href="login.html">Log in</a>
+          </div>
+        `;
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not load recent materials.");
+      }
+
+      renderRecentMaterials(data.materials);
+    } catch (error) {
+      root.innerHTML = `
+        <div class="course-recent-status">
+          <strong>Recent materials are unavailable right now.</strong>
+          <p>Please try again later.</p>
+        </div>
+      `;
+    }
+  }
+
+  function setupCourseUploadStart() {
+    const button = document.getElementById("course-upload-start");
+    const searchInput = document.getElementById("course-search-input");
+
+    if (!button || !searchInput) {
+      return;
+    }
+
+    button.addEventListener("click", function () {
+      searchInput.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+      window.setTimeout(function () {
+        searchInput.focus();
+      }, 350);
     });
   }
 
@@ -470,12 +658,12 @@
   }
 
   function setCoursesSearchState(hasActiveSearch) {
-    const discovery = document.getElementById("course-discovery");
+    const homeContent = document.getElementById("courses-home-content");
     const grid = document.getElementById("courses-grid");
     const count = document.getElementById("courses-result-count");
 
-    if (discovery) {
-      discovery.hidden = hasActiveSearch;
+    if (homeContent) {
+      homeContent.hidden = hasActiveSearch;
     }
 
     if (grid) {
@@ -1929,6 +2117,10 @@
       searchInput.addEventListener("input", renderCourses);
     }
 
+    renderSubjectFilters();
+    renderPopularCourses();
+    setupCourseUploadStart();
+    loadRecentMaterials();
     animateCourseSearchPlaceholder();
     renderCourses();
   }
