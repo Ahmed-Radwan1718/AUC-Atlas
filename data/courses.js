@@ -1355,27 +1355,29 @@
 
           ${previewTile}
 
-          <div class="course-material-context">
-            <span>${escapeMaterialText(
-              material.materialType || "Material"
-            )}</span>
-            <span>${escapeMaterialText(
-              material.professor ||
-              "Professor not listed"
-            )}</span>
-            <span>${escapeMaterialText(
-              material.semester ||
-              "Semester not listed"
-            )}</span>
-          </div>
+          <div class="course-material-footer">
+            <div class="course-material-context">
+              <span>${escapeMaterialText(
+                material.materialType || "Material"
+              )}</span>
+              <span>${escapeMaterialText(
+                material.professor ||
+                "Professor not listed"
+              )}</span>
+              <span>${escapeMaterialText(
+                material.semester ||
+                "Semester not listed"
+              )}</span>
+            </div>
 
-          <div class="course-material-actions">
-            <a
-              class="course-material-download-button"
-              href="${safeDownloadUrl}"
-              target="_blank"
-              rel="noopener"
-            >Download</a>
+            <div class="course-material-actions">
+              <a
+                class="course-material-download-button"
+                href="${safeDownloadUrl}"
+                target="_blank"
+                rel="noopener"
+              >Download file</a>
+            </div>
           </div>
         </article>
       `;
