@@ -392,9 +392,6 @@ module.exports = async function handler(req, res) {
       signedIn: false,
       authenticated: false,
       loggedIn: false,
-      authError: error && error.message ? error.message : "unknown-auth-error",
-      authErrorCode: error && error.code ? error.code : "",
-      hasCookieHeader: Boolean(req.headers && req.headers.cookie),
       user: null
     });
   }
