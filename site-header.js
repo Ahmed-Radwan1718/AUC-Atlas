@@ -7,6 +7,107 @@
 
   const isAdminPage = /\/admin(?:\.html)?\/?$/.test(window.location.pathname);
 
+  function createWeeklyVisitorId() {
+    if (
+      window.crypto &&
+      typeof window.crypto.randomUUID === "function"
+    ) {
+      return window.crypto.randomUUID();
+    }
+
+    return (
+      "visitor-" +
+      Date.now().toString(36) +
+      "-" +
+      Math.random().toString(36).slice(2) +
+      Math.random().toString(36).slice(2)
+    );
+  }
+
+  function getWeeklyVisitorId() {
+    const storageKey = "aucAtlasVisitorId";
+
+    try {
+      let visitorId =
+        window.localStorage.getItem(storageKey);
+
+      if (!visitorId) {
+        visitorId = createWeeklyVisitorId();
+        window.localStorage.setItem(
+          storageKey,
+          visitorId
+        );
+      }
+
+      return visitorId;
+    } catch (error) {
+      try {
+        let visitorId =
+          window.sessionStorage.getItem(storageKey);
+
+        if (!visitorId) {
+          visitorId = createWeeklyVisitorId();
+          window.sessionStorage.setItem(
+            storageKey,
+            visitorId
+          );
+        }
+
+        return visitorId;
+      } catch (sessionError) {
+        return createWeeklyVisitorId();
+      }
+    }
+  }
+
+  function trackWeeklyVisitor() {
+    if (
+      isAdminPage ||
+      typeof window.fetch !== "function"
+    ) {
+      return Promise.resolve(null);
+    }
+
+    return fetch("/api/weekly-visitors", {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        visitorId: getWeeklyVisitorId()
+      })
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error(
+            "Could not update weekly visitors."
+          );
+        }
+
+        return response.json();
+      })
+      .then(function (data) {
+        const weeklyVisitors = Math.max(
+          0,
+          Number(data.weeklyVisitors) || 0
+        );
+
+        window.aucAtlasWeeklyVisitors =
+          weeklyVisitors;
+
+        return weeklyVisitors;
+      })
+      .catch(function () {
+        return null;
+      });
+  }
+
+  window.aucAtlasWeeklyVisitorsPromise =
+    trackWeeklyVisitor();
+
   if (!isAdminPage && !document.querySelector('script[src="site-footer.js"]')) {
     const footerScript = document.createElement("script");
     footerScript.src = "site-footer.js";
