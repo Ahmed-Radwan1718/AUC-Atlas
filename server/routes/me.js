@@ -173,7 +173,22 @@ module.exports = async function handler(req, res) {
       const requestedAucId = aucIdWasSubmitted
         ? cleanAucId(requestBody.aucId)
         : "";
-      const phone = cleanPhone(requestBody.phone);
+      const phone = cleanPhone(
+        storedUserData.phone ||
+        (
+          storedUserData.phoneLookupKey
+            ? "+" + storedUserData.phoneLookupKey
+            : ""
+        )
+      );
+      const phoneWasSubmitted =
+        Object.prototype.hasOwnProperty.call(
+          requestBody,
+          "phone"
+        );
+      const requestedPhone = phoneWasSubmitted
+        ? cleanPhone(requestBody.phone)
+        : "";
       const major = cleanString(requestBody.major, 100);
 
       if (!fullName) {
@@ -190,6 +205,17 @@ module.exports = async function handler(req, res) {
         );
       }
 
+      if (
+        phoneWasSubmitted &&
+        getPhoneLookupKey(requestedPhone) !==
+          getPhoneLookupKey(phone)
+      ) {
+        throw createProfileError(
+          "Phone number cannot be changed.",
+          400
+        );
+      }
+
       if (aucId && !hasValidAucIdFormat(aucId)) {
         throw createProfileError(
           "The saved AUC ID is invalid.",
@@ -198,7 +224,10 @@ module.exports = async function handler(req, res) {
       }
 
       if (phone && !hasValidPhoneFormat(phone)) {
-        throw createProfileError("Please enter a valid phone number.", 400);
+        throw createProfileError(
+          "The saved phone number is invalid.",
+          500
+        );
       }
 
       const phoneLookupKey = phone ? getPhoneLookupKey(phone) : "";
