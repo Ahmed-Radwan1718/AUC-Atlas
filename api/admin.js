@@ -2,7 +2,10 @@ const admin = require("../server/_lib/firebaseAdmin");
 const {
   createAdminError,
   ensureAdminUser,
-  isAdminUid
+  isAdminUid,
+  getAdminAuthenticationRequirements,
+  authenticateAdminUser,
+  requireFreshAdminAccess
 } = require("../server/_lib/adminHelpers");
 
 function cleanString(value, maxLength) {
@@ -616,20 +619,77 @@ async function handleUpdateDonation(actor, body) {
 
 module.exports = async function handler(req, res) {
   try {
-    res.setHeader("Cache-Control", "no-store");
-    const actor = await ensureAdminUser(req);
+    res.setHeader(
+      "Cache-Control",
+      "no-store"
+    );
+
+    if (
+      req.method !== "GET" &&
+      req.method !== "POST"
+    ) {
+      res.setHeader(
+        "Allow",
+        "GET, POST"
+      );
+
+      return res.status(405).json({
+        error: "Method not allowed"
+      });
+    }
+
+    const actor =
+      await ensureAdminUser(req);
+    const body =
+      req.method === "POST"
+        ? getRequestBody(req)
+        : {};
+    const action = cleanString(
+      body.action,
+      80
+    );
+
+    if (
+      req.method === "POST" &&
+      action ===
+        "getAuthenticationRequirements"
+    ) {
+      return res.status(200).json(
+        Object.assign(
+          {
+            success: true
+          },
+          await getAdminAuthenticationRequirements(
+            actor
+          )
+        )
+      );
+    }
+
+    if (
+      req.method === "POST" &&
+      action === "authenticateAdmin"
+    ) {
+      return res.status(200).json(
+        await authenticateAdminUser(
+          actor,
+          body.password,
+          body.authenticatorCode
+        )
+      );
+    }
+
+    await requireFreshAdminAccess(
+      req,
+      actor
+    );
 
     if (req.method === "GET") {
-      return res.status(200).json(await getDashboardData(actor));
+      return res.status(200).json(
+        await getDashboardData(actor)
+      );
     }
 
-    if (req.method !== "POST") {
-      res.setHeader("Allow", "GET, POST");
-      return res.status(405).json({ error: "Method not allowed" });
-    }
-
-    const body = getRequestBody(req);
-    const action = cleanString(body.action, 80);
     let result;
 
     if (action === "lookupUser") {
@@ -637,25 +697,83 @@ module.exports = async function handler(req, res) {
         success: true,
         user: await lookupUser(body.uid)
       };
-    } else if (action === "setUserBan") {
-      result = await handleSetUserBan(actor, body);
-    } else if (action === "revokeUserSessions") {
-      result = await handleRevokeUserSessions(actor, body);
-    } else if (action === "deleteReview") {
-      result = await handleDeleteReview(actor, body);
-    } else if (action === "deleteMaterial") {
-      result = await handleDeleteMaterial(actor, body);
-    } else if (action === "updateDonation") {
-      result = await handleUpdateDonation(actor, body);
+    } else if (
+      action === "setUserBan"
+    ) {
+      result =
+        await handleSetUserBan(
+          actor,
+          body
+        );
+    } else if (
+      action === "revokeUserSessions"
+    ) {
+      result =
+        await handleRevokeUserSessions(
+          actor,
+          body
+        );
+    } else if (
+      action === "deleteReview"
+    ) {
+      result =
+        await handleDeleteReview(
+          actor,
+          body
+        );
+    } else if (
+      action === "deleteMaterial"
+    ) {
+      result =
+        await handleDeleteMaterial(
+          actor,
+          body
+        );
+    } else if (
+      action === "updateDonation"
+    ) {
+      result =
+        await handleUpdateDonation(
+          actor,
+          body
+        );
     } else {
-      throw createAdminError("Unknown administrator action.", 400);
+      throw createAdminError(
+        "Unknown administrator action.",
+        400
+      );
     }
 
-    return res.status(200).json(result);
+    return res
+      .status(200)
+      .json(result);
   } catch (error) {
-    res.setHeader("Cache-Control", "no-store");
-    return res.status(error.statusCode || 500).json({
-      error: error.message || "Could not complete the administrator action."
-    });
+    res.setHeader(
+      "Cache-Control",
+      "no-store"
+    );
+
+    if (error.retryAfterSeconds) {
+      res.setHeader(
+        "Retry-After",
+        String(
+          error.retryAfterSeconds
+        )
+      );
+    }
+
+    return res
+      .status(
+        error.statusCode || 500
+      )
+      .json({
+        error:
+          error.message ||
+          "Could not complete the administrator action.",
+        code: error.code || "",
+        requiresTwoFactor: Boolean(
+          error.requiresTwoFactor
+        )
+      });
   }
 };
