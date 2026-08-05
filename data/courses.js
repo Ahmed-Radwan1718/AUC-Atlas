@@ -1270,20 +1270,13 @@
     }
 
     const visibleCourses = courses.filter(courseMatches);
-    const shownCourses = visibleCourses.slice(0, 12);
 
     if (count) {
       count.textContent =
-        visibleCourses.length +
-        " matches" +
-        (
-          visibleCourses.length > shownCourses.length
-            ? " · showing first " + shownCourses.length
-            : ""
-        );
+        visibleCourses.length + " matches";
     }
 
-    grid.innerHTML = shownCourses.map(function (course) {
+    grid.innerHTML = visibleCourses.map(function (course) {
       return `
         <a
           class="course-card"
