@@ -195,16 +195,14 @@ async function getImageKitCourseMaterials(courseCode) {
       imageKitFileName,
       240
     );
-    const filePath = cleanString(file && file.filePath, 500);
+    const fileId = cleanString(file && file.fileId, 160);
     const titleFromName = fileName
       .replace(/\.[^.]+$/, "")
       .replace(/[-_]+/g, " ")
       .trim();
 
     return {
-      id:
-        "imagekit-" +
-        cleanString(file && file.fileId, 160),
+      id: "imagekit-" + fileId,
       courseCode,
       courseTitle: "",
       professor:
@@ -221,9 +219,9 @@ async function getImageKitCourseMaterials(courseCode) {
         "Course material",
       fileName,
       fileUrl: "",
-      downloadUrl: filePath
-        ? "/api/course-material-download?path=" +
-          encodeURIComponent(filePath)
+      downloadUrl: fileId
+        ? "/api/course-material-download?imageKitFileId=" +
+          encodeURIComponent(fileId)
         : "",
       filePath: "",
       fileId: "",
@@ -350,6 +348,171 @@ function getImageKitAuthorizationHeader() {
   return privateKey
     ? "Basic " + Buffer.from(privateKey + ":").toString("base64")
     : "";
+}
+
+function normalizeImageKitPath(value) {
+  let normalizedPath = String(value || "").trim();
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const decodedPath = decodeURIComponent(normalizedPath);
+
+      if (decodedPath === normalizedPath) {
+        break;
+      }
+
+      normalizedPath = decodedPath;
+    } catch (error) {
+      break;
+    }
+  }
+
+  normalizedPath = normalizedPath.replace(/\\/g, "/");
+
+  if (normalizedPath.charAt(0) !== "/") {
+    normalizedPath = "/" + normalizedPath;
+  }
+
+  return normalizedPath.replace(/\/{2,}/g, "/");
+}
+
+function getExpectedImageKitMaterialFolder(data) {
+  return (
+    "/auc-atlas/materials/" +
+    slugifyMaterialValue(data.courseCode) +
+    "/" +
+    slugifyMaterialValue(data.professor) +
+    "/" +
+    slugifyMaterialValue(data.semester) +
+    "/"
+  );
+}
+
+async function getImageKitFileDetails(fileId) {
+  const authorization = getImageKitAuthorizationHeader();
+  const safeFileId = cleanString(fileId, 160);
+
+  if (
+    !authorization ||
+    !/^[A-Za-z0-9_-]{6,160}$/.test(safeFileId)
+  ) {
+    throw createMaterialError(
+      "Could not verify the uploaded course material.",
+      400
+    );
+  }
+
+  const response = await fetch(
+    "https://api.imagekit.io/v1/files/" +
+      encodeURIComponent(safeFileId) +
+      "/details",
+    {
+      headers: {
+        Accept: "application/json",
+        Authorization: authorization
+      }
+    }
+  );
+
+  if (response.status === 404) {
+    throw createMaterialError(
+      "Could not verify the uploaded course material.",
+      400
+    );
+  }
+
+  if (!response.ok) {
+    throw createMaterialError(
+      "Could not verify the stored ImageKit file.",
+      502
+    );
+  }
+
+  const file = await response.json().catch(function () {
+    return {};
+  });
+
+  if (
+    !file ||
+    file.type !== "file" ||
+    cleanString(file.fileId, 160) !== safeFileId
+  ) {
+    throw createMaterialError(
+      "Could not verify the uploaded course material.",
+      400
+    );
+  }
+
+  return file;
+}
+
+async function verifyImageKitMaterialUpload(data) {
+  const file = await getImageKitFileDetails(data.fileId);
+  const filePath = normalizeImageKitPath(file.filePath);
+  const expectedFolder =
+    getExpectedImageKitMaterialFolder(data);
+  const pathParts = filePath.split("/");
+  const actualFolder = filePath.slice(
+    0,
+    filePath.lastIndexOf("/") + 1
+  );
+  const descriptionParts =
+    getImageKitDescriptionParts(file);
+  const tags = new Set(
+    (Array.isArray(file.tags) ? file.tags : []).map(
+      function (tag) {
+        return cleanString(tag, 160);
+      }
+    )
+  );
+  const expectedTags = [
+    "auc-atlas-material",
+    "course-" + slugifyMaterialValue(data.courseCode),
+    "professor-" + slugifyMaterialValue(data.professor),
+    "semester-" + slugifyMaterialValue(data.semester),
+    "uploader-" + slugifyMaterialValue(data.uploaderUid)
+  ];
+  const metadataMatches =
+    cleanString(descriptionParts[1], 40).toUpperCase() ===
+      cleanString(data.courseCode, 40).toUpperCase() &&
+    cleanString(descriptionParts[2], 120) ===
+      cleanString(data.professor, 120) &&
+    cleanString(descriptionParts[3], 80) ===
+      cleanString(data.semester, 80) &&
+    cleanString(descriptionParts[7], 160) ===
+      cleanString(data.uploaderUid, 160);
+
+  if (
+    actualFolder !== expectedFolder ||
+    pathParts.includes(".") ||
+    pathParts.includes("..") ||
+    /%2e/i.test(filePath) ||
+    filePath.endsWith("/") ||
+    !expectedTags.every(function (tag) {
+      return tags.has(tag);
+    }) ||
+    !metadataMatches
+  ) {
+    throw createMaterialError(
+      "Could not verify ownership of the uploaded course material.",
+      403
+    );
+  }
+
+  return {
+    fileId: cleanString(file.fileId, 160),
+    fileName: cleanString(
+      descriptionParts[8] || file.name,
+      240
+    ),
+    fileUrl: cleanUrl(file.url),
+    filePath,
+    size: Math.max(0, Number(file.size) || 0),
+    fileType: cleanString(
+      file.mime || file.fileType,
+      80
+    )
+  };
 }
 
 function cleanImageKitDescriptionPart(value, maxLength) {
@@ -676,19 +839,56 @@ module.exports = async function handler(req, res) {
       body.category
     );
     const title = cleanString(body.title, 160);
-    const fileName = cleanString(body.fileName, 240);
-    const fileUrl = cleanUrl(body.fileUrl);
-    const filePath = cleanString(body.filePath, 500);
-    const fileId = cleanString(body.fileId, 160);
-    const size = Number(body.size || 0);
-    const fileType = cleanString(body.fileType, 80);
+    const submittedFileId = cleanString(body.fileId, 160);
     const createdAtIso = new Date().toISOString();
 
-    if (!courseCode || !title || !materialType || !filePath) {
+    if (
+      !courseCode ||
+      !professor ||
+      !semester ||
+      !title ||
+      !materialType ||
+      !submittedFileId
+    ) {
       throw createMaterialError(
         "Could not save this course material.",
         400
       );
+    }
+
+    const verifiedFile =
+      await verifyImageKitMaterialUpload({
+        fileId: submittedFileId,
+        uploaderUid: decodedUser.uid,
+        courseCode,
+        professor,
+        semester
+      });
+    const materialsCollection = admin.firestore()
+      .collection("courseMaterials");
+    const existingSnapshot = await materialsCollection
+      .where("fileId", "==", verifiedFile.fileId)
+      .limit(1)
+      .get();
+
+    if (!existingSnapshot.empty) {
+      const existingDoc = existingSnapshot.docs[0];
+      const existingData = existingDoc.data() || {};
+
+      if (
+        cleanString(existingData.uploaderUid, 160) !==
+        cleanString(decodedUser.uid, 160)
+      ) {
+        throw createMaterialError(
+          "This uploaded file is already registered to another account.",
+          409
+        );
+      }
+
+      return res.status(200).json({
+        material: serializeMaterial(existingDoc),
+        alreadySaved: true
+      });
     }
 
     const materialData = {
@@ -698,12 +898,12 @@ module.exports = async function handler(req, res) {
       semester,
       materialType,
       title,
-      fileName,
-      fileUrl,
-      filePath,
-      fileId,
-      size: Number.isFinite(size) ? size : 0,
-      fileType,
+      fileName: verifiedFile.fileName,
+      fileUrl: verifiedFile.fileUrl,
+      filePath: verifiedFile.filePath,
+      fileId: verifiedFile.fileId,
+      size: verifiedFile.size,
+      fileType: verifiedFile.fileType,
       status: "pending",
       uploaderUid: decodedUser.uid,
       uploaderDisplayName: uploader.displayName,
@@ -711,10 +911,43 @@ module.exports = async function handler(req, res) {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       createdAtIso
     };
+    const materialRef = materialsCollection.doc(
+      "imagekit-" + verifiedFile.fileId
+    );
 
-    const materialRef = await admin.firestore()
-      .collection("courseMaterials")
-      .add(materialData);
+    try {
+      await materialRef.create(materialData);
+    } catch (error) {
+      const errorCode = String(
+        error && error.code ? error.code : ""
+      );
+      const alreadyExists =
+        errorCode === "6" ||
+        errorCode === "already-exists" ||
+        /already exists/i.test(
+          error && error.message ? error.message : ""
+        );
+
+      if (alreadyExists) {
+        const existingDoc = await materialRef.get();
+        const existingData = existingDoc.exists
+          ? existingDoc.data() || {}
+          : {};
+
+        if (
+          existingDoc.exists &&
+          cleanString(existingData.uploaderUid, 160) ===
+            cleanString(decodedUser.uid, 160)
+        ) {
+          return res.status(200).json({
+            material: serializeMaterial(existingDoc),
+            alreadySaved: true
+          });
+        }
+      }
+
+      throw error;
+    }
 
     return res.status(201).json({
       material: serializeMaterialData(
