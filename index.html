@@ -64,9 +64,8 @@
 
     .home-hero {
       width: min(1180px, calc(100% - 32px));
-      min-height: calc(100svh - 104px);
       margin: 0 auto;
-      padding: 56px 0;
+      padding: 74px 0 96px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
       gap: 38px;
@@ -478,16 +477,15 @@
     .home-content-section,
     .support-section {
       width: min(1180px, calc(100% - 32px));
-      min-height: 100svh;
       margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
     }
 
-    .home-stats-section,
+    .home-stats-section {
+      padding: 0 0 104px;
+    }
+
     .home-content-section {
-      padding: 72px 0;
+      padding: 0 0 112px;
     }
 
     .home-section-head {
@@ -902,7 +900,7 @@
     }
 
     .support-section {
-      padding: 72px 0;
+      padding: 0 0 120px;
     }
 
     .support-copy {
@@ -1308,8 +1306,7 @@
       }
 
       .home-hero {
-        min-height: 0;
-        padding: 48px 0 80px;
+        padding-top: 48px;
         grid-template-columns: 1fr;
       }
 
@@ -1322,18 +1319,12 @@
         width: 100%;
       }
 
-      .home-stats-section,
-      .home-content-section {
-        min-height: 0;
-        display: block;
-      }
-
       .home-stats-section {
-        padding: 0 0 80px;
+        padding-bottom: 80px;
       }
 
       .home-content-section {
-        padding: 0 0 88px;
+        padding-bottom: 88px;
       }
 
       .home-section-head,
@@ -1379,9 +1370,7 @@
       }
 
       .support-section {
-        min-height: 0;
-        padding: 0 0 80px;
-        display: block;
+        padding-bottom: 80px;
       }
 
       .support-copy {
