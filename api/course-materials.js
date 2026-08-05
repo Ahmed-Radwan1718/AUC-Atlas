@@ -280,6 +280,45 @@ async function getCourseMaterials(courseCode) {
   return materials;
 }
 
+async function getRecentCourseMaterials(limit) {
+  const safeLimit = Math.max(
+    1,
+    Math.min(
+      12,
+      Math.floor(Number(limit) || 6)
+    )
+  );
+
+  const snapshot = await admin.firestore()
+    .collection("courseMaterials")
+    .orderBy("createdAt", "desc")
+    .limit(100)
+    .get();
+
+  const materials = [];
+
+  snapshot.forEach(function (doc) {
+    const material = serializeMaterial(doc);
+    const status = cleanString(
+      material.status,
+      40
+    ).toLowerCase();
+
+    if (status === "approved") {
+      materials.push(material);
+    }
+  });
+
+  materials.sort(function (a, b) {
+    return (
+      getTimestampMillis(b.createdAt) -
+      getTimestampMillis(a.createdAt)
+    );
+  });
+
+  return materials.slice(0, safeLimit);
+}
+
 function getImageKitAuthorizationHeader() {
   const privateKey = cleanString(
     process.env.IMAGEKIT_PRIVATE_KEY,
@@ -782,10 +821,17 @@ module.exports = async function handler(req, res) {
     if (req.method === "GET") {
       const query = req.query || {};
       const mine = String(query.mine || "").toLowerCase() === "true";
+      const recent = String(query.recent || "").toLowerCase() === "true";
 
       if (mine) {
         return res.status(200).json({
           materials: await getUserMaterials(decodedUser.uid)
+        });
+      }
+
+      if (recent) {
+        return res.status(200).json({
+          materials: await getRecentCourseMaterials(query.limit)
         });
       }
 
