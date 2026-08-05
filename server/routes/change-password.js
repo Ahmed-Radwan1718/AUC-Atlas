@@ -6,6 +6,15 @@ const {
   createSiteSessionForUid,
   requireSecurityPanelAccess
 } = require("../_lib/securityHelpers");
+const {
+  consumeSecurityRateLimit,
+  clearSecurityRateLimit
+} = require("../_lib/securityRateLimits");
+
+const PASSWORD_VERIFICATION_WINDOW_MS =
+  15 * 60 * 1000;
+const PASSWORD_VERIFICATION_MAX_ATTEMPTS =
+  5;
 
 function isStrongPassword(password) {
   return typeof password === "string" &&
@@ -56,11 +65,33 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: "No email address found on this account." });
     }
 
+    await consumeSecurityRateLimit({
+      scope: "change-password-account",
+      identifier: decodedUser.uid,
+      maxAttempts:
+        PASSWORD_VERIFICATION_MAX_ATTEMPTS,
+      windowMs:
+        PASSWORD_VERIFICATION_WINDOW_MS,
+      message:
+        "Too many current-password attempts. Please try again later."
+    });
+
     try {
-      await signInWithPassword(email, currentPassword);
+      await signInWithPassword(
+        email,
+        currentPassword
+      );
     } catch (error) {
-      return res.status(401).json({ error: "Current password is incorrect." });
+      return res.status(401).json({
+        error:
+          "Current password is incorrect."
+      });
     }
+
+    await clearSecurityRateLimit(
+      "change-password-account",
+      decodedUser.uid
+    );
 
     await admin.auth().updateUser(decodedUser.uid, {
       password: newPassword
@@ -78,6 +109,13 @@ module.exports = async function handler(req, res) {
       success: true
     });
   } catch (error) {
+    if (error.retryAfterSeconds) {
+      res.setHeader(
+        "Retry-After",
+        String(error.retryAfterSeconds)
+      );
+    }
+
     return res.status(error.statusCode || 500).json({
       error: error.message || "Could not change password."
     });
