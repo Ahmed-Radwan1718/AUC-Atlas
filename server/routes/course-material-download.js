@@ -29,6 +29,8 @@ async function ensureVerifiedAucUser(req) {
   if (!userRecord.emailVerified || !email.endsWith("@aucegypt.edu")) {
     throw createDownloadError("Please verify your AUC email address before downloading materials.", 403);
   }
+
+  return decodedUser;
 }
 
 function slugifyMaterialValue(value) {
@@ -329,14 +331,11 @@ module.exports = async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed" });
     }
 
-    await ensureVerifiedAucUser(req);
+    const decodedUser =
+      await ensureVerifiedAucUser(req);
 
     const materialId = cleanString(
       getQueryValue(req, "id"),
-      160
-    );
-    const imageKitFileId = cleanString(
-      getQueryValue(req, "imageKitFileId"),
       160
     );
     let filePath = "";
@@ -363,9 +362,28 @@ module.exports = async function handler(req, res) {
       }
 
       const material = materialDoc.data() || {};
+      const status = cleanString(
+        material.status,
+        40
+      ).toLowerCase();
+      const isOwner =
+        cleanString(
+          material.uploaderUid,
+          160
+        ) ===
+        cleanString(
+          decodedUser.uid,
+          160
+        );
+      const canDownload =
+        status === "approved" ||
+        (
+          status === "pending" &&
+          isOwner
+        );
 
       if (
-        material.status === "rejected" ||
+        !canDownload ||
         !/^[A-Za-z0-9_-]{6,160}$/.test(
           cleanString(material.fileId, 160)
         )
@@ -383,19 +401,6 @@ module.exports = async function handler(req, res) {
       filePath = validateImageKitMaterialFile(
         file,
         material
-      );
-    } else if (imageKitFileId) {
-      await ensureImageKitFileIsNotRejected(
-        imageKitFileId
-      );
-
-      const file = await getImageKitFileDetails(
-        imageKitFileId
-      );
-
-      filePath = validateImageKitMaterialFile(
-        file,
-        null
       );
     } else {
       throw createDownloadError(
