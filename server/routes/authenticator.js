@@ -10,13 +10,59 @@ const {
   issueSecurityPanelAccess,
   requireSecurityPanelAccess
 } = require("../_lib/securityHelpers");
+const {
+  encryptTotpSecret,
+  decryptTotpSecret
+} = require("../_lib/totpEncryption");
 
-const SETUP_EXPIRES_MS = 10 * 60 * 1000;
+const SETUP_EXPIRES_MS =
+  10 * 60 * 1000;
+const RECENT_SETUP_AUTH_MAX_AGE_MS =
+  10 * 60 * 1000;
 
 function cleanCode(value) {
   return String(value || "")
     .trim()
     .replace(/\D/g, "");
+}
+
+function requireRecentAuthenticatorSetup(
+  decodedUser
+) {
+  const authenticationTimeSeconds =
+    Number(
+      decodedUser &&
+      decodedUser.auth_time
+        ? decodedUser.auth_time
+        : 0
+    );
+  const authenticationTimeMs =
+    Number.isFinite(
+      authenticationTimeSeconds
+    )
+      ? authenticationTimeSeconds *
+        1000
+      : 0;
+  const authenticationAgeMs =
+    Date.now() -
+    authenticationTimeMs;
+
+  if (
+    !authenticationTimeMs ||
+    authenticationAgeMs < 0 ||
+    authenticationAgeMs >
+      RECENT_SETUP_AUTH_MAX_AGE_MS
+  ) {
+    const error = new Error(
+      "For your security, log out and log back in before setting up an authenticator app."
+    );
+
+    error.statusCode = 403;
+    error.code =
+      "recent-authentication-required";
+
+    throw error;
+  }
 }
 
 async function verifyAuthenticatorCode(
@@ -84,13 +130,33 @@ async function handleSetup(res, decodedUser) {
     margin: 1,
     width: 220
   });
+  const secretEncrypted =
+    encryptTotpSecret(
+      secret,
+      "authenticator-setup:" +
+        decodedUser.uid
+    );
 
-  await admin.firestore().collection("authenticatorSetupSessions").doc(decodedUser.uid).set({
-    secret,
-    email,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    expiresAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() + SETUP_EXPIRES_MS))
-  });
+  await admin.firestore()
+    .collection(
+      "authenticatorSetupSessions"
+    )
+    .doc(decodedUser.uid)
+    .set({
+      secretEncrypted,
+      email,
+      createdAt:
+        admin.firestore.FieldValue
+          .serverTimestamp(),
+      expiresAt:
+        admin.firestore.Timestamp
+          .fromDate(
+            new Date(
+              Date.now() +
+              SETUP_EXPIRES_MS
+            )
+          )
+    });
 
   return res.status(200).json({
     success: true,
@@ -121,12 +187,34 @@ async function handleVerifySetup(req, res, decodedUser) {
     return res.status(400).json({ error: "Authenticator setup expired. Please restart setup." });
   }
 
+  const setupSecret =
+    setupData.secretEncrypted
+      ? decryptTotpSecret(
+          setupData.secretEncrypted,
+          "authenticator-setup:" +
+            decodedUser.uid
+        )
+      : String(
+          setupData.secret || ""
+        ).trim();
+
+  if (!setupSecret) {
+    await setupRef
+      .delete()
+      .catch(function () {});
+
+    return res.status(400).json({
+      error:
+        "Please restart authenticator setup."
+    });
+  }
+
   const validCode =
     await verifyAuthenticatorCode(
       decodedUser.uid,
       "setup",
       code,
-      setupData.secret || ""
+      setupSecret
     );
 
   if (!validCode) {
@@ -144,10 +232,23 @@ async function handleVerifySetup(req, res, decodedUser) {
 
   delete nextTwoFactor.appSecret;
 
-  await admin.firestore().collection("twoFactorSecrets").doc(decodedUser.uid).set({
-    appSecret: setupData.secret,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
+  await admin.firestore()
+    .collection("twoFactorSecrets")
+    .doc(decodedUser.uid)
+    .set({
+      appSecretEncrypted:
+        encryptTotpSecret(
+          setupSecret,
+          "authenticator-account:" +
+            decodedUser.uid
+        ),
+      appSecret:
+        admin.firestore.FieldValue
+          .delete(),
+      updatedAt:
+        admin.firestore.FieldValue
+          .serverTimestamp()
+    }, { merge: true });
 
   await state.userRef.set({
     twoFactor: nextTwoFactor,
@@ -296,7 +397,14 @@ module.exports = async function handler(req, res) {
     const action = String((req.body || {}).action || "").trim();
 
     if (action === "setup") {
-      return await handleSetup(res, decodedUser);
+      requireRecentAuthenticatorSetup(
+        decodedUser
+      );
+
+      return await handleSetup(
+        res,
+        decodedUser
+      );
     }
 
     if (action === "verify-setup") {
