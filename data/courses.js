@@ -1228,29 +1228,35 @@
   }
 
   function setCoursesSearchState(hasActiveSearch) {
-    const homeContent = document.getElementById("courses-home-content");
-    const grid = document.getElementById("courses-grid");
-    const count = document.getElementById("courses-result-count");
+    const dropdown = document.getElementById(
+      "course-search-dropdown"
+    );
+    const searchInput = document.getElementById(
+      "course-search-input"
+    );
 
-    if (homeContent) {
-      homeContent.hidden = hasActiveSearch;
+    if (dropdown) {
+      dropdown.hidden = !hasActiveSearch;
     }
 
-    if (grid) {
-      grid.hidden = !hasActiveSearch;
-    }
-
-    if (count) {
-      count.hidden = !hasActiveSearch;
+    if (searchInput) {
+      searchInput.setAttribute(
+        "aria-expanded",
+        hasActiveSearch ? "true" : "false"
+      );
     }
   }
 
   function renderCourses() {
     const grid = document.getElementById("courses-grid");
-    const count = document.getElementById("courses-result-count");
+    const count = document.getElementById(
+      "courses-result-count"
+    );
     const query = getCourseSearchQuery();
     const selectedSubjects = getCheckedSubjects();
-    const hasActiveSearch = Boolean(query || selectedSubjects.length);
+    const hasActiveSearch = Boolean(
+      query || selectedSubjects.length
+    );
 
     if (!grid) {
       return;
@@ -1264,29 +1270,54 @@
     }
 
     const visibleCourses = courses.filter(courseMatches);
-    const shownCourses = visibleCourses.slice(0, 48);
+    const shownCourses = visibleCourses.slice(0, 12);
 
     if (count) {
-      count.textContent = visibleCourses.length + " matches" + (visibleCourses.length > shownCourses.length ? " · showing first " + shownCourses.length : "");
+      count.textContent =
+        visibleCourses.length +
+        " matches" +
+        (
+          visibleCourses.length > shownCourses.length
+            ? " · showing first " + shownCourses.length
+            : ""
+        );
     }
 
     grid.innerHTML = shownCourses.map(function (course) {
       return `
-        <a class="course-card" href="courses.html?course=${encodeURIComponent(course.code)}" aria-label="Open ${course.code} course page">
-          <div class="course-card-main">
-            <span class="course-code">${course.code}</span>
-            <h2>${course.title}</h2>
-          </div>
-          <div class="course-card-meta">
-            <span>${course.department}</span>
-            <span>${course.level}</span>
-          </div>
+        <a
+          class="course-card"
+          href="courses.html?course=${encodeURIComponent(course.code)}"
+          aria-label="Open ${escapeMaterialText(course.code)} course page"
+        >
+          <span class="course-code">
+            ${escapeMaterialText(course.code)}
+          </span>
+
+          <span class="course-search-copy">
+            <strong>
+              ${escapeMaterialText(course.title)}
+            </strong>
+            <small>
+              ${escapeMaterialText(course.department)}
+              ·
+              ${escapeMaterialText(course.level)}
+            </small>
+          </span>
+
+          <span class="course-search-arrow" aria-hidden="true">
+            →
+          </span>
         </a>
       `;
     }).join("");
 
     if (!visibleCourses.length) {
-      grid.innerHTML = '<p class="courses-empty">No courses found. Try a course code, subject, department, or broader keyword.</p>';
+      grid.innerHTML = `
+        <p class="courses-empty">
+          No courses found. Try a course code, title, department, or broader keyword.
+        </p>
+      `;
     }
   }
 
@@ -2677,14 +2708,52 @@
   }
 
   function setupCoursesPage() {
-    const searchInput = document.getElementById("course-search-input");
+    const searchInput = document.getElementById(
+      "course-search-input"
+    );
 
     if (renderCourseDetail(getSelectedCourseCode())) {
       return;
     }
 
     if (searchInput) {
-      searchInput.addEventListener("input", renderCourses);
+      const searchBox = searchInput.closest(
+        ".courses-search-box"
+      );
+
+      searchInput.addEventListener(
+        "input",
+        renderCourses
+      );
+
+      searchInput.addEventListener(
+        "focus",
+        renderCourses
+      );
+
+      searchInput.addEventListener(
+        "keydown",
+        function (event) {
+          if (event.key !== "Escape") {
+            return;
+          }
+
+          setCoursesSearchState(false);
+          searchInput.blur();
+        }
+      );
+
+      document.addEventListener(
+        "click",
+        function (event) {
+          if (
+            searchBox &&
+            !searchBox.contains(event.target)
+          ) {
+            setCoursesSearchState(false);
+          }
+        }
+      );
     }
 
     renderSubjectFilters();
