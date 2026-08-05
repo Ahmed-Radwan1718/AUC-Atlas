@@ -1,5 +1,9 @@
 const crypto = require("crypto");
 const admin = require("./firebaseAdmin");
+const {
+  encryptTotpSecret,
+  decryptTotpSecret
+} = require("./totpEncryption");
 
 const IS_PRODUCTION =
   process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
@@ -1140,19 +1144,102 @@ async function clearLoginChallenge(req, res) {
 }
 
 async function getAuthenticatorSecret(uid) {
-  const db = admin.firestore();
-  const secretDoc = await db.collection("twoFactorSecrets").doc(uid).get();
+  const safeUid = String(
+    uid || ""
+  ).trim();
 
-  if (secretDoc.exists) {
-    const data = secretDoc.data() || {};
-    return data.appSecret || "";
+  if (!safeUid) {
+    return "";
   }
 
-  const userDoc = await db.collection("users").doc(uid).get();
-  const userData = userDoc.exists ? userDoc.data() || {} : {};
-  const twoFactor = userData.twoFactor || {};
+  const db = admin.firestore();
+  const secretRef = db
+    .collection("twoFactorSecrets")
+    .doc(safeUid);
+  const secretDoc =
+    await secretRef.get();
+  const encryptionContext =
+    "authenticator-account:" +
+    safeUid;
 
-  return twoFactor.appSecret || "";
+  if (secretDoc.exists) {
+    const data =
+      secretDoc.data() || {};
+
+    if (data.appSecretEncrypted) {
+      return decryptTotpSecret(
+        data.appSecretEncrypted,
+        encryptionContext
+      );
+    }
+
+    const legacySecret = String(
+      data.appSecret || ""
+    ).trim();
+
+    if (legacySecret) {
+      await secretRef.set({
+        appSecretEncrypted:
+          encryptTotpSecret(
+            legacySecret,
+            encryptionContext
+          ),
+        appSecret:
+          admin.firestore.FieldValue
+            .delete(),
+        encryptionUpdatedAt:
+          admin.firestore.FieldValue
+            .serverTimestamp()
+      }, { merge: true });
+
+      return legacySecret;
+    }
+  }
+
+  const userRef = db
+    .collection("users")
+    .doc(safeUid);
+  const userDoc =
+    await userRef.get();
+  const userData = userDoc.exists
+    ? userDoc.data() || {}
+    : {};
+  const twoFactor =
+    userData.twoFactor &&
+    typeof userData.twoFactor ===
+      "object"
+      ? userData.twoFactor
+      : {};
+  const legacyUserSecret = String(
+    twoFactor.appSecret || ""
+  ).trim();
+
+  if (!legacyUserSecret) {
+    return "";
+  }
+
+  await Promise.all([
+    secretRef.set({
+      appSecretEncrypted:
+        encryptTotpSecret(
+          legacyUserSecret,
+          encryptionContext
+        ),
+      appSecret:
+        admin.firestore.FieldValue
+          .delete(),
+      encryptionUpdatedAt:
+        admin.firestore.FieldValue
+          .serverTimestamp()
+    }, { merge: true }),
+    userRef.update({
+      "twoFactor.appSecret":
+        admin.firestore.FieldValue
+          .delete()
+    }).catch(function () {})
+  ]);
+
+  return legacyUserSecret;
 }
 
 function getSecurityPanelAccessDocumentId(decodedUser) {
