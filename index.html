@@ -473,9 +473,433 @@
       line-height: 1;
     }
 
+    .home-stats-section,
+    .home-content-section,
     .support-section {
       width: min(1180px, calc(100% - 32px));
       margin: 0 auto;
+    }
+
+    .home-stats-section {
+      padding: 0 0 104px;
+    }
+
+    .home-content-section {
+      padding: 0 0 112px;
+    }
+
+    .home-section-head {
+      margin-bottom: 30px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 38px;
+      align-items: end;
+    }
+
+    .home-section-head .home-kicker {
+      margin-bottom: 14px;
+    }
+
+    .home-section-head h2 {
+      max-width: 680px;
+      color: #171717;
+      font-size: clamp(36px, 4.8vw, 58px);
+      font-weight: 700;
+      line-height: 1.06;
+      text-transform: uppercase;
+    }
+
+    .home-section-head > p {
+      color: rgba(23, 23, 23, 0.64);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .home-stats-grid {
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .home-stat {
+      min-width: 0;
+      min-height: 170px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 26px;
+    }
+
+    .home-stat + .home-stat {
+      border-left: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .home-stat strong {
+      color: #171717;
+      font-size: clamp(42px, 5vw, 62px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 0.9;
+    }
+
+    .home-stat span {
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+
+    .home-latest-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .home-latest-card {
+      min-width: 0;
+      min-height: 390px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .home-latest-card-head {
+      min-height: 104px;
+      padding: 24px 24px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .home-latest-card-head span {
+      display: block;
+      margin-bottom: 7px;
+      color: rgba(192, 154, 92, 0.9);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .home-latest-card-head h3 {
+      color: #171717;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.18;
+    }
+
+    .home-latest-card-head a {
+      flex: 0 0 auto;
+      padding-top: 4px;
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .home-latest-card-head a:hover,
+    .home-latest-card-head a:focus-visible {
+      outline: none;
+      color: rgba(154, 112, 48, 0.96);
+    }
+
+    .home-latest-list {
+      flex: 1;
+      padding: 0 12px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .home-latest-item {
+      min-width: 0;
+      min-height: 82px;
+      padding: 14px 12px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 14px;
+      color: inherit;
+      text-decoration: none;
+      display: grid;
+      gap: 8px;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .home-latest-item:hover,
+    .home-latest-item:focus-visible {
+      outline: none;
+      background: rgba(192, 154, 92, 0.12);
+      transform: translateX(2px);
+    }
+
+    .home-latest-item > strong {
+      overflow: hidden;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .home-latest-item-top,
+    .home-latest-item-bottom {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .home-latest-item-top small,
+    .home-latest-item-bottom small {
+      overflow: hidden;
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.4;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .home-latest-type {
+      overflow: hidden;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .home-latest-stars {
+      flex: 0 0 auto;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    .home-latest-arrow {
+      flex: 0 0 auto;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .home-latest-status {
+      margin: auto 12px;
+      padding: 28px 10px;
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .home-latest-person {
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .home-latest-person img {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: block;
+      object-fit: cover;
+      object-position: center 18%;
+      background: rgba(23, 23, 23, 0.05);
+    }
+
+    .home-latest-person-copy {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .home-latest-person-copy strong {
+      overflow: hidden;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .home-latest-person-copy small {
+      overflow: hidden;
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .home-request-layout {
+      padding: 48px 0;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      display: grid;
+      grid-template-columns: minmax(0, 0.82fr) minmax(520px, 1.18fr);
+      gap: clamp(44px, 6vw, 86px);
+      align-items: start;
+    }
+
+    .home-request-copy {
+      position: sticky;
+      top: 120px;
+    }
+
+    .home-request-copy h2 {
+      max-width: 540px;
+      margin-bottom: 18px;
+      color: #171717;
+      font-size: clamp(36px, 4.2vw, 58px);
+      font-weight: 700;
+      line-height: 1.04;
+      text-transform: uppercase;
+    }
+
+    .home-request-copy > p:last-child {
+      max-width: 520px;
+      color: rgba(23, 23, 23, 0.64);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .home-request-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .home-request-card {
+      min-height: 190px;
+      padding: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.76);
+      color: inherit;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .home-request-card:hover,
+    .home-request-card:focus-visible {
+      outline: none;
+      border-color: rgba(192, 154, 92, 0.42);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 20px 48px rgba(42, 32, 20, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .home-request-card > span:first-child {
+      margin-bottom: 28px;
+      color: rgba(192, 154, 92, 0.9);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .home-request-card strong {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .home-request-card p {
+      margin-top: 8px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .home-request-card > span:last-child {
+      margin-top: auto;
+      padding-top: 18px;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 19px;
+      line-height: 1;
+      text-align: right;
+    }
+
+    .home-roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .home-roadmap-card {
+      min-height: 230px;
+      padding: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.66);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .home-roadmap-status {
+      width: fit-content;
+      padding: 8px 10px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.74);
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .home-roadmap-status.in-development {
+      border-color: rgba(192, 154, 92, 0.28);
+      background: rgba(192, 154, 92, 0.12);
+      color: rgba(154, 112, 48, 0.96);
+    }
+
+    .home-roadmap-card h3 {
+      margin-top: auto;
+      color: #171717;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .home-roadmap-card p {
+      margin-top: 9px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .support-section {
       padding: 0 0 120px;
     }
 
@@ -895,6 +1319,56 @@
         width: 100%;
       }
 
+      .home-stats-section {
+        padding-bottom: 80px;
+      }
+
+      .home-content-section {
+        padding-bottom: 88px;
+      }
+
+      .home-section-head,
+      .home-request-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .home-section-head {
+        gap: 18px;
+      }
+
+      .home-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .home-stat:nth-child(3) {
+        border-left: 0;
+      }
+
+      .home-stat:nth-child(n + 3) {
+        border-top: 1px solid rgba(23, 23, 23, 0.08);
+      }
+
+      .home-latest-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .home-latest-card {
+        min-height: 0;
+      }
+
+      .home-request-layout {
+        padding: 38px 0;
+        gap: 30px;
+      }
+
+      .home-request-copy {
+        position: static;
+      }
+
+      .home-roadmap-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .support-section {
         padding-bottom: 80px;
       }
@@ -960,6 +1434,35 @@
 
       .support-donation-card h2 {
         font-size: 26px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .home-stats-grid,
+      .home-request-grid,
+      .home-roadmap-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .home-stat + .home-stat {
+        border-left: 0;
+        border-top: 1px solid rgba(23, 23, 23, 0.08);
+      }
+
+      .home-stat {
+        min-height: 142px;
+        padding: 24px;
+      }
+
+      .home-latest-card,
+      .home-request-card,
+      .home-roadmap-card {
+        border-radius: 22px;
+      }
+
+      .home-request-card,
+      .home-roadmap-card {
+        min-height: 180px;
       }
     }
   </style>
@@ -1050,6 +1553,202 @@
           </a>
         </div>
       </aside>
+    </section>
+
+    <section class="home-stats-section" aria-labelledby="home-stats-title">
+      <div class="home-section-head">
+        <div>
+          <p class="home-kicker">AUC Atlas by the numbers</p>
+          <h2 id="home-stats-title">Built from student knowledge.</h2>
+        </div>
+
+        <p>
+          Live counts from the professors, courses, reviews, and approved materials currently available across AUC Atlas.
+        </p>
+      </div>
+
+      <div class="home-stats-grid">
+        <article class="home-stat">
+          <strong id="home-professor-count">0</strong>
+          <span>Professors listed</span>
+        </article>
+
+        <article class="home-stat">
+          <strong id="home-course-count">0</strong>
+          <span>Courses available</span>
+        </article>
+
+        <article class="home-stat">
+          <strong id="home-review-count">—</strong>
+          <span>Student reviews</span>
+        </article>
+
+        <article class="home-stat">
+          <strong id="home-material-count">—</strong>
+          <span>Approved materials</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="home-content-section" aria-labelledby="home-latest-title">
+      <div class="home-section-head">
+        <div>
+          <p class="home-kicker">Latest on AUC Atlas</p>
+          <h2 id="home-latest-title">See what students added recently.</h2>
+        </div>
+
+        <p>
+          Check the newest professor reviews, approved course materials, and professor profiles added to the platform.
+        </p>
+      </div>
+
+      <div class="home-latest-grid">
+        <article class="home-latest-card">
+          <div class="home-latest-card-head">
+            <div>
+              <span>Student feedback</span>
+              <h3>Recent reviews</h3>
+            </div>
+
+            <a href="professors.html">View all →</a>
+          </div>
+
+          <div class="home-latest-list" id="home-latest-reviews">
+            <p class="home-latest-status">Loading recent reviews...</p>
+          </div>
+        </article>
+
+        <article class="home-latest-card">
+          <div class="home-latest-card-head">
+            <div>
+              <span>Course resources</span>
+              <h3>New materials</h3>
+            </div>
+
+            <a href="courses.html">View all →</a>
+          </div>
+
+          <div class="home-latest-list" id="home-latest-materials">
+            <p class="home-latest-status">Loading new materials...</p>
+          </div>
+        </article>
+
+        <article class="home-latest-card">
+          <div class="home-latest-card-head">
+            <div>
+              <span>New profiles</span>
+              <h3>Recently added</h3>
+            </div>
+
+            <a href="professors.html">View all →</a>
+          </div>
+
+          <div class="home-latest-list" id="home-latest-professors">
+            <p class="home-latest-status">Loading professor profiles...</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="home-content-section" aria-labelledby="home-request-title">
+      <div class="home-request-layout">
+        <div class="home-request-copy">
+          <p class="home-kicker">Missing something?</p>
+          <h2 id="home-request-title">Help us fill the gaps.</h2>
+          <p>
+            Request a missing professor, course, or study resource, or report information that needs to be corrected.
+          </p>
+        </div>
+
+        <div class="home-request-grid">
+          <a
+            class="home-request-card"
+            href="https://github.com/Ahmed-Radwan1718/AUC-Atlas/issues/new?title=Request%3A%20Add%20a%20professor&amp;body=Professor%20name%3A%0ADepartment%3A%0AWhy%20they%20should%20be%20added%3A"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>Professor request</span>
+            <strong>Request a professor</strong>
+            <p>Tell us which AUC professor is missing from the directory.</p>
+            <span aria-hidden="true">→</span>
+          </a>
+
+          <a
+            class="home-request-card"
+            href="https://github.com/Ahmed-Radwan1718/AUC-Atlas/issues/new?title=Request%3A%20Add%20a%20course&amp;body=Course%20code%3A%0ACourse%20name%3A%0ADepartment%3A"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>Course request</span>
+            <strong>Request a course</strong>
+            <p>Submit a course code or title that should be searchable.</p>
+            <span aria-hidden="true">→</span>
+          </a>
+
+          <a
+            class="home-request-card"
+            href="https://github.com/Ahmed-Radwan1718/AUC-Atlas/issues/new?title=Request%3A%20Course%20material&amp;body=Course%20code%3A%0AMaterial%20needed%3A%0AAdditional%20details%3A"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>Material request</span>
+            <strong>Request course material</strong>
+            <p>Let students know which notes, exams, or resources are needed.</p>
+            <span aria-hidden="true">→</span>
+          </a>
+
+          <a
+            class="home-request-card"
+            href="https://github.com/Ahmed-Radwan1718/AUC-Atlas/issues/new?title=Correction%3A%20Incorrect%20information&amp;body=Page%20or%20item%3A%0AIncorrect%20information%3A%0ACorrect%20information%3A"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>Correction</span>
+            <strong>Report incorrect information</strong>
+            <p>Flag outdated, missing, or inaccurate information on the site.</p>
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="home-content-section" aria-labelledby="home-roadmap-title">
+      <div class="home-section-head">
+        <div>
+          <p class="home-kicker">Coming to AUC Atlas</p>
+          <h2 id="home-roadmap-title">The next tools being planned.</h2>
+        </div>
+
+        <p>
+          A look at the student tools currently being developed, planned, or explored for future versions of AUC Atlas.
+        </p>
+      </div>
+
+      <div class="home-roadmap-grid">
+        <article class="home-roadmap-card">
+          <span class="home-roadmap-status in-development">In development</span>
+          <h3>Degree planner</h3>
+          <p>Track completed courses and see what remains in your degree.</p>
+        </article>
+
+        <article class="home-roadmap-card">
+          <span class="home-roadmap-status">Planned</span>
+          <h3>Schedule builder</h3>
+          <p>Organize possible schedules before registration begins.</p>
+        </article>
+
+        <article class="home-roadmap-card">
+          <span class="home-roadmap-status">Planned</span>
+          <h3>Saved professors and courses</h3>
+          <p>Keep a personal shortlist of the pages you want to revisit.</p>
+        </article>
+
+        <article class="home-roadmap-card">
+          <span class="home-roadmap-status">Exploring</span>
+          <h3>Course comparison</h3>
+          <p>Compare course details, professors, and available resources.</p>
+        </article>
+      </div>
     </section>
 
     <section class="support-section" aria-label="Support AUC Atlas">
@@ -1152,6 +1851,256 @@
   <script src="data/courses.js"></script>
   <script src="data/professor-data.js"></script>
   <script src="home-search.js"></script>
+
+  <script>
+    (function () {
+      const professorCount = document.getElementById("home-professor-count");
+      const courseCount = document.getElementById("home-course-count");
+      const reviewCount = document.getElementById("home-review-count");
+      const materialCount = document.getElementById("home-material-count");
+      const latestReviewsRoot = document.getElementById("home-latest-reviews");
+      const latestMaterialsRoot = document.getElementById("home-latest-materials");
+      const latestProfessorsRoot = document.getElementById("home-latest-professors");
+
+      function escapeHomeText(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function formatHomeCount(value) {
+        const number = Math.max(0, Number(value) || 0);
+        return number.toLocaleString("en-US");
+      }
+
+      function setHomeCount(element, value) {
+        if (element) {
+          element.textContent = formatHomeCount(value);
+        }
+      }
+
+      function formatHomeDate(value) {
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+          return "Recently";
+        }
+
+        return new Intl.DateTimeFormat("en-US", {
+          month: "short",
+          day: "numeric"
+        }).format(date);
+      }
+
+      function renderLatestProfessors() {
+        if (!latestProfessorsRoot) {
+          return;
+        }
+
+        const professors = Array.isArray(window.aucAtlasProfessors)
+          ? window.aucAtlasProfessors
+          : [];
+        const latestProfessors = professors.filter(function (professor) {
+          return (
+            professor &&
+            professor.id &&
+            professor.name &&
+            professor.image !== "user.png"
+          );
+        }).slice(0, 3);
+
+        if (!latestProfessors.length) {
+          latestProfessorsRoot.innerHTML = `
+            <p class="home-latest-status">
+              New professor profiles will appear here.
+            </p>
+          `;
+          return;
+        }
+
+        latestProfessorsRoot.innerHTML = latestProfessors.map(function (professor) {
+          const department =
+            professor.displayDepartment ||
+            professor.department ||
+            "AUC";
+
+          return `
+            <a
+              class="home-latest-item home-latest-person"
+              href="professors.html?id=${encodeURIComponent(professor.id)}"
+            >
+              <img src="${escapeHomeText(professor.image)}" alt="">
+              <span class="home-latest-person-copy">
+                <strong>${escapeHomeText(professor.name)}</strong>
+                <small>${escapeHomeText(department)}</small>
+              </span>
+              <span class="home-latest-arrow" aria-hidden="true">→</span>
+            </a>
+          `;
+        }).join("");
+      }
+
+      function renderLatestReviews(reviews) {
+        if (!latestReviewsRoot) {
+          return;
+        }
+
+        const safeReviews = Array.isArray(reviews)
+          ? reviews.slice(0, 3)
+          : [];
+
+        if (!safeReviews.length) {
+          latestReviewsRoot.innerHTML = `
+            <p class="home-latest-status">
+              The newest professor reviews will appear here.
+            </p>
+          `;
+          return;
+        }
+
+        latestReviewsRoot.innerHTML = safeReviews.map(function (review) {
+          const rating = Math.max(
+            0,
+            Math.min(
+              5,
+              Math.round(Number(review.rating) || 0)
+            )
+          );
+          const stars =
+            "★".repeat(rating) +
+            "☆".repeat(5 - rating);
+          const professorName =
+            review.professorName ||
+            "AUC professor";
+          const professorHref = review.professorId
+            ? "professors.html?id=" +
+              encodeURIComponent(review.professorId)
+            : "professors.html";
+
+          return `
+            <a class="home-latest-item" href="${professorHref}">
+              <span class="home-latest-item-top">
+                <span class="home-latest-type">Review</span>
+                <small>${escapeHomeText(formatHomeDate(review.createdAt))}</small>
+              </span>
+
+              <strong>${escapeHomeText(professorName)}</strong>
+
+              <span class="home-latest-item-bottom">
+                <small>
+                  ${escapeHomeText(review.courseCode || "Course not listed")}
+                </small>
+                <span
+                  class="home-latest-stars"
+                  aria-label="${rating} out of 5 stars"
+                >${stars}</span>
+              </span>
+            </a>
+          `;
+        }).join("");
+      }
+
+      function renderLatestMaterials(materials) {
+        if (!latestMaterialsRoot) {
+          return;
+        }
+
+        const safeMaterials = Array.isArray(materials)
+          ? materials.slice(0, 3)
+          : [];
+
+        if (!safeMaterials.length) {
+          latestMaterialsRoot.innerHTML = `
+            <p class="home-latest-status">
+              New approved course materials will appear here.
+            </p>
+          `;
+          return;
+        }
+
+        latestMaterialsRoot.innerHTML = safeMaterials.map(function (material) {
+          const courseCode =
+            material.courseCode ||
+            "AUC course";
+          const materialHref = material.courseCode
+            ? "courses.html?course=" +
+              encodeURIComponent(material.courseCode) +
+              "#course-materials-access"
+            : "courses.html";
+
+          return `
+            <a class="home-latest-item" href="${materialHref}">
+              <span class="home-latest-item-top">
+                <span class="home-latest-type">
+                  ${escapeHomeText(material.materialType || "Material")}
+                </span>
+                <small>
+                  ${escapeHomeText(formatHomeDate(material.createdAt))}
+                </small>
+              </span>
+
+              <strong>
+                ${escapeHomeText(material.title || "Course material")}
+              </strong>
+
+              <span class="home-latest-item-bottom">
+                <small>${escapeHomeText(courseCode)}</small>
+                <span class="home-latest-arrow" aria-hidden="true">→</span>
+              </span>
+            </a>
+          `;
+        }).join("");
+      }
+
+      const courses = Array.isArray(window.aucAtlasCourses)
+        ? window.aucAtlasCourses
+        : [];
+      const professors = Array.isArray(window.aucAtlasProfessors)
+        ? window.aucAtlasProfessors
+        : [];
+
+      setHomeCount(courseCount, courses.length);
+      setHomeCount(professorCount, professors.length);
+      renderLatestProfessors();
+
+      fetch("/api/homepage-overview", {
+        method: "GET",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: {
+          Accept: "application/json"
+        }
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Could not load homepage activity.");
+          }
+
+          return response.json();
+        })
+        .then(function (data) {
+          setHomeCount(reviewCount, data.reviewCount);
+          setHomeCount(materialCount, data.materialCount);
+          renderLatestReviews(data.latestReviews);
+          renderLatestMaterials(data.latestMaterials);
+        })
+        .catch(function () {
+          if (reviewCount) {
+            reviewCount.textContent = "—";
+          }
+
+          if (materialCount) {
+            materialCount.textContent = "—";
+          }
+
+          renderLatestReviews([]);
+          renderLatestMaterials([]);
+        });
+    })();
+  </script>
 
   <script>
     (function () {
