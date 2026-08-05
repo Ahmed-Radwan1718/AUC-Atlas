@@ -1,6 +1,13 @@
 const admin = require("../server/_lib/firebaseAdmin");
 
 const { getSiteSessionUser } = require("../server/_lib/securityHelpers");
+const {
+  MATERIAL_MAX_FILE_BYTES,
+  cleanMaterialFileName,
+  normalizeMaterialMimeType,
+  isAllowedMaterialMimeType,
+  doesMaterialMimeMatchFileName
+} = require("../server/_lib/courseMaterialUploadPolicy");
 
 function cleanString(value, maxLength) {
   return String(value || "").trim().replace(/\s+/g, " ").slice(0, maxLength);
@@ -446,6 +453,94 @@ async function getImageKitFileDetails(fileId) {
   return file;
 }
 
+function validateMaterialUploadAuthorizationData(
+  data,
+  authorizationId,
+  uploaderUid
+) {
+  const authorizationData = data || {};
+  const expiresAtMs = getTimestampMillis(
+    authorizationData.expiresAt
+  );
+  const registrationGraceMs = 5 * 60 * 1000;
+
+  if (
+    cleanString(
+      authorizationData.authorizationId,
+      80
+    ) !== cleanString(authorizationId, 80) ||
+    cleanString(
+      authorizationData.uploaderUid,
+      160
+    ) !== cleanString(uploaderUid, 160)
+  ) {
+    throw createMaterialError(
+      "Could not verify this upload authorization.",
+      403
+    );
+  }
+
+  if (
+    authorizationData.consumedAt ||
+    authorizationData.cancelledAt
+  ) {
+    throw createMaterialError(
+      "This upload authorization has already been used.",
+      409
+    );
+  }
+
+  if (
+    !expiresAtMs ||
+    expiresAtMs + registrationGraceMs <= Date.now()
+  ) {
+    throw createMaterialError(
+      "This upload authorization has expired.",
+      410
+    );
+  }
+
+  return authorizationData;
+}
+
+async function getMaterialUploadAuthorization(
+  authorizationId,
+  uploaderUid
+) {
+  const safeAuthorizationId = cleanString(
+    authorizationId,
+    80
+  );
+
+  if (!/^[a-f0-9]{36}$/i.test(safeAuthorizationId)) {
+    throw createMaterialError(
+      "Could not verify this upload authorization.",
+      400
+    );
+  }
+
+  const ref = admin.firestore()
+    .collection("materialUploadAuthorizations")
+    .doc(safeAuthorizationId);
+  const doc = await ref.get();
+
+  if (!doc.exists) {
+    throw createMaterialError(
+      "Could not verify this upload authorization.",
+      400
+    );
+  }
+
+  return {
+    ref,
+    data: validateMaterialUploadAuthorizationData(
+      doc.data() || {},
+      safeAuthorizationId,
+      uploaderUid
+    )
+  };
+}
+
 async function verifyImageKitMaterialUpload(data) {
   const file = await getImageKitFileDetails(data.fileId);
   const filePath = normalizeImageKitPath(file.filePath);
@@ -467,20 +562,40 @@ async function verifyImageKitMaterialUpload(data) {
   );
   const expectedTags = [
     "auc-atlas-material",
+    "status-pending",
     "course-" + slugifyMaterialValue(data.courseCode),
     "professor-" + slugifyMaterialValue(data.professor),
     "semester-" + slugifyMaterialValue(data.semester),
-    "uploader-" + slugifyMaterialValue(data.uploaderUid)
+    "material-type-" +
+      slugifyMaterialValue(data.materialType),
+    "uploader-" + slugifyMaterialValue(data.uploaderUid),
+    "upload-auth-" + data.uploadAuthorizationId
   ];
+  const verifiedFileName = cleanMaterialFileName(
+    descriptionParts[8]
+  );
+  const actualSize = Math.max(
+    0,
+    Number(file.size) || 0
+  );
+  const actualMimeType = normalizeMaterialMimeType(
+    file.mime
+  );
   const metadataMatches =
+    cleanString(descriptionParts[0], 160) ===
+      cleanString(data.title, 160) &&
     cleanString(descriptionParts[1], 40).toUpperCase() ===
       cleanString(data.courseCode, 40).toUpperCase() &&
     cleanString(descriptionParts[2], 120) ===
       cleanString(data.professor, 120) &&
     cleanString(descriptionParts[3], 80) ===
       cleanString(data.semester, 80) &&
+    cleanString(descriptionParts[4], 80) ===
+      cleanString(data.materialType, 80) &&
     cleanString(descriptionParts[7], 160) ===
-      cleanString(data.uploaderUid, 160);
+      cleanString(data.uploaderUid, 160) &&
+    verifiedFileName ===
+      cleanMaterialFileName(data.fileName);
 
   if (
     actualFolder !== expectedFolder ||
@@ -488,6 +603,7 @@ async function verifyImageKitMaterialUpload(data) {
     pathParts.includes("..") ||
     /%2e/i.test(filePath) ||
     filePath.endsWith("/") ||
+    file.isPrivateFile !== true ||
     !expectedTags.every(function (tag) {
       return tags.has(tag);
     }) ||
@@ -499,19 +615,33 @@ async function verifyImageKitMaterialUpload(data) {
     );
   }
 
+  if (
+    actualSize !== Number(data.fileSize) ||
+    actualSize <= 0 ||
+    actualSize > MATERIAL_MAX_FILE_BYTES ||
+    !isAllowedMaterialMimeType(actualMimeType) ||
+    !doesMaterialMimeMatchFileName(
+      verifiedFileName,
+      actualMimeType
+    )
+  ) {
+    await deleteImageKitMaterial(file.fileId).catch(
+      function () {}
+    );
+
+    throw createMaterialError(
+      "The uploaded file type or size is not allowed.",
+      400
+    );
+  }
+
   return {
     fileId: cleanString(file.fileId, 160),
-    fileName: cleanString(
-      descriptionParts[8] || file.name,
-      240
-    ),
+    fileName: verifiedFileName,
     fileUrl: cleanUrl(file.url),
     filePath,
-    size: Math.max(0, Number(file.size) || 0),
-    fileType: cleanString(
-      file.mime || file.fileType,
-      80
-    )
+    size: actualSize,
+    fileType: actualMimeType
   };
 }
 
@@ -826,32 +956,71 @@ module.exports = async function handler(req, res) {
       decodedUser,
       userRecord
     );
+    const uploadAuthorizationId = cleanString(
+      body.uploadAuthorizationId,
+      80
+    );
+    const submittedFileId = cleanString(
+      body.fileId,
+      160
+    );
+
+    if (!uploadAuthorizationId || !submittedFileId) {
+      throw createMaterialError(
+        "Could not save this course material.",
+        400
+      );
+    }
+
+    const authorization =
+      await getMaterialUploadAuthorization(
+        uploadAuthorizationId,
+        decodedUser.uid
+      );
+    const authorizationData = authorization.data;
     const courseCode = cleanString(
-      body.courseCode,
+      authorizationData.courseCode,
       40
     ).toUpperCase();
-    const courseTitle = cleanString(body.courseTitle, 160);
-    const professor = cleanString(body.professor, 120);
-    const semester = cleanString(body.semester, 80);
-    const materialType = cleanMaterialType(
-      body.materialType ||
-      body.type ||
-      body.category
+    const courseTitle = cleanString(
+      authorizationData.courseTitle,
+      160
     );
-    const title = cleanString(body.title, 160);
-    const submittedFileId = cleanString(body.fileId, 160);
-    const createdAtIso = new Date().toISOString();
+    const professor = cleanString(
+      authorizationData.professor,
+      120
+    );
+    const semester = cleanString(
+      authorizationData.semester,
+      80
+    );
+    const materialType = cleanMaterialType(
+      authorizationData.materialType
+    );
+    const title = cleanString(
+      authorizationData.title,
+      160
+    );
+    const fileName = cleanMaterialFileName(
+      authorizationData.fileName
+    );
+    const fileSize = Number(
+      authorizationData.fileSize
+    );
 
     if (
       !courseCode ||
       !professor ||
       !semester ||
-      !title ||
       !materialType ||
-      !submittedFileId
+      !title ||
+      !fileName ||
+      !Number.isSafeInteger(fileSize) ||
+      fileSize <= 0 ||
+      fileSize > MATERIAL_MAX_FILE_BYTES
     ) {
       throw createMaterialError(
-        "Could not save this course material.",
+        "Could not verify this upload authorization.",
         400
       );
     }
@@ -859,38 +1028,17 @@ module.exports = async function handler(req, res) {
     const verifiedFile =
       await verifyImageKitMaterialUpload({
         fileId: submittedFileId,
+        uploadAuthorizationId,
         uploaderUid: decodedUser.uid,
         courseCode,
         professor,
-        semester
+        semester,
+        materialType,
+        title,
+        fileName,
+        fileSize
       });
-    const materialsCollection = admin.firestore()
-      .collection("courseMaterials");
-    const existingSnapshot = await materialsCollection
-      .where("fileId", "==", verifiedFile.fileId)
-      .limit(1)
-      .get();
-
-    if (!existingSnapshot.empty) {
-      const existingDoc = existingSnapshot.docs[0];
-      const existingData = existingDoc.data() || {};
-
-      if (
-        cleanString(existingData.uploaderUid, 160) !==
-        cleanString(decodedUser.uid, 160)
-      ) {
-        throw createMaterialError(
-          "This uploaded file is already registered to another account.",
-          409
-        );
-      }
-
-      return res.status(200).json({
-        material: serializeMaterial(existingDoc),
-        alreadySaved: true
-      });
-    }
-
+    const createdAtIso = new Date().toISOString();
     const materialData = {
       courseCode,
       courseTitle,
@@ -911,50 +1059,96 @@ module.exports = async function handler(req, res) {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       createdAtIso
     };
-    const materialRef = materialsCollection.doc(
-      "imagekit-" + verifiedFile.fileId
-    );
+    const db = admin.firestore();
+    const materialRef = db
+      .collection("courseMaterials")
+      .doc("imagekit-" + verifiedFile.fileId);
+    const uploadLimitRef = db
+      .collection("materialUploadLimits")
+      .doc(decodedUser.uid);
+    let existingMaterialData = null;
 
-    try {
-      await materialRef.create(materialData);
-    } catch (error) {
-      const errorCode = String(
-        error && error.code ? error.code : ""
-      );
-      const alreadyExists =
-        errorCode === "6" ||
-        errorCode === "already-exists" ||
-        /already exists/i.test(
-          error && error.message ? error.message : ""
+    await db.runTransaction(async function (transaction) {
+      const currentAuthorizationDoc =
+        await transaction.get(authorization.ref);
+
+      if (!currentAuthorizationDoc.exists) {
+        throw createMaterialError(
+          "Could not verify this upload authorization.",
+          400
         );
-
-      if (alreadyExists) {
-        const existingDoc = await materialRef.get();
-        const existingData = existingDoc.exists
-          ? existingDoc.data() || {}
-          : {};
-
-        if (
-          existingDoc.exists &&
-          cleanString(existingData.uploaderUid, 160) ===
-            cleanString(decodedUser.uid, 160)
-        ) {
-          return res.status(200).json({
-            material: serializeMaterial(existingDoc),
-            alreadySaved: true
-          });
-        }
       }
 
-      throw error;
-    }
+      validateMaterialUploadAuthorizationData(
+        currentAuthorizationDoc.data() || {},
+        uploadAuthorizationId,
+        decodedUser.uid
+      );
 
-    return res.status(201).json({
-      material: serializeMaterialData(
-        materialRef.id,
-        materialData
-      )
+      const existingMaterialDoc =
+        await transaction.get(materialRef);
+      const uploadLimitDoc =
+        await transaction.get(uploadLimitRef);
+
+      if (existingMaterialDoc.exists) {
+        const existingData =
+          existingMaterialDoc.data() || {};
+
+        if (
+          cleanString(existingData.uploaderUid, 160) !==
+          cleanString(decodedUser.uid, 160) ||
+          existingData.status === "rejected"
+        ) {
+          throw createMaterialError(
+            "This uploaded file is already registered.",
+            409
+          );
+        }
+
+        existingMaterialData = existingData;
+      } else {
+        transaction.set(materialRef, materialData);
+      }
+
+      transaction.update(authorization.ref, {
+        consumedAt:
+          admin.firestore.FieldValue.serverTimestamp(),
+        registeredFileId: verifiedFile.fileId,
+        registeredMaterialId: materialRef.id
+      });
+
+      const uploadLimitData = uploadLimitDoc.exists
+        ? uploadLimitDoc.data() || {}
+        : {};
+
+      if (
+        cleanString(
+          uploadLimitData.activeAuthorizationId,
+          80
+        ) === uploadAuthorizationId
+      ) {
+        transaction.set(
+          uploadLimitRef,
+          {
+            activeAuthorizationId: "",
+            activeAuthorizationExpiresAt: null,
+            updatedAt:
+              admin.firestore.FieldValue.serverTimestamp()
+          },
+          { merge: true }
+        );
+      }
     });
+
+    return res
+      .status(existingMaterialData ? 200 : 201)
+      .json({
+        material: serializeMaterialData(
+          materialRef.id,
+          existingMaterialData || materialData
+        ),
+        alreadySaved: Boolean(existingMaterialData)
+      });
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       error:
