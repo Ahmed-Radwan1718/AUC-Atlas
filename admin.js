@@ -3,37 +3,156 @@
     dashboard: null,
     selectedUser: null,
     activePanel: "overview",
-    busy: false
+    busy: false,
+    authenticationBusy: false,
+    requiresTwoFactor: false,
+    adminAccessToken: "",
+    adminAccessExpiresAt: ""
   };
 
-  const loadingState = document.getElementById("admin-loading");
-  const deniedState = document.getElementById("admin-denied");
-  const deniedMessage = document.getElementById("admin-denied-message");
-  const app = document.getElementById("admin-app");
-  const identity = document.getElementById("admin-identity");
-  const navButtons = Array.from(document.querySelectorAll("[data-admin-panel]"));
-  const panels = Array.from(document.querySelectorAll(".admin-panel"));
-  const auditList = document.getElementById("admin-audit-list");
-  const reviewList = document.getElementById("admin-review-list");
-  const materialList = document.getElementById("admin-material-list");
-  const reviewSearch = document.getElementById("admin-review-search");
-  const materialSearch = document.getElementById("admin-material-search");
-  const userLookupForm = document.getElementById("admin-user-lookup-form");
-  const userUidInput = document.getElementById("admin-user-uid");
-  const userLookupButton = document.getElementById("admin-user-lookup-button");
-  const userMessage = document.getElementById("admin-user-message");
-  const userResult = document.getElementById("admin-user-result");
-  const donationForm = document.getElementById("admin-donation-form");
-  const donationCurrentInput = document.getElementById("admin-donation-current");
-  const donationGoalInput = document.getElementById("admin-donation-goal");
-  const donationCurrencyInput = document.getElementById("admin-donation-currency");
-  const donationReasonInput = document.getElementById("admin-donation-reason");
-  const donationSubmit = document.getElementById("admin-donation-submit");
-  const donationMessage = document.getElementById("admin-donation-message");
-  const donationPreviewAmount = document.getElementById("admin-donation-preview-amount");
-  const donationPreviewFill = document.getElementById("admin-donation-preview-fill");
-  const donationPreviewCopy = document.getElementById("admin-donation-preview-copy");
-  const toast = document.getElementById("admin-toast");
+  const loadingState =
+    document.getElementById(
+      "admin-loading"
+    );
+  const authState =
+    document.getElementById(
+      "admin-auth"
+    );
+  const authForm =
+    document.getElementById(
+      "admin-auth-form"
+    );
+  const authPasswordInput =
+    document.getElementById(
+      "admin-auth-password"
+    );
+  const authCodeField =
+    document.getElementById(
+      "admin-auth-code-field"
+    );
+  const authCodeInput =
+    document.getElementById(
+      "admin-auth-code"
+    );
+  const authSubmitButton =
+    document.getElementById(
+      "admin-auth-submit"
+    );
+  const authMessage =
+    document.getElementById(
+      "admin-auth-message"
+    );
+  const deniedState =
+    document.getElementById(
+      "admin-denied"
+    );
+  const deniedMessage =
+    document.getElementById(
+      "admin-denied-message"
+    );
+  const app =
+    document.getElementById(
+      "admin-app"
+    );
+  const identity =
+    document.getElementById(
+      "admin-identity"
+    );
+  const navButtons = Array.from(
+    document.querySelectorAll(
+      "[data-admin-panel]"
+    )
+  );
+  const panels = Array.from(
+    document.querySelectorAll(
+      ".admin-panel"
+    )
+  );
+  const auditList =
+    document.getElementById(
+      "admin-audit-list"
+    );
+  const reviewList =
+    document.getElementById(
+      "admin-review-list"
+    );
+  const materialList =
+    document.getElementById(
+      "admin-material-list"
+    );
+  const reviewSearch =
+    document.getElementById(
+      "admin-review-search"
+    );
+  const materialSearch =
+    document.getElementById(
+      "admin-material-search"
+    );
+  const userLookupForm =
+    document.getElementById(
+      "admin-user-lookup-form"
+    );
+  const userUidInput =
+    document.getElementById(
+      "admin-user-uid"
+    );
+  const userLookupButton =
+    document.getElementById(
+      "admin-user-lookup-button"
+    );
+  const userMessage =
+    document.getElementById(
+      "admin-user-message"
+    );
+  const userResult =
+    document.getElementById(
+      "admin-user-result"
+    );
+  const donationForm =
+    document.getElementById(
+      "admin-donation-form"
+    );
+  const donationCurrentInput =
+    document.getElementById(
+      "admin-donation-current"
+    );
+  const donationGoalInput =
+    document.getElementById(
+      "admin-donation-goal"
+    );
+  const donationCurrencyInput =
+    document.getElementById(
+      "admin-donation-currency"
+    );
+  const donationReasonInput =
+    document.getElementById(
+      "admin-donation-reason"
+    );
+  const donationSubmit =
+    document.getElementById(
+      "admin-donation-submit"
+    );
+  const donationMessage =
+    document.getElementById(
+      "admin-donation-message"
+    );
+  const donationPreviewAmount =
+    document.getElementById(
+      "admin-donation-preview-amount"
+    );
+  const donationPreviewFill =
+    document.getElementById(
+      "admin-donation-preview-fill"
+    );
+  const donationPreviewCopy =
+    document.getElementById(
+      "admin-donation-preview-copy"
+    );
+  const toast =
+    document.getElementById(
+      "admin-toast"
+    );
+
   let toastTimer = 0;
 
   function escapeHtml(value) {
@@ -90,33 +209,170 @@
     }, 3200);
   }
 
-  function setMessage(element, message, type) {
+  function setMessage(
+    element,
+    message,
+    type
+  ) {
     element.textContent = message || "";
-    element.classList.remove("error", "success");
+    element.classList.remove(
+      "error",
+      "success"
+    );
 
     if (type) {
       element.classList.add(type);
     }
   }
 
-  async function requestJson(url, options) {
-    const response = await fetch(url, Object.assign({
-      credentials: "same-origin",
-      headers: {
-        Accept: "application/json"
+  function showDenied(message) {
+    state.adminAccessToken = "";
+    state.adminAccessExpiresAt = "";
+
+    loadingState.hidden = true;
+    authState.hidden = true;
+    app.hidden = true;
+    deniedState.hidden = false;
+    deniedMessage.textContent =
+      message ||
+      "Administrator access could not be verified.";
+  }
+
+  function showAuthenticationGate(
+    message
+  ) {
+    state.adminAccessToken = "";
+    state.adminAccessExpiresAt = "";
+
+    loadingState.hidden = true;
+    deniedState.hidden = true;
+    app.hidden = true;
+    authState.hidden = false;
+
+    authCodeField.hidden =
+      !state.requiresTwoFactor;
+    authCodeInput.required =
+      state.requiresTwoFactor;
+
+    authPasswordInput.value = "";
+    authCodeInput.value = "";
+
+    setMessage(
+      authMessage,
+      message || "",
+      message ? "error" : ""
+    );
+
+    window.requestAnimationFrame(
+      function () {
+        authPasswordInput.focus();
       }
-    }, options || {}));
-    const data = await response.json().catch(function () {
-      return {};
-    });
+    );
+  }
+
+  async function requestJson(
+    url,
+    options
+  ) {
+    const settings = options || {};
+    const headers = Object.assign(
+      {
+        Accept: "application/json"
+      },
+      settings.headers || {}
+    );
+
+    if (state.adminAccessToken) {
+      headers["X-AUC-Admin-Access"] =
+        state.adminAccessToken;
+    }
+
+    const response = await fetch(
+      url,
+      Object.assign(
+        {},
+        settings,
+        {
+          credentials: "same-origin",
+          cache: "no-store",
+          headers
+        }
+      )
+    );
+    const data = await response
+      .json()
+      .catch(function () {
+        return {};
+      });
 
     if (!response.ok) {
-      const error = new Error(data.error || "The request could not be completed.");
+      const error = new Error(
+        data.error ||
+        "The request could not be completed."
+      );
+
       error.status = response.status;
+      error.code = data.code || "";
+      error.requiresTwoFactor =
+        Boolean(
+          data.requiresTwoFactor
+        );
+
+      if (
+        error.code ===
+          "admin-fresh-auth-required" &&
+        state.adminAccessToken
+      ) {
+        showAuthenticationGate(
+          error.message
+        );
+      }
+
       throw error;
     }
 
     return data;
+  }
+
+  async function prepareAdminAuthentication(
+    message
+  ) {
+    loadingState.hidden = false;
+    authState.hidden = true;
+    deniedState.hidden = true;
+    app.hidden = true;
+
+    try {
+      const data = await requestJson(
+        "/api/admin",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+            action:
+              "getAuthenticationRequirements"
+          })
+        }
+      );
+
+      state.requiresTwoFactor =
+        Boolean(
+          data.requiresTwoFactor
+        );
+
+      showAuthenticationGate(
+        message || ""
+      );
+    } catch (error) {
+      showDenied(
+        error.message ||
+        "Administrator access could not be verified."
+      );
+    }
   }
 
   async function postAction(payload) {
@@ -124,16 +380,150 @@
       method: "POST",
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json"
+        "Content-Type":
+          "application/json"
       },
-      body: JSON.stringify(payload || {})
+      body: JSON.stringify(
+        payload || {}
+      )
     });
   }
 
   function switchPanel(panelName) {
     state.activePanel = panelName;
 
-    navButtons.forEach(function (button) {
+  authForm.addEventListener(
+    "submit",
+    async function (event) {
+      event.preventDefault();
+
+      if (state.authenticationBusy) {
+        return;
+      }
+
+      const password =
+        authPasswordInput.value;
+      const authenticatorCode =
+        authCodeInput.value
+          .replace(/\D/g, "")
+          .slice(0, 6);
+
+      if (!password) {
+        setMessage(
+          authMessage,
+          "Enter your administrator account password.",
+          "error"
+        );
+        authPasswordInput.focus();
+        return;
+      }
+
+      if (
+        state.requiresTwoFactor &&
+        !/^\d{6}$/.test(
+          authenticatorCode
+        )
+      ) {
+        setMessage(
+          authMessage,
+          "Enter your 6-digit authenticator code.",
+          "error"
+        );
+        authCodeInput.focus();
+        return;
+      }
+
+      state.authenticationBusy = true;
+
+      const originalText =
+        authSubmitButton.textContent;
+
+      authSubmitButton.disabled = true;
+      authSubmitButton.textContent =
+        "Authenticating...";
+
+      setMessage(
+        authMessage,
+        "Verifying administrator credentials...",
+        ""
+      );
+
+      try {
+        const data = await requestJson(
+          "/api/admin",
+          {
+            method: "POST",
+            headers: {
+              Accept:
+                "application/json",
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              action:
+                "authenticateAdmin",
+              password,
+              authenticatorCode:
+                state.requiresTwoFactor
+                  ? authenticatorCode
+                  : ""
+            })
+          }
+        );
+
+        state.adminAccessToken =
+          String(
+            data.adminAccessToken ||
+            ""
+          );
+        state.adminAccessExpiresAt =
+          String(
+            data.adminAccessExpiresAt ||
+            ""
+          );
+        state.requiresTwoFactor =
+          Boolean(
+            data.requiresTwoFactor
+          );
+
+        authPasswordInput.value = "";
+        authCodeInput.value = "";
+        authState.hidden = true;
+        loadingState.hidden = false;
+
+        await loadDashboard();
+      } catch (error) {
+        if (error.requiresTwoFactor) {
+          state.requiresTwoFactor = true;
+          authCodeField.hidden = false;
+          authCodeInput.required = true;
+        }
+
+        setMessage(
+          authMessage,
+          error.message ||
+          "Administrator authentication failed.",
+          "error"
+        );
+
+        if (
+          error.requiresTwoFactor &&
+          password
+        ) {
+          authCodeInput.focus();
+        } else {
+          authPasswordInput.focus();
+        }
+      } finally {
+        state.authenticationBusy = false;
+        authSubmitButton.disabled = false;
+        authSubmitButton.textContent =
+          originalText;
+      }
+    }
+  );
+
+  navButtons.forEach(function (button) {
       button.classList.toggle("active", button.dataset.adminPanel === panelName);
     });
 
@@ -349,10 +739,15 @@
     const settings = options || {};
 
     try {
-      const data = await requestJson("/api/admin");
+      const data = await requestJson(
+        "/api/admin"
+      );
+
       state.dashboard = data;
       renderDashboard();
+
       loadingState.hidden = true;
+      authState.hidden = true;
       deniedState.hidden = true;
       app.hidden = false;
 
@@ -360,10 +755,20 @@
         showToast(settings.message);
       }
     } catch (error) {
-      loadingState.hidden = true;
-      app.hidden = true;
-      deniedState.hidden = false;
-      deniedMessage.textContent = error.message || "Administrator access could not be verified.";
+      if (
+        error.code ===
+        "admin-fresh-auth-required"
+      ) {
+        showAuthenticationGate(
+          error.message
+        );
+        return;
+      }
+
+      showDenied(
+        error.message ||
+        "Administrator access could not be verified."
+      );
     }
   }
 
@@ -553,5 +958,5 @@
     });
   });
 
-  loadDashboard();
+  prepareAdminAuthentication();
 })();
