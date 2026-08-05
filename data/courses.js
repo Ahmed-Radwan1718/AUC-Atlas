@@ -1354,9 +1354,19 @@
     const searchInput = document.getElementById(
       "course-search-input"
     );
+    const results = document.querySelector(
+      ".courses-results"
+    );
 
     if (dropdown) {
       dropdown.hidden = !hasActiveSearch;
+    }
+
+    if (results) {
+      results.classList.toggle(
+        "is-search-active",
+        hasActiveSearch
+      );
     }
 
     if (searchInput) {
