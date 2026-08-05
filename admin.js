@@ -625,7 +625,8 @@
         material.professor,
         material.uploaderDisplayName,
         material.uploaderUid,
-        material.materialType
+        material.materialType,
+        material.status
       ].join(" ")).includes(search);
     });
 
@@ -635,6 +636,20 @@
     }
 
     materialList.innerHTML = filtered.map(function (material) {
+      const status = normalizeSearch(
+        material.status || "pending"
+      );
+      const approveButton =
+        material.source !== "imagekit" &&
+        status === "pending"
+          ? [
+              '<button class="admin-button primary" type="button"',
+                ' data-approve-material="', escapeHtml(material.id), '">',
+                'Approve upload',
+              '</button>'
+            ].join("")
+          : "";
+
       return [
         '<article class="admin-item">',
           '<div class="admin-item-main">',
@@ -643,12 +658,14 @@
               '<span>', escapeHtml(material.courseCode || "Course not listed"), '</span>',
               '<span>', escapeHtml(material.materialType || "Material"), '</span>',
               '<span>', escapeHtml(material.source || "firestore"), '</span>',
+              '<span>', escapeHtml(status || "pending"), '</span>',
               '<span>', escapeHtml(formatDate(material.createdAt)), '</span>',
             '</div>',
             '<p class="admin-item-copy">', escapeHtml(material.fileName || "Filename unavailable"), '</p>',
             '<p class="admin-item-copy"><strong>Uploader:</strong> ', escapeHtml(material.uploaderDisplayName || "AUC student"), ' · ', escapeHtml(material.uploaderUid || "UID unavailable"), '</p>',
           '</div>',
           '<div class="admin-item-actions">',
+            approveButton,
             '<button class="admin-button danger" type="button"',
               ' data-delete-material="', escapeHtml(material.id), '"',
               ' data-material-source="', escapeHtml(material.source || "firestore"), '"',
@@ -843,30 +860,97 @@
   });
 
   materialList.addEventListener("click", function (event) {
-    const button = event.target.closest("[data-delete-material]");
+    const approveButton =
+      event.target.closest(
+        "[data-approve-material]"
+      );
 
-    if (!button) {
-      return;
-    }
+    if (approveButton) {
+      if (
+        !window.confirm(
+          "Approve this upload and make it publicly available?"
+        )
+      ) {
+        return;
+      }
 
-    const reason = window.prompt("Reason for deleting this upload?", "");
+      runBusy(
+        approveButton,
+        async function () {
+          await postAction({
+            action: "approveMaterial",
+            materialId:
+              approveButton.dataset
+                .approveMaterial
+          });
 
-    if (reason === null || !window.confirm("Delete this uploaded content?")) {
-      return;
-    }
-
-    runBusy(button, async function () {
-      await postAction({
-        action: "deleteMaterial",
-        materialId: button.dataset.deleteMaterial,
-        source: button.dataset.materialSource,
-        fileId: button.dataset.materialFileId,
-        title: button.dataset.materialTitle,
-        reason
+          await loadDashboard({
+            message: "Uploaded content approved."
+          });
+        }
+      ).catch(function (error) {
+        showToast(
+          error.message ||
+          "Could not approve the upload."
+        );
       });
-      await loadDashboard({ message: "Uploaded content deleted." });
-    }).catch(function (error) {
-      showToast(error.message || "Could not delete the upload.");
+
+      return;
+    }
+
+    const deleteButton =
+      event.target.closest(
+        "[data-delete-material]"
+      );
+
+    if (!deleteButton) {
+      return;
+    }
+
+    const reason = window.prompt(
+      "Reason for deleting this upload?",
+      ""
+    );
+
+    if (
+      reason === null ||
+      !window.confirm(
+        "Delete this uploaded content?"
+      )
+    ) {
+      return;
+    }
+
+    runBusy(
+      deleteButton,
+      async function () {
+        await postAction({
+          action: "deleteMaterial",
+          materialId:
+            deleteButton.dataset
+              .deleteMaterial,
+          source:
+            deleteButton.dataset
+              .materialSource,
+          fileId:
+            deleteButton.dataset
+              .materialFileId,
+          title:
+            deleteButton.dataset
+              .materialTitle,
+          reason
+        });
+
+        await loadDashboard({
+          message:
+            "Uploaded content deleted."
+        });
+      }
+    ).catch(function (error) {
+      showToast(
+        error.message ||
+        "Could not delete the upload."
+      );
     });
   });
 
