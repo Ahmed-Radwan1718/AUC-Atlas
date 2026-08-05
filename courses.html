@@ -1264,30 +1264,11 @@
       gap: 5px;
     }
 
-    .course-material-author-name-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .course-material-author-name-row strong {
+    .course-material-author-copy strong {
       color: #171717;
       font-size: 14px;
       font-weight: 800;
       line-height: 1.25;
-    }
-
-    .course-material-verified-badge {
-      padding: 5px 7px;
-      border-radius: 999px;
-      background: rgba(192, 154, 92, 0.14);
-      color: rgba(145, 101, 35, 0.96);
-      font-size: 8px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      line-height: 1;
-      text-transform: uppercase;
     }
 
     .course-material-upload-date {
@@ -1361,6 +1342,13 @@
       text-transform: uppercase;
     }
 
+    .course-material-file-icon-image {
+      width: 62px;
+      height: 76px;
+      object-fit: contain;
+      display: block;
+    }
+
     .course-material-file-copy {
       min-width: 0;
       display: grid;
@@ -1421,12 +1409,13 @@
       flex-wrap: wrap;
     }
 
-    .course-material-preview-button,
-    .course-material-download-button,
-    .course-material-preview-unavailable {
+    .course-material-download-button {
       min-height: 42px;
       padding: 0 16px;
+      border: 1px solid rgba(23, 23, 23, 0.14);
       border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      color: #171717;
       font: inherit;
       font-size: 11px;
       font-weight: 900;
@@ -1438,36 +1427,11 @@
       justify-content: center;
     }
 
-    .course-material-preview-button {
-      border: 1px solid #171717;
-      background: #171717;
-      color: #ffffff;
-      cursor: pointer;
-    }
-
-    .course-material-preview-button:hover,
-    .course-material-preview-button:focus-visible {
-      background: rgba(23, 23, 23, 0.84);
-      outline: none;
-    }
-
-    .course-material-download-button {
-      border: 1px solid rgba(23, 23, 23, 0.14);
-      background: rgba(255, 255, 255, 0.7);
-      color: #171717;
-    }
-
     .course-material-download-button:hover,
     .course-material-download-button:focus-visible {
       border-color: rgba(23, 23, 23, 0.38);
       background: #ffffff;
       outline: none;
-    }
-
-    .course-material-preview-unavailable {
-      border: 1px solid rgba(23, 23, 23, 0.08);
-      background: rgba(247, 244, 238, 0.7);
-      color: rgba(23, 23, 23, 0.42);
     }
 
     body.material-preview-open {
