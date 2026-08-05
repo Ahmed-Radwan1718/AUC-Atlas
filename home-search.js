@@ -71,9 +71,28 @@
 
   const professorReviewCountCache = new Map();
   const professorReviewCountRequests = new Map();
+  const professorReviewCountCacheLifetime = 15000;
 
   function getReviewCountLabel(count) {
     return count + " " + (count === 1 ? "review" : "reviews");
+  }
+
+  function getCachedProfessorReviewCount(professorId) {
+    const cachedResult = professorReviewCountCache.get(professorId);
+
+    if (!cachedResult) {
+      return null;
+    }
+
+    if (
+      Date.now() - cachedResult.fetchedAt >
+      professorReviewCountCacheLifetime
+    ) {
+      professorReviewCountCache.delete(professorId);
+      return null;
+    }
+
+    return cachedResult.reviewCount;
   }
 
   function getProfessorMeta(result, reviewCount) {
@@ -83,14 +102,16 @@
 
     return [
       result.department,
-      result.courses,
       reviewLabel
     ].filter(Boolean).join(" · ");
   }
 
   function loadProfessorReviewCount(professorId) {
-    if (professorReviewCountCache.has(professorId)) {
-      return Promise.resolve(professorReviewCountCache.get(professorId));
+    const cachedReviewCount =
+      getCachedProfessorReviewCount(professorId);
+
+    if (Number.isInteger(cachedReviewCount)) {
+      return Promise.resolve(cachedReviewCount);
     }
 
     if (professorReviewCountRequests.has(professorId)) {
@@ -117,7 +138,11 @@
     }).then(function (data) {
       const reviewCount = Number(data.reviewCount || 0);
 
-      professorReviewCountCache.set(professorId, reviewCount);
+      professorReviewCountCache.set(professorId, {
+        reviewCount,
+        fetchedAt: Date.now()
+      });
+
       return reviewCount;
     }).catch(function () {
       return null;
@@ -136,8 +161,10 @@
 
     return professors.map(function (professor) {
       const professorId = professor.id || "";
-      const department = professor.displayDepartment || professor.department || "AUC";
-      const courses = professor.course || "Courses coming soon";
+      const department =
+        professor.displayDepartment ||
+        professor.department ||
+        "AUC";
       const score = getMatchScore(query, professor.name, [
         professor.name,
         professor.id,
@@ -152,15 +179,16 @@
         title: professor.name,
         professorId,
         department,
-        courses,
         meta: "",
-        href: "professors.html?id=" + encodeURIComponent(professorId),
+        href:
+          "professors.html?id=" +
+          encodeURIComponent(professorId),
         score
       };
 
       result.meta = getProfessorMeta(
         result,
-        professorReviewCountCache.get(professorId)
+        getCachedProfessorReviewCount(professorId)
       );
 
       return result;
@@ -253,7 +281,6 @@
         meta.textContent = reviewCount === null
           ? [
               result.department,
-              result.courses,
               "Reviews unavailable"
             ].filter(Boolean).join(" · ")
           : getProfessorMeta(result, reviewCount);
