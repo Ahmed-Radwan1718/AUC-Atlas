@@ -2,6 +2,11 @@ const admin = require("../_lib/firebaseAdmin");
 
 const { getSiteSessionUser } = require("../_lib/securityHelpers");
 
+const REVIEW_MAX_PER_PROFESSOR = 5;
+const REVIEW_SUBMISSION_WINDOW_MS =
+  60 * 60 * 1000;
+const REVIEW_MAX_SUBMISSIONS_PER_WINDOW = 5;
+
 const allowedValues = {
   recommendation: ["Yes", "Depends", "No"],
   attendancePolicy: ["Required", "Sometimes checked", "Not important", "Not sure"],
@@ -49,6 +54,207 @@ function getTimestampMillis(value) {
 
   const parsedDate = new Date(value);
   return Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
+}
+
+function createReviewRateLimitError(
+  retryAfterSeconds
+) {
+  const safeRetryAfterSeconds = Math.max(
+    1,
+    Math.ceil(
+      Number(retryAfterSeconds) || 1
+    )
+  );
+  const retryAfterMinutes = Math.max(
+    1,
+    Math.ceil(
+      safeRetryAfterSeconds / 60
+    )
+  );
+  const error = createReviewError(
+    "You can submit up to " +
+      REVIEW_MAX_SUBMISSIONS_PER_WINDOW +
+      " new reviews per hour. Try again in " +
+      retryAfterMinutes +
+      (
+        retryAfterMinutes === 1
+          ? " minute."
+          : " minutes."
+      ),
+    429
+  );
+
+  error.retryAfterSeconds =
+    safeRetryAfterSeconds;
+
+  return error;
+}
+
+async function createReviewWithSubmissionLimits(
+  decodedUser,
+  reviewFields,
+  reviewData
+) {
+  const db = admin.firestore();
+  const reviewCollection =
+    db.collection("professorReviews");
+  const reviewRef =
+    reviewCollection.doc();
+  const hourlyLimitRef = db
+    .collection("users")
+    .doc(decodedUser.uid)
+    .collection("reviewSubmissionLimits")
+    .doc("hourly");
+  const currentAuthorQuery =
+    reviewCollection
+      .where(
+        "professorId",
+        "==",
+        reviewFields.professorId
+      )
+      .where(
+        "authorUid",
+        "==",
+        decodedUser.uid
+      )
+      .limit(
+        REVIEW_MAX_PER_PROFESSOR
+      );
+  const legacyAuthorQuery =
+    reviewCollection
+      .where(
+        "professorId",
+        "==",
+        reviewFields.professorId
+      )
+      .where(
+        "authorUserId",
+        "==",
+        decodedUser.uid
+      )
+      .limit(
+        REVIEW_MAX_PER_PROFESSOR
+      );
+  const nowMs = Date.now();
+
+  await db.runTransaction(
+    async function (transaction) {
+      const hourlyLimitDoc =
+        await transaction.get(
+          hourlyLimitRef
+        );
+      const currentAuthorSnapshot =
+        await transaction.get(
+          currentAuthorQuery
+        );
+      const legacyAuthorSnapshot =
+        await transaction.get(
+          legacyAuthorQuery
+        );
+      const existingReviewIds =
+        new Set();
+
+      currentAuthorSnapshot.forEach(
+        function (doc) {
+          existingReviewIds.add(doc.id);
+        }
+      );
+
+      legacyAuthorSnapshot.forEach(
+        function (doc) {
+          existingReviewIds.add(doc.id);
+        }
+      );
+
+      if (
+        existingReviewIds.size >=
+        REVIEW_MAX_PER_PROFESSOR
+      ) {
+        throw createReviewError(
+          "You can leave a maximum of " +
+            REVIEW_MAX_PER_PROFESSOR +
+            " reviews for each professor.",
+          409
+        );
+      }
+
+      const hourlyLimitData =
+        hourlyLimitDoc.exists
+          ? hourlyLimitDoc.data() || {}
+          : {};
+      const windowStartedAtMs =
+        getTimestampMillis(
+          hourlyLimitData.windowStartedAt
+        );
+      const windowEndsAtMs =
+        windowStartedAtMs +
+        REVIEW_SUBMISSION_WINDOW_MS;
+      const hasActiveWindow =
+        windowStartedAtMs > 0 &&
+        nowMs < windowEndsAtMs;
+      const submissionCount =
+        hasActiveWindow
+          ? Math.max(
+              0,
+              Number(
+                hourlyLimitData.count || 0
+              )
+            )
+          : 0;
+
+      if (
+        hasActiveWindow &&
+        submissionCount >=
+          REVIEW_MAX_SUBMISSIONS_PER_WINDOW
+      ) {
+        throw createReviewRateLimitError(
+          Math.ceil(
+            (
+              windowEndsAtMs -
+              nowMs
+            ) / 1000
+          )
+        );
+      }
+
+      const activeWindowStartedAtMs =
+        hasActiveWindow
+          ? windowStartedAtMs
+          : nowMs;
+
+      transaction.set(
+        hourlyLimitRef,
+        {
+          count: submissionCount + 1,
+          windowStartedAt:
+            admin.firestore.Timestamp
+              .fromDate(
+                new Date(
+                  activeWindowStartedAtMs
+                )
+              ),
+          lastSubmissionAt:
+            admin.firestore.FieldValue
+              .serverTimestamp(),
+          expiresAt:
+            admin.firestore.Timestamp
+              .fromDate(
+                new Date(
+                  activeWindowStartedAtMs +
+                    REVIEW_SUBMISSION_WINDOW_MS
+                )
+              )
+        }
+      );
+
+      transaction.set(
+        reviewRef,
+        reviewData
+      );
+    }
+  );
+
+  return reviewRef;
 }
 
 function serializeReview(doc) {
@@ -403,7 +609,12 @@ module.exports = async function handler(req, res) {
       createdAtIso
     });
 
-    const reviewRef = await admin.firestore().collection("professorReviews").add(reviewData);
+    const reviewRef =
+      await createReviewWithSubmissionLimits(
+        decodedUser,
+        reviewFields,
+        reviewData
+      );
     const createdReviewDoc = await reviewRef.get();
     const reviews = await getProfessorReviews(reviewFields.professorId);
 
@@ -413,6 +624,13 @@ module.exports = async function handler(req, res) {
       reviews
     });
   } catch (error) {
+    if (error.retryAfterSeconds) {
+      res.setHeader(
+        "Retry-After",
+        String(error.retryAfterSeconds)
+      );
+    }
+
     return res.status(error.statusCode || 500).json({
       error: error.message || "Could not save review."
     });
