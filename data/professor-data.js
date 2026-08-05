@@ -238,6 +238,10 @@
       cursor: pointer;
       display: flex;
       align-items: center;
+      transition:
+        background 0.22s ease,
+        color 0.22s ease,
+        transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .rating-filter-option {
@@ -263,6 +267,28 @@
     .filter-content label:has(input:checked) {
       background: rgba(192, 154, 92, 0.12);
       color: #171717;
+    }
+
+    .filter-content label:active {
+      transform: scale(0.97);
+    }
+
+    .filter-content label:has(input:checked) {
+      animation: professorFilterOptionSelected 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes professorFilterOptionSelected {
+      0% {
+        transform: scale(1);
+      }
+
+      45% {
+        transform: scale(0.97);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
 
     .professors-search-box {
@@ -294,6 +320,31 @@
       text-decoration: none;
       cursor: pointer;
       transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .professors-grid.is-filtering .professor-card,
+    .professors-grid.is-filtering .professors-empty {
+      animation: professorFilterResultIn 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes professorFilterResultIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .filter-content label:has(input:checked),
+      .professors-grid.is-filtering .professor-card,
+      .professors-grid.is-filtering .professors-empty {
+        animation: none;
+      }
     }
 
     .professor-card:hover,
@@ -2553,7 +2604,9 @@
     `;
   }
 
-  function renderProfessors() {
+  let professorFilterAnimationTimer = 0;
+
+  function renderProfessors(animateResults) {
     const grid = document.getElementById("professors-grid");
     const browser = document.querySelector(".professors-browser");
     const currentProfessorId = getCurrentProfessorId();
@@ -2608,6 +2661,17 @@
     if (!visibleProfessors.length) {
       grid.innerHTML = '<p class="professors-empty">No professors match those filters.</p>';
     }
+
+    if (animateResults) {
+      window.clearTimeout(professorFilterAnimationTimer);
+      grid.classList.remove("is-filtering");
+      void grid.offsetWidth;
+      grid.classList.add("is-filtering");
+
+      professorFilterAnimationTimer = window.setTimeout(function () {
+        grid.classList.remove("is-filtering");
+      }, 520);
+    }
   }
 
   function setupProfessorFilters() {
@@ -2620,16 +2684,20 @@
     });
 
     document.querySelectorAll("#professor-filters input").forEach(function (input) {
-      input.addEventListener("change", renderProfessors);
+      input.addEventListener("change", function () {
+        renderProfessors(true);
+      });
     });
 
     const searchInput = document.getElementById("professor-search-input");
 
     if (searchInput) {
-      searchInput.addEventListener("input", renderProfessors);
+      searchInput.addEventListener("input", function () {
+        renderProfessors(false);
+      });
     }
 
-    renderProfessors();
+    renderProfessors(false);
   }
 
   if (document.readyState === "loading") {
