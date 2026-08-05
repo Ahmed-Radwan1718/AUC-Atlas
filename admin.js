@@ -392,6 +392,23 @@
   function switchPanel(panelName) {
     state.activePanel = panelName;
 
+    navButtons.forEach(function (button) {
+      button.classList.toggle(
+        "active",
+        button.dataset.adminPanel ===
+          panelName
+      );
+    });
+
+    panels.forEach(function (panel) {
+      panel.classList.toggle(
+        "active",
+        panel.id ===
+          "admin-panel-" + panelName
+      );
+    });
+  }
+
   authForm.addEventListener(
     "submit",
     async function (event) {
@@ -522,15 +539,6 @@
       }
     }
   );
-
-  navButtons.forEach(function (button) {
-      button.classList.toggle("active", button.dataset.adminPanel === panelName);
-    });
-
-    panels.forEach(function (panel) {
-      panel.classList.toggle("active", panel.id === "admin-panel-" + panelName);
-    });
-  }
 
   function renderStats() {
     const stats = state.dashboard.stats || {};
