@@ -3,7 +3,10 @@ const { authenticator } = require("otplib");
 
 const {
   getLoginChallenge,
+  consumeLoginChallenge,
   clearLoginChallenge,
+  consumeAuthenticatorAttempt,
+  clearAuthenticatorAttempts,
   createSiteSessionFromIdToken,
   createSiteSessionForUid,
   getAuthenticatorSecret
@@ -37,19 +40,41 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: "Authenticator app is not enabled for this account." });
     }
 
+    await consumeAuthenticatorAttempt(
+      challenge.uid,
+      "login"
+    );
+
     authenticator.options = { window: 1 };
 
     if (!authenticator.check(code, secret)) {
-      return res.status(401).json({ error: "Invalid authenticator code." });
+      return res.status(401).json({
+        error: "Invalid authenticator code."
+      });
     }
+
+    await consumeLoginChallenge(challenge);
+
+    await clearAuthenticatorAttempts(
+      challenge.uid,
+      "login"
+    );
 
     if (challenge.idToken) {
-      await createSiteSessionFromIdToken(challenge.idToken, res, req);
+      await createSiteSessionFromIdToken(
+        challenge.idToken,
+        res,
+        req
+      );
     } else {
-      await createSiteSessionForUid(challenge.uid, res, req);
+      await createSiteSessionForUid(
+        challenge.uid,
+        res,
+        req
+      );
     }
 
-    clearLoginChallenge(req, res).catch(function () {});
+    await clearLoginChallenge(req, res);
 
     return res.status(200).json({
       success: true,
@@ -64,8 +89,19 @@ module.exports = async function handler(req, res) {
       }
     });
   } catch (error) {
-    return res.status(error.statusCode || 500).json({
-      error: error.message || "Could not verify authenticator code."
-    });
+    if (error.retryAfterSeconds) {
+      res.setHeader(
+        "Retry-After",
+        String(error.retryAfterSeconds)
+      );
+    }
+
+    return res
+      .status(error.statusCode || 500)
+      .json({
+        error:
+          error.message ||
+          "Could not verify authenticator code."
+      });
   }
 };
