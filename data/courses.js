@@ -1277,6 +1277,20 @@
           ? "FILE"
           : extension.toUpperCase()
       );
+      const fileIcon = extension === "pdf"
+        ? `
+          <img
+            class="course-material-file-icon-image"
+            src="pdf.png"
+            alt=""
+            aria-hidden="true"
+          >
+        `
+        : `
+          <span class="course-material-file-icon" aria-hidden="true">
+            <strong>${extensionLabel}</strong>
+          </span>
+        `;
 
       const previewDataAttributes = [
         'data-download-url="' + safeDownloadUrl + '"',
@@ -1294,9 +1308,7 @@
             ${previewDataAttributes}
             aria-label="Preview ${fileName}"
           >
-            <span class="course-material-file-icon" aria-hidden="true">
-              <strong>${extensionLabel}</strong>
-            </span>
+            ${fileIcon}
 
             <span class="course-material-file-copy">
               <strong>${fileName}</strong>
@@ -1308,9 +1320,7 @@
         `
         : `
           <div class="course-material-preview-tile is-disabled">
-            <span class="course-material-file-icon" aria-hidden="true">
-              <strong>${extensionLabel}</strong>
-            </span>
+            ${fileIcon}
 
             <span class="course-material-file-copy">
               <strong>${fileName}</strong>
@@ -1321,20 +1331,6 @@
           </div>
         `;
 
-      const previewAction = previewable
-        ? `
-          <button
-            class="course-material-preview-button course-material-preview-trigger"
-            type="button"
-            ${previewDataAttributes}
-          >Preview file</button>
-        `
-        : `
-          <span class="course-material-preview-unavailable">
-            Preview unavailable
-          </span>
-        `;
-
       return `
         <article class="course-material-card">
           <div class="course-material-card-top">
@@ -1342,13 +1338,7 @@
               ${avatar}
 
               <div class="course-material-author-copy">
-                <div class="course-material-author-name-row">
-                  <strong>${uploaderName}</strong>
-                  <span
-                    class="course-material-verified-badge"
-                    title="Uploaded by a verified AUC account"
-                  >Verified AUC</span>
-                </div>
+                <strong>${uploaderName}</strong>
 
                 <small class="course-material-upload-date">
                   ${escapeMaterialText(uploadDate)}
@@ -1380,8 +1370,6 @@
           </div>
 
           <div class="course-material-actions">
-            ${previewAction}
-
             <a
               class="course-material-download-button"
               href="${safeDownloadUrl}"
@@ -1806,10 +1794,7 @@
           const formData = new FormData();
 
           formData.append("file", file);
-          formData.append(
-            "fileName",
-            buildMaterialFileName(uploadTitle, file.name)
-          );
+          formData.append("fileName", file.name);
           formData.append("publicKey", auth.publicKey);
           formData.append("token", auth.token);
           formData.append("signature", auth.signature);
@@ -1833,7 +1818,9 @@
               " | " +
               uploaderPhotoURL +
               " | " +
-              uploaderUid
+              uploaderUid +
+              " | " +
+              file.name.replace(/\s*\|\s*/g, " ")
           );
           formData.append(
             "responseFields",
@@ -1871,9 +1858,7 @@
               semester: semester,
               materialType: materialType,
               title: uploadTitle,
-              fileName:
-                uploadedFile.name ||
-                buildMaterialFileName(uploadTitle, file.name),
+              fileName: file.name,
               fileUrl: uploadedFile.url || "",
               filePath: uploadedFile.filePath || "",
               fileId: uploadedFile.fileId || "",
