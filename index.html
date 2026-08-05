@@ -169,10 +169,25 @@
       background: rgba(255, 253, 248, 0.98);
       box-shadow: 0 30px 80px rgba(42, 32, 20, 0.18);
       text-align: left;
+      transform-origin: top center;
+      animation: atlas-search-panel-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+      will-change: opacity, transform;
     }
 
     .atlas-search-results[hidden] {
       display: none;
+    }
+
+    @keyframes atlas-search-panel-in {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .atlas-search-result-section {
@@ -210,6 +225,43 @@
       gap: 14px;
       align-items: center;
       transition: background 0.16s ease, transform 0.16s ease;
+      animation: atlas-search-result-in 300ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
+    .atlas-search-result:nth-of-type(1) {
+      animation-delay: 20ms;
+    }
+
+    .atlas-search-result:nth-of-type(2) {
+      animation-delay: 45ms;
+    }
+
+    .atlas-search-result:nth-of-type(3) {
+      animation-delay: 70ms;
+    }
+
+    .atlas-search-result:nth-of-type(4) {
+      animation-delay: 95ms;
+    }
+
+    .atlas-search-result:nth-of-type(5) {
+      animation-delay: 120ms;
+    }
+
+    .atlas-search-result:nth-of-type(n + 6) {
+      animation-delay: 145ms;
+    }
+
+    @keyframes atlas-search-result-in {
+      from {
+        opacity: 0;
+        transform: translateY(7px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .atlas-search-result:hover,
@@ -263,8 +315,59 @@
       line-height: 1.5;
     }
 
+    .atlas-search-status.is-loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .atlas-search-status.is-loading::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      flex: 0 0 auto;
+      border: 2px solid rgba(192, 154, 92, 0.22);
+      border-top-color: rgba(192, 154, 92, 0.96);
+      border-radius: 50%;
+      animation: atlas-search-spinner 700ms linear infinite;
+    }
+
+    .atlas-search.is-searching {
+      animation: atlas-search-working 1.35s ease-in-out infinite;
+    }
+
     .atlas-search-status[hidden] {
       display: none;
+    }
+
+    @keyframes atlas-search-spinner {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes atlas-search-working {
+      0%,
+      100% {
+        box-shadow:
+          0 0 0 4px rgba(192, 154, 92, 0.1),
+          0 24px 70px rgba(42, 32, 20, 0.12);
+      }
+
+      50% {
+        box-shadow:
+          0 0 0 7px rgba(192, 154, 92, 0.16),
+          0 28px 78px rgba(42, 32, 20, 0.15);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .atlas-search-results,
+      .atlas-search-result,
+      .atlas-search.is-searching,
+      .atlas-search-status.is-loading::before {
+        animation: none;
+      }
     }
 
     .home-search-tags {
