@@ -1466,13 +1466,28 @@
         text-align: left;
       }
 
+      .support-donation-modal {
+        padding: 12px;
+      }
+
       .support-donation-card {
-        padding: 24px 18px 20px;
+        max-height: calc(100dvh - 24px);
+        padding: 24px 18px max(20px, env(safe-area-inset-bottom));
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
         border-radius: 24px;
       }
 
+      .support-donation-close {
+        top: 12px;
+        right: 12px;
+        width: 44px;
+        height: 44px;
+      }
+
       .support-donation-heading {
-        padding-right: 42px;
+        padding-right: 50px;
         grid-template-columns: 1fr;
         gap: 14px;
       }
