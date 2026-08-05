@@ -28,7 +28,7 @@
     }
 
     .gpa-inner {
-      width: min(1120px, calc(100% - 32px));
+      width: min(1680px, calc(100% - 32px));
       margin: 0 auto;
     }
 
@@ -38,21 +38,10 @@
       grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
       gap: 28px;
       align-items: end;
-      animation: gpaFadeUp 0.56s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    .gpa-kicker {
-      margin-bottom: 16px;
-      color: rgba(192, 154, 92, 0.84);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      line-height: 1.4;
-      text-transform: uppercase;
     }
 
     .gpa-header h1 {
-      max-width: 650px;
+      max-width: 640px;
       color: #171717;
       font-size: clamp(34px, 4.8vw, 58px);
       font-weight: 700;
@@ -73,7 +62,11 @@
       align-items: start;
     }
 
-    .gpa-panel,
+    .gpa-panel {
+      min-width: 0;
+      background: transparent;
+    }
+
     .gpa-summary {
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 28px;
@@ -81,29 +74,34 @@
       box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
     }
 
-    .gpa-panel {
-      padding: 18px;
-      animation: gpaFadeUp 0.58s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
-    }
-
-    .gpa-summary {
-      animation: gpaFadeUp 0.58s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
-    }
-
     .gpa-row,
     .gpa-table-head {
       display: grid;
-      grid-template-columns: minmax(130px, 1fr) 110px 120px 42px;
-      gap: 10px;
+      grid-template-columns: minmax(160px, 1fr) 92px 120px 36px;
+      gap: 12px;
       align-items: center;
     }
 
     .gpa-row {
       position: relative;
       z-index: 1;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
       transform-origin: center top;
-      transition: height 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease, transform 0.28s ease;
+      transition:
+        height 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.28s ease,
+        transform 0.28s ease;
       will-change: height, opacity, transform;
+    }
+
+    .gpa-row:first-child {
+      padding-top: 0;
+    }
+
+    .gpa-row:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
     }
 
     .gpa-row:has(.grade-dropdown.open) {
@@ -113,8 +111,12 @@
     .gpa-row > .course-name,
     .gpa-row > .course-credits,
     .gpa-row > .grade-dropdown {
+      min-width: 0;
       transform-origin: right center;
-      transition: opacity 0.26s ease, transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), filter 0.26s ease;
+      transition:
+        opacity 0.26s ease,
+        transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.26s ease;
     }
 
     .gpa-row.is-entering {
@@ -131,38 +133,46 @@
     }
 
     .gpa-table-head {
-      margin-bottom: 10px;
-      padding: 0;
-      color: rgba(23, 23, 23, 0.54);
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+      padding: 0 4px 10px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
     .gpa-table-head span:nth-child(2),
     .gpa-table-head span:nth-child(3) {
-      padding-left: 14px;
       text-align: left;
     }
 
-    .gpa-semesters,
-    .semester-courses {
+    .gpa-semesters {
       display: grid;
-      gap: 10px;
+      gap: 22px;
     }
 
-    .gpa-semesters {
-      gap: 16px;
+    .semester-courses {
+      display: block;
     }
 
     .gpa-semester {
-      padding: 14px;
-      border: 1px solid rgba(23, 23, 23, 0.08);
-      border-radius: 22px;
-      background: rgba(247, 244, 238, 0.42);
-      transition: height 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease, transform 0.28s ease;
+      position: relative;
+      padding: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      transition:
+        height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.28s ease,
+        transform 0.28s ease;
       will-change: height, opacity, transform;
+    }
+
+    .gpa-semester:has(.grade-dropdown.open) {
+      z-index: 20;
     }
 
     .gpa-semester.is-entering,
@@ -173,10 +183,10 @@
     }
 
     .gpa-semester-header {
-      margin-bottom: 12px;
+      margin-bottom: 18px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
+      gap: 16px;
       align-items: center;
     }
 
@@ -184,97 +194,128 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 8px;
     }
 
     .remove-semester {
-      flex: 0 0 42px;
+      flex: 0 0 36px;
     }
 
     .semester-course-footer {
-      margin-top: 12px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
     }
 
     .gpa-action.semester-add-course {
-      position: relative;
-      width: 42px;
-      height: 42px;
-      min-height: 42px;
-      padding: 0;
-      border-color: rgba(192, 154, 92, 0.42);
-      background: rgba(255, 255, 255, 0.72);
-      color: rgba(192, 154, 92, 0.96);
-      font-size: 0;
-      font-weight: 300;
+      width: auto;
+      height: 38px;
+      min-height: 38px;
+      padding: 0 14px;
+      border-color: rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.74);
+      color: rgba(23, 23, 23, 0.68);
+      font-size: 18px;
+      font-weight: 500;
       letter-spacing: 0;
       line-height: 1;
       text-transform: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 12px 26px rgba(42, 32, 20, 0.08);
+      gap: 7px;
+      box-shadow: none;
     }
 
-    .semester-add-course::before,
-    .semester-add-course::after {
-      content: "";
-      position: absolute;
-      width: 28px;
-      height: 5px;
-      border-radius: 999px;
-      background: currentColor;
+    .semester-add-course::before {
+      content: none;
     }
 
     .semester-add-course::after {
-      transform: rotate(90deg);
+      content: "Add course";
+      position: static;
+      width: auto;
+      height: auto;
+      border-radius: 0;
+      background: transparent;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transform: none;
     }
 
     .gpa-action.semester-add-course:hover {
-      border-color: rgba(192, 154, 92, 0.68);
-      background: rgba(192, 154, 92, 0.84);
-      color: white;
+      border-color: rgba(192, 154, 92, 0.34);
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
     }
 
-    .semester-name,
+    .semester-name {
+      width: 100%;
+      min-height: 42px;
+      padding: 0 2px;
+      border: 0;
+      border-bottom: 1px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      color: #171717;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
     .gpa-row input,
     .prior-inputs input,
     .grade-toggle {
       width: 100%;
-      min-height: 46px;
+      min-height: 48px;
       padding: 0 14px;
-      border-radius: 999px;
       border: 1px solid rgba(23, 23, 23, 0.1);
-      background: rgba(247, 244, 238, 0.58);
+      border-radius: 14px;
+      background: rgba(247, 244, 238, 0.74);
       color: #171717;
       font: inherit;
       font-size: 14px;
       font-weight: 600;
       outline: none;
-      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
     }
 
-    .semester-name {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+    .course-credits {
+      text-align: center;
     }
 
-    .semester-name:hover,
+    .semester-name:hover {
+      border-bottom-color: rgba(23, 23, 23, 0.16);
+    }
+
     .gpa-row input:hover,
     .prior-inputs input:hover,
     .grade-toggle:hover {
       border-color: rgba(23, 23, 23, 0.18);
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.88);
     }
 
-    .semester-name:focus,
+    .semester-name:focus {
+      border-bottom-color: rgba(192, 154, 92, 0.84);
+    }
+
     .gpa-row input:focus,
     .prior-inputs input:focus,
     .grade-dropdown.open .grade-toggle {
       border-color: rgba(192, 154, 92, 0.58);
+      background: rgba(255, 255, 255, 0.96);
       box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
     }
 
@@ -314,10 +355,12 @@
       left: 0;
       right: 0;
       z-index: 30;
+      max-height: 280px;
       padding: 8px;
-      border-radius: 20px;
+      overflow-y: auto;
       border: 1px solid rgba(23, 23, 23, 0.1);
-      background: rgba(255, 255, 255, 0.96);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.98);
       box-shadow: 0 22px 55px rgba(42, 32, 20, 0.16);
       display: grid;
       gap: 4px;
@@ -351,46 +394,37 @@
     }
 
     .remove-course {
-      position: relative;
-      width: 42px;
-      height: 42px;
-      padding: 0;
+      width: 36px;
+      height: 36px;
+      padding: 0 0 2px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 999px;
-      background: rgba(247, 244, 238, 0.58);
-      color: #c45b4d;
-      font-family: inherit;
-      font-size: 0;
-      font-weight: 300;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.4);
+      font-family: Arial, sans-serif;
+      font-size: 22px;
+      font-weight: 400;
       line-height: 1;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.2s ease, transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      transition:
+        color 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
     }
 
     .remove-course::before,
     .remove-course::after {
-      content: "";
-      position: absolute;
-      width: 28px;
-      height: 5px;
-      border-radius: 999px;
-      background: currentColor;
-    }
-
-    .remove-course::before {
-      transform: rotate(45deg);
-    }
-
-    .remove-course::after {
-      transform: rotate(-45deg);
+      content: none;
     }
 
     .remove-course:hover {
-      border-color: rgba(23, 23, 23, 0.18);
-      background: rgba(255, 255, 255, 0.72);
+      border-color: rgba(196, 91, 77, 0.28);
+      background: rgba(196, 91, 77, 0.08);
       color: #ad4d42;
       transform: translateY(-1px);
     }
@@ -400,7 +434,7 @@
     }
 
     .remove-course:disabled {
-      opacity: 0.48;
+      opacity: 0.38;
       cursor: not-allowed;
     }
 
@@ -450,62 +484,71 @@
     .gpa-summary {
       position: sticky;
       top: 120px;
-      padding: 22px;
+      padding: 24px;
     }
 
     .summary-label {
-      color: rgba(192, 154, 92, 0.84);
-      font-size: 12px;
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 10px;
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
     .summary-gpa {
-      margin: 12px 0 18px;
+      margin: 14px 0 26px;
       color: #171717;
-      font-size: 58px;
+      font-size: clamp(52px, 5vw, 68px);
       font-weight: 700;
-      line-height: 1;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
       transition: color 0.35s ease, text-shadow 0.35s ease;
     }
 
     .summary-gpa.gpa-good {
       color: #2f8f5b;
-      text-shadow: 0 12px 30px rgba(47, 143, 91, 0.16);
+      text-shadow: 0 12px 30px rgba(47, 143, 91, 0.14);
     }
 
     .summary-gpa.gpa-mid {
       color: #c09a5c;
-      text-shadow: 0 12px 30px rgba(192, 154, 92, 0.18);
+      text-shadow: 0 12px 30px rgba(192, 154, 92, 0.16);
     }
 
     .summary-gpa.gpa-low {
       color: #c45b4d;
-      text-shadow: 0 12px 30px rgba(196, 91, 77, 0.16);
+      text-shadow: 0 12px 30px rgba(196, 91, 77, 0.14);
     }
 
     .summary-items {
       display: grid;
-      gap: 12px;
     }
 
     .summary-item {
+      min-height: 48px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      padding-top: 12px;
       border-top: 1px solid rgba(23, 23, 23, 0.08);
-      color: rgba(23, 23, 23, 0.64);
-      font-size: 13px;
-      font-weight: 400;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 500;
     }
 
     .summary-item strong {
       color: #171717;
-      font-size: 14px;
-      font-weight: 400;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .summary-item span {
+      padding: 7px 9px;
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.74);
+      color: rgba(23, 23, 23, 0.64);
+      font-size: 11px;
+      font-weight: 800;
     }
 
     .prior-box {
@@ -582,7 +625,7 @@
       }
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1040px) {
       .gpa-layout,
       .gpa-header {
         grid-template-columns: 1fr;
@@ -598,17 +641,65 @@
         padding-top: 96px;
       }
 
-      .gpa-row,
-      .gpa-table-head {
-        grid-template-columns: 1fr;
+      .gpa-inner {
+        width: min(100% - 24px, 1680px);
+      }
+
+      .gpa-header {
+        margin-bottom: 26px;
+      }
+
+      .gpa-semester,
+      .gpa-summary {
+        padding: 18px;
+        border-radius: 22px;
+      }
+
+      .gpa-semester-header {
+        margin-bottom: 16px;
       }
 
       .gpa-table-head {
         display: none;
       }
 
+      .gpa-row {
+        grid-template-columns: minmax(0, 1fr) 110px 36px;
+        grid-template-areas:
+          "course course course"
+          "credits grade remove";
+        gap: 8px;
+        padding: 12px 0;
+      }
+
+      .course-name {
+        grid-area: course;
+      }
+
+      .course-credits {
+        grid-area: credits;
+      }
+
+      .grade-dropdown {
+        grid-area: grade;
+      }
+
+      .gpa-row > .remove-course {
+        grid-area: remove;
+      }
+
       .remove-course {
+        width: 36px;
+      }
+
+      .gpa-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .gpa-action {
         width: 100%;
+        padding: 0 12px;
       }
     }
   </style>
@@ -622,12 +713,11 @@
     <div class="gpa-inner">
       <section class="gpa-header">
         <div>
-          <p class="gpa-kicker">GPA calculator</p>
           <h1>Calculate your GPA.</h1>
         </div>
 
         <p>
-          Add your courses, credits, and expected grades to calculate your semester GPA and estimated cumulative GPA.
+          Add your courses, credits, and grades to calculate your overall GPA across multiple semesters.
         </p>
       </section>
 
