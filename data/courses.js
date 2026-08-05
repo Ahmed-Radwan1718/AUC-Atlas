@@ -1200,23 +1200,143 @@
   }
 
   function setupCourseUploadStart() {
-    const button = document.getElementById("course-upload-start");
-    const searchInput = document.getElementById("course-search-input");
+    const button = document.getElementById(
+      "course-upload-start"
+    );
+    const modal = document.getElementById(
+      "quick-material-upload-modal"
+    );
+    const form = document.getElementById(
+      "quick-material-upload-form"
+    );
+    const closeButton = document.getElementById(
+      "quick-material-upload-close"
+    );
 
-    if (!button || !searchInput) {
+    if (
+      !button ||
+      !modal ||
+      !form ||
+      modal.dataset.ready === "true"
+    ) {
       return;
     }
 
-    button.addEventListener("click", function () {
-      searchInput.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
+    modal.dataset.ready = "true";
+
+    populateQuickMaterialCourseSelect(form);
+    populateMaterialProfessorSelect(form);
+    setupMaterialChoiceMenus(form);
+    setupMaterialFilePicker(form);
+
+    setupMaterialUploadForm(null, {
+      form: form,
+      buttonLabel: "Upload material",
+      getCourse: function () {
+        const courseInput = getMaterialFormControl(
+          form,
+          "course",
+          "quick-material-course"
+        );
+
+        return courseInput
+          ? getCourseByCode(courseInput.value)
+          : null;
+      },
+      onSuccess: function () {
+        return loadRecentMaterials();
+      }
+    });
+
+    let lastTrigger = null;
+
+    function openQuickMaterialUpload() {
+      lastTrigger =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : button;
+
+      modal.hidden = false;
+      document.body.classList.add(
+        "quick-material-upload-open"
+      );
+      button.setAttribute("aria-expanded", "true");
+
+      setMaterialUploadStatus("", "", form);
+      setMaterialUploadProgress(
+        0,
+        "Uploading files",
+        false,
+        form
+      );
+
+      const courseInput = getMaterialFormControl(
+        form,
+        "course",
+        "quick-material-course"
+      );
+      const courseChoice = courseInput
+        ? courseInput.nextElementSibling
+        : null;
+      const courseChoiceButton =
+        courseChoice &&
+        courseChoice.classList.contains(
+          "material-choice"
+        )
+          ? courseChoice.querySelector(
+              ".material-choice-button"
+            )
+          : null;
 
       window.setTimeout(function () {
-        searchInput.focus();
-      }, 350);
-    });
+        if (courseChoiceButton) {
+          courseChoiceButton.focus();
+        } else if (closeButton) {
+          closeButton.focus();
+        }
+      }, 0);
+    }
+
+    function closeQuickMaterialUpload() {
+      modal.hidden = true;
+      document.body.classList.remove(
+        "quick-material-upload-open"
+      );
+      button.setAttribute("aria-expanded", "false");
+      closeMaterialChoiceMenus();
+
+      if (lastTrigger) {
+        lastTrigger.focus();
+      }
+    }
+
+    button.addEventListener(
+      "click",
+      openQuickMaterialUpload
+    );
+
+    modal
+      .querySelectorAll(
+        "[data-close-quick-material-upload]"
+      )
+      .forEach(function (closeTrigger) {
+        closeTrigger.addEventListener(
+          "click",
+          closeQuickMaterialUpload
+        );
+      });
+
+    document.addEventListener(
+      "keydown",
+      function (event) {
+        if (
+          event.key === "Escape" &&
+          !modal.hidden
+        ) {
+          closeQuickMaterialUpload();
+        }
+      }
+    );
   }
 
   function courseMatches(course) {
@@ -1527,7 +1647,13 @@
       const choice = document.createElement("div");
       const button = document.createElement("button");
       const menu = document.createElement("div");
-      const isProfessorSelect = select.id === "material-professor";
+      const searchPlaceholder = String(
+        select.dataset.materialSearchPlaceholder || ""
+      ).trim();
+      const isSearchableSelect =
+        Boolean(searchPlaceholder) ||
+        select.id === "material-professor" ||
+        select.dataset.materialRole === "professor";
       let searchInput = null;
 
       choice.className = "material-choice";
@@ -1563,14 +1689,20 @@
         }
       }
 
-      if (isProfessorSelect) {
+      if (isSearchableSelect) {
         const searchWrap = document.createElement("div");
+        const resolvedSearchPlaceholder =
+          searchPlaceholder || "Search professors";
 
         searchInput = document.createElement("input");
         searchInput.type = "search";
         searchInput.className = "material-choice-search";
-        searchInput.placeholder = "Search professors";
-        searchInput.setAttribute("aria-label", "Search professors");
+        searchInput.placeholder =
+          resolvedSearchPlaceholder;
+        searchInput.setAttribute(
+          "aria-label",
+          resolvedSearchPlaceholder
+        );
         searchInput.setAttribute("autocomplete", "new-password");
         searchInput.setAttribute("autocorrect", "off");
         searchInput.setAttribute("autocapitalize", "none");
@@ -1663,7 +1795,9 @@
   }
 
   function setMaterialFileSelection(form, files) {
-    const selection = form.querySelector("#material-file-selection");
+    const selection = form.querySelector(
+      '[data-material-role="file-selection"], #material-file-selection'
+    );
     const selectedFiles = Array.from(files || []);
 
     if (!selection) {
@@ -1683,16 +1817,24 @@
   }
 
   function setupMaterialFilePicker(form) {
-    const fileInput = form.querySelector("#material-file");
+    const fileInput = form.querySelector(
+      '[data-material-role="file"], #material-file'
+    );
 
-    if (!fileInput || fileInput.dataset.fileReady === "true") {
+    if (
+      !fileInput ||
+      fileInput.dataset.fileReady === "true"
+    ) {
       return;
     }
 
     fileInput.dataset.fileReady = "true";
 
     fileInput.addEventListener("change", function () {
-      setMaterialFileSelection(form, fileInput.files);
+      setMaterialFileSelection(
+        form,
+        fileInput.files
+      );
     });
   }
 
@@ -2288,25 +2430,77 @@
     return slugifyMaterialValue(title) + extension;
   }
 
-  function setMaterialUploadStatus(message, type) {
-    const status = document.getElementById("material-upload-status");
+  function getMaterialFormControl(
+    form,
+    role,
+    fallbackId
+  ) {
+    const selectors = [];
+
+    if (role) {
+      selectors.push(
+        '[data-material-role="' + role + '"]'
+      );
+    }
+
+    if (fallbackId) {
+      selectors.push("#" + fallbackId);
+    }
+
+    if (form && selectors.length) {
+      const control = form.querySelector(
+        selectors.join(", ")
+      );
+
+      if (control) {
+        return control;
+      }
+    }
+
+    return fallbackId
+      ? document.getElementById(fallbackId)
+      : null;
+  }
+
+  function setMaterialUploadStatus(
+    message,
+    type,
+    form
+  ) {
+    const status = getMaterialFormControl(
+      form,
+      "status",
+      "material-upload-status"
+    );
 
     if (!status) {
       return;
     }
 
-    status.className = "material-upload-status" + (type ? " " + type : "");
+    status.className =
+      "material-upload-status" +
+      (type ? " " + type : "");
     status.textContent = message;
   }
 
   function getMaterialProfessorOptions() {
-    const source = Array.isArray(window.aucAtlasProfessors) ? window.aucAtlasProfessors : [];
+    const source = Array.isArray(
+      window.aucAtlasProfessors
+    )
+      ? window.aucAtlasProfessors
+      : [];
     const seen = {};
     const names = [];
 
     source.forEach(function (professor) {
-      const name = String(professor && professor.name ? professor.name : "").trim();
-      const key = name.toLowerCase().replace(/\s+/g, " ");
+      const name = String(
+        professor && professor.name
+          ? professor.name
+          : ""
+      ).trim();
+      const key = name
+        .toLowerCase()
+        .replace(/\s+/g, " ");
 
       if (name && !seen[key]) {
         seen[key] = true;
@@ -2314,21 +2508,35 @@
       }
     });
 
-    return names.sort(function (firstName, secondName) {
-      return firstName.localeCompare(secondName);
-    });
+    return names.sort(
+      function (firstName, secondName) {
+        return firstName.localeCompare(
+          secondName
+        );
+      }
+    );
   }
 
   function populateMaterialProfessorSelect(form) {
-    const select = form.querySelector("#material-professor");
+    const select = getMaterialFormControl(
+      form,
+      "professor",
+      "material-professor"
+    );
 
-    if (!select || select.dataset.professorOptionsReady === "true") {
+    if (
+      !select ||
+      select.dataset.professorOptionsReady ===
+        "true"
+    ) {
       return;
     }
 
     const currentValue = select.value;
-    const professorNames = getMaterialProfessorOptions();
-    const placeholder = document.createElement("option");
+    const professorNames =
+      getMaterialProfessorOptions();
+    const placeholder =
+      document.createElement("option");
 
     select.dataset.professorOptionsReady = "true";
     select.innerHTML = "";
@@ -2337,27 +2545,94 @@
     select.appendChild(placeholder);
 
     professorNames.forEach(function (name) {
-      const option = document.createElement("option");
+      const option =
+        document.createElement("option");
 
       option.value = name;
       option.textContent = name;
       select.appendChild(option);
     });
 
-    if (currentValue && professorNames.includes(currentValue)) {
+    if (
+      currentValue &&
+      professorNames.includes(currentValue)
+    ) {
       select.value = currentValue;
     }
   }
 
-  function setMaterialUploadProgress(percent, label, isVisible) {
-    const progress = document.getElementById("material-upload-progress");
-    const progressTrack = document.getElementById("material-upload-progress-track");
-    const progressFill = document.getElementById("material-upload-progress-fill");
-    const progressValue = document.getElementById("material-upload-progress-value");
-    const progressLabel = document.getElementById("material-upload-progress-label");
+  function populateQuickMaterialCourseSelect(form) {
+    const select = getMaterialFormControl(
+      form,
+      "course",
+      "quick-material-course"
+    );
+
+    if (
+      !select ||
+      select.dataset.courseOptionsReady ===
+        "true"
+    ) {
+      return;
+    }
+
+    const placeholder =
+      document.createElement("option");
+
+    select.dataset.courseOptionsReady = "true";
+    select.innerHTML = "";
+    placeholder.value = "";
+    placeholder.textContent = "Choose course";
+    select.appendChild(placeholder);
+
+    courses.forEach(function (course) {
+      const option =
+        document.createElement("option");
+
+      option.value = course.code;
+      option.textContent =
+        course.code + " — " + course.title;
+      select.appendChild(option);
+    });
+  }
+
+  function setMaterialUploadProgress(
+    percent,
+    label,
+    isVisible,
+    form
+  ) {
+    const progress = getMaterialFormControl(
+      form,
+      "progress",
+      "material-upload-progress"
+    );
+    const progressTrack = getMaterialFormControl(
+      form,
+      "progress-track",
+      "material-upload-progress-track"
+    );
+    const progressFill = getMaterialFormControl(
+      form,
+      "progress-fill",
+      "material-upload-progress-fill"
+    );
+    const progressValue = getMaterialFormControl(
+      form,
+      "progress-value",
+      "material-upload-progress-value"
+    );
+    const progressLabel = getMaterialFormControl(
+      form,
+      "progress-label",
+      "material-upload-progress-label"
+    );
     const safePercent = Math.max(
       0,
-      Math.min(100, Math.round(Number(percent) || 0))
+      Math.min(
+        100,
+        Math.round(Number(percent) || 0)
+      )
     );
 
     if (progress) {
@@ -2365,15 +2640,20 @@
     }
 
     if (progressTrack) {
-      progressTrack.setAttribute("aria-valuenow", String(safePercent));
+      progressTrack.setAttribute(
+        "aria-valuenow",
+        String(safePercent)
+      );
     }
 
     if (progressFill) {
-      progressFill.style.width = safePercent + "%";
+      progressFill.style.width =
+        safePercent + "%";
     }
 
     if (progressValue) {
-      progressValue.textContent = safePercent + "%";
+      progressValue.textContent =
+        safePercent + "%";
     }
 
     if (progressLabel && label) {
@@ -2431,13 +2711,36 @@
     });
   }
 
-  function setupMaterialUploadForm(course) {
-    const form = document.getElementById("material-upload-form");
-    const button = document.getElementById("material-upload-button");
+  function setupMaterialUploadForm(
+    course,
+    options
+  ) {
+    const settings = options || {};
+    const form =
+      settings.form ||
+      document.getElementById(
+        "material-upload-form"
+      );
+    const button = getMaterialFormControl(
+      form,
+      "submit",
+      "material-upload-button"
+    );
 
-    if (!form || form.dataset.ready === "true") {
+    if (
+      !form ||
+      form.dataset.ready === "true"
+    ) {
       return;
     }
+
+    const defaultButtonLabel =
+      settings.buttonLabel ||
+      (
+        button
+          ? button.textContent.trim()
+          : "Upload material"
+      );
 
     form.dataset.ready = "true";
     form.noValidate = true;
@@ -2445,259 +2748,439 @@
     setupMaterialChoiceMenus(form);
     setupMaterialFilePicker(form);
 
-    form.addEventListener("submit", async function (event) {
-      event.preventDefault();
+    form.addEventListener(
+      "submit",
+      async function (event) {
+        event.preventDefault();
 
-      const professorInput = document.getElementById("material-professor");
-      const materialTypeInput = document.getElementById("material-type");
-      const semesterInput = document.getElementById("material-semester");
-      const titleInput = document.getElementById("material-title");
-      const fileInput = document.getElementById("material-file");
-      const files = fileInput && fileInput.files
-        ? Array.from(fileInput.files)
-        : [];
-      const professor = professorInput ? professorInput.value.trim() : "";
-      const materialType = materialTypeInput
-        ? materialTypeInput.value.trim()
-        : "";
-      const semester = semesterInput ? semesterInput.value.trim() : "";
-      const title = titleInput ? titleInput.value.trim() : "";
-
-      if (
-        !professor ||
-        !materialType ||
-        !semester ||
-        !title ||
-        !files.length
-      ) {
-        setMaterialUploadStatus(
-          "Fill in the professor, material type, semester, title, and choose at least one file.",
-          "error"
-        );
-        return;
-      }
-
-      const oversizedFile = files.find(function (file) {
-        return file.size > 25 * 1024 * 1024;
-      });
-
-      if (oversizedFile) {
-        setMaterialUploadStatus(
-          oversizedFile.name + " is above the 25MB upload limit.",
-          "error"
-        );
-        return;
-      }
-
-      if (button) {
-        button.disabled = true;
-      }
-
-      const totalBytes = files.reduce(function (total, file) {
-        return total + file.size;
-      }, 0);
-
-      let uploadedCount = 0;
-      let completedBytes = 0;
-      let activeAuthorizationId = "";
-
-      setMaterialUploadProgress(0, "Preparing upload", true);
-
-      try {
-        for (let index = 0; index < files.length; index += 1) {
-          const file = files[index];
-          const originalTitle = file.name.replace(/\.[^.]+$/, "");
-          const uploadTitle = files.length > 1
-            ? title + " - " + originalTitle
-            : title;
-          const progressLabel =
-            files.length > 1
-              ? "Uploading file " + (index + 1) + " of " + files.length
-              : "Uploading file";
-
-          if (button) {
-            button.textContent =
-              files.length > 1
-                ? "Uploading " + (index + 1) + " of " + files.length + "..."
-                : "Uploading...";
-          }
-
-          setMaterialUploadStatus(progressLabel + "...", "");
-
-          const authResponse = await fetch("/api/imagekit-auth", {
-            method: "POST",
-            credentials: "same-origin",
-            cache: "no-store",
-            headers: {
-              "Accept": "application/json",
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              action: "authorize",
-              courseCode: course.code,
-              courseTitle: course.title || "",
-              professor: professor,
-              semester: semester,
-              materialType: materialType,
-              title: uploadTitle,
-              fileName: file.name,
-              fileSize: file.size
-            })
-          });
-          const auth = await authResponse.json().catch(
-            function () {
-              return {};
-            }
+        const activeCourse =
+          typeof settings.getCourse === "function"
+            ? settings.getCourse()
+            : course;
+        const professorInput =
+          getMaterialFormControl(
+            form,
+            "professor",
+            "material-professor"
           );
-
-          if (!authResponse.ok) {
-            throw new Error(
-              auth.error ||
-                "Could not prepare the next file upload."
-            );
-          }
-
-          const uploadPayload =
-            auth && auth.uploadPayload &&
-            typeof auth.uploadPayload === "object"
-              ? auth.uploadPayload
-              : {};
-
-          activeAuthorizationId = String(
-            auth.authorizationId || ""
-          ).trim();
-
-          if (
-            !auth.token ||
-            !activeAuthorizationId ||
-            !uploadPayload.fileName
-          ) {
-            throw new Error(
-              "The secure upload authorization is incomplete."
-            );
-          }
-
-          const formData = new FormData();
-
-          formData.append("file", file);
-          formData.append("token", auth.token);
-
-          Object.keys(uploadPayload).forEach(function (key) {
-            formData.append(
-              key,
-              String(uploadPayload[key])
-            );
-          });
-
-          const uploadedFile = await uploadMaterialFormData(
-            formData,
-            function (fileProgress) {
-              const uploadedBytes =
-                completedBytes + file.size * fileProgress;
-              const overallProgress =
-                totalBytes > 0
-                  ? (uploadedBytes / totalBytes) * 100
-                  : 0;
-
-              setMaterialUploadProgress(
-                overallProgress,
-                progressLabel,
-                true
-              );
-            }
+        const materialTypeInput =
+          getMaterialFormControl(
+            form,
+            "type",
+            "material-type"
           );
-
-          const saveResponse = await fetch("/api/course-materials", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              uploadAuthorizationId:
-                activeAuthorizationId,
-              fileId: uploadedFile.fileId || ""
-            })
-          });
-
-          let saveData = {};
-
-          try {
-            saveData = await saveResponse.json();
-          } catch (error) {
-            saveData = {};
-          }
-
-          if (!saveResponse.ok) {
-            throw new Error(
-              saveData.error ||
-                "The file uploaded, but its course-material record could not be saved."
-            );
-          }
-
-          activeAuthorizationId = "";
-          completedBytes += file.size;
-          uploadedCount += 1;
-
-          setMaterialUploadProgress(
-            totalBytes > 0
-              ? (completedBytes / totalBytes) * 100
-              : 100,
-            progressLabel,
-            true
+        const semesterInput =
+          getMaterialFormControl(
+            form,
+            "semester",
+            "material-semester"
           );
-        }
-
-        form.reset();
-        syncMaterialChoiceMenus(form);
-        setMaterialFileSelection(form, []);
-        await loadCourseMaterials(course);
-        setMaterialUploadProgress(100, "Upload complete", true);
-
-        setMaterialUploadStatus(
-          files.length === 1
-            ? "File uploaded successfully and added to the course materials library."
-            : files.length +
-                " files uploaded successfully and added to the course materials library.",
-          "success"
-        );
-
-        window.setTimeout(function () {
-          setMaterialUploadProgress(0, "Uploading files", false);
-        }, 900);
-      } catch (error) {
-        if (activeAuthorizationId) {
-          await fetch("/api/imagekit-auth", {
-            method: "POST",
-            credentials: "same-origin",
-            cache: "no-store",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              action: "cancel",
-              authorizationId: activeAuthorizationId
-            })
-          }).catch(function () {});
-        }
-
-        const progressMessage = uploadedCount
-          ? uploadedCount + " of " + files.length + " files uploaded. "
+        const titleInput =
+          getMaterialFormControl(
+            form,
+            "title",
+            "material-title"
+          );
+        const fileInput =
+          getMaterialFormControl(
+            form,
+            "file",
+            "material-file"
+          );
+        const files =
+          fileInput && fileInput.files
+            ? Array.from(fileInput.files)
+            : [];
+        const professor = professorInput
+          ? professorInput.value.trim()
+          : "";
+        const materialType = materialTypeInput
+          ? materialTypeInput.value.trim()
+          : "";
+        const semester = semesterInput
+          ? semesterInput.value.trim()
+          : "";
+        const title = titleInput
+          ? titleInput.value.trim()
           : "";
 
-        setMaterialUploadProgress(0, "Uploading files", false);
+        if (
+          !activeCourse ||
+          !activeCourse.code
+        ) {
+          setMaterialUploadStatus(
+            "Choose a course before uploading material.",
+            "error",
+            form
+          );
+          return;
+        }
 
-        setMaterialUploadStatus(
-          progressMessage + (error.message || "Upload failed. Try again."),
-          "error"
+        if (
+          !professor ||
+          !materialType ||
+          !semester ||
+          !title ||
+          !files.length
+        ) {
+          setMaterialUploadStatus(
+            "Fill in the professor, material type, semester, title, and choose at least one file.",
+            "error",
+            form
+          );
+          return;
+        }
+
+        const oversizedFile = files.find(
+          function (file) {
+            return (
+              file.size >
+              25 * 1024 * 1024
+            );
+          }
         );
-      } finally {
+
+        if (oversizedFile) {
+          setMaterialUploadStatus(
+            oversizedFile.name +
+              " is above the 25MB upload limit.",
+            "error",
+            form
+          );
+          return;
+        }
+
         if (button) {
-          button.disabled = false;
-          button.textContent = "Upload material";
+          button.disabled = true;
+        }
+
+        const totalBytes = files.reduce(
+          function (total, file) {
+            return total + file.size;
+          },
+          0
+        );
+
+        let uploadedCount = 0;
+        let completedBytes = 0;
+        let activeAuthorizationId = "";
+
+        setMaterialUploadProgress(
+          0,
+          "Preparing upload",
+          true,
+          form
+        );
+
+        try {
+          for (
+            let index = 0;
+            index < files.length;
+            index += 1
+          ) {
+            const file = files[index];
+            const originalTitle =
+              file.name.replace(/\.[^.]+$/, "");
+            const uploadTitle =
+              files.length > 1
+                ? title +
+                  " - " +
+                  originalTitle
+                : title;
+            const progressLabel =
+              files.length > 1
+                ? "Uploading file " +
+                  (index + 1) +
+                  " of " +
+                  files.length
+                : "Uploading file";
+
+            if (button) {
+              button.textContent =
+                files.length > 1
+                  ? "Uploading " +
+                    (index + 1) +
+                    " of " +
+                    files.length +
+                    "..."
+                  : "Uploading...";
+            }
+
+            setMaterialUploadStatus(
+              progressLabel + "...",
+              "",
+              form
+            );
+
+            const authResponse = await fetch(
+              "/api/imagekit-auth",
+              {
+                method: "POST",
+                credentials: "same-origin",
+                cache: "no-store",
+                headers: {
+                  Accept:
+                    "application/json",
+                  "Content-Type":
+                    "application/json"
+                },
+                body: JSON.stringify({
+                  action: "authorize",
+                  courseCode:
+                    activeCourse.code,
+                  courseTitle:
+                    activeCourse.title || "",
+                  professor: professor,
+                  semester: semester,
+                  materialType:
+                    materialType,
+                  title: uploadTitle,
+                  fileName: file.name,
+                  fileSize: file.size
+                })
+              }
+            );
+
+            const auth =
+              await authResponse
+                .json()
+                .catch(function () {
+                  return {};
+                });
+
+            if (!authResponse.ok) {
+              throw new Error(
+                auth.error ||
+                  "Could not prepare the next file upload."
+              );
+            }
+
+            const uploadPayload =
+              auth &&
+              auth.uploadPayload &&
+              typeof auth.uploadPayload ===
+                "object"
+                ? auth.uploadPayload
+                : {};
+
+            activeAuthorizationId =
+              String(
+                auth.authorizationId || ""
+              ).trim();
+
+            if (
+              !auth.token ||
+              !activeAuthorizationId ||
+              !uploadPayload.fileName
+            ) {
+              throw new Error(
+                "The secure upload authorization is incomplete."
+              );
+            }
+
+            const formData =
+              new FormData();
+
+            formData.append("file", file);
+            formData.append(
+              "token",
+              auth.token
+            );
+
+            Object.keys(
+              uploadPayload
+            ).forEach(function (key) {
+              formData.append(
+                key,
+                String(
+                  uploadPayload[key]
+                )
+              );
+            });
+
+            const uploadedFile =
+              await uploadMaterialFormData(
+                formData,
+                function (
+                  fileProgress
+                ) {
+                  const uploadedBytes =
+                    completedBytes +
+                    file.size *
+                      fileProgress;
+                  const overallProgress =
+                    totalBytes > 0
+                      ? (
+                          uploadedBytes /
+                          totalBytes
+                        ) * 100
+                      : 0;
+
+                  setMaterialUploadProgress(
+                    overallProgress,
+                    progressLabel,
+                    true,
+                    form
+                  );
+                }
+              );
+
+            const saveResponse =
+              await fetch(
+                "/api/course-materials",
+                {
+                  method: "POST",
+                  credentials:
+                    "same-origin",
+                  headers: {
+                    "Content-Type":
+                      "application/json"
+                  },
+                  body: JSON.stringify({
+                    uploadAuthorizationId:
+                      activeAuthorizationId,
+                    fileId:
+                      uploadedFile.fileId ||
+                      ""
+                  })
+                }
+              );
+
+            let saveData = {};
+
+            try {
+              saveData =
+                await saveResponse.json();
+            } catch (error) {
+              saveData = {};
+            }
+
+            if (!saveResponse.ok) {
+              throw new Error(
+                saveData.error ||
+                  "The file uploaded, but its course-material record could not be saved."
+              );
+            }
+
+            activeAuthorizationId = "";
+            completedBytes += file.size;
+            uploadedCount += 1;
+
+            setMaterialUploadProgress(
+              totalBytes > 0
+                ? (
+                    completedBytes /
+                    totalBytes
+                  ) * 100
+                : 100,
+              progressLabel,
+              true,
+              form
+            );
+          }
+
+          form.reset();
+          syncMaterialChoiceMenus(form);
+          setMaterialFileSelection(
+            form,
+            []
+          );
+
+          if (
+            typeof settings.onSuccess ===
+            "function"
+          ) {
+            await settings.onSuccess(
+              activeCourse
+            );
+          } else {
+            await loadCourseMaterials(
+              activeCourse
+            );
+          }
+
+          setMaterialUploadProgress(
+            100,
+            "Upload complete",
+            true,
+            form
+          );
+
+          setMaterialUploadStatus(
+            files.length === 1
+              ? "File uploaded successfully and added to the course materials library."
+              : files.length +
+                  " files uploaded successfully and added to the course materials library.",
+            "success",
+            form
+          );
+
+          window.setTimeout(
+            function () {
+              setMaterialUploadProgress(
+                0,
+                "Uploading files",
+                false,
+                form
+              );
+            },
+            900
+          );
+        } catch (error) {
+          if (activeAuthorizationId) {
+            await fetch(
+              "/api/imagekit-auth",
+              {
+                method: "POST",
+                credentials:
+                  "same-origin",
+                cache: "no-store",
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+                body: JSON.stringify({
+                  action: "cancel",
+                  authorizationId:
+                    activeAuthorizationId
+                })
+              }
+            ).catch(function () {});
+          }
+
+          const progressMessage =
+            uploadedCount
+              ? uploadedCount +
+                " of " +
+                files.length +
+                " files uploaded. "
+              : "";
+
+          setMaterialUploadProgress(
+            0,
+            "Uploading files",
+            false,
+            form
+          );
+
+          setMaterialUploadStatus(
+            progressMessage +
+              (
+                error.message ||
+                "Upload failed. Try again."
+              ),
+            "error",
+            form
+          );
+        } finally {
+          if (button) {
+            button.disabled = false;
+            button.textContent =
+              defaultButtonLabel;
+          }
         }
       }
-    });
+    );
   }
 
   function setupCoursesPage() {
