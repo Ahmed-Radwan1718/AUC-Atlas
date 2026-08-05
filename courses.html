@@ -1974,13 +1974,154 @@
       transform: translateY(-2px);
     }
 
-    .course-popular-grid {
+    .course-popular-heading {
+      max-width: none;
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 22px;
+      grid-template-columns:
+        minmax(0, 1fr)
+        minmax(280px, 420px);
+      gap: 36px;
+      align-items: end;
     }
 
-    .course-feature-card,
+    .course-popular-heading h2 {
+      margin-bottom: 0;
+    }
+
+    .course-popular-heading > p {
+      max-width: 420px;
+      justify-self: end;
+    }
+
+    .course-popular-grid {
+      counter-reset: popular-course;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: 0 26px 76px rgba(42, 32, 20, 0.1);
+    }
+
+    .course-feature-card {
+      counter-increment: popular-course;
+      min-width: 0;
+      min-height: 132px;
+      padding: 22px 24px;
+      color: inherit;
+      text-decoration: none;
+      display: grid;
+      grid-template-columns:
+        44px
+        minmax(0, 1fr)
+        34px;
+      grid-template-rows: auto auto auto;
+      column-gap: 18px;
+      row-gap: 7px;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.38);
+      animation: courseCardIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .course-feature-card::before {
+      content: counter(popular-course, decimal-leading-zero);
+      grid-column: 1;
+      grid-row: 1 / 4;
+      align-self: center;
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .course-feature-card::after {
+      content: "→";
+      grid-column: 3;
+      grid-row: 1 / 4;
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(192, 154, 92, 0.24);
+      border-radius: 999px;
+      color: rgba(154, 112, 48, 0.96);
+      font-size: 16px;
+      display: grid;
+      place-items: center;
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .course-feature-card:nth-child(odd) {
+      border-right: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .course-feature-card:nth-child(n + 3) {
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .course-feature-code {
+      grid-column: 2;
+      grid-row: 1;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .course-feature-card h3 {
+      grid-column: 2;
+      grid-row: 2;
+      overflow: hidden;
+      color: #171717;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-feature-meta {
+      grid-column: 2;
+      grid-row: 3;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .course-feature-meta span {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .course-feature-meta span + span::before {
+      content: "•";
+      margin: 0 8px;
+      color: rgba(192, 154, 92, 0.72);
+    }
+
+    .course-feature-card:hover,
+    .course-feature-card:focus-visible {
+      outline: none;
+      background: rgba(192, 154, 92, 0.11);
+      box-shadow: inset 0 0 0 1px rgba(192, 154, 92, 0.2);
+    }
+
+    .course-feature-card:hover::after,
+    .course-feature-card:focus-visible::after {
+      background: #171717;
+      color: #ffffff;
+      transform: translateX(3px);
+    }
+
     .course-recent-card {
       border: 1px solid rgba(23, 23, 23, 0.1);
       background: rgba(255, 255, 255, 0.76);
@@ -1995,17 +2136,6 @@
         transform 0.2s ease;
     }
 
-    .course-feature-card {
-      min-height: 220px;
-      padding: 22px;
-      border-radius: 28px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 24px;
-    }
-
-    .course-feature-code,
     .course-recent-type {
       color: rgba(192, 154, 92, 0.96);
       font-size: 10px;
@@ -2014,7 +2144,6 @@
       text-transform: uppercase;
     }
 
-    .course-feature-card h3,
     .course-recent-card h3 {
       color: #171717;
       font-size: 21px;
@@ -2022,14 +2151,12 @@
       line-height: 1.2;
     }
 
-    .course-feature-meta,
     .course-recent-meta {
       display: flex;
       flex-wrap: wrap;
       gap: 7px;
     }
 
-    .course-feature-meta span,
     .course-recent-meta span {
       padding: 7px 9px;
       border: 1px solid rgba(23, 23, 23, 0.08);
@@ -2042,8 +2169,6 @@
       text-transform: uppercase;
     }
 
-    .course-feature-card:hover,
-    .course-feature-card:focus-visible,
     .course-recent-card:hover,
     .course-recent-card:focus-visible {
       outline: none;
@@ -2503,7 +2628,6 @@
 
     @media (max-width: 1240px) {
       .course-department-grid,
-      .course-popular-grid,
       .courses-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
@@ -2523,8 +2647,17 @@
         max-width: 620px;
       }
 
+      .course-popular-heading {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .course-popular-heading > p {
+        max-width: 620px;
+        justify-self: start;
+      }
+
       .course-department-grid,
-      .course-popular-grid,
       .courses-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -2545,13 +2678,38 @@
       }
 
       .course-department-grid,
-      .course-popular-grid,
       .course-recent-grid,
       .courses-grid {
         grid-template-columns: 1fr;
       }
 
-      .course-feature-card,
+      .course-popular-grid {
+        grid-template-columns: 1fr;
+        border-radius: 22px;
+      }
+
+      .course-feature-card {
+        min-height: 112px;
+        padding: 18px;
+        grid-template-columns:
+          36px
+          minmax(0, 1fr)
+          30px;
+        column-gap: 14px;
+      }
+
+      .course-feature-card:nth-child(odd) {
+        border-right: 0;
+      }
+
+      .course-feature-card:nth-child(n + 2) {
+        border-top: 1px solid rgba(23, 23, 23, 0.08);
+      }
+
+      .course-feature-card h3 {
+        font-size: 16px;
+      }
+
       .course-recent-card,
       .course-card {
         border-radius: 22px;
@@ -2618,11 +2776,14 @@
 
             <div class="courses-home-content" id="courses-home-content">
               <section class="course-home-section" aria-labelledby="popular-courses-title">
-                <div class="course-section-heading">
-                  <p class="course-section-kicker">Start here</p>
-                  <h2 id="popular-courses-title">Popular courses</h2>
+                <div class="course-section-heading course-popular-heading">
+                  <div>
+                    <p class="course-section-kicker">Start here</p>
+                    <h2 id="popular-courses-title">Popular courses</h2>
+                  </div>
+
                   <p>
-                    Quick access to foundational courses across AUC.
+                    Quick access to the foundational courses students search for most across AUC.
                   </p>
                 </div>
 
