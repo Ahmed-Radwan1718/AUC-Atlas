@@ -1499,17 +1499,13 @@
           return getProfessorDepartment(professor);
         })
       )
-    ).sort(function (firstDepartment, secondDepartment) {
-      if (firstDepartment === "Other") {
-        return 1;
-      }
-
-      if (secondDepartment === "Other") {
-        return -1;
-      }
-
-      return firstDepartment.localeCompare(secondDepartment);
-    });
+    )
+      .filter(function (department) {
+        return department !== "Other";
+      })
+      .sort(function (firstDepartment, secondDepartment) {
+        return firstDepartment.localeCompare(secondDepartment);
+      });
 
     container.innerHTML = "";
 
