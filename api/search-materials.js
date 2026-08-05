@@ -121,7 +121,7 @@ async function getMaterialIndex() {
     const data = doc.data() || {};
     const status = cleanString(data.status, 40).toLowerCase();
 
-    if (status === "rejected") {
+    if (status !== "approved") {
       return;
     }
 
