@@ -16,11 +16,19 @@ const LOGIN_CHALLENGE_COOKIE_NAME = IS_PRODUCTION
   ? "__Host-auc_atlas_login_challenge"
   : "auc_atlas_login_challenge";
 
-const SITE_SESSION_EXPIRES_MS = 5 * 24 * 60 * 60 * 1000;
-const SITE_SESSION_TOUCH_COOLDOWN_MS = 5 * 60 * 1000;
-const LOGIN_CHALLENGE_EXPIRES_MS = 10 * 60 * 1000;
-const SECURITY_PANEL_ACCESS_EXPIRES_MS = 15 * 60 * 1000;
-const ALLOWED_AUC_EMAIL_DOMAIN = "aucegypt.edu";
+const SITE_SESSION_EXPIRES_MS =
+  5 * 24 * 60 * 60 * 1000;
+const SITE_SESSION_TOUCH_COOLDOWN_MS =
+  5 * 60 * 1000;
+const LOGIN_CHALLENGE_EXPIRES_MS =
+  10 * 60 * 1000;
+const SECURITY_PANEL_ACCESS_EXPIRES_MS =
+  15 * 60 * 1000;
+const AUTHENTICATOR_ATTEMPT_WINDOW_MS =
+  15 * 60 * 1000;
+const AUTHENTICATOR_MAX_ATTEMPTS = 5;
+const ALLOWED_AUC_EMAIL_DOMAIN =
+  "aucegypt.edu";
 
 function getSecuritySecret() {
   return String(process.env.SECURITY_CODE_SECRET || process.env.FIREBASE_PRIVATE_KEY || process.env.FIREBASE_CLIENT_EMAIL || "auc-atlas-security-secret");
@@ -165,11 +173,163 @@ function sessionTimestampToMillis(value) {
 
 function serializeSessionTimestamp(value) {
   const millis = sessionTimestampToMillis(value);
-  return millis ? new Date(millis).toISOString() : "";
+
+  return millis
+    ? new Date(millis).toISOString()
+    : "";
+}
+
+function createAuthenticatorAttemptLimitError(
+  retryAfterSeconds
+) {
+  const safeRetryAfterSeconds = Math.max(
+    1,
+    Math.ceil(Number(retryAfterSeconds) || 1)
+  );
+  const retryAfterMinutes = Math.max(
+    1,
+    Math.ceil(safeRetryAfterSeconds / 60)
+  );
+  const error = new Error(
+    "Too many authenticator attempts. Try again in " +
+      retryAfterMinutes +
+      (
+        retryAfterMinutes === 1
+          ? " minute."
+          : " minutes."
+      )
+  );
+
+  error.statusCode = 429;
+  error.retryAfterSeconds =
+    safeRetryAfterSeconds;
+
+  return error;
+}
+
+function getAuthenticatorAttemptDocumentId(scope) {
+  return String(scope || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+async function consumeAuthenticatorAttempt(
+  uid,
+  scope
+) {
+  const safeUid = String(uid || "").trim();
+  const documentId =
+    getAuthenticatorAttemptDocumentId(scope);
+
+  if (!safeUid || !documentId) {
+    const error = new Error(
+      "Could not verify authenticator attempt."
+    );
+
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const db = admin.firestore();
+  const attemptRef = db
+    .collection("users")
+    .doc(safeUid)
+    .collection("authenticatorAttempts")
+    .doc(documentId);
+  const nowMs = Date.now();
+
+  await db.runTransaction(
+    async function (transaction) {
+      const attemptDoc =
+        await transaction.get(attemptRef);
+      const data = attemptDoc.exists
+        ? attemptDoc.data() || {}
+        : {};
+      const windowStartedAtMs =
+        sessionTimestampToMillis(
+          data.windowStartedAt
+        );
+      const windowEndsAtMs =
+        windowStartedAtMs +
+        AUTHENTICATOR_ATTEMPT_WINDOW_MS;
+      const hasActiveWindow =
+        windowStartedAtMs > 0 &&
+        nowMs < windowEndsAtMs;
+      const attemptCount = hasActiveWindow
+        ? Math.max(
+            0,
+            Number(data.count || 0)
+          )
+        : 0;
+
+      if (
+        hasActiveWindow &&
+        attemptCount >=
+          AUTHENTICATOR_MAX_ATTEMPTS
+      ) {
+        throw createAuthenticatorAttemptLimitError(
+          Math.ceil(
+            (windowEndsAtMs - nowMs) / 1000
+          )
+        );
+      }
+
+      const activeWindowStartedAtMs =
+        hasActiveWindow
+          ? windowStartedAtMs
+          : nowMs;
+
+      transaction.set(attemptRef, {
+        count: attemptCount + 1,
+        windowStartedAt:
+          admin.firestore.Timestamp.fromDate(
+            new Date(activeWindowStartedAtMs)
+          ),
+        lastAttemptAt:
+          admin.firestore.FieldValue
+            .serverTimestamp(),
+        expiresAt:
+          admin.firestore.Timestamp.fromDate(
+            new Date(
+              activeWindowStartedAtMs +
+                AUTHENTICATOR_ATTEMPT_WINDOW_MS
+            )
+          )
+      });
+    }
+  );
+}
+
+async function clearAuthenticatorAttempts(
+  uid,
+  scope
+) {
+  const safeUid = String(uid || "").trim();
+  const documentId =
+    getAuthenticatorAttemptDocumentId(scope);
+
+  if (!safeUid || !documentId) {
+    return;
+  }
+
+  await admin.firestore()
+    .collection("users")
+    .doc(safeUid)
+    .collection("authenticatorAttempts")
+    .doc(documentId)
+    .delete()
+    .catch(function () {});
 }
 
 function isSiteSessionActive(data) {
-  return Boolean(data && !data.revokedAt && !isExpired(data.expiresAt));
+  return Boolean(
+    data &&
+    !data.revokedAt &&
+    !isExpired(data.expiresAt)
+  );
 }
 
 function cleanAuthEmail(value) {
@@ -702,34 +862,79 @@ async function clearCurrentSiteSession(req, res) {
   clearSiteSessionCookie(res);
 }
 
-async function createLoginChallenge(uid, res, details) {
+async function createLoginChallenge(
+  uid,
+  res,
+  details
+) {
   const db = admin.firestore();
-  const challengeRef = db.collection("loginChallenges").doc();
+  const challengeRef = db
+    .collection("loginChallenges")
+    .doc();
   const challengeId = challengeRef.id;
   const token = createRandomToken();
   const salt = db.collection("_").doc().id;
 
   await challengeRef.set({
     uid,
-    challengeHash: getLoginChallengeHash(uid, challengeId, token, salt),
+    challengeHash: getLoginChallengeHash(
+      uid,
+      challengeId,
+      token,
+      salt
+    ),
     salt,
-    email: details && details.email ? details.email : "",
-    idToken: details && details.idToken ? details.idToken : "",
-    twoFactor: details && details.twoFactor ? details.twoFactor : {},
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    expiresAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() + LOGIN_CHALLENGE_EXPIRES_MS))
+    email:
+      details && details.email
+        ? details.email
+        : "",
+    idToken:
+      details && details.idToken
+        ? details.idToken
+        : "",
+    twoFactor:
+      details && details.twoFactor
+        ? details.twoFactor
+        : {},
+    consumedAt: null,
+    createdAt:
+      admin.firestore.FieldValue
+        .serverTimestamp(),
+    expiresAt:
+      admin.firestore.Timestamp.fromDate(
+        new Date(
+          Date.now() +
+            LOGIN_CHALLENGE_EXPIRES_MS
+        )
+      )
   });
 
-  setCookie(res, LOGIN_CHALLENGE_COOKIE_NAME, challengeId + "." + token, Math.floor(LOGIN_CHALLENGE_EXPIRES_MS / 1000));
+  setCookie(
+    res,
+    LOGIN_CHALLENGE_COOKIE_NAME,
+    challengeId + "." + token,
+    Math.floor(
+      LOGIN_CHALLENGE_EXPIRES_MS / 1000
+    )
+  );
 
   return { challengeId };
 }
 
 async function getLoginChallenge(req) {
-  const cookieValue = getCookie(req, LOGIN_CHALLENGE_COOKIE_NAME);
+  const cookieValue = getCookie(
+    req,
+    LOGIN_CHALLENGE_COOKIE_NAME
+  );
 
-  if (!cookieValue || !cookieValue.includes(".")) {
-    const error = new Error("Please log in again.");
+  if (
+    !cookieValue ||
+    !cookieValue.includes(".")
+  ) {
+    const error = new Error(
+      "Please log in again."
+    );
+
     error.statusCode = 401;
     throw error;
   }
@@ -737,30 +942,87 @@ async function getLoginChallenge(req) {
   const parts = cookieValue.split(".");
   const challengeId = parts[0];
   const token = parts.slice(1).join(".");
-  const challengeRef = admin.firestore().collection("loginChallenges").doc(challengeId);
-  const challengeDoc = await challengeRef.get();
+
+  if (
+    !/^[A-Za-z0-9_-]{6,160}$/.test(
+      challengeId
+    )
+  ) {
+    const error = new Error(
+      "Please log in again."
+    );
+
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const challengeRef = admin.firestore()
+    .collection("loginChallenges")
+    .doc(challengeId);
+  const challengeDoc =
+    await challengeRef.get();
 
   if (!challengeDoc.exists) {
-    const error = new Error("Please log in again.");
+    const error = new Error(
+      "Please log in again."
+    );
+
     error.statusCode = 401;
     throw error;
   }
 
   const data = challengeDoc.data() || {};
 
-  if (isExpired(data.expiresAt)) {
-    await challengeRef.delete().catch(function () {});
-    const error = new Error("Authenticator login expired. Please log in again.");
+  if (data.consumedAt) {
+    const error = new Error(
+      "Please log in again."
+    );
+
     error.statusCode = 401;
     throw error;
   }
 
-  const submittedHash = getLoginChallengeHash(data.uid, challengeId, token, data.salt || "");
-  const savedBuffer = Buffer.from(data.challengeHash || "", "hex");
-  const submittedBuffer = Buffer.from(submittedHash, "hex");
+  if (isExpired(data.expiresAt)) {
+    await challengeRef
+      .delete()
+      .catch(function () {});
 
-  if (savedBuffer.length !== submittedBuffer.length || !crypto.timingSafeEqual(savedBuffer, submittedBuffer)) {
-    const error = new Error("Please log in again.");
+    const error = new Error(
+      "Authenticator login expired. Please log in again."
+    );
+
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const submittedHash =
+    getLoginChallengeHash(
+      data.uid,
+      challengeId,
+      token,
+      data.salt || ""
+    );
+  const savedBuffer = Buffer.from(
+    data.challengeHash || "",
+    "hex"
+  );
+  const submittedBuffer = Buffer.from(
+    submittedHash,
+    "hex"
+  );
+
+  if (
+    savedBuffer.length !==
+      submittedBuffer.length ||
+    !crypto.timingSafeEqual(
+      savedBuffer,
+      submittedBuffer
+    )
+  ) {
+    const error = new Error(
+      "Please log in again."
+    );
+
     error.statusCode = 401;
     throw error;
   }
@@ -775,13 +1037,106 @@ async function getLoginChallenge(req) {
   };
 }
 
-async function clearLoginChallenge(req, res) {
-  clearCookie(res, LOGIN_CHALLENGE_COOKIE_NAME);
+async function consumeLoginChallenge(
+  challenge
+) {
+  if (
+    !challenge ||
+    !challenge.ref ||
+    !challenge.uid
+  ) {
+    const error = new Error(
+      "Please log in again."
+    );
 
-  try {
-    const challenge = await getLoginChallenge(req);
-    await challenge.ref.delete().catch(function () {});
-  } catch (error) {}
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const db = admin.firestore();
+
+  await db.runTransaction(
+    async function (transaction) {
+      const challengeDoc =
+        await transaction.get(
+          challenge.ref
+        );
+
+      if (!challengeDoc.exists) {
+        const error = new Error(
+          "Please log in again."
+        );
+
+        error.statusCode = 401;
+        throw error;
+      }
+
+      const data =
+        challengeDoc.data() || {};
+
+      if (
+        data.consumedAt ||
+        isExpired(data.expiresAt) ||
+        String(data.uid || "") !==
+          String(challenge.uid || "")
+      ) {
+        const error = new Error(
+          "Please log in again."
+        );
+
+        error.statusCode = 401;
+        throw error;
+      }
+
+      transaction.update(
+        challenge.ref,
+        {
+          consumedAt:
+            admin.firestore.FieldValue
+              .serverTimestamp(),
+          consumedReason: "authenticated"
+        }
+      );
+    }
+  );
+
+  return challenge;
+}
+
+async function clearLoginChallenge(req, res) {
+  const cookieValue = getCookie(
+    req,
+    LOGIN_CHALLENGE_COOKIE_NAME
+  );
+
+  clearCookie(
+    res,
+    LOGIN_CHALLENGE_COOKIE_NAME
+  );
+
+  if (
+    !cookieValue ||
+    !cookieValue.includes(".")
+  ) {
+    return;
+  }
+
+  const challengeId =
+    cookieValue.split(".")[0];
+
+  if (
+    !/^[A-Za-z0-9_-]{6,160}$/.test(
+      challengeId
+    )
+  ) {
+    return;
+  }
+
+  await admin.firestore()
+    .collection("loginChallenges")
+    .doc(challengeId)
+    .delete()
+    .catch(function () {});
 }
 
 async function getAuthenticatorSecret(uid) {
@@ -949,7 +1304,10 @@ module.exports = {
   revokeUserSiteSession,
   createLoginChallenge,
   getLoginChallenge,
+  consumeLoginChallenge,
   clearLoginChallenge,
+  consumeAuthenticatorAttempt,
+  clearAuthenticatorAttempts,
   getAuthenticatorSecret,
   issueSecurityPanelAccess,
   requireSecurityPanelAccess
