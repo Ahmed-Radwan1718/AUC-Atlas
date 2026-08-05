@@ -1662,19 +1662,50 @@
       }
 
       .course-material-preview-modal {
+        height: 100dvh;
         padding: 10px;
       }
 
       .course-material-preview-dialog {
-        max-height: calc(100vh - 20px);
+        height: calc(100dvh - 20px);
+        max-height: calc(100dvh - 20px);
         border-radius: 20px;
       }
 
-      .course-material-preview-viewer,
+      .course-material-preview-header {
+        padding: 14px;
+        gap: 10px;
+      }
+
+      .course-material-preview-header h2 {
+        font-size: 15px;
+      }
+
+      .course-material-preview-close {
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
+      }
+
+      .course-material-preview-viewer {
+        min-height: 0;
+        height: 100%;
+      }
+
       .course-material-preview-frame,
       .course-material-preview-image {
-        min-height: 62vh;
-        height: 62vh;
+        min-height: 0;
+        height: 100%;
+      }
+
+      .course-material-preview-footer {
+        padding: 12px 14px max(12px, env(safe-area-inset-bottom));
+      }
+
+      .course-material-preview-download {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
       }
     }
 
@@ -2441,14 +2472,29 @@
 
     @media (max-width: 640px) {
       .quick-material-upload-modal {
+        height: 100dvh;
         padding: 12px;
         align-items: end;
       }
 
       .quick-material-upload-dialog {
-        max-height: calc(100vh - 24px);
-        padding: 22px 18px;
+        max-height: calc(100dvh - 24px);
+        padding: 22px 18px max(22px, env(safe-area-inset-bottom));
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
         border-radius: 24px;
+      }
+
+      .quick-material-upload-close {
+        top: 14px;
+        right: 14px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .quick-material-upload-header {
+        padding-right: 52px;
       }
 
       .quick-material-upload-dialog .material-upload-grid {
@@ -2457,6 +2503,15 @@
 
       .quick-material-course-field {
         grid-column: auto;
+      }
+
+      .quick-material-upload-dialog .material-choice-menu {
+        position: static;
+        z-index: auto;
+        width: 100%;
+        max-height: min(240px, 38dvh);
+        margin-top: 8px;
+        box-shadow: none;
       }
     }
 
@@ -2605,8 +2660,17 @@
     }
 
     @media (max-width: 640px) {
+      .courses-search-dropdown {
+        max-width: 100%;
+        border-radius: 20px;
+      }
+
+      .courses-grid {
+        max-height: min(440px, 52dvh);
+      }
+
       .courses-grid .course-card {
-        grid-template-columns: 76px minmax(0, 1fr) auto;
+        grid-template-columns: 70px minmax(0, 1fr) 20px;
         gap: 10px;
         padding: 13px 14px;
       }
