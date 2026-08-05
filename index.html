@@ -539,15 +539,176 @@
       line-height: 1.45;
     }
 
-    .support-barcode {
+    .support-donate-action {
       width: min(100%, 300px);
       align-self: center;
       justify-self: end;
+      display: grid;
+      gap: 10px;
+    }
+
+    .support-donate-button {
+      width: 100%;
+      min-height: 92px;
+      padding: 20px 22px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 24px;
+      background: #171717;
+      color: white;
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.14);
+      display: grid;
+      gap: 8px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .support-donate-button span {
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .support-donate-button strong {
+      color: white;
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .support-donate-button:hover,
+    .support-donate-button:focus-visible {
+      outline: none;
+      background: #2a2116;
+      box-shadow: 0 28px 76px rgba(42, 32, 20, 0.2);
+      transform: translateY(-3px);
+    }
+
+    .support-donate-action > p {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    body.support-donation-open {
+      overflow: hidden;
+    }
+
+    .support-donation-modal[hidden] {
+      display: none;
+    }
+
+    .support-donation-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 180;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+
+    .support-donation-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: rgba(23, 23, 23, 0.58);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor: default;
+    }
+
+    .support-donation-card {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 420px);
+      max-height: calc(100dvh - 48px);
+      padding: 28px;
+      overflow-y: auto;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 32px 90px rgba(23, 23, 23, 0.3);
+      text-align: center;
+      animation: supportDonationEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes supportDonationEnter {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .support-donation-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: white;
+      color: #171717;
+      font-family: inherit;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .support-donation-close:hover,
+    .support-donation-close:focus-visible {
+      outline: none;
+      border-color: rgba(192, 154, 92, 0.52);
+      background: rgba(192, 154, 92, 0.1);
+    }
+
+    .support-donation-kicker {
+      margin-bottom: 9px;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .support-donation-card h2 {
+      padding: 0 42px;
+      color: #171717;
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .support-donation-copy {
+      max-width: 320px;
+      margin: 12px auto 0;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .support-barcode {
+      width: min(100%, 300px);
+      margin: 24px auto 0;
       padding: 14px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 24px;
-      background: rgba(255, 255, 255, 0.78);
-      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.12);
+      background: rgba(247, 244, 238, 0.72);
       display: grid;
       gap: 12px;
       text-align: center;
@@ -601,10 +762,18 @@
         text-align: left;
       }
 
-      .support-barcode {
-        width: min(100%, 280px);
-        max-width: 280px;
+      .support-donate-action {
+        width: min(100%, 300px);
         justify-self: start;
+      }
+
+      .support-donation-card {
+        padding: 24px 18px 20px;
+        border-radius: 24px;
+      }
+
+      .support-donation-card h2 {
+        font-size: 26px;
       }
     }
   </style>
@@ -737,15 +906,98 @@
         </div>
       </div>
 
-      <div class="support-barcode">
-        <img src="telda-payment-barcode.png" alt="Telda donation barcode">
-        <span>Scan to donate</span>
+      <div class="support-donate-action">
+        <button
+          class="support-donate-button"
+          type="button"
+          id="support-donate-open"
+          aria-haspopup="dialog"
+          aria-controls="support-donation-modal"
+        >
+          <span>Support the project</span>
+          <strong>Donate to AUC Atlas</strong>
+        </button>
+
+        <p>The donation QR code opens only when needed.</p>
       </div>
     </section>
   </main>
 
+  <div class="support-donation-modal" id="support-donation-modal" hidden>
+    <button
+      class="support-donation-backdrop"
+      type="button"
+      id="support-donation-backdrop"
+      aria-label="Close donation window"
+    ></button>
+
+    <div
+      class="support-donation-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="support-donation-title"
+    >
+      <button
+        class="support-donation-close"
+        type="button"
+        id="support-donation-close"
+        aria-label="Close donation window"
+      >×</button>
+
+      <p class="support-donation-kicker">Support AUC Atlas</p>
+      <h2 id="support-donation-title">Scan to donate</h2>
+
+      <p class="support-donation-copy">
+        Open Telda on your phone and scan this QR code to help cover the monthly running costs.
+      </p>
+
+      <div class="support-barcode">
+        <img src="telda-payment-barcode.png" alt="Telda donation QR code">
+        <span>Scan with Telda</span>
+      </div>
+    </div>
+  </div>
+
   <script src="data/courses.js"></script>
   <script src="data/professor-data.js"></script>
   <script src="home-search.js"></script>
+
+  <script>
+    (function () {
+      const openButton = document.getElementById("support-donate-open");
+      const modal = document.getElementById("support-donation-modal");
+      const backdrop = document.getElementById("support-donation-backdrop");
+      const closeButton = document.getElementById("support-donation-close");
+
+      if (!openButton || !modal || !backdrop || !closeButton) {
+        return;
+      }
+
+      function openDonationModal() {
+        modal.hidden = false;
+        document.body.classList.add("support-donation-open");
+
+        window.setTimeout(function () {
+          closeButton.focus();
+        }, 0);
+      }
+
+      function closeDonationModal() {
+        modal.hidden = true;
+        document.body.classList.remove("support-donation-open");
+        openButton.focus();
+      }
+
+      openButton.addEventListener("click", openDonationModal);
+      backdrop.addEventListener("click", closeDonationModal);
+      closeButton.addEventListener("click", closeDonationModal);
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !modal.hidden) {
+          closeDonationModal();
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
