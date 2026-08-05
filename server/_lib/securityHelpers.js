@@ -317,8 +317,16 @@ async function signInWithCustomToken(customToken) {
 }
 
 function getCurrentSiteSessionHash(req) {
-  const sessionId = getCookie(req, SITE_SESSION_ID_COOKIE_NAME);
-  return sessionId ? getSiteSessionHash(sessionId) : "";
+  const sessionId = getCookie(
+    req,
+    SITE_SESSION_ID_COOKIE_NAME
+  );
+
+  if (!/^[a-f0-9]{64}$/i.test(sessionId)) {
+    return "";
+  }
+
+  return getSiteSessionHash(sessionId);
 }
 
 async function saveSiteSession(uid, sessionHash, req, options) {
@@ -573,7 +581,12 @@ function clearSiteSessionCookie(res) {
 
 async function getSiteSessionUser(req, options) {
   const settings = options || {};
-  const sessionCookie = getCookie(req, SITE_SESSION_COOKIE_NAME);
+  const sessionCookie = getCookie(
+    req,
+    SITE_SESSION_COOKIE_NAME
+  );
+  const sessionHash =
+    getCurrentSiteSessionHash(req);
   const fallbackSessionPrefix = "idtoken.";
 
   if (!sessionCookie) {
@@ -582,40 +595,88 @@ async function getSiteSessionUser(req, options) {
     throw error;
   }
 
-  const usesFallbackIdToken = sessionCookie.startsWith(fallbackSessionPrefix);
+  if (!sessionHash) {
+    const error = new Error(
+      "account-session-invalid"
+    );
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const usesFallbackIdToken =
+    sessionCookie.startsWith(
+      fallbackSessionPrefix
+    );
   const cookieToken = usesFallbackIdToken
-    ? sessionCookie.slice(fallbackSessionPrefix.length)
+    ? sessionCookie.slice(
+        fallbackSessionPrefix.length
+      )
     : sessionCookie;
   const decodedUser = usesFallbackIdToken
-    ? await admin.auth().verifyIdToken(cookieToken, settings.checkRevoked !== false)
-    : await admin.auth().verifySessionCookie(cookieToken, settings.checkRevoked !== false);
+    ? await admin.auth().verifyIdToken(
+        cookieToken,
+        settings.checkRevoked !== false
+      )
+    : await admin.auth().verifySessionCookie(
+        cookieToken,
+        settings.checkRevoked !== false
+      );
 
-  await ensureDecodedUserHasAllowedAucEmail(decodedUser, "continue");
+  await ensureDecodedUserHasAllowedAucEmail(
+    decodedUser,
+    "continue"
+  );
 
-  const sessionHash = getCurrentSiteSessionHash(req);
+  const sessionRef = admin.firestore()
+    .collection("users")
+    .doc(decodedUser.uid)
+    .collection("sessions")
+    .doc(sessionHash);
+  const sessionDoc = await sessionRef.get();
+  const sessionData = sessionDoc.exists
+    ? sessionDoc.data() || {}
+    : {};
+  const storedSessionUid = String(
+    sessionData.uid || ""
+  ).trim();
+  const storedSessionId = String(
+    sessionData.sessionId || ""
+  ).trim();
 
-  if (sessionHash) {
-    const sessionRef = admin.firestore().collection("users").doc(decodedUser.uid).collection("sessions").doc(sessionHash);
-    const sessionDoc = await sessionRef.get();
-    const sessionData = sessionDoc.exists ? sessionDoc.data() || {} : {};
-
-    if (!sessionDoc.exists || !isSiteSessionActive(sessionData)) {
-      const error = new Error("account-session-invalid");
-      error.statusCode = 401;
-      error.revokedReason = sessionData.revokedReason || "";
-      throw error;
-    }
-
-    const lastSeenAtMs = sessionTimestampToMillis(sessionData.lastSeenAt || sessionData.createdAt);
-
-    if (!lastSeenAtMs || Date.now() - lastSeenAtMs > SITE_SESSION_TOUCH_COOLDOWN_MS) {
-      await saveSiteSession(decodedUser.uid, sessionHash, req, { create: false });
-    }
-
-    decodedUser.siteSessionId = sessionHash;
-  } else {
-    decodedUser.siteSessionId = "";
+  if (
+    !sessionDoc.exists ||
+    !isSiteSessionActive(sessionData) ||
+    storedSessionUid !== decodedUser.uid ||
+    storedSessionId !== sessionHash
+  ) {
+    const error = new Error(
+      "account-session-invalid"
+    );
+    error.statusCode = 401;
+    error.revokedReason =
+      sessionData.revokedReason || "";
+    throw error;
   }
+
+  const lastSeenAtMs = sessionTimestampToMillis(
+    sessionData.lastSeenAt ||
+      sessionData.createdAt
+  );
+
+  if (
+    !lastSeenAtMs ||
+    Date.now() - lastSeenAtMs >
+      SITE_SESSION_TOUCH_COOLDOWN_MS
+  ) {
+    await saveSiteSession(
+      decodedUser.uid,
+      sessionHash,
+      req,
+      { create: false }
+    );
+  }
+
+  decodedUser.siteSessionId = sessionHash;
 
   return decodedUser;
 }
