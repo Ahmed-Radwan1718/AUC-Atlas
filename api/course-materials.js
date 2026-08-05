@@ -181,7 +181,20 @@ async function getImageKitCourseMaterials(courseCode) {
 
   return files.map(function (file) {
     const descriptionParts = getImageKitDescriptionParts(file);
-    const fileName = cleanString(file && file.name, 240);
+    const imageKitFileName = cleanString(
+      file && file.name,
+      240
+    );
+    const legacyFileName = imageKitFileName.replace(
+      /_[a-z0-9]{6,}(\.[^.]+)$/i,
+      "$1"
+    );
+    const fileName = cleanString(
+      descriptionParts[8] ||
+      legacyFileName ||
+      imageKitFileName,
+      240
+    );
     const filePath = cleanString(file && file.filePath, 500);
     const titleFromName = fileName
       .replace(/\.[^.]+$/, "")
