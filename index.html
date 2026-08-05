@@ -1617,7 +1617,7 @@
         </div>
 
         <p>
-          Live counts from the professors, courses, reviews, and approved materials currently available across AUC Atlas.
+          Live counts from the professors, courses, reviews, and weekly visitors currently active across AUC Atlas.
         </p>
       </div>
 
@@ -1638,8 +1638,8 @@
         </article>
 
         <article class="home-stat">
-          <strong id="home-material-count">—</strong>
-          <span>Approved materials</span>
+          <strong id="home-weekly-visitor-count">—</strong>
+          <span>Weekly visitors</span>
         </article>
       </div>
     </section>
@@ -1911,7 +1911,7 @@
       const professorCount = document.getElementById("home-professor-count");
       const courseCount = document.getElementById("home-course-count");
       const reviewCount = document.getElementById("home-review-count");
-      const materialCount = document.getElementById("home-material-count");
+      const weeklyVisitorCount = document.getElementById("home-weekly-visitor-count");
       const latestReviewsRoot = document.getElementById("home-latest-reviews");
       const latestMaterialsRoot = document.getElementById("home-latest-materials");
       const latestProfessorsRoot = document.getElementById("home-latest-professors");
@@ -2120,6 +2120,50 @@
       setHomeCount(professorCount, professors.length);
       renderLatestProfessors();
 
+      Promise.resolve(
+        window.aucAtlasWeeklyVisitorsPromise
+      )
+        .then(function (count) {
+          const numericCount = Number(count);
+
+          if (
+            count !== null &&
+            count !== undefined &&
+            Number.isFinite(numericCount)
+          ) {
+            return numericCount;
+          }
+
+          return fetch("/api/weekly-visitors", {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              Accept: "application/json"
+            }
+          })
+            .then(function (response) {
+              if (!response.ok) {
+                throw new Error(
+                  "Could not load weekly visitors."
+                );
+              }
+
+              return response.json();
+            })
+            .then(function (data) {
+              return data.weeklyVisitors;
+            });
+        })
+        .then(function (count) {
+          setHomeCount(weeklyVisitorCount, count);
+        })
+        .catch(function () {
+          if (weeklyVisitorCount) {
+            weeklyVisitorCount.textContent = "—";
+          }
+        });
+
       fetch("/api/homepage-overview", {
         method: "GET",
         credentials: "same-origin",
@@ -2137,17 +2181,12 @@
         })
         .then(function (data) {
           setHomeCount(reviewCount, data.reviewCount);
-          setHomeCount(materialCount, data.materialCount);
           renderLatestReviews(data.latestReviews);
           renderLatestMaterials(data.latestMaterials);
         })
         .catch(function () {
           if (reviewCount) {
             reviewCount.textContent = "—";
-          }
-
-          if (materialCount) {
-            materialCount.textContent = "—";
           }
 
           renderLatestReviews([]);
