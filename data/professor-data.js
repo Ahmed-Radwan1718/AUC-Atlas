@@ -219,6 +219,19 @@
       align-items: center;
     }
 
+    .rating-filter-option {
+      gap: 9px;
+    }
+
+    .rating-filter-stars {
+      min-width: 62px;
+      color: #c09a5c;
+      font-size: 13px;
+      letter-spacing: 1px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
     .filter-content input {
       position: absolute;
       opacity: 0;
@@ -1370,18 +1383,54 @@
     });
   }
 
+  function getProfessorRatingStatus(professor) {
+    const ratingValue = parseFloat(
+      String(
+        professor.averageRating ||
+        professor.averageStars ||
+        professor.rating ||
+        ""
+      ).replace(",", ".")
+    );
+
+    if (!Number.isFinite(ratingValue) || ratingValue <= 0) {
+      return "No ratings yet";
+    }
+
+    const roundedRating = Math.max(
+      1,
+      Math.min(5, Math.round(ratingValue))
+    );
+
+    return roundedRating === 1
+      ? "1 star"
+      : roundedRating + " stars";
+  }
+
   function professorMatches(professor) {
     const searchInput = document.getElementById("professor-search-input");
     const query = normalize(searchInput ? searchInput.value : "");
     const departments = getCheckedValues("department");
     const statuses = getCheckedValues("status");
     const groups = getCheckedValues("group");
+    const ratingStatus = getProfessorRatingStatus(professor);
 
-    const searchableText = normalize([getProfessorId(professor), professor.name, professor.department, professor.displayDepartment, professor.filterDepartment, professor.status, professor.course, professor.bio, professor.group].join(" "));
+    const searchableText = normalize([
+      getProfessorId(professor),
+      professor.name,
+      professor.department,
+      professor.displayDepartment,
+      professor.filterDepartment,
+      professor.status,
+      ratingStatus,
+      professor.course,
+      professor.bio,
+      professor.group
+    ].join(" "));
     const matchesSearch = !query || searchableText.includes(query);
     const professorFilterDepartment = professor.filterDepartment || professor.displayDepartment || professor.department;
     const matchesDepartment = !departments.length || departments.includes(professorFilterDepartment);
-    const matchesStatus = !statuses.length || statuses.includes(professor.status);
+    const matchesStatus = !statuses.length || statuses.includes(ratingStatus);
     const matchesGroup = !groups.length || groups.includes(professor.group);
 
     return matchesSearch && matchesDepartment && matchesStatus && matchesGroup;
