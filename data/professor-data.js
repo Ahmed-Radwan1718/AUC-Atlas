@@ -946,6 +946,44 @@
       box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.1);
     }
 
+    .review-anonymous-option {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      background: rgba(247, 244, 238, 0.72);
+      cursor: pointer;
+    }
+
+    .review-anonymous-option input {
+      width: 18px;
+      height: 18px;
+      margin: 2px 0 0;
+      flex: 0 0 auto;
+      accent-color: #c09a5c;
+      cursor: pointer;
+    }
+
+    .review-anonymous-option span {
+      display: grid;
+      gap: 3px;
+    }
+
+    .review-anonymous-option strong {
+      color: #171717;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .review-anonymous-option small {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
     .review-submit-button {
       width: fit-content;
       min-height: 46px;
@@ -2292,6 +2330,14 @@
                 <label for="review-note">Additional comments</label>
                 <textarea id="review-note" name="studentNote" maxlength="360" required></textarea>
               </div>
+
+              <label class="review-anonymous-option">
+                <input name="isAnonymous" type="checkbox" value="true">
+                <span>
+                  <strong>Post anonymously</strong>
+                  <small>Your name and profile photo will be hidden. Your account will remain privately linked for moderation and review limits.</small>
+                </span>
+              </label>
 
               <button class="review-submit-button" type="submit">Submit Review</button>
               <p class="review-form-message" aria-live="polite"></p>
