@@ -1605,7 +1605,7 @@
 
       request.open(
         "POST",
-        "https://upload.imagekit.io/api/v1/files/upload"
+        "https://upload.imagekit.io/api/v2/files/upload"
       );
 
       request.upload.addEventListener("progress", function (event) {
@@ -1711,29 +1711,13 @@
         button.disabled = true;
       }
 
-      const courseSlug = slugifyMaterialValue(course.code);
-      const professorSlug = slugifyMaterialValue(professor);
-      const semesterSlug = slugifyMaterialValue(semester);
-      const folder =
-        "/auc-atlas/materials/" +
-        courseSlug +
-        "/" +
-        professorSlug +
-        "/" +
-        semesterSlug;
-      const tags = [
-        "auc-atlas-material",
-        "status-pending",
-        "course-" + courseSlug,
-        "professor-" + professorSlug,
-        "semester-" + semesterSlug
-      ].join(",");
       const totalBytes = files.reduce(function (total, file) {
         return total + file.size;
       }, 0);
 
       let uploadedCount = 0;
       let completedBytes = 0;
+      let activeAuthorizationId = "";
 
       setMaterialUploadProgress(0, "Preparing upload", true);
 
@@ -1759,75 +1743,69 @@
           setMaterialUploadStatus(progressLabel + "...", "");
 
           const authResponse = await fetch("/api/imagekit-auth", {
-            cache: "no-store"
+            method: "POST",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              action: "authorize",
+              courseCode: course.code,
+              courseTitle: course.title || "",
+              professor: professor,
+              semester: semester,
+              materialType: materialType,
+              title: uploadTitle,
+              fileName: file.name,
+              fileSize: file.size
+            })
           });
+          const auth = await authResponse.json().catch(
+            function () {
+              return {};
+            }
+          );
 
           if (!authResponse.ok) {
-            throw new Error("Could not prepare the next file upload.");
+            throw new Error(
+              auth.error ||
+                "Could not prepare the next file upload."
+            );
           }
 
-          const auth = await authResponse.json();
-          const uploader =
-            auth && auth.uploader
-              ? auth.uploader
+          const uploadPayload =
+            auth && auth.uploadPayload &&
+            typeof auth.uploadPayload === "object"
+              ? auth.uploadPayload
               : {};
-          const uploaderName = String(
-            uploader.displayName || "AUC student"
-          )
-            .replace(/\s*\|\s*/g, " ")
-            .trim();
-          const uploaderPhotoURL = String(
-            uploader.photoURL || ""
+
+          activeAuthorizationId = String(
+            auth.authorizationId || ""
           ).trim();
-          const uploaderUid = String(
-            uploader.uid || ""
-          ).trim();
-          const uploadTags = [
-            tags,
-            "material-type-" +
-              slugifyMaterialValue(materialType),
-            uploaderUid
-              ? "uploader-" +
-                slugifyMaterialValue(uploaderUid)
-              : ""
-          ]
-            .filter(Boolean)
-            .join(",");
+
+          if (
+            !auth.token ||
+            !activeAuthorizationId ||
+            !uploadPayload.fileName
+          ) {
+            throw new Error(
+              "The secure upload authorization is incomplete."
+            );
+          }
+
           const formData = new FormData();
 
           formData.append("file", file);
-          formData.append("fileName", file.name);
-          formData.append("publicKey", auth.publicKey);
           formData.append("token", auth.token);
-          formData.append("signature", auth.signature);
-          formData.append("expire", auth.expire);
-          formData.append("folder", folder);
-          formData.append("tags", uploadTags);
-          formData.append("useUniqueFileName", "true");
-          formData.append(
-            "description",
-            uploadTitle +
-              " | " +
-              course.code +
-              " | " +
-              professor +
-              " | " +
-              semester +
-              " | " +
-              materialType +
-              " | " +
-              uploaderName +
-              " | " +
-              uploaderPhotoURL +
-              " | " +
-              uploaderUid +
-              " | " +
-              file.name.replace(/\s*\|\s*/g, " ")
-          );
-          formData.append(
-            "responseFields",
-            "fileId,name,url,filePath,size,fileType,tags"
-          );
+
+          Object.keys(uploadPayload).forEach(function (key) {
+            formData.append(
+              key,
+              String(uploadPayload[key])
+            );
+          });
 
           const uploadedFile = await uploadMaterialFormData(
             formData,
@@ -1854,18 +1832,9 @@
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              courseCode: course.code,
-              courseTitle: course.title || "",
-              professor: professor,
-              semester: semester,
-              materialType: materialType,
-              title: uploadTitle,
-              fileName: file.name,
-              fileUrl: uploadedFile.url || "",
-              filePath: uploadedFile.filePath || "",
-              fileId: uploadedFile.fileId || "",
-              size: Number(uploadedFile.size || file.size || 0),
-              fileType: uploadedFile.fileType || file.type || ""
+              uploadAuthorizationId:
+                activeAuthorizationId,
+              fileId: uploadedFile.fileId || ""
             })
           });
 
@@ -1884,6 +1853,7 @@
             );
           }
 
+          activeAuthorizationId = "";
           completedBytes += file.size;
           uploadedCount += 1;
 
@@ -1914,6 +1884,21 @@
           setMaterialUploadProgress(0, "Uploading files", false);
         }, 900);
       } catch (error) {
+        if (activeAuthorizationId) {
+          await fetch("/api/imagekit-auth", {
+            method: "POST",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              action: "cancel",
+              authorizationId: activeAuthorizationId
+            })
+          }).catch(function () {});
+        }
+
         const progressMessage = uploadedCount
           ? uploadedCount + " of " + files.length + " files uploaded. "
           : "";
