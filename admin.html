@@ -101,6 +101,124 @@
       text-align: center;
     }
 
+    .admin-two-factor-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 3300;
+      padding: 24px;
+      background: rgba(23, 23, 23, 0.38);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-two-factor-panel[hidden] {
+      display: none;
+    }
+
+    .admin-two-factor-card {
+      width: min(500px, 100%);
+      padding: 30px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 28px 70px rgba(42, 32, 20, 0.22);
+    }
+
+    .admin-two-factor-header {
+      margin-bottom: 24px;
+    }
+
+    .admin-two-factor-eyebrow {
+      margin-bottom: 14px;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .admin-two-factor-header h2 {
+      margin-bottom: 12px;
+      color: #171717;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .admin-two-factor-header p {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .admin-two-factor-code-inputs {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .admin-field .admin-two-factor-code-input {
+      width: 100%;
+      min-width: 0;
+      min-height: 58px;
+      padding: 0;
+      border-radius: 16px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-align: center;
+    }
+
+    .admin-two-factor-actions {
+      display: grid;
+      gap: 12px;
+    }
+
+    .admin-two-factor-actions .admin-button {
+      width: 100%;
+      min-height: 52px;
+    }
+
+    .admin-two-factor-link-button {
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .admin-two-factor-link-button:hover {
+      opacity: 0.72;
+    }
+
+    @media (max-width: 620px) {
+      .admin-two-factor-card {
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      .admin-two-factor-header h2 {
+        font-size: 24px;
+      }
+
+      .admin-two-factor-code-inputs {
+        gap: 7px;
+      }
+
+      .admin-field .admin-two-factor-code-input {
+        min-height: 50px;
+        border-radius: 14px;
+        font-size: 20px;
+      }
+    }
+
     .admin-header {
       margin-bottom: 30px;
       display: flex;
@@ -670,7 +788,7 @@
       <section class="admin-state-card" id="admin-auth" hidden>
         <p class="admin-kicker">Fresh authentication required</p>
         <h1>Verify access</h1>
-        <p>Enter the current password for your administrator account. Your authenticator-app code is also required when app-based two-factor authentication is enabled.</p>
+        <p>Enter the current password for your administrator account to continue.</p>
 
         <form class="admin-form admin-auth-form" id="admin-auth-form">
           <div class="admin-field">
@@ -685,24 +803,11 @@
             >
           </div>
 
-          <div class="admin-field" id="admin-auth-code-field" hidden>
-            <label for="admin-auth-code">Authenticator code</label>
-            <input
-              id="admin-auth-code"
-              name="authenticatorCode"
-              type="text"
-              maxlength="6"
-              inputmode="numeric"
-              pattern="[0-9]{6}"
-              autocomplete="one-time-code"
-            >
-          </div>
-
           <button
             class="admin-button primary admin-auth-submit"
             id="admin-auth-submit"
             type="submit"
-          >Open admin dashboard</button>
+          >Continue</button>
 
           <p
             class="admin-message"
@@ -871,6 +976,112 @@
       </div>
     </div>
   </main>
+
+  <div
+    class="admin-two-factor-panel"
+    id="admin-two-factor-panel"
+    hidden
+  >
+    <div class="admin-two-factor-card">
+      <div class="admin-two-factor-header">
+        <p class="admin-two-factor-eyebrow">
+          Two-Factor Authentication
+        </p>
+
+        <h2>Enter Authenticator Code</h2>
+
+        <p>
+          Open your authenticator app and enter the
+          6-digit code for AUC Atlas.
+        </p>
+      </div>
+
+      <form class="admin-form" id="admin-two-factor-form">
+        <div class="admin-field">
+          <label>Authenticator Code</label>
+
+          <div
+            class="admin-two-factor-code-inputs"
+            aria-label="Authenticator code"
+          >
+            <input
+              class="admin-two-factor-code-input"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="1"
+              data-admin-two-factor-input
+              aria-label="Digit 1"
+            >
+            <input
+              class="admin-two-factor-code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              data-admin-two-factor-input
+              aria-label="Digit 2"
+            >
+            <input
+              class="admin-two-factor-code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              data-admin-two-factor-input
+              aria-label="Digit 3"
+            >
+            <input
+              class="admin-two-factor-code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              data-admin-two-factor-input
+              aria-label="Digit 4"
+            >
+            <input
+              class="admin-two-factor-code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              data-admin-two-factor-input
+              aria-label="Digit 5"
+            >
+            <input
+              class="admin-two-factor-code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              data-admin-two-factor-input
+              aria-label="Digit 6"
+            >
+          </div>
+        </div>
+
+        <div class="admin-two-factor-actions">
+          <button
+            class="admin-button primary"
+            type="submit"
+            id="admin-two-factor-submit"
+          >
+            Verify Code
+          </button>
+
+          <button
+            class="admin-two-factor-link-button"
+            type="button"
+            id="admin-two-factor-cancel"
+          >
+            Cancel
+          </button>
+        </div>
+
+        <p
+          class="admin-message"
+          id="admin-two-factor-message"
+          aria-live="polite"
+        ></p>
+      </form>
+    </div>
+  </div>
 
   <div class="admin-toast" id="admin-toast" role="status" hidden></div>
 
