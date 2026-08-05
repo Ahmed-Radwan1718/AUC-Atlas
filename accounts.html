@@ -176,6 +176,7 @@
     .account-content { min-width: 0; }
 
     .account-panel {
+      position: relative;
       display: none;
       padding: 30px;
       border-radius: 26px;
@@ -185,6 +186,68 @@
     .account-panel.active {
       display: block;
       animation: accountPanelEnter 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .account-panel.is-loading {
+      min-height: 680px;
+      overflow: hidden;
+    }
+
+    .account-panel.is-loading > :not(.account-details-loading-state) {
+      visibility: hidden;
+    }
+
+    .account-details-loading-state {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      padding: 36px;
+      border-radius: inherit;
+      background: rgba(255, 255, 255, 0.96);
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .account-details-loading-state[hidden] {
+      display: none;
+    }
+
+    .account-details-loading-inner {
+      max-width: 320px;
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+    }
+
+    .account-details-loading-spinner {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 6px;
+      border: 3px solid rgba(192, 154, 92, 0.2);
+      border-top-color: rgba(192, 154, 92, 0.96);
+      border-radius: 999px;
+      animation: accountDetailsLoadingSpin 0.8s linear infinite;
+    }
+
+    .account-details-loading-inner strong {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .account-details-loading-inner p {
+      color: rgba(23, 23, 23, 0.6);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    @keyframes accountDetailsLoadingSpin {
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     @keyframes accountPanelEnter {
@@ -2434,7 +2497,15 @@
           </aside>
 
           <section class="account-content">
-            <article class="account-panel active" id="account-panel-details">
+            <article class="account-panel active is-loading" id="account-panel-details" aria-busy="true">
+              <div class="account-details-loading-state" id="account-details-loading-state" role="status" aria-live="polite">
+                <div class="account-details-loading-inner">
+                  <span class="account-details-loading-spinner" aria-hidden="true"></span>
+                  <strong>Loading account details</strong>
+                  <p>Retrieving your saved profile information.</p>
+                </div>
+              </div>
+
               <div class="account-panel-header">
                 <h2>Saved Details</h2>
                 <p>Update your profile photo, display name, and major. Your email address, phone number, and AUC ID are read-only.</p>
@@ -3113,6 +3184,8 @@
   <script>
     const sidebarLinks = document.querySelectorAll("[data-account-panel]");
     const accountPanels = document.querySelectorAll(".account-panel");
+    const accountDetailsPanel = document.getElementById("account-panel-details");
+    const accountDetailsLoadingState = document.getElementById("account-details-loading-state");
     const photoInput = document.getElementById("account-photo-input");
     const photoChooseButton = document.getElementById("account-photo-choose-button");
     const photoRemoveButton = document.getElementById("account-photo-remove-button");
@@ -5223,6 +5296,15 @@
         photoPreview.hidden = true;
         photoInitial.hidden = false;
         photoRemoveButton.hidden = true;
+      }
+
+      if (accountDetailsPanel) {
+        accountDetailsPanel.classList.remove("is-loading");
+        accountDetailsPanel.setAttribute("aria-busy", "false");
+      }
+
+      if (accountDetailsLoadingState) {
+        accountDetailsLoadingState.hidden = true;
       }
     }
 
