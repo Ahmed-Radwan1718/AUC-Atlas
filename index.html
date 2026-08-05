@@ -481,7 +481,7 @@
     }
 
     .support-progress-fill {
-      width: 100%;
+      width: 0;
       height: 100%;
       display: block;
       position: relative;
@@ -493,6 +493,7 @@
         #c09a5c 55%,
         #e2c48c 100%
       );
+      transition: width 0.35s ease;
     }
 
     .support-progress-fill::after {
@@ -906,7 +907,7 @@
         <p class="home-kicker">Keep AUC Atlas running</p>
         <h2>Help keep AUC Atlas free for students.</h2>
         <p>
-          AUC Atlas costs roughly <strong>$100/month</strong> to keep online, maintained, and useful. If it helped you choose a class, compare professors, or find material faster, a small donation helps cover the monthly running cost.
+          AUC Atlas costs roughly <strong id="support-monthly-goal-copy">$100/month</strong> to keep online, maintained, and useful. If it helped you choose a class, compare professors, or find material faster, a small donation helps cover the monthly running cost.
         </p>
 
         <div class="support-cost-card" aria-label="AUC Atlas monthly running cost">
@@ -917,18 +918,18 @@
             </div>
 
             <div class="support-cost-amount">
-              <strong>$100</strong>
+              <strong id="support-monthly-goal">$100</strong>
               <span>per month</span>
             </div>
           </div>
 
           <div class="support-progress" aria-hidden="true">
-            <span class="support-progress-fill"></span>
+            <span class="support-progress-fill" id="support-progress-fill"></span>
           </div>
 
           <div class="support-progress-row">
             <span>Donated so far</span>
-            <span>$0 of $100</span>
+            <span id="support-progress-text">$0 of $100</span>
           </div>
 
           <div class="support-cost-breakdown">
@@ -1008,6 +1009,67 @@
       const modal = document.getElementById("support-donation-modal");
       const backdrop = document.getElementById("support-donation-backdrop");
       const closeButton = document.getElementById("support-donation-close");
+      const monthlyGoalCopy = document.getElementById("support-monthly-goal-copy");
+      const monthlyGoal = document.getElementById("support-monthly-goal");
+      const progressFill = document.getElementById("support-progress-fill");
+      const progressText = document.getElementById("support-progress-text");
+
+      function formatDonationAmount(value, currency) {
+        const amount = Number(value || 0);
+        const formatted = Number.isInteger(amount)
+          ? amount.toLocaleString("en-US")
+          : amount.toLocaleString("en-US", {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2
+            });
+
+        return currency === "EGP" ? "EGP " + formatted : "$" + formatted;
+      }
+
+      function updateDonationCounter(data) {
+        const currentAmount = Math.max(0, Number(data.currentAmount || 0));
+        const goalAmount = Math.max(0, Number(data.goalAmount || 100));
+        const currency = data.currency === "EGP" ? "EGP" : "USD";
+        const percentage = goalAmount > 0
+          ? Math.min(100, Math.max(0, currentAmount / goalAmount * 100))
+          : 0;
+
+        if (monthlyGoalCopy) {
+          monthlyGoalCopy.textContent = formatDonationAmount(goalAmount, currency) + "/month";
+        }
+
+        if (monthlyGoal) {
+          monthlyGoal.textContent = formatDonationAmount(goalAmount, currency);
+        }
+
+        if (progressFill) {
+          progressFill.style.width = percentage + "%";
+        }
+
+        if (progressText) {
+          progressText.textContent =
+            formatDonationAmount(currentAmount, currency) +
+            " of " +
+            formatDonationAmount(goalAmount, currency);
+        }
+      }
+
+      fetch("/api/donation-counter", {
+        method: "GET",
+        credentials: "same-origin",
+        headers: {
+          Accept: "application/json"
+        }
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Could not load donation counter.");
+          }
+
+          return response.json();
+        })
+        .then(updateDonationCounter)
+        .catch(function () {});
 
       if (!openButton || !modal || !backdrop || !closeButton) {
         return;
