@@ -493,7 +493,7 @@
 
         <a href="accounts.html#reviews" class="floating-account-menu-link" id="floating-reviews-link" hidden>
           <span class="floating-account-menu-icon floating-reviews-icon" aria-hidden="true"></span>
-          <span>Review History</span>
+          <span>Activity History</span>
         </a>
 
         <button class="floating-account-menu-link floating-account-logout" id="floating-logout-button" type="button" hidden>
