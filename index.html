@@ -134,6 +134,25 @@
       font-size: 16px;
     }
 
+    .atlas-search input::-webkit-search-cancel-button {
+      width: 14px;
+      height: 14px;
+      margin-left: 12px;
+      border-radius: 50%;
+      background:
+        linear-gradient(45deg, transparent 43%, rgba(23, 23, 23, 0.9) 44%, rgba(23, 23, 23, 0.9) 56%, transparent 57%),
+        linear-gradient(-45deg, transparent 43%, rgba(23, 23, 23, 0.9) 44%, rgba(23, 23, 23, 0.9) 56%, transparent 57%);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .atlas-search input::-webkit-search-cancel-button:hover {
+      background:
+        linear-gradient(45deg, transparent 43%, #171717 44%, #171717 56%, transparent 57%),
+        linear-gradient(-45deg, transparent 43%, #171717 44%, #171717 56%, transparent 57%);
+    }
+
     .atlas-search button {
       min-height: 52px;
       padding: 0 24px;
