@@ -5,6 +5,8 @@ const { authenticator } = require("otplib");
 const {
   getSiteSessionUser,
   getAuthenticatorSecret,
+  consumeAuthenticatorAttempt,
+  clearAuthenticatorAttempts,
   issueSecurityPanelAccess,
   requireSecurityPanelAccess
 } = require("../_lib/securityHelpers");
@@ -12,7 +14,34 @@ const {
 const SETUP_EXPIRES_MS = 10 * 60 * 1000;
 
 function cleanCode(value) {
-  return String(value || "").trim().replace(/\D/g, "");
+  return String(value || "")
+    .trim()
+    .replace(/\D/g, "");
+}
+
+async function verifyAuthenticatorCode(
+  uid,
+  scope,
+  code,
+  secret
+) {
+  await consumeAuthenticatorAttempt(
+    uid,
+    scope
+  );
+
+  authenticator.options = { window: 1 };
+
+  if (!authenticator.check(code, secret)) {
+    return false;
+  }
+
+  await clearAuthenticatorAttempts(
+    uid,
+    scope
+  );
+
+  return true;
 }
 
 function timestampToMillis(value) {
@@ -92,10 +121,18 @@ async function handleVerifySetup(req, res, decodedUser) {
     return res.status(400).json({ error: "Authenticator setup expired. Please restart setup." });
   }
 
-  authenticator.options = { window: 1 };
+  const validCode =
+    await verifyAuthenticatorCode(
+      decodedUser.uid,
+      "setup",
+      code,
+      setupData.secret || ""
+    );
 
-  if (!authenticator.check(code, setupData.secret || "")) {
-    return res.status(401).json({ error: "Invalid authenticator code." });
+  if (!validCode) {
+    return res.status(401).json({
+      error: "Invalid authenticator code."
+    });
   }
 
   const state = await getTwoFactorState(decodedUser.uid);
@@ -164,9 +201,15 @@ async function handleVerifySecurityPanel(req, res, decodedUser) {
     });
   }
 
-  authenticator.options = { window: 1 };
+  const validCode =
+    await verifyAuthenticatorCode(
+      decodedUser.uid,
+      "account",
+      code,
+      secret
+    );
 
-  if (!authenticator.check(code, secret)) {
+  if (!validCode) {
     return res.status(401).json({
       error: "Invalid authenticator code."
     });
@@ -197,10 +240,18 @@ async function handleDisable(req, res, decodedUser) {
     return res.status(400).json({ error: "Authenticator app is not enabled." });
   }
 
-  authenticator.options = { window: 1 };
+  const validCode =
+    await verifyAuthenticatorCode(
+      decodedUser.uid,
+      "account",
+      code,
+      secret
+    );
 
-  if (!authenticator.check(code, secret)) {
-    return res.status(401).json({ error: "Invalid authenticator code." });
+  if (!validCode) {
+    return res.status(401).json({
+      error: "Invalid authenticator code."
+    });
   }
 
   const state = await getTwoFactorState(decodedUser.uid);
@@ -267,8 +318,19 @@ module.exports = async function handler(req, res) {
 
     return res.status(400).json({ error: "Unknown authenticator action." });
   } catch (error) {
-    return res.status(error.statusCode || 500).json({
-      error: error.message || "Could not update authenticator app."
-    });
+    if (error.retryAfterSeconds) {
+      res.setHeader(
+        "Retry-After",
+        String(error.retryAfterSeconds)
+      );
+    }
+
+    return res
+      .status(error.statusCode || 500)
+      .json({
+        error:
+          error.message ||
+          "Could not update authenticator app."
+      });
   }
 };
