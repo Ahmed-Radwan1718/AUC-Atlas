@@ -5,7 +5,9 @@
   faviconLink.href = "favicon.svg";
   document.head.appendChild(faviconLink);
 
-  if (!document.querySelector('script[src="site-footer.js"]')) {
+  const isAdminPage = /\/admin(?:\.html)?\/?$/.test(window.location.pathname);
+
+  if (!isAdminPage && !document.querySelector('script[src="site-footer.js"]')) {
     const footerScript = document.createElement("script");
     footerScript.src = "site-footer.js";
     footerScript.defer = true;
