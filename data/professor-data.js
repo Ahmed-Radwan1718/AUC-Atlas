@@ -202,6 +202,27 @@
       padding: 10px 8px 12px;
     }
 
+    .filter-item.open .department-filter-content {
+      max-height: 420px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(192, 154, 92, 0.48) transparent;
+    }
+
+    .department-filter-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .department-filter-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .department-filter-content::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.48);
+    }
+
     .filter-item.open .chevron {
       transform: rotate(225deg);
     }
@@ -1383,6 +1404,74 @@
     });
   }
 
+  function getProfessorDepartment(professor) {
+    const department = String(
+      professor && professor.department
+        ? professor.department
+        : ""
+    ).trim();
+
+    if (
+      !department ||
+      normalize(department) === "department coming soon"
+    ) {
+      return "Other";
+    }
+
+    return department;
+  }
+
+  function populateDepartmentFilters() {
+    const container = document.getElementById(
+      "department-filter-options"
+    );
+
+    if (
+      !container ||
+      container.dataset.departmentOptionsReady === "true"
+    ) {
+      return;
+    }
+
+    const departmentNames = Array.from(
+      new Set(
+        professors.map(function (professor) {
+          return getProfessorDepartment(professor);
+        })
+      )
+    ).sort(function (firstDepartment, secondDepartment) {
+      if (firstDepartment === "Other") {
+        return 1;
+      }
+
+      if (secondDepartment === "Other") {
+        return -1;
+      }
+
+      return firstDepartment.localeCompare(secondDepartment);
+    });
+
+    container.innerHTML = "";
+
+    departmentNames.forEach(function (department) {
+      const label = document.createElement("label");
+      const input = document.createElement("input");
+
+      input.type = "checkbox";
+      input.value = department;
+      input.dataset.filterGroup = "department";
+
+      label.appendChild(input);
+      label.appendChild(
+        document.createTextNode(" " + department)
+      );
+
+      container.appendChild(label);
+    });
+
+    container.dataset.departmentOptionsReady = "true";
+  }
+
   function getProfessorRatingStatus(professor) {
     const ratingValue = parseFloat(
       String(
@@ -1414,6 +1503,8 @@
     const statuses = getCheckedValues("status");
     const groups = getCheckedValues("group");
     const ratingStatus = getProfessorRatingStatus(professor);
+    const professorDepartment =
+      getProfessorDepartment(professor);
 
     const searchableText = normalize([
       getProfessorId(professor),
@@ -1428,12 +1519,22 @@
       professor.group
     ].join(" "));
     const matchesSearch = !query || searchableText.includes(query);
-    const professorFilterDepartment = professor.filterDepartment || professor.displayDepartment || professor.department;
-    const matchesDepartment = !departments.length || departments.includes(professorFilterDepartment);
-    const matchesStatus = !statuses.length || statuses.includes(ratingStatus);
-    const matchesGroup = !groups.length || groups.includes(professor.group);
+    const matchesDepartment =
+      !departments.length ||
+      departments.includes(professorDepartment);
+    const matchesStatus =
+      !statuses.length ||
+      statuses.includes(ratingStatus);
+    const matchesGroup =
+      !groups.length ||
+      groups.includes(professor.group);
 
-    return matchesSearch && matchesDepartment && matchesStatus && matchesGroup;
+    return (
+      matchesSearch &&
+      matchesDepartment &&
+      matchesStatus &&
+      matchesGroup
+    );
   }
 
   function getReviewDateLabel(value) {
@@ -2510,6 +2611,8 @@
   }
 
   function setupProfessorFilters() {
+    populateDepartmentFilters();
+
     document.querySelectorAll(".filter-toggle").forEach(function (button) {
       button.addEventListener("click", function () {
         button.closest(".filter-item").classList.toggle("open");
