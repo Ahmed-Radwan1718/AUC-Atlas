@@ -552,6 +552,49 @@
     </div>
   </div>
 
+  <div class="auth-two-factor-panel" id="login-email-code-panel" hidden>
+    <div class="auth-two-factor-card">
+      <div class="auth-two-factor-header">
+        <p class="auth-two-factor-eyebrow">Email Sign-In</p>
+        <h2>Enter Email Code</h2>
+        <p id="login-email-code-description">
+          Enter the 6-digit code sent to your AUC email address.
+        </p>
+      </div>
+
+      <form class="auth-form" id="login-email-code-form">
+        <div class="auth-field">
+          <label>Email Sign-In Code</label>
+
+          <div class="auth-two-factor-code-inputs" aria-label="Email sign-in code">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" data-login-email-code-input aria-label="Digit 1">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-email-code-input aria-label="Digit 2">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-email-code-input aria-label="Digit 3">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-email-code-input aria-label="Digit 4">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-email-code-input aria-label="Digit 5">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-email-code-input aria-label="Digit 6">
+          </div>
+        </div>
+
+        <div class="auth-two-factor-actions">
+          <button class="auth-button" type="submit" id="login-email-code-submit">
+            Verify Code
+          </button>
+
+          <button class="auth-two-factor-link-button" type="button" id="login-email-code-resend">
+            Send a new code
+          </button>
+
+          <button class="auth-two-factor-link-button" type="button" id="login-email-code-cancel">
+            Cancel sign in
+          </button>
+        </div>
+
+        <p class="auth-message" id="login-email-code-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
   <script>
     const loginForm = document.getElementById("login-form");
     const loginButton = document.getElementById("login-submit");
@@ -841,9 +884,7 @@
       closeTwoFactorPanel("Sign in cancelled.");
     });
 
-    passwordlessLoginButton.addEventListener("click", function () {
-      showMessage("Email sign-in codes are not connected yet.", "error");
-    });
   </script>
+  <script src="login-code.js"></script>
 </body>
 </html>
