@@ -3,6 +3,7 @@ const routeLoaders = {
   "change-password": function () { return require("../server/routes/change-password"); },
   "course-material-download": function () { return require("../server/routes/course-material-download"); },
   "login": function () { return require("../server/routes/login"); },
+  "login-code": function () { return require("../server/routes/login-code"); },
   "logout": function () { return require("../server/routes/logout"); },
   "me": function () { return require("../server/routes/me"); },
   "profile-photo": function () { return require("../server/routes/profile-photo"); },
