@@ -152,21 +152,49 @@ module.exports = async function handler(req, res) {
       const decodedUser = await getSiteSessionUser(req, {
         checkRevoked: true
       });
-      const fullName = cleanString((req.body || {}).fullName, 80);
-      const aucId = cleanAucId((req.body || {}).aucId);
-      const phone = cleanPhone((req.body || {}).phone);
-      const major = cleanString((req.body || {}).major, 100);
+      const db = admin.firestore();
+      const userRef = db.collection("users").doc(decodedUser.uid);
+      const storedUserDoc = await userRef.get();
+      const storedUserData = storedUserDoc.exists
+        ? storedUserDoc.data() || {}
+        : {};
+      const requestBody = req.body || {};
+      const fullName = cleanString(requestBody.fullName, 80);
+      const aucId = cleanAucId(
+        storedUserData.aucId ||
+        storedUserData.aucIdLookupKey ||
+        ""
+      );
+      const aucIdWasSubmitted =
+        Object.prototype.hasOwnProperty.call(
+          requestBody,
+          "aucId"
+        );
+      const requestedAucId = aucIdWasSubmitted
+        ? cleanAucId(requestBody.aucId)
+        : "";
+      const phone = cleanPhone(requestBody.phone);
+      const major = cleanString(requestBody.major, 100);
 
       if (!fullName) {
         throw createProfileError("Please enter your display name.", 400);
       }
 
-      if (!aucId) {
-        throw createProfileError("Please enter your AUC ID.", 400);
+      if (
+        aucIdWasSubmitted &&
+        requestedAucId !== aucId
+      ) {
+        throw createProfileError(
+          "AUC ID cannot be changed.",
+          400
+        );
       }
 
-      if (!hasValidAucIdFormat(aucId)) {
-        throw createProfileError("AUC ID number must start with 900 and be 9 digits total.", 400);
+      if (aucId && !hasValidAucIdFormat(aucId)) {
+        throw createProfileError(
+          "The saved AUC ID is invalid.",
+          500
+        );
       }
 
       if (phone && !hasValidPhoneFormat(phone)) {
@@ -175,8 +203,6 @@ module.exports = async function handler(req, res) {
 
       const phoneLookupKey = phone ? getPhoneLookupKey(phone) : "";
       const aucIdLookupKey = getAucIdLookupKey(aucId);
-      const db = admin.firestore();
-      const userRef = db.collection("users").doc(decodedUser.uid);
       const phoneReservations = db.collection("accountPhoneNumbers");
       const aucIdReservations = db.collection("accountAucIds");
       const existingUserRecord = await admin.auth().getUser(decodedUser.uid);
