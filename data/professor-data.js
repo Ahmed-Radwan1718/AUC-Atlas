@@ -1423,6 +1423,72 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media (max-width: 640px) {
+      .professor-review-form {
+        top: 8px;
+        left: 8px;
+        width: calc(100% - 16px);
+        max-height: calc(100dvh - 16px);
+        padding: 18px 18px max(18px, env(safe-area-inset-bottom));
+        overflow-x: hidden;
+        scrollbar-gutter: auto;
+        border-radius: 22px;
+        transform: none;
+        animation: none;
+      }
+
+      .review-modal-header {
+        position: sticky;
+        top: -18px;
+        z-index: 8;
+        margin: -18px -18px 0;
+        padding: 18px 18px 12px;
+        background: rgba(255, 255, 255, 0.98);
+      }
+
+      .review-close-button {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+      }
+
+      .review-step.is-active {
+        grid-template-columns: 1fr;
+      }
+
+      .review-field.full {
+        grid-column: auto;
+      }
+
+      .review-choice-menu {
+        position: static;
+        display: none;
+        max-height: min(240px, 38dvh);
+        margin-top: 8px;
+        opacity: 1;
+        pointer-events: none;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .review-choice.open .review-choice-menu {
+        display: grid;
+        pointer-events: auto;
+        transform: none;
+      }
+
+      .professor-review-toggle {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .professor-profile-body,
+      .professor-review-insights,
+      .professor-reviews-section {
+        min-width: 0;
+      }
+    }
   `;
   document.head.appendChild(style);
 
