@@ -503,6 +503,10 @@
     }
 
     @media (max-width: 900px) {
+      body.nav-menu-open {
+        overflow: hidden;
+      }
+
       .site-header {
         top: 14px;
         left: 14px;
@@ -544,9 +548,23 @@
       }
 
       .site-header-user,
-      .site-header-user:visited {
-        width: 42px;
-        height: 42px;
+      .site-header-user:visited,
+      .floating-account-button {
+        width: 44px;
+        height: 44px;
+      }
+
+      .floating-account-menu {
+        right: -4px;
+        max-width: calc(100vw - 28px);
+        max-height: calc(100dvh - 90px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .floating-account-menu-link {
+        min-height: 44px;
       }
 
       .hamburger-toggle {
@@ -556,6 +574,46 @@
         justify-self: start;
         width: 44px;
         height: 44px;
+      }
+
+      .nav-menu-overlay {
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .nav-menu-panel {
+        max-height: calc(100dvh - 96px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+
+      .auth-section {
+        min-height: calc(100dvh - 88px);
+      }
+
+      .auth-password-input-wrap input {
+        padding-right: 62px;
+      }
+
+      .auth-password-visibility-toggle {
+        right: 4px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .auth-two-factor-panel {
+        padding: 12px;
+        overflow-y: auto;
+        align-items: flex-start;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .auth-two-factor-card {
+        max-height: calc(100dvh - 24px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
       }
     }
   `;
