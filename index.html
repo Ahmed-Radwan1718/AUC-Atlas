@@ -314,27 +314,60 @@
       line-height: 1.7;
     }
 
-    .rating-row {
-      margin-top: 24px;
+    .home-quick-links {
+      margin-top: 22px;
       display: grid;
-      gap: 12px;
     }
 
-    .rating-item {
+    .home-quick-link {
+      margin: 0 -12px;
+      padding: 14px 12px;
+      border-radius: 14px;
+      color: inherit;
+      text-decoration: none;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(23, 23, 23, 0.08);
-      color: rgba(23, 23, 23, 0.64);
-      font-size: 13px;
-      font-weight: 700;
+      gap: 18px;
+      transition: background 0.18s ease, transform 0.18s ease;
     }
 
-    .rating-item strong {
+    .home-quick-link + .home-quick-link {
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .home-quick-link:hover,
+    .home-quick-link:focus-visible {
+      outline: none;
+      background: rgba(192, 154, 92, 0.12);
+      transform: translateX(3px);
+    }
+
+    .home-quick-link div {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .home-quick-link strong {
       color: #171717;
       font-size: 14px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .home-quick-link small {
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .home-quick-link > span {
+      flex: 0 0 auto;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 20px;
+      line-height: 1;
     }
 
     .support-section {
@@ -834,29 +867,36 @@
       </div>
 
       <aside class="home-feature-card">
-        <span>Review context</span>
-        <h2>Ratings that explain the class, not just the professor.</h2>
+        <span>Quick access</span>
+        <h2>Start with what you need.</h2>
         <p>
-          Each review can connect a professor to a specific course and semester, then summarize what students cared about most.
+          Jump directly to the main AUC Atlas tools instead of searching through the site.
         </p>
 
-        <div class="rating-row">
-          <div class="rating-item">
-            <strong>Overall</strong>
-            <span>4.6 / 5</span>
-          </div>
-          <div class="rating-item">
-            <strong>Clarity</strong>
-            <span>High</span>
-          </div>
-          <div class="rating-item">
-            <strong>Workload</strong>
-            <span>Moderate</span>
-          </div>
-          <div class="rating-item">
-            <strong>Attendance</strong>
-            <span>Lenient</span>
-          </div>
+        <div class="home-quick-links">
+          <a class="home-quick-link" href="professors.html">
+            <div>
+              <strong>Browse professors</strong>
+              <small>Compare ratings, courses, and student reviews.</small>
+            </div>
+            <span aria-hidden="true">→</span>
+          </a>
+
+          <a class="home-quick-link" href="courses.html">
+            <div>
+              <strong>Explore courses</strong>
+              <small>Find course details, professors, and uploaded materials.</small>
+            </div>
+            <span aria-hidden="true">→</span>
+          </a>
+
+          <a class="home-quick-link" href="gpa-calculator.html">
+            <div>
+              <strong>Calculate your GPA</strong>
+              <small>Estimate your semester and cumulative GPA.</small>
+            </div>
+            <span aria-hidden="true">→</span>
+          </a>
         </div>
       </aside>
     </section>
