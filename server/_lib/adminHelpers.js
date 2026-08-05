@@ -317,10 +317,285 @@ async function getAdminAuthenticationRequirements(
   };
 }
 
-async function authenticateAdminUser(
+function createAdminChallengeError(
+  message
+) {
+  const error = createAdminError(
+    message ||
+      "Administrator verification expired. Enter your password again.",
+    401,
+    "admin-auth-challenge-invalid"
+  );
+
+  error.requiresTwoFactor = true;
+
+  return error;
+}
+
+function getAdminChallengeHash(
+  uid,
+  siteSessionId,
+  token
+) {
+  return crypto
+    .createHash("sha256")
+    .update(
+      "admin-auth-challenge:" +
+      uid +
+      ":" +
+      siteSessionId +
+      ":" +
+      token
+    )
+    .digest("hex");
+}
+
+async function createAdminAccess(
   actor,
-  passwordValue,
-  codeValue
+  authenticatorVerified
+) {
+  const siteSessionId =
+    getAdminSessionId(actor);
+  const token = crypto
+    .randomBytes(32)
+    .toString("hex");
+  const expiresAt = new Date(
+    Date.now() +
+      ADMIN_ACCESS_EXPIRES_MS
+  );
+  const accessRef =
+    getAdminAccessRef(actor);
+
+  await accessRef.set({
+    uid: actor.uid,
+    siteSessionId,
+    tokenHash: getAdminAccessHash(
+      actor.uid,
+      siteSessionId,
+      token
+    ),
+    passwordVerified: true,
+    authenticatorVerified:
+      Boolean(
+        authenticatorVerified
+      ),
+    createdAt:
+      admin.firestore.FieldValue
+        .serverTimestamp(),
+    expiresAt:
+      admin.firestore.Timestamp
+        .fromDate(expiresAt)
+  });
+
+  return {
+    success: true,
+    adminAccessToken: token,
+    adminAccessExpiresAt:
+      expiresAt.toISOString(),
+    requiresTwoFactor:
+      Boolean(
+        authenticatorVerified
+      )
+  };
+}
+
+async function createAdminChallenge(
+  actor
+) {
+  const siteSessionId =
+    getAdminSessionId(actor);
+  const token = crypto
+    .randomBytes(32)
+    .toString("hex");
+  const expiresAt = new Date(
+    Date.now() +
+      ADMIN_ACCESS_EXPIRES_MS
+  );
+  const accessRef =
+    getAdminAccessRef(actor);
+
+  await accessRef.set({
+    uid: actor.uid,
+    siteSessionId,
+    challengeTokenHash:
+      getAdminChallengeHash(
+        actor.uid,
+        siteSessionId,
+        token
+      ),
+    passwordVerified: true,
+    authenticatorVerified: false,
+    createdAt:
+      admin.firestore.FieldValue
+        .serverTimestamp(),
+    expiresAt:
+      admin.firestore.Timestamp
+        .fromDate(expiresAt)
+  });
+
+  return {
+    token,
+    expiresAt
+  };
+}
+
+async function requireAdminChallenge(
+  actor,
+  tokenValue
+) {
+  const token = String(
+    tokenValue || ""
+  ).trim();
+
+  if (
+    !/^[a-f0-9]{64}$/i.test(token)
+  ) {
+    throw createAdminChallengeError();
+  }
+
+  const siteSessionId =
+    getAdminSessionId(actor);
+  const accessRef =
+    getAdminAccessRef(actor);
+  const accessDoc =
+    await accessRef.get();
+
+  if (!accessDoc.exists) {
+    throw createAdminChallengeError();
+  }
+
+  const accessData =
+    accessDoc.data() || {};
+  const expiresAtMs =
+    timestampToMillis(
+      accessData.expiresAt
+    );
+
+  if (
+    !expiresAtMs ||
+    expiresAtMs <= Date.now()
+  ) {
+    await accessRef
+      .delete()
+      .catch(function () {});
+
+    throw createAdminChallengeError(
+      "Administrator verification expired. Enter your password again."
+    );
+  }
+
+  if (
+    String(accessData.uid || "") !==
+      actor.uid ||
+    String(
+      accessData.siteSessionId || ""
+    ) !== siteSessionId ||
+    accessData.passwordVerified !==
+      true ||
+    accessData.authenticatorVerified ===
+      true
+  ) {
+    throw createAdminChallengeError();
+  }
+
+  const savedHash = String(
+    accessData.challengeTokenHash || ""
+  );
+  const submittedHash =
+    getAdminChallengeHash(
+      actor.uid,
+      siteSessionId,
+      token
+    );
+
+  if (
+    !safeEqualHex(
+      savedHash,
+      submittedHash
+    )
+  ) {
+    throw createAdminChallengeError();
+  }
+
+  return {
+    token,
+    siteSessionId,
+    accessRef
+  };
+}
+
+async function consumeAdminChallenge(
+  actor,
+  tokenValue
+) {
+  const validated =
+    await requireAdminChallenge(
+      actor,
+      tokenValue
+    );
+
+  await admin.firestore()
+    .runTransaction(
+      async function (transaction) {
+        const accessDoc =
+          await transaction.get(
+            validated.accessRef
+          );
+
+        if (!accessDoc.exists) {
+          throw createAdminChallengeError();
+        }
+
+        const accessData =
+          accessDoc.data() || {};
+        const expiresAtMs =
+          timestampToMillis(
+            accessData.expiresAt
+          );
+        const savedHash = String(
+          accessData.challengeTokenHash ||
+          ""
+        );
+        const submittedHash =
+          getAdminChallengeHash(
+            actor.uid,
+            validated.siteSessionId,
+            validated.token
+          );
+
+        if (
+          !expiresAtMs ||
+          expiresAtMs <= Date.now() ||
+          String(
+            accessData.uid || ""
+          ) !== actor.uid ||
+          String(
+            accessData.siteSessionId ||
+            ""
+          ) !==
+            validated.siteSessionId ||
+          accessData.passwordVerified !==
+            true ||
+          accessData.authenticatorVerified ===
+            true ||
+          !safeEqualHex(
+            savedHash,
+            submittedHash
+          )
+        ) {
+          throw createAdminChallengeError();
+        }
+
+        transaction.delete(
+          validated.accessRef
+        );
+      }
+    );
+}
+
+async function authenticateAdminPassword(
+  actor,
+  passwordValue
 ) {
   const password = String(
     passwordValue || ""
@@ -377,105 +652,123 @@ async function authenticateAdminUser(
       actor.uid
     );
 
-  if (twoFactor.requiresTwoFactor) {
-    const code = String(
-      codeValue || ""
-    )
-      .replace(/\D/g, "")
-      .slice(0, 6);
-
-    if (!/^\d{6}$/.test(code)) {
-      const error = createAdminError(
-        "Enter your 6-digit authenticator code.",
-        400,
-        "admin-authenticator-required"
-      );
-
-      error.requiresTwoFactor = true;
-      throw error;
-    }
-
-    if (!twoFactor.secret) {
-      const error = createAdminError(
-        "Authenticator app is not configured correctly.",
-        500,
-        "admin-authenticator-misconfigured"
-      );
-
-      error.requiresTwoFactor = true;
-      throw error;
-    }
-
-    await consumeAuthenticatorAttempt(
-      actor.uid,
-      "admin-two-factor"
-    );
-
-    authenticator.options = {
-      window: 1
-    };
-
-    if (
-      !authenticator.check(
-        code,
-        twoFactor.secret
-      )
-    ) {
-      const error = createAdminError(
-        "Invalid authenticator code.",
-        401,
-        "admin-authenticator-invalid"
-      );
-
-      error.requiresTwoFactor = true;
-      throw error;
-    }
-
-    await clearAuthenticatorAttempts(
-      actor.uid,
-      "admin-two-factor"
+  if (!twoFactor.requiresTwoFactor) {
+    return createAdminAccess(
+      actor,
+      false
     );
   }
 
-  const siteSessionId =
-    getAdminSessionId(actor);
-  const token = crypto
-    .randomBytes(32)
-    .toString("hex");
-  const expiresAt = new Date(
-    Date.now() +
-      ADMIN_ACCESS_EXPIRES_MS
-  );
-  const accessRef =
-    getAdminAccessRef(actor);
+  if (!twoFactor.secret) {
+    const error = createAdminError(
+      "Authenticator app is not configured correctly.",
+      500,
+      "admin-authenticator-misconfigured"
+    );
 
-  await accessRef.set({
-    uid: actor.uid,
-    siteSessionId,
-    tokenHash: getAdminAccessHash(
-      actor.uid,
-      siteSessionId,
-      token
-    ),
-    passwordVerified: true,
-    authenticatorVerified:
-      twoFactor.requiresTwoFactor,
-    createdAt:
-      admin.firestore.FieldValue
-        .serverTimestamp(),
-    expiresAt:
-      admin.firestore.Timestamp
-        .fromDate(expiresAt)
-  });
+    error.requiresTwoFactor = true;
+    throw error;
+  }
+
+  const challenge =
+    await createAdminChallenge(actor);
 
   return {
     success: true,
-    adminAccessToken: token,
-    adminAccessExpiresAt:
-      expiresAt.toISOString(),
-    requiresTwoFactor:
-      twoFactor.requiresTwoFactor
+    requiresTwoFactor: true,
+    adminChallengeToken:
+      challenge.token,
+    adminChallengeExpiresAt:
+      challenge.expiresAt
+        .toISOString()
   };
+}
+
+async function verifyAdminAuthenticator(
+  actor,
+  challengeTokenValue,
+  codeValue
+) {
+  const code = String(
+    codeValue || ""
+  )
+    .replace(/\D/g, "")
+    .slice(0, 6);
+
+  if (!/^\d{6}$/.test(code)) {
+    const error = createAdminError(
+      "Enter your 6-digit authenticator code.",
+      400,
+      "admin-authenticator-required"
+    );
+
+    error.requiresTwoFactor = true;
+    throw error;
+  }
+
+  await requireAdminChallenge(
+    actor,
+    challengeTokenValue
+  );
+
+  const twoFactor =
+    await getAdminTwoFactorState(
+      actor.uid
+    );
+
+  if (
+    !twoFactor.requiresTwoFactor ||
+    !twoFactor.secret
+  ) {
+    const error = createAdminError(
+      "Authenticator app is not configured correctly.",
+      500,
+      "admin-authenticator-misconfigured"
+    );
+
+    error.requiresTwoFactor = true;
+    throw error;
+  }
+
+  await consumeAuthenticatorAttempt(
+    actor.uid,
+    "admin-two-factor"
+  );
+
+  authenticator.options = {
+    window: 1
+  };
+
+  if (
+    !authenticator.check(
+      code,
+      twoFactor.secret
+    )
+  ) {
+    const error = createAdminError(
+      "Invalid authenticator code.",
+      401,
+      "admin-authenticator-invalid"
+    );
+
+    error.requiresTwoFactor = true;
+    throw error;
+  }
+
+  await consumeAdminChallenge(
+    actor,
+    challengeTokenValue
+  );
+
+  await clearAuthenticatorAttempts(
+    actor.uid,
+    "admin-two-factor"
+  );
+
+  return createAdminAccess(
+    actor,
+    true
+  );
 }
 
 async function requireFreshAdminAccess(
@@ -578,6 +871,7 @@ module.exports = {
   ensureAdminUser,
   isAdminUid,
   getAdminAuthenticationRequirements,
-  authenticateAdminUser,
+  authenticateAdminPassword,
+  verifyAdminAuthenticator,
   requireFreshAdminAccess
 };
