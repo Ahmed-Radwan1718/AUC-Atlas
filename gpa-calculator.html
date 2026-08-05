@@ -667,7 +667,7 @@
       }
 
       .gpa-row {
-        grid-template-columns: minmax(0, 1fr) 110px 36px;
+        grid-template-columns: minmax(0, 1fr) 104px 44px;
         grid-template-areas:
           "course course course"
           "credits grade remove";
@@ -692,7 +692,25 @@
       }
 
       .remove-course {
-        width: 36px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .remove-semester {
+        flex: 0 0 44px;
+      }
+
+      .grade-menu {
+        max-height: min(280px, 45dvh);
+      }
+
+      .grade-option {
+        min-height: 44px;
+      }
+
+      .gpa-action.semester-add-course {
+        height: 44px;
+        min-height: 44px;
       }
 
       .gpa-actions {
@@ -703,6 +721,12 @@
       .gpa-action {
         width: 100%;
         padding: 0 12px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .gpa-actions {
+        grid-template-columns: 1fr;
       }
     }
   </style>
