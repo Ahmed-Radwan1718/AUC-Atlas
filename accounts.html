@@ -1385,6 +1385,187 @@
       }
     }
 
+    .account-activity-tabs {
+      margin-bottom: 24px;
+      padding: 5px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.72);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .account-activity-tab {
+      min-height: 40px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.58);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .account-activity-tab:hover,
+    .account-activity-tab.active {
+      background: white;
+      color: #171717;
+      box-shadow: 0 8px 22px rgba(42, 32, 20, 0.08);
+    }
+
+    .account-activity-section[hidden] {
+      display: none;
+    }
+
+    .account-upload-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .account-upload-item {
+      position: relative;
+      padding: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.58);
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .account-upload-file-icon {
+      width: 64px;
+      height: 64px;
+      padding: 8px;
+      border: 1px solid rgba(192, 154, 92, 0.22);
+      border-radius: 17px;
+      background: rgba(192, 154, 92, 0.1);
+      color: rgba(154, 112, 48, 0.96);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-align: center;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .account-upload-body {
+      min-width: 0;
+      padding-right: 178px;
+      display: grid;
+      gap: 13px;
+    }
+
+    .account-upload-head h3 {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+
+    .account-upload-head p {
+      margin-top: 5px;
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .account-upload-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .account-upload-meta span {
+      padding: 8px 10px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.72);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .account-upload-file-name {
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .account-upload-actions {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: 160px;
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .account-upload-download-button {
+      min-height: 34px;
+      padding: 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.86);
+      color: rgba(23, 23, 23, 0.76);
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 32px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .account-upload-download-button:hover {
+      border-color: rgba(192, 154, 92, 0.36);
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 700px) {
+      .account-activity-tabs {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .account-upload-item {
+        grid-template-columns: 52px minmax(0, 1fr);
+        gap: 13px;
+      }
+
+      .account-upload-file-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+      }
+
+      .account-upload-body {
+        padding-right: 0;
+      }
+
+      .account-upload-actions {
+        position: static;
+        width: auto;
+        justify-content: flex-start;
+      }
+    }
+
     body.account-review-editor-open {
       overflow: hidden;
     }
@@ -2233,7 +2414,7 @@
       <div class="account-section-inner">
         <div class="account-header">
           <h1>My Account</h1>
-          <p>Manage your details, degree progression, security, and review history.</p>
+          <p>Manage your details, degree progression, security, reviews, and uploaded materials.</p>
         </div>
 
         <div class="account-layout">
@@ -2255,7 +2436,7 @@
 
             <button class="account-sidebar-link" type="button" data-account-panel="reviews">
               <span class="account-sidebar-icon account-reviews-icon" aria-hidden="true"></span>
-              <span>Review History</span>
+              <span>Activity History</span>
             </button>
 
             <button class="account-sidebar-link account-logout-link" type="button" id="account-logout-sidebar">
@@ -2575,18 +2756,62 @@
 
             <article class="account-panel" id="account-panel-reviews">
               <div class="account-panel-header">
-                <h2>Reviews</h2>
-                <p>Track professor and course reviews submitted from your account.</p>
+                <h2>Activity History</h2>
+                <p>Manage the reviews and course materials submitted from your account.</p>
               </div>
 
-              <div class="account-review-list" id="account-review-list">
-                <div class="account-empty-state">
-                  <h3>No reviews yet</h3>
-                  <p>Your professor and course reviews will appear here after submission.</p>
+              <div class="account-activity-tabs" role="tablist" aria-label="Activity history">
+                <button
+                  class="account-activity-tab active"
+                  type="button"
+                  role="tab"
+                  aria-selected="true"
+                  data-account-activity-tab="reviews"
+                >
+                  Reviews
+                </button>
+
+                <button
+                  class="account-activity-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  data-account-activity-tab="uploads"
+                >
+                  Uploads
+                </button>
+              </div>
+
+              <section
+                class="account-activity-section"
+                role="tabpanel"
+                data-account-activity-section="reviews"
+              >
+                <div class="account-review-list" id="account-review-list">
+                  <div class="account-empty-state">
+                    <h3>No reviews yet</h3>
+                    <p>Your professor and course reviews will appear here after submission.</p>
+                  </div>
                 </div>
-              </div>
 
-              <p class="account-message" id="reviews-message" aria-live="polite"></p>
+                <p class="account-message" id="reviews-message" aria-live="polite"></p>
+              </section>
+
+              <section
+                class="account-activity-section"
+                role="tabpanel"
+                data-account-activity-section="uploads"
+                hidden
+              >
+                <div class="account-upload-list" id="account-upload-list">
+                  <div class="account-empty-state">
+                    <h3>No uploads yet</h3>
+                    <p>Course materials uploaded from your account will appear here.</p>
+                  </div>
+                </div>
+
+                <p class="account-message" id="uploads-message" aria-live="polite"></p>
+              </section>
             </article>
           </section>
         </div>
@@ -2774,6 +2999,59 @@
     </div>
   </div>
 
+  <div class="account-review-editor" id="account-material-editor" hidden>
+    <div class="account-review-editor-backdrop" id="account-material-editor-backdrop"></div>
+
+    <div class="account-review-editor-card" role="dialog" aria-modal="true" aria-labelledby="account-material-editor-title">
+      <button class="account-review-editor-close" type="button" id="account-material-editor-close" aria-label="Close material editor">×</button>
+
+      <div class="account-review-editor-header">
+        <span>Edit upload</span>
+        <h2 id="account-material-editor-title">Course Material</h2>
+      </div>
+
+      <form class="account-review-editor-form" id="account-material-editor-form">
+        <input type="hidden" name="materialId">
+
+        <div class="account-review-editor-grid">
+          <div class="account-review-editor-field full">
+            <label for="account-material-title">Material name</label>
+            <input
+              id="account-material-title"
+              name="title"
+              type="text"
+              maxlength="160"
+              required
+            >
+          </div>
+
+          <div class="account-review-editor-field full">
+            <label for="account-material-type">Category</label>
+
+            <select id="account-material-type" name="materialType" required>
+              <option value="" disabled>Choose category</option>
+              <option value="Notes">Notes</option>
+              <option value="Slides">Slides</option>
+              <option value="Past exam">Past exam</option>
+              <option value="Practice sheet">Practice sheet</option>
+              <option value="Lab file">Lab file</option>
+              <option value="Assignment">Assignment</option>
+              <option value="Project">Project</option>
+              <option value="Review sheet">Review sheet</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="account-review-editor-actions">
+          <button class="account-secondary-button" type="button" id="account-material-editor-cancel">Cancel</button>
+          <button class="account-primary-button" type="submit" id="account-material-editor-submit">Save Changes</button>
+        </div>
+
+        <p class="account-message" id="account-material-editor-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
   <div class="account-authenticator-modal" id="authenticator-modal" hidden>
     <div class="account-authenticator-modal-backdrop" id="authenticator-modal-backdrop"></div>
 
@@ -2925,8 +3203,12 @@
     const securityAccessCodeInputs = Array.from(document.querySelectorAll("[data-security-access-code-input]"));
     const securityAccessSubmit = document.getElementById("security-access-submit");
     const securityAccessMessage = document.getElementById("security-access-message");
+    const accountActivityTabs = document.querySelectorAll("[data-account-activity-tab]");
+    const accountActivitySections = document.querySelectorAll("[data-account-activity-section]");
     const accountReviewList = document.getElementById("account-review-list");
     const reviewsMessage = document.getElementById("reviews-message");
+    const accountUploadList = document.getElementById("account-upload-list");
+    const uploadsMessage = document.getElementById("uploads-message");
     const accountReviewEditor = document.getElementById("account-review-editor");
     const accountReviewEditorBackdrop = document.getElementById("account-review-editor-backdrop");
     const accountReviewEditorClose = document.getElementById("account-review-editor-close");
@@ -2935,6 +3217,14 @@
     const accountReviewEditorTitle = document.getElementById("account-review-editor-title");
     const accountReviewEditorSubmit = document.getElementById("account-review-editor-submit");
     const accountReviewEditorMessage = document.getElementById("account-review-editor-message");
+    const accountMaterialEditor = document.getElementById("account-material-editor");
+    const accountMaterialEditorBackdrop = document.getElementById("account-material-editor-backdrop");
+    const accountMaterialEditorClose = document.getElementById("account-material-editor-close");
+    const accountMaterialEditorCancel = document.getElementById("account-material-editor-cancel");
+    const accountMaterialEditorForm = document.getElementById("account-material-editor-form");
+    const accountMaterialEditorTitle = document.getElementById("account-material-editor-title");
+    const accountMaterialEditorSubmit = document.getElementById("account-material-editor-submit");
+    const accountMaterialEditorMessage = document.getElementById("account-material-editor-message");
 
     const PROFILE_PHOTO_MAX_SIZE = 4 * 1024 * 1024;
     const PROFILE_PHOTO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -2954,6 +3244,8 @@
     let aucIdEditMode = false;
     let accountReviewHistory = [];
     let activeAccountReviewId = "";
+    let accountUploadHistory = [];
+    let activeAccountMaterialId = "";
 
     function getAccountDateFromValue(value) {
       if (!value) {
@@ -3262,7 +3554,7 @@
       }
 
       if (panelName === "reviews") {
-        loadAccountReviewHistory();
+        loadAccountActivityHistory();
       }
     }
 
@@ -4289,6 +4581,381 @@
           </div>
         `;
         showMessage(reviewsMessage, error.message || "Could not load your reviews.", "error");
+      }
+    }
+
+    function setAccountActivityTab(tabName) {
+      const activeTab = tabName === "uploads" ? "uploads" : "reviews";
+
+      accountActivityTabs.forEach(function (tab) {
+        const isActive = tab.dataset.accountActivityTab === activeTab;
+
+        tab.classList.toggle("active", isActive);
+        tab.setAttribute("aria-selected", isActive ? "true" : "false");
+        tab.tabIndex = isActive ? 0 : -1;
+      });
+
+      accountActivitySections.forEach(function (section) {
+        section.hidden =
+          section.dataset.accountActivitySection !== activeTab;
+      });
+    }
+
+    function getAccountUploadById(materialId) {
+      return accountUploadHistory.find(function (material) {
+        return String(material.id || "") === String(materialId || "");
+      }) || null;
+    }
+
+    function formatAccountMaterialSize(value) {
+      const bytes = Number(value || 0);
+
+      if (!Number.isFinite(bytes) || bytes <= 0) {
+        return "Size not listed";
+      }
+
+      const units = ["B", "KB", "MB", "GB"];
+      let size = bytes;
+      let unitIndex = 0;
+
+      while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex += 1;
+      }
+
+      return (
+        (unitIndex === 0 ? Math.round(size) : size.toFixed(size >= 10 ? 0 : 1)) +
+        " " +
+        units[unitIndex]
+      );
+    }
+
+    function renderAccountUploadHistory(materials) {
+      const safeMaterials = Array.isArray(materials) ? materials : [];
+      accountUploadHistory = safeMaterials.slice();
+
+      if (!accountUploadList) {
+        return;
+      }
+
+      if (!safeMaterials.length) {
+        accountUploadList.innerHTML = `
+          <div class="account-empty-state">
+            <h3>No uploads yet</h3>
+            <p>Course materials uploaded from your account will appear here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      accountUploadList.innerHTML = safeMaterials.map(function (material) {
+        const materialId = String(material.id || "");
+        const title = material.title || "Course material";
+        const fileName = material.fileName || "File name not listed";
+        const extensionMatch = fileName.match(/\.([^.]+)$/);
+        const extensionLabel = extensionMatch
+          ? extensionMatch[1].slice(0, 5).toUpperCase()
+          : "FILE";
+        const downloadUrl = String(material.downloadUrl || "");
+        const downloadAction = downloadUrl
+          ? `
+              <a
+                class="account-upload-download-button"
+                href="${escapeAccountHtml(downloadUrl)}"
+                target="_blank"
+                rel="noopener"
+              >Download</a>
+            `
+          : "";
+        const managementActions = materialId
+          ? `
+              <button
+                class="account-review-action-button"
+                type="button"
+                data-account-material-edit="${escapeAccountHtml(materialId)}"
+              >Edit</button>
+
+              <button
+                class="account-review-action-button is-danger"
+                type="button"
+                data-account-material-delete="${escapeAccountHtml(materialId)}"
+              >Delete</button>
+            `
+          : "";
+
+        return `
+          <article class="account-upload-item">
+            <span class="account-upload-file-icon" aria-hidden="true">
+              ${escapeAccountHtml(extensionLabel)}
+            </span>
+
+            <div class="account-upload-body">
+              <div class="account-upload-head">
+                <h3>${escapeAccountHtml(title)}</h3>
+                <p>${escapeAccountHtml(getAccountReviewDateLabel(material.createdAt))}</p>
+              </div>
+
+              <div class="account-upload-meta">
+                <span>${escapeAccountHtml(material.courseCode || "Course not listed")}</span>
+                <span>${escapeAccountHtml(material.materialType || "Category not listed")}</span>
+                <span>${escapeAccountHtml(material.professor || "Professor not listed")}</span>
+                <span>${escapeAccountHtml(material.semester || "Semester not listed")}</span>
+              </div>
+
+              <p class="account-upload-file-name">
+                ${escapeAccountHtml(fileName)} ·
+                ${escapeAccountHtml(formatAccountMaterialSize(material.size))}
+              </p>
+
+              <div class="account-upload-actions">
+                ${downloadAction}
+                ${managementActions}
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    async function loadAccountUploadHistory() {
+      if (!accountUploadList) {
+        return;
+      }
+
+      showMessage(uploadsMessage, "", "");
+      accountUploadList.innerHTML = `
+        <div class="account-empty-state">
+          <h3>Loading uploads</h3>
+          <p>Checking the course materials uploaded from your account.</p>
+        </div>
+      `;
+
+      try {
+        const response = await fetch("/api/course-materials?mine=true", {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not load your uploads.");
+        }
+
+        renderAccountUploadHistory(data.materials || []);
+      } catch (error) {
+        accountUploadHistory = [];
+        accountUploadList.innerHTML = `
+          <div class="account-empty-state">
+            <h3>Could not load uploads</h3>
+            <p>Your upload history could not be loaded right now.</p>
+          </div>
+        `;
+
+        showMessage(
+          uploadsMessage,
+          error.message || "Could not load your uploads.",
+          "error"
+        );
+      }
+    }
+
+    function loadAccountActivityHistory() {
+      loadAccountReviewHistory();
+      loadAccountUploadHistory();
+    }
+
+    function closeAccountMaterialEditor() {
+      if (!accountMaterialEditor) {
+        return;
+      }
+
+      accountMaterialEditor.hidden = true;
+      document.body.classList.remove("account-review-editor-open");
+      activeAccountMaterialId = "";
+
+      if (accountMaterialEditorForm) {
+        accountMaterialEditorForm.reset();
+      }
+
+      showMessage(accountMaterialEditorMessage, "", "");
+    }
+
+    function openAccountMaterialEditor(materialId) {
+      const material = getAccountUploadById(materialId);
+
+      if (!material || !accountMaterialEditor || !accountMaterialEditorForm) {
+        showMessage(uploadsMessage, "Upload not found.", "error");
+        return;
+      }
+
+      const materialIdField =
+        accountMaterialEditorForm.elements.namedItem("materialId");
+      const titleField =
+        accountMaterialEditorForm.elements.namedItem("title");
+      const materialTypeField =
+        accountMaterialEditorForm.elements.namedItem("materialType");
+
+      activeAccountMaterialId = String(material.id || "");
+      accountMaterialEditorForm.reset();
+
+      if (materialIdField) {
+        materialIdField.value = activeAccountMaterialId;
+      }
+
+      if (titleField) {
+        titleField.value = material.title || "";
+      }
+
+      if (materialTypeField) {
+        materialTypeField.value = material.materialType || "";
+      }
+
+      accountMaterialEditorTitle.textContent =
+        material.title || "Course Material";
+
+      showMessage(accountMaterialEditorMessage, "", "");
+      accountMaterialEditor.hidden = false;
+      document.body.classList.add("account-review-editor-open");
+
+      window.setTimeout(function () {
+        if (titleField) {
+          titleField.focus();
+          titleField.select();
+        }
+      }, 50);
+    }
+
+    async function saveAccountMaterialChanges() {
+      const formData = new FormData(accountMaterialEditorForm);
+      const materialId = String(
+        formData.get("materialId") ||
+        activeAccountMaterialId ||
+        ""
+      );
+      const title = String(formData.get("title") || "").trim();
+      const materialType = String(
+        formData.get("materialType") || ""
+      ).trim();
+
+      if (!materialId || !title || !materialType) {
+        showMessage(
+          accountMaterialEditorMessage,
+          "Enter a material name and choose a category.",
+          "error"
+        );
+        return;
+      }
+
+      accountMaterialEditorSubmit.disabled = true;
+      accountMaterialEditorSubmit.textContent = "Saving...";
+      showMessage(accountMaterialEditorMessage, "", "");
+
+      try {
+        const response = await fetch("/api/course-materials", {
+          method: "PATCH",
+          credentials: "same-origin",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            materialId,
+            title,
+            materialType
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Could not update this upload.");
+        }
+
+        renderAccountUploadHistory(data.materials || []);
+        closeAccountMaterialEditor();
+        setAccountActivityTab("uploads");
+        showMessage(uploadsMessage, "Upload updated.", "success");
+      } catch (error) {
+        showMessage(
+          accountMaterialEditorMessage,
+          error.message || "Could not update this upload.",
+          "error"
+        );
+      } finally {
+        accountMaterialEditorSubmit.disabled = false;
+        accountMaterialEditorSubmit.textContent = "Save Changes";
+      }
+    }
+
+    async function deleteAccountMaterial(materialId, button) {
+      const material = getAccountUploadById(materialId);
+
+      if (!material) {
+        showMessage(uploadsMessage, "Upload not found.", "error");
+        return;
+      }
+
+      const confirmed = window.confirm(
+        "Delete \"" +
+        (material.title || "this course material") +
+        "\"? This cannot be undone."
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Deleting...";
+      }
+
+      showMessage(uploadsMessage, "", "");
+
+      try {
+        const response = await fetch("/api/course-materials", {
+          method: "DELETE",
+          credentials: "same-origin",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            materialId
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Could not delete this upload.");
+        }
+
+        renderAccountUploadHistory(data.materials || []);
+        setAccountActivityTab("uploads");
+        showMessage(uploadsMessage, "Upload deleted.", "success");
+      } catch (error) {
+        if (button) {
+          button.disabled = false;
+          button.textContent = "Delete";
+        }
+
+        showMessage(
+          uploadsMessage,
+          error.message || "Could not delete this upload.",
+          "error"
+        );
       }
     }
 
@@ -5419,6 +6086,12 @@
       });
     }
 
+    accountActivityTabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        setAccountActivityTab(tab.dataset.accountActivityTab || "reviews");
+      });
+    });
+
     if (accountReviewList) {
       accountReviewList.addEventListener("click", function (event) {
         const editButton = event.target.closest("[data-account-review-edit]");
@@ -5435,6 +6108,27 @@
       });
     }
 
+    if (accountUploadList) {
+      accountUploadList.addEventListener("click", function (event) {
+        const editButton = event.target.closest("[data-account-material-edit]");
+        const deleteButton = event.target.closest("[data-account-material-delete]");
+
+        if (editButton) {
+          openAccountMaterialEditor(
+            editButton.dataset.accountMaterialEdit || ""
+          );
+          return;
+        }
+
+        if (deleteButton) {
+          deleteAccountMaterial(
+            deleteButton.dataset.accountMaterialDelete || "",
+            deleteButton
+          );
+        }
+      });
+    }
+
     if (accountReviewEditorForm) {
       accountReviewEditorForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -5447,9 +6141,27 @@
       });
     }
 
+    if (accountMaterialEditorForm) {
+      accountMaterialEditorForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        if (!accountMaterialEditorForm.reportValidity()) {
+          return;
+        }
+
+        saveAccountMaterialChanges();
+      });
+    }
+
     [accountReviewEditorBackdrop, accountReviewEditorClose, accountReviewEditorCancel].forEach(function (control) {
       if (control) {
         control.addEventListener("click", closeAccountReviewEditor);
+      }
+    });
+
+    [accountMaterialEditorBackdrop, accountMaterialEditorClose, accountMaterialEditorCancel].forEach(function (control) {
+      if (control) {
+        control.addEventListener("click", closeAccountMaterialEditor);
       }
     });
 
@@ -5465,6 +6177,11 @@
 
       if (authenticatorModal && !authenticatorModal.hidden) {
         closeAuthenticatorModal();
+        return;
+      }
+
+      if (accountMaterialEditor && !accountMaterialEditor.hidden) {
+        closeAccountMaterialEditor();
         return;
       }
 
