@@ -947,39 +947,140 @@
     }
 
     .review-anonymous-option {
+      position: relative;
       grid-column: 1 / -1;
+      overflow: hidden;
       display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 14px;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
       border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 14px;
-      background: rgba(247, 244, 238, 0.72);
+      border-radius: 18px;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.88),
+          rgba(247, 244, 238, 0.78)
+        );
+      box-shadow: 0 10px 26px rgba(42, 32, 20, 0.05);
       cursor: pointer;
+      transition:
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease,
+        transform 0.22s ease;
+    }
+
+    .review-anonymous-option:hover {
+      border-color: rgba(192, 154, 92, 0.34);
+      box-shadow: 0 14px 32px rgba(42, 32, 20, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .review-anonymous-option:has(input:checked) {
+      border-color: rgba(192, 154, 92, 0.5);
+      background:
+        linear-gradient(
+          135deg,
+          rgba(192, 154, 92, 0.16),
+          rgba(255, 255, 255, 0.9)
+        );
+      box-shadow:
+        0 0 0 3px rgba(192, 154, 92, 0.08),
+        0 14px 34px rgba(42, 32, 20, 0.09);
     }
 
     .review-anonymous-option input {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      margin: 0;
+      flex: 0 0 46px;
+      appearance: none;
+      -webkit-appearance: none;
+      border: 1px solid rgba(23, 23, 23, 0.13);
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.12);
+      box-shadow: inset 0 1px 3px rgba(23, 23, 23, 0.12);
+      cursor: pointer;
+      outline: none;
+      transition:
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
+    }
+
+    .review-anonymous-option input::before {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
       width: 18px;
       height: 18px;
-      margin: 2px 0 0;
-      flex: 0 0 auto;
-      accent-color: #c09a5c;
-      cursor: pointer;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 7px rgba(23, 23, 23, 0.22);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .review-anonymous-option input:checked {
+      border-color: rgba(154, 112, 48, 0.8);
+      background: #c09a5c;
+      box-shadow:
+        inset 0 1px 3px rgba(90, 58, 15, 0.18),
+        0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .review-anonymous-option input:checked::before {
+      transform: translateX(20px);
+    }
+
+    .review-anonymous-option input:focus-visible {
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.2);
     }
 
     .review-anonymous-option span {
+      min-width: 0;
+      padding-right: 68px;
       display: grid;
-      gap: 3px;
+      gap: 4px;
+    }
+
+    .review-anonymous-option span::after {
+      content: "Private";
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      padding: 6px 9px;
+      border: 1px solid rgba(192, 154, 92, 0.24);
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.12);
+      color: rgba(145, 101, 35, 0.96);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition:
+        opacity 0.22s ease,
+        transform 0.22s ease;
+    }
+
+    .review-anonymous-option input:checked + span::after {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .review-anonymous-option strong {
       color: #171717;
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.3;
     }
 
     .review-anonymous-option small {
-      color: rgba(23, 23, 23, 0.58);
+      color: rgba(23, 23, 23, 0.56);
       font-size: 12px;
       line-height: 1.5;
     }
