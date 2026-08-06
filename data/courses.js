@@ -947,6 +947,46 @@
       "Concepts of Engineering Management, Organizing, Motivation and Leadership, Performance evaluation, Project selection and initiation, Project planning, Project scheduling, monitoring, control, and evaluation, Resources scheduling, Project management software.",
     "MENG 3502":
       "Linkage synthesis, position, velocity, and acceleration of mechanisms, cams, gears and gear trains, machine dynamics, rotating and reciprocating machines, dynamic balancing.",
+    "MENG 3505":
+      "Internal reactions, load-stress relations and transformation of stresses for generally loaded rods. Generalized concepts of stress, strain and material relations. Computerized Methods. Elastic-plastic behavior of beams. Analysis of thin walled beams. Membrane theory of axisymmetric shells. Stress concentrations.",
+    "MENG 3506":
+      "Introduction to design concepts. Constructional details as affected by manufacturing, assembly, and strength considerations. Engineering materials. Design for steady and cyclic loading, and for rigidity and stability. Rigid and elastic connections. Bolts, rivets and welds. Design of shafts and springs. Use of interactive computer programs for problem solving is illustrated and encouraged. Design projects.",
+    "MENG 3601":
+      "Fundamental Concepts and Definitions. Thermodynamic Processes, pure substances and perfect gases, The First Law of Thermodynamics, the Second Law of Thermodynamics, the Carnot cycle. Thermodynamic Relations, Reversibility and Entropy.",
+    "MENG 3602":
+      "Dimensional analysis, external flow and aerodynamic forces, compressible flow, turbomachinery, pumps, fans, compressors, and turbines. Measurements of fluid flow applications.",
+    "MENG 3605":
+      "Availability and second-law analysis. Power cycles: air standard and actual cycles; reversed cycles: refrigerators and heat pumps, gas mixtures, psychrometry and air conditioning, hydrocarbon reactions, waste heat recovery.",
+    "MENG 3705":
+      "Mathematical modeling of mechanical, electrical, electromechanical, and thermo-fluid systems. Free and forced vibrations for a single degree of freedom systems. Free and forced vibrations of multiple degrees of freedom systems. Linearization. Stability, Steady-state error, and Time response analysis. State-space and transfer function solutions. System analogies. Introduction to automatic control and Feedback control systems. Team based project covering modeling, analysis, and design of a selected system by each team.",
+    "MENG 4208":
+      "Effect of material properties on design. Effect of manufacturing processes on design. Failure and reliability of components in service. Economics of materials and manufacturing processes. Decision making and the selection process. Integration of design and economic analysis with materials and process selection. Case studies.",
+    "MENG 4507":
+      "Design of machine elements used in power transmission: couplings, gears, bearings, roller chain drives, clutches. Design for surface failure prevention. Applications: automotive and machine tool areas, etc. Basics of systems design. Design projects.",
+    "MENG 4606":
+      "Steady and unsteady, one and multi-dimensional, heat conduction. Finite-difference and Finite-volume methods applied to heat conduction. Heat transfer by natural and forced convection. Introduction to Mass transfer. Heat transfer by radiation. Design of Heat exchangers.",
+    "MENG 4661":
+      "Preliminary design procedures for turbo-machines. Ideal and actual performance characteristics for hydraulic pumps and turbines, axial and centrifugal flow compressors and fans, axial and radial flow gas turbines. Cavitation in hydraulic machinery. Turbo-chargers. Hydro-power plants and pumped-storage.",
+    "MENG 4662":
+      "Steam and Gas turbine power plants. Combined-cycle power plants. Co-generation. Principles of nuclear energy and introduction to Nuclear power plants. Environmental impacts of power plants.",
+    "MENG 4663":
+      "The world energy scene. Environmental impact of energy use. Wind power, PV and Solar Thermal Electricity and Biomass. Hybrid systems. Renewable energy generation in Power systems. Economics and sustainability.",
+    "MENG 4665":
+      "Review of Air standard cycles. Diesel and Petrol combustion overview. Fuels and chemistry of combustion reactions. Octane and Cetane ratings. Fluid mechanic interactions with flames - burn rates. Overview of exhaust emissions. Turbocharging and supercharging, volumetric efficiency and valve timing.",
+    "MENG 4666":
+      "Calculation of building cooling and heating loads, and ventilation requirements. Design of Air conditioning and ventilation systems. Passive cooling and heating. Air conditioning equipment.",
+    "MENG 4667":
+      "Refrigeration and Air conditioning cycles and C.O.P. Vapor compression refrigeration systems. Absorption refrigeration. Cryogenics. Design of Air conditioning systems and components. Heat pumps and heating systems. District cooling.",
+    "MENG 4936":
+      "Covers specialized topics in Power engineering not covered in other listed courses.",
+    "MENG 4950":
+      "Each student is required to spend a minimum of eight weeks in industrial training in Egypt or abroad. A complete account of the experience is reported, presented and evaluated.",
+    "MENG 4980":
+      "Working in project teams, students will conceptualize and design a multi-disciplinary engineering solution addressing a real-world problem in an area of societal, national or international need. The project work constitutes a substantial design experience, typically based on the integration of knowledge and skills acquired in a broad range of earlier course work, incorporating applicable engineering standards and realistic constraints. Topics are selected by teams of students according to their areas of interest and the approval of advisors. This course is the first of a sequence of two capstone courses, which guides students through execution and documentation of the conceptual and detailed design stage.",
+    "MENG 4981":
+      "Working in project teams, students continue the work on the project topic selected in MENG 4980 to develop and analyze the engineering solution for the selected problem. The project work constitutes a substantial design experience, typically based on the integration of knowledge and skills acquired in a broad range of earlier course work, incorporating applicable engineering standards and realistic constraints. This course is the second of a sequence of two capstone courses, where development, testing, and analysis take place, resulting in a functional solution that meets design requirements.",
+    "MENG 5168":
+      "Fundamentals of nuclear reactor engineering and reactor safety. Aspects of nuclear physics, nuclear interactions, reactor criticality and heat removal. Introduction to current nuclear reactor types, and next generation reactor types.",
     "PHYS 1011":
       "An introduction to classical mechanics covering vectors, applications of Newton’s laws, conservation laws and forces, motion in a plane, circular motion, equilibrium and elasticity, rotational motion, simple harmonic motion, energy and power; mechanical and sound waves, temperature, heat and the first law of thermodynamics.",
     "PHYS 1012":
@@ -954,7 +994,11 @@
     "PHYS 1021":
       "An introduction to electricity and magnetism covering the electric field, Gauss’s law, electric potential, capacitance, dc circuits, magnetic fields, Faraday’s and Ampere’s laws, time-varying fields, Maxwell’s equations in integral form and alternating currents.",
     "PHYS 1022":
-      "The fundamental quantities of physics are measured through selected experiments in electricity, magnetism, and optics. Data are summarized, errors are estimated, and reports are presented."
+      "The fundamental quantities of physics are measured through selected experiments in electricity, magnetism, and optics. Data are summarized, errors are estimated, and reports are presented.",
+    "PHYS 2216":
+      "Foundation of circuit analysis and Theorems, AC theory and circuits analysis, Introduction to semiconductor basics and diodes, Metal-Oxide-Semiconductor Structure, Transistors, Operational amplifiers, Digital Electronic fundamentals, and Logic gates.",
+    "PHYS 2217":
+      "Basic experiments demonstrating the fundamental theory of circuits and electronics for mechanical engineering students."
   };
 
   const coursePrerequisites = {
