@@ -156,7 +156,7 @@
       text-decoration: none;
       white-space: nowrap;
       display: inline-flex;
-      align-items: center;
+      align-items: baseline;
       justify-content: center;
       gap: 4px;
       overflow: hidden;
