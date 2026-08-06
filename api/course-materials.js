@@ -18,6 +18,14 @@ function cleanUrl(value) {
   return /^https?:\/\//i.test(url) ? url : "";
 }
 
+function cleanBoolean(value) {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  return cleanString(value, 10).toLowerCase() === "true";
+}
+
 const MATERIAL_TYPE_CHOICES = [
   "Notes",
   "Slides",
@@ -50,6 +58,7 @@ function getTimestampMillis(value) {
 
 function serializeMaterialData(id, data) {
   const createdAtMillis = getTimestampMillis(data.createdAt || data.createdAtIso);
+  const isAnonymous = cleanBoolean(data.isAnonymous);
 
   return {
     id,
@@ -67,9 +76,16 @@ function serializeMaterialData(id, data) {
     size: Number(data.size || 0),
     fileType: data.fileType || "",
     status: data.status || "pending",
-    uploaderUid: data.uploaderUid || "",
-    uploaderDisplayName: data.uploaderDisplayName || "AUC student",
-    uploaderPhotoURL: data.uploaderPhotoURL || "",
+    isAnonymous,
+    uploaderUid: isAnonymous
+      ? ""
+      : (data.uploaderUid || ""),
+    uploaderDisplayName: isAnonymous
+      ? "Anonymous student"
+      : (data.uploaderDisplayName || "AUC student"),
+    uploaderPhotoURL: isAnonymous
+      ? ""
+      : (data.uploaderPhotoURL || ""),
     createdAt: createdAtMillis ? new Date(createdAtMillis).toISOString() : (data.createdAtIso || "")
   };
 }
@@ -203,6 +219,12 @@ async function getImageKitCourseMaterials(courseCode) {
       240
     );
     const fileId = cleanString(file && file.fileId, 160);
+    const isAnonymous =
+      cleanBoolean(descriptionParts[9]) ||
+      (
+        Array.isArray(file && file.tags) &&
+        file.tags.includes("anonymous-upload")
+      );
     const titleFromName = fileName
       .replace(/\.[^.]+$/, "")
       .replace(/[-_]+/g, " ")
@@ -238,10 +260,16 @@ async function getImageKitCourseMaterials(courseCode) {
         80
       ),
       status: "pending",
-      uploaderUid: descriptionParts[7] || "",
-      uploaderDisplayName:
-        descriptionParts[5] || "AUC student",
-      uploaderPhotoURL: cleanUrl(descriptionParts[6]),
+      isAnonymous,
+      uploaderUid: isAnonymous
+        ? ""
+        : (descriptionParts[7] || ""),
+      uploaderDisplayName: isAnonymous
+        ? "Anonymous student"
+        : (descriptionParts[5] || "AUC student"),
+      uploaderPhotoURL: isAnonymous
+        ? ""
+        : cleanUrl(descriptionParts[6]),
       createdAt: cleanString(file && file.createdAt, 80)
     };
   });
@@ -544,6 +572,11 @@ async function verifyImageKitMaterialUpload(data) {
     "uploader-" + slugifyMaterialValue(data.uploaderUid),
     "upload-auth-" + data.uploadAuthorizationId
   ];
+
+  if (cleanBoolean(data.isAnonymous)) {
+    expectedTags.push("anonymous-upload");
+  }
+
   const verifiedFileName = cleanMaterialFileName(
     descriptionParts[8]
   );
@@ -567,6 +600,8 @@ async function verifyImageKitMaterialUpload(data) {
       cleanString(data.materialType, 80) &&
     cleanString(descriptionParts[7], 160) ===
       cleanString(data.uploaderUid, 160) &&
+    cleanBoolean(descriptionParts[9]) ===
+      cleanBoolean(data.isAnonymous) &&
     verifiedFileName ===
       cleanMaterialFileName(data.fileName);
 
@@ -633,7 +668,11 @@ function buildImageKitMaterialDescription(data) {
     cleanImageKitDescriptionPart(data.uploaderDisplayName, 80),
     cleanImageKitDescriptionPart(data.uploaderPhotoURL, 500),
     cleanImageKitDescriptionPart(data.uploaderUid, 160),
-    cleanImageKitDescriptionPart(data.fileName, 240)
+    cleanImageKitDescriptionPart(data.fileName, 240),
+    cleanImageKitDescriptionPart(
+      String(cleanBoolean(data.isAnonymous)),
+      10
+    )
   ].join(" | ");
 }
 
@@ -655,6 +694,9 @@ function buildImageKitMaterialTags(data) {
       : "",
     data.uploaderUid
       ? "uploader-" + slugifyMaterialValue(data.uploaderUid)
+      : "",
+    cleanBoolean(data.isAnonymous)
+      ? "anonymous-upload"
       : ""
   ].filter(Boolean);
 }
@@ -1002,6 +1044,9 @@ module.exports = async function handler(req, res) {
     const materialType = cleanMaterialType(
       authorizationData.materialType
     );
+    const isAnonymous = cleanBoolean(
+      authorizationData.isAnonymous
+    );
     const title = cleanString(
       authorizationData.title,
       160
@@ -1039,6 +1084,7 @@ module.exports = async function handler(req, res) {
         professor,
         semester,
         materialType,
+        isAnonymous,
         title,
         fileName,
         fileSize
@@ -1050,6 +1096,7 @@ module.exports = async function handler(req, res) {
       professor,
       semester,
       materialType,
+      isAnonymous,
       title,
       fileName: verifiedFile.fileName,
       fileUrl: verifiedFile.fileUrl,
