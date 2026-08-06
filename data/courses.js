@@ -2447,7 +2447,11 @@
     setCourseDetailText("course-detail-subject", selectedCourse.subject);
     setCourseDetailText("course-detail-level", selectedCourse.level);
     setCourseDetailText("course-detail-full-code", selectedCourse.code);
-    setCourseDetailText("course-detail-note", "This course page is ready for professor links, student notes, ratings, prerequisites, and review details.");
+    setCourseDetailText(
+      "course-detail-note",
+      selectedCourse.description ||
+        "Course description coming soon."
+    );
     loadCourseProfessors(selectedCourse);
     setupCourseMaterialsAccess(selectedCourse);
 
