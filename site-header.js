@@ -150,6 +150,8 @@
       justify-self: start;
       min-width: 88px;
       min-height: 34px;
+      padding: 6px 0;
+      box-sizing: border-box;
       color: #171717;
       font-weight: 700;
       letter-spacing: -0.02em;
