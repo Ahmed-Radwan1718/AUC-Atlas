@@ -751,6 +751,52 @@
       font-weight: 700;
     }
 
+    .professors-view-more {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: min(100%, 340px);
+      min-height: 54px;
+      padding: 0 22px;
+      border: 1px solid #171717;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .professors-view-more span {
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 10px;
+    }
+
+    .professors-view-more:hover,
+    .professors-view-more:focus-visible {
+      border-color: rgba(192, 154, 92, 0.84);
+      background: rgba(192, 154, 92, 0.84);
+      color: #171717;
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .professors-view-more:hover span,
+    .professors-view-more:focus-visible span {
+      color: rgba(23, 23, 23, 0.62);
+    }
+
     .professors-browser.professor-profile-mode {
       grid-template-columns: minmax(0, 1fr);
     }
@@ -3186,9 +3232,29 @@
     `;
   }
 
+  const professorPageSize = 30;
+  let professorVisibleLimit = professorPageSize;
   let professorFilterAnimationTimer = 0;
 
-  function renderProfessors(animateResults) {
+  function getProfessorCardImageUrl(imageURL) {
+    const safeImageURL =
+      String(imageURL || "user.png").trim() ||
+      "user.png";
+
+    if (
+      safeImageURL.includes("res.cloudinary.com") &&
+      safeImageURL.includes("/image/upload/")
+    ) {
+      return safeImageURL.replace(
+        "/image/upload/",
+        "/image/upload/f_auto,q_auto:good,c_fill,g_auto,w_720,h_456/"
+      );
+    }
+
+    return safeImageURL;
+  }
+
+  function renderProfessors(animateResults, resetVisibleLimit) {
     const grid = document.getElementById("professors-grid");
     const browser = document.querySelector(".professors-browser");
     const currentProfessorId = getCurrentProfessorId();
@@ -3219,13 +3285,31 @@
 
     document.title = "Professors | AUC Atlas";
 
-    const visibleProfessors = professors.filter(professorMatches);
+    if (resetVisibleLimit) {
+      professorVisibleLimit = professorPageSize;
+    }
 
-    grid.innerHTML = visibleProfessors.map(function (professor) {
+    const matchingProfessors = professors.filter(professorMatches);
+    const visibleProfessors = matchingProfessors.slice(
+      0,
+      professorVisibleLimit
+    );
+
+    grid.innerHTML = visibleProfessors.map(function (professor, index) {
+      const shouldLoadImmediately = index < 8;
+
       return `
         <a class="professor-card" href="${escapeHtml(getProfessorUrl(professor))}" aria-label="Open ${escapeHtml(professor.name)} profile">
           <div class="professor-card-image">
-            <img src="${escapeHtml(professor.image)}" alt="${escapeHtml(professor.name)}">
+            <img
+              src="${escapeHtml(getProfessorCardImageUrl(professor.image))}"
+              alt="${escapeHtml(professor.name)}"
+              width="720"
+              height="456"
+              loading="${shouldLoadImmediately ? "eager" : "lazy"}"
+              decoding="async"
+              fetchpriority="${index < 4 ? "high" : "auto"}"
+            >
           </div>
           <div class="professor-card-body">
             <h2>${escapeHtml(professor.name)}</h2>
@@ -3240,8 +3324,41 @@
       `;
     }).join("");
 
-    if (!visibleProfessors.length) {
+    if (!matchingProfessors.length) {
       grid.innerHTML = '<p class="professors-empty">No professors match those filters.</p>';
+    } else if (matchingProfessors.length > professorVisibleLimit) {
+      const remainingProfessorCount =
+        matchingProfessors.length -
+        professorVisibleLimit;
+      const nextBatchSize = Math.min(
+        professorPageSize,
+        remainingProfessorCount
+      );
+
+      grid.insertAdjacentHTML(
+        "beforeend",
+        `
+          <button
+            class="professors-view-more"
+            id="professors-view-more"
+            type="button"
+            aria-label="Show ${nextBatchSize} more professors"
+          >
+            View ${nextBatchSize} more
+            <span>${remainingProfessorCount} remaining</span>
+          </button>
+        `
+      );
+
+      const viewMoreButton =
+        document.getElementById("professors-view-more");
+
+      if (viewMoreButton) {
+        viewMoreButton.addEventListener("click", function () {
+          professorVisibleLimit += professorPageSize;
+          renderProfessors(false, false);
+        });
+      }
     }
 
     if (animateResults) {
@@ -3267,7 +3384,7 @@
 
     document.querySelectorAll("#professor-filters input").forEach(function (input) {
       input.addEventListener("change", function () {
-        renderProfessors(true);
+        renderProfessors(true, true);
       });
     });
 
@@ -3275,11 +3392,11 @@
 
     if (searchInput) {
       searchInput.addEventListener("input", function () {
-        renderProfessors(true);
+        renderProfessors(true, true);
       });
     }
 
-    renderProfessors(false);
+    renderProfessors(false, true);
   }
 
   if (document.readyState === "loading") {
