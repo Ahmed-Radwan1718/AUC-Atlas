@@ -7,7 +7,7 @@
 
   const isAdminPage = /\/admin(?:\.html)?\/?$/.test(window.location.pathname);
 
-  function createWeeklyVisitorId() {
+  function createUniqueVisitorId() {
     if (
       window.crypto &&
       typeof window.crypto.randomUUID === "function"
@@ -24,7 +24,7 @@
     );
   }
 
-  function getWeeklyVisitorId() {
+  function getUniqueVisitorId() {
     const storageKey = "aucAtlasVisitorId";
 
     try {
@@ -32,7 +32,7 @@
         window.localStorage.getItem(storageKey);
 
       if (!visitorId) {
-        visitorId = createWeeklyVisitorId();
+        visitorId = createUniqueVisitorId();
         window.localStorage.setItem(
           storageKey,
           visitorId
@@ -46,7 +46,7 @@
           window.sessionStorage.getItem(storageKey);
 
         if (!visitorId) {
-          visitorId = createWeeklyVisitorId();
+          visitorId = createUniqueVisitorId();
           window.sessionStorage.setItem(
             storageKey,
             visitorId
@@ -55,12 +55,12 @@
 
         return visitorId;
       } catch (sessionError) {
-        return createWeeklyVisitorId();
+        return createUniqueVisitorId();
       }
     }
   }
 
-  function trackWeeklyVisitor() {
+  function trackUniqueVisitor() {
     if (
       isAdminPage ||
       typeof window.fetch !== "function"
@@ -77,36 +77,36 @@
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        visitorId: getWeeklyVisitorId()
+        visitorId: getUniqueVisitorId()
       })
     })
       .then(function (response) {
         if (!response.ok) {
           throw new Error(
-            "Could not update weekly visitors."
+            "Could not update unique visitors."
           );
         }
 
         return response.json();
       })
       .then(function (data) {
-        const weeklyVisitors = Math.max(
+        const uniqueVisitors = Math.max(
           0,
-          Number(data.weeklyVisitors) || 0
+          Number(data.uniqueVisitors) || 0
         );
 
-        window.aucAtlasWeeklyVisitors =
-          weeklyVisitors;
+        window.aucAtlasUniqueVisitors =
+          uniqueVisitors;
 
-        return weeklyVisitors;
+        return uniqueVisitors;
       })
       .catch(function () {
         return null;
       });
   }
 
-  window.aucAtlasWeeklyVisitorsPromise =
-    trackWeeklyVisitor();
+  window.aucAtlasUniqueVisitorsPromise =
+    trackUniqueVisitor();
 
   if (!isAdminPage && !document.querySelector('script[src="site-footer.js"]')) {
     const footerScript = document.createElement("script");
