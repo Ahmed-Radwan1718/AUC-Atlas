@@ -2431,11 +2431,13 @@
       document.title = "Course not found | AUC Atlas";
       setCourseDetailText("course-detail-code", "Course not found");
       setCourseDetailText("course-detail-title", "Course not found.");
-      setCourseDetailText("course-detail-department", "Go back to courses and choose a course from the search results.");
+      setCourseDetailText(
+        "course-detail-description",
+        "Go back to courses and choose a course from the search results."
+      );
       setCourseDetailText("course-detail-subject", "Unavailable");
       setCourseDetailText("course-detail-level", "Unavailable");
       setCourseDetailText("course-detail-full-code", courseCode || "Unavailable");
-      setCourseDetailText("course-detail-note", "This course could not be matched to the current AUC Atlas course list.");
       renderCourseProfessors({ code: "" }, []);
       return true;
     }
@@ -2443,15 +2445,14 @@
     document.title = selectedCourse.code + " | AUC Atlas";
     setCourseDetailText("course-detail-code", selectedCourse.code);
     setCourseDetailText("course-detail-title", selectedCourse.title);
-    setCourseDetailText("course-detail-department", selectedCourse.department);
-    setCourseDetailText("course-detail-subject", selectedCourse.subject);
-    setCourseDetailText("course-detail-level", selectedCourse.level);
-    setCourseDetailText("course-detail-full-code", selectedCourse.code);
     setCourseDetailText(
-      "course-detail-note",
+      "course-detail-description",
       selectedCourse.description ||
         "Course description coming soon."
     );
+    setCourseDetailText("course-detail-subject", selectedCourse.subject);
+    setCourseDetailText("course-detail-level", selectedCourse.level);
+    setCourseDetailText("course-detail-full-code", selectedCourse.code);
     loadCourseProfessors(selectedCourse);
     setupCourseMaterialsAccess(selectedCourse);
 
