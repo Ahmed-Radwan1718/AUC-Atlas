@@ -147,6 +147,251 @@
       .info-answer { padding: 0 38px 18px 0; }
     }
   </style>
+
+  <style>
+    body {
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .info-page {
+      min-height: 100vh;
+      padding: 180px 44px 96px;
+      background: #f7f4ee;
+      overflow-x: clip;
+    }
+
+    .info-inner {
+      width: 100%;
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 30px;
+      border: 1px solid rgba(192, 154, 92, 0.22);
+      border-radius: 26px;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(192, 154, 92, 0.1),
+          rgba(255, 255, 255, 0.42)
+        ),
+        rgba(255, 255, 255, 0.72);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.1);
+    }
+
+    .info-header {
+      max-width: 820px;
+      margin-bottom: 28px;
+      display: block;
+    }
+
+    .info-kicker {
+      margin-bottom: 12px;
+      color: rgba(192, 154, 92, 0.94);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .info-header h1 {
+      max-width: none;
+      margin-bottom: 12px;
+      color: #171717;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .info-header > p:last-child {
+      display: none;
+    }
+
+    .info-content {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      display: grid;
+      gap: 0;
+    }
+
+    .info-content::before {
+      content: "Privacy Policy";
+      display: block;
+      margin-bottom: 14px;
+      color: rgba(192, 154, 92, 0.9);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .info-section {
+      border: 0;
+      border-top: 1px solid rgba(192, 154, 92, 0.22);
+      transition: border-color 0.24s ease;
+    }
+
+    .info-section:last-child {
+      border-bottom: 1px solid rgba(192, 154, 92, 0.22);
+    }
+
+    .info-section:hover,
+    .info-section.open {
+      border-color: rgba(192, 154, 92, 0.46);
+    }
+
+    .info-section h2 {
+      margin: 0;
+      color: #171717;
+      font-size: inherit;
+      line-height: inherit;
+    }
+
+    .info-toggle {
+      width: 100%;
+      padding: 24px 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      color: #171717;
+      font-family: inherit;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: center;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .info-toggle:hover {
+      background: transparent;
+      color: inherit;
+    }
+
+    .info-toggle:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.9);
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    .info-toggle span:first-child {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+      transition: color 0.24s ease;
+    }
+
+    .info-toggle:hover span:first-child,
+    .info-section.open .info-toggle span:first-child {
+      color: rgba(166, 124, 57, 1);
+    }
+
+    .info-toggle-icon {
+      color: rgba(192, 154, 92, 0.94);
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      transition:
+        transform 0.24s ease,
+        color 0.24s ease;
+    }
+
+    .info-toggle-icon::before,
+    .info-toggle[aria-expanded="true"] .info-toggle-icon::before {
+      content: "+";
+    }
+
+    .info-toggle:hover .info-toggle-icon,
+    .info-section.open .info-toggle-icon {
+      color: rgba(166, 124, 57, 1);
+    }
+
+    .info-section.open .info-toggle-icon {
+      transform: rotate(45deg);
+    }
+
+    .info-answer {
+      max-height: 0;
+      padding: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition:
+        max-height 0.32s ease,
+        opacity 0.22s ease;
+    }
+
+    .info-section.open .info-answer {
+      max-height: 1200px;
+      opacity: 1;
+    }
+
+    .info-answer p {
+      max-width: 760px;
+      padding: 0 64px 24px 0;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.7;
+    }
+
+    .info-answer ul {
+      max-width: 760px;
+      margin: 0 64px 24px 20px;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .info-answer li {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 700px) {
+      .info-page {
+        padding: 128px 22px 70px;
+      }
+
+      .info-inner {
+        padding: 24px;
+        border-radius: 22px;
+      }
+
+      .info-header {
+        margin-bottom: 24px;
+      }
+
+      .info-header h1 {
+        font-size: 30px;
+      }
+
+      .info-toggle {
+        gap: 18px;
+        padding: 22px 0;
+      }
+
+      .info-toggle span:first-child {
+        font-size: 16px;
+      }
+
+      .info-answer p {
+        padding-right: 0;
+        font-size: 15px;
+      }
+
+      .info-answer ul {
+        margin-right: 0;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -281,14 +526,25 @@
 
   <script>
     document.querySelectorAll(".info-toggle").forEach((toggle) => {
-      toggle.addEventListener("click", () => {
-        const answer = document.getElementById(toggle.getAttribute("aria-controls"));
-        const isOpen = toggle.getAttribute("aria-expanded") === "true";
+      const item = toggle.closest(".info-section");
+      const answer = document.getElementById(
+        toggle.getAttribute("aria-controls")
+      );
 
-        toggle.setAttribute("aria-expanded", String(!isOpen));
-        answer.hidden = isOpen;
+      if (!item || !answer) {
+        return;
+      }
+
+      answer.hidden = false;
+
+      toggle.addEventListener("click", () => {
+        const isOpen = item.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", String(isOpen));
       });
     });
   </script>
+
+  <div id="site-footer-root"></div>
+  <script src="site-footer.js"></script>
 </body>
 </html>
