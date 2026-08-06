@@ -24,22 +24,6 @@ function getRequestBody(req) {
   return {};
 }
 
-function getCurrentWeekKey(date) {
-  const currentDate = new Date(date);
-  const day = currentDate.getUTCDay() || 7;
-  const weekStart = new Date(
-    Date.UTC(
-      currentDate.getUTCFullYear(),
-      currentDate.getUTCMonth(),
-      currentDate.getUTCDate()
-    )
-  );
-
-  weekStart.setUTCDate(weekStart.getUTCDate() - day + 1);
-
-  return weekStart.toISOString().slice(0, 10);
-}
-
 function hashVisitorId(visitorId) {
   return crypto
     .createHash("sha256")
@@ -47,7 +31,7 @@ function hashVisitorId(visitorId) {
     .digest("hex");
 }
 
-async function getWeeklyVisitorCount(countRef) {
+async function getUniqueVisitorCount(countRef) {
   const countSnapshot = await countRef.get();
   const countData = countSnapshot.exists
     ? countSnapshot.data() || {}
@@ -69,18 +53,16 @@ module.exports = async function handler(req, res) {
 
   try {
     const db = admin.firestore();
-    const weekKey = getCurrentWeekKey(new Date());
     const countRef = db
-      .collection("weeklyVisitorCounts")
-      .doc(weekKey);
+      .collection("uniqueVisitorCounts")
+      .doc("all-time");
 
     if (req.method === "GET") {
-      const weeklyVisitors =
-        await getWeeklyVisitorCount(countRef);
+      const uniqueVisitors =
+        await getUniqueVisitorCount(countRef);
 
       return res.status(200).json({
-        weekKey,
-        weeklyVisitors
+        uniqueVisitors
       });
     }
 
@@ -98,10 +80,10 @@ module.exports = async function handler(req, res) {
 
     const visitorHash = hashVisitorId(visitorId);
     const visitorRef = db
-      .collection("weeklyVisitors")
-      .doc(weekKey + "_" + visitorHash);
+      .collection("uniqueVisitors")
+      .doc(visitorHash);
 
-    let weeklyVisitors = 0;
+    let uniqueVisitors = 0;
 
     await db.runTransaction(async function (transaction) {
       const visitorSnapshot =
@@ -112,7 +94,7 @@ module.exports = async function handler(req, res) {
         ? countSnapshot.data() || {}
         : {};
 
-      weeklyVisitors = Math.max(
+      uniqueVisitors = Math.max(
         0,
         Number(countData.count) || 0
       );
@@ -121,10 +103,9 @@ module.exports = async function handler(req, res) {
         return;
       }
 
-      weeklyVisitors += 1;
+      uniqueVisitors += 1;
 
       transaction.create(visitorRef, {
-        weekKey,
         visitorHash,
         firstSeenAt:
           admin.firestore.FieldValue.serverTimestamp()
@@ -133,8 +114,7 @@ module.exports = async function handler(req, res) {
       transaction.set(
         countRef,
         {
-          weekKey,
-          count: weeklyVisitors,
+          count: uniqueVisitors,
           updatedAt:
             admin.firestore.FieldValue.serverTimestamp()
         },
@@ -145,12 +125,11 @@ module.exports = async function handler(req, res) {
     });
 
     return res.status(200).json({
-      weekKey,
-      weeklyVisitors
+      uniqueVisitors
     });
   } catch (error) {
     return res.status(500).json({
-      error: "Could not update the weekly visitor count."
+      error: "Could not update the unique visitor count."
     });
   }
 };
