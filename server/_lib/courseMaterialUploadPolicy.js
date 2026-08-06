@@ -41,9 +41,7 @@ const MATERIAL_ALLOWED_MIME_TYPES = Object.freeze([
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif"
+  "image/png"
 ]);
 
 const MATERIAL_MIME_TYPES_BY_EXTENSION = Object.freeze({
@@ -62,9 +60,7 @@ const MATERIAL_MIME_TYPES_BY_EXTENSION = Object.freeze({
   ],
   jpg: ["image/jpeg"],
   jpeg: ["image/jpeg"],
-  png: ["image/png"],
-  webp: ["image/webp"],
-  gif: ["image/gif"]
+  png: ["image/png"]
 });
 
 function cleanMaterialFileName(value) {
