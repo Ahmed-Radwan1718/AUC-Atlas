@@ -17,11 +17,11 @@ const {
 const MATERIAL_TYPE_CHOICES = [
   "Notes",
   "Slides",
+  "Syllabus",
   "Past exam",
   "Practice sheet",
   "Lab file",
-  "Assignment",
-  "Project",
+  "Past assignments",
   "Review sheet"
 ];
 const MATERIAL_TYPE_LOOKUP = MATERIAL_TYPE_CHOICES.reduce(
