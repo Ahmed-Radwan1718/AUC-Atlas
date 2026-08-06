@@ -2891,11 +2891,18 @@
               <div class="account-panel-subheader">
                 <div>
                   <h3>Delete Account</h3>
-                  <p>This permanently deletes your account, profile data, and reviews.</p>
+                  <p>This permanently deletes your account, profile data, reviews, and uploaded materials.</p>
                 </div>
               </div>
 
-              <button class="account-danger-button" type="button" data-account-action>Delete Account</button>
+              <button
+                class="account-danger-button"
+                type="button"
+                id="delete-account-button"
+              >
+                Delete Account
+              </button>
+
               <p class="account-message" id="security-message" aria-live="polite"></p>
             </article>
 
@@ -3197,6 +3204,101 @@
     </div>
   </div>
 
+  <div class="account-review-editor" id="delete-account-modal" hidden>
+    <div
+      class="account-review-editor-backdrop"
+      id="delete-account-modal-backdrop"
+    ></div>
+
+    <div
+      class="account-review-editor-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="delete-account-modal-title"
+    >
+      <button
+        class="account-review-editor-close"
+        type="button"
+        id="delete-account-modal-close"
+        aria-label="Close account deletion window"
+      >
+        ×
+      </button>
+
+      <div class="account-review-editor-header">
+        <span>Permanent action</span>
+        <h2 id="delete-account-modal-title">Delete Account</h2>
+        <p>
+          This permanently deletes your profile, reviews, uploaded
+          materials, security settings, and account. This cannot be undone.
+        </p>
+      </div>
+
+      <form
+        class="account-review-editor-form"
+        id="delete-account-form"
+      >
+        <div class="account-review-editor-grid">
+          <div class="account-review-editor-field full">
+            <label for="delete-account-password">
+              Current password
+            </label>
+
+            <input
+              id="delete-account-password"
+              name="currentPassword"
+              type="password"
+              maxlength="1024"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+
+          <div class="account-review-editor-field full">
+            <label for="delete-account-confirmation">
+              Type DELETE to confirm
+            </label>
+
+            <input
+              id="delete-account-confirmation"
+              name="confirmation"
+              type="text"
+              maxlength="6"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="account-review-editor-actions">
+          <button
+            class="account-secondary-button"
+            type="button"
+            id="delete-account-modal-cancel"
+          >
+            Cancel
+          </button>
+
+          <button
+            class="account-danger-button"
+            type="submit"
+            id="delete-account-submit"
+          >
+            Delete Account
+          </button>
+        </div>
+
+        <p
+          class="account-message"
+          id="delete-account-message"
+          aria-live="polite"
+        ></p>
+      </form>
+    </div>
+  </div>
+
   <div class="account-authenticator-modal" id="authenticator-modal" hidden>
     <div class="account-authenticator-modal-backdrop" id="authenticator-modal-backdrop"></div>
 
@@ -3318,6 +3420,16 @@
     const accountMajorMenu = document.getElementById("account-major-menu");
     const accountAucIdInput = document.getElementById("account-auc-id");
     const securityMessage = document.getElementById("security-message");
+    const deleteAccountButton = document.getElementById("delete-account-button");
+    const deleteAccountModal = document.getElementById("delete-account-modal");
+    const deleteAccountModalBackdrop = document.getElementById("delete-account-modal-backdrop");
+    const deleteAccountModalClose = document.getElementById("delete-account-modal-close");
+    const deleteAccountModalCancel = document.getElementById("delete-account-modal-cancel");
+    const deleteAccountForm = document.getElementById("delete-account-form");
+    const deleteAccountPassword = document.getElementById("delete-account-password");
+    const deleteAccountConfirmation = document.getElementById("delete-account-confirmation");
+    const deleteAccountSubmit = document.getElementById("delete-account-submit");
+    const deleteAccountMessage = document.getElementById("delete-account-message");
     const accountLoginSessionsList = document.getElementById("account-login-sessions-list");
     const changePasswordOpenButton = document.getElementById("change-password-open-button");
     const changePasswordForm = document.getElementById("change-password-form");
@@ -5068,6 +5180,175 @@
       }
     }
 
+    function resetDeleteAccountModal() {
+      if (deleteAccountForm) {
+        deleteAccountForm.reset();
+      }
+
+      if (deleteAccountSubmit) {
+        deleteAccountSubmit.disabled = false;
+        deleteAccountSubmit.textContent = "Delete Account";
+      }
+
+      showMessage(deleteAccountMessage, "", "");
+    }
+
+    function closeDeleteAccountModal() {
+      if (!deleteAccountModal) {
+        return;
+      }
+
+      deleteAccountModal.hidden = true;
+      document.body.classList.remove(
+        "account-review-editor-open"
+      );
+
+      resetDeleteAccountModal();
+
+      if (deleteAccountButton) {
+        deleteAccountButton.focus();
+      }
+    }
+
+    async function openDeleteAccountModal() {
+      if (
+        !deleteAccountModal ||
+        !deleteAccountForm
+      ) {
+        showMessage(
+          securityMessage,
+          "Could not open account deletion.",
+          "error"
+        );
+        return;
+      }
+
+      const accessGranted =
+        await requestSecurityPanelAccess();
+
+      if (!accessGranted) {
+        return;
+      }
+
+      resetDeleteAccountModal();
+      deleteAccountModal.hidden = false;
+
+      document.body.classList.add(
+        "account-review-editor-open"
+      );
+
+      window.setTimeout(function () {
+        if (deleteAccountPassword) {
+          deleteAccountPassword.focus();
+        }
+      }, 50);
+    }
+
+    async function submitDeleteAccount() {
+      const currentPassword = deleteAccountPassword
+        ? deleteAccountPassword.value
+        : "";
+      const confirmation = deleteAccountConfirmation
+        ? deleteAccountConfirmation.value.trim()
+        : "";
+
+      if (!currentPassword) {
+        showMessage(
+          deleteAccountMessage,
+          "Enter your current password.",
+          "error"
+        );
+        return;
+      }
+
+      if (confirmation !== "DELETE") {
+        showMessage(
+          deleteAccountMessage,
+          "Type DELETE exactly to confirm account deletion.",
+          "error"
+        );
+
+        if (deleteAccountConfirmation) {
+          deleteAccountConfirmation.focus();
+          deleteAccountConfirmation.select();
+        }
+
+        return;
+      }
+
+      if (deleteAccountSubmit) {
+        deleteAccountSubmit.disabled = true;
+        deleteAccountSubmit.textContent =
+          "Deleting Account...";
+      }
+
+      showMessage(deleteAccountMessage, "", "");
+
+      try {
+        const response = await fetch(
+          "/api/delete-account",
+          {
+            method: "DELETE",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              "X-AUC-Security-Access":
+                securityPanelAccessToken
+            },
+            body: JSON.stringify({
+              currentPassword: currentPassword,
+              confirmation: confirmation
+            })
+          }
+        );
+
+        const data = await response
+          .json()
+          .catch(function () {
+            return {};
+          });
+
+        if (!response.ok || !data.success) {
+          throw new Error(
+            data.error ||
+              "Could not delete your account."
+          );
+        }
+
+        try {
+          localStorage.removeItem(
+            "auc-atlas-signed-in"
+          );
+          localStorage.removeItem(
+            "aucAtlasSignedIn"
+          );
+          sessionStorage.removeItem(
+            "auc-atlas-signed-in"
+          );
+          sessionStorage.removeItem(
+            "aucAtlasSignedIn"
+          );
+        } catch (error) {}
+
+        window.location.replace("index.html");
+      } catch (error) {
+        showMessage(
+          deleteAccountMessage,
+          error.message ||
+            "Could not delete your account.",
+          "error"
+        );
+
+        if (deleteAccountSubmit) {
+          deleteAccountSubmit.disabled = false;
+          deleteAccountSubmit.textContent =
+            "Delete Account";
+        }
+      }
+    }
+
     function getAccountInitials(user) {
       const name = String(user.fullName || user.displayName || "").trim();
 
@@ -6237,6 +6518,41 @@
       }
     });
 
+    if (deleteAccountButton) {
+      deleteAccountButton.addEventListener(
+        "click",
+        openDeleteAccountModal
+      );
+    }
+
+    if (deleteAccountForm) {
+      deleteAccountForm.addEventListener(
+        "submit",
+        function (event) {
+          event.preventDefault();
+
+          if (!deleteAccountForm.reportValidity()) {
+            return;
+          }
+
+          submitDeleteAccount();
+        }
+      );
+    }
+
+    [
+      deleteAccountModalBackdrop,
+      deleteAccountModalClose,
+      deleteAccountModalCancel
+    ].forEach(function (control) {
+      if (control) {
+        control.addEventListener(
+          "click",
+          closeDeleteAccountModal
+        );
+      }
+    });
+
     document.addEventListener("keydown", function (event) {
       if (event.key !== "Escape") {
         return;
@@ -6244,6 +6560,11 @@
 
       if (securityAccessModal && !securityAccessModal.hidden) {
         closeSecurityAccessModal(false);
+        return;
+      }
+
+      if (deleteAccountModal && !deleteAccountModal.hidden) {
+        closeDeleteAccountModal();
         return;
       }
 
