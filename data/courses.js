@@ -2318,6 +2318,36 @@
     }).join("");
   }
 
+  function setCourseMaterialsLocked(access, isLocked) {
+    if (!access) {
+      return;
+    }
+
+    access.classList.toggle("is-locked", isLocked);
+
+    access.querySelectorAll(
+      ".course-material-summary > :not(.course-material-access-lock), " +
+      ".material-upload-panel > :not(.course-material-access-lock)"
+    ).forEach(function (element) {
+      element.inert = isLocked;
+
+      if (isLocked) {
+        element.setAttribute("aria-hidden", "true");
+      } else {
+        element.removeAttribute("aria-hidden");
+      }
+    });
+
+    access.querySelectorAll(
+      ".course-material-access-lock"
+    ).forEach(function (lock) {
+      lock.setAttribute(
+        "aria-hidden",
+        isLocked ? "false" : "true"
+      );
+    });
+  }
+
   async function loadCourseMaterials(course) {
     const access = document.getElementById("course-materials-access");
     const list = document.getElementById("course-materials-list");
@@ -2325,6 +2355,7 @@
 
     if (access) {
       access.hidden = false;
+      setCourseMaterialsLocked(access, true);
       access.classList.add("is-loading");
       access.setAttribute("aria-busy", "true");
     }
@@ -2338,17 +2369,26 @@
     }
 
     try {
-      const response = await fetch("/api/course-materials?courseCode=" + encodeURIComponent(course.code), {
-        credentials: "same-origin"
-      });
+      const response = await fetch(
+        "/api/course-materials?courseCode=" +
+          encodeURIComponent(course.code),
+        {
+          credentials: "same-origin",
+          cache: "no-store"
+        }
+      );
 
       if (!response.ok) {
-        throw new Error("Could not load course materials.");
+        throw new Error("Course-material access was denied.");
       }
 
       const data = await response.json();
 
-      renderCourseMaterials(Array.isArray(data.materials) ? data.materials : []);
+      renderCourseMaterials(
+        Array.isArray(data.materials)
+          ? data.materials
+          : []
+      );
 
       if (loading) {
         loading.hidden = true;
@@ -2357,16 +2397,23 @@
       if (access) {
         access.classList.remove("is-loading");
         access.removeAttribute("aria-busy");
+        setCourseMaterialsLocked(access, false);
       }
     } catch (error) {
       if (loading) {
         loading.hidden = true;
       }
 
+      if (list) {
+        list.innerHTML =
+          '<p class="course-material-status">Verified account required.</p>';
+      }
+
       if (access) {
+        access.hidden = false;
         access.classList.remove("is-loading");
         access.removeAttribute("aria-busy");
-        access.hidden = true;
+        setCourseMaterialsLocked(access, true);
       }
     }
   }
