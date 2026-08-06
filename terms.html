@@ -60,20 +60,78 @@
     }
 
     .info-content {
-      padding: 28px;
+      padding: 8px 28px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 30px;
       background: rgba(255, 255, 255, 0.76);
       box-shadow: 0 28px 80px rgba(42, 32, 20, 0.1);
       display: grid;
-      gap: 24px;
+      gap: 0;
+    }
+
+    .info-section {
+      border-bottom: 1px solid rgba(23, 23, 23, 0.1);
+    }
+
+    .info-section:last-child {
+      border-bottom: 0;
     }
 
     .info-section h2 {
-      margin-bottom: 10px;
+      margin: 0;
       color: #171717;
       font-size: 22px;
+      font-weight: 700;
       line-height: 1.2;
+    }
+
+    .info-toggle {
+      width: 100%;
+      padding: 20px 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .info-toggle:hover {
+      color: rgba(23, 23, 23, 0.72);
+    }
+
+    .info-toggle:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.9);
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    .info-toggle-icon {
+      flex: 0 0 auto;
+      color: rgba(192, 154, 92, 0.95);
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .info-toggle-icon::before {
+      content: "+";
+    }
+
+    .info-toggle[aria-expanded="true"] .info-toggle-icon::before {
+      content: "−";
+    }
+
+    .info-answer {
+      padding: 0 48px 20px 0;
+    }
+
+    .info-answer[hidden] {
+      display: none;
     }
 
     .info-section ul {
@@ -84,7 +142,9 @@
 
     @media (max-width: 640px) {
       .info-page { padding-top: 96px; }
-      .info-content { padding: 22px; border-radius: 22px; }
+      .info-content { padding: 6px 22px; border-radius: 22px; }
+      .info-toggle { padding: 18px 0; gap: 18px; }
+      .info-answer { padding: 0 38px 18px 0; }
     }
   </style>
 </head>
@@ -103,56 +163,131 @@
 
       <section class="info-content">
         <article class="info-section">
-          <h2>1. Using AUC Atlas</h2>
-          <p>By using AUC Atlas, you agree to use the website responsibly and only for lawful academic, informational, and student-support purposes.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="terms-answer-1">
+              <span>1. Using AUC Atlas</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="terms-answer-1" hidden>
+            <p>By using AUC Atlas, you agree to use the website responsibly and only for lawful academic, informational, and student-support purposes.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>2. Independent Student Resource</h2>
-          <p>AUC Atlas is an independent student resource. It is not an official American University in Cairo website and does not speak on behalf of AUC.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="terms-answer-2">
+              <span>2. Independent Student Resource</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="terms-answer-2" hidden>
+            <p>AUC Atlas is an independent student resource. It is not an official American University in Cairo website and does not speak on behalf of AUC.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>3. Accounts and Submissions</h2>
-          <p>If you create an account, upload material, submit reviews, or send information, you are responsible for the accuracy and legality of what you submit.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="terms-answer-3">
+              <span>3. Accounts and Submissions</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="terms-answer-3" hidden>
+            <p>If you create an account, upload material, submit reviews, or send information, you are responsible for the accuracy and legality of what you submit.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>4. Uploaded Materials</h2>
-          <ul>
-            <li>Only upload files you own or have permission to share.</li>
-            <li>Do not upload copyrighted textbooks, paid content, private data, malware, or restricted exam material.</li>
-            <li>Uploaded files may be tied to a course, professor, semester, title, upload time, and moderation status.</li>
-            <li>AUC Atlas may remove, hide, reject, or reorganize uploaded materials at any time.</li>
-          </ul>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="terms-answer-4">
+              <span>4. Uploaded Materials</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="terms-answer-4" hidden>
+            <ul>
+              <li>Only upload files you own or have permission to share.</li>
+              <li>Do not upload copyrighted textbooks, paid content, private data, malware, or restricted exam material.</li>
+              <li>Uploaded files may be tied to a course, professor, semester, title, upload time, and moderation status.</li>
+              <li>AUC Atlas may remove, hide, reject, or reorganize uploaded materials at any time.</li>
+            </ul>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>5. Professor and Course Information</h2>
-          <p>Professor, course, rating, and material information may be incomplete, user-submitted, outdated, or inaccurate. Students should verify important academic decisions through official AUC sources.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="terms-answer-5">
+              <span>5. Professor and Course Information</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="terms-answer-5" hidden>
+            <p>Professor, course, rating, and material information may be incomplete, user-submitted, outdated, or inaccurate. Students should verify important academic decisions through official AUC sources.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>6. Prohibited Use</h2>
-          <p>You must not abuse the website, attack its systems, scrape aggressively, impersonate others, submit spam, upload harmful files, violate intellectual property rights, or use AUC Atlas to harass, defame, or expose private information.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="terms-answer-6">
+              <span>6. Prohibited Use</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="terms-answer-6" hidden>
+            <p>You must not abuse the website, attack its systems, scrape aggressively, impersonate others, submit spam, upload harmful files, violate intellectual property rights, or use AUC Atlas to harass, defame, or expose private information.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>7. Changes and Availability</h2>
-          <p>AUC Atlas may change, pause, remove, or update features, pages, uploaded materials, or account access when needed for safety, maintenance, moderation, legal compliance, or product improvements.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="terms-answer-7">
+              <span>7. Changes and Availability</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="terms-answer-7" hidden>
+            <p>AUC Atlas may change, pause, remove, or update features, pages, uploaded materials, or account access when needed for safety, maintenance, moderation, legal compliance, or product improvements.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>8. No Academic Guarantee</h2>
-          <p>AUC Atlas does not guarantee grades, enrollment outcomes, professor availability, course availability, or the accuracy of student-submitted content.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="terms-answer-8">
+              <span>8. No Academic Guarantee</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="terms-answer-8" hidden>
+            <p>AUC Atlas does not guarantee grades, enrollment outcomes, professor availability, course availability, or the accuracy of student-submitted content.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>9. Contact and Reports</h2>
-          <p>If content should be removed or reviewed, contact the AUC Atlas operator with the page, file, course, professor, and reason for the request.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="terms-answer-9">
+              <span>9. Contact and Reports</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="terms-answer-9" hidden>
+            <p>If content should be removed or reviewed, contact the AUC Atlas operator with the page, file, course, professor, and reason for the request.</p>
+          </div>
         </article>
       </section>
     </div>
   </main>
+
+  <script>
+    document.querySelectorAll(".info-toggle").forEach((toggle) => {
+      toggle.addEventListener("click", () => {
+        const answer = document.getElementById(toggle.getAttribute("aria-controls"));
+        const isOpen = toggle.getAttribute("aria-expanded") === "true";
+
+        toggle.setAttribute("aria-expanded", String(!isOpen));
+        answer.hidden = isOpen;
+      });
+    });
+  </script>
 </body>
 </html>
