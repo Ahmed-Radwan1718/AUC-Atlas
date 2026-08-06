@@ -2,6 +2,7 @@ const routeLoaders = {
   "authenticator": function () { return require("../server/routes/authenticator"); },
   "change-password": function () { return require("../server/routes/change-password"); },
   "course-material-download": function () { return require("../server/routes/course-material-download"); },
+  "delete-account": function () { return require("../server/routes/delete-account"); },
   "login": function () { return require("../server/routes/login"); },
   "login-code": function () { return require("../server/routes/login-code"); },
   "logout": function () { return require("../server/routes/logout"); },
