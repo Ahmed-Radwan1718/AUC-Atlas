@@ -29,11 +29,11 @@ function cleanBoolean(value) {
 const MATERIAL_TYPE_CHOICES = [
   "Notes",
   "Slides",
+  "Syllabus",
   "Past exam",
   "Practice sheet",
   "Lab file",
-  "Assignment",
-  "Project",
+  "Past assignments",
   "Review sheet"
 ];
 
