@@ -2819,6 +2819,12 @@
             "file",
             "material-file"
           );
+        const anonymousInput =
+          getMaterialFormControl(
+            form,
+            "anonymous",
+            "material-anonymous"
+          );
         const files =
           fileInput && fileInput.files
             ? Array.from(fileInput.files)
@@ -2835,6 +2841,10 @@
         const title = titleInput
           ? titleInput.value.trim()
           : "";
+        const isAnonymous = Boolean(
+          anonymousInput &&
+          anonymousInput.checked
+        );
 
         if (
           !activeCourse ||
@@ -2966,6 +2976,8 @@
                   semester: semester,
                   materialType:
                     materialType,
+                  isAnonymous:
+                    isAnonymous,
                   title: uploadTitle,
                   fileName: file.name,
                   fileSize: file.size
