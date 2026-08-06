@@ -64,7 +64,7 @@
     }
 
     .info-item {
-      padding: 22px;
+      overflow: hidden;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 22px;
       background: rgba(255, 255, 255, 0.76);
@@ -72,10 +72,61 @@
     }
 
     .info-item h2 {
-      margin-bottom: 10px;
+      margin: 0;
       color: #171717;
       font-size: 21px;
+      font-weight: 700;
       line-height: 1.2;
+    }
+
+    .info-toggle {
+      width: 100%;
+      padding: 22px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      transition: background-color 0.2s ease;
+    }
+
+    .info-toggle:hover {
+      background: rgba(192, 154, 92, 0.08);
+    }
+
+    .info-toggle:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.9);
+      outline-offset: -4px;
+      border-radius: 18px;
+    }
+
+    .info-toggle-icon {
+      flex: 0 0 auto;
+      color: rgba(192, 154, 92, 0.95);
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .info-toggle-icon::before {
+      content: "+";
+    }
+
+    .info-toggle[aria-expanded="true"] .info-toggle-icon::before {
+      content: "−";
+    }
+
+    .info-answer {
+      padding: 0 56px 22px 22px;
+    }
+
+    .info-answer[hidden] {
+      display: none;
     }
 
     .info-item p {
@@ -92,6 +143,8 @@
     @media (max-width: 640px) {
       .info-page { padding-top: 96px; }
       .info-item { border-radius: 18px; }
+      .info-toggle { padding: 18px; gap: 18px; }
+      .info-answer { padding: 0 48px 18px 18px; }
     }
   </style>
 </head>
@@ -110,41 +163,102 @@
 
       <section class="info-list" aria-label="Frequently asked questions">
         <article class="info-item">
-          <h2>What is AUC Atlas?</h2>
-          <p>AUC Atlas is a student-focused website for browsing professors, courses, GPA tools, and student-uploaded academic materials in one place.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="faq-answer-1">
+              <span>What is AUC Atlas?</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="faq-answer-1" hidden>
+            <p>AUC Atlas is a student-focused website for browsing professors, courses, GPA tools, and student-uploaded academic materials in one place.</p>
+          </div>
         </article>
 
         <article class="info-item">
-          <h2>Is AUC Atlas officially affiliated with AUC?</h2>
-          <p>No. AUC Atlas is an independent student resource and is not an official American University in Cairo website.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="faq-answer-2">
+              <span>Is AUC Atlas officially affiliated with AUC?</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="faq-answer-2" hidden>
+            <p>No. AUC Atlas is an independent student resource and is not an official American University in Cairo website.</p>
+          </div>
         </article>
 
         <article class="info-item">
-          <h2>How do course material uploads work?</h2>
-          <p>When materials are uploaded, they can be tied to a course, professor, and semester. Uploaded files may be reviewed, organized, removed, or hidden if they are unsafe, irrelevant, inaccurate, or not allowed.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="faq-answer-3">
+              <span>How do course material uploads work?</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="faq-answer-3" hidden>
+            <p>When materials are uploaded, they can be tied to a course, professor, and semester. Uploaded files may be reviewed, organized, removed, or hidden if they are unsafe, irrelevant, inaccurate, or not allowed.</p>
+          </div>
         </article>
 
         <article class="info-item">
-          <h2>What should I upload?</h2>
-          <p>Upload useful course materials such as notes, review sheets, slides, summaries, practice questions, or study files that you have permission to share.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="faq-answer-4">
+              <span>What should I upload?</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="faq-answer-4" hidden>
+            <p>Upload useful course materials such as notes, review sheets, slides, summaries, practice questions, or study files that you have permission to share.</p>
+          </div>
         </article>
 
         <article class="info-item">
-          <h2>What should I not upload?</h2>
-          <p>Do not upload copyrighted books, paid materials, private messages, exams that are not allowed to be shared, personal data, malware, or anything you do not have permission to distribute.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="faq-answer-5">
+              <span>What should I not upload?</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="faq-answer-5" hidden>
+            <p>Do not upload copyrighted books, paid materials, private messages, exams that are not allowed to be shared, personal data, malware, or anything you do not have permission to distribute.</p>
+          </div>
         </article>
 
         <article class="info-item">
-          <h2>Can materials be removed?</h2>
-          <p>Yes. AUC Atlas may remove files or information if they are reported, inaccurate, harmful, private, copyrighted, spam, or otherwise unsuitable for the site.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="faq-answer-6">
+              <span>Can materials be removed?</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="faq-answer-6" hidden>
+            <p>Yes. AUC Atlas may remove files or information if they are reported, inaccurate, harmful, private, copyrighted, spam, or otherwise unsuitable for the site.</p>
+          </div>
         </article>
 
         <article class="info-item">
-          <h2>Where can I read the rules?</h2>
-          <p>Read the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a> for more details.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="faq-answer-7">
+              <span>Where can I read the rules?</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="faq-answer-7" hidden>
+            <p>Read the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a> for more details.</p>
+          </div>
         </article>
       </section>
     </div>
   </main>
+
+  <script>
+    document.querySelectorAll(".info-toggle").forEach((toggle) => {
+      toggle.addEventListener("click", () => {
+        const answer = document.getElementById(toggle.getAttribute("aria-controls"));
+        const isOpen = toggle.getAttribute("aria-expanded") === "true";
+
+        toggle.setAttribute("aria-expanded", String(!isOpen));
+        answer.hidden = isOpen;
+      });
+    });
+  </script>
 </body>
 </html>
