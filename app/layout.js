@@ -1,7 +1,11 @@
 import "./globals.css";
+import "./site-header.css";
 
 export const metadata = {
-  title: "AUC Atlas | Professors, Courses & Student Materials"
+  title: "AUC Atlas | Professors, Courses & Student Materials",
+  icons: {
+    icon: "/favicon.svg"
+  }
 };
 
 export const viewport = {
