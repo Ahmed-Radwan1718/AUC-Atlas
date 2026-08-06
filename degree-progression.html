@@ -450,12 +450,12 @@
 
               <div class="degree-summary-grid" aria-label="Degree progress summary">
                 <div class="degree-stat-card">
-                  <span>Completed</span>
+                  <span>Completed Credits</span>
                   <strong id="degree-completed-count">0</strong>
                 </div>
 
                 <div class="degree-stat-card">
-                  <span>Remaining</span>
+                  <span>Remaining Credits</span>
                   <strong id="degree-remaining-count">0</strong>
                 </div>
 
@@ -643,6 +643,31 @@
       resetDegreeProgressSummary();
     }
 
+    function getDegreeItemCredits(item) {
+      const creditSection = String(item || "").match(
+        /\(([^()]*(?:cr\.?)[^()]*)\)\s*$/i
+      );
+
+      if (!creditSection) {
+        return 0;
+      }
+
+      const creditValues =
+        creditSection[1].match(/\d+(?:\.\d+)?/g) || [];
+
+      return creditValues.reduce(function (total, value) {
+        return total + Number(value);
+      }, 0);
+    }
+
+    function formatDegreeCreditCount(value) {
+      const credits = Number(value) || 0;
+
+      return Number.isInteger(credits)
+        ? String(credits)
+        : credits.toFixed(1).replace(/\.0$/, "");
+    }
+
     function renderDegreeRequirementGroup(group, groupIndex) {
       return `
         <article class="degree-requirement-group">
@@ -655,9 +680,15 @@
           <div class="degree-requirement-list">
             ${group.items.map(function (item, itemIndex) {
               const key = groupIndex + "-" + itemIndex;
+              const credits = getDegreeItemCredits(item);
+
               return `
                 <label class="degree-requirement-item">
-                  <input type="checkbox" data-degree-item="${escapeDegreeHtml(key)}">
+                  <input
+                    type="checkbox"
+                    data-degree-item="${escapeDegreeHtml(key)}"
+                    data-degree-credits="${credits}"
+                  >
                   <span class="degree-requirement-text">${escapeDegreeHtml(item)}</span>
                 </label>
               `;
@@ -668,18 +699,54 @@
     }
 
     function updateDegreeProgress() {
-      const items = Array.from(degreeRequirementsRoot.querySelectorAll("[data-degree-item]"));
-      const total = items.length;
-      const completed = items.filter(function (item) {
-        return item.checked;
-      }).length;
-      const remaining = Math.max(total - completed, 0);
-      const percent = total ? Math.round((completed / total) * 100) : 0;
+      const items = Array.from(
+        degreeRequirementsRoot.querySelectorAll(
+          "[data-degree-item]"
+        )
+      );
 
-      degreeCompletedCount.textContent = String(completed);
-      degreeRemainingCount.textContent = String(remaining);
-      degreeProgressPercent.textContent = percent + "%";
-      degreeProgressBar.style.width = percent + "%";
+      const totalCredits = items.reduce(
+        function (total, item) {
+          return total + Number(
+            item.dataset.degreeCredits || 0
+          );
+        },
+        0
+      );
+
+      const completedCredits = items.reduce(
+        function (total, item) {
+          return item.checked
+            ? total + Number(
+                item.dataset.degreeCredits || 0
+              )
+            : total;
+        },
+        0
+      );
+
+      const remainingCredits = Math.max(
+        totalCredits - completedCredits,
+        0
+      );
+
+      const percent = totalCredits
+        ? Math.round(
+            (completedCredits / totalCredits) * 100
+          )
+        : 0;
+
+      degreeCompletedCount.textContent =
+        formatDegreeCreditCount(completedCredits);
+
+      degreeRemainingCount.textContent =
+        formatDegreeCreditCount(remainingCredits);
+
+      degreeProgressPercent.textContent =
+        percent + "%";
+
+      degreeProgressBar.style.width =
+        percent + "%";
     }
 
     function renderDegreeProgression(user) {
