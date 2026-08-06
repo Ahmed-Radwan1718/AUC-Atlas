@@ -33,11 +33,17 @@
     }
 
     .gpa-header {
-      margin-bottom: 34px;
+      width: min(100%, 1162px);
+      margin: 0 auto 34px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
-      gap: 28px;
-      align-items: end;
+      grid-template-columns: minmax(0, 820px) 320px;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .gpa-header > div {
+      display: flex;
+      justify-content: center;
     }
 
     .gpa-header h1 {
@@ -46,13 +52,18 @@
       font-size: clamp(34px, 4.8vw, 58px);
       font-weight: 700;
       line-height: 1.08;
+      text-align: center;
       text-transform: uppercase;
     }
 
     .gpa-header p {
+      width: 100%;
+      max-width: 300px;
+      justify-self: center;
       color: rgba(23, 23, 23, 0.66);
       font-size: 17px;
       line-height: 1.7;
+      text-align: center;
     }
 
     .gpa-layout {
@@ -68,6 +79,40 @@
       width: 100%;
       min-width: 0;
       background: transparent;
+    }
+
+    .gpa-loading {
+      min-height: 318px;
+      padding: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .gpa-loading-spinner {
+      width: 24px;
+      height: 24px;
+      flex: 0 0 24px;
+      border: 2px solid rgba(192, 154, 92, 0.2);
+      border-top-color: #c09a5c;
+      border-radius: 50%;
+      animation: gpaLoadingSpin 0.75s linear infinite;
+    }
+
+    @keyframes gpaLoadingSpin {
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .gpa-summary {
@@ -778,7 +823,12 @@
 
       <section class="gpa-layout" aria-label="GPA calculator">
         <section class="gpa-panel">
-          <div class="gpa-semesters" id="gpa-semesters"></div>
+          <div class="gpa-semesters" id="gpa-semesters">
+            <div class="gpa-loading" role="status" aria-live="polite">
+              <span class="gpa-loading-spinner" aria-hidden="true"></span>
+              <span>Loading GPA calculator...</span>
+            </div>
+          </div>
 
           <div class="gpa-actions">
             <button class="gpa-action primary" type="button" id="add-semester">Add Semester</button>
@@ -1513,6 +1563,15 @@
           "Could not load the saved GPA plan.",
           "error"
         );
+      } finally {
+        const loadingState =
+          semestersRoot.querySelector(
+            ".gpa-loading"
+          );
+
+        if (loadingState) {
+          loadingState.remove();
+        }
       }
     }
 
