@@ -902,6 +902,15 @@
     ["BIOL 4981", "Seminar in Biology"]
   ];
 
+  const courseDescriptions = {
+    "MACT 1121":
+      "Limits of one variable functions. Continuity and differentiability. Implicit differentiation. Differentiation of trigonometric, exponential, and logarithmic functions. Higher derivatives. Applications of derivatives: related rates, linear approximations, the Mean Value Theorem, l'Hopital's Rule, maxima and minima, curve sketching and optimization problems. Definite and indefinite integrals, Riemann Sums, the Fundamental Theorem of Calculus.",
+    "MACT 1122":
+      "The calculus of inverse trigonometric and hyperbolic functions. Applications of the definite integral for finding areas and volumes of revolutions. Techniques of integration. Improper integrals. Sequences and series: Convergence tests, power series, Taylor series with applications. Vectors and the three-dimensional space: Dot and cross products, lines and planes.",
+    "MACT 2123":
+      "Vector valued functions and space curves. Functions of several variables: Limits and continuity, partial derivatives, directional derivatives, maximum and minimum values, Lagrange multipliers. Multiple integrals: Double and triple integrals, change of variables in multiple integrals, including polar, cylindrical and spherical coordinates. Vector calculus: vector fields, The Fundamental Theorem of Line Integrals, Green’s Theorem, surface integrals, Stokes’ and Gauss’s Theorems."
+  };
+
   const subjectLabels = {
     ACCT: "Accounting",
     ANTH: "Anthropology",
@@ -954,6 +963,7 @@
     return {
       code: entry[0],
       title: entry[1],
+      description: courseDescriptions[entry[0]] || "",
       subject: subject,
       department: subjectLabels[subject] || subject,
       level: number.charAt(0) + "000 Level"
