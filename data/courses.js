@@ -903,12 +903,58 @@
   ];
 
   const courseDescriptions = {
+    "CHEM 1005":
+      "Chemical stoichiometry; atomic structure and periodicity; an overview of chemical bonding with a discussion of models and theories of covalent bonding; introduction to structure and chemistry of organic compounds.",
+    "CHEM 1015":
+      "Selected experiments in inorganic and organic chemistry.",
+    "ENGR 1005":
+      "Introductory descriptive geometry. Orthographic and pictorial drawing. Sectional views, auxiliary views, and conventions. Dimensioning. Free hand sketching, and both manual and computer-aided drafting.",
+    "ENGR 2102":
+      "Fundamentals of mechanics. Equilibrium of practices, forces in space, equivalent systems, equilibrium of rigid bodies, distributed forces, center of gravity, internal actions, analysis of simple structures and machine parts. Friction. Moment of inertia.",
+    "ENGR 2104":
+      "Kinematics and kinetics of a particle, system of particles, and rigid bodies. Energy and momentum methods. Engineering applications.",
+    "ENGR 3202":
+      "Solution of sets of linear equations, roots of equations, curve fitting (interpolation), numerical integration and differentiation, numerical solution of ordinary differential equations, boundary value problems and introduction to the finite difference method of computer programs for problem solving. It includes a programming based project.",
+    "ENGR 3212":
+      "Active, reactive and apparent power, three-phase systems, electrical measurements, transformers, motors: types, performance and selection generation, transmission and distribution of Electrical Energy, protective and earthing systems, energy management and cost.",
     "MACT 1121":
       "Limits of one variable functions. Continuity and differentiability. Implicit differentiation. Differentiation of trigonometric, exponential, and logarithmic functions. Higher derivatives. Applications of derivatives: related rates, linear approximations, the Mean Value Theorem, l'Hopital's Rule, maxima and minima, curve sketching and optimization problems. Definite and indefinite integrals, Riemann Sums, the Fundamental Theorem of Calculus.",
     "MACT 1122":
       "The calculus of inverse trigonometric and hyperbolic functions. Applications of the definite integral for finding areas and volumes of revolutions. Techniques of integration. Improper integrals. Sequences and series: Convergence tests, power series, Taylor series with applications. Vectors and the three-dimensional space: Dot and cross products, lines and planes.",
     "MACT 2123":
-      "Vector valued functions and space curves. Functions of several variables: Limits and continuity, partial derivatives, directional derivatives, maximum and minimum values, Lagrange multipliers. Multiple integrals: Double and triple integrals, change of variables in multiple integrals, including polar, cylindrical and spherical coordinates. Vector calculus: vector fields, The Fundamental Theorem of Line Integrals, Green’s Theorem, surface integrals, Stokes’ and Gauss’s Theorems."
+      "Vector valued functions and space curves. Functions of several variables: Limits and continuity, partial derivatives, directional derivatives, maximum and minimum values, Lagrange multipliers. Multiple integrals: Double and triple integrals, change of variables in multiple integrals, including polar, cylindrical and spherical coordinates. Vector calculus: vector fields, The Fundamental Theorem of Line Integrals, Green’s Theorem, surface integrals, Stokes’ and Gauss’s Theorems.",
+    "MACT 2141":
+      "First-order differential equations and applications. Higher-order differential equations. Applications of second-order linear differential equations with constant coefficients. Systems of linear differential equations. Series solutions. Laplace transform.",
+    "MACT 3224":
+      "A course in probability and statistics designed for computer science and engineering students. Probability is used to construct parametric models that often arise in computer science and engineering problems. Statistics is then used to estimate the parameters of these models based on available data, check the adequacy of the fitted models, and test specific hypotheses. Topics include random variables and their probability distributions including uniform, binomial, geometric, Poisson, normal, and exponential distributions; expected value of functions of random variables; stochastic simulation; sampling distributions; maximum likelihood and least squares methods of estimation; statistical inference including hypothesis testing and interval estimation.",
+    "MENG 2112":
+      "Concept of stress and strain in components, mechanical behavior of materials under tensile, compressive, and shear loads, hardness, impact loading, fracture and fatigue. Analysis of stresses and the corresponding deformations in components, axial loading, torsion, bending, and transverse loading. Statically indeterminate problems. Transformation of plane stresses, and Mohr’s circle.",
+    "MENG 2202":
+      "This lab is intended for students with no programming background. It teaches students solving engineering problems via the principle of programming and computing employing a programming language and techniques of current use in engineering. Topics covered include data types, arithmetic, scripts, user-defined functions, inputs, outputs, conditionals, loops, arrays, and modular programming. An emphasis is given to the visualization and graphical representation. Basics of software engineering introduced (code maintenance, debugging, and documentation). Accuracy and speed are discussed as limitations of engineering computation.",
+    "MENG 2505":
+      "Computer-aided drafting. Mechanical details and assembly drawings. Working drawings. Geometrical tolerances. Welding symbols and details, introduction to 3D modeling. Introduction to civil and architectural drawings.",
+    "MENG 2601":
+      "Fluid properties and fluid statics. Fluid flow, Euler’s and Bernoulli’s equations, Conservation of continuity, momentum, and energy. Laminar and turbulent flows, Reynolds number, closed conduit flow and secondary losses, and pipe networks. Fundamental flow measurements.",
+    "MENG 3207":
+      "Introduction to materials. Crystal structure of solids. Construction and use of phase diagrams in materials systems. Relationship of crystal structure to properties of metallic materials and their applications. Heat treatment of steels. Types of polymers, ceramics, glasses, and semiconducting materials and their applications.",
+    "MENG 3209":
+      "Processing by casting, powder metallurgy, metal working, material removal, welding and joining. Processing of plastics and ceramics. Finishing processes. Materials recycling.",
+    "MENG 3217":
+      "Through a series of experiments carried out by the students, the behavior of the different classes of engineering materials including metals, polymers, ceramics, and composites are demonstrated. Relationship of bonding type, crystalline/amorphous structures to properties of metallic/polymeric/ceramic materials and their applications. Materials’ mechanical performance under the various loading modes. Difference between meso and microstructure, single and multiphase solids, etc. Experiments that demonstrate the influence of cooling rate, strain hardening and heat treatment on the mechanical behavior of materials. Identify causes of failure resulting from chemical attack (corrosion), mechanical wear (erosion) or due to structural changes associated with high temperature (creep), etc.",
+    "MENG 3402":
+      "Fundamentals of statistical quality control; control charts for variables and attributes; process capability analysis; sampling plans and techniques; introduction to design of experiments.",
+    "MENG 3446":
+      "Concepts of Engineering Management, Organizing, Motivation and Leadership, Performance evaluation, Project selection and initiation, Project planning, Project scheduling, monitoring, control, and evaluation, Resources scheduling, Project management software.",
+    "MENG 3502":
+      "Linkage synthesis, position, velocity, and acceleration of mechanisms, cams, gears and gear trains, machine dynamics, rotating and reciprocating machines, dynamic balancing.",
+    "PHYS 1011":
+      "An introduction to classical mechanics covering vectors, applications of Newton’s laws, conservation laws and forces, motion in a plane, circular motion, equilibrium and elasticity, rotational motion, simple harmonic motion, energy and power; mechanical and sound waves, temperature, heat and the first law of thermodynamics.",
+    "PHYS 1012":
+      "The fundamental quantities of physics are measured through selected experiments in mechanics, heat, and sound. Data are summarized, errors are estimated, and reports are presented.",
+    "PHYS 1021":
+      "An introduction to electricity and magnetism covering the electric field, Gauss’s law, electric potential, capacitance, dc circuits, magnetic fields, Faraday’s and Ampere’s laws, time-varying fields, Maxwell’s equations in integral form and alternating currents.",
+    "PHYS 1022":
+      "The fundamental quantities of physics are measured through selected experiments in electricity, magnetism, and optics. Data are summarized, errors are estimated, and reports are presented."
   };
 
   const coursePrerequisites = {
