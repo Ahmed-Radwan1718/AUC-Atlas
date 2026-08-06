@@ -749,6 +749,94 @@
       animation: courseMaterialsReady 0.28s ease both;
     }
 
+    .course-action-stack.is-locked > .course-material-summary,
+    .course-action-stack.is-locked > .material-upload-panel {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .course-action-stack.is-locked > .course-material-summary {
+      min-height: 310px;
+    }
+
+    .course-action-stack.is-locked > .material-upload-panel {
+      min-height: 520px;
+    }
+
+    .course-action-stack.is-locked
+      > .course-material-summary
+      > :not(.course-material-access-lock),
+    .course-action-stack.is-locked
+      > .material-upload-panel
+      > :not(.course-material-access-lock) {
+      filter: blur(7px);
+      opacity: 0.42;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .course-material-access-lock {
+      display: none;
+    }
+
+    .course-action-stack.is-locked .course-material-access-lock {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      padding: 24px;
+      background: rgba(247, 244, 238, 0.46);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      display: grid;
+      place-items: center;
+    }
+
+    .course-material-access-lock-card {
+      width: min(100%, 320px);
+      padding: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 22px 60px rgba(42, 32, 20, 0.14);
+      text-align: center;
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+    }
+
+    .course-material-access-lock-card strong {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .course-action-stack .course-material-access-lock-card p {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    .course-material-access-lock-card a {
+      min-height: 42px;
+      margin-top: 4px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @keyframes courseMaterialsLoadingSpin {
       to {
         transform: rotate(360deg);
@@ -2964,6 +3052,14 @@
               <div class="course-materials-list" id="course-materials-list" aria-label="Downloadable course files">
                 <p class="course-material-status">Loading course files...</p>
               </div>
+
+              <div class="course-material-access-lock" aria-hidden="true">
+                <div class="course-material-access-lock-card">
+                  <strong>Log in to view content</strong>
+                  <p>Sign in with a verified AUC email to view, preview, and download course files.</p>
+                  <a href="login.html">Log in</a>
+                </div>
+              </div>
             </section>
 
             <section class="material-upload-panel" aria-label="Upload course material">
@@ -3064,6 +3160,14 @@
                   <div class="material-upload-spinner"></div>
                 </div>
               </form>
+
+              <div class="course-material-access-lock" aria-hidden="true">
+                <div class="course-material-access-lock-card">
+                  <strong>Log in to view content</strong>
+                  <p>Sign in with a verified AUC email to access the material upload form.</p>
+                  <a href="login.html">Log in</a>
+                </div>
+              </div>
             </section>
           </aside>
         </div>
