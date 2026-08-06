@@ -197,6 +197,14 @@
       gap: 18px;
     }
 
+    .degree-panel-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .degree-major-pill {
       width: fit-content;
       min-height: 34px;
@@ -211,6 +219,56 @@
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
+    }
+
+    .degree-save-button {
+      min-height: 38px;
+      padding: 0 15px;
+      border: 1px solid #171717;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font: inherit;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        opacity 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .degree-save-button:hover:not(:disabled) {
+      background: rgba(126, 90, 34, 0.96);
+      transform: translateY(-1px);
+    }
+
+    .degree-save-button:disabled {
+      cursor: wait;
+      opacity: 0.48;
+    }
+
+    .degree-save-message {
+      min-height: 20px;
+      margin: -8px 0 18px;
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .degree-save-message:empty {
+      display: none;
+    }
+
+    .degree-save-message.success {
+      color: #2f7d53;
+    }
+
+    .degree-save-message.error {
+      color: #9d3b3b;
     }
 
     .degree-summary-grid {
@@ -445,7 +503,18 @@
                   <p id="degree-major-copy">Your saved major will load here.</p>
                 </div>
 
-                <span class="degree-major-pill" id="degree-major-pill">Degree audit</span>
+                <div class="degree-panel-actions">
+                  <span class="degree-major-pill" id="degree-major-pill">Degree audit</span>
+
+                  <button
+                    class="degree-save-button"
+                    id="degree-save-progress"
+                    type="button"
+                    disabled
+                  >
+                    Save Progress
+                  </button>
+                </div>
               </div>
 
               <div class="degree-summary-grid" aria-label="Degree progress summary">
@@ -468,6 +537,12 @@
                   <div class="degree-progress-bar" id="degree-progress-bar"></div>
                 </div>
               </div>
+
+              <p
+                class="degree-save-message"
+                id="degree-save-message"
+                aria-live="polite"
+              ></p>
 
               <div class="degree-requirements-grid" id="degree-requirements-root" aria-live="polite">
                 <div class="degree-empty-state">
@@ -495,6 +570,10 @@
     const degreeProgressBar = document.getElementById("degree-progress-bar");
     const degreeRequirementsRoot = document.getElementById("degree-requirements-root");
     const degreePlanNote = document.getElementById("degree-plan-note");
+    const degreeSaveButton = document.getElementById("degree-save-progress");
+    const degreeSaveMessage = document.getElementById("degree-save-message");
+
+    let activeDegreeMajor = "";
 
     function escapeDegreeHtml(value) {
       return String(value || "")
@@ -698,12 +777,43 @@
       `;
     }
 
+    function showDegreeSaveMessage(message, type) {
+      degreeSaveMessage.textContent = message;
+      degreeSaveMessage.className =
+        "degree-save-message" +
+        (type ? " " + type : "");
+    }
+
+    function getCompletedDegreeKeys() {
+      return Array.from(
+        degreeRequirementsRoot.querySelectorAll(
+          "[data-degree-item]:checked"
+        )
+      ).map(function (item) {
+        return item.dataset.degreeItem;
+      });
+    }
+
     function updateDegreeProgress() {
       const items = Array.from(
         degreeRequirementsRoot.querySelectorAll(
           "[data-degree-item]"
         )
       );
+
+      items.forEach(function (item) {
+        const requirement =
+          item.closest(
+            ".degree-requirement-item"
+          );
+
+        if (requirement) {
+          requirement.classList.toggle(
+            "is-complete",
+            item.checked
+          );
+        }
+      });
 
       const totalCredits = items.reduce(
         function (total, item) {
@@ -732,15 +842,22 @@
 
       const percent = totalCredits
         ? Math.round(
-            (completedCredits / totalCredits) * 100
+            (
+              completedCredits /
+              totalCredits
+            ) * 100
           )
         : 0;
 
       degreeCompletedCount.textContent =
-        formatDegreeCreditCount(completedCredits);
+        formatDegreeCreditCount(
+          completedCredits
+        );
 
       degreeRemainingCount.textContent =
-        formatDegreeCreditCount(remainingCredits);
+        formatDegreeCreditCount(
+          remainingCredits
+        );
 
       degreeProgressPercent.textContent =
         percent + "%";
@@ -749,33 +866,229 @@
         percent + "%";
     }
 
-    function renderDegreeProgression(user) {
-      const savedMajor = String((user || {}).major || "").trim();
-      const majorPlan = DEGREE_REQUIREMENTS[savedMajor] || null;
+    async function loadSavedDegreeProgress() {
+      if (!activeDegreeMajor) {
+        return;
+      }
 
-      degreeMajorName.textContent = savedMajor || "No Major Selected";
-      degreeMajorPill.textContent = savedMajor ? "Saved major" : "Missing major";
-      degreeMajorCopy.textContent = majorPlan
-        ? "Requirements loaded for your saved major."
-        : "Requirements have not been added for this major yet.";
+      degreeSaveButton.disabled = true;
+      showDegreeSaveMessage("", "");
+
+      try {
+        const response = await fetch(
+          "/api/academic-progress",
+          {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              Accept: "application/json"
+            }
+          }
+        );
+
+        const data = await response
+          .json()
+          .catch(function () {
+            return {};
+          });
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ||
+            "Could not load saved progress."
+          );
+        }
+
+        const savedProgress =
+          data.degreeProgress;
+
+        if (
+          savedProgress &&
+          savedProgress.major ===
+            activeDegreeMajor
+        ) {
+          const completedKeys = new Set(
+            Array.isArray(
+              savedProgress.completedKeys
+            )
+              ? savedProgress.completedKeys
+              : []
+          );
+
+          degreeRequirementsRoot
+            .querySelectorAll(
+              "[data-degree-item]"
+            )
+            .forEach(function (item) {
+              item.checked =
+                completedKeys.has(
+                  item.dataset.degreeItem
+                );
+            });
+
+          updateDegreeProgress();
+
+          showDegreeSaveMessage(
+            "Saved progress loaded.",
+            "success"
+          );
+        }
+      } catch (error) {
+        showDegreeSaveMessage(
+          error.message ||
+          "Could not load saved progress.",
+          "error"
+        );
+      } finally {
+        degreeSaveButton.disabled = false;
+      }
+    }
+
+    async function saveDegreeProgress() {
+      if (!activeDegreeMajor) {
+        return;
+      }
+
+      degreeSaveButton.disabled = true;
+      degreeSaveButton.textContent =
+        "Saving...";
+      showDegreeSaveMessage("", "");
+
+      try {
+        const response = await fetch(
+          "/api/academic-progress",
+          {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              type: "degree",
+              progress: {
+                major:
+                  activeDegreeMajor,
+                completedKeys:
+                  getCompletedDegreeKeys()
+              }
+            })
+          }
+        );
+
+        const data = await response
+          .json()
+          .catch(function () {
+            return {};
+          });
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ||
+            "Could not save degree progress."
+          );
+        }
+
+        showDegreeSaveMessage(
+          "Degree progress saved.",
+          "success"
+        );
+      } catch (error) {
+        showDegreeSaveMessage(
+          error.message ||
+          "Could not save degree progress.",
+          "error"
+        );
+      } finally {
+        degreeSaveButton.disabled = false;
+        degreeSaveButton.textContent =
+          "Save Progress";
+      }
+    }
+
+    function renderDegreeProgression(user) {
+      const savedMajor = String(
+        (user || {}).major || ""
+      ).trim();
+
+      const majorPlan =
+        DEGREE_REQUIREMENTS[
+          savedMajor
+        ] || null;
+
+      activeDegreeMajor = savedMajor;
+
+      degreeMajorName.textContent =
+        savedMajor ||
+        "No Major Selected";
+
+      degreeMajorPill.textContent =
+        savedMajor
+          ? "Saved major"
+          : "Missing major";
+
+      degreeMajorCopy.textContent =
+        majorPlan
+          ? "Requirements loaded for your saved major."
+          : "Requirements have not been added for this major yet.";
 
       if (!savedMajor) {
-        renderDegreeEmptyState("No major selected", "Go to Account Details, choose your major, then return to this page.");
+        degreeSaveButton.disabled = true;
+
+        renderDegreeEmptyState(
+          "No major selected",
+          "Go to Account Details, choose your major, then return to this page."
+        );
+
         return;
       }
 
       if (!majorPlan) {
-        renderDegreeEmptyState("Requirements not found", "Requirements were not found for " + savedMajor + " yet.");
+        degreeSaveButton.disabled = true;
+
+        renderDegreeEmptyState(
+          "Requirements not found",
+          "Requirements were not found for " +
+            savedMajor +
+            " yet."
+        );
+
         return;
       }
 
-      degreeRequirementsRoot.innerHTML = majorPlan.groups.map(renderDegreeRequirementGroup).join("");
-      degreePlanNote.hidden = !majorPlan.note;
-      degreePlanNote.textContent = majorPlan.note || "";
+      degreeRequirementsRoot.innerHTML =
+        majorPlan.groups
+          .map(
+            renderDegreeRequirementGroup
+          )
+          .join("");
+
+      degreePlanNote.hidden =
+        !majorPlan.note;
+
+      degreePlanNote.textContent =
+        majorPlan.note || "";
+
       updateDegreeProgress();
     }
 
-    degreeRequirementsRoot.addEventListener("change", updateDegreeProgress);
+    degreeRequirementsRoot.addEventListener(
+      "change",
+      function () {
+        updateDegreeProgress();
+
+        showDegreeSaveMessage(
+          "You have unsaved changes.",
+          ""
+        );
+      }
+    );
+
+    degreeSaveButton.addEventListener(
+      "click",
+      saveDegreeProgress
+    );
 
     async function requireSignedIn() {
       try {
@@ -795,6 +1108,7 @@
         }
 
         renderDegreeProgression(data.user);
+        await loadSavedDegreeProgress();
       } catch (error) {
         try {
           localStorage.setItem("auc-atlas-login-redirect", "degree-progression.html");
