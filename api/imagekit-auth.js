@@ -65,6 +65,14 @@ function cleanString(value, maxLength) {
     .slice(0, maxLength);
 }
 
+function cleanBoolean(value) {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  return cleanString(value, 10).toLowerCase() === "true";
+}
+
 function cleanMaterialType(value) {
   return MATERIAL_TYPE_LOOKUP[
     cleanString(value, 80).toLowerCase()
@@ -412,6 +420,7 @@ async function reserveMaterialUploadAuthorization(data) {
       uploadFileName: data.uploadFileName,
       fileSize: data.fileSize,
       folder: data.folder,
+      isAnonymous: cleanBoolean(data.isAnonymous),
       uploaderDisplayName: data.uploaderDisplayName,
       uploaderPhotoURL: data.uploaderPhotoURL,
       createdAt:
@@ -537,6 +546,9 @@ module.exports = async function handler(req, res) {
       body.type ||
       body.category
     );
+    const isAnonymous = cleanBoolean(
+      body.isAnonymous
+    );
     const title = cleanString(body.title, 160);
     const fileName = cleanMaterialFileName(body.fileName);
     const fileSize = Number(body.fileSize);
@@ -584,6 +596,11 @@ module.exports = async function handler(req, res) {
       uploaderTag,
       "upload-auth-" + authorizationId
     ];
+
+    if (isAnonymous) {
+      tags.push("anonymous-upload");
+    }
+
     const description = [
       cleanDescriptionPart(title, 160),
       cleanDescriptionPart(courseCode, 40),
@@ -596,7 +613,11 @@ module.exports = async function handler(req, res) {
       ),
       cleanDescriptionPart(uploader.photoURL, 500),
       cleanDescriptionPart(uploader.uid, 160),
-      cleanDescriptionPart(fileName, 240)
+      cleanDescriptionPart(fileName, 240),
+      cleanDescriptionPart(
+        String(isAnonymous),
+        10
+      )
     ].join(" | ");
     const uploadFileName =
       buildImageKitFileName(fileName);
@@ -632,6 +653,7 @@ module.exports = async function handler(req, res) {
       professor,
       semester,
       materialType,
+      isAnonymous,
       title,
       fileName,
       uploadFileName,
