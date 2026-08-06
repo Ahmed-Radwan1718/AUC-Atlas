@@ -60,20 +60,78 @@
     }
 
     .info-content {
-      padding: 28px;
+      padding: 8px 28px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 30px;
       background: rgba(255, 255, 255, 0.76);
       box-shadow: 0 28px 80px rgba(42, 32, 20, 0.1);
       display: grid;
-      gap: 24px;
+      gap: 0;
+    }
+
+    .info-section {
+      border-bottom: 1px solid rgba(23, 23, 23, 0.1);
+    }
+
+    .info-section:last-child {
+      border-bottom: 0;
     }
 
     .info-section h2 {
-      margin-bottom: 10px;
+      margin: 0;
       color: #171717;
       font-size: 22px;
+      font-weight: 700;
       line-height: 1.2;
+    }
+
+    .info-toggle {
+      width: 100%;
+      padding: 20px 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .info-toggle:hover {
+      color: rgba(23, 23, 23, 0.72);
+    }
+
+    .info-toggle:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.9);
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    .info-toggle-icon {
+      flex: 0 0 auto;
+      color: rgba(192, 154, 92, 0.95);
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .info-toggle-icon::before {
+      content: "+";
+    }
+
+    .info-toggle[aria-expanded="true"] .info-toggle-icon::before {
+      content: "−";
+    }
+
+    .info-answer {
+      padding: 0 48px 20px 0;
+    }
+
+    .info-answer[hidden] {
+      display: none;
     }
 
     .info-section ul {
@@ -84,7 +142,9 @@
 
     @media (max-width: 640px) {
       .info-page { padding-top: 96px; }
-      .info-content { padding: 22px; border-radius: 22px; }
+      .info-content { padding: 6px 22px; border-radius: 22px; }
+      .info-toggle { padding: 18px 0; gap: 18px; }
+      .info-answer { padding: 0 38px 18px 0; }
     }
   </style>
 </head>
@@ -103,57 +163,132 @@
 
       <section class="info-content">
         <article class="info-section">
-          <h2>1. Information You Provide</h2>
-          <p>AUC Atlas may collect information you submit, such as account details, professor reviews, course material metadata, uploaded files, professor names, semesters, course codes, support messages, and profile information.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="privacy-answer-1">
+              <span>1. Information You Provide</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="privacy-answer-1" hidden>
+            <p>AUC Atlas may collect information you submit, such as account details, professor reviews, course material metadata, uploaded files, professor names, semesters, course codes, support messages, and profile information.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>2. Uploaded Files</h2>
-          <p>Course materials uploaded to AUC Atlas may be stored with a file storage provider and tied to course, professor, semester, title, file type, file size, upload time, and moderation status.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="privacy-answer-2">
+              <span>2. Uploaded Files</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="privacy-answer-2" hidden>
+            <p>Course materials uploaded to AUC Atlas may be stored with a file storage provider and tied to course, professor, semester, title, file type, file size, upload time, and moderation status.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>3. Automatically Collected Data</h2>
-          <p>The website, hosting provider, authentication tools, and storage providers may collect basic technical information such as IP address, browser type, device information, request logs, security events, and error logs.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="privacy-answer-3">
+              <span>3. Automatically Collected Data</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="privacy-answer-3" hidden>
+            <p>The website, hosting provider, authentication tools, and storage providers may collect basic technical information such as IP address, browser type, device information, request logs, security events, and error logs.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>4. How Information Is Used</h2>
-          <ul>
-            <li>To run course pages, professor pages, accounts, uploads, and GPA tools.</li>
-            <li>To organize uploaded material by course, professor, and semester.</li>
-            <li>To moderate unsafe, private, copyrighted, spam, or inaccurate content.</li>
-            <li>To protect the website from abuse, fraud, security threats, and technical errors.</li>
-            <li>To improve AUC Atlas features and reliability.</li>
-          </ul>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="privacy-answer-4">
+              <span>4. How Information Is Used</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="privacy-answer-4" hidden>
+            <ul>
+              <li>To run course pages, professor pages, accounts, uploads, and GPA tools.</li>
+              <li>To organize uploaded material by course, professor, and semester.</li>
+              <li>To moderate unsafe, private, copyrighted, spam, or inaccurate content.</li>
+              <li>To protect the website from abuse, fraud, security threats, and technical errors.</li>
+              <li>To improve AUC Atlas features and reliability.</li>
+            </ul>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>5. Sharing With Service Providers</h2>
-          <p>AUC Atlas may use third-party services for hosting, authentication, file storage, databases, analytics, email, or security. These providers may process information only as needed to provide their services.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="privacy-answer-5">
+              <span>5. Sharing With Service Providers</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="privacy-answer-5" hidden>
+            <p>AUC Atlas may use third-party services for hosting, authentication, file storage, databases, analytics, email, or security. These providers may process information only as needed to provide their services.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>6. Public Content</h2>
-          <p>Reviews, course material titles, professor names, semesters, course codes, and approved file links may become visible to other users. Do not upload personal, private, confidential, or identifying information that should not be public.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="privacy-answer-6">
+              <span>6. Public Content</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="privacy-answer-6" hidden>
+            <p>Reviews, course material titles, professor names, semesters, course codes, and approved file links may become visible to other users. Do not upload personal, private, confidential, or identifying information that should not be public.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>7. Cookies and Local Storage</h2>
-          <p>AUC Atlas may use cookies, local storage, or session storage for login state, account features, security, preferences, and basic website functionality.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="privacy-answer-7">
+              <span>7. Cookies and Local Storage</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="privacy-answer-7" hidden>
+            <p>AUC Atlas may use cookies, local storage, or session storage for login state, account features, security, preferences, and basic website functionality.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>8. Data Removal</h2>
-          <p>You may request review or removal of content you submitted or content that includes private, unsafe, copyrighted, or incorrect information. Some records may be kept when needed for security, moderation, legal, or technical reasons.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="privacy-answer-8">
+              <span>8. Data Removal</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="privacy-answer-8" hidden>
+            <p>You may request review or removal of content you submitted or content that includes private, unsafe, copyrighted, or incorrect information. Some records may be kept when needed for security, moderation, legal, or technical reasons.</p>
+          </div>
         </article>
 
         <article class="info-section">
-          <h2>9. Student Reminder</h2>
-          <p>Before uploading files, remove names, IDs, emails, grades, private messages, and any personal information that does not need to be shared.</p>
+          <h2>
+            <button class="info-toggle" type="button" aria-expanded="false" aria-controls="privacy-answer-9">
+              <span>9. Student Reminder</span>
+              <span class="info-toggle-icon" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="info-answer" id="privacy-answer-9" hidden>
+            <p>Before uploading files, remove names, IDs, emails, grades, private messages, and any personal information that does not need to be shared.</p>
+          </div>
         </article>
       </section>
     </div>
   </main>
+
+  <script>
+    document.querySelectorAll(".info-toggle").forEach((toggle) => {
+      toggle.addEventListener("click", () => {
+        const answer = document.getElementById(toggle.getAttribute("aria-controls"));
+        const isOpen = toggle.getAttribute("aria-expanded") === "true";
+
+        toggle.setAttribute("aria-expanded", String(!isOpen));
+        answer.hidden = isOpen;
+      });
+    });
+  </script>
 </body>
 </html>
