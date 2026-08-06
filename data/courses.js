@@ -911,6 +911,11 @@
       "Vector valued functions and space curves. Functions of several variables: Limits and continuity, partial derivatives, directional derivatives, maximum and minimum values, Lagrange multipliers. Multiple integrals: Double and triple integrals, change of variables in multiple integrals, including polar, cylindrical and spherical coordinates. Vector calculus: vector fields, The Fundamental Theorem of Line Integrals, Green’s Theorem, surface integrals, Stokes’ and Gauss’s Theorems."
   };
 
+  const coursePrerequisites = {
+    "MACT 1122":
+      "Calculus I (MACT 1121) or Calculus I exemption."
+  };
+
   const subjectLabels = {
     ACCT: "Accounting",
     ANTH: "Anthropology",
@@ -964,6 +969,7 @@
       code: entry[0],
       title: entry[1],
       description: courseDescriptions[entry[0]] || "",
+      prerequisite: coursePrerequisites[entry[0]] || "",
       subject: subject,
       department: subjectLabels[subject] || subject,
       level: number.charAt(0) + "000 Level"
