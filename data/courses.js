@@ -2418,6 +2418,9 @@
   function renderCourseDetail(courseCode) {
     const listView = document.getElementById("courses-list-view");
     const detailView = document.getElementById("course-detail-view");
+    const prerequisiteRow = document.getElementById(
+      "course-detail-prerequisite-row"
+    );
 
     if (!courseCode || !detailView) {
       return false;
@@ -2444,6 +2447,11 @@
       setCourseDetailText("course-detail-subject", "Unavailable");
       setCourseDetailText("course-detail-level", "Unavailable");
       setCourseDetailText("course-detail-full-code", courseCode || "Unavailable");
+
+      if (prerequisiteRow) {
+        prerequisiteRow.hidden = true;
+      }
+
       renderCourseProfessors({ code: "" }, []);
       return true;
     }
@@ -2459,6 +2467,15 @@
     setCourseDetailText("course-detail-subject", selectedCourse.subject);
     setCourseDetailText("course-detail-level", selectedCourse.level);
     setCourseDetailText("course-detail-full-code", selectedCourse.code);
+    setCourseDetailText(
+      "course-detail-prerequisite",
+      selectedCourse.prerequisite
+    );
+
+    if (prerequisiteRow) {
+      prerequisiteRow.hidden = !selectedCourse.prerequisite;
+    }
+
     loadCourseProfessors(selectedCourse);
     setupCourseMaterialsAccess(selectedCourse);
 
