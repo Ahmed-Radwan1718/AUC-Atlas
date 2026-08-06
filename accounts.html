@@ -2256,6 +2256,10 @@
       -webkit-backdrop-filter: blur(18px);
     }
 
+    #security-access-modal:not([hidden]) .account-authenticator-modal-backdrop {
+      animation: securityAccessBackdropIn 0.32s ease both;
+    }
+
     .security-access-card {
       width: min(500px, calc(100vw - 48px));
       padding: 30px;
@@ -2263,6 +2267,44 @@
       background: rgba(255, 255, 255, 0.9);
       box-shadow: 0 28px 70px rgba(42, 32, 20, 0.22);
       display: block;
+      transform-origin: center;
+    }
+
+    #security-access-modal:not([hidden]) .security-access-card {
+      animation: securityAccessCardIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes securityAccessBackdropIn {
+      from {
+        opacity: 0;
+        backdrop-filter: blur(0);
+        -webkit-backdrop-filter: blur(0);
+      }
+
+      to {
+        opacity: 1;
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+      }
+    }
+
+    @keyframes securityAccessCardIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% + 24px)) scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #security-access-modal:not([hidden]) .account-authenticator-modal-backdrop,
+      #security-access-modal:not([hidden]) .security-access-card {
+        animation: none;
+      }
     }
 
     .security-access-header {
