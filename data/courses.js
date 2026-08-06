@@ -1914,27 +1914,110 @@
     const selection = form.querySelector(
       '[data-material-role="file-selection"], #material-file-selection'
     );
+    const fileInput = form.querySelector(
+      '[data-material-role="file"], #material-file'
+    );
+    const fileField = fileInput
+      ? fileInput.closest(".material-file-field")
+      : null;
     const selectedFiles = Array.from(files || []);
+
+    if (fileInput) {
+      fileInput.materialSelectedFiles = selectedFiles;
+    }
+
+    if (fileField) {
+      fileField.classList.toggle(
+        "has-files",
+        Boolean(selectedFiles.length)
+      );
+    }
 
     if (!selection) {
       return;
     }
 
     selection.hidden = !selectedFiles.length;
+    selection.classList.remove("is-uploading");
+    selection.removeAttribute("aria-busy");
 
-    selection.innerHTML = selectedFiles.map(function (file) {
-      return `
-        <div class="material-file-item">
-          <strong>${escapeMaterialText(file.name)}</strong>
-          <span>${formatMaterialFileSize(file.size)}</span>
-        </div>
-      `;
-    }).join("");
+    if (!selectedFiles.length) {
+      selection.innerHTML = "";
+      return;
+    }
+
+    selection.innerHTML = `
+      <div class="material-file-selection-head">
+        <button
+          class="material-file-add-button"
+          type="button"
+          data-add-material-file
+        >
+          <span class="material-file-add-icon" aria-hidden="true">+</span>
+          <span>Add more files</span>
+        </button>
+      </div>
+
+      <div class="material-file-list">
+        ${selectedFiles.map(function (file) {
+          return `
+            <div class="material-file-item">
+              <strong>${escapeMaterialText(file.name)}</strong>
+
+              <span class="material-file-item-status">
+                <span class="material-file-size">
+                  ${formatMaterialFileSize(file.size)}
+                </span>
+
+                <span
+                  class="material-file-upload-spinner"
+                  aria-hidden="true"
+                ></span>
+              </span>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+
+  function setMaterialFileUploadState(
+    form,
+    isUploading
+  ) {
+    const selection = form.querySelector(
+      '[data-material-role="file-selection"], #material-file-selection'
+    );
+
+    if (!selection) {
+      return;
+    }
+
+    selection.classList.toggle(
+      "is-uploading",
+      isUploading
+    );
+
+    selection.setAttribute(
+      "aria-busy",
+      isUploading ? "true" : "false"
+    );
+
+    const addButton = selection.querySelector(
+      "[data-add-material-file]"
+    );
+
+    if (addButton) {
+      addButton.disabled = isUploading;
+    }
   }
 
   function setupMaterialFilePicker(form) {
     const fileInput = form.querySelector(
       '[data-material-role="file"], #material-file'
+    );
+    const selection = form.querySelector(
+      '[data-material-role="file-selection"], #material-file-selection'
     );
 
     if (
@@ -1945,13 +2028,76 @@
     }
 
     fileInput.dataset.fileReady = "true";
+    fileInput.materialSelectedFiles = [];
 
-    fileInput.addEventListener("change", function () {
+    function applySelectedFiles(files) {
+      const transfer = new DataTransfer();
+
+      files.forEach(function (file) {
+        transfer.items.add(file);
+      });
+
+      fileInput.files = transfer.files;
+
       setMaterialFileSelection(
         form,
         fileInput.files
       );
+    }
+
+    fileInput.addEventListener("change", function () {
+      const existingFiles = Array.isArray(
+        fileInput.materialSelectedFiles
+      )
+        ? fileInput.materialSelectedFiles
+        : [];
+      const newlySelectedFiles = Array.from(
+        fileInput.files || []
+      );
+      const seenFiles = new Set();
+
+      const mergedFiles = existingFiles
+        .concat(newlySelectedFiles)
+        .filter(function (file) {
+          const fileKey = [
+            file.name,
+            file.size,
+            file.lastModified
+          ].join("::");
+
+          if (seenFiles.has(fileKey)) {
+            return false;
+          }
+
+          seenFiles.add(fileKey);
+          return true;
+        });
+
+      applySelectedFiles(mergedFiles);
     });
+
+    if (selection) {
+      selection.addEventListener(
+        "click",
+        function (event) {
+          const addButton = event.target.closest(
+            "[data-add-material-file]"
+          );
+
+          if (
+            !addButton ||
+            addButton.disabled
+          ) {
+            return;
+          }
+
+          event.preventDefault();
+
+          fileInput.value = "";
+          fileInput.click();
+        }
+      );
+    }
   }
 
   function escapeMaterialText(value) {
@@ -2793,6 +2939,11 @@
         100,
         Math.round(Number(percent) || 0)
       )
+    );
+
+    setMaterialFileUploadState(
+      form,
+      Boolean(isVisible && safePercent < 100)
     );
 
     if (progress) {
