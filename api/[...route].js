@@ -1,4 +1,5 @@
 const routeLoaders = {
+  "academic-progress": function () { return require("../server/routes/academic-progress"); },
   "authenticator": function () { return require("../server/routes/authenticator"); },
   "change-password": function () { return require("../server/routes/change-password"); },
   "course-material-download": function () { return require("../server/routes/course-material-download"); },
