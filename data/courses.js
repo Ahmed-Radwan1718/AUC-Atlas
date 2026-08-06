@@ -2017,7 +2017,7 @@
       }
     }
 
-    async function openPreview(button) {
+    function openPreview(button) {
       const downloadUrl = button.dataset.downloadUrl || "";
       const fileName = button.dataset.fileName || "Course material";
       const extension = button.dataset.fileExtension || "file";
@@ -2027,6 +2027,12 @@
       if (!downloadUrl) {
         return;
       }
+
+      const previewUrl = appendMaterialQueryParameter(
+        downloadUrl,
+        "disposition",
+        "inline"
+      );
 
       lastTrigger = button;
       resetPreview();
@@ -2042,72 +2048,41 @@
         closeButton.focus();
       }
 
-      try {
-        const response = await fetch(
-          appendMaterialQueryParameter(
-            downloadUrl,
-            "format",
-            "json"
-          ),
-          {
-            credentials: "same-origin",
-            cache: "no-store"
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Could not prepare this preview.");
-        }
-
-        const data = await response.json();
-        const signedUrl = String(data.url || "");
-
-        if (!signedUrl) {
-          throw new Error("The secure preview URL is missing.");
-        }
-
-        if (
-          ["jpg", "jpeg", "png", "webp", "gif"].includes(extension)
-        ) {
-          image.src = signedUrl;
-          image.hidden = false;
-          return;
-        }
-
-        if (extension === "pdf") {
-          frame.src =
-            signedUrl +
-            "#toolbar=1&navpanes=0&view=FitH";
-          frame.hidden = false;
-          return;
-        }
-
-        if (
-          [
-            "doc",
-            "docx",
-            "ppt",
-            "pptx",
-            "xls",
-            "xlsx"
-          ].includes(extension)
-        ) {
-          frame.src =
-            "https://view.officeapps.live.com/op/embed.aspx?src=" +
-            encodeURIComponent(signedUrl);
-          frame.hidden = false;
-          return;
-        }
-
-        showPreviewFallback(
-          "A browser preview is not available for this file type. Review the uploader, filename, size, course, professor, and semester before downloading."
-        );
-      } catch (error) {
-        showPreviewFallback(
-          error.message ||
-          "The preview could not be prepared. You can still download the original file."
-        );
+      if (
+        ["jpg", "jpeg", "png", "webp", "gif"].includes(extension)
+      ) {
+        image.src = previewUrl;
+        image.hidden = false;
+        return;
       }
+
+      if (extension === "pdf") {
+        frame.src =
+          previewUrl +
+          "#toolbar=1&navpanes=0&view=FitH";
+        frame.hidden = false;
+        return;
+      }
+
+      if (
+        [
+          "doc",
+          "docx",
+          "ppt",
+          "pptx",
+          "xls",
+          "xlsx"
+        ].includes(extension)
+      ) {
+        showPreviewFallback(
+          "Office file previews are disabled to keep the file behind verified account access. Download the original file to open it."
+        );
+        return;
+      }
+
+      showPreviewFallback(
+        "A browser preview is not available for this file type. Review the uploader, filename, size, course, professor, and semester before downloading."
+      );
     }
 
     frame.addEventListener("load", function () {
