@@ -474,15 +474,42 @@
       transform: translateY(1px);
     }
 
+    .gpa-action:disabled {
+      cursor: wait;
+      opacity: 0.5;
+      transform: none;
+    }
+
     .gpa-action.primary {
       border-color: rgba(192, 154, 92, 0.84);
       background: rgba(192, 154, 92, 0.84);
       color: white;
     }
 
-    .gpa-action.primary:hover {
+    .gpa-action.primary:hover:not(:disabled) {
       border-color: rgba(178, 139, 74, 0.94);
       background: rgba(178, 139, 74, 0.94);
+    }
+
+    .gpa-save-message {
+      min-height: 20px;
+      margin-top: 12px;
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .gpa-save-message:empty {
+      display: none;
+    }
+
+    .gpa-save-message.success {
+      color: #2f7d53;
+    }
+
+    .gpa-save-message.error {
+      color: #9d3b3b;
     }
 
     .gpa-summary {
@@ -755,8 +782,15 @@
 
           <div class="gpa-actions">
             <button class="gpa-action primary" type="button" id="add-semester">Add Semester</button>
+            <button class="gpa-action" type="button" id="save-gpa-plan">Save GPA Plan</button>
             <button class="gpa-action" type="button" id="reset-courses">Reset</button>
           </div>
+
+          <p
+            class="gpa-save-message"
+            id="gpa-save-message"
+            aria-live="polite"
+          ></p>
         </section>
 
         <aside class="gpa-summary">
@@ -785,7 +819,9 @@
   <script>
     const semestersRoot = document.getElementById("gpa-semesters");
     const addSemesterButton = document.getElementById("add-semester");
+    const saveGpaButton = document.getElementById("save-gpa-plan");
     const resetButton = document.getElementById("reset-courses");
+    const gpaSaveMessage = document.getElementById("gpa-save-message");
     const semesterGpaOutput = document.getElementById("semester-gpa");
     const semesterCreditsOutput = document.getElementById("semester-credits");
     const qualityPointsOutput = document.getElementById("quality-points");
@@ -1000,15 +1036,27 @@
       }, 320);
     }
 
-    function createSemesterBlock(semesterName = "") {
-      const semester = document.createElement("section");
-      const semesterNumber = semestersRoot.children.length + 1;
-      const title = semesterName || "Semester " + semesterNumber;
+    function createSemesterBlock(
+      semesterName = "",
+      savedCourses,
+      animateSemester = true
+    ) {
+      const semester =
+        document.createElement("section");
 
-      semester.className = "gpa-semester";
+      const semesterNumber =
+        semestersRoot.children.length + 1;
+
+      const title =
+        semesterName ||
+        "Semester " + semesterNumber;
+
+      semester.className =
+        "gpa-semester";
+
       semester.innerHTML = `
         <div class="gpa-semester-header">
-          <input class="semester-name" type="text" value="${title}" aria-label="Semester name">
+          <input class="semester-name" type="text" value="" aria-label="Semester name">
           <div class="semester-actions">
             <button class="remove-course remove-semester" type="button" aria-label="Remove semester" title="Remove semester">&times;</button>
           </div>
@@ -1028,22 +1076,135 @@
         </div>
       `;
 
-      const semesterCoursesRoot = semester.querySelector(".semester-courses");
+      const semesterNameInput =
+        semester.querySelector(
+          ".semester-name"
+        );
 
-      semester.querySelector(".semester-add-course").addEventListener("click", function () {
-        createCourseRow(semesterCoursesRoot);
+      const semesterCoursesRoot =
+        semester.querySelector(
+          ".semester-courses"
+        );
+
+      semesterNameInput.value = title;
+
+      semester
+        .querySelector(
+          ".semester-add-course"
+        )
+        .addEventListener(
+          "click",
+          function () {
+            createCourseRow(
+              semesterCoursesRoot
+            );
+          }
+        );
+
+      semester
+        .querySelector(
+          ".remove-semester"
+        )
+        .addEventListener(
+          "click",
+          function () {
+            removeSemesterBlock(
+              semester,
+              semester.querySelector(
+                ".remove-semester"
+              )
+            );
+          }
+        );
+
+      semesterNameInput.addEventListener(
+        "input",
+        calculateGpa
+      );
+
+      const courses =
+        Array.isArray(savedCourses) &&
+        savedCourses.length
+          ? savedCourses
+          : [
+              {
+                name: "",
+                credits: "3",
+                grade: ""
+              },
+              {
+                name: "",
+                credits: "3",
+                grade: ""
+              },
+              {
+                name: "",
+                credits: "3",
+                grade: ""
+              }
+            ];
+
+      courses.forEach(function (course) {
+        createCourseRow(
+          semesterCoursesRoot,
+          "",
+          "3",
+          "",
+          false
+        );
+
+        const row =
+          semesterCoursesRoot
+            .lastElementChild;
+
+        const courseName =
+          row.querySelector(
+            ".course-name"
+          );
+
+        const courseCredits =
+          row.querySelector(
+            ".course-credits"
+          );
+
+        const courseGrade =
+          row.querySelector(
+            ".course-grade"
+          );
+
+        const gradeLabel =
+          row.querySelector(
+            ".grade-toggle-label"
+          );
+
+        courseName.value =
+          String(course.name || "");
+
+        courseCredits.value =
+          String(
+            course.credits == null
+              ? ""
+              : course.credits
+          );
+
+        courseGrade.value =
+          String(course.grade || "");
+
+        gradeLabel.textContent =
+          getGradeLabel(
+            courseGrade.value
+          );
       });
 
-      semester.querySelector(".remove-semester").addEventListener("click", function () {
-        removeSemesterBlock(semester, semester.querySelector(".remove-semester"));
-      });
+      if (animateSemester) {
+        animateSemesterIn(semester);
+      } else {
+        semestersRoot.appendChild(
+          semester
+        );
 
-      semester.querySelector(".semester-name").addEventListener("input", calculateGpa);
-
-      createCourseRow(semesterCoursesRoot, "", "3", "", false);
-      createCourseRow(semesterCoursesRoot, "", "3", "", false);
-      createCourseRow(semesterCoursesRoot, "", "3", "", false);
-      animateSemesterIn(semester);
+        calculateGpa();
+      }
     }
 
     function createCourseRow(semesterCoursesRoot, courseName = "", credits = "3", grade = "", animateRow = true) {
@@ -1145,31 +1306,305 @@
       animateSummaryNumber(cumulativeGpaOutput, cumulativeGpa, 2);
     }
 
-    document.addEventListener("click", function (event) {
-      if (event.target.closest(".grade-dropdown")) {
-        return;
+    function showGpaSaveMessage(
+      message,
+      type
+    ) {
+      gpaSaveMessage.textContent =
+        message;
+
+      gpaSaveMessage.className =
+        "gpa-save-message" +
+        (type ? " " + type : "");
+    }
+
+    function getGpaCalculatorState() {
+      return {
+        semesters: Array.from(
+          semestersRoot.querySelectorAll(
+            ".gpa-semester"
+          )
+        ).map(function (semester) {
+          return {
+            name:
+              semester.querySelector(
+                ".semester-name"
+              ).value.trim(),
+            courses: Array.from(
+              semester.querySelectorAll(
+                ".gpa-row"
+              )
+            ).map(function (row) {
+              return {
+                name:
+                  row.querySelector(
+                    ".course-name"
+                  ).value.trim(),
+                credits:
+                  row.querySelector(
+                    ".course-credits"
+                  ).value,
+                grade:
+                  row.querySelector(
+                    ".course-grade"
+                  ).value
+              };
+            })
+          };
+        })
+      };
+    }
+
+    async function saveGpaCalculator() {
+      saveGpaButton.disabled = true;
+      saveGpaButton.textContent =
+        "Saving...";
+      showGpaSaveMessage("", "");
+
+      try {
+        const response = await fetch(
+          "/api/academic-progress",
+          {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              type: "gpa",
+              calculator:
+                getGpaCalculatorState()
+            })
+          }
+        );
+
+        const data = await response
+          .json()
+          .catch(function () {
+            return {};
+          });
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+          try {
+            localStorage.setItem(
+              "auc-atlas-login-redirect",
+              "gpa-calculator.html"
+            );
+          } catch (error) {}
+
+          window.location.href =
+            "login.html";
+
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ||
+            "Could not save the GPA plan."
+          );
+        }
+
+        showGpaSaveMessage(
+          "GPA plan saved.",
+          "success"
+        );
+      } catch (error) {
+        showGpaSaveMessage(
+          error.message ||
+          "Could not save the GPA plan.",
+          "error"
+        );
+      } finally {
+        saveGpaButton.disabled = false;
+        saveGpaButton.textContent =
+          "Save GPA Plan";
       }
+    }
 
-      document.querySelectorAll(".grade-menu").forEach(function (menu) {
-        menu.hidden = true;
-      });
+    async function loadSavedGpaCalculator() {
+      try {
+        const response = await fetch(
+          "/api/academic-progress",
+          {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              Accept: "application/json"
+            }
+          }
+        );
 
-      document.querySelectorAll(".grade-dropdown").forEach(function (dropdown) {
-        dropdown.classList.remove("open");
-      });
-    });
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+          createSemesterBlock(
+            "Semester 1"
+          );
 
-    addSemesterButton.addEventListener("click", function () {
-      createSemesterBlock();
-    });
+          return;
+        }
 
-    resetButton.addEventListener("click", function () {
-      semestersRoot.innerHTML = "";
-      createSemesterBlock("Semester 1");
-      calculateGpa();
-    });
+        const data = await response
+          .json()
+          .catch(function () {
+            return {};
+          });
 
-    createSemesterBlock("Semester 1");
+        if (!response.ok) {
+          throw new Error(
+            data.error ||
+            "Could not load the saved GPA plan."
+          );
+        }
+
+        const savedCalculator =
+          data.gpaCalculator;
+
+        const savedSemesters =
+          savedCalculator &&
+          Array.isArray(
+            savedCalculator.semesters
+          )
+            ? savedCalculator.semesters
+            : [];
+
+        if (!savedSemesters.length) {
+          createSemesterBlock(
+            "Semester 1"
+          );
+
+          return;
+        }
+
+        semestersRoot.innerHTML = "";
+
+        savedSemesters.forEach(
+          function (semester) {
+            createSemesterBlock(
+              semester.name,
+              semester.courses,
+              false
+            );
+          }
+        );
+
+        calculateGpa();
+
+        showGpaSaveMessage(
+          "Saved GPA plan loaded.",
+          "success"
+        );
+      } catch (error) {
+        semestersRoot.innerHTML = "";
+
+        createSemesterBlock(
+          "Semester 1"
+        );
+
+        showGpaSaveMessage(
+          error.message ||
+          "Could not load the saved GPA plan.",
+          "error"
+        );
+      }
+    }
+
+    function markGpaPlanUnsaved() {
+      showGpaSaveMessage(
+        "You have unsaved changes.",
+        ""
+      );
+    }
+
+    document.addEventListener(
+      "click",
+      function (event) {
+        if (
+          event.target.closest(
+            ".grade-dropdown"
+          )
+        ) {
+          return;
+        }
+
+        document
+          .querySelectorAll(
+            ".grade-menu"
+          )
+          .forEach(function (menu) {
+            menu.hidden = true;
+          });
+
+        document
+          .querySelectorAll(
+            ".grade-dropdown"
+          )
+          .forEach(
+            function (dropdown) {
+              dropdown.classList.remove(
+                "open"
+              );
+            }
+          );
+      }
+    );
+
+    semestersRoot.addEventListener(
+      "input",
+      markGpaPlanUnsaved
+    );
+
+    semestersRoot.addEventListener(
+      "click",
+      function (event) {
+        if (
+          event.target.closest(
+            ".grade-option, .remove-course, .semester-add-course"
+          )
+        ) {
+          window.setTimeout(
+            markGpaPlanUnsaved,
+            0
+          );
+        }
+      }
+    );
+
+    addSemesterButton.addEventListener(
+      "click",
+      function () {
+        createSemesterBlock();
+        markGpaPlanUnsaved();
+      }
+    );
+
+    saveGpaButton.addEventListener(
+      "click",
+      saveGpaCalculator
+    );
+
+    resetButton.addEventListener(
+      "click",
+      function () {
+        semestersRoot.innerHTML = "";
+
+        createSemesterBlock(
+          "Semester 1"
+        );
+
+        calculateGpa();
+        markGpaPlanUnsaved();
+      }
+    );
+
+    loadSavedGpaCalculator();
   </script>
 </body>
 </html>
