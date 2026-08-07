@@ -398,6 +398,15 @@
       opacity: 0.72;
     }
 
+    .auth-two-factor-link-button span {
+      color: rgba(192, 154, 92, 0.95);
+    }
+
+    .auth-two-factor-link-button:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
     @media (max-width: 900px) {
       .auth-page {
         padding-top: 88px;
@@ -542,12 +551,56 @@
             Verify Code
           </button>
 
-          <button class="auth-two-factor-link-button" type="button" id="login-two-factor-cancel">
-            Cancel sign in
+          <button class="auth-two-factor-link-button" type="button" id="login-two-factor-email-recovery">
+            Lost access to your authenticator app?<br>
+            <span>Receive a code by email</span>
           </button>
         </div>
 
         <p class="auth-message" id="login-two-factor-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="auth-two-factor-panel" id="login-authenticator-recovery-panel" hidden>
+    <div class="auth-two-factor-card">
+      <div class="auth-two-factor-header">
+        <p class="auth-two-factor-eyebrow">Email Recovery</p>
+        <h2>Enter Email Code</h2>
+        <p id="login-authenticator-recovery-description">
+          Enter the 6-digit code sent to your AUC email address.
+        </p>
+      </div>
+
+      <form class="auth-form" id="login-authenticator-recovery-form">
+        <div class="auth-field">
+          <label>Email Recovery Code</label>
+
+          <div class="auth-two-factor-code-inputs" aria-label="Email recovery code">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 1">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 2">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 3">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 4">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 5">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 6">
+          </div>
+        </div>
+
+        <div class="auth-two-factor-actions">
+          <button class="auth-button" type="submit" id="login-authenticator-recovery-submit">
+            Verify Code
+          </button>
+
+          <button class="auth-two-factor-link-button" type="button" id="login-authenticator-recovery-resend">
+            Send a new code
+          </button>
+
+          <button class="auth-two-factor-link-button" type="button" id="login-authenticator-recovery-back">
+            Back to authenticator app
+          </button>
+        </div>
+
+        <p class="auth-message" id="login-authenticator-recovery-message" aria-live="polite"></p>
       </form>
     </div>
   </div>
@@ -605,7 +658,7 @@
     const twoFactorForm = document.getElementById("login-two-factor-form");
     const twoFactorCodeInputs = Array.from(document.querySelectorAll("[data-login-two-factor-input]"));
     const twoFactorSubmit = document.getElementById("login-two-factor-submit");
-    const twoFactorCancelButton = document.getElementById("login-two-factor-cancel");
+    const twoFactorRecoveryButton = document.getElementById("login-two-factor-email-recovery");
     const twoFactorMessage = document.getElementById("login-two-factor-message");
 
     let awaitingAuthenticatorCode = false;
@@ -689,12 +742,17 @@
       }
     }
 
-    function openTwoFactorPanel() {
+    function openTwoFactorPanel(options) {
+      const settings = options || {};
+
       clearLocalSignedInState();
       awaitingAuthenticatorCode = true;
       clearTwoFactorCodeInputs();
       showMessage("", "");
       showTwoFactorMessage("", "");
+
+      twoFactorRecoveryButton.hidden =
+        !Boolean(settings.emailRecoveryAvailable);
 
       twoFactorPanel.hidden = false;
       twoFactorSubmit.disabled = false;
@@ -859,7 +917,9 @@
         }
 
         if (data.requiresTwoFactor) {
-          openTwoFactorPanel();
+          openTwoFactorPanel({
+            emailRecoveryAvailable: true
+          });
           return;
         }
 
@@ -880,11 +940,8 @@
       await verifyAuthenticatorLogin();
     });
 
-    twoFactorCancelButton.addEventListener("click", function () {
-      closeTwoFactorPanel("Sign in cancelled.");
-    });
-
   </script>
   <script src="login-code.js"></script>
+  <script src="login-authenticator-recovery.js"></script>
 </body>
 </html>
