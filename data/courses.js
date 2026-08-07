@@ -2564,11 +2564,20 @@
             aria-hidden="true"
           >
         `
-        : `
-          <span class="course-material-file-icon" aria-hidden="true">
-            <strong>${extensionLabel}</strong>
-          </span>
-        `;
+        : ["doc", "docx"].includes(extension)
+          ? `
+            <img
+              class="course-material-file-icon-image"
+              src="doc.png"
+              alt=""
+              aria-hidden="true"
+            >
+          `
+          : `
+            <span class="course-material-file-icon" aria-hidden="true">
+              <strong>${extensionLabel}</strong>
+            </span>
+          `;
 
       const previewDataAttributes = [
         'data-download-url="' + safeDownloadUrl + '"',
