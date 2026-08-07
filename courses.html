@@ -1694,6 +1694,38 @@
       flex: 0 0 auto;
       display: flex;
       align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .course-material-report-button {
+      padding: 6px 0;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.46);
+      font: inherit;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    .course-material-report-button:hover,
+    .course-material-report-button:focus-visible {
+      color: #9f2f2f;
+      outline: none;
+    }
+
+    .course-material-report-button:disabled {
+      color: rgba(23, 23, 23, 0.38);
+      cursor: default;
+      opacity: 0.72;
     }
 
     .course-material-download-button {
