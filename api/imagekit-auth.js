@@ -625,9 +625,7 @@ module.exports = async function handler(req, res) {
       isPrivateFile: "true",
       tags: tags.join(","),
       checks,
-      description,
-      responseFields:
-        "fileId,name,url,filePath,size,fileType,tags"
+      description
     };
     const currentStoredBytes =
       await getImageKitStoredBytesForUploader(
