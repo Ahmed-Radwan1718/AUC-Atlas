@@ -1925,23 +1925,27 @@
       text-transform: uppercase;
     }
 
-    .course-material-sort {
-      min-height: 34px;
-      padding: 0 30px 0 11px;
-      border: 1px solid rgba(23, 23, 23, 0.09);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.78);
-      color: #171717;
-      font: inherit;
-      font-size: 10px;
-      font-weight: 800;
-      outline: none;
-      cursor: pointer;
+    .course-material-sort-choice {
+      width: 118px;
     }
 
-    .course-material-sort:focus {
-      border-color: rgba(192, 154, 92, 0.52);
-      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.1);
+    .course-material-sort-choice .material-choice-button {
+      min-height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .course-material-sort-choice .material-choice-menu {
+      right: 0;
+      left: auto;
+      width: 138px;
+    }
+
+    .course-material-sort-choice .material-choice-option {
+      min-height: 36px;
+      font-size: 11px;
     }
 
     .course-materials-list {
@@ -4132,18 +4136,50 @@
                   >Sheets</button>
                 </div>
 
-                <label class="course-material-sort-wrap">
+                <div class="course-material-sort-wrap">
                   <span>Sort</span>
 
-                  <select
-                    class="course-material-sort"
+                  <div
+                    class="material-choice course-material-sort-choice"
                     id="course-material-sort"
-                    aria-label="Sort course materials"
                   >
-                    <option value="newest">Newest</option>
-                    <option value="oldest">Oldest</option>
-                  </select>
-                </label>
+                    <button
+                      class="material-choice-button"
+                      type="button"
+                      data-material-sort-button
+                      data-sort-value="newest"
+                      aria-haspopup="listbox"
+                      aria-expanded="false"
+                    >
+                      Newest
+                    </button>
+
+                    <div
+                      class="material-choice-menu"
+                      data-material-sort-menu
+                      role="listbox"
+                      aria-label="Sort course materials"
+                    >
+                      <button
+                        class="material-choice-option"
+                        type="button"
+                        data-material-sort-option="newest"
+                        aria-selected="true"
+                      >
+                        Newest
+                      </button>
+
+                      <button
+                        class="material-choice-option"
+                        type="button"
+                        data-material-sort-option="oldest"
+                        aria-selected="false"
+                      >
+                        Oldest
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="course-materials-list" id="course-materials-list" aria-label="Downloadable course files">
