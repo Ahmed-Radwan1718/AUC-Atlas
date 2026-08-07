@@ -2817,7 +2817,7 @@
               href="${safeDownloadUrl}"
               target="_blank"
               rel="noopener"
-            >Download file</a>
+            >Download</a>
           </div>
         `;
 
@@ -2941,7 +2941,7 @@
       function updateFooterDownloadButton() {
         footerDownload.textContent = more.open
           ? "Download all files"
-          : "Download file";
+          : "Download";
       }
 
       more.addEventListener(
