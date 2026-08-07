@@ -36,34 +36,24 @@
       width: min(100%, 1162px);
       margin: 0 auto 34px;
       display: grid;
-      grid-template-columns: minmax(0, 820px) 320px;
-      gap: 22px;
-      align-items: center;
-    }
-
-    .gpa-header > div {
-      display: flex;
-      justify-content: center;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 28px;
+      align-items: end;
     }
 
     .gpa-header h1 {
-      max-width: 640px;
+      max-width: 650px;
       color: #171717;
       font-size: clamp(34px, 4.8vw, 58px);
       font-weight: 700;
       line-height: 1.08;
-      text-align: left;
       text-transform: uppercase;
     }
 
     .gpa-header p {
-      width: 100%;
-      max-width: 300px;
-      justify-self: center;
       color: rgba(23, 23, 23, 0.66);
       font-size: 17px;
       line-height: 1.7;
-      text-align: center;
     }
 
     .gpa-layout {
