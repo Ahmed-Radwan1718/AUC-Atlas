@@ -2032,6 +2032,20 @@
         grid-column: auto;
       }
 
+      .review-submit-button {
+        position: sticky;
+        bottom: 0;
+        z-index: 9;
+        width: 100%;
+        min-height: 50px;
+        grid-column: 1 / -1;
+        flex-shrink: 0;
+        margin-top: 4px;
+        box-shadow:
+          0 -12px 24px rgba(255, 255, 255, 0.92),
+          0 8px 22px rgba(42, 32, 20, 0.12);
+      }
+
       .review-choice-menu {
         position: static;
         display: none;
