@@ -597,10 +597,6 @@ module.exports = async function handler(req, res) {
       "upload-auth-" + authorizationId
     ];
 
-    if (isAnonymous) {
-      tags.push("anonymous-upload");
-    }
-
     const description = [
       cleanDescriptionPart(title, 160),
       cleanDescriptionPart(courseCode, 40),
@@ -613,11 +609,7 @@ module.exports = async function handler(req, res) {
       ),
       cleanDescriptionPart(uploader.photoURL, 500),
       cleanDescriptionPart(uploader.uid, 160),
-      cleanDescriptionPart(fileName, 240),
-      cleanDescriptionPart(
-        String(isAnonymous),
-        10
-      )
+      cleanDescriptionPart(fileName, 240)
     ].join(" | ");
     const uploadFileName =
       buildImageKitFileName(fileName);
