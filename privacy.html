@@ -392,6 +392,276 @@
       }
     }
   </style>
+
+  <style>
+    .info-page {
+      min-height: 100vh;
+      padding: 126px 0 86px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+      overflow-x: clip;
+    }
+
+    .info-inner {
+      width: min(1180px, calc(100% - 32px));
+      max-width: none;
+      margin: 0 auto;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .info-header {
+      max-width: none;
+      margin: 0 0 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      grid-template-areas:
+        "kicker copy"
+        "title copy";
+      column-gap: 28px;
+      align-items: end;
+    }
+
+    .info-kicker {
+      grid-area: kicker;
+      margin: 0 0 16px;
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .info-header h1 {
+      grid-area: title;
+      max-width: 720px;
+      margin: 0;
+      color: #171717;
+      font-size: clamp(34px, 4.8vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .info-header > p:last-child {
+      grid-area: copy;
+      display: block;
+      max-width: 420px;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .info-content {
+      padding: 8px 28px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      display: grid;
+      gap: 0;
+    }
+
+    .info-content::before {
+      content: none;
+    }
+
+    .info-section {
+      border: 0;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: transparent;
+    }
+
+    .info-section:last-child {
+      border-bottom: 0;
+    }
+
+    .info-toggle {
+      width: 100%;
+      padding: 22px 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #171717;
+      font-family: inherit;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .info-toggle:hover {
+      background: transparent;
+      color: inherit;
+    }
+
+    .info-toggle:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.9);
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    .info-toggle span:first-child {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+      transition: color 0.2s ease;
+    }
+
+    .info-toggle:hover span:first-child,
+    .info-section.open .info-toggle span:first-child {
+      color: #a67c39;
+    }
+
+    .info-toggle-icon {
+      width: 36px;
+      height: 36px;
+      color: rgba(23, 23, 23, 0.58);
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 50%;
+      background: rgba(247, 244, 238, 0.74);
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.24s ease;
+    }
+
+    .info-toggle-icon::before,
+    .info-toggle[aria-expanded="true"] .info-toggle-icon::before {
+      content: "+";
+    }
+
+    .info-toggle:hover .info-toggle-icon,
+    .info-section.open .info-toggle-icon {
+      color: #171717;
+      border-color: rgba(192, 154, 92, 0.38);
+      background: rgba(192, 154, 92, 0.12);
+    }
+
+    .info-section.open .info-toggle-icon {
+      transform: rotate(45deg);
+    }
+
+    .info-answer {
+      max-height: none;
+      padding: 0 56px 24px 0;
+      overflow: visible;
+      opacity: 1;
+      transition: none;
+    }
+
+    .info-answer[hidden] {
+      display: none;
+    }
+
+    .info-section.open .info-answer {
+      max-height: none;
+      opacity: 1;
+    }
+
+    .info-answer:not([hidden]) {
+      animation: infoAnswerIn 0.22s ease both;
+    }
+
+    .info-answer p {
+      max-width: 820px;
+      padding: 0;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .info-answer ul {
+      max-width: 820px;
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .info-answer li {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    @keyframes infoAnswerIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .info-page {
+        padding: 104px 0 64px;
+      }
+
+      .info-inner {
+        width: min(100% - 24px, 1180px);
+      }
+
+      .info-header {
+        margin-bottom: 26px;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "kicker"
+          "title"
+          "copy";
+      }
+
+      .info-header h1 {
+        margin-bottom: 14px;
+      }
+
+      .info-header > p:last-child {
+        max-width: 680px;
+      }
+
+      .info-content {
+        padding: 6px 18px;
+        border-radius: 22px;
+      }
+
+      .info-toggle {
+        padding: 20px 0;
+        gap: 16px;
+      }
+
+      .info-toggle span:first-child {
+        font-size: 16px;
+      }
+
+      .info-toggle-icon {
+        width: 34px;
+        height: 34px;
+      }
+
+      .info-answer {
+        padding: 0 0 20px;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -535,11 +805,15 @@
         return;
       }
 
-      answer.hidden = false;
+      toggle.setAttribute("aria-expanded", "false");
+      answer.hidden = true;
 
       toggle.addEventListener("click", () => {
-        const isOpen = item.classList.toggle("open");
-        toggle.setAttribute("aria-expanded", String(isOpen));
+        const willOpen = toggle.getAttribute("aria-expanded") !== "true";
+
+        item.classList.toggle("open", willOpen);
+        toggle.setAttribute("aria-expanded", String(willOpen));
+        answer.hidden = !willOpen;
       });
     });
   </script>
