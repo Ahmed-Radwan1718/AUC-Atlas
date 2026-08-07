@@ -1877,6 +1877,264 @@
       opacity: 0.72;
     }
 
+    body.content-report-open {
+      overflow: hidden;
+    }
+
+    .course-report-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3100;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .course-report-modal[hidden] {
+      display: none;
+    }
+
+    .course-report-backdrop {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: rgba(23, 23, 23, 0.58);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor: pointer;
+      animation:
+        courseReportBackdropIn
+        0.24s
+        ease
+        both;
+    }
+
+    .course-report-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(520px, 100%);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 26px;
+      background: #f7f4ee;
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.3);
+      animation:
+        courseReportDialogIn
+        0.3s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+    }
+
+    .course-report-header {
+      padding: 24px 24px 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .course-report-header-copy {
+      min-width: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .course-report-kicker {
+      margin: 0;
+      color: rgba(145, 101, 35, 0.9);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .course-report-header h2 {
+      margin: 0;
+      color: #171717;
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .course-report-header-copy > p:last-child {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.65;
+    }
+
+    .course-report-close {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.68);
+      color: #171717;
+      font: inherit;
+      font-size: 21px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .course-report-form {
+      padding: 0 24px 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .course-report-field {
+      display: grid;
+      gap: 9px;
+    }
+
+    .course-report-field > span {
+      color: #171717;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .course-report-field textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 14px 15px;
+      resize: vertical;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 16px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      font: inherit;
+      font-size: 14px;
+      line-height: 1.6;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .course-report-field textarea:focus {
+      border-color: rgba(192, 154, 92, 0.68);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .course-report-status {
+      min-height: 0;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .course-report-status:empty {
+      display: none;
+    }
+
+    .course-report-status.error {
+      color: #9f2f2f;
+    }
+
+    .course-report-actions {
+      padding-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .course-report-cancel,
+    .course-report-submit {
+      min-height: 44px;
+      padding: 0 17px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .course-report-cancel {
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      background: transparent;
+      color: rgba(23, 23, 23, 0.68);
+    }
+
+    .course-report-submit {
+      border: 0;
+      background: #171717;
+      color: #ffffff;
+    }
+
+    .course-report-submit:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    @keyframes courseReportBackdropIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes courseReportDialogIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-report-backdrop,
+      .course-report-dialog {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .course-report-modal {
+        padding: 14px;
+      }
+
+      .course-report-dialog {
+        border-radius: 22px;
+      }
+
+      .course-report-header {
+        padding: 20px 18px 16px;
+      }
+
+      .course-report-form {
+        padding: 0 18px 18px;
+      }
+
+      .course-report-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .course-report-cancel,
+      .course-report-submit {
+        width: 100%;
+      }
+    }
+
     .professor-review-empty,
     .professor-review-status {
       grid-column: 1 / -1;
@@ -2589,7 +2847,7 @@
     }).join(", ");
   }
 
-  async function submitProfessorReviewReport(
+  function submitProfessorReviewReport(
     button
   ) {
     const targetId =
@@ -2597,83 +2855,290 @@
     const targetLabel =
       button.dataset.reportLabel ||
       "this review";
-    const reason = window.prompt(
-      "Why are you reporting " +
-        targetLabel +
-        "?",
-      ""
+
+    if (!targetId) {
+      return;
+    }
+
+    let modal = document.getElementById(
+      "professor-review-report-modal"
     );
 
-    if (reason === null) {
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.className = "course-report-modal";
+      modal.id = "professor-review-report-modal";
+      modal.hidden = true;
+      modal.innerHTML = `
+        <button
+          class="course-report-backdrop"
+          type="button"
+          aria-label="Close report panel"
+          data-close-professor-review-report
+        ></button>
+
+        <section
+          class="course-report-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="professor-review-report-title"
+        >
+          <header class="course-report-header">
+            <div class="course-report-header-copy">
+              <p class="course-report-kicker">Content moderation</p>
+              <h2 id="professor-review-report-title">Report review</h2>
+              <p id="professor-review-report-copy">
+                Tell us what is wrong with this review. Our moderators will review your report.
+              </p>
+            </div>
+
+            <button
+              class="course-report-close"
+              type="button"
+              aria-label="Close report panel"
+              data-close-professor-review-report
+            >×</button>
+          </header>
+
+          <form
+            class="course-report-form"
+            id="professor-review-report-form"
+          >
+            <label class="course-report-field">
+              <span>Reason for report</span>
+              <textarea
+                id="professor-review-report-reason"
+                name="reason"
+                maxlength="1000"
+                placeholder="Describe the issue with this review..."
+                required
+              ></textarea>
+            </label>
+
+            <p
+              class="course-report-status"
+              id="professor-review-report-status"
+              aria-live="polite"
+            ></p>
+
+            <div class="course-report-actions">
+              <button
+                class="course-report-cancel"
+                type="button"
+                data-close-professor-review-report
+              >Cancel</button>
+
+              <button
+                class="course-report-submit"
+                id="professor-review-report-submit"
+                type="submit"
+              >Submit report</button>
+            </div>
+          </form>
+        </section>
+      `;
+
+      document.body.appendChild(modal);
+    }
+
+    const form = document.getElementById(
+      "professor-review-report-form"
+    );
+    const copy = document.getElementById(
+      "professor-review-report-copy"
+    );
+    const reasonInput = document.getElementById(
+      "professor-review-report-reason"
+    );
+    const status = document.getElementById(
+      "professor-review-report-status"
+    );
+    const submitButton = document.getElementById(
+      "professor-review-report-submit"
+    );
+
+    if (
+      !form ||
+      !copy ||
+      !reasonInput ||
+      !status ||
+      !submitButton
+    ) {
       return;
     }
 
-    const cleanedReason =
-      reason.trim();
-
-    if (cleanedReason.length < 3) {
-      window.alert(
-        "Briefly explain why you are reporting this review."
+    function closeReportPanel() {
+      modal.hidden = true;
+      document.body.classList.remove(
+        "content-report-open"
       );
-      return;
+      form.reset();
+      status.textContent = "";
+      status.className = "course-report-status";
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit report";
+
+      if (
+        modal.reportSourceButton &&
+        !modal.reportSourceButton.disabled
+      ) {
+        modal.reportSourceButton.focus();
+      }
     }
 
-    const originalText =
-      button.textContent;
+    if (modal.dataset.ready !== "true") {
+      modal.dataset.ready = "true";
 
-    button.disabled = true;
-    button.textContent =
-      "Reporting...";
-
-    try {
-      const response = await fetch(
-        "/api/content-reports",
-        {
-          method: "POST",
-          credentials: "same-origin",
-          cache: "no-store",
-          headers: {
-            Accept: "application/json",
-            "Content-Type":
-              "application/json"
-          },
-          body: JSON.stringify({
-            targetType: "review",
-            targetId,
-            reason: cleanedReason
-          })
-        }
-      );
-      const data = await response
-        .json()
-        .catch(function () {
-          return {};
+      modal
+        .querySelectorAll(
+          "[data-close-professor-review-report]"
+        )
+        .forEach(function (closeButton) {
+          closeButton.addEventListener(
+            "click",
+            closeReportPanel
+          );
         });
 
-      if (response.status === 409) {
-        button.textContent =
-          "Reported";
-        return;
-      }
+      document.addEventListener(
+        "keydown",
+        function (event) {
+          if (
+            event.key === "Escape" &&
+            !modal.hidden
+          ) {
+            closeReportPanel();
+          }
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            "Could not submit the report."
-        );
-      }
+      form.addEventListener(
+        "submit",
+        async function (event) {
+          event.preventDefault();
 
-      button.textContent = "Reported";
-    } catch (error) {
-      button.disabled = false;
-      button.textContent =
-        originalText;
+          const activeButton =
+            modal.reportSourceButton;
+          const activeTargetId =
+            modal.dataset.targetId || "";
+          const cleanedReason =
+            reasonInput.value.trim();
 
-      window.alert(
-        error.message ||
-          "Could not submit the report."
+          if (cleanedReason.length < 3) {
+            status.textContent =
+              "Briefly explain why you are reporting this content.";
+            status.className =
+              "course-report-status error";
+            reasonInput.focus();
+            return;
+          }
+
+          status.textContent = "";
+          status.className =
+            "course-report-status";
+          submitButton.disabled = true;
+          submitButton.textContent =
+            "Submitting...";
+
+          if (activeButton) {
+            activeButton.disabled = true;
+            activeButton.textContent =
+              "Reporting...";
+          }
+
+          try {
+            const response = await fetch(
+              "/api/content-reports",
+              {
+                method: "POST",
+                credentials: "same-origin",
+                cache: "no-store",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type":
+                    "application/json"
+                },
+                body: JSON.stringify({
+                  targetType: "review",
+                  targetId:
+                    activeTargetId,
+                  reason: cleanedReason
+                })
+              }
+            );
+
+            const data = await response
+              .json()
+              .catch(function () {
+                return {};
+              });
+
+            if (
+              response.status !== 409 &&
+              !response.ok
+            ) {
+              throw new Error(
+                data.error ||
+                  "Could not submit the report."
+              );
+            }
+
+            if (activeButton) {
+              activeButton.textContent =
+                "Reported";
+              activeButton.disabled = true;
+            }
+
+            modal.hidden = true;
+            document.body.classList.remove(
+              "content-report-open"
+            );
+            form.reset();
+          } catch (error) {
+            status.textContent =
+              error.message ||
+              "Could not submit the report.";
+            status.className =
+              "course-report-status error";
+            submitButton.disabled = false;
+            submitButton.textContent =
+              "Submit report";
+
+            if (activeButton) {
+              activeButton.disabled = false;
+              activeButton.textContent =
+                modal.reportSourceOriginalText ||
+                "Report";
+            }
+          }
+        }
       );
     }
+
+    modal.reportSourceButton = button;
+    modal.reportSourceOriginalText =
+      button.textContent;
+    modal.dataset.targetId = targetId;
+
+    copy.textContent =
+      "Tell us what is wrong with " +
+      targetLabel +
+      ". Our moderators will review your report.";
+
+    form.reset();
+    status.textContent = "";
+    status.className = "course-report-status";
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit report";
+
+    modal.hidden = false;
+    document.body.classList.add(
+      "content-report-open"
+    );
+
+    window.setTimeout(function () {
+      reasonInput.focus();
+    }, 0);
   }
 
   function setupProfessorReviewReports(
