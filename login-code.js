@@ -436,7 +436,9 @@
           typeof openTwoFactorPanel ===
           "function"
         ) {
-          openTwoFactorPanel();
+          openTwoFactorPanel({
+            emailRecoveryAvailable: false
+          });
           return;
         }
 
