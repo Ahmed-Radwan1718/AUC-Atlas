@@ -435,41 +435,48 @@
     .remove-course {
       width: 36px;
       height: 36px;
-      padding: 0 0 2px;
-      border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 999px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
       background: transparent;
-      color: rgba(23, 23, 23, 0.4);
+      color: rgba(192, 154, 92, 0.94);
       font-family: Arial, sans-serif;
-      font-size: 22px;
-      font-weight: 400;
+      font-size: 0;
+      font-weight: 300;
       line-height: 1;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition:
-        color 0.2s ease,
-        transform 0.2s ease,
-        opacity 0.2s ease,
-        border-color 0.2s ease,
-        background 0.2s ease;
+        color 0.24s ease,
+        opacity 0.2s ease;
     }
 
-    .remove-course::before,
+    .remove-course::before {
+      content: "+";
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      transform: rotate(45deg);
+      transition:
+        transform 0.24s ease,
+        color 0.24s ease;
+    }
+
     .remove-course::after {
       content: none;
     }
 
     .remove-course:hover {
-      border-color: rgba(196, 91, 77, 0.28);
-      background: rgba(196, 91, 77, 0.08);
-      color: #ad4d42;
-      transform: translateY(-1px);
+      border-color: transparent;
+      background: transparent;
+      color: #a67c39;
+      transform: none;
     }
 
     .remove-course:active {
-      transform: translateY(1px) scale(0.96);
+      transform: none;
     }
 
     .remove-course:disabled {
