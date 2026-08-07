@@ -100,6 +100,46 @@ function serializeMaterial(doc) {
   };
 }
 
+function serializeReport(doc) {
+  const data = doc.data() || {};
+  const targetSnapshot =
+    data.targetSnapshot &&
+    typeof data.targetSnapshot === "object"
+      ? data.targetSnapshot
+      : {};
+
+  return {
+    id: doc.id,
+    targetType: data.targetType || "",
+    targetId: data.targetId || "",
+    targetKey: data.targetKey || "",
+    targetLabel: data.targetLabel || "",
+    targetOwnerUid: data.targetOwnerUid || "",
+    reason: data.reason || "",
+    reporterUid: data.reporterUid || "",
+    reporterEmail: data.reporterEmail || "",
+    status: data.status || "open",
+    createdAt: getTimestampIso(data.createdAt || data.createdAtIso),
+    targetSnapshot: {
+      professorName: targetSnapshot.professorName || "",
+      courseCode: targetSnapshot.courseCode || "",
+      semesterTaken: targetSnapshot.semesterTaken || "",
+      rating: Number(targetSnapshot.rating || 0),
+      studentNote: targetSnapshot.studentNote || "",
+      authorUid: targetSnapshot.authorUid || "",
+      authorName: targetSnapshot.authorName || "",
+      title: targetSnapshot.title || "",
+      fileName: targetSnapshot.fileName || "",
+      professor: targetSnapshot.professor || "",
+      semester: targetSnapshot.semester || "",
+      materialType: targetSnapshot.materialType || "",
+      uploaderUid: targetSnapshot.uploaderUid || "",
+      uploaderDisplayName: targetSnapshot.uploaderDisplayName || "",
+      fileId: targetSnapshot.fileId || ""
+    }
+  };
+}
+
 function serializeAudit(doc) {
   const data = doc.data() || {};
 
@@ -263,6 +303,7 @@ async function getDashboardData(actor) {
     db.collection("users").where("moderation.banned", "==", true).count().get(),
     db.collection("professorReviews").limit(500).get(),
     db.collection("courseMaterials").limit(500).get(),
+    db.collection("contentReports").where("status", "==", "open").limit(500).get(),
     db.collection("adminAuditLogs").orderBy("createdAt", "desc").limit(30).get(),
     db.collection("siteSettings").doc("donationCounter").get(),
     getImageKitMaterials()
@@ -272,11 +313,13 @@ async function getDashboardData(actor) {
   const bannedUserCountSnapshot = results[1];
   const reviewsSnapshot = results[2];
   const materialsSnapshot = results[3];
-  const auditSnapshot = results[4];
-  const donationDoc = results[5];
-  const imageKitMaterials = results[6];
+  const reportsSnapshot = results[4];
+  const auditSnapshot = results[5];
+  const donationDoc = results[6];
+  const imageKitMaterials = results[7];
   const reviews = [];
   const firestoreMaterials = [];
+  const reports = [];
   const audits = [];
   const knownImageKitFileIds = new Set();
 
@@ -291,6 +334,10 @@ async function getDashboardData(actor) {
     if (material.fileId) {
       knownImageKitFileIds.add(material.fileId);
     }
+  });
+
+  reportsSnapshot.forEach(function (doc) {
+    reports.push(serializeReport(doc));
   });
 
   auditSnapshot.forEach(function (doc) {
@@ -315,6 +362,10 @@ async function getDashboardData(actor) {
     return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
   });
 
+  reports.sort(function (a, b) {
+    return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
+  });
+
   return {
     success: true,
     admin: {
@@ -328,6 +379,7 @@ async function getDashboardData(actor) {
       materials: materials.length,
       bannedUsers: Number(bannedUserCountSnapshot.data().count || 0)
     },
+    reports: reports.slice(0, 250),
     reviews: reviews.slice(0, 250),
     materials: materials.slice(0, 250),
     auditLogs: audits,
@@ -387,6 +439,94 @@ async function lookupUser(uid) {
   };
 }
 
+async function resolveOpenReportsForTarget(
+  actor,
+  targetType,
+  targetId,
+  resolution
+) {
+  const safeTargetType = cleanString(
+    targetType,
+    20
+  );
+  const safeTargetId = cleanString(
+    targetId,
+    180
+  );
+
+  if (!safeTargetType || !safeTargetId) {
+    return 0;
+  }
+
+  const db = admin.firestore();
+  const targetKey =
+    safeTargetType +
+    ":" +
+    safeTargetId;
+  const reportsSnapshot = await db
+    .collection("contentReports")
+    .where("targetKey", "==", targetKey)
+    .limit(500)
+    .get();
+
+  if (reportsSnapshot.empty) {
+    return 0;
+  }
+
+  const batch = db.batch();
+  const resolvedAtIso =
+    new Date().toISOString();
+  let resolvedCount = 0;
+
+  reportsSnapshot.forEach(
+    function (reportDoc) {
+      const reportData =
+        reportDoc.data() || {};
+
+      if (reportData.status !== "open") {
+        return;
+      }
+
+      resolvedCount += 1;
+
+      batch.set(
+        reportDoc.ref,
+        {
+          status: "resolved",
+          resolution: cleanString(
+            resolution,
+            80
+          ),
+          resolvedAt:
+            admin.firestore.FieldValue
+              .serverTimestamp(),
+          resolvedAtIso,
+          resolvedByAdminUid:
+            actor.uid,
+          resolvedByAdminEmail:
+            actor.email,
+          updatedAt:
+            admin.firestore.FieldValue
+              .serverTimestamp(),
+          updatedAtIso:
+            resolvedAtIso
+        },
+        {
+          merge: true
+        }
+      );
+    }
+  );
+
+  if (!resolvedCount) {
+    return 0;
+  }
+
+  await batch.commit();
+
+  return resolvedCount;
+}
+
 async function handleDeleteReview(actor, body) {
   const reviewId = cleanString(body.reviewId, 160);
   const reason = cleanMultiline(body.reason, 500);
@@ -415,6 +555,13 @@ async function handleDeleteReview(actor, body) {
     ),
     reason
   });
+
+  await resolveOpenReportsForTarget(
+    actor,
+    "review",
+    reviewId,
+    "content_removed"
+  );
 
   return { success: true };
 }
@@ -556,7 +703,89 @@ async function handleDeleteMaterial(actor, body) {
     reason
   });
 
+  await resolveOpenReportsForTarget(
+    actor,
+    "material",
+    materialId,
+    "content_removed"
+  );
+
   return { success: true };
+}
+
+async function handleDismissReport(
+  actor,
+  body
+) {
+  const reportId = cleanString(
+    body.reportId,
+    80
+  );
+  const reason = cleanMultiline(
+    body.reason,
+    500
+  );
+
+  if (
+    !/^[a-f0-9]{64}$/i.test(
+      reportId
+    )
+  ) {
+    throw createAdminError(
+      "Content report not found.",
+      400
+    );
+  }
+
+  const reportRef = admin
+    .firestore()
+    .collection("contentReports")
+    .doc(reportId);
+  const reportDoc =
+    await reportRef.get();
+
+  if (!reportDoc.exists) {
+    throw createAdminError(
+      "Content report not found.",
+      404
+    );
+  }
+
+  const reportData =
+    reportDoc.data() || {};
+  const targetType = cleanString(
+    reportData.targetType,
+    20
+  );
+  const targetId = cleanString(
+    reportData.targetId,
+    180
+  );
+
+  await resolveOpenReportsForTarget(
+    actor,
+    targetType,
+    targetId,
+    "dismissed"
+  );
+
+  await writeAuditLog(actor, {
+    action: "dismiss_content_report",
+    targetType: "content_report",
+    targetId: reportId,
+    targetLabel: cleanString(
+      reportData.targetLabel ||
+        targetType +
+          " " +
+          targetId,
+      240
+    ),
+    reason
+  });
+
+  return {
+    success: true
+  };
 }
 
 async function handleSetUserBan(actor, body) {
@@ -836,6 +1065,14 @@ module.exports = async function handler(req, res) {
     ) {
       result =
         await handleDeleteMaterial(
+          actor,
+          body
+        );
+    } else if (
+      action === "dismissReport"
+    ) {
+      result =
+        await handleDismissReport(
           actor,
           body
         );
