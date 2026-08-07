@@ -67,6 +67,7 @@ function serializeMaterialData(id, data) {
     professor: data.professor || "",
     semester: data.semester || "",
     materialType: data.materialType || data.type || data.category || "",
+    uploadGroupId: data.uploadGroupId || "",
     title: data.title || "",
     fileName: data.fileName || "",
     fileUrl: "",
@@ -344,7 +345,21 @@ async function getRecentCourseMaterials(limit) {
     );
   });
 
-  return materials.slice(0, safeLimit);
+  const seenGroups = new Set();
+  const groupedMaterials = materials.filter(function (material) {
+    const groupKey =
+      cleanString(material.uploadGroupId, 80) ||
+      material.id;
+
+    if (seenGroups.has(groupKey)) {
+      return false;
+    }
+
+    seenGroups.add(groupKey);
+    return true;
+  });
+
+  return groupedMaterials.slice(0, safeLimit);
 }
 
 function getImageKitAuthorizationHeader() {
@@ -1005,6 +1020,10 @@ module.exports = async function handler(req, res) {
       body.fileId,
       160
     );
+    const requestedUploadGroupId = cleanString(
+      body.uploadGroupId,
+      80
+    );
 
     if (!uploadAuthorizationId || !submittedFileId) {
       throw createMaterialError(
@@ -1012,6 +1031,11 @@ module.exports = async function handler(req, res) {
         400
       );
     }
+
+    const uploadGroupId =
+      /^[A-Za-z0-9-]{8,80}$/.test(requestedUploadGroupId)
+        ? requestedUploadGroupId
+        : "single-" + uploadAuthorizationId;
 
     const authorization =
       await getMaterialUploadAuthorization(
@@ -1090,6 +1114,7 @@ module.exports = async function handler(req, res) {
       professor,
       semester,
       materialType,
+      uploadGroupId,
       isAnonymous,
       title,
       fileName: verifiedFile.fileName,
