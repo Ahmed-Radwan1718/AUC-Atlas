@@ -2208,92 +2208,223 @@
       encodeURIComponent(value);
   }
 
-  async function submitContentReport(
+  function submitContentReport(
     button,
     targetType,
     targetId,
     targetLabel
   ) {
-    const reason = window.prompt(
-      "Why are you reporting " +
-        (
-          targetLabel ||
-          "this content"
-        ) +
-        "?",
-      ""
+    const modal = document.getElementById(
+      "course-report-modal"
+    );
+    const form = document.getElementById(
+      "course-report-form"
+    );
+    const title = document.getElementById(
+      "course-report-title"
+    );
+    const copy = document.getElementById(
+      "course-report-copy"
+    );
+    const reasonInput = document.getElementById(
+      "course-report-reason"
+    );
+    const status = document.getElementById(
+      "course-report-status"
+    );
+    const submitButton = document.getElementById(
+      "course-report-submit"
     );
 
-    if (reason === null) {
+    if (
+      !modal ||
+      !form ||
+      !title ||
+      !copy ||
+      !reasonInput ||
+      !status ||
+      !submitButton
+    ) {
       return;
     }
 
-    const cleanedReason =
-      reason.trim();
-
-    if (cleanedReason.length < 3) {
-      window.alert(
-        "Briefly explain why you are reporting this content."
+    function closeReportPanel() {
+      modal.hidden = true;
+      document.body.classList.remove(
+        "content-report-open"
       );
-      return;
+      form.reset();
+      status.textContent = "";
+      status.className = "course-report-status";
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit report";
+
+      if (
+        modal.reportSourceButton &&
+        !modal.reportSourceButton.disabled
+      ) {
+        modal.reportSourceButton.focus();
+      }
     }
 
-    const originalText =
-      button.textContent;
+    if (modal.dataset.ready !== "true") {
+      modal.dataset.ready = "true";
 
-    button.disabled = true;
-    button.textContent =
-      "Reporting...";
-
-    try {
-      const response = await fetch(
-        "/api/content-reports",
-        {
-          method: "POST",
-          credentials: "same-origin",
-          cache: "no-store",
-          headers: {
-            Accept: "application/json",
-            "Content-Type":
-              "application/json"
-          },
-          body: JSON.stringify({
-            targetType,
-            targetId,
-            reason: cleanedReason
-          })
-        }
-      );
-      const data = await response
-        .json()
-        .catch(function () {
-          return {};
+      modal
+        .querySelectorAll(
+          "[data-close-course-report]"
+        )
+        .forEach(function (closeButton) {
+          closeButton.addEventListener(
+            "click",
+            closeReportPanel
+          );
         });
 
-      if (response.status === 409) {
-        button.textContent =
-          "Reported";
-        return;
-      }
+      document.addEventListener(
+        "keydown",
+        function (event) {
+          if (
+            event.key === "Escape" &&
+            !modal.hidden
+          ) {
+            closeReportPanel();
+          }
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            "Could not submit the report."
-        );
-      }
+      form.addEventListener(
+        "submit",
+        async function (event) {
+          event.preventDefault();
 
-      button.textContent = "Reported";
-    } catch (error) {
-      button.disabled = false;
-      button.textContent =
-        originalText;
+          const activeButton =
+            modal.reportSourceButton;
+          const activeTargetType =
+            modal.dataset.targetType || "";
+          const activeTargetId =
+            modal.dataset.targetId || "";
+          const cleanedReason =
+            reasonInput.value.trim();
 
-      window.alert(
-        error.message ||
-          "Could not submit the report."
+          if (cleanedReason.length < 3) {
+            status.textContent =
+              "Briefly explain why you are reporting this content.";
+            status.className =
+              "course-report-status error";
+            reasonInput.focus();
+            return;
+          }
+
+          status.textContent = "";
+          status.className =
+            "course-report-status";
+          submitButton.disabled = true;
+          submitButton.textContent =
+            "Submitting...";
+
+          if (activeButton) {
+            activeButton.disabled = true;
+            activeButton.textContent =
+              "Reporting...";
+          }
+
+          try {
+            const response = await fetch(
+              "/api/content-reports",
+              {
+                method: "POST",
+                credentials: "same-origin",
+                cache: "no-store",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type":
+                    "application/json"
+                },
+                body: JSON.stringify({
+                  targetType:
+                    activeTargetType,
+                  targetId:
+                    activeTargetId,
+                  reason: cleanedReason
+                })
+              }
+            );
+
+            const data = await response
+              .json()
+              .catch(function () {
+                return {};
+              });
+
+            if (
+              response.status !== 409 &&
+              !response.ok
+            ) {
+              throw new Error(
+                data.error ||
+                  "Could not submit the report."
+              );
+            }
+
+            if (activeButton) {
+              activeButton.textContent =
+                "Reported";
+              activeButton.disabled = true;
+            }
+
+            modal.hidden = true;
+            document.body.classList.remove(
+              "content-report-open"
+            );
+            form.reset();
+          } catch (error) {
+            status.textContent =
+              error.message ||
+              "Could not submit the report.";
+            status.className =
+              "course-report-status error";
+            submitButton.disabled = false;
+            submitButton.textContent =
+              "Submit report";
+
+            if (activeButton) {
+              activeButton.disabled = false;
+              activeButton.textContent =
+                modal.reportSourceOriginalText ||
+                "Report";
+            }
+          }
+        }
       );
     }
+
+    modal.reportSourceButton = button;
+    modal.reportSourceOriginalText =
+      button.textContent;
+    modal.dataset.targetType = targetType;
+    modal.dataset.targetId = targetId;
+
+    title.textContent = "Report material";
+    copy.textContent =
+      "Tell us what is wrong with " +
+      (targetLabel || "this course material") +
+      ". Our moderators will review your report.";
+
+    form.reset();
+    status.textContent = "";
+    status.className = "course-report-status";
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit report";
+
+    modal.hidden = false;
+    document.body.classList.add(
+      "content-report-open"
+    );
+
+    window.setTimeout(function () {
+      reasonInput.focus();
+    }, 0);
   }
 
   function setupCourseMaterialPreview() {
