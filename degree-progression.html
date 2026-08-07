@@ -338,7 +338,7 @@
     .degree-requirement-group-head {
       margin-bottom: 14px;
       display: grid;
-      gap: 5px;
+      gap: 7px;
     }
 
     .degree-requirement-group-head span {
@@ -358,9 +358,40 @@
       text-transform: uppercase;
     }
 
+    .degree-requirement-group-head p {
+      max-width: none;
+      color: rgba(23, 23, 23, 0.64);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
     .degree-requirement-list {
       display: grid;
       gap: 10px;
+    }
+
+    .degree-requirement-subgroups {
+      margin-top: 18px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .degree-requirement-subgroup {
+      display: grid;
+      gap: 12px;
+    }
+
+    .degree-requirement-subgroup + .degree-requirement-subgroup {
+      padding-top: 18px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .degree-requirement-subgroup h4 {
+      color: #171717;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.3;
+      text-transform: uppercase;
     }
 
     .degree-requirement-item {
@@ -583,7 +614,7 @@
 
     const DEGREE_REQUIREMENTS = {
       "Mechanical Engineering": {
-        note: "Concentration electives require 15 credit hours selected from at least two concentrations. A minimum of nine credits must be taken from one concentration and at least one course from another concentration.",
+        note: "",
         groups: [
           {
             scope: "Engineering Core",
@@ -636,6 +667,150 @@
               "MENG 4981 - Senior Project II (2 cr.)",
               "PHYS 2216 - Fundamentals of Circuits and Electronics (2 cr.)",
               "PHYS 2217 - Fundamentals of Circuits and Electronics Lab (1 cr.)"
+            ]
+          },
+          {
+            scope: "Concentration Electives",
+            title: "Concentration Electives (15 credit hours)",
+            description: "Courses must be selected from at least two of the five available concentrations of courses. A minimum of nine credits must be taken from one concentration and at least one course from another concentration as follows:",
+            items: []
+          },
+          {
+            scope: "Concentration Elective",
+            title: "Energy Systems Concentration",
+            description: "A minimum of six credits from Group A courses, which should include MENG 4663, and either MENG 4662 or MENG 5168. The remaining three credits should be selected from either Group A or Group B.",
+            creditGroup: "mechanical-concentration-electives",
+            creditCap: 15,
+            subgroups: [
+              {
+                title: "Group A",
+                items: [
+                  "MENG 4662 - Power Plant Technology (3 cr.)",
+                  "MENG 4663 - Design of Renewable Energy Systems (3 cr.)",
+                  "MENG 5168 - Nuclear Power Plant Engineering (3 cr.)"
+                ]
+              },
+              {
+                title: "Group B",
+                items: [
+                  "MENG 4661 - Turbo-Machinery (3 cr.)",
+                  "MENG 4665 - Internal Combustion Engines (3 cr.)",
+                  "MENG 4666 - Design of Heating, Ventilation, and Air Conditioning Systems (3 cr.)",
+                  "MENG 4667 - Refrigeration and Air-conditioning (3 cr.)",
+                  "MENG 4936 - Selected Topics in Power Engineering (3 cr.)"
+                ]
+              }
+            ]
+          },
+          {
+            scope: "Concentration Elective",
+            title: "Design Concentration",
+            description: "A minimum of six credits from courses in Group A of the Design concentration and the remaining three credits from courses in either Group A or Group B of the concentration.",
+            creditGroup: "mechanical-concentration-electives",
+            creditCap: 15,
+            subgroups: [
+              {
+                title: "Group A",
+                items: [
+                  "MENG 4551 - Design for Additive Manufacturing (3 cr.)",
+                  "MENG 4553 - Finite Element Method and Applications in Design (3 cr.)",
+                  "MENG 4555 - Applied Vibration Measurements, Analysis and Control (3 cr.)",
+                  "MENG 4756 - Automatic Control Systems (3 cr.)"
+                ]
+              },
+              {
+                title: "Group B",
+                items: [
+                  "MENG 4227 - Failure of Mechanical Components (3 cr.)",
+                  "MENG 4239 - Advanced Manufacturing Processes (3 cr.)",
+                  "MENG 4558 - Integrated Design (3 cr.)",
+                  "MENG 4565 - Design of Engineering Systems (3 cr.)",
+                  "MENG 4757 - Robotics: Design, Analysis and Control (3 cr.)",
+                  "MENG 4931 - Selected Topics in Design (3 cr.)"
+                ]
+              }
+            ]
+          },
+          {
+            scope: "Concentration Elective",
+            title: "Industrial Concentration",
+            description: "A minimum of six credits from courses in Group A of the Industrial Engineering concentration and the remaining three credits from courses in either Group A or Group B of the concentration.",
+            creditGroup: "mechanical-concentration-electives",
+            creditCap: 15,
+            subgroups: [
+              {
+                title: "Group A",
+                items: [
+                  "MENG 4440 - Engineering Operations Research (3 cr.)",
+                  "MENG 4444 - Work Analysis and Design (3 cr.)",
+                  "MENG 4445 - Production and Inventory Control (3 cr.)"
+                ]
+              },
+              {
+                title: "Group B",
+                items: [
+                  "MENG 4441 - Decision Support in Engineering Systems (3 cr.)",
+                  "MENG 4442 - Reliability Engineering and Risk Analysis (3 cr.)",
+                  "MENG 4443 - Systems Simulation (3 cr.)",
+                  "MENG 4448 - Facilities Planning (3 cr.)",
+                  "MENG 4449 - Maintenance Management Systems (3 cr.)",
+                  "MENG 4477 - Manufacturing System Automation (3 cr.)",
+                  "MENG 4930 - Selected Topics in Industrial Engineering (3 cr.)"
+                ]
+              }
+            ]
+          },
+          {
+            scope: "Concentration Elective",
+            title: "Materials and Manufacturing Concentration",
+            description: "A minimum of six credits from courses in Group A of the Materials and Manufacturing concentration and the remaining three credits from courses in either Group A or Group B of the concentration.",
+            creditGroup: "mechanical-concentration-electives",
+            creditCap: 15,
+            subgroups: [
+              {
+                title: "Group A",
+                items: [
+                  "MENG 4221 - Composites: Design, Materials, and Manufacturing (3 cr.)",
+                  "MENG 4229 - Nanostructured Materials (3 cr.)",
+                  "MENG 4551 - Design for Additive Manufacturing (3 cr.)"
+                ]
+              },
+              {
+                title: "Group B",
+                items: [
+                  "MENG 4226 - Metals, Alloys and Composites (3 cr.)",
+                  "MENG 4227 - Failure of Mechanical Components (3 cr.)",
+                  "MENG 4232 - Materials, Processing, and Design (3 cr.)",
+                  "MENG 4239 - Advanced Manufacturing Processes (3 cr.)",
+                  "MENG 4932 - Selected Topics in Materials and Manufacturing (3 cr.)"
+                ]
+              }
+            ]
+          },
+          {
+            scope: "Concentration Elective",
+            title: "Mechatronics Concentration",
+            description: "A minimum of six credits from courses in Group A of the Mechatronics concentration and the remaining three credits from courses in either Group A or Group B of the concentration.",
+            creditGroup: "mechanical-concentration-electives",
+            creditCap: 15,
+            subgroups: [
+              {
+                title: "Group A",
+                items: [
+                  "MENG 4756 - Automatic Control Systems (3 cr.)",
+                  "MENG 4778 - Microcontrollers and Mechatronics Systems (3 cr.)",
+                  "MENG 4779 - Integrated Design of Electromechanical Systems (3 cr.)"
+                ]
+              },
+              {
+                title: "Group B",
+                items: [
+                  "MENG 4239 - Advanced Manufacturing Processes (3 cr.)",
+                  "MENG 4477 - Manufacturing System Automation (3 cr.)",
+                  "MENG 4757 - Robotics: Design, Analysis and Control (3 cr.)",
+                  "MENG 4937 - Selected Topics in Mechatronics (3 cr.)"
+                ]
+              }
             ]
           }
         ]
@@ -744,7 +919,104 @@
         : credits.toFixed(1).replace(/\.0$/, "");
     }
 
-    function renderDegreeRequirementGroup(group, groupIndex) {
+    function renderDegreeRequirementItems(
+      items,
+      keyPrefix,
+      creditGroup,
+      creditCap
+    ) {
+      return (Array.isArray(items) ? items : [])
+        .map(function (item, itemIndex) {
+          const key =
+            keyPrefix + "-" + itemIndex;
+          const credits =
+            getDegreeItemCredits(item);
+          const courseCode = String(
+            item || ""
+          )
+            .split(" - ")[0]
+            .trim()
+            .toUpperCase();
+          const creditAttributes =
+            creditGroup
+              ? `
+                    data-degree-credit-group="${escapeDegreeHtml(creditGroup)}"
+                    data-degree-credit-cap="${Number(creditCap) || 0}"`
+              : "";
+
+          return `
+            <label class="degree-requirement-item">
+              <input
+                type="checkbox"
+                data-degree-item="${escapeDegreeHtml(key)}"
+                data-degree-credits="${credits}"
+                data-degree-course-code="${escapeDegreeHtml(courseCode)}"${creditAttributes}
+              >
+              <span class="degree-requirement-text">${escapeDegreeHtml(item)}</span>
+            </label>
+          `;
+        })
+        .join("");
+    }
+
+    function renderDegreeRequirementGroup(
+      group,
+      groupIndex
+    ) {
+      const items = Array.isArray(
+        group.items
+      )
+        ? group.items
+        : [];
+      const subgroups = Array.isArray(
+        group.subgroups
+      )
+        ? group.subgroups
+        : [];
+      const directItemsMarkup =
+        items.length
+          ? `
+            <div class="degree-requirement-list">
+              ${renderDegreeRequirementItems(
+                items,
+                String(groupIndex),
+                group.creditGroup,
+                group.creditCap
+              )}
+            </div>
+          `
+          : "";
+      const subgroupMarkup =
+        subgroups.length
+          ? `
+            <div class="degree-requirement-subgroups">
+              ${subgroups.map(function (
+                subgroup,
+                subgroupIndex
+              ) {
+                return `
+                  <section class="degree-requirement-subgroup">
+                    <h4>${escapeDegreeHtml(subgroup.title)}</h4>
+
+                    <div class="degree-requirement-list">
+                      ${renderDegreeRequirementItems(
+                        subgroup.items,
+                        groupIndex +
+                          "-" +
+                          subgroupIndex,
+                        subgroup.creditGroup ||
+                          group.creditGroup,
+                        subgroup.creditCap ||
+                          group.creditCap
+                      )}
+                    </div>
+                  </section>
+                `;
+              }).join("")}
+            </div>
+          `
+          : "";
+
       return `
         <article class="degree-requirement-group">
           <div class="degree-requirement-group-head">
@@ -753,23 +1025,8 @@
             ${group.description ? `<p>${escapeDegreeHtml(group.description)}</p>` : ""}
           </div>
 
-          <div class="degree-requirement-list">
-            ${group.items.map(function (item, itemIndex) {
-              const key = groupIndex + "-" + itemIndex;
-              const credits = getDegreeItemCredits(item);
-
-              return `
-                <label class="degree-requirement-item">
-                  <input
-                    type="checkbox"
-                    data-degree-item="${escapeDegreeHtml(key)}"
-                    data-degree-credits="${credits}"
-                  >
-                  <span class="degree-requirement-text">${escapeDegreeHtml(item)}</span>
-                </label>
-              `;
-            }).join("")}
-          </div>
+          ${directItemsMarkup}
+          ${subgroupMarkup}
         </article>
       `;
     }
@@ -797,12 +1054,27 @@
           "[data-degree-item]"
         )
       );
+      const creditGroups = {};
+      let totalCredits = 0;
+      let completedCredits = 0;
 
       items.forEach(function (item) {
         const requirement =
           item.closest(
             ".degree-requirement-item"
           );
+        const credits = Number(
+          item.dataset.degreeCredits || 0
+        );
+        const creditGroup = String(
+          item.dataset.degreeCreditGroup ||
+            ""
+        );
+        const courseCode = String(
+          item.dataset.degreeCourseCode ||
+            item.dataset.degreeItem ||
+            ""
+        );
 
         if (requirement) {
           requirement.classList.toggle(
@@ -810,27 +1082,76 @@
             item.checked
           );
         }
+
+        if (!creditGroup) {
+          totalCredits += credits;
+
+          if (item.checked) {
+            completedCredits += credits;
+          }
+
+          return;
+        }
+
+        if (!creditGroups[creditGroup]) {
+          creditGroups[creditGroup] = {
+            cap: Number(
+              item.dataset
+                .degreeCreditCap || 0
+            ),
+            completedCourses: {}
+          };
+        }
+
+        if (
+          item.checked &&
+          !creditGroups[creditGroup]
+            .completedCourses[
+              courseCode
+            ]
+        ) {
+          creditGroups[creditGroup]
+            .completedCourses[
+              courseCode
+            ] = credits;
+        }
       });
 
-      const totalCredits = items.reduce(
-        function (total, item) {
-          return total + Number(
-            item.dataset.degreeCredits || 0
+      Object.keys(
+        creditGroups
+      ).forEach(function (creditGroup) {
+        const group =
+          creditGroups[creditGroup];
+        const selectedCredits =
+          Object.keys(
+            group.completedCourses
+          ).reduce(
+            function (
+              total,
+              courseCode
+            ) {
+              return (
+                total +
+                Number(
+                  group.completedCourses[
+                    courseCode
+                  ] || 0
+                )
+              );
+            },
+            0
           );
-        },
-        0
-      );
+        const creditCap = Math.max(
+          0,
+          Number(group.cap || 0)
+        );
 
-      const completedCredits = items.reduce(
-        function (total, item) {
-          return item.checked
-            ? total + Number(
-                item.dataset.degreeCredits || 0
-              )
-            : total;
-        },
-        0
-      );
+        totalCredits += creditCap;
+        completedCredits += Math.min(
+          selectedCredits,
+          creditCap
+        );
+      });
 
       const remainingCredits = Math.max(
         totalCredits - completedCredits,
