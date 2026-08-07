@@ -1142,22 +1142,23 @@
 
     .review-section-heading {
       grid-column: 1 / -1;
-      margin-top: 4px;
-      color: rgba(192, 154, 92, 0.86);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
+      margin-top: 10px;
+      color: #a67c39;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .review-section-heading::after {
       content: "";
-      height: 1px;
+      height: 2px;
       flex: 1;
-      background: rgba(23, 23, 23, 0.08);
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.28);
     }
 
     .review-section-heading:first-of-type {
@@ -2961,6 +2962,7 @@
               <div class="review-field">
                 <label for="review-recommend">Would you recommend for this course?</label>
                 <select id="review-recommend" name="recommendation">
+                  <option value="" selected>Choose recommendation</option>
                   <option>Yes</option>
                   <option>Depends</option>
                   <option>No</option>
@@ -2977,6 +2979,7 @@
               <div class="review-field">
                 <label for="review-attendance">Attendance policy</label>
                 <select id="review-attendance" name="attendancePolicy">
+                  <option value="" selected>Choose attendance policy</option>
                   <option>Required</option>
                   <option>Sometimes checked</option>
                   <option>Not important</option>
@@ -2987,6 +2990,7 @@
               <div class="review-field">
                 <label for="review-workload">Workload</label>
                 <select id="review-workload" name="workload">
+                  <option value="" selected>Choose workload</option>
                   <option>Light</option>
                   <option>Moderate</option>
                   <option>Heavy</option>
@@ -2996,6 +3000,7 @@
               <div class="review-field">
                 <label for="review-lecture">Lecture usefulness</label>
                 <select id="review-lecture" name="lectureUsefulness">
+                  <option value="" selected>Choose lecture usefulness</option>
                   <option>Essential</option>
                   <option>Helpful</option>
                   <option>Skippable</option>
@@ -3006,6 +3011,7 @@
               <div class="review-field">
                 <label for="review-office-hours">Office hours/help</label>
                 <select id="review-office-hours" name="officeHours">
+                  <option value="" selected>Choose an option</option>
                   <option>Helpful</option>
                   <option>Available but limited</option>
                   <option>Hard to reach</option>
@@ -3018,6 +3024,7 @@
               <div class="review-field">
                 <label for="review-grading-style">Grading style</label>
                 <select id="review-grading-style" name="gradingStyle">
+                  <option value="" selected>Choose grading style</option>
                   <option>Exams-heavy</option>
                   <option>Projects-heavy</option>
                   <option>Assignments-heavy</option>
@@ -3029,6 +3036,7 @@
               <div class="review-field">
                 <label for="review-exam-difficulty">Exam difficulty</label>
                 <select id="review-exam-difficulty" name="examDifficulty">
+                  <option value="" selected>Choose exam difficulty</option>
                   <option>Easier than class material</option>
                   <option>Matches class material</option>
                   <option>Harder than class material</option>
@@ -3039,6 +3047,7 @@
               <div class="review-field">
                 <label for="review-transparency">Grading transparency</label>
                 <select id="review-transparency" name="gradingTransparency">
+                  <option value="" selected>Choose grading transparency</option>
                   <option>Rubric is clear</option>
                   <option>Somewhat clear</option>
                   <option>Unclear</option>
@@ -3048,6 +3057,7 @@
               <div class="review-field">
                 <label for="review-feedback">Feedback quality</label>
                 <select id="review-feedback" name="feedbackQuality">
+                  <option value="" selected>Choose feedback quality</option>
                   <option>Helpful</option>
                   <option>Minimal</option>
                   <option>None</option>
