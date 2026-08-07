@@ -1023,9 +1023,19 @@
       box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.2);
     }
 
-    .material-anonymous-option span {
+    .material-anonymous-option > span {
       min-width: 0;
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .material-anonymous-option > span::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      flex: 0 0 22px;
+      background: url("anonymous.png") center / contain no-repeat;
     }
 
     .material-anonymous-option strong {
@@ -1832,16 +1842,16 @@
     }
 
     .course-material-download-button::after {
-      content: "↓";
+      content: "";
       width: 24px;
       height: 24px;
       border-radius: 999px;
-      background: rgba(192, 154, 92, 0.16);
-      color: rgba(145, 101, 35, 0.96);
-      font-size: 14px;
-      line-height: 1;
-      display: grid;
-      place-items: center;
+      background:
+        rgba(192, 154, 92, 0.16)
+        url("download.png")
+        center / 15px 15px
+        no-repeat;
+      display: block;
     }
 
     .course-material-download-button:hover,
@@ -2019,7 +2029,7 @@
 
     .course-material-preview-download {
       min-height: 42px;
-      padding: 0 16px;
+      padding: 0 12px 0 16px;
       border-radius: 999px;
       background: #171717;
       color: #ffffff;
@@ -2030,6 +2040,15 @@
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
+      gap: 9px;
+    }
+
+    .course-material-preview-download::after {
+      content: "";
+      width: 22px;
+      height: 22px;
+      flex: 0 0 22px;
+      background: url("download.png") center / 15px 15px no-repeat;
     }
 
     .course-report-modal {
