@@ -2208,6 +2208,94 @@
       encodeURIComponent(value);
   }
 
+  async function submitContentReport(
+    button,
+    targetType,
+    targetId,
+    targetLabel
+  ) {
+    const reason = window.prompt(
+      "Why are you reporting " +
+        (
+          targetLabel ||
+          "this content"
+        ) +
+        "?",
+      ""
+    );
+
+    if (reason === null) {
+      return;
+    }
+
+    const cleanedReason =
+      reason.trim();
+
+    if (cleanedReason.length < 3) {
+      window.alert(
+        "Briefly explain why you are reporting this content."
+      );
+      return;
+    }
+
+    const originalText =
+      button.textContent;
+
+    button.disabled = true;
+    button.textContent =
+      "Reporting...";
+
+    try {
+      const response = await fetch(
+        "/api/content-reports",
+        {
+          method: "POST",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            Accept: "application/json",
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+            targetType,
+            targetId,
+            reason: cleanedReason
+          })
+        }
+      );
+      const data = await response
+        .json()
+        .catch(function () {
+          return {};
+        });
+
+      if (response.status === 409) {
+        button.textContent =
+          "Reported";
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            "Could not submit the report."
+        );
+      }
+
+      button.textContent = "Reported";
+    } catch (error) {
+      button.disabled = false;
+      button.textContent =
+        originalText;
+
+      window.alert(
+        error.message ||
+          "Could not submit the report."
+      );
+    }
+  }
+
   function setupCourseMaterialPreview() {
     const list = document.getElementById("course-materials-list");
     const modal = document.getElementById("course-material-preview-modal");
@@ -2352,6 +2440,27 @@
     });
 
     list.addEventListener("click", function (event) {
+      const reportButton =
+        event.target.closest(
+          "[data-report-material]"
+        );
+
+      if (
+        reportButton &&
+        list.contains(reportButton)
+      ) {
+        submitContentReport(
+          reportButton,
+          "material",
+          reportButton.dataset
+            .reportMaterial,
+          reportButton.dataset
+            .reportLabel
+        );
+
+        return;
+      }
+
       const button = event.target.closest(
         ".course-material-preview-trigger"
       );
@@ -2433,6 +2542,14 @@
         rawDownloadUrl || "#"
       );
       const safeExtension = escapeMaterialText(extension);
+      const safeMaterialId = escapeMaterialText(
+        material.id || ""
+      );
+      const safeMaterialLabel = escapeMaterialText(
+        material.title ||
+          rawFileName ||
+          "Course material"
+      );
       const extensionLabel = escapeMaterialText(
         extension === "file"
           ? "FILE"
@@ -2492,6 +2609,17 @@
           </div>
         `;
 
+      const reportButton = safeMaterialId
+        ? `
+          <button
+            class="course-material-report-button"
+            type="button"
+            data-report-material="${safeMaterialId}"
+            data-report-label="${safeMaterialLabel}"
+          >Report</button>
+        `
+        : "";
+
       return `
         <article class="course-material-card">
           <div class="course-material-card-top">
@@ -2532,6 +2660,8 @@
             </div>
 
             <div class="course-material-actions">
+              ${reportButton}
+
               <a
                 class="course-material-download-button"
                 href="${safeDownloadUrl}"
