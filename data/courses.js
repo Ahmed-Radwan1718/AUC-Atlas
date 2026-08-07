@@ -3665,12 +3665,6 @@
                   : "Uploading...";
             }
 
-            setMaterialUploadStatus(
-              progressLabel + "...",
-              "",
-              form
-            );
-
             const authResponse = await fetch(
               "/api/imagekit-auth",
               {
