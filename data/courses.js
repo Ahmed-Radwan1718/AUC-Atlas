@@ -2863,6 +2863,10 @@
                 </summary>
 
                 <div class="course-material-more-content">
+                  <div class="course-material-first-file-actions">
+                    ${fileViews[0] ? fileViews[0].actions : ""}
+                  </div>
+
                   ${remainingFilesMarkup}
                 </div>
               </details>
