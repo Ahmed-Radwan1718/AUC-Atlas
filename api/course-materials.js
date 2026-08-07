@@ -573,10 +573,6 @@ async function verifyImageKitMaterialUpload(data) {
     "upload-auth-" + data.uploadAuthorizationId
   ];
 
-  if (cleanBoolean(data.isAnonymous)) {
-    expectedTags.push("anonymous-upload");
-  }
-
   const verifiedFileName = cleanMaterialFileName(
     descriptionParts[8]
   );
@@ -600,8 +596,6 @@ async function verifyImageKitMaterialUpload(data) {
       cleanString(data.materialType, 80) &&
     cleanString(descriptionParts[7], 160) ===
       cleanString(data.uploaderUid, 160) &&
-    cleanBoolean(descriptionParts[9]) ===
-      cleanBoolean(data.isAnonymous) &&
     verifiedFileName ===
       cleanMaterialFileName(data.fileName);
 
