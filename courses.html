@@ -1729,13 +1729,14 @@
     }
 
     .course-material-download-button {
-      padding: 6px 0;
-      border: 0;
-      border-bottom: 1px solid rgba(23, 23, 23, 0.34);
-      background: transparent;
+      min-height: 38px;
+      padding: 0 12px 0 15px;
+      border: 1px solid rgba(192, 154, 92, 0.28);
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.08);
       color: #171717;
       font: inherit;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 900;
       letter-spacing: 0.08em;
       line-height: 1.2;
@@ -1743,22 +1744,36 @@
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      box-shadow: 0 6px 18px rgba(42, 32, 20, 0.05);
       transition:
         color 0.2s ease,
-        border-color 0.2s ease;
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
     }
 
     .course-material-download-button::after {
       content: "↓";
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.16);
+      color: rgba(145, 101, 35, 0.96);
       font-size: 14px;
       line-height: 1;
+      display: grid;
+      place-items: center;
     }
 
     .course-material-download-button:hover,
     .course-material-download-button:focus-visible {
-      border-color: rgba(145, 101, 35, 0.88);
-      color: rgba(145, 101, 35, 0.96);
+      border-color: rgba(192, 154, 92, 0.52);
+      background: rgba(192, 154, 92, 0.14);
+      color: #171717;
+      box-shadow: 0 10px 24px rgba(42, 32, 20, 0.09);
+      transform: translateY(-1px);
       outline: none;
     }
 
