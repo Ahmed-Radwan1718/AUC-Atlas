@@ -2664,26 +2664,20 @@
     list.innerHTML = materialGroups.map(function (group) {
       const material = group.material;
       const files = group.files;
-      const rawUploaderName =
-        material.uploaderDisplayName || "AUC student";
-      const uploaderName =
-        escapeMaterialText(rawUploaderName);
-      const uploaderPhoto =
-        escapeMaterialText(material.uploaderPhotoURL || "");
-      const avatar = uploaderPhoto
-        ? '<img class="course-material-avatar" src="' +
-          uploaderPhoto +
-          '" alt="">'
-        : '<span class="course-material-avatar-fallback">' +
-          escapeMaterialText(
-            getMaterialInitials(rawUploaderName)
-          ) +
-          "</span>";
-      const uploadDate = formatMaterialUploadDate(
-        material.createdAt
+      const uploaderName = escapeMaterialText(
+        material.uploaderDisplayName ||
+        "AUC student"
+      );
+      const semester = escapeMaterialText(
+        material.semester ||
+        "Semester not listed"
+      );
+      const materialType = escapeMaterialText(
+        material.materialType ||
+        "Material"
       );
 
-      const fileViews = files.map(function (fileMaterial) {
+      function renderCompactFile(fileMaterial) {
         const rawFileName =
           fileMaterial.fileName ||
           fileMaterial.title ||
@@ -2704,8 +2698,6 @@
 
         const fileName =
           escapeMaterialText(rawFileName);
-        const safeFileLabel =
-          escapeMaterialText(fileLabel);
         const safeFileSize =
           escapeMaterialText(fileSize);
         const safeDownloadUrl =
@@ -2714,175 +2706,134 @@
           );
         const safeExtension =
           escapeMaterialText(extension);
-        const safeMaterialId =
-          escapeMaterialText(
-            fileMaterial.id || ""
-          );
-        const safeMaterialLabel =
-          escapeMaterialText(
-            (material.title || "Course material") +
-            (
-              files.length > 1
-                ? " — " + rawFileName
-                : ""
-            )
-          );
-        const extensionLabel =
-          escapeMaterialText(
-            extension === "file"
-              ? "FILE"
-              : extension.toUpperCase()
-          );
+        const safeFileLabel =
+          escapeMaterialText(fileLabel);
 
-        const fileIcon = extension === "pdf"
-          ? `
-            <img
-              class="course-material-file-icon-image"
-              src="pdf.png"
-              alt=""
-              aria-hidden="true"
-            >
-          `
-          : ["doc", "docx"].includes(extension)
-            ? `
-              <img
-                class="course-material-file-icon-image"
-                src="doc.png"
-                alt=""
-                aria-hidden="true"
-              >
-            `
-            : `
-              <span class="course-material-file-icon" aria-hidden="true">
-                <strong>${extensionLabel}</strong>
-              </span>
-            `;
+        const fileContents = `
+          <span class="course-material-compact-file-name">
+            ${fileName}
+          </span>
 
-        const previewDataAttributes = [
-          'data-download-url="' + safeDownloadUrl + '"',
-          'data-file-name="' + fileName + '"',
-          'data-file-extension="' + safeExtension + '"',
-          'data-file-label="' + safeFileLabel + '"',
-          'data-file-size="' + safeFileSize + '"'
-        ].join(" ");
+          <span
+            class="course-material-compact-file-divider"
+            aria-hidden="true"
+          >—</span>
 
-        const previewTile = previewable
-          ? `
+          <span class="course-material-compact-file-size">
+            ${safeFileSize}
+          </span>
+
+          <span
+            class="course-material-compact-file-divider"
+            aria-hidden="true"
+          >—</span>
+        `;
+
+        if (previewable) {
+          return `
             <button
-              class="course-material-preview-tile course-material-preview-trigger"
+              class="course-material-compact-file course-material-preview-trigger"
               type="button"
-              ${previewDataAttributes}
+              data-download-url="${safeDownloadUrl}"
+              data-file-name="${fileName}"
+              data-file-extension="${safeExtension}"
+              data-file-label="${safeFileLabel}"
+              data-file-size="${safeFileSize}"
               aria-label="Preview ${fileName}"
             >
-              ${fileIcon}
-
-              <span class="course-material-file-copy">
-                <strong>${fileName}</strong>
-                <small>${safeFileLabel} · ${safeFileSize}</small>
-              </span>
-
-              <span class="course-material-preview-hint">Open preview</span>
+              ${fileContents}
+              <strong class="course-material-compact-file-action">
+                Preview
+              </strong>
             </button>
-          `
-          : `
-            <div class="course-material-preview-tile is-disabled">
-              ${fileIcon}
-
-              <span class="course-material-file-copy">
-                <strong>${fileName}</strong>
-                <small>${safeFileLabel} · ${safeFileSize}</small>
-              </span>
-
-              <span class="course-material-preview-hint">No browser preview</span>
-            </div>
           `;
+        }
 
-        const reportButton = safeMaterialId
-          ? `
-            <button
-              class="course-material-report-button"
-              type="button"
-              data-report-material="${safeMaterialId}"
-              data-report-label="${safeMaterialLabel}"
-            >Report</button>
-          `
-          : "";
-
-        const actions = `
-          <div class="course-material-actions">
-            ${reportButton}
-
+        if (rawDownloadUrl) {
+          return `
             <a
-              class="course-material-download-button"
+              class="course-material-compact-file"
               href="${safeDownloadUrl}"
               target="_blank"
               rel="noopener"
-            >Download file</a>
+              aria-label="Download ${fileName}"
+            >
+              ${fileContents}
+              <strong class="course-material-compact-file-action">
+                Download
+              </strong>
+            </a>
+          `;
+        }
+
+        return `
+          <div class="course-material-compact-file is-disabled">
+            ${fileContents}
+            <strong class="course-material-compact-file-action">
+              Unavailable
+            </strong>
           </div>
         `;
+      }
 
-        return {
-          previewTile,
-          actions
-        };
-      });
+      const firstFile = files.length
+        ? renderCompactFile(files[0])
+        : "";
 
-      const fileMarkup = fileViews
-        .map(function (fileView) {
-          return files.length > 1
-            ? fileView.previewTile +
-                fileView.actions
-            : fileView.previewTile;
-        })
-        .join("");
+      const remainingFiles =
+        files.slice(1);
 
-      const footerActions =
-        files.length === 1 &&
-        fileViews[0]
-          ? fileViews[0].actions
+      const moreFilesMarkup =
+        remainingFiles.length
+          ? `
+            <details class="course-material-more">
+              <summary class="course-material-more-toggle">
+                <span class="course-material-more-closed">
+                  + ${remainingFiles.length} more ${remainingFiles.length === 1 ? "file" : "files"}
+                </span>
+
+                <span class="course-material-more-open">
+                  Show fewer files
+                </span>
+              </summary>
+
+              <div class="course-material-more-files">
+                ${remainingFiles
+                  .map(renderCompactFile)
+                  .join("")}
+              </div>
+            </details>
+          `
           : "";
 
       return `
         <article class="course-material-card">
-          <div class="course-material-card-top">
-            <div class="course-material-author">
-              ${avatar}
-
-              <div class="course-material-author-copy">
-                <strong>${uploaderName}</strong>
-
-                <small class="course-material-upload-date">
-                  ${escapeMaterialText(uploadDate)}
-                </small>
-              </div>
-            </div>
-          </div>
-
           <h3 class="course-material-title">
             ${escapeMaterialText(
-              material.title || "Course material"
+              material.title ||
+              "Course material"
             )}
           </h3>
 
-          ${fileMarkup}
+          <p class="course-material-meta-line">
+            <span>${uploaderName}</span>
+            <span
+              class="course-material-meta-separator"
+              aria-hidden="true"
+            >·</span>
+            <span>${semester}</span>
+            <span
+              class="course-material-meta-separator"
+              aria-hidden="true"
+            >·</span>
+            <span>${materialType}</span>
+          </p>
 
-          <div class="course-material-footer">
-            <div class="course-material-context">
-              <span>${escapeMaterialText(
-                material.materialType || "Material"
-              )}</span>
-              <span>${escapeMaterialText(
-                material.professor ||
-                "Professor not listed"
-              )}</span>
-              <span>${escapeMaterialText(
-                material.semester ||
-                "Semester not listed"
-              )}</span>
-            </div>
-
-            ${footerActions}
+          <div class="course-material-compact-files">
+            ${firstFile}
           </div>
+
+          ${moreFilesMarkup}
         </article>
       `;
     }).join("");
