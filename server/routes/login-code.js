@@ -4,7 +4,11 @@ const admin = require("../_lib/firebaseAdmin");
 const {
   ensureAllowedAucEmail,
   createLoginChallenge,
-  createSiteSessionForUid
+  createSiteSessionFromIdToken,
+  createSiteSessionForUid,
+  getLoginChallenge,
+  consumeLoginChallenge,
+  clearLoginChallenge
 } = require("../_lib/securityHelpers");
 
 const {
@@ -317,21 +321,67 @@ async function requestLoginCode(
   req,
   res
 ) {
-  const email = cleanEmail(
-    (req.body || {}).email
-  );
+  const body = req.body || {};
+  const recovery =
+    body.recovery === true;
 
-  if (!email) {
-    return res.status(400).json({
-      error:
-        "Please enter your email address."
-    });
+  let loginChallenge = null;
+  let email = cleanEmail(
+    body.email
+  );
+  let userRecord = null;
+
+  if (recovery) {
+    loginChallenge =
+      await getLoginChallenge(req);
+
+    if (
+      !loginChallenge ||
+      !loginChallenge.uid ||
+      !loginChallenge.idToken ||
+      !loginChallenge.twoFactor ||
+      !loginChallenge.twoFactor.appEnabled
+    ) {
+      throw createHttpError(
+        "Log in with your password again to receive a recovery code.",
+        403
+      );
+    }
+
+    userRecord =
+      await admin.auth().getUser(
+        loginChallenge.uid
+      );
+
+    if (userRecord.disabled) {
+      throw createHttpError(
+        "This account is disabled.",
+        403
+      );
+    }
+
+    email = ensureAllowedAucEmail(
+      userRecord.email ||
+      loginChallenge.email ||
+      "",
+      "receive a recovery code"
+    );
+  } else {
+    if (!email) {
+      return res.status(400).json({
+        error:
+          "Please enter your email address."
+      });
+    }
+
+    ensureAllowedAucEmail(
+      email,
+      "receive a sign-in code"
+    );
+
+    userRecord =
+      await getUserByEmail(email);
   }
-
-  ensureAllowedAucEmail(
-    email,
-    "receive a sign-in code"
-  );
 
   await consumeRequestRateLimits(
     req,
@@ -340,9 +390,6 @@ async function requestLoginCode(
 
   const challengeId =
     crypto.randomBytes(32).toString("hex");
-
-  const userRecord =
-    await getUserByEmail(email);
 
   if (
     !userRecord ||
@@ -380,6 +427,13 @@ async function requestLoginCode(
       userRecord.uid,
       code
     ),
+    purpose: recovery
+      ? "authenticator-recovery"
+      : "passwordless",
+    loginChallengeId:
+      recovery && loginChallenge
+        ? loginChallenge.challengeId
+        : "",
     attempts: 0,
     createdAt:
       admin.firestore.FieldValue
@@ -393,10 +447,17 @@ async function requestLoginCode(
       )
   });
 
-  return res.status(200).json(
+  const responseData =
     createGenericRequestResponse(
       challengeId
-    )
+    );
+
+  if (recovery) {
+    responseData.email = email;
+  }
+
+  return res.status(200).json(
+    responseData
   );
 }
 
@@ -404,44 +465,89 @@ async function verifyLoginCode(
   req,
   res
 ) {
-  const email = cleanEmail(
-    (req.body || {}).email
+  const body = req.body || {};
+  const recovery =
+    body.recovery === true;
+
+  let loginChallenge = null;
+  let email = cleanEmail(
+    body.email
   );
 
   const challengeId =
     cleanChallengeId(
-      (req.body || {}).challengeId
+      body.challengeId
     );
 
   const code = cleanCode(
-    (req.body || {}).code
+    body.code
   );
 
   if (
-    !email ||
+    (!recovery && !email) ||
     !/^[a-f0-9]{64}$/.test(
       challengeId
     ) ||
     !/^\d{6}$/.test(code)
   ) {
     return res.status(400).json({
-      error:
-        "Please enter the 6-digit sign-in code."
+      error: recovery
+        ? "Please enter the 6-digit recovery code."
+        : "Please enter the 6-digit sign-in code."
     });
   }
 
-  ensureAllowedAucEmail(
-    email,
-    "verify a sign-in code"
-  );
+  let userRecord = null;
+
+  if (recovery) {
+    loginChallenge =
+      await getLoginChallenge(req);
+
+    if (
+      !loginChallenge ||
+      !loginChallenge.uid ||
+      !loginChallenge.idToken ||
+      !loginChallenge.twoFactor ||
+      !loginChallenge.twoFactor.appEnabled
+    ) {
+      throw createHttpError(
+        "Log in with your password again to use email recovery.",
+        403
+      );
+    }
+
+    userRecord =
+      await admin.auth().getUser(
+        loginChallenge.uid
+      );
+
+    if (userRecord.disabled) {
+      throw createHttpError(
+        "This account is disabled.",
+        403
+      );
+    }
+
+    email = ensureAllowedAucEmail(
+      userRecord.email ||
+      loginChallenge.email ||
+      "",
+      "verify a recovery code"
+    );
+  } else {
+    ensureAllowedAucEmail(
+      email,
+      "verify a sign-in code"
+    );
+
+    userRecord =
+      await getUserByEmail(email);
+  }
 
   await consumeVerifyRateLimits(
     req,
     email
   );
-
-  const userRecord =
-    await getUserByEmail(email);
 
   if (
     !userRecord ||
@@ -497,9 +603,32 @@ async function verifyLoginCode(
             };
           }
 
+          const challengePurpose =
+            String(
+              challenge.purpose ||
+              "passwordless"
+            );
+
+          const expectedPurpose =
+            recovery
+              ? "authenticator-recovery"
+              : "passwordless";
+
           if (
             challenge.challengeId !==
-            challengeId
+              challengeId ||
+            challenge.uid !==
+              userRecord.uid ||
+            challengePurpose !==
+              expectedPurpose ||
+            (
+              recovery &&
+              (
+                !loginChallenge ||
+                challenge.loginChallengeId !==
+                  loginChallenge.challengeId
+              )
+            )
           ) {
             return {
               valid: false
@@ -626,6 +755,53 @@ async function verifyLoginCode(
     userData.photoURL ||
     userRecord.photoURL ||
     "";
+
+  if (recovery) {
+    await consumeLoginChallenge(
+      loginChallenge
+    );
+
+    await createSiteSessionFromIdToken(
+      loginChallenge.idToken,
+      res,
+      req
+    );
+
+    await clearLoginChallenge(
+      req,
+      res
+    );
+
+    await challengeRef
+      .delete()
+      .catch(function () {});
+
+    await Promise.all([
+      clearSecurityRateLimit(
+        "email-login-code-request-email",
+        email
+      ),
+      clearSecurityRateLimit(
+        "email-login-code-verify-email",
+        email
+      )
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      requiresTwoFactor: false,
+      user: {
+        uid: userRecord.uid,
+        email: emailAddress,
+        emailVerified: Boolean(
+          userRecord.emailVerified
+        ),
+        displayName: fullName,
+        fullName,
+        photoURL
+      }
+    });
+  }
 
   if (twoFactor.appEnabled) {
     await createLoginChallenge(
