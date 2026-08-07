@@ -1674,10 +1674,7 @@
       display: grid;
       gap: 8px;
       overflow: hidden;
-      opacity: 1;
-      transform: translateY(0);
       transition: height 0.28s ease, opacity 0.22s ease, transform 0.22s ease;
-      will-change: height, opacity, transform;
     }
 
     .professor-review-detail-row {
@@ -2508,8 +2505,14 @@
     });
 
     content.addEventListener("transitionend", function (event) {
-      if (event.propertyName === "height" && details.open) {
+      if (
+        event.propertyName === "height" &&
+        details.open &&
+        content.style.height !== "0px"
+      ) {
         content.style.height = "auto";
+        content.style.opacity = "";
+        content.style.transform = "";
       }
     });
   }
