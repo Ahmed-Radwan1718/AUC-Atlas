@@ -2829,12 +2829,7 @@
 
       const firstFileMarkup =
         fileViews[0]
-          ? fileViews[0].previewTile +
-            (
-              files.length > 1
-                ? fileViews[0].actions
-                : ""
-            )
+          ? fileViews[0].previewTile
           : "";
 
       const remainingFilesMarkup =
@@ -2876,7 +2871,6 @@
           : firstFileMarkup;
 
       const footerActions =
-        files.length === 1 &&
         fileViews[0]
           ? fileViews[0].actions
           : "";
