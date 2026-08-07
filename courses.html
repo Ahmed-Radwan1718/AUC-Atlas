@@ -1561,32 +1561,47 @@
 
     .course-material-file-stack {
       display: grid;
-      gap: 12px;
+      gap: 14px;
     }
 
     .course-material-more {
       display: grid;
-      gap: 12px;
+      gap: 16px;
     }
 
     .course-material-more-toggle {
+      order: 2;
       width: fit-content;
-      min-height: 36px;
-      padding: 0 15px;
-      border: 1px solid rgba(192, 154, 92, 0.28);
-      border-radius: 999px;
-      background: rgba(192, 154, 92, 0.08);
-      color: rgba(145, 101, 35, 0.96);
+      padding: 2px 0;
+      border: 0;
+      background: transparent;
+      color: #171717;
       font-size: 10px;
       font-weight: 900;
       letter-spacing: 0.08em;
-      line-height: 1.2;
+      line-height: 1.4;
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
+      gap: 8px;
       cursor: pointer;
       list-style: none;
       user-select: none;
+    }
+
+    .course-material-more-toggle::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.2s ease;
+    }
+
+    .course-material-more[open]
+      .course-material-more-toggle::after {
+      transform: rotate(225deg) translate(-1px, -1px);
     }
 
     .course-material-more-toggle::-webkit-details-marker {
@@ -1595,8 +1610,7 @@
 
     .course-material-more-toggle:hover,
     .course-material-more-toggle:focus-visible {
-      border-color: rgba(192, 154, 92, 0.52);
-      background: rgba(192, 154, 92, 0.14);
+      color: rgba(145, 101, 35, 0.96);
       outline: none;
     }
 
@@ -1615,7 +1629,7 @@
     }
 
     .course-material-more-content {
-      margin-top: 12px;
+      order: 1;
       display: grid;
       gap: 16px;
     }
