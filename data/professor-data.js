@@ -2867,7 +2867,6 @@
       pageHeader.classList.add("professor-profile-heading");
       pageHeader.innerHTML = `
         <div>
-          <p class="professors-kicker">Professor profile</p>
           <h1>${escapeHtml(professor.name)}</h1>
         </div>
 
