@@ -1494,6 +1494,11 @@
     .account-upload-file-icon {
       width: 64px;
       height: 64px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .account-upload-file-icon-fallback {
       padding: 8px;
       border: 1px solid rgba(192, 154, 92, 0.22);
       border-radius: 17px;
@@ -1504,10 +1509,13 @@
       letter-spacing: 0.08em;
       text-align: center;
       text-transform: uppercase;
-      display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+    }
+
+    .account-upload-file-icon-fallback {
+      display: flex;
     }
 
     .account-upload-body {
@@ -4916,9 +4924,47 @@
         const title = material.title || "Course material";
         const fileName = material.fileName || "File name not listed";
         const extensionMatch = fileName.match(/\.([^.]+)$/);
-        const extensionLabel = extensionMatch
-          ? extensionMatch[1].slice(0, 5).toUpperCase()
+        const fileExtension = extensionMatch
+          ? extensionMatch[1].toLowerCase()
+          : "";
+        const extensionLabel = fileExtension
+          ? fileExtension.slice(0, 5).toUpperCase()
           : "FILE";
+
+        const fileIconMap = {
+          pdf: "pdf.png",
+          doc: "doc.png",
+          docx: "doc.png",
+          xls: "xls.png",
+          xlsx: "xls.png",
+          ppt: "ppt.png",
+          pptx: "ppt.png",
+          png: "png.png",
+          jpg: "jpg.png",
+          jpeg: "jpg.png"
+        };
+
+        const fileIconUrl =
+          fileIconMap[fileExtension] || "";
+
+        const fileIconMarkup = fileIconUrl
+          ? `
+              <img
+                class="account-upload-file-icon"
+                src="${escapeAccountHtml(fileIconUrl)}"
+                alt=""
+                aria-hidden="true"
+              >
+            `
+          : `
+              <span
+                class="account-upload-file-icon account-upload-file-icon-fallback"
+                aria-hidden="true"
+              >
+                ${escapeAccountHtml(extensionLabel)}
+              </span>
+            `;
+
         const downloadUrl = String(material.downloadUrl || "");
         const downloadAction = downloadUrl
           ? `
@@ -4948,9 +4994,7 @@
 
         return `
           <article class="account-upload-item">
-            <span class="account-upload-file-icon" aria-hidden="true">
-              ${escapeAccountHtml(extensionLabel)}
-            </span>
+            ${fileIconMarkup}
 
             <div class="account-upload-body">
               <div class="account-upload-head">
