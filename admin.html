@@ -720,7 +720,7 @@
 
       .admin-sidebar {
         position: static;
-        grid-template-columns: repeat(5, minmax(130px, 1fr));
+        grid-template-columns: repeat(6, minmax(130px, 1fr));
         overflow-x: auto;
       }
 
@@ -859,6 +859,7 @@
         <div class="admin-layout">
           <aside class="admin-sidebar" aria-label="Admin sections">
             <button class="admin-nav-button active" type="button" data-admin-panel="overview">Overview</button>
+            <button class="admin-nav-button" type="button" data-admin-panel="reports">Reports</button>
             <button class="admin-nav-button" type="button" data-admin-panel="reviews">Reviews</button>
             <button class="admin-nav-button" type="button" data-admin-panel="materials">Uploads</button>
             <button class="admin-nav-button" type="button" data-admin-panel="users">Users</button>
@@ -874,6 +875,17 @@
                 </div>
               </div>
               <div class="admin-list" id="admin-audit-list"></div>
+            </article>
+
+            <article class="admin-panel" id="admin-panel-reports">
+              <div class="admin-panel-heading">
+                <div>
+                  <h2>Content reports</h2>
+                  <p>Review user reports for professor reviews and approved course-material uploads.</p>
+                </div>
+                <input class="admin-search" id="admin-report-search" type="search" placeholder="Search reports" aria-label="Search content reports">
+              </div>
+              <div class="admin-list" id="admin-report-list"></div>
             </article>
 
             <article class="admin-panel" id="admin-panel-reviews">
