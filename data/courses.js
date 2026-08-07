@@ -1217,8 +1217,8 @@
     if (!safeMaterials.length) {
       root.innerHTML = `
         <div class="course-recent-status">
-          <strong>No approved course materials yet.</strong>
-          <p>New uploads will appear here after they are reviewed.</p>
+          <strong>No course materials yet.</strong>
+          <p>New uploads will appear here as soon as students share them.</p>
         </div>
       `;
       return;
