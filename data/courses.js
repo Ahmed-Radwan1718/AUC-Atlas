@@ -2827,14 +2827,53 @@
         };
       });
 
-      const fileMarkup = fileViews
-        .map(function (fileView) {
-          return files.length > 1
-            ? fileView.previewTile +
-                fileView.actions
-            : fileView.previewTile;
-        })
-        .join("");
+      const firstFileMarkup =
+        fileViews[0]
+          ? fileViews[0].previewTile +
+            (
+              files.length > 1
+                ? fileViews[0].actions
+                : ""
+            )
+          : "";
+
+      const remainingFilesMarkup =
+        fileViews
+          .slice(1)
+          .map(function (fileView) {
+            return `
+              <div class="course-material-extra-file">
+                ${fileView.previewTile}
+                ${fileView.actions}
+              </div>
+            `;
+          })
+          .join("");
+
+      const fileMarkup =
+        files.length > 1
+          ? `
+            <div class="course-material-file-stack">
+              ${firstFileMarkup}
+
+              <details class="course-material-more">
+                <summary class="course-material-more-toggle">
+                  <span class="course-material-more-closed">
+                    Show more
+                  </span>
+
+                  <span class="course-material-more-open">
+                    Show less
+                  </span>
+                </summary>
+
+                <div class="course-material-more-content">
+                  ${remainingFilesMarkup}
+                </div>
+              </details>
+            </div>
+          `
+          : firstFileMarkup;
 
       const footerActions =
         files.length === 1 &&
