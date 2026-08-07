@@ -1865,6 +1865,44 @@
       line-height: 1.5;
     }
 
+    .professor-review-card-actions {
+      margin-top: 2px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .professor-review-report-button {
+      padding: 4px 0;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.44);
+      font: inherit;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    .professor-review-report-button:hover,
+    .professor-review-report-button:focus-visible {
+      color: #9f2f2f;
+      outline: none;
+    }
+
+    .professor-review-report-button:disabled {
+      color: rgba(23, 23, 23, 0.38);
+      cursor: default;
+      opacity: 0.72;
+    }
+
     .professor-review-empty,
     .professor-review-status {
       grid-column: 1 / -1;
@@ -2507,6 +2545,128 @@
     }).join(", ");
   }
 
+  async function submitProfessorReviewReport(
+    button
+  ) {
+    const targetId =
+      button.dataset.reportReview;
+    const targetLabel =
+      button.dataset.reportLabel ||
+      "this review";
+    const reason = window.prompt(
+      "Why are you reporting " +
+        targetLabel +
+        "?",
+      ""
+    );
+
+    if (reason === null) {
+      return;
+    }
+
+    const cleanedReason =
+      reason.trim();
+
+    if (cleanedReason.length < 3) {
+      window.alert(
+        "Briefly explain why you are reporting this review."
+      );
+      return;
+    }
+
+    const originalText =
+      button.textContent;
+
+    button.disabled = true;
+    button.textContent =
+      "Reporting...";
+
+    try {
+      const response = await fetch(
+        "/api/content-reports",
+        {
+          method: "POST",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            Accept: "application/json",
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+            targetType: "review",
+            targetId,
+            reason: cleanedReason
+          })
+        }
+      );
+      const data = await response
+        .json()
+        .catch(function () {
+          return {};
+        });
+
+      if (response.status === 409) {
+        button.textContent =
+          "Reported";
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            "Could not submit the report."
+        );
+      }
+
+      button.textContent = "Reported";
+    } catch (error) {
+      button.disabled = false;
+      button.textContent =
+        originalText;
+
+      window.alert(
+        error.message ||
+          "Could not submit the report."
+      );
+    }
+  }
+
+  function setupProfessorReviewReports(
+    list
+  ) {
+    if (
+      !list ||
+      list.dataset.reportReady ===
+        "true"
+    ) {
+      return;
+    }
+
+    list.dataset.reportReady = "true";
+
+    list.addEventListener(
+      "click",
+      function (event) {
+        const button =
+          event.target.closest(
+            "[data-report-review]"
+          );
+
+        if (
+          !button ||
+          !list.contains(button)
+        ) {
+          return;
+        }
+
+        submitProfessorReviewReport(
+          button
+        );
+      }
+    );
+  }
+
   function renderProfessorReviews(reviews) {
     const list = document.getElementById("professor-reviews-list");
     const count = document.getElementById("professor-reviews-count");
@@ -2518,6 +2678,10 @@
     if (!list) {
       return;
     }
+
+    setupProfessorReviewReports(
+      list
+    );
 
     if (count) {
       count.textContent = safeReviews.length + " " + (safeReviews.length === 1 ? "review" : "reviews");
@@ -2531,6 +2695,29 @@
     list.innerHTML = safeReviews.map(function (review) {
       const authorUserId = review.authorUserId || review.authorUid || "";
       const rating = Number(review.rating || 0);
+      const reviewId = escapeHtml(review.id || "");
+      const reportLabel = escapeHtml(
+        [
+          review.professorName ||
+            "professor review",
+          review.courseTaken ||
+            review.courseCode
+        ]
+          .filter(Boolean)
+          .join(" · ")
+      );
+      const reportButton = reviewId
+        ? `
+          <div class="professor-review-card-actions">
+            <button
+              class="professor-review-report-button"
+              type="button"
+              data-report-review="${reviewId}"
+              data-report-label="${reportLabel}"
+            >Report</button>
+          </div>
+        `
+        : "";
 
       return `
         <article class="professor-review-card" data-author-user-id="${escapeHtml(authorUserId)}">
@@ -2551,6 +2738,8 @@
           </div>
 
           <p class="professor-review-note">${escapeHtml(review.studentNote || "No written note.")}</p>
+
+          ${reportButton}
         </article>
       `;
     }).join("");
