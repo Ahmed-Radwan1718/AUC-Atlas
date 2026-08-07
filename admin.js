@@ -1091,16 +1091,6 @@
       const status = normalizeSearch(
         material.status || "pending"
       );
-      const approveButton =
-        material.source !== "imagekit" &&
-        status === "pending"
-          ? [
-              '<button class="admin-button primary" type="button"',
-                ' data-approve-material="', escapeHtml(material.id), '">',
-                'Approve upload',
-              '</button>'
-            ].join("")
-          : "";
 
       return [
         '<article class="admin-item">',
@@ -1117,7 +1107,6 @@
             '<p class="admin-item-copy"><strong>Uploader:</strong> ', escapeHtml(material.uploaderDisplayName || "AUC student"), ' · ', escapeHtml(material.uploaderUid || "UID unavailable"), '</p>',
           '</div>',
           '<div class="admin-item-actions">',
-            approveButton,
             '<button class="admin-button danger" type="button"',
               ' data-delete-material="', escapeHtml(material.id), '"',
               ' data-material-source="', escapeHtml(material.source || "firestore"), '"',
@@ -1387,44 +1376,6 @@
   });
 
   materialList.addEventListener("click", function (event) {
-    const approveButton =
-      event.target.closest(
-        "[data-approve-material]"
-      );
-
-    if (approveButton) {
-      if (
-        !window.confirm(
-          "Approve this upload and make it publicly available?"
-        )
-      ) {
-        return;
-      }
-
-      runBusy(
-        approveButton,
-        async function () {
-          await postAction({
-            action: "approveMaterial",
-            materialId:
-              approveButton.dataset
-                .approveMaterial
-          });
-
-          await loadDashboard({
-            message: "Uploaded content approved."
-          });
-        }
-      ).catch(function (error) {
-        showToast(
-          error.message ||
-          "Could not approve the upload."
-        );
-      });
-
-      return;
-    }
-
     const deleteButton =
       event.target.closest(
         "[data-delete-material]"
