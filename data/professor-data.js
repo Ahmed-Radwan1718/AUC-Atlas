@@ -1451,35 +1451,7 @@
 
     .review-anonymous-option span {
       min-width: 0;
-      padding-right: 68px;
-      display: grid;
-      gap: 4px;
-    }
-
-    .review-anonymous-option span::after {
-      content: "Private";
-      position: absolute;
-      top: 14px;
-      right: 16px;
-      padding: 6px 9px;
-      border: 1px solid rgba(192, 154, 92, 0.24);
-      border-radius: 999px;
-      background: rgba(192, 154, 92, 0.12);
-      color: rgba(145, 101, 35, 0.96);
-      font-size: 9px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(-4px);
-      transition:
-        opacity 0.22s ease,
-        transform 0.22s ease;
-    }
-
-    .review-anonymous-option input:checked + span::after {
-      opacity: 1;
-      transform: translateY(0);
+      display: block;
     }
 
     .review-anonymous-option strong {
@@ -1487,12 +1459,6 @@
       font-size: 14px;
       font-weight: 800;
       line-height: 1.3;
-    }
-
-    .review-anonymous-option small {
-      color: rgba(23, 23, 23, 0.56);
-      font-size: 12px;
-      line-height: 1.5;
     }
 
     .review-submit-button {
@@ -2845,8 +2811,7 @@
               <label class="review-anonymous-option">
                 <input name="isAnonymous" type="checkbox" value="true">
                 <span>
-                  <strong>Post anonymously</strong>
-                  <small>Your name and profile photo will be hidden. Your account will remain privately linked for moderation and review limits.</small>
+                  <strong>Upload anonymously</strong>
                 </span>
               </label>
 
