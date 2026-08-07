@@ -2923,6 +2923,63 @@
         </article>
       `;
     }).join("");
+
+    list.querySelectorAll(
+      ".course-material-card"
+    ).forEach(function (card) {
+      const more = card.querySelector(
+        ".course-material-more"
+      );
+      const footerDownload = card.querySelector(
+        ".course-material-footer .course-material-download-button"
+      );
+
+      if (!more || !footerDownload) {
+        return;
+      }
+
+      function updateFooterDownloadButton() {
+        footerDownload.textContent = more.open
+          ? "Download all files"
+          : "Download file";
+      }
+
+      more.addEventListener(
+        "toggle",
+        updateFooterDownloadButton
+      );
+
+      footerDownload.addEventListener(
+        "click",
+        function (event) {
+          if (!more.open) {
+            return;
+          }
+
+          event.preventDefault();
+
+          const downloadLinks = more.querySelectorAll(
+            ".course-material-more-content .course-material-download-button"
+          );
+
+          downloadLinks.forEach(function (link) {
+            const downloadLink =
+              document.createElement("a");
+
+            downloadLink.href = link.href;
+            downloadLink.target = "_blank";
+            downloadLink.rel = "noopener";
+            downloadLink.download = "";
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            downloadLink.remove();
+          });
+        }
+      );
+
+      updateFooterDownloadButton();
+    });
   }
 
   function setCourseMaterialsLocked(access, isLocked) {
