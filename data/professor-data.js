@@ -1985,19 +1985,30 @@
       }
 
       .review-modal-backdrop {
-        background: rgba(247, 244, 238, 0.48);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        position: fixed;
+        inset: 0;
+        z-index: 5000;
+        background: rgba(247, 244, 238, 0.46);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
         overscroll-behavior: none;
         touch-action: none;
       }
 
       .professor-review-form {
+        position: fixed;
         top: 50%;
         left: 50%;
-        width: calc(100% - 24px);
-        max-height: calc(100dvh - 32px);
-        padding: 18px 18px max(18px, env(safe-area-inset-bottom));
+        z-index: 5001;
+        box-sizing: border-box;
+        width: calc(100vw - 20px);
+        height: calc(100dvh - 20px);
+        max-height: calc(100dvh - 20px);
+        margin: 0;
+        padding:
+          18px
+          18px
+          max(24px, env(safe-area-inset-bottom));
         overflow-x: hidden;
         overflow-y: auto;
         overscroll-behavior: contain;
@@ -2012,10 +2023,16 @@
       .review-modal-header {
         position: sticky;
         top: -18px;
-        z-index: 8;
+        z-index: 20;
         margin: -18px -18px 0;
-        padding: 18px 18px 12px;
+        padding:
+          max(18px, env(safe-area-inset-top))
+          18px
+          12px;
+        border-bottom: 1px solid rgba(23, 23, 23, 0.07);
         background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
       }
 
       .review-close-button {
@@ -2028,29 +2045,29 @@
         grid-template-columns: 1fr;
       }
 
-      .review-field.full {
-        grid-column: auto;
+      .review-field,
+      .review-field.full,
+      .review-anonymous-option,
+      .review-form-message {
+        min-width: 0;
+        grid-column: 1 / -1;
       }
 
-      .review-submit-button {
-        position: sticky;
-        bottom: 0;
-        z-index: 9;
-        width: 100%;
-        min-height: 50px;
-        grid-column: 1 / -1;
-        flex-shrink: 0;
-        margin-top: 4px;
-        box-shadow:
-          0 -12px 24px rgba(255, 255, 255, 0.92),
-          0 8px 22px rgba(42, 32, 20, 0.12);
+      .review-field input,
+      .review-field select,
+      .review-field textarea,
+      .review-choice,
+      .review-choice-button {
+        max-width: 100%;
       }
 
       .review-choice-menu {
         position: static;
         display: none;
-        max-height: min(240px, 38dvh);
+        max-height: min(260px, 36dvh);
         margin-top: 8px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
         opacity: 1;
         pointer-events: none;
         transform: none;
@@ -2061,6 +2078,20 @@
         display: grid;
         pointer-events: auto;
         transform: none;
+      }
+
+      .review-submit-button {
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+        width: 100%;
+        min-height: 52px;
+        grid-column: 1 / -1;
+        margin-top: 6px;
+        flex-shrink: 0;
+        box-shadow:
+          0 -18px 28px rgba(255, 255, 255, 0.96),
+          0 10px 26px rgba(42, 32, 20, 0.14);
       }
 
       .professor-review-toggle {
@@ -3374,6 +3405,14 @@
     const panel = grid.querySelector(".professor-review-panel");
     const form = grid.querySelector(".professor-review-form");
     const backdrop = grid.querySelector(".review-modal-backdrop");
+    const closeButton = form
+      ? form.querySelector(".review-close-button")
+      : null;
+    const mobileViewport = window.matchMedia(
+      "(max-width: 640px)"
+    );
+
+    let mobilePortalActive = false;
 
     if (!panel || !form) {
       return;
@@ -3388,22 +3427,112 @@
       submitProfessorReview(form, panel);
     });
 
-    function syncReviewModalLock() {
-      document.body.classList.toggle("review-modal-open", panel.open);
-
-      if (!panel.open) {
-        form.querySelectorAll(".review-choice.open").forEach(function (choice) {
-          choice.classList.remove("open");
-        });
+    function mountMobileReviewModal() {
+      if (
+        !mobileViewport.matches ||
+        mobilePortalActive
+      ) {
+        return;
       }
+
+      if (backdrop) {
+        document.body.appendChild(backdrop);
+      }
+
+      document.body.appendChild(form);
+      mobilePortalActive = true;
+
+      window.requestAnimationFrame(function () {
+        form.scrollTop = 0;
+      });
     }
 
-    panel.addEventListener("toggle", syncReviewModalLock);
+    function restoreReviewModal() {
+      if (!mobilePortalActive) {
+        return;
+      }
+
+      if (backdrop) {
+        panel.appendChild(backdrop);
+      }
+
+      panel.appendChild(form);
+      mobilePortalActive = false;
+    }
+
+    function closeReviewModal() {
+      panel.removeAttribute("open");
+      syncReviewModalLock();
+    }
+
+    function syncReviewModalLock() {
+      document.body.classList.toggle(
+        "review-modal-open",
+        panel.open
+      );
+
+      if (panel.open) {
+        if (mobileViewport.matches) {
+          mountMobileReviewModal();
+        }
+
+        return;
+      }
+
+      form
+        .querySelectorAll(".review-choice.open")
+        .forEach(function (choice) {
+          choice.classList.remove("open");
+        });
+
+      restoreReviewModal();
+    }
 
     if (backdrop) {
-      backdrop.addEventListener("wheel", function (event) {
-        event.preventDefault();
-      }, { passive: false });
+      backdrop.onclick = null;
+
+      backdrop.addEventListener(
+        "click",
+        closeReviewModal
+      );
+
+      backdrop.addEventListener(
+        "wheel",
+        function (event) {
+          event.preventDefault();
+        },
+        { passive: false }
+      );
+    }
+
+    if (closeButton) {
+      closeButton.onclick = null;
+      closeButton.addEventListener(
+        "click",
+        closeReviewModal
+      );
+    }
+
+    panel.addEventListener(
+      "toggle",
+      syncReviewModalLock
+    );
+
+    if (typeof mobileViewport.addEventListener === "function") {
+      mobileViewport.addEventListener(
+        "change",
+        function () {
+          if (!panel.open) {
+            return;
+          }
+
+          if (mobileViewport.matches) {
+            mountMobileReviewModal();
+          } else {
+            restoreReviewModal();
+          }
+        }
+      );
     }
 
     syncReviewModalLock();
