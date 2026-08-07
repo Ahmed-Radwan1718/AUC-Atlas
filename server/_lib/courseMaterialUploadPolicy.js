@@ -20,17 +20,11 @@ const MATERIAL_USER_QUOTA_BYTES = getPositiveInteger(
   250 * 1024 * 1024,
   5 * 1024 * 1024 * 1024
 );
-const MATERIAL_UPLOADS_PER_HOUR = getPositiveInteger(
-  process.env.COURSE_MATERIAL_UPLOADS_PER_HOUR,
-  10,
-  100
-);
 const MATERIAL_UPLOAD_AUTH_TTL_SECONDS = getPositiveInteger(
   process.env.COURSE_MATERIAL_UPLOAD_AUTH_TTL_SECONDS,
   15 * 60,
   30 * 60
 );
-const MATERIAL_UPLOAD_WINDOW_MS = 60 * 60 * 1000;
 
 const MATERIAL_ALLOWED_MIME_TYPES = Object.freeze([
   "application/pdf",
@@ -148,9 +142,7 @@ function buildImageKitUploadChecks(fileSize) {
 module.exports = {
   MATERIAL_MAX_FILE_BYTES,
   MATERIAL_USER_QUOTA_BYTES,
-  MATERIAL_UPLOADS_PER_HOUR,
   MATERIAL_UPLOAD_AUTH_TTL_SECONDS,
-  MATERIAL_UPLOAD_WINDOW_MS,
   MATERIAL_ALLOWED_MIME_TYPES,
   cleanMaterialFileName,
   getMaterialFileExtension,
