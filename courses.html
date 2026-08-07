@@ -1893,9 +1893,11 @@
       text-transform: uppercase;
       cursor: pointer;
       transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease;
+        background 0.22s ease,
+        border-color 0.22s ease,
+        color 0.22s ease,
+        transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.22s ease;
     }
 
     .course-material-filter:hover,
@@ -1903,12 +1905,18 @@
       border-color: rgba(192, 154, 92, 0.42);
       color: #171717;
       outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-material-filter:active {
+      transform: translateY(0) scale(0.94);
     }
 
     .course-material-filter[aria-pressed="true"] {
       border-color: #171717;
       background: #171717;
       color: #ffffff;
+      box-shadow: 0 6px 18px rgba(23, 23, 23, 0.12);
     }
 
     .course-material-sort-wrap {
@@ -1935,21 +1943,181 @@
       border-radius: 999px;
       font-size: 10px;
       font-weight: 800;
+      transition:
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease,
+        transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .course-material-sort-choice .material-choice-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .course-material-sort-choice .material-choice-button:active {
+      transform: translateY(0) scale(0.96);
     }
 
     .course-material-sort-choice .material-choice-menu {
       right: 0;
       left: auto;
       width: 138px;
+      display: grid;
+      gap: 4px;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-7px) scale(0.96);
+      transform-origin: top right;
+      transition:
+        opacity 0.18s ease,
+        transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0.18s ease;
+    }
+
+    .course-material-sort-choice.open .material-choice-menu {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
     }
 
     .course-material-sort-choice .material-choice-option {
       min-height: 36px;
       font-size: 11px;
+      transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        transform 0.14s ease;
+    }
+
+    .course-material-sort-choice .material-choice-option:active {
+      transform: scale(0.97);
     }
 
     .course-materials-list {
       gap: 9px;
+      opacity: 1;
+      transform: translateY(0);
+      transition:
+        opacity 0.14s ease,
+        transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .course-materials-list.is-changing {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+
+    .course-material-row,
+    .course-material-group {
+      animation:
+        courseMaterialItemIn
+        0.34s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+    }
+
+    .course-material-row:nth-child(2),
+    .course-material-group:nth-child(2) {
+      animation-delay: 0.025s;
+    }
+
+    .course-material-row:nth-child(3),
+    .course-material-group:nth-child(3) {
+      animation-delay: 0.05s;
+    }
+
+    .course-material-row:nth-child(4),
+    .course-material-group:nth-child(4) {
+      animation-delay: 0.075s;
+    }
+
+    .course-material-row:nth-child(5),
+    .course-material-group:nth-child(5) {
+      animation-delay: 0.1s;
+    }
+
+    .course-material-row:nth-child(6),
+    .course-material-group:nth-child(6) {
+      animation-delay: 0.125s;
+    }
+
+    @keyframes courseMaterialItemIn {
+      from {
+        opacity: 0;
+        transform: translateY(9px) scale(0.992);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .course-material-group.is-animating {
+      overflow: hidden;
+    }
+
+    .course-material-action-menu[open]
+      .course-material-action-menu-panel {
+      animation:
+        courseMaterialMenuIn
+        0.2s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+      transform-origin: top right;
+    }
+
+    @keyframes courseMaterialMenuIn {
+      from {
+        opacity: 0;
+        transform: translateY(-5px) scale(0.94);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .course-material-group-summary,
+    .course-material-row-main,
+    .course-material-compact-download,
+    .course-material-action-menu > summary,
+    .course-material-show-more {
+      transition:
+        transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .course-material-group-summary:active,
+    button.course-material-row-main:active,
+    .course-material-compact-download:active,
+    .course-material-action-menu > summary:active,
+    .course-material-show-more:active {
+      transform: scale(0.975);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-material-filter,
+      .course-material-sort-choice .material-choice-button,
+      .course-material-sort-choice .material-choice-menu,
+      .course-material-sort-choice .material-choice-option,
+      .course-materials-list,
+      .course-material-row,
+      .course-material-group,
+      .course-material-action-menu-panel,
+      .course-material-group-summary,
+      .course-material-row-main,
+      .course-material-compact-download,
+      .course-material-action-menu > summary,
+      .course-material-show-more {
+        animation: none !important;
+        transition: none !important;
+      }
     }
 
     .course-material-row,
