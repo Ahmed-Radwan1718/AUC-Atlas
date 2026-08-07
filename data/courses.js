@@ -2625,12 +2625,29 @@
         "[data-material-filter]"
       )
     );
-    const sortSelect = document.getElementById(
+    const sortChoice = document.getElementById(
       "course-material-sort"
     );
+    const sortButton = sortChoice
+      ? sortChoice.querySelector(
+          "[data-material-sort-button]"
+        )
+      : null;
+    const sortOptions = sortChoice
+      ? Array.from(
+          sortChoice.querySelectorAll(
+            "[data-material-sort-option]"
+          )
+        )
+      : [];
     const pageSize = 6;
     let visibleCount = pageSize;
     let activeFilter = "all";
+    let sortDirection =
+      sortButton &&
+      sortButton.dataset.sortValue
+        ? sortButton.dataset.sortValue
+        : "newest";
 
     if (!list) {
       return;
@@ -3157,11 +3174,6 @@
     }
 
     function renderMaterialView() {
-      const sortDirection =
-        sortSelect
-          ? sortSelect.value
-          : "newest";
-
       const filteredGroups =
         materialGroups
           .filter(groupMatchesFilter)
@@ -3248,10 +3260,84 @@
       }
     );
 
-    if (sortSelect) {
-      sortSelect.onchange = function () {
-        visibleCount = pageSize;
-        renderMaterialView();
+    if (
+      sortChoice &&
+      sortButton &&
+      sortOptions.length
+    ) {
+      function closeSortMenu() {
+        sortChoice.classList.remove("open");
+        sortButton.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+      }
+
+      sortButton.onclick = function () {
+        const shouldOpen =
+          !sortChoice.classList.contains(
+            "open"
+          );
+
+        sortChoice.classList.toggle(
+          "open",
+          shouldOpen
+        );
+
+        sortButton.setAttribute(
+          "aria-expanded",
+          shouldOpen ? "true" : "false"
+        );
+      };
+
+      sortOptions.forEach(
+        function (option) {
+          option.onclick = function () {
+            sortDirection =
+              option.dataset
+                .materialSortOption ||
+              "newest";
+
+            sortButton.dataset.sortValue =
+              sortDirection;
+            sortButton.textContent =
+              option.textContent.trim();
+
+            sortOptions.forEach(
+              function (sortOption) {
+                sortOption.setAttribute(
+                  "aria-selected",
+                  sortOption === option
+                    ? "true"
+                    : "false"
+                );
+              }
+            );
+
+            visibleCount = pageSize;
+            closeSortMenu();
+            renderMaterialView();
+          };
+        }
+      );
+
+      sortChoice.onfocusout = function () {
+        window.setTimeout(function () {
+          if (
+            !sortChoice.contains(
+              document.activeElement
+            )
+          ) {
+            closeSortMenu();
+          }
+        }, 0);
+      };
+
+      sortChoice.onkeydown = function (event) {
+        if (event.key === "Escape") {
+          closeSortMenu();
+          sortButton.focus();
+        }
       };
     }
 
