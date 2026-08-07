@@ -1978,16 +1978,34 @@
     }
 
     @media (max-width: 640px) {
+      html:has(body.review-modal-open),
+      body.review-modal-open {
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
+      .review-modal-backdrop {
+        background: rgba(247, 244, 238, 0.48);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        overscroll-behavior: none;
+        touch-action: none;
+      }
+
       .professor-review-form {
-        top: 8px;
-        left: 8px;
-        width: calc(100% - 16px);
-        max-height: calc(100dvh - 16px);
+        top: 50%;
+        left: 50%;
+        width: calc(100% - 24px);
+        max-height: calc(100dvh - 32px);
         padding: 18px 18px max(18px, env(safe-area-inset-bottom));
         overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
         scrollbar-gutter: auto;
         border-radius: 22px;
-        transform: none;
+        transform: translate(-50%, -50%);
         animation: none;
       }
 
