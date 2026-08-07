@@ -291,7 +291,7 @@ async function getCourseMaterials(courseCode) {
       40
     ).toLowerCase();
 
-    if (status !== "approved") {
+    if (status === "rejected") {
       return;
     }
 
@@ -332,7 +332,7 @@ async function getRecentCourseMaterials(limit) {
       40
     ).toLowerCase();
 
-    if (status === "approved") {
+    if (status !== "rejected") {
       materials.push(material);
     }
   });
