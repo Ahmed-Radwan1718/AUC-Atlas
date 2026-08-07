@@ -91,6 +91,10 @@
     document.getElementById(
       "admin-audit-list"
     );
+  const reportList =
+    document.getElementById(
+      "admin-report-list"
+    );
   const reviewList =
     document.getElementById(
       "admin-review-list"
@@ -98,6 +102,10 @@
   const materialList =
     document.getElementById(
       "admin-material-list"
+    );
+  const reportSearch =
+    document.getElementById(
+      "admin-report-search"
     );
   const reviewSearch =
     document.getElementById(
@@ -864,11 +872,164 @@
     }).join("");
   }
 
+  function renderReports() {
+    const reports = Array.isArray(
+      state.dashboard.reports
+    )
+      ? state.dashboard.reports
+      : [];
+    const search = normalizeSearch(
+      reportSearch.value
+    );
+    const filtered = reports.filter(
+      function (report) {
+        return (
+          !search ||
+          normalizeSearch(
+            [
+              report.targetType,
+              report.targetId,
+              report.targetLabel,
+              report.reason,
+              report.reporterUid,
+              report.reporterEmail,
+              JSON.stringify(
+                report.targetSnapshot ||
+                  {}
+              )
+            ].join(" ")
+          ).includes(search)
+        );
+      }
+    );
+
+    if (!filtered.length) {
+      reportList.innerHTML =
+        '<div class="admin-empty">No open content reports were found.</div>';
+      return;
+    }
+
+    reportList.innerHTML =
+      filtered.map(function (report) {
+        const snapshot =
+          report.targetSnapshot || {};
+        const targetType =
+          report.targetType === "material"
+            ? "material"
+            : "review";
+        const targetSummary =
+          targetType === "review"
+            ? [
+                snapshot.professorName,
+                snapshot.courseCode
+              ]
+                .filter(Boolean)
+                .join(" · ")
+            : [
+                snapshot.title,
+                snapshot.courseCode
+              ]
+                .filter(Boolean)
+                .join(" · ");
+        const targetCopy =
+          targetType === "review"
+            ? snapshot.studentNote
+            : snapshot.fileName;
+        const targetButtonLabel =
+          targetType === "review"
+            ? "Open review"
+            : "Open upload";
+
+        return [
+          '<article class="admin-item">',
+            '<div class="admin-item-main">',
+              '<div class="admin-item-title">',
+                escapeHtml(
+                  report.targetLabel ||
+                    targetSummary ||
+                    "Reported content"
+                ),
+              '</div>',
+              '<div class="admin-meta">',
+                '<span class="admin-badge is-danger">Open report</span>',
+                '<span>',
+                  escapeHtml(targetType),
+                '</span>',
+                '<span>',
+                  escapeHtml(
+                    report.targetId ||
+                      "Target unavailable"
+                  ),
+                '</span>',
+                '<span>',
+                  escapeHtml(
+                    formatDate(
+                      report.createdAt
+                    )
+                  ),
+                '</span>',
+              '</div>',
+              targetSummary
+                ? '<p class="admin-item-copy"><strong>Content:</strong> ' +
+                  escapeHtml(
+                    targetSummary
+                  ) +
+                  '</p>'
+                : '',
+              targetCopy
+                ? '<p class="admin-item-copy">' +
+                  escapeHtml(targetCopy) +
+                  '</p>'
+                : '',
+              '<p class="admin-item-copy"><strong>Report reason:</strong> ',
+                escapeHtml(
+                  report.reason ||
+                    "No reason supplied."
+                ),
+              '</p>',
+              '<p class="admin-item-copy"><strong>Reporter:</strong> ',
+                escapeHtml(
+                  report.reporterEmail ||
+                    "Email unavailable"
+                ),
+                ' · ',
+                escapeHtml(
+                  report.reporterUid ||
+                    "UID unavailable"
+                ),
+              '</p>',
+            '</div>',
+            '<div class="admin-item-actions">',
+              '<button class="admin-button" type="button"',
+                ' data-open-report-target',
+                ' data-report-target-type="',
+                  escapeHtml(targetType),
+                '"',
+                ' data-report-target-id="',
+                  escapeHtml(
+                    report.targetId
+                  ),
+                '">',
+                targetButtonLabel,
+              '</button>',
+              '<button class="admin-button danger" type="button"',
+                ' data-dismiss-report="',
+                  escapeHtml(report.id),
+                '">',
+                'Dismiss report',
+              '</button>',
+            '</div>',
+          '</article>'
+        ].join("");
+      }).join("");
+  }
+
   function renderReviews() {
     const reviews = Array.isArray(state.dashboard.reviews) ? state.dashboard.reviews : [];
     const search = normalizeSearch(reviewSearch.value);
     const filtered = reviews.filter(function (review) {
       return !search || normalizeSearch([
+        review.id,
         review.professorName,
         review.courseCode,
         review.authorName,
@@ -909,6 +1070,7 @@
     const search = normalizeSearch(materialSearch.value);
     const filtered = materials.filter(function (material) {
       return !search || normalizeSearch([
+        material.id,
         material.title,
         material.fileName,
         material.courseCode,
@@ -1044,6 +1206,7 @@
     identity.textContent = [adminUser.email, adminUser.uid].filter(Boolean).join(" · ");
     renderStats();
     renderAuditLogs();
+    renderReports();
     renderReviews();
     renderMaterials();
     renderDonation();
@@ -1118,11 +1281,85 @@
     });
   });
 
+  reportSearch.addEventListener("input", renderReports);
   reviewSearch.addEventListener("input", renderReviews);
   materialSearch.addEventListener("input", renderMaterials);
   donationCurrentInput.addEventListener("input", updateDonationPreview);
   donationGoalInput.addEventListener("input", updateDonationPreview);
   donationCurrencyInput.addEventListener("change", updateDonationPreview);
+
+  reportList.addEventListener("click", function (event) {
+    const openButton = event.target.closest(
+      "[data-open-report-target]"
+    );
+
+    if (openButton) {
+      const targetType =
+        openButton.dataset
+          .reportTargetType;
+      const targetId =
+        openButton.dataset
+          .reportTargetId;
+
+      if (targetType === "review") {
+        reviewSearch.value = targetId;
+        renderReviews();
+        switchPanel("reviews");
+      } else {
+        materialSearch.value = targetId;
+        renderMaterials();
+        switchPanel("materials");
+      }
+
+      return;
+    }
+
+    const dismissButton =
+      event.target.closest(
+        "[data-dismiss-report]"
+      );
+
+    if (!dismissButton) {
+      return;
+    }
+
+    const reason = window.prompt(
+      "Internal reason for dismissing this report?",
+      "Reviewed and dismissed"
+    );
+
+    if (
+      reason === null ||
+      !window.confirm(
+        "Dismiss all open reports for this content?"
+      )
+    ) {
+      return;
+    }
+
+    runBusy(
+      dismissButton,
+      async function () {
+        await postAction({
+          action: "dismissReport",
+          reportId:
+            dismissButton.dataset
+              .dismissReport,
+          reason
+        });
+
+        await loadDashboard({
+          message:
+            "Content report dismissed."
+        });
+      }
+    ).catch(function (error) {
+      showToast(
+        error.message ||
+          "Could not dismiss the report."
+      );
+    });
+  });
 
   reviewList.addEventListener("click", function (event) {
     const button = event.target.closest("[data-delete-review]");
