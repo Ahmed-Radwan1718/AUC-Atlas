@@ -5,9 +5,7 @@ const { getSiteSessionUser } = require("../server/_lib/securityHelpers");
 const {
   MATERIAL_MAX_FILE_BYTES,
   MATERIAL_USER_QUOTA_BYTES,
-  MATERIAL_UPLOADS_PER_HOUR,
   MATERIAL_UPLOAD_AUTH_TTL_SECONDS,
-  MATERIAL_UPLOAD_WINDOW_MS,
   cleanMaterialFileName,
   getMaterialFileExtension,
   isAllowedMaterialFileName,
@@ -349,33 +347,6 @@ async function reserveMaterialUploadAuthorization(data) {
       );
     }
 
-    const windowStartedAtMs = getTimestampMillis(
-      limitData.windowStartedAt
-    );
-    const hasActiveWindow =
-      windowStartedAtMs > 0 &&
-      nowMs <
-        windowStartedAtMs +
-          MATERIAL_UPLOAD_WINDOW_MS;
-    const uploadCount = hasActiveWindow
-      ? Math.max(0, Number(limitData.uploadCount) || 0)
-      : 0;
-    const activeWindowStartedAtMs = hasActiveWindow
-      ? windowStartedAtMs
-      : nowMs;
-
-    if (uploadCount >= MATERIAL_UPLOADS_PER_HOUR) {
-      throw createImageKitRateLimitError(
-        Math.ceil(
-          (
-            activeWindowStartedAtMs +
-            MATERIAL_UPLOAD_WINDOW_MS -
-            nowMs
-          ) / 1000
-        )
-      );
-    }
-
     if (
       data.currentStoredBytes + data.fileSize >
       MATERIAL_USER_QUOTA_BYTES
@@ -390,11 +361,6 @@ async function reserveMaterialUploadAuthorization(data) {
       limitRef,
       {
         uploaderUid: data.uploaderUid,
-        uploadCount: uploadCount + 1,
-        windowStartedAt:
-          admin.firestore.Timestamp.fromDate(
-            new Date(activeWindowStartedAtMs)
-          ),
         activeAuthorizationId:
           data.authorizationId,
         activeAuthorizationExpiresAt:
@@ -667,8 +633,7 @@ module.exports = async function handler(req, res) {
       expiresAt: new Date(expiresAtMs).toISOString(),
       limits: {
         maxFileBytes: MATERIAL_MAX_FILE_BYTES,
-        userQuotaBytes: MATERIAL_USER_QUOTA_BYTES,
-        uploadsPerHour: MATERIAL_UPLOADS_PER_HOUR
+        userQuotaBytes: MATERIAL_USER_QUOTA_BYTES
       }
     });
   } catch (error) {
