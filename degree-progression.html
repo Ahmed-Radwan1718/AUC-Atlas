@@ -504,8 +504,6 @@
                 </div>
 
                 <div class="degree-panel-actions">
-                  <span class="degree-major-pill" id="degree-major-pill">Degree audit</span>
-
                   <button
                     class="degree-save-button"
                     id="degree-save-progress"
@@ -563,7 +561,6 @@
     const logoutButton = document.getElementById("degree-logout-sidebar");
     const degreeMajorName = document.getElementById("degree-major-name");
     const degreeMajorCopy = document.getElementById("degree-major-copy");
-    const degreeMajorPill = document.getElementById("degree-major-pill");
     const degreeCompletedCount = document.getElementById("degree-completed-count");
     const degreeRemainingCount = document.getElementById("degree-remaining-count");
     const degreeProgressPercent = document.getElementById("degree-progress-percent");
@@ -928,11 +925,6 @@
             });
 
           updateDegreeProgress();
-
-          showDegreeSaveMessage(
-            "Saved progress loaded.",
-            "success"
-          );
         }
       } catch (error) {
         showDegreeSaveMessage(
@@ -1022,11 +1014,6 @@
       degreeMajorName.textContent =
         savedMajor ||
         "No Major Selected";
-
-      degreeMajorPill.textContent =
-        savedMajor
-          ? "Saved major"
-          : "Missing major";
 
       degreeMajorCopy.textContent =
         majorPlan
