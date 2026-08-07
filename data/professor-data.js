@@ -1358,47 +1358,35 @@
     }
 
     .review-anonymous-option {
-      position: relative;
       grid-column: 1 / -1;
-      overflow: hidden;
+      min-width: 0;
+      padding: 16px 0 0;
+      border-top: 1px solid rgba(23, 23, 23, 0.1);
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 16px;
-      border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 18px;
-      background:
-        linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.88),
-          rgba(247, 244, 238, 0.78)
-        );
-      box-shadow: 0 10px 26px rgba(42, 32, 20, 0.05);
+      justify-content: space-between;
+      gap: 24px;
       cursor: pointer;
-      transition:
-        border-color 0.22s ease,
-        background 0.22s ease,
-        box-shadow 0.22s ease,
-        transform 0.22s ease;
     }
 
-    .review-anonymous-option:hover {
-      border-color: rgba(192, 154, 92, 0.34);
-      box-shadow: 0 14px 32px rgba(42, 32, 20, 0.08);
-      transform: translateY(-1px);
+    .review-anonymous-copy {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
     }
 
-    .review-anonymous-option:has(input:checked) {
-      border-color: rgba(192, 154, 92, 0.5);
-      background:
-        linear-gradient(
-          135deg,
-          rgba(192, 154, 92, 0.16),
-          rgba(255, 255, 255, 0.9)
-        );
-      box-shadow:
-        0 0 0 3px rgba(192, 154, 92, 0.08),
-        0 14px 34px rgba(42, 32, 20, 0.09);
+    .review-anonymous-copy strong {
+      color: #171717;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .review-anonymous-copy small {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.45;
     }
 
     .review-anonymous-option input {
@@ -1448,18 +1436,6 @@
 
     .review-anonymous-option input:focus-visible {
       box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.2);
-    }
-
-    .review-anonymous-option span {
-      min-width: 0;
-      display: block;
-    }
-
-    .review-anonymous-option strong {
-      color: #171717;
-      font-size: 14px;
-      font-weight: 800;
-      line-height: 1.3;
     }
 
     .review-submit-button {
@@ -2055,7 +2031,7 @@
       }
 
       .review-anonymous-option {
-        margin-bottom: 36px;
+        margin-bottom: 0;
       }
 
       .review-field input,
@@ -3071,10 +3047,11 @@
               </div>
 
               <label class="review-anonymous-option">
-                <input name="isAnonymous" type="checkbox" value="true">
-                <span>
-                  <strong>Upload anonymously</strong>
+                <span class="review-anonymous-copy">
+                  <strong>Post anonymously</strong>
+                  <small>Your name and profile photo won’t appear with this review.</small>
                 </span>
+                <input name="isAnonymous" type="checkbox" value="true">
               </label>
 
               <button class="review-submit-button" type="submit">Submit Review</button>
