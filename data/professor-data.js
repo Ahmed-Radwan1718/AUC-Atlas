@@ -2053,6 +2053,10 @@
         grid-column: 1 / -1;
       }
 
+      .review-anonymous-option {
+        margin-bottom: 12px;
+      }
+
       .review-field input,
       .review-field select,
       .review-field textarea,
@@ -2087,10 +2091,10 @@
         width: 100%;
         min-height: 52px;
         grid-column: 1 / -1;
-        margin-top: 6px;
+        margin-top: 10px;
         flex-shrink: 0;
         box-shadow:
-          0 -18px 28px rgba(255, 255, 255, 0.96),
+          0 -8px 18px rgba(255, 255, 255, 0.88),
           0 10px 26px rgba(42, 32, 20, 0.14);
       }
 
