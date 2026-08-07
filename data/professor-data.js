@@ -2054,7 +2054,7 @@
       }
 
       .review-anonymous-option {
-        margin-bottom: 12px;
+        margin-bottom: 36px;
       }
 
       .review-field input,
