@@ -2617,10 +2617,37 @@
   }
 
   function renderCourseMaterials(materials) {
-    const list = document.getElementById("course-materials-list");
+    const list = document.getElementById(
+      "course-materials-list"
+    );
+    const filterButtons = Array.from(
+      document.querySelectorAll(
+        "[data-material-filter]"
+      )
+    );
+    const sortSelect = document.getElementById(
+      "course-material-sort"
+    );
+    const pageSize = 6;
+    let visibleCount = pageSize;
+    let activeFilter = "all";
 
     if (!list) {
       return;
+    }
+
+    const pressedFilter = filterButtons.find(
+      function (button) {
+        return button.getAttribute(
+          "aria-pressed"
+        ) === "true";
+      }
+    );
+
+    if (pressedFilter) {
+      activeFilter =
+        pressedFilter.dataset.materialFilter ||
+        "all";
     }
 
     if (!materials.length) {
@@ -2661,80 +2688,142 @@
       group.files.push(material);
     });
 
-    list.innerHTML = materialGroups.map(function (group) {
-      const material = group.material;
-      const files = group.files;
-      const rawUploaderName =
-        material.uploaderDisplayName || "AUC student";
-      const uploaderName =
-        escapeMaterialText(rawUploaderName);
-      const uploaderPhoto =
-        escapeMaterialText(material.uploaderPhotoURL || "");
-      const avatar = uploaderPhoto
-        ? '<img class="course-material-avatar" src="' +
-          uploaderPhoto +
-          '" alt="">'
-        : '<span class="course-material-avatar-fallback">' +
-          escapeMaterialText(
-            getMaterialInitials(rawUploaderName)
-          ) +
-          "</span>";
-      const uploadDate = formatMaterialUploadDate(
-        material.createdAt
+    function getMaterialTimestamp(value) {
+      const timestamp = new Date(
+        value || ""
+      ).getTime();
+
+      return Number.isNaN(timestamp)
+        ? 0
+        : timestamp;
+    }
+
+    materialGroups.forEach(function (group) {
+      group.latestTime = group.files.reduce(
+        function (latestTime, fileMaterial) {
+          return Math.max(
+            latestTime,
+            getMaterialTimestamp(
+              fileMaterial.createdAt
+            )
+          );
+        },
+        0
+      );
+    });
+
+    function groupMatchesFilter(group) {
+      if (activeFilter === "all") {
+        return true;
+      }
+
+      const materialTypes = group.files.map(
+        function (fileMaterial) {
+          return String(
+            fileMaterial.materialType ||
+            group.material.materialType ||
+            ""
+          ).toLowerCase();
+        }
       );
 
-      const fileViews = files.map(function (fileMaterial) {
-        const rawFileName =
-          fileMaterial.fileName ||
-          fileMaterial.title ||
-          "Course material";
-        const extension = getMaterialFileExtension(
+      if (activeFilter === "notes") {
+        return materialTypes.some(
+          function (type) {
+            return type.includes("note");
+          }
+        );
+      }
+
+      if (activeFilter === "slides") {
+        return materialTypes.some(
+          function (type) {
+            return type.includes("slide");
+          }
+        );
+      }
+
+      if (activeFilter === "exams") {
+        return materialTypes.some(
+          function (type) {
+            return type.includes("exam");
+          }
+        );
+      }
+
+      if (activeFilter === "sheets") {
+        return materialTypes.some(
+          function (type) {
+            return type.includes("sheet");
+          }
+        );
+      }
+
+      return true;
+    }
+
+    function getFileView(
+      fileMaterial,
+      material,
+      files
+    ) {
+      const rawFileName =
+        fileMaterial.fileName ||
+        fileMaterial.title ||
+        "Course material";
+      const extension =
+        getMaterialFileExtension(
           rawFileName,
           fileMaterial.fileType
         );
-        const fileLabel = getMaterialFileLabel(extension);
-        const fileSize = Number(fileMaterial.size) > 0
-          ? formatMaterialFileSize(fileMaterial.size)
-          : "Size unavailable";
-        const rawDownloadUrl =
-          fileMaterial.downloadUrl || "";
-        const previewable =
-          Boolean(rawDownloadUrl) &&
-          isMaterialPreviewable(extension);
-
-        const fileName =
-          escapeMaterialText(rawFileName);
-        const safeFileLabel =
-          escapeMaterialText(fileLabel);
-        const safeFileSize =
-          escapeMaterialText(fileSize);
-        const safeDownloadUrl =
-          escapeMaterialText(
-            rawDownloadUrl || "#"
-          );
-        const safeExtension =
-          escapeMaterialText(extension);
-        const safeMaterialId =
-          escapeMaterialText(
-            fileMaterial.id || ""
-          );
-        const safeMaterialLabel =
-          escapeMaterialText(
-            (material.title || "Course material") +
-            (
-              files.length > 1
-                ? " — " + rawFileName
-                : ""
+      const fileLabel =
+        getMaterialFileLabel(extension);
+      const fileSize =
+        Number(fileMaterial.size) > 0
+          ? formatMaterialFileSize(
+              fileMaterial.size
             )
-          );
-        const extensionLabel =
-          escapeMaterialText(
-            extension === "file"
-              ? "FILE"
-              : extension.toUpperCase()
-          );
+          : "Size unavailable";
+      const rawDownloadUrl =
+        fileMaterial.downloadUrl || "";
+      const previewable =
+        Boolean(rawDownloadUrl) &&
+        isMaterialPreviewable(extension);
+      const fileName =
+        escapeMaterialText(rawFileName);
+      const safeFileLabel =
+        escapeMaterialText(fileLabel);
+      const safeFileSize =
+        escapeMaterialText(fileSize);
+      const safeDownloadUrl =
+        escapeMaterialText(
+          rawDownloadUrl || "#"
+        );
+      const safeExtension =
+        escapeMaterialText(extension);
+      const safeMaterialId =
+        escapeMaterialText(
+          fileMaterial.id || ""
+        );
+      const safeMaterialLabel =
+        escapeMaterialText(
+          (material.title ||
+            "Course material") +
+          (
+            files.length > 1
+              ? " — " + rawFileName
+              : ""
+          )
+        );
+      const extensionLabel =
+        escapeMaterialText(
+          extension === "file"
+            ? "FILE"
+            : extension.toUpperCase()
+        );
 
-        const fileIcon = extension === "pdf"
+      const fileIcon =
+        extension === "pdf"
           ? `
             <img
               class="course-material-file-icon-image"
@@ -2743,7 +2832,9 @@
               aria-hidden="true"
             >
           `
-          : ["doc", "docx"].includes(extension)
+          : ["doc", "docx"].includes(
+              extension
+            )
             ? `
               <img
                 class="course-material-file-icon-image"
@@ -2753,233 +2844,435 @@
               >
             `
             : `
-              <span class="course-material-file-icon" aria-hidden="true">
+              <span
+                class="course-material-file-icon"
+                aria-hidden="true"
+              >
                 <strong>${extensionLabel}</strong>
               </span>
             `;
 
-        const previewDataAttributes = [
-          'data-download-url="' + safeDownloadUrl + '"',
-          'data-file-name="' + fileName + '"',
-          'data-file-extension="' + safeExtension + '"',
-          'data-file-label="' + safeFileLabel + '"',
-          'data-file-size="' + safeFileSize + '"'
-        ].join(" ");
+      const previewDataAttributes = [
+        'data-download-url="' +
+          safeDownloadUrl +
+          '"',
+        'data-file-name="' +
+          fileName +
+          '"',
+        'data-file-extension="' +
+          safeExtension +
+          '"',
+        'data-file-label="' +
+          safeFileLabel +
+          '"',
+        'data-file-size="' +
+          safeFileSize +
+          '"'
+      ].join(" ");
 
-        const previewTile = previewable
+      return {
+        fileName,
+        safeFileLabel,
+        safeFileSize,
+        safeDownloadUrl,
+        safeMaterialId,
+        safeMaterialLabel,
+        fileIcon,
+        previewable,
+        previewDataAttributes,
+        hasDownload:
+          Boolean(rawDownloadUrl)
+      };
+    }
+
+    function buildActions(fileView) {
+      const downloadMarkup =
+        fileView.hasDownload
           ? `
-            <button
-              class="course-material-preview-tile course-material-preview-trigger"
-              type="button"
-              ${previewDataAttributes}
-              aria-label="Preview ${fileName}"
-            >
-              ${fileIcon}
-
-              <span class="course-material-file-copy">
-                <strong>${fileName}</strong>
-                <small>${safeFileLabel} · ${safeFileSize}</small>
-              </span>
-
-              <span class="course-material-preview-hint">Open preview</span>
-            </button>
-          `
-          : `
-            <div class="course-material-preview-tile is-disabled">
-              ${fileIcon}
-
-              <span class="course-material-file-copy">
-                <strong>${fileName}</strong>
-                <small>${safeFileLabel} · ${safeFileSize}</small>
-              </span>
-
-              <span class="course-material-preview-hint">No browser preview</span>
-            </div>
-          `;
-
-        const reportButton = safeMaterialId
-          ? `
-            <button
-              class="course-material-report-button"
-              type="button"
-              data-report-material="${safeMaterialId}"
-              data-report-label="${safeMaterialLabel}"
-            >Report</button>
-          `
-          : "";
-
-        const actions = `
-          <div class="course-material-actions">
-            ${reportButton}
-
             <a
-              class="course-material-download-button"
-              href="${safeDownloadUrl}"
+              class="course-material-compact-download"
+              href="${fileView.safeDownloadUrl}"
               target="_blank"
               rel="noopener"
-            >Download</a>
-          </div>
-        `;
-
-        return {
-          previewTile,
-          actions
-        };
-      });
-
-      const firstFileMarkup =
-        fileViews[0]
-          ? fileViews[0].previewTile
-          : "";
-
-      const remainingFilesMarkup =
-        fileViews
-          .slice(1)
-          .map(function (fileView) {
-            return `
-              <div class="course-material-extra-file">
-                ${fileView.previewTile}
-                ${fileView.actions}
-              </div>
-            `;
-          })
-          .join("");
-
-      const fileMarkup =
-        files.length > 1
-          ? `
-            <div class="course-material-file-stack">
-              ${firstFileMarkup}
-
-              <details class="course-material-more">
-                <summary class="course-material-more-toggle">
-                  <span class="course-material-more-closed">
-                    Show more
-                  </span>
-
-                  <span class="course-material-more-open">
-                    Show less
-                  </span>
-                </summary>
-
-                <div class="course-material-more-content">
-                  <div class="course-material-first-file-actions">
-                    ${fileViews[0] ? fileViews[0].actions : ""}
-                  </div>
-
-                  ${remainingFilesMarkup}
-                </div>
-              </details>
-            </div>
+              aria-label="Download ${fileView.fileName}"
+              title="Download"
+            ></a>
           `
-          : firstFileMarkup;
-
-      const footerActions =
-        fileViews[0]
-          ? fileViews[0].actions
           : "";
+
+      const menuMarkup =
+        fileView.safeMaterialId
+          ? `
+            <details
+              class="course-material-action-menu"
+            >
+              <summary
+                aria-label="More actions for ${fileView.fileName}"
+                title="More actions"
+              >⋮</summary>
+
+              <div
+                class="course-material-action-menu-panel"
+              >
+                <button
+                  class="course-material-report-button"
+                  type="button"
+                  data-report-material="${fileView.safeMaterialId}"
+                  data-report-label="${fileView.safeMaterialLabel}"
+                >Report</button>
+              </div>
+            </details>
+          `
+          : "";
+
+      return downloadMarkup + menuMarkup;
+    }
+
+    function buildPreviewMain(
+      fileView,
+      primaryTitle,
+      secondaryText,
+      metadataText,
+      materialType
+    ) {
+      const typeMarkup = materialType
+        ? `
+          <em>${materialType}</em>
+        `
+        : "";
+
+      const secondaryMarkup =
+        secondaryText
+          ? `
+            <span
+              class="course-material-row-file-name"
+            >${secondaryText}</span>
+          `
+          : "";
+
+      const previewMarkup =
+        fileView.previewable
+          ? `
+            <span
+              class="course-material-preview-label"
+            >Preview</span>
+          `
+          : "";
+
+      const content = `
+        ${fileView.fileIcon}
+
+        <span class="course-material-row-copy">
+          <span
+            class="course-material-row-title-line"
+          >
+            <strong>${primaryTitle}</strong>
+            ${typeMarkup}
+          </span>
+
+          ${secondaryMarkup}
+
+          <small>${metadataText}</small>
+        </span>
+
+        ${previewMarkup}
+      `;
+
+      if (fileView.previewable) {
+        return `
+          <button
+            class="course-material-row-main course-material-preview-trigger"
+            type="button"
+            ${fileView.previewDataAttributes}
+            aria-label="Preview ${fileView.fileName}"
+          >
+            ${content}
+          </button>
+        `;
+      }
 
       return `
-        <article class="course-material-card">
-          <div class="course-material-card-top">
-            <div class="course-material-author">
-              ${avatar}
+        <div
+          class="course-material-row-main is-disabled"
+        >
+          ${content}
+        </div>
+      `;
+    }
 
-              <div class="course-material-author-copy">
-                <strong>${uploaderName}</strong>
+    function buildGroupMetadata(material) {
+      const uploadDate =
+        formatMaterialUploadDate(
+          material.createdAt
+        ).replace(
+          /^Uploaded\s+/,
+          ""
+        );
 
-                <small class="course-material-upload-date">
-                  ${escapeMaterialText(uploadDate)}
-                </small>
-              </div>
-            </div>
-          </div>
+      return [
+        material.professor ||
+          "Professor not listed",
+        material.semester ||
+          "Semester not listed",
+        material.uploaderDisplayName ||
+          "AUC student",
+        uploadDate
+      ]
+        .map(function (value) {
+          return escapeMaterialText(value);
+        })
+        .join(" · ");
+    }
 
-          <h3 class="course-material-title">
-            ${escapeMaterialText(
-              material.title || "Course material"
-            )}
-          </h3>
+    function buildSingleRow(group) {
+      const material = group.material;
+      const files = group.files;
+      const fileView = getFileView(
+        files[0],
+        material,
+        files
+      );
+      const title =
+        escapeMaterialText(
+          material.title ||
+          "Course material"
+        );
+      const materialType =
+        escapeMaterialText(
+          material.materialType ||
+          "Material"
+        );
+      const metadata =
+        buildGroupMetadata(material) +
+        " · " +
+        fileView.safeFileSize;
 
-          ${fileMarkup}
+      return `
+        <article class="course-material-row">
+          ${buildPreviewMain(
+            fileView,
+            title,
+            fileView.fileName,
+            metadata,
+            materialType
+          )}
 
-          <div class="course-material-footer">
-            <div class="course-material-context">
-              <span>${escapeMaterialText(
-                material.materialType || "Material"
-              )}</span>
-              <span>${escapeMaterialText(
-                material.professor ||
-                "Professor not listed"
-              )}</span>
-              <span>${escapeMaterialText(
-                material.semester ||
-                "Semester not listed"
-              )}</span>
-            </div>
-
-            ${footerActions}
-          </div>
+          ${buildActions(fileView)}
         </article>
       `;
-    }).join("");
+    }
 
-    list.querySelectorAll(
-      ".course-material-card"
-    ).forEach(function (card) {
-      const more = card.querySelector(
-        ".course-material-more"
-      );
-      const footerDownload = card.querySelector(
-        ".course-material-footer .course-material-download-button"
+    function buildChildRow(
+      fileMaterial,
+      material,
+      files
+    ) {
+      const fileView = getFileView(
+        fileMaterial,
+        material,
+        files
       );
 
-      if (!more || !footerDownload) {
+      return `
+        <div class="course-material-child-row">
+          ${buildPreviewMain(
+            fileView,
+            fileView.fileName,
+            "",
+            fileView.safeFileLabel +
+              " · " +
+              fileView.safeFileSize,
+            ""
+          )}
+
+          ${buildActions(fileView)}
+        </div>
+      `;
+    }
+
+    function buildMultiFileGroup(group) {
+      const material = group.material;
+      const files = group.files;
+      const firstFileView = getFileView(
+        files[0],
+        material,
+        files
+      );
+      const title =
+        escapeMaterialText(
+          material.title ||
+          "Course material"
+        );
+      const materialType =
+        escapeMaterialText(
+          material.materialType ||
+          "Material"
+        );
+      const metadata =
+        buildGroupMetadata(material);
+
+      const fileRows = files
+        .map(function (fileMaterial) {
+          return buildChildRow(
+            fileMaterial,
+            material,
+            files
+          );
+        })
+        .join("");
+
+      return `
+        <details class="course-material-group">
+          <summary
+            class="course-material-group-summary"
+          >
+            ${firstFileView.fileIcon}
+
+            <span class="course-material-group-copy">
+              <span
+                class="course-material-row-title-line"
+              >
+                <strong>${title}</strong>
+                <em>${materialType}</em>
+              </span>
+
+              <small>${metadata}</small>
+            </span>
+
+            <span class="course-material-file-count">
+              ${files.length} files
+            </span>
+
+            <span
+              class="course-material-group-chevron"
+              aria-hidden="true"
+            ></span>
+          </summary>
+
+          <div class="course-material-group-files">
+            ${fileRows}
+          </div>
+        </details>
+      `;
+    }
+
+    function renderMaterialView() {
+      const sortDirection =
+        sortSelect
+          ? sortSelect.value
+          : "newest";
+
+      const filteredGroups =
+        materialGroups
+          .filter(groupMatchesFilter)
+          .slice()
+          .sort(function (
+            firstGroup,
+            secondGroup
+          ) {
+            if (sortDirection === "oldest") {
+              return (
+                firstGroup.latestTime -
+                secondGroup.latestTime
+              );
+            }
+
+            return (
+              secondGroup.latestTime -
+              firstGroup.latestTime
+            );
+          });
+
+      if (!filteredGroups.length) {
+        list.innerHTML =
+          '<p class="course-material-status">No materials match this filter yet.</p>';
         return;
       }
 
-      function updateFooterDownloadButton() {
-        footerDownload.textContent = more.open
-          ? "Download all files"
-          : "Download";
-      }
+      const visibleGroups =
+        filteredGroups.slice(
+          0,
+          visibleCount
+        );
 
-      more.addEventListener(
-        "toggle",
-        updateFooterDownloadButton
-      );
+      const rows = visibleGroups
+        .map(function (group) {
+          return group.files.length > 1
+            ? buildMultiFileGroup(group)
+            : buildSingleRow(group);
+        })
+        .join("");
 
-      footerDownload.addEventListener(
-        "click",
-        function (event) {
-          if (!more.open) {
-            return;
-          }
+      const remainingCount =
+        filteredGroups.length -
+        visibleGroups.length;
 
-          event.preventDefault();
+      const showMoreMarkup =
+        remainingCount > 0
+          ? `
+            <button
+              class="course-material-show-more"
+              type="button"
+              data-material-show-more
+            >
+              Show more
+            </button>
+          `
+          : "";
 
-          const downloadLinks = more.querySelectorAll(
-            ".course-material-more-content .course-material-download-button"
+      list.innerHTML =
+        rows + showMoreMarkup;
+    }
+
+    filterButtons.forEach(
+      function (button) {
+        button.onclick = function () {
+          activeFilter =
+            button.dataset.materialFilter ||
+            "all";
+          visibleCount = pageSize;
+
+          filterButtons.forEach(
+            function (filterButton) {
+              filterButton.setAttribute(
+                "aria-pressed",
+                filterButton === button
+                  ? "true"
+                  : "false"
+              );
+            }
           );
 
-          downloadLinks.forEach(function (link) {
-            const downloadLink =
-              document.createElement("a");
+          renderMaterialView();
+        };
+      }
+    );
 
-            downloadLink.href = link.href;
-            downloadLink.target = "_blank";
-            downloadLink.rel = "noopener";
-            downloadLink.download = "";
+    if (sortSelect) {
+      sortSelect.onchange = function () {
+        visibleCount = pageSize;
+        renderMaterialView();
+      };
+    }
 
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            downloadLink.remove();
-          });
-        }
-      );
+    list.onclick = function (event) {
+      const showMoreButton =
+        event.target.closest(
+          "[data-material-show-more]"
+        );
 
-      updateFooterDownloadButton();
-    });
+      if (
+        !showMoreButton ||
+        !list.contains(showMoreButton)
+      ) {
+        return;
+      }
+
+      visibleCount += pageSize;
+      renderMaterialView();
+    };
+
+    renderMaterialView();
   }
 
   function setCourseMaterialsLocked(access, isLocked) {
