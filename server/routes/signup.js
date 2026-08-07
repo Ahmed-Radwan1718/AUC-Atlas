@@ -410,9 +410,16 @@ module.exports = async function handler(req, res) {
     const email = cleanEmail((req.body || {}).email);
     const password = cleanPassword((req.body || {}).password);
     const confirmPassword = cleanPassword((req.body || {}).confirmPassword);
+    const consentAccepted = (req.body || {}).consentAccepted === true;
 
     if (!fullName || !aucId || !phone || !email || !password || !confirmPassword) {
       return res.status(400).json({ error: "Please complete all required fields." });
+    }
+
+    if (!consentAccepted) {
+      return res.status(400).json({
+        error: "You must agree to the Terms of Service and confirm that you have read the Privacy Policy before creating an account."
+      });
     }
 
     ensureAllowedAucEmail(email, "create an account");
