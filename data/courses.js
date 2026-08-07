@@ -3173,6 +3173,134 @@
       `;
     }
 
+    function setupMaterialGroupAnimations() {
+      if (
+        window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches
+      ) {
+        return;
+      }
+
+      list.querySelectorAll(
+        ".course-material-group"
+      ).forEach(function (group) {
+        if (
+          group.dataset.animationReady ===
+          "true"
+        ) {
+          return;
+        }
+
+        const summary = group.querySelector(
+          ".course-material-group-summary"
+        );
+
+        if (!summary) {
+          return;
+        }
+
+        group.dataset.animationReady = "true";
+
+        summary.addEventListener(
+          "click",
+          function (event) {
+            event.preventDefault();
+
+            if (
+              group.dataset.animating ===
+              "true"
+            ) {
+              return;
+            }
+
+            const wasOpen = group.open;
+            const startHeight =
+              group.getBoundingClientRect()
+                .height;
+
+            group.dataset.animating = "true";
+            group.classList.add(
+              "is-animating"
+            );
+
+            if (!wasOpen) {
+              group.open = true;
+
+              const endHeight =
+                group.getBoundingClientRect()
+                  .height;
+
+              const animation =
+                group.animate(
+                  [
+                    {
+                      height:
+                        startHeight + "px"
+                    },
+                    {
+                      height:
+                        endHeight + "px"
+                    }
+                  ],
+                  {
+                    duration: 280,
+                    easing:
+                      "cubic-bezier(0.22, 1, 0.36, 1)"
+                  }
+                );
+
+              animation.onfinish =
+                function () {
+                  group.dataset.animating =
+                    "false";
+                  group.classList.remove(
+                    "is-animating"
+                  );
+                };
+
+              return;
+            }
+
+            const endHeight =
+              summary.getBoundingClientRect()
+                .height + 2;
+
+            const animation =
+              group.animate(
+                [
+                  {
+                    height:
+                      startHeight + "px",
+                    opacity: 1
+                  },
+                  {
+                    height:
+                      endHeight + "px",
+                    opacity: 0.98
+                  }
+                ],
+                {
+                  duration: 240,
+                  easing:
+                    "cubic-bezier(0.4, 0, 0.2, 1)"
+                }
+              );
+
+            animation.onfinish =
+              function () {
+                group.open = false;
+                group.dataset.animating =
+                  "false";
+                group.classList.remove(
+                  "is-animating"
+                );
+              };
+          }
+        );
+      });
+    }
+
     function renderMaterialView() {
       const filteredGroups =
         materialGroups
@@ -3234,11 +3362,63 @@
 
       list.innerHTML =
         rows + showMoreMarkup;
+
+      setupMaterialGroupAnimations();
+    }
+
+    let materialViewAnimationTimer = 0;
+
+    function animateMaterialViewUpdate() {
+      if (
+        window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches
+      ) {
+        renderMaterialView();
+        return;
+      }
+
+      window.clearTimeout(
+        materialViewAnimationTimer
+      );
+
+      list.classList.add("is-changing");
+
+      materialViewAnimationTimer =
+        window.setTimeout(
+          function () {
+            renderMaterialView();
+
+            window.requestAnimationFrame(
+              function () {
+                window.requestAnimationFrame(
+                  function () {
+                    list.classList.remove(
+                      "is-changing"
+                    );
+                  }
+                );
+              }
+            );
+          },
+          140
+        );
     }
 
     filterButtons.forEach(
       function (button) {
         button.onclick = function () {
+          if (
+            activeFilter ===
+            (
+              button.dataset
+                .materialFilter ||
+              "all"
+            )
+          ) {
+            return;
+          }
+
           activeFilter =
             button.dataset.materialFilter ||
             "all";
@@ -3255,7 +3435,7 @@
             }
           );
 
-          renderMaterialView();
+          animateMaterialViewUpdate();
         };
       }
     );
@@ -3316,7 +3496,7 @@
 
             visibleCount = pageSize;
             closeSortMenu();
-            renderMaterialView();
+            animateMaterialViewUpdate();
           };
         }
       );
@@ -3355,7 +3535,7 @@
       }
 
       visibleCount += pageSize;
-      renderMaterialView();
+      animateMaterialViewUpdate();
     };
 
     renderMaterialView();
