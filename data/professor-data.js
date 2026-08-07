@@ -2085,16 +2085,13 @@
       }
 
       .review-submit-button {
-        position: sticky;
-        bottom: 0;
-        z-index: 20;
+        position: static;
         width: 100%;
         min-height: 52px;
         grid-column: 1 / -1;
         margin-top: 10px;
         flex-shrink: 0;
         box-shadow:
-          0 -8px 18px rgba(255, 255, 255, 0.88),
           0 10px 26px rgba(42, 32, 20, 0.14);
       }
 
