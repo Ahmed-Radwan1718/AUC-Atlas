@@ -1770,7 +1770,8 @@
       }
     }
 
-    body.material-preview-open {
+    body.material-preview-open,
+    body.content-report-open {
       overflow: hidden;
     }
 
@@ -1937,6 +1938,221 @@
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
+    }
+
+    .course-report-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3100;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .course-report-modal[hidden] {
+      display: none;
+    }
+
+    .course-report-backdrop {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: rgba(23, 23, 23, 0.58);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor: pointer;
+    }
+
+    .course-report-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(520px, 100%);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 26px;
+      background: #f7f4ee;
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.3);
+    }
+
+    .course-report-header {
+      padding: 24px 24px 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .course-report-header-copy {
+      min-width: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .course-report-kicker {
+      margin: 0;
+      color: rgba(145, 101, 35, 0.9);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .course-report-header h2 {
+      margin: 0;
+      color: #171717;
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .course-report-header-copy > p:last-child {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.65;
+    }
+
+    .course-report-close {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.68);
+      color: #171717;
+      font: inherit;
+      font-size: 21px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .course-report-form {
+      padding: 0 24px 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .course-report-field {
+      display: grid;
+      gap: 9px;
+    }
+
+    .course-report-field > span {
+      color: #171717;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .course-report-field textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 14px 15px;
+      resize: vertical;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 16px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      font: inherit;
+      font-size: 14px;
+      line-height: 1.6;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .course-report-field textarea:focus {
+      border-color: rgba(192, 154, 92, 0.68);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .course-report-status {
+      min-height: 0;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .course-report-status:empty {
+      display: none;
+    }
+
+    .course-report-status.error {
+      color: #9f2f2f;
+    }
+
+    .course-report-actions {
+      padding-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .course-report-cancel,
+    .course-report-submit {
+      min-height: 44px;
+      padding: 0 17px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .course-report-cancel {
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      background: transparent;
+      color: rgba(23, 23, 23, 0.68);
+    }
+
+    .course-report-submit {
+      border: 0;
+      background: #171717;
+      color: #ffffff;
+    }
+
+    .course-report-submit:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    @media (max-width: 560px) {
+      .course-report-modal {
+        padding: 14px;
+      }
+
+      .course-report-dialog {
+        border-radius: 22px;
+      }
+
+      .course-report-header {
+        padding: 20px 18px 16px;
+      }
+
+      .course-report-form {
+        padding: 0 18px 18px;
+      }
+
+      .course-report-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .course-report-cancel,
+      .course-report-submit {
+        width: 100%;
+      }
     }
 
     .course-material-status {
@@ -3707,6 +3923,79 @@
           rel="noopener"
         >Download original</a>
       </footer>
+    </section>
+  </div>
+
+  <div
+    class="course-report-modal"
+    id="course-report-modal"
+    hidden
+  >
+    <button
+      class="course-report-backdrop"
+      type="button"
+      aria-label="Close report panel"
+      data-close-course-report
+    ></button>
+
+    <section
+      class="course-report-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="course-report-title"
+    >
+      <header class="course-report-header">
+        <div class="course-report-header-copy">
+          <p class="course-report-kicker">Content moderation</p>
+          <h2 id="course-report-title">Report material</h2>
+          <p id="course-report-copy">
+            Tell us what is wrong with this course material. Our moderators will review your report.
+          </p>
+        </div>
+
+        <button
+          class="course-report-close"
+          type="button"
+          aria-label="Close report panel"
+          data-close-course-report
+        >×</button>
+      </header>
+
+      <form
+        class="course-report-form"
+        id="course-report-form"
+      >
+        <label class="course-report-field">
+          <span>Reason for report</span>
+          <textarea
+            id="course-report-reason"
+            name="reason"
+            maxlength="1000"
+            placeholder="Describe the issue with this material..."
+            required
+          ></textarea>
+        </label>
+
+        <p
+          class="course-report-status"
+          id="course-report-status"
+          aria-live="polite"
+        ></p>
+
+        <div class="course-report-actions">
+          <button
+            class="course-report-cancel"
+            type="button"
+            data-close-course-report
+          >Cancel</button>
+
+          <button
+            class="course-report-submit"
+            id="course-report-submit"
+            type="submit"
+          >Submit report</button>
+        </div>
+      </form>
     </section>
   </div>
 
