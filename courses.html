@@ -2056,6 +2056,11 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       cursor: pointer;
+      animation:
+        courseReportBackdropIn
+        0.24s
+        ease
+        both;
     }
 
     .course-report-dialog {
@@ -2067,6 +2072,40 @@
       border-radius: 26px;
       background: #f7f4ee;
       box-shadow: 0 40px 120px rgba(0, 0, 0, 0.3);
+      animation:
+        courseReportDialogIn
+        0.3s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+    }
+
+    @keyframes courseReportBackdropIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes courseReportDialogIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-report-backdrop,
+      .course-report-dialog {
+        animation: none;
+      }
     }
 
     .course-report-header {
