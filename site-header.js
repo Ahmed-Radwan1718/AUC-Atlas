@@ -7,6 +7,13 @@
 
   const isAdminPage = /\/admin(?:\.html)?\/?$/.test(window.location.pathname);
 
+  if (!isAdminPage && !document.querySelector('link[href="site-theme.css"]')) {
+    const themeLink = document.createElement("link");
+    themeLink.rel = "stylesheet";
+    themeLink.href = "site-theme.css";
+    document.head.appendChild(themeLink);
+  }
+
   function createUniqueVisitorId() {
     if (
       window.crypto &&
