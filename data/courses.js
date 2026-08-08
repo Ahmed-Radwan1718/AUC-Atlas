@@ -2648,6 +2648,98 @@
       return;
     }
 
+    function setupMaterialFilterChoice(onFilterChange) {
+      if (
+        !filterChoice ||
+        !filterButton ||
+        !filterOptions.length
+      ) {
+        return;
+      }
+
+      function closeFilterMenu() {
+        filterChoice.classList.remove("open");
+        filterButton.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+      }
+
+      filterButton.onclick = function () {
+        const shouldOpen =
+          !filterChoice.classList.contains(
+            "open"
+          );
+
+        closeMaterialChoiceMenus(filterChoice);
+        filterChoice.classList.toggle(
+          "open",
+          shouldOpen
+        );
+
+        filterButton.setAttribute(
+          "aria-expanded",
+          shouldOpen ? "true" : "false"
+        );
+      };
+
+      filterOptions.forEach(
+        function (option) {
+          option.onclick = function () {
+            const nextFilter =
+              option.dataset
+                .materialFilterOption ||
+              "all";
+
+            activeFilter = nextFilter;
+            filterButton.dataset.materialFilterValue =
+              activeFilter;
+            filterButton.textContent =
+              option.textContent.trim();
+            visibleCount = pageSize;
+
+            filterOptions.forEach(
+              function (filterOption) {
+                filterOption.setAttribute(
+                  "aria-selected",
+                  filterOption === option
+                    ? "true"
+                    : "false"
+                );
+              }
+            );
+
+            closeFilterMenu();
+
+            if (typeof onFilterChange === "function") {
+              onFilterChange();
+            }
+          };
+        }
+      );
+
+      filterChoice.onfocusout = function () {
+        window.setTimeout(function () {
+          if (
+            !filterChoice.contains(
+              document.activeElement
+            )
+          ) {
+            closeFilterMenu();
+          }
+        }, 0);
+      };
+
+      filterChoice.onkeydown = function (event) {
+        if (event.key === "Escape") {
+          closeFilterMenu();
+          filterButton.focus();
+        }
+      };
+    }
+
+    setupMaterialFilterChoice(null);
+
     if (!materials.length) {
       list.innerHTML =
         '<p class="course-material-status">No course files shared yet.</p>';
@@ -3373,92 +3465,7 @@
         );
     }
 
-    if (
-      filterChoice &&
-      filterButton &&
-      filterOptions.length
-    ) {
-      function closeFilterMenu() {
-        filterChoice.classList.remove("open");
-        filterButton.setAttribute(
-          "aria-expanded",
-          "false"
-        );
-      }
-
-      filterButton.onclick = function () {
-        const shouldOpen =
-          !filterChoice.classList.contains(
-            "open"
-          );
-
-        filterChoice.classList.toggle(
-          "open",
-          shouldOpen
-        );
-
-        filterButton.setAttribute(
-          "aria-expanded",
-          shouldOpen ? "true" : "false"
-        );
-      };
-
-      filterOptions.forEach(
-        function (option) {
-          option.onclick = function () {
-            const nextFilter =
-              option.dataset
-                .materialFilterOption ||
-              "all";
-
-            if (activeFilter === nextFilter) {
-              closeFilterMenu();
-              return;
-            }
-
-            activeFilter = nextFilter;
-            filterButton.dataset.materialFilterValue =
-              activeFilter;
-            filterButton.textContent =
-              option.textContent.trim();
-            visibleCount = pageSize;
-
-            filterOptions.forEach(
-              function (filterOption) {
-                filterOption.setAttribute(
-                  "aria-selected",
-                  filterOption === option
-                    ? "true"
-                    : "false"
-                );
-              }
-            );
-
-            closeFilterMenu();
-            animateMaterialViewUpdate();
-          };
-        }
-      );
-
-      filterChoice.onfocusout = function () {
-        window.setTimeout(function () {
-          if (
-            !filterChoice.contains(
-              document.activeElement
-            )
-          ) {
-            closeFilterMenu();
-          }
-        }, 0);
-      };
-
-      filterChoice.onkeydown = function (event) {
-        if (event.key === "Escape") {
-          closeFilterMenu();
-          filterButton.focus();
-        }
-      };
-    }
+    setupMaterialFilterChoice(animateMaterialViewUpdate);
 
     list.onclick = function (event) {
       const showMoreButton =
