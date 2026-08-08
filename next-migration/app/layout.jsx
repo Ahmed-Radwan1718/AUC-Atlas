@@ -12,7 +12,9 @@ export const metadata = {
 const navItems = [
   { href: "/professors", label: "Professors" },
   { href: "/courses", label: "Courses" },
-  { href: "/gpa-calculator", label: "GPA Calculator" }
+  { href: "/gpa-calculator", label: "GPA Calculator" },
+  { href: "/degree-progression", label: "Degree Progression" },
+  { href: "/faq", label: "FAQ" }
 ];
 
 export default function RootLayout({ children }) {
