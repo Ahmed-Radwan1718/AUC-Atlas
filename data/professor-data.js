@@ -4024,44 +4024,13 @@
       );
     }
 
-    function getOriginTransform(triggerRect) {
-      const modalRect = form.getBoundingClientRect();
-
-      const buttonCenterX =
-        triggerRect.left + triggerRect.width / 2;
-      const buttonCenterY =
-        triggerRect.top + triggerRect.height / 2;
-      const modalCenterX =
-        modalRect.left + modalRect.width / 2;
-      const modalCenterY =
-        modalRect.top + modalRect.height / 2;
-
-      const originStrength =
-        mobileViewport.matches ? 0.2 : 0.88;
-
-      const x =
-        (buttonCenterX - modalCenterX) *
-        originStrength;
-      const y =
-        (buttonCenterY - modalCenterY) *
-        originStrength;
-
-      const scale =
-        mobileViewport.matches ? 0.94 : 0.68;
-
+    function getOriginTransform() {
       return {
         transform:
-          "translate(calc(-50% + " +
-          x +
-          "px), calc(-50% + " +
-          y +
-          "px)) scale(" +
-          scale +
-          ")",
+          "translate(-50%, calc(-50% + 10px)) scale(0.985)",
         radius:
-          mobileViewport.matches
-            ? "32px"
-            : "999px"
+          window.getComputedStyle(form)
+            .borderRadius || "24px"
       };
     }
 
