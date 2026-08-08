@@ -1,4 +1,4 @@
-import Link from "next/link";
+import CoursesBrowser from "./CoursesBrowser";
 
 export const metadata = {
   title: "Courses",
