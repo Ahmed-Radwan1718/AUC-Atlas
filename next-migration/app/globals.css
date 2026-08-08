@@ -525,6 +525,150 @@ a {
   font-size: 0.78rem;
 }
 
+.professors-page-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 82px 0 104px;
+}
+
+.professors-hero {
+  margin-bottom: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
+  gap: 32px;
+  align-items: end;
+}
+
+.professors-hero h1 {
+  max-width: 760px;
+  margin: 0;
+  color: var(--atlas-ink);
+  font-size: clamp(3rem, 6vw, 5.6rem);
+  font-weight: 820;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+
+.professors-hero p {
+  margin: 0;
+  color: var(--atlas-muted);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.professor-filter-card {
+  min-height: 92px;
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid var(--atlas-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 18px 48px rgba(42, 32, 20, 0.09);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, auto);
+  gap: 18px;
+  align-items: center;
+}
+
+.professor-filter-card > div:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.professor-filter-card span,
+.professor-profile-card > .professor-card-copy > span {
+  color: var(--atlas-accent);
+  font-size: 0.82rem;
+  font-weight: 820;
+}
+
+.professor-filter-card strong {
+  color: var(--atlas-ink);
+  font-size: 1.05rem;
+}
+
+.professor-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.professor-filter-chips button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid rgba(23, 23, 23, 0.08);
+  border-radius: 999px;
+  background: rgba(247, 243, 235, 0.72);
+  color: rgba(23, 23, 23, 0.72);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.professor-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.professor-profile-card {
+  min-height: 360px;
+  padding: 22px;
+  border: 1px solid var(--atlas-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 48px rgba(42, 32, 20, 0.09);
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+
+.professor-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, rgba(168, 121, 56, 0.18), rgba(23, 23, 23, 0.06)),
+    rgba(255, 255, 255, 0.78);
+  color: var(--atlas-accent);
+  font-size: 1.3rem;
+  font-weight: 820;
+  display: grid;
+  place-items: center;
+}
+
+.professor-card-copy h2 {
+  margin: 7px 0 0;
+  color: var(--atlas-ink);
+  font-size: 1.35rem;
+  line-height: 1.14;
+}
+
+.professor-card-copy p {
+  margin: 12px 0 0;
+  color: var(--atlas-muted);
+  font-size: 0.95rem;
+  line-height: 1.62;
+}
+
+.professor-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.professor-card-meta span {
+  padding: 8px 10px;
+  border: 1px solid rgba(23, 23, 23, 0.08);
+  border-radius: 999px;
+  background: rgba(247, 243, 235, 0.74);
+  color: rgba(23, 23, 23, 0.62);
+  font-size: 0.78rem;
+  font-weight: 720;
+}
+
 .atlas-footer {
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
@@ -547,20 +691,24 @@ a {
   }
 
   .home-page-shell,
-  .courses-page-shell {
+  .courses-page-shell,
+  .professors-page-shell {
     padding: 54px 0 84px;
   }
 
   .home-hero-grid,
   .courses-hero,
-  .course-browser-layout {
+  .professors-hero,
+  .course-browser-layout,
+  .professor-filter-card {
     min-height: 0;
     grid-template-columns: 1fr;
     gap: 24px;
   }
 
   .home-hero-copy h1,
-  .courses-hero h1 {
+  .courses-hero h1,
+  .professors-hero h1 {
     font-size: clamp(2.75rem, 15vw, 4.8rem);
   }
 
@@ -573,6 +721,10 @@ a {
   .home-search-preview a,
   .course-search-card a {
     justify-content: center;
+  }
+
+  .professor-filter-chips {
+    justify-content: flex-start;
   }
 
   .course-filter-rail {
@@ -588,7 +740,8 @@ a {
   }
 
   .home-stat-grid,
-  .feature-grid {
+  .feature-grid,
+  .professor-grid {
     grid-template-columns: 1fr;
   }
 
