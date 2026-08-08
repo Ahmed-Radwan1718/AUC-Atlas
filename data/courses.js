@@ -3392,118 +3392,89 @@
         );
     }
 
-    filterButtons.forEach(
-      function (button) {
-        button.onclick = function () {
-          if (
-            activeFilter ===
-            (
-              button.dataset
-                .materialFilter ||
-              "all"
-            )
-          ) {
-            return;
-          }
-
-          activeFilter =
-            button.dataset.materialFilter ||
-            "all";
-          visibleCount = pageSize;
-
-          filterButtons.forEach(
-            function (filterButton) {
-              filterButton.setAttribute(
-                "aria-pressed",
-                filterButton === button
-                  ? "true"
-                  : "false"
-              );
-            }
-          );
-
-          animateMaterialViewUpdate();
-        };
-      }
-    );
-
     if (
-      sortChoice &&
-      sortButton &&
-      sortOptions.length
+      filterChoice &&
+      filterButton &&
+      filterOptions.length
     ) {
-      function closeSortMenu() {
-        sortChoice.classList.remove("open");
-        sortButton.setAttribute(
+      function closeFilterMenu() {
+        filterChoice.classList.remove("open");
+        filterButton.setAttribute(
           "aria-expanded",
           "false"
         );
       }
 
-      sortButton.onclick = function () {
+      filterButton.onclick = function () {
         const shouldOpen =
-          !sortChoice.classList.contains(
+          !filterChoice.classList.contains(
             "open"
           );
 
-        sortChoice.classList.toggle(
+        filterChoice.classList.toggle(
           "open",
           shouldOpen
         );
 
-        sortButton.setAttribute(
+        filterButton.setAttribute(
           "aria-expanded",
           shouldOpen ? "true" : "false"
         );
       };
 
-      sortOptions.forEach(
+      filterOptions.forEach(
         function (option) {
           option.onclick = function () {
-            sortDirection =
+            const nextFilter =
               option.dataset
-                .materialSortOption ||
-              "newest";
+                .materialFilterOption ||
+              "all";
 
-            sortButton.dataset.sortValue =
-              sortDirection;
-            sortButton.textContent =
+            if (activeFilter === nextFilter) {
+              closeFilterMenu();
+              return;
+            }
+
+            activeFilter = nextFilter;
+            filterButton.dataset.materialFilterValue =
+              activeFilter;
+            filterButton.textContent =
               option.textContent.trim();
+            visibleCount = pageSize;
 
-            sortOptions.forEach(
-              function (sortOption) {
-                sortOption.setAttribute(
+            filterOptions.forEach(
+              function (filterOption) {
+                filterOption.setAttribute(
                   "aria-selected",
-                  sortOption === option
+                  filterOption === option
                     ? "true"
                     : "false"
                 );
               }
             );
 
-            visibleCount = pageSize;
-            closeSortMenu();
+            closeFilterMenu();
             animateMaterialViewUpdate();
           };
         }
       );
 
-      sortChoice.onfocusout = function () {
+      filterChoice.onfocusout = function () {
         window.setTimeout(function () {
           if (
-            !sortChoice.contains(
+            !filterChoice.contains(
               document.activeElement
             )
           ) {
-            closeSortMenu();
+            closeFilterMenu();
           }
         }, 0);
       };
 
-      sortChoice.onkeydown = function (event) {
+      filterChoice.onkeydown = function (event) {
         if (event.key === "Escape") {
-          closeSortMenu();
-          sortButton.focus();
+          closeFilterMenu();
+          filterButton.focus();
         }
       };
     }
