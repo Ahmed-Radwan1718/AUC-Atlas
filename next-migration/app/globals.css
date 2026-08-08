@@ -986,6 +986,105 @@ a {
   margin-top: 4px;
 }
 
+.auth-form button:disabled {
+  opacity: 0.62;
+  cursor: wait;
+}
+
+.auth-form-note,
+.auth-secondary-links,
+.auth-message {
+  color: var(--atlas-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.auth-secondary-links {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.auth-secondary-links a,
+.auth-consent a {
+  color: var(--atlas-accent);
+  font-weight: 820;
+}
+
+.auth-form .auth-consent {
+  color: var(--atlas-muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.auth-form .auth-consent input {
+  width: 16px;
+  min-height: 16px;
+  margin-top: 3px;
+  padding: 0;
+  accent-color: var(--atlas-accent);
+}
+
+.auth-message {
+  min-height: 22px;
+  margin: 0;
+  font-weight: 720;
+}
+
+.auth-message.error {
+  color: #9d3b3b;
+}
+
+.auth-message.success {
+  color: #426d43;
+}
+
+.auth-form .auth-link-button {
+  border: 0;
+  background: transparent;
+  color: var(--atlas-accent);
+  font-weight: 820;
+}
+
+.auth-two-factor-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  padding: 22px;
+  background: rgba(23, 23, 23, 0.34);
+  backdrop-filter: blur(14px);
+  display: grid;
+  place-items: center;
+}
+
+.auth-two-factor-card {
+  width: min(520px, 100%);
+  padding: 26px;
+  border: 1px solid var(--atlas-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 28px 70px rgba(42, 32, 20, 0.22);
+}
+
+.auth-two-factor-card h2 {
+  margin: 0;
+  color: var(--atlas-ink);
+  font-size: 2rem;
+  line-height: 1.08;
+}
+
+.auth-two-factor-card p {
+  color: var(--atlas-muted);
+  line-height: 1.68;
+}
+
+.auth-two-factor-actions {
+  display: grid;
+  gap: 10px;
+}
+
 .auth-switch {
   margin-top: 18px;
   padding-top: 18px;
@@ -1010,6 +1109,42 @@ a {
 .account-section-card {
   min-height: 230px;
   padding: 22px;
+}
+
+.account-wide-card {
+  grid-column: 1 / -1;
+}
+
+.account-form {
+  margin-top: 18px;
+}
+
+.account-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.account-detail-grid input[readonly] {
+  color: rgba(23, 23, 23, 0.56);
+  cursor: default;
+}
+
+.account-actions {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.account-danger-button {
+  color: #9d3b3b;
+}
+
+@media (max-width: 900px) {
+  .account-detail-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .atlas-footer {
