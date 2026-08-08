@@ -3671,6 +3671,48 @@
         transform 0.2s ease;
     }
 
+    .course-recent-card-top {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .course-recent-file-icon-image,
+    .course-recent-file-icon-fallback {
+      width: 40px;
+      height: 48px;
+      flex: 0 0 40px;
+    }
+
+    .course-recent-file-icon-image {
+      object-fit: contain;
+      display: block;
+    }
+
+    .course-recent-file-icon-fallback {
+      box-sizing: border-box;
+      padding: 5px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 9px;
+      background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.98),
+        rgba(237, 231, 220, 0.96)
+      );
+      color: rgba(145, 101, 35, 0.96);
+      display: grid;
+      place-items: end center;
+    }
+
+    .course-recent-file-icon-fallback strong {
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
     .course-recent-type {
       color: rgba(192, 154, 92, 0.96);
       font-size: 10px;
