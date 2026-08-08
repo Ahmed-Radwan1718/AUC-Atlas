@@ -1155,7 +1155,7 @@
     });
   }
 
-  const popularCourseCodes = [
+  const fallbackPopularCourseCodes = [
     "MACT 1121",
     "CSCE 1001",
     "PHYS 1011",
@@ -1165,6 +1165,7 @@
     "MKTG 2101",
     "BADM 2001"
   ];
+  const recordedCourseViews = new Set();
 
   function getCourseByCode(courseCode) {
     const normalizedCode = normalizeCourseCode(courseCode);
@@ -1174,17 +1175,29 @@
     });
   }
 
-  function renderPopularCourses() {
-    const root = document.getElementById("course-popular-grid");
+  function getPopularCoursesForDisplay(courseCodes) {
+    const seenCodes = new Set();
 
-    if (!root) {
-      return;
-    }
-
-    const popularCourses = popularCourseCodes
+    return courseCodes
       .map(getCourseByCode)
-      .filter(Boolean);
+      .filter(function (course) {
+        if (!course) {
+          return false;
+        }
 
+        const normalizedCode = normalizeCourseCode(course.code);
+
+        if (seenCodes.has(normalizedCode)) {
+          return false;
+        }
+
+        seenCodes.add(normalizedCode);
+        return true;
+      })
+      .slice(0, 8);
+  }
+
+  function renderPopularCourseCards(root, popularCourses) {
     root.innerHTML = popularCourses.map(function (course) {
       return `
         <a
@@ -1202,6 +1215,112 @@
         </a>
       `;
     }).join("");
+  }
+
+  async function renderPopularCourses() {
+    const root = document.getElementById("course-popular-grid");
+
+    if (!root) {
+      return;
+    }
+
+    renderPopularCourseCards(
+      root,
+      getPopularCoursesForDisplay(fallbackPopularCourseCodes)
+    );
+
+    try {
+      const response = await fetch(
+        "/api/course-popularity",
+        {
+          method: "GET",
+          credentials: "same-origin"
+        }
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+          "Could not load popular courses."
+        );
+      }
+
+      const rankedCourseCodes =
+        Array.isArray(data.popularCourses)
+          ? data.popularCourses
+              .map(function (item) {
+                return normalizeCourseCode(
+                  item && item.courseCode
+                );
+              })
+              .filter(Boolean)
+          : [];
+
+      renderPopularCourseCards(
+        root,
+        getPopularCoursesForDisplay(
+          rankedCourseCodes.concat(
+            fallbackPopularCourseCodes
+          )
+        )
+      );
+    } catch (error) {
+      // Keep the fallback courses visible if popularity data is unavailable.
+    }
+  }
+
+  async function recordCourseView(courseCode) {
+    const normalizedCode = normalizeCourseCode(courseCode);
+
+    if (
+      !normalizedCode ||
+      recordedCourseViews.has(normalizedCode)
+    ) {
+      return;
+    }
+
+    const storageKey =
+      "aucAtlasCourseView:" + normalizedCode;
+
+    try {
+      if (window.sessionStorage.getItem(storageKey) === "1") {
+        recordedCourseViews.add(normalizedCode);
+        return;
+      }
+    } catch (error) {
+      // In-memory tracking still prevents duplicate counts on this page.
+    }
+
+    recordedCourseViews.add(normalizedCode);
+
+    try {
+      const response = await fetch(
+        "/api/course-popularity",
+        {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            courseCode: normalizedCode
+          })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Could not record the course view.");
+      }
+
+      try {
+        window.sessionStorage.setItem(storageKey, "1");
+      } catch (error) {
+        // The view was recorded even if browser storage is unavailable.
+      }
+    } catch (error) {
+      recordedCourseViews.delete(normalizedCode);
+    }
   }
 
   function renderRecentMaterials(materials) {
@@ -3688,6 +3807,7 @@
       prerequisiteRow.hidden = !selectedCourse.prerequisite;
     }
 
+    recordCourseView(selectedCourse.code);
     loadCourseProfessors(selectedCourse);
     setupCourseMaterialsAccess(selectedCourse);
 
