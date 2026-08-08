@@ -40,7 +40,7 @@
         margin-bottom: 10px;
         color: #171717;
         font-weight: 700;
-        letter-spacing: 0;
+        letter-spacing: -0.02em;
         display: inline-flex;
         align-items: baseline;
         gap: 4px;
@@ -60,15 +60,14 @@
       .site-footer-bottom p {
         color: rgba(23, 23, 23, 0.62);
         font-size: 14px;
-        font-weight: 400;
-        line-height: 1.65;
+        line-height: 1.7;
       }
 
       .site-footer-column h3 {
         margin-bottom: 13px;
         color: rgba(192, 154, 92, 0.9);
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 800;
         letter-spacing: 0.14em;
         text-transform: uppercase;
       }
@@ -83,8 +82,7 @@
       .site-footer-links a:visited {
         color: rgba(23, 23, 23, 0.64);
         font-size: 14px;
-        font-weight: 600;
-        line-height: 1.45;
+        font-weight: 700;
         text-decoration: none;
       }
 
