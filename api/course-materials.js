@@ -309,7 +309,7 @@ async function getCourseMaterials(courseCode) {
   return materials;
 }
 
-async function getRecentCourseMaterials(limit) {
+async function getRandomCourseMaterials(limit) {
   const safeLimit = Math.max(
     1,
     Math.min(
@@ -320,11 +320,9 @@ async function getRecentCourseMaterials(limit) {
 
   const snapshot = await admin.firestore()
     .collection("courseMaterials")
-    .orderBy("createdAt", "desc")
-    .limit(100)
     .get();
 
-  const materials = [];
+  const groupsByKey = new Map();
 
   snapshot.forEach(function (doc) {
     const material = serializeMaterial(doc);
@@ -333,31 +331,44 @@ async function getRecentCourseMaterials(limit) {
       40
     ).toLowerCase();
 
-    if (status !== "rejected") {
-      materials.push(material);
+    if (status === "rejected") {
+      return;
     }
-  });
 
-  materials.sort(function (a, b) {
-    return (
-      getTimestampMillis(b.createdAt) -
-      getTimestampMillis(a.createdAt)
-    );
-  });
-
-  const seenGroups = new Set();
-  const groupedMaterials = materials.filter(function (material) {
     const groupKey =
       cleanString(material.uploadGroupId, 80) ||
       material.id;
+    const currentMaterial =
+      groupsByKey.get(groupKey);
 
-    if (seenGroups.has(groupKey)) {
-      return false;
+    if (
+      !currentMaterial ||
+      getTimestampMillis(material.createdAt) >
+        getTimestampMillis(currentMaterial.createdAt)
+    ) {
+      groupsByKey.set(groupKey, material);
     }
-
-    seenGroups.add(groupKey);
-    return true;
   });
+
+  const groupedMaterials =
+    Array.from(groupsByKey.values());
+
+  for (
+    let index = groupedMaterials.length - 1;
+    index > 0;
+    index -= 1
+  ) {
+    const randomIndex = Math.floor(
+      Math.random() * (index + 1)
+    );
+    const randomMaterial =
+      groupedMaterials[randomIndex];
+
+    groupedMaterials[randomIndex] =
+      groupedMaterials[index];
+    groupedMaterials[index] =
+      randomMaterial;
+  }
 
   return groupedMaterials.slice(0, safeLimit);
 }
@@ -872,7 +883,7 @@ module.exports = async function handler(req, res) {
     if (req.method === "GET") {
       const query = req.query || {};
       const mine = String(query.mine || "").toLowerCase() === "true";
-      const recent = String(query.recent || "").toLowerCase() === "true";
+      const random = String(query.random || "").toLowerCase() === "true";
 
       if (mine) {
         return res.status(200).json({
@@ -880,9 +891,9 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      if (recent) {
+      if (random) {
         return res.status(200).json({
-          materials: await getRecentCourseMaterials(query.limit)
+          materials: await getRandomCourseMaterials(query.limit)
         });
       }
 
