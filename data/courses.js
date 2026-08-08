@@ -1321,7 +1321,7 @@
 
     try {
       const response = await fetch(
-        "/api/course-materials?recent=true&limit=6",
+        "/api/course-materials?random=true&limit=6",
         {
           credentials: "same-origin",
           cache: "no-store",
@@ -1338,7 +1338,7 @@
       if (response.status === 401 || response.status === 403) {
         root.innerHTML = `
           <div class="course-recent-status">
-            <strong>Sign in to view recent materials.</strong>
+            <strong>Sign in to view course materials.</strong>
             <p>Course files are available to students with a verified AUC email.</p>
             <a href="login.html">Log in</a>
           </div>
@@ -1347,14 +1347,14 @@
       }
 
       if (!response.ok) {
-        throw new Error(data.error || "Could not load recent materials.");
+        throw new Error(data.error || "Could not load course materials.");
       }
 
       renderRecentMaterials(data.materials);
     } catch (error) {
       root.innerHTML = `
         <div class="course-recent-status">
-          <strong>Recent materials are unavailable right now.</strong>
+          <strong>Course materials are unavailable right now.</strong>
           <p>Please try again later.</p>
         </div>
       `;
