@@ -452,6 +452,40 @@ a {
   cursor: pointer;
 }
 
+.course-filter-rail button:hover,
+.course-filter-rail button[aria-pressed="true"] {
+  border-color: rgba(168, 121, 56, 0.38);
+  background: var(--atlas-accent-soft);
+  color: var(--atlas-ink);
+}
+
+.atlas-search-input {
+  min-height: 48px;
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid rgba(23, 23, 23, 0.1);
+  border-radius: 12px;
+  background: rgba(247, 243, 235, 0.58);
+  color: var(--atlas-ink);
+  font: inherit;
+}
+
+.atlas-search-input:focus {
+  border-color: rgba(168, 121, 56, 0.46);
+  outline: 0;
+  box-shadow: 0 0 0 4px rgba(168, 121, 56, 0.12);
+}
+
+.course-empty-state,
+.professor-empty-state {
+  padding: 22px;
+  border: 1px dashed rgba(23, 23, 23, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--atlas-muted);
+  text-align: center;
+}
+
 .course-list-panel {
   padding: 22px;
 }
@@ -607,6 +641,30 @@ a {
   cursor: pointer;
 }
 
+.professor-filter-chips button:hover,
+.professor-filter-chips button[aria-pressed="true"] {
+  border-color: rgba(168, 121, 56, 0.38);
+  background: var(--atlas-accent-soft);
+  color: var(--atlas-ink);
+}
+
+.professor-filter-card-searchable {
+  grid-template-columns: 1fr;
+}
+
+.professor-filter-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.professor-filter-card-searchable .professor-filter-chips {
+  justify-content: flex-start;
+}
+
+.professor-empty-state {
+  grid-column: 1 / -1;
+}
+
 .professor-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -637,6 +695,35 @@ a {
   font-weight: 820;
   display: grid;
   place-items: center;
+}
+
+.professor-image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.18;
+  overflow: hidden;
+  border-radius: 16px;
+  background:
+    linear-gradient(145deg, rgba(168, 121, 56, 0.18), rgba(23, 23, 23, 0.06)),
+    rgba(255, 255, 255, 0.78);
+  display: grid;
+  place-items: center;
+}
+
+.professor-image-fallback {
+  color: var(--atlas-accent);
+  font-size: 1.5rem;
+  font-weight: 820;
+}
+
+.professor-profile-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center 18%;
 }
 
 .professor-card-copy h2 {
