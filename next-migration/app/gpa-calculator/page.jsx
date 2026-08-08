@@ -2,10 +2,6 @@
 
 import { useMemo, useState } from "react";
 
-export const metadata = {
-  title: "GPA Calculator"
-};
-
 const gradeOptions = [
   ["A", 4],
   ["A-", 3.7],
