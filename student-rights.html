@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Student Rights | AUC Atlas</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .info-page {
+      min-height: 100vh;
+      padding: 126px 0 86px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+      overflow-x: clip;
+    }
+
+    .info-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .info-header {
+      max-width: none;
+      margin: 0 0 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      grid-template-areas:
+        "kicker copy"
+        "title copy";
+      column-gap: 28px;
+      align-items: end;
+    }
+
+    .info-kicker {
+      grid-area: kicker;
+      margin: 0 0 16px;
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .info-header h1 {
+      grid-area: title;
+      max-width: 720px;
+      color: #171717;
+      font-size: clamp(34px, 4.8vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .info-header > p:last-child {
+      grid-area: copy;
+      max-width: 420px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .info-content {
+      padding: 8px 28px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      display: grid;
+      gap: 0;
+    }
+
+    .info-section {
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: transparent;
+    }
+
+    .info-section:last-child {
+      border-bottom: 0;
+    }
+
+    .info-section h2 {
+      margin: 0;
+      color: #171717;
+      font-size: inherit;
+      line-height: inherit;
+    }
+
+    .info-toggle {
+      width: 100%;
+      padding: 22px 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #171717;
+      font-family: inherit;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .info-toggle:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.9);
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    .info-toggle span:first-child {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+      transition: color 0.2s ease;
+    }
+
+    .info-toggle:hover span:first-child,
+    .info-section.open .info-toggle span:first-child {
+      color: #a67c39;
+    }
+
+    .info-toggle-icon {
+      color: rgba(192, 154, 92, 0.94);
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      transition:
+        transform 0.24s ease,
+        color 0.24s ease;
+    }
+
+    .info-toggle-icon::before,
+    .info-toggle[aria-expanded="true"] .info-toggle-icon::before {
+      content: "+";
+    }
+
+    .info-toggle:hover .info-toggle-icon,
+    .info-section.open .info-toggle-icon {
+      color: #a67c39;
+    }
+
+    .info-section.open .info-toggle-icon {
+      transform: rotate(45deg);
+    }
+
+    .info-answer {
+      max-height: none;
+      padding: 0 56px 24px 0;
+      overflow: hidden;
+      opacity: 1;
+      transition: none;
+      will-change: height, opacity, transform;
+    }
+
+    .info-answer[hidden] {
+      display: none;
+    }
+
+    .info-answer p {
+      max-width: 820px;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .info-answer p + p,
+    .info-answer ul + p,
+    .info-answer p + ul {
+      margin-top: 14px;
+    }
+
+    .info-answer strong {
+      color: rgba(23, 23, 23, 0.82);
+      font-weight: 700;
+    }
+
+    .info-answer a,
+    .info-answer a:visited {
+      color: #a67c39;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .info-answer a:hover {
+      color: #171717;
+    }
+
+    @media (max-width: 760px) {
+      .info-page {
+        padding: 104px 0 64px;
+      }
+
+      .info-inner {
+        width: min(100% - 24px, 1180px);
+      }
+
+      .info-header {
+        margin-bottom: 26px;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "kicker"
+          "title"
+          "copy";
+      }
+
+      .info-header h1 {
+        margin-bottom: 14px;
+      }
+
+      .info-content {
+        padding: 6px 18px;
+        border-radius: 22px;
+      }
+
+      .info-toggle {
+        padding: 20px 0;
+        gap: 16px;
+      }
+
+      .info-toggle span:first-child {
+        font-size: 16px;
+      }
+
+      .info-answer {
+        padding: 0 0 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="site-header-root"></div>
+  <script src="site-header.js"></script>
+
+  <main class="info-page">
+    <div class="info-inner">
+      <section class="info-header">
+        <p class="info-kicker">Student guidance</p>
+        <h1>Student Rights</h1>
+        <p>A practical overview of broad student rights based on published AUC policies and official university resources. Last updated: August 8, 2026.</p>
+      </section>
+
+      <section class="info-content">
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-1"><span>1. Freedom of Speech, Expression and Assembly</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-1" hidden>
+            <p>AUC states that members of its community have freedom of speech, thought, expression and assembly both inside and outside the classroom. Students should not be disciplined or retaliated against simply for exercising protected expression, and controversial opinions are not, by themselves, grounds for restricting speech.</p>
+            <p>AUC may still impose content-neutral restrictions related to safety, access, disruption, University operations and applicable law.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy">AUC Freedom of Expression Policy</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-2"><span>2. Right to Peaceful Protest and Demonstration</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-2" hidden>
+            <p>Students may organize and participate in peaceful demonstrations, rallies and other expressive activities on campus. AUC requires advance notification for planned demonstrations primarily so the University can arrange safety, logistics and access; notification does not mean AUC must approve the students' message.</p>
+            <p>Students may also participate in peaceful counter-demonstrations as long as they do not prevent others from speaking or participating.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-3"><span>3. Right to Petition, Distribute Material and Express Views Publicly</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-3" hidden>
+            <p>AUC allows students to circulate petitions, distribute printed materials and make speeches outside University buildings without obtaining prior approval, provided they follow applicable safety, access and conduct requirements.</p>
+            <p>This means AUC's expression policy protects more than formal demonstrations; it also protects ordinary student advocacy and communication.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy">AUC Freedom of Expression Policy</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-4"><span>4. Freedom of the Student Press</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-4" hidden>
+            <p>AUC specifically extends freedom-of-expression protections to student publications.</p>
+            <p>Student journalism and publications therefore fall within the University's broader commitment to free expression, subject to the same limitations concerning law, safety, harassment, threats and substantial disruption.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy">AUC Freedom of Expression Policy</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-5"><span>5. Right to an Environment Free From Discrimination and Harassment</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-5" hidden>
+            <p>AUC states that students have the right to study in an environment free from prohibited discrimination and harassment.</p>
+            <p>Its Institutional Equity framework covers discrimination and harassment based on protected characteristics and provides mechanisms through which students can report alleged violations.</p>
+            <p><strong>Sources:</strong> <a href="https://www.aucegypt.edu/institutional-equity">AUC Office of Institutional Equity</a> and <a href="https://www.aucegypt.edu/institutional-equity/about">Institutional Equity Rights and Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-6"><span>6. Right to Protection From Sexual Harassment and Non-Consensual Conduct</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-6" hidden>
+            <p>AUC prohibits sexual harassment and certain forms of sexual misconduct.</p>
+            <p>AUC describes consent as knowing, voluntary and mutual. Consent cannot simply be assumed from silence, passivity, clothing, a previous relationship or previous consent to another sexual act.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/institutional-equity/about">AUC Institutional Equity Policy Information</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-7"><span>7. Right to Protection From Retaliation</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-7" hidden>
+            <p>Students who report discrimination or harassment, participate in an investigation or otherwise engage in activity protected by AUC's Institutional Equity policies are protected against retaliation.</p>
+            <p>AUC treats retaliation itself as a serious policy issue rather than requiring a student simply to tolerate negative consequences for making a complaint.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/institutional-equity/about">AUC Institutional Equity Policy Information</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-8"><span>8. Right to Fair Treatment During Harassment or Discrimination Proceedings</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-8" hidden>
+            <p>AUC gives both complainants and respondents procedural protections.</p>
+            <p>These include respectful treatment, reasonable participation in the process, access to relevant support resources, written notification of outcomes and, where applicable, the ability to have an advisor and appeal the result. A respondent is also entitled to notice of the allegations being made against them.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/institutional-equity/about">AUC Institutional Equity Policy Information</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-9"><span>9. Right to Due Process in Academic Integrity Cases</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-9" hidden>
+            <p>A student accused of cheating, plagiarism or another academic-integrity violation is not supposed to be punished simply because an accusation has been made.</p>
+            <p>AUC's process provides for notification of the alleged violation, consideration of evidence, an Academic Integrity Committee hearing and communication of the Committee's decision, reasoning and sanctions.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/academics/academic-integrity/processes-handling-academic-integrity-violations">AUC Processes for Handling Academic Integrity Violations</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-10"><span>10. Right to Appeal an Academic Integrity Decision</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-10" hidden>
+            <p>A student may appeal an Academic Integrity Committee decision under AUC's stated appeal grounds.</p>
+            <p>These include an unreasonable conclusion, substantial procedural error, a grossly disproportionate sanction or significant new evidence that was not previously available. Cases involving suspension or expulsion have additional appeal procedures involving the Provost, and AUC states that sanctions are not implemented until available appeal options have been exhausted.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/academics/academic-integrity/processes-handling-academic-integrity-violations">AUC Academic Integrity Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-11"><span>11. Right to Fair Student Conduct Procedures</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-11" hidden>
+            <p>Students involved in formal Student Conduct proceedings have procedural protections under AUC's Student Conduct system.</p>
+            <p>Student Conduct Board decisions can be appealed under specified circumstances, including certain procedural errors that could have affected the outcome and qualifying new information that was unavailable during the original proceeding.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/student-life/conduct">AUC Student Conduct</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-12"><span>12. Right to Submit Grievances and Challenge University Decisions</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-12" hidden>
+            <p>AUC formally maintains a Grievance and Appeal Process for Student Concerns.</p>
+            <p>Students therefore have a University mechanism for raising concerns about treatment or decisions rather than being limited to informal complaints. Academic departments also direct students to grievance procedures when issues cannot be resolved at the professor or department level.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/university-policies">AUC University Policies</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-13"><span>13. Right to Challenge Certain Academic or Grading Decisions</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-13" hidden>
+            <p>A student may use the applicable academic grievance process when they believe a grade or academic decision was made improperly.</p>
+            <p>This does not mean students have a right to negotiate any grade they dislike. AUC's published guidance focuses on situations involving alleged errors, inconsistencies or grading that cannot be justified under the course's stated requirements, syllabus, assignments or rubrics.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/academics/rhetoric-and-composition/frequently-asked-questions">AUC Rhetoric and Composition Grade Questions</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-14"><span>14. Right to Access Your Education Records</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-14" hidden>
+            <p>Under FERPA, students have the right to inspect and review most education records maintained by AUC.</p>
+            <p>AUC's FERPA notice states that AUC must provide access within 45 days after receiving the student's request.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/admissions/consumer-disclosures/FERPA">AUC FERPA Information</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-15"><span>15. Right to Correct Inaccurate Education Records</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-15" hidden>
+            <p>If a student believes an education record is inaccurate, misleading or violates their privacy rights, they may request that AUC amend it.</p>
+            <p>If AUC refuses the amendment, the student must be informed in writing and told about their right to a hearing concerning the disputed record.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/admissions/consumer-disclosures/FERPA">AUC FERPA Information</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-16"><span>16. Right to Privacy of Education Records</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-16" hidden>
+            <p>AUC generally needs a student's written consent before releasing personally identifiable information from their education records unless a specific FERPA exception applies.</p>
+            <p>FERPA contains defined exceptions, including certain disclosures to University officials with legitimate educational interests, health and safety emergencies, legal orders and other circumstances specified by law.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/admissions/consumer-disclosures/FERPA">AUC FERPA Information</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-17"><span>17. Right to Restrict Directory Information</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-17" hidden>
+            <p>AUC classifies certain information, such as a student's name, email, enrollment status, field of study, photograph and several other categories, as directory information.</p>
+            <p>Students may opt out of having this information disclosed through the University's directory-information process. According to AUC's FERPA notice, the request must normally be made within the first 12 days of a fall or spring semester or first four class days of summer. The restriction remains in place until the student rescinds it.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/admissions/consumer-disclosures/FERPA">AUC FERPA Information</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-18"><span>18. Right to Know Certain Disclosures of Your Records</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-18" hidden>
+            <p>When FERPA requires AUC to keep a record showing that information from a student's education record was disclosed, the student has the right to inspect and review that disclosure record.</p>
+            <p>There are exceptions where FERPA does not require such disclosure logging.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/admissions/consumer-disclosures/FERPA">AUC FERPA Information</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-19"><span>19. Right to Personal-Data Privacy</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-19" hidden>
+            <p>AUC states that personal information should be collected and processed for legitimate University purposes.</p>
+            <p>AUC also says it employs administrative and technical safeguards for personal information and does not sell personal data. Students who believe their information has been mishandled can contact AUC's data-protection mechanisms.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/data-privacy/FAQs">AUC Data Privacy FAQs</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-20"><span>20. Right to Medical Privacy</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-20" hidden>
+            <p>Information held by AUC Medical Services is treated as confidential medical information.</p>
+            <p>AUC states that medical information is not ordinarily disclosed except under circumstances such as legal requirements or serious health and safety concerns. Students may also request information from their own medical records.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/clinics/healthcare-data-confidentiality">AUC Healthcare Data Confidentiality</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-21"><span>21. Right to Confidential Counseling</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-21" hidden>
+            <p>AUC describes counseling through its Counseling Center as confidential.</p>
+            <p>Information discussed with a counselor is generally kept private, subject to the professional and safety exceptions that apply to counseling services. Students also have access to individual and group counseling services, and crisis situations are prioritized.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/student-life/well-being/counseling-center">AUC Counseling Center</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-22"><span>22. Right to Emergency Medical Assistance on Campus</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-22" hidden>
+            <p>AUC provides emergency medical services to students on the New Cairo campus.</p>
+            <p>The University states that its clinic provides 24/7 emergency care, including stabilization and ambulance transfer when necessary.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/clinics/medical-services">AUC Medical Services</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-23"><span>23. Right to Disability Accommodations</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-23" hidden>
+            <p>Students with documented disabilities who qualify through AUC's accessibility process are entitled to reasonable accommodations intended to provide equal access to education and University life.</p>
+            <p>Depending on the student's needs, accommodations can concern classrooms, assignments, examinations and other aspects of academic participation.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/student-life/well-being/accessibility-services">AUC Student Accessibility Services</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-24"><span>24. Right to Confidentiality of Disability Information</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-24" hidden>
+            <p>A student's disability documentation and related medical information are treated as confidential.</p>
+            <p>AUC states that members of the University community generally do not have access to this information unless they are authorized to do so or disclosure is necessary under an applicable exception.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/student-life/well-being/accessibility-services">AUC Student Accessibility Services</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-25"><span>25. Right to Student Representation</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-25" hidden>
+            <p>AUC students are represented through Student Government.</p>
+            <p>The Student Senate represents different student constituencies, while the Student Union represents students before the administration and advocates for their needs, interests and concerns.</p>
+            <p><strong>Sources:</strong> <a href="https://www.aucegypt.edu/student-life/government">Student Government</a>, <a href="https://www.aucegypt.edu/student-life/government/senate">Student Senate</a>, and <a href="https://www.aucegypt.edu/student-life/government/student-union">Student Union</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-26"><span>26. Right to Form and Participate in Student Organizations</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-26" hidden>
+            <p>AUC allows students to associate through recognized student organizations covering academic, cultural, civic, technological, recreational and other interests.</p>
+            <p>This operates alongside AUC's broader protections for freedom of association, assembly and expression.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/student-life/organizations">AUC Student Organizations</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-27"><span>27. Right to Participate in University Governance</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-27" hidden>
+            <p>Students are represented within AUC's wider governance structure, including participation in the University Senate.</p>
+            <p>The Senate's constitution provides a structure in which faculty, administration, staff and students participate in University governance.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/leadership/senate/constitution">AUC University Senate Constitution</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-28"><span>28. Ordinary Consensual Relationships Between Students</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-28" hidden>
+            <p>AUC does not publish this as an affirmative "right to date," so this should be read carefully.</p>
+            <p>AUC's relationship restrictions are primarily directed toward romantic or sexual relationships involving unequal institutional authority, for example a faculty or staff member having instructional, evaluative, advising or supervisory authority over a student. No general AUC rule was identified here that prohibits ordinary consensual romantic relationships between students.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/university-policies">AUC University Policies</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-29"><span>29. Ordinary Consensual PDA Is Not Specifically Prohibited by a Published AUC PDA Policy</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-29" hidden>
+            <p>This is an absence-of-prohibition finding rather than an explicitly granted right.</p>
+            <p>In the current AUC policy materials checked for this page, there is no published blanket rule stating that students may not hold hands, hug or engage in ordinary consensual displays of affection. Such behavior can still become a policy issue if it crosses into non-consensual contact, harassment, material disruption, another conduct violation or conduct prohibited by applicable law.</p>
+            <p><strong>Sources:</strong> <a href="https://www.aucegypt.edu/about/university-policies">AUC University Policies</a> and <a href="https://www.aucegypt.edu/institutional-equity/about">AUC Institutional Equity</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rights-answer-30"><span>30. Right to Use Established Appeal and Complaint Mechanisms</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rights-answer-30" hidden>
+            <p>The most important overarching protection is that AUC has formal procedures for many disputes.</p>
+            <p>Academic-integrity accusations, Student Conduct decisions, discrimination and harassment cases, academic grievances, disability issues and privacy complaints all have designated offices, policies or appeal mechanisms. A disagreement with a professor, administrator or other University employee does not necessarily end with that person's individual decision.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/university-policies">AUC University Policies</a></p>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    document.querySelectorAll(".info-toggle").forEach((toggle) => {
+      const item = toggle.closest(".info-section");
+      const answer = document.getElementById(
+        toggle.getAttribute("aria-controls")
+      );
+
+      if (!item || !answer) {
+        return;
+      }
+
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      toggle.setAttribute("aria-expanded", "false");
+      answer.hidden = true;
+
+      toggle.addEventListener("click", () => {
+        const willOpen =
+          toggle.getAttribute("aria-expanded") !== "true";
+
+        const computedStyle = answer.hidden
+          ? null
+          : window.getComputedStyle(answer);
+
+        const currentHeight = answer.hidden
+          ? 0
+          : answer.getBoundingClientRect().height;
+
+        const currentOpacity = answer.hidden
+          ? 0
+          : parseFloat(computedStyle.opacity) || 1;
+
+        const currentPaddingBottom = answer.hidden
+          ? 0
+          : parseFloat(computedStyle.paddingBottom) || 0;
+
+        const currentTransform =
+          answer.hidden || computedStyle.transform === "none"
+            ? "translateY(-6px)"
+            : computedStyle.transform;
+
+        answer.getAnimations().forEach((animation) => {
+          animation.cancel();
+        });
+
+        item.classList.toggle("open", willOpen);
+        toggle.setAttribute("aria-expanded", String(willOpen));
+
+        if (willOpen) {
+          answer.hidden = false;
+
+          if (reduceMotion) {
+            return;
+          }
+
+          const targetPaddingBottom =
+            parseFloat(window.getComputedStyle(answer).paddingBottom) || 0;
+
+          const targetHeight = answer.scrollHeight;
+
+          const animation = answer.animate(
+            [
+              {
+                height: `${currentHeight}px`,
+                opacity: currentOpacity,
+                paddingBottom: `${currentPaddingBottom}px`,
+                transform: currentTransform
+              },
+              {
+                height: `${targetHeight}px`,
+                opacity: 1,
+                paddingBottom: `${targetPaddingBottom}px`,
+                transform: "translateY(0)"
+              }
+            ],
+            {
+              duration: 440,
+              easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+              fill: "both"
+            }
+          );
+
+          animation.addEventListener(
+            "finish",
+            () => {
+              animation.cancel();
+            },
+            { once: true }
+          );
+
+          return;
+        }
+
+        if (reduceMotion) {
+          answer.hidden = true;
+          return;
+        }
+
+        const animation = answer.animate(
+          [
+            {
+              height: `${currentHeight}px`,
+              opacity: currentOpacity,
+              paddingBottom: `${currentPaddingBottom}px`,
+              transform: currentTransform
+            },
+            {
+              height: "0px",
+              opacity: 0,
+              paddingBottom: "0px",
+              transform: "translateY(-6px)"
+            }
+          ],
+          {
+            duration: 320,
+            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+            fill: "both"
+          }
+        );
+
+        animation.addEventListener(
+          "finish",
+          () => {
+            if (toggle.getAttribute("aria-expanded") === "false") {
+              answer.hidden = true;
+            }
+
+            animation.cancel();
+          },
+          { once: true }
+        );
+      });
+    });
+  </script>
+
+  <div id="site-footer-root"></div>
+  <script src="site-footer.js"></script>
+</body>
+</html>
