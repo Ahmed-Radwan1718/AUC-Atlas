@@ -2406,6 +2406,7 @@
     }
 
     .course-material-action-menu > summary {
+      position: relative;
       width: 36px;
       height: 36px;
       border: 1px solid rgba(23, 23, 23, 0.1);
@@ -2429,6 +2430,9 @@
 
     .course-material-action-menu > summary::before {
       content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
       width: 4px;
       height: 4px;
       border-radius: 999px;
@@ -2436,6 +2440,7 @@
       box-shadow:
         0 -7px 0 currentColor,
         0 7px 0 currentColor;
+      transform: translate(-50%, -50%);
       transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
@@ -2454,7 +2459,7 @@
     }
 
     .course-material-action-menu[open] > summary::before {
-      transform: rotate(90deg);
+      transform: translate(-50%, -50%) rotate(90deg);
     }
 
     .course-material-action-menu-panel {
