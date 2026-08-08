@@ -1285,23 +1285,28 @@
 
       return `
         <a class="course-recent-card" href="${href}">
-          <div class="course-recent-card-top">
+          <div class="course-recent-icon-shell">
+            ${fileIconMarkup}
+          </div>
+
+          <div class="course-recent-card-copy">
             <span class="course-recent-type">
               ${escapeMaterialText(material.materialType || "Course material")}
             </span>
 
-            ${fileIconMarkup}
+            <h3>${escapeMaterialText(material.title || "Course material")}</h3>
+            <p>${escapeMaterialText(courseLabel || "AUC course material")}</p>
           </div>
-
-          <h3>${escapeMaterialText(material.title || "Course material")}</h3>
-          <p>${escapeMaterialText(courseLabel || "AUC course material")}</p>
 
           <div class="course-recent-meta">
             <span>${escapeMaterialText(material.professor || "Professor not listed")}</span>
             <span>${escapeMaterialText(material.semester || "Semester not listed")}</span>
           </div>
 
-          <small>${escapeMaterialText(formatMaterialUploadDate(material.createdAt))}</small>
+          <div class="course-recent-footer">
+            <small>${escapeMaterialText(formatMaterialUploadDate(material.createdAt))}</small>
+            <span class="course-recent-arrow" aria-hidden="true">→</span>
+          </div>
         </a>
       `;
     }).join("");
