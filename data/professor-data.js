@@ -2069,7 +2069,7 @@
       margin: 0;
       color: rgba(192, 154, 92, 0.92);
       font-size: 10px;
-      font-weight: 600;
+      font-weight: 800;
       letter-spacing: 0.1em;
       line-height: 1.3;
       text-transform: uppercase;
