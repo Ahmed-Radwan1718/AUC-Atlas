@@ -893,19 +893,34 @@
     .material-upload-panel {
       margin: 0;
       padding: 22px;
-      background: rgba(247, 244, 238, 0.74);
+      background: rgba(255, 255, 255, 0.78);
+      display: grid;
+      align-content: start;
+      gap: 16px;
+    }
+
+    .material-upload-panel-header {
+      display: grid;
+      gap: 4px;
+    }
+
+    .material-upload-panel-header span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
     .material-upload-panel h2 {
-      margin-bottom: 8px;
       color: #171717;
       font-size: 24px;
       line-height: 1.12;
     }
 
     .material-upload-panel p {
-      margin-bottom: 18px;
-      color: rgba(23, 23, 23, 0.58);
+      margin: 0;
+      color: rgba(23, 23, 23, 0.62);
       font-size: 14px;
       line-height: 1.65;
     }
@@ -1997,13 +2012,30 @@
     }
 
     .course-material-sort-wrap {
+      min-height: 34px;
+      padding: 0 10px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.78);
       display: flex;
       align-items: center;
       gap: 8px;
+      transition:
+        background 0.22s ease,
+        border-color 0.22s ease,
+        transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .course-material-sort-wrap:hover,
+    .course-material-sort-wrap:has(.material-choice-button:focus-visible),
+    .course-material-sort-wrap:has(.material-choice.open) {
+      border-color: rgba(192, 154, 92, 0.42);
+      background: rgba(192, 154, 92, 0.1);
+      transform: translateY(-1px);
     }
 
     .course-material-sort-wrap > span {
-      color: rgba(23, 23, 23, 0.46);
+      color: rgba(23, 23, 23, 0.5);
       font-size: 9px;
       font-weight: 900;
       letter-spacing: 0.07em;
@@ -2011,28 +2043,37 @@
     }
 
     .course-material-sort-choice {
-      width: 118px;
+      width: 82px;
     }
 
     .course-material-sort-choice .material-choice-button {
-      min-height: 36px;
-      padding: 0 12px;
-      border-radius: 999px;
+      min-height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
       font-size: 10px;
-      font-weight: 800;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       transition:
-        border-color 0.22s ease,
-        background 0.22s ease,
-        box-shadow 0.22s ease,
+        color 0.22s ease,
         transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .course-material-sort-choice .material-choice-button:hover {
-      transform: translateY(-1px);
+    .course-material-sort-choice .material-choice-button:hover,
+    .course-material-sort-choice .material-choice-button:focus-visible,
+    .course-material-sort-choice.open .material-choice-button {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      outline: none;
+      transform: none;
     }
 
     .course-material-sort-choice .material-choice-button:active {
-      transform: translateY(0) scale(0.96);
+      transform: scale(0.96);
     }
 
     .course-material-sort-choice .material-choice-menu {
@@ -4469,7 +4510,11 @@
             </section>
 
             <section class="material-upload-panel" aria-label="Upload course material">
-              <h2>Upload material</h2>
+              <div class="material-upload-panel-header">
+                <span>Contribute material</span>
+                <h2>Upload material</h2>
+              </div>
+
               <p>Share a useful file and tie it to the professor and semester you took this course with.</p>
 
               <form class="material-upload-form" id="material-upload-form">
