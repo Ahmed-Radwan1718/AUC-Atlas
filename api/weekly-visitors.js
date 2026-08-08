@@ -1,37 +1,39 @@
-const crypto = require("crypto");
 const admin = require("../server/_lib/firebaseAdmin");
 
-function cleanString(value, maxLength) {
-  return String(value || "")
-    .trim()
-    .replace(/\s+/g, " ")
-    .slice(0, maxLength);
-}
+const VISITOR_TIME_ZONE = "Africa/Cairo";
 
-function getRequestBody(req) {
-  if (req.body && typeof req.body === "object") {
-    return req.body;
-  }
+function getCurrentWeekStart() {
+  const dateParts = new Intl.DateTimeFormat("en-US", {
+    timeZone: VISITOR_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
 
-  if (typeof req.body === "string") {
-    try {
-      return JSON.parse(req.body);
-    } catch (error) {
-      return {};
+  const calendarDate = {};
+
+  dateParts.forEach(function (part) {
+    if (part.type !== "literal") {
+      calendarDate[part.type] = Number(part.value);
     }
-  }
+  });
 
-  return {};
+  const cairoDate = new Date(Date.UTC(
+    calendarDate.year,
+    calendarDate.month - 1,
+    calendarDate.day
+  ));
+  const daysSinceMonday =
+    (cairoDate.getUTCDay() + 6) % 7;
+
+  cairoDate.setUTCDate(
+    cairoDate.getUTCDate() - daysSinceMonday
+  );
+
+  return cairoDate.toISOString().slice(0, 10);
 }
 
-function hashVisitorId(visitorId) {
-  return crypto
-    .createHash("sha256")
-    .update(visitorId)
-    .digest("hex");
-}
-
-async function getUniqueVisitorCount(countRef) {
+async function getWeeklyVisitCount(countRef) {
   const countSnapshot = await countRef.get();
   const countData = countSnapshot.exists
     ? countSnapshot.data() || {}
@@ -53,68 +55,42 @@ module.exports = async function handler(req, res) {
 
   try {
     const db = admin.firestore();
+    const weekStart = getCurrentWeekStart();
     const countRef = db
-      .collection("uniqueVisitorCounts")
-      .doc("all-time");
+      .collection("weeklyVisitCounts")
+      .doc(weekStart);
 
     if (req.method === "GET") {
-      const uniqueVisitors =
-        await getUniqueVisitorCount(countRef);
+      const weeklyVisits =
+        await getWeeklyVisitCount(countRef);
 
       return res.status(200).json({
-        uniqueVisitors
+        weeklyVisits,
+        weekStart
       });
     }
 
-    const body = getRequestBody(req);
-    const visitorId = cleanString(body.visitorId, 160);
-
-    if (
-      !visitorId ||
-      !/^[A-Za-z0-9._:-]{16,160}$/.test(visitorId)
-    ) {
-      return res.status(400).json({
-        error: "A valid visitor ID is required."
-      });
-    }
-
-    const visitorHash = hashVisitorId(visitorId);
-    const visitorRef = db
-      .collection("uniqueVisitors")
-      .doc(visitorHash);
-
-    let uniqueVisitors = 0;
+    let weeklyVisits = 0;
 
     await db.runTransaction(async function (transaction) {
-      const visitorSnapshot =
-        await transaction.get(visitorRef);
       const countSnapshot =
         await transaction.get(countRef);
       const countData = countSnapshot.exists
         ? countSnapshot.data() || {}
         : {};
 
-      uniqueVisitors = Math.max(
-        0,
-        Number(countData.count) || 0
-      );
-
-      if (visitorSnapshot.exists) {
-        return;
-      }
-
-      uniqueVisitors += 1;
-
-      transaction.create(visitorRef, {
-        visitorHash,
-        firstSeenAt:
-          admin.firestore.FieldValue.serverTimestamp()
-      });
+      weeklyVisits =
+        Math.max(
+          0,
+          Number(countData.count) || 0
+        ) + 1;
 
       transaction.set(
         countRef,
         {
-          count: uniqueVisitors,
+          count: weeklyVisits,
+          weekStart,
+          timeZone: VISITOR_TIME_ZONE,
           updatedAt:
             admin.firestore.FieldValue.serverTimestamp()
         },
@@ -125,11 +101,12 @@ module.exports = async function handler(req, res) {
     });
 
     return res.status(200).json({
-      uniqueVisitors
+      weeklyVisits,
+      weekStart
     });
   } catch (error) {
     return res.status(500).json({
-      error: "Could not update the unique visitor count."
+      error: "Could not process the weekly visit count."
     });
   }
 };
