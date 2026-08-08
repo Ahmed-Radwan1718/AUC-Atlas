@@ -2490,10 +2490,6 @@
 
     function openPreview(button) {
       const downloadUrl = button.dataset.downloadUrl || "";
-      const fileName = button.dataset.fileName || "Course material";
-      const extension = button.dataset.fileExtension || "file";
-      const fileLabel = button.dataset.fileLabel || "File";
-      const fileSize = button.dataset.fileSize || "Size unavailable";
 
       if (!downloadUrl) {
         return;
@@ -2505,55 +2501,15 @@
         "inline"
       );
 
-      lastTrigger = button;
-      resetPreview();
-
-      title.textContent = fileName;
-      meta.textContent = fileLabel + " · " + fileSize;
-      download.href = downloadUrl;
-
-      modal.hidden = false;
-      document.body.classList.add("material-preview-open");
-
-      if (closeButton) {
-        closeButton.focus();
-      }
-
-      if (
-        ["jpg", "jpeg", "png", "webp", "gif"].includes(extension)
-      ) {
-        image.src = previewUrl;
-        image.hidden = false;
-        return;
-      }
-
-      if (extension === "pdf") {
-        frame.src =
-          previewUrl +
-          "#toolbar=1&navpanes=0&view=FitH";
-        frame.hidden = false;
-        return;
-      }
-
-      if (
-        [
-          "doc",
-          "docx",
-          "ppt",
-          "pptx",
-          "xls",
-          "xlsx"
-        ].includes(extension)
-      ) {
-        showPreviewFallback(
-          "Office file previews are disabled to keep the file behind verified account access. Download the original file to open it."
-        );
-        return;
-      }
-
-      showPreviewFallback(
-        "A browser preview is not available for this file type. Review the uploader, filename, size, course, professor, and semester before downloading."
+      const previewWindow = window.open(
+        previewUrl,
+        "_blank",
+        "noopener"
       );
+
+      if (previewWindow) {
+        previewWindow.opener = null;
+      }
     }
 
     frame.addEventListener("load", function () {
