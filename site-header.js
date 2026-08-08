@@ -7,60 +7,25 @@
 
   const isAdminPage = /\/admin(?:\.html)?\/?$/.test(window.location.pathname);
 
-  function createUniqueVisitorId() {
-    if (
-      window.crypto &&
-      typeof window.crypto.randomUUID === "function"
-    ) {
-      return window.crypto.randomUUID();
+  function clearLegacyUniqueVisitorId() {
+    try {
+      window.localStorage.removeItem(
+        "aucAtlasVisitorId"
+      );
+    } catch (error) {
+      // Local storage is unavailable.
     }
-
-    return (
-      "visitor-" +
-      Date.now().toString(36) +
-      "-" +
-      Math.random().toString(36).slice(2) +
-      Math.random().toString(36).slice(2)
-    );
-  }
-
-  function getUniqueVisitorId() {
-    const storageKey = "aucAtlasVisitorId";
 
     try {
-      let visitorId =
-        window.localStorage.getItem(storageKey);
-
-      if (!visitorId) {
-        visitorId = createUniqueVisitorId();
-        window.localStorage.setItem(
-          storageKey,
-          visitorId
-        );
-      }
-
-      return visitorId;
+      window.sessionStorage.removeItem(
+        "aucAtlasVisitorId"
+      );
     } catch (error) {
-      try {
-        let visitorId =
-          window.sessionStorage.getItem(storageKey);
-
-        if (!visitorId) {
-          visitorId = createUniqueVisitorId();
-          window.sessionStorage.setItem(
-            storageKey,
-            visitorId
-          );
-        }
-
-        return visitorId;
-      } catch (sessionError) {
-        return createUniqueVisitorId();
-      }
+      // Session storage is unavailable.
     }
   }
 
-  function trackUniqueVisitor() {
+  function trackWeeklyVisit() {
     if (
       isAdminPage ||
       typeof window.fetch !== "function"
@@ -73,40 +38,38 @@
       credentials: "same-origin",
       cache: "no-store",
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        visitorId: getUniqueVisitorId()
-      })
+        Accept: "application/json"
+      }
     })
       .then(function (response) {
         if (!response.ok) {
           throw new Error(
-            "Could not update unique visitors."
+            "Could not update weekly visits."
           );
         }
 
         return response.json();
       })
       .then(function (data) {
-        const uniqueVisitors = Math.max(
+        const weeklyVisits = Math.max(
           0,
-          Number(data.uniqueVisitors) || 0
+          Number(data.weeklyVisits) || 0
         );
 
-        window.aucAtlasUniqueVisitors =
-          uniqueVisitors;
+        window.aucAtlasWeeklyVisits =
+          weeklyVisits;
 
-        return uniqueVisitors;
+        return weeklyVisits;
       })
       .catch(function () {
         return null;
       });
   }
 
-  window.aucAtlasUniqueVisitorsPromise =
-    trackUniqueVisitor();
+  clearLegacyUniqueVisitorId();
+
+  window.aucAtlasWeeklyVisitsPromise =
+    trackWeeklyVisit();
 
   if (!isAdminPage && !document.querySelector('script[src="site-footer.js"]')) {
     const footerScript = document.createElement("script");
