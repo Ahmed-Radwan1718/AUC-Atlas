@@ -1616,12 +1616,16 @@
       font-weight: 900;
     }
 
-    .professor-review-stat-track {
+    .professor-review-stat-track,
+    .professor-review-stat-answer-track {
       width: 100%;
-      height: 7px;
       overflow: hidden;
       border-radius: 999px;
       background: rgba(23, 23, 23, 0.08);
+    }
+
+    .professor-review-stat-track {
+      height: 7px;
     }
 
     .professor-review-stat-fill {
@@ -1638,6 +1642,117 @@
         cubic-bezier(0.16, 1, 0.3, 1)
         var(--stat-delay, 0ms)
         forwards;
+    }
+
+    .professor-review-stat-details {
+      display: grid;
+      gap: 8px;
+    }
+
+    .professor-review-stat-details-toggle {
+      width: fit-content;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      line-height: 1.3;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      list-style: none;
+      transition: color 0.18s ease;
+    }
+
+    .professor-review-stat-details-toggle::after {
+      content: "";
+      width: 5px;
+      height: 5px;
+      border-right: 1.4px solid currentColor;
+      border-bottom: 1.4px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.22s ease;
+    }
+
+    .professor-review-stat-details[open] .professor-review-stat-details-toggle {
+      color: #171717;
+    }
+
+    .professor-review-stat-details[open] .professor-review-stat-details-toggle::after {
+      transform: rotate(225deg) translate(-1px, -1px);
+    }
+
+    .professor-review-stat-details-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .professor-review-stat-details-less {
+      display: none;
+    }
+
+    .professor-review-stat-details[open] .professor-review-stat-details-more {
+      display: none;
+    }
+
+    .professor-review-stat-details[open] .professor-review-stat-details-less {
+      display: inline;
+    }
+
+    .professor-review-stat-breakdown {
+      display: grid;
+      gap: 9px;
+      padding: 5px 0 1px;
+    }
+
+    .professor-review-stat-total,
+    .professor-review-stat-answer {
+      display: grid;
+      gap: 5px;
+    }
+
+    .professor-review-stat-answer-head {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+
+    .professor-review-stat-answer-head span:first-child {
+      min-width: 0;
+      color: rgba(23, 23, 23, 0.72);
+    }
+
+    .professor-review-stat-answer-head span:last-child {
+      color: rgba(192, 154, 92, 0.96);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .professor-review-stat-answer-track {
+      height: 6px;
+    }
+
+    .professor-review-stat-answer-fill {
+      width: var(--stat-width, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(192, 154, 92, 0.82);
+      display: block;
+    }
+
+    .professor-review-stat-total-fill {
+      background: rgba(23, 23, 23, 0.22);
     }
 
     @keyframes professorReviewStatFill {
@@ -2693,6 +2808,76 @@
       return compactValues[value] || String(value || "").replace(/-/g, " ");
     }
 
+    function getResponseLabel(count) {
+      return Number(count) === 1
+        ? "1 response"
+        : count + " responses";
+    }
+
+    function renderStatBreakdown(row) {
+      const answers = Array.isArray(row.answers) ? row.answers : [];
+      const total = Number(row.total || 0);
+      const totalLabel = getResponseLabel(total);
+      const answerMarkup = answers.map(function (answer) {
+        const answerValue = getCompactStatValue(answer.value);
+        const answerCount = Number(answer.count || 0);
+        const answerPercent = Number(answer.percent || 0);
+        const answerWidth = Math.max(0, Math.min(100, Number(answer.width || 0)));
+        const answerMeta = answerCount + " of " + total + " · " + answerPercent + "%";
+
+        return `
+          <div class="professor-review-stat-answer">
+            <div class="professor-review-stat-answer-head">
+              <span>${escapeHtml(answerValue)}</span>
+              <span>${escapeHtml(answerMeta)}</span>
+            </div>
+
+            <div
+              class="professor-review-stat-answer-track"
+              role="img"
+              aria-label="${escapeHtml(row.label + ": " + answerValue + ", " + answerMeta)}"
+            >
+              <span
+                class="professor-review-stat-answer-fill"
+                style="--stat-width: ${escapeHtml(String(answerWidth))}%;"
+              ></span>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <details class="professor-review-stat-details">
+          <summary class="professor-review-stat-details-toggle">
+            <span class="professor-review-stat-details-more">More details</span>
+            <span class="professor-review-stat-details-less">Hide details</span>
+          </summary>
+
+          <div class="professor-review-stat-breakdown">
+            <div class="professor-review-stat-total">
+              <div class="professor-review-stat-answer-head">
+                <span>Total responses</span>
+                <span>${escapeHtml(totalLabel)}</span>
+              </div>
+
+              <div
+                class="professor-review-stat-answer-track"
+                role="img"
+                aria-label="${escapeHtml(row.label + ": " + totalLabel + " answered this question")}"
+              >
+                <span
+                  class="professor-review-stat-answer-fill professor-review-stat-total-fill"
+                  style="--stat-width: 100%;"
+                ></span>
+              </div>
+            </div>
+
+            ${answerMarkup}
+          </div>
+        </details>
+      `;
+    }
+
     function renderStatRow(row, index) {
       const displayValue = getCompactStatValue(row.topAnswer.value);
       const delay = Math.min(index * 55, 275);
@@ -2719,6 +2904,8 @@
               style="--stat-width: ${escapeHtml(String(row.topAnswer.width))}%; --stat-delay: ${delay}ms;"
             ></span>
           </div>
+
+          ${renderStatBreakdown(row)}
         </div>
       `;
     }
