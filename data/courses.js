@@ -2734,49 +2734,36 @@
         return true;
       }
 
-      const materialTypes = group.files.map(
-        function (fileMaterial) {
-          return String(
-            fileMaterial.materialType ||
-            group.material.materialType ||
-            ""
-          ).toLowerCase();
-        }
-      );
-
-      if (activeFilter === "notes") {
-        return materialTypes.some(
-          function (type) {
-            return type.includes("note");
-          }
-        );
+      function normalizeMaterialFilter(value) {
+        return String(value || "")
+          .trim()
+          .toLowerCase()
+          .replace(/&/g, "and")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
       }
 
-      if (activeFilter === "slides") {
-        return materialTypes.some(
-          function (type) {
-            return type.includes("slide");
-          }
-        );
-      }
+      const normalizedActiveFilter =
+        normalizeMaterialFilter(activeFilter);
+      const acceptedFilters =
+        normalizedActiveFilter === "past-assignment" ||
+        normalizedActiveFilter === "past-assignments"
+          ? [
+              "past-assignment",
+              "past-assignments"
+            ]
+          : [normalizedActiveFilter];
 
-      if (activeFilter === "exams") {
-        return materialTypes.some(
-          function (type) {
-            return type.includes("exam");
-          }
-        );
-      }
+      return group.files.some(function (fileMaterial) {
+        const materialType =
+          fileMaterial.materialType ||
+          group.material.materialType ||
+          "";
 
-      if (activeFilter === "sheets") {
-        return materialTypes.some(
-          function (type) {
-            return type.includes("sheet");
-          }
+        return acceptedFilters.includes(
+          normalizeMaterialFilter(materialType)
         );
-      }
-
-      return true;
+      });
     }
 
     function getFileView(
