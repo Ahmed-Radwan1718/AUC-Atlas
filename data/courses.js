@@ -1401,6 +1401,12 @@
             <strong>${escapeMaterialText(extensionLabel)}</strong>
           </span>
         `;
+      const uploaderName = String(
+        material.uploaderDisplayName ||
+        "AUC student"
+      ).trim();
+      const uploaderInitial =
+        uploaderName.charAt(0).toUpperCase() || "A";
 
       return `
         <a class="course-recent-card" href="${href}">
@@ -1423,6 +1429,15 @@
           </div>
 
           <div class="course-recent-footer">
+            <span class="course-recent-uploader">
+              <span class="course-recent-uploader-avatar" aria-hidden="true">
+                ${escapeMaterialText(uploaderInitial)}
+              </span>
+              <span class="course-recent-uploader-name">
+                Uploaded by ${escapeMaterialText(uploaderName)}
+              </span>
+            </span>
+
             <small>${escapeMaterialText(formatMaterialUploadDate(material.createdAt))}</small>
           </div>
         </a>
