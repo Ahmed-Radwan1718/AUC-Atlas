@@ -937,6 +937,287 @@ a {
   gap: 18px;
 }
 
+.content-page-shell,
+.legal-page-shell,
+.declaration-page-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 82px 0 104px;
+}
+
+.not-found-page-shell {
+  width: min(760px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 96px 0 120px;
+  display: grid;
+  place-items: center;
+}
+
+.content-hero,
+.legal-hero,
+.declaration-hero {
+  margin-bottom: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
+  gap: 32px;
+  align-items: end;
+}
+
+.content-hero h1,
+.legal-hero h1,
+.declaration-hero h1 {
+  max-width: 760px;
+  margin: 0;
+  color: var(--atlas-ink);
+  font-size: 4.6rem;
+  font-weight: 820;
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.content-hero p,
+.legal-hero p,
+.declaration-hero p {
+  margin: 0;
+  color: var(--atlas-muted);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.content-list {
+  display: grid;
+  gap: 12px;
+}
+
+.content-card,
+.legal-document,
+.declaration-card,
+.not-found-panel {
+  border: 1px solid var(--atlas-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 18px 48px rgba(42, 32, 20, 0.09);
+}
+
+.content-card {
+  padding: 22px;
+}
+
+.content-card h2,
+.legal-section h2,
+.declaration-card h2,
+.not-found-panel h1 {
+  margin: 0;
+  color: var(--atlas-ink);
+  font-size: 1.35rem;
+  line-height: 1.16;
+}
+
+.content-card p,
+.legal-section p,
+.legal-section li,
+.declaration-card li,
+.declaration-source,
+.not-found-panel p,
+.auth-message {
+  color: var(--atlas-muted);
+  font-size: 0.95rem;
+  line-height: 1.68;
+}
+
+.content-card a,
+.legal-section a,
+.declaration-source a {
+  color: var(--atlas-accent);
+  font-weight: 820;
+}
+
+.content-details {
+  padding: 0;
+}
+
+.content-details summary {
+  min-height: 70px;
+  padding: 20px 22px;
+  cursor: pointer;
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+}
+
+.content-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.content-details summary span:first-child {
+  color: var(--atlas-ink);
+  font-size: 1.08rem;
+  font-weight: 780;
+  line-height: 1.35;
+}
+
+.content-details summary span:last-child {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(23, 23, 23, 0.08);
+  border-radius: 999px;
+  color: var(--atlas-accent);
+  display: grid;
+  place-items: center;
+  transition: transform 0.18s ease;
+}
+
+.content-details[open] summary span:last-child {
+  transform: rotate(45deg);
+}
+
+.content-answer {
+  padding: 0 22px 22px;
+}
+
+.content-answer p {
+  max-width: 820px;
+  margin: 0;
+}
+
+.legal-document {
+  padding: 8px 28px;
+}
+
+.legal-meta {
+  margin-top: 10px;
+  color: var(--atlas-accent);
+  font-size: 0.84rem;
+  font-weight: 820;
+}
+
+.legal-section {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--atlas-line);
+}
+
+.legal-section:last-child {
+  border-bottom: 0;
+}
+
+.legal-section p,
+.legal-section ul {
+  max-width: 860px;
+  margin: 12px 0 0;
+}
+
+.legal-section ul {
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.declaration-tools {
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid var(--atlas-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 18px 48px rgba(42, 32, 20, 0.09);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 12px;
+}
+
+.declaration-tools input,
+.declaration-tools select {
+  min-height: 48px;
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid rgba(23, 23, 23, 0.1);
+  border-radius: 12px;
+  background: rgba(247, 243, 235, 0.58);
+  color: var(--atlas-ink);
+  font: inherit;
+}
+
+.declaration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.declaration-card {
+  padding: 22px;
+  display: grid;
+  gap: 14px;
+}
+
+.declaration-school {
+  color: var(--atlas-accent);
+  font-size: 0.78rem;
+  font-weight: 820;
+}
+
+.declaration-card ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+.declaration-empty {
+  grid-column: 1 / -1;
+  padding: 22px;
+  border: 1px dashed rgba(23, 23, 23, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--atlas-muted);
+  text-align: center;
+}
+
+.declaration-source {
+  margin: 18px 0 0;
+}
+
+.auth-message {
+  min-height: 22px;
+  margin: 0;
+  font-weight: 720;
+}
+
+.auth-message.error {
+  color: #9d3b3b;
+}
+
+.auth-message.success {
+  color: #426d43;
+}
+
+.auth-form button:disabled {
+  opacity: 0.64;
+  cursor: wait;
+}
+
+.not-found-panel {
+  padding: 30px;
+  text-align: center;
+}
+
+.not-found-panel h1 {
+  font-size: 3rem;
+}
+
+.not-found-panel p {
+  margin: 14px auto 0;
+  max-width: 520px;
+}
+
+.not-found-actions {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
 @media (max-width: 900px) {
   .atlas-header {
     grid-template-columns: 1fr auto;
@@ -950,7 +1231,10 @@ a {
   .courses-page-shell,
   .professors-page-shell,
   .tool-page-shell,
-  .auth-page-shell {
+  .auth-page-shell,
+  .content-page-shell,
+  .legal-page-shell,
+  .declaration-page-shell {
     padding: 54px 0 84px;
   }
 
@@ -958,10 +1242,14 @@ a {
   .courses-hero,
   .professors-hero,
   .tool-hero,
+  .content-hero,
+  .legal-hero,
+  .declaration-hero,
   .course-browser-layout,
   .professor-filter-card,
   .calculator-layout,
-  .degree-dashboard {
+  .degree-dashboard,
+  .declaration-tools {
     min-height: 0;
     grid-template-columns: 1fr;
     gap: 24px;
@@ -971,8 +1259,11 @@ a {
   .courses-hero h1,
   .professors-hero h1,
   .tool-hero h1,
-  .auth-card h1 {
-    font-size: clamp(2.75rem, 15vw, 4.8rem);
+  .auth-card h1,
+  .content-hero h1,
+  .legal-hero h1,
+  .declaration-hero h1 {
+    font-size: 3rem;
   }
 
   .home-search-preview,
@@ -1008,7 +1299,8 @@ a {
   .home-stat-grid,
   .feature-grid,
   .professor-grid,
-  .account-section-grid {
+  .account-section-grid,
+  .declaration-grid {
     grid-template-columns: 1fr;
   }
 
