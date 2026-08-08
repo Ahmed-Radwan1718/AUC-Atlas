@@ -549,9 +549,10 @@
     .info-answer {
       max-height: none;
       padding: 0 56px 24px 0;
-      overflow: visible;
+      overflow: hidden;
       opacity: 1;
       transition: none;
+      will-change: height, opacity, transform;
     }
 
     .info-answer[hidden] {
@@ -564,7 +565,7 @@
     }
 
     .info-answer:not([hidden]) {
-      animation: infoAnswerIn 0.22s ease both;
+      animation: none;
     }
 
     .info-answer p {
@@ -1220,15 +1221,136 @@
         return;
       }
 
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
       toggle.setAttribute("aria-expanded", "false");
       answer.hidden = true;
 
       toggle.addEventListener("click", () => {
-        const willOpen = toggle.getAttribute("aria-expanded") !== "true";
+        const willOpen =
+          toggle.getAttribute("aria-expanded") !== "true";
+
+        const computedStyle = answer.hidden
+          ? null
+          : window.getComputedStyle(answer);
+
+        const currentHeight = answer.hidden
+          ? 0
+          : answer.getBoundingClientRect().height;
+
+        const currentOpacity = answer.hidden
+          ? 0
+          : parseFloat(computedStyle.opacity) || 1;
+
+        const currentPaddingBottom = answer.hidden
+          ? 0
+          : parseFloat(computedStyle.paddingBottom) || 0;
+
+        const currentTransform =
+          answer.hidden || computedStyle.transform === "none"
+            ? "translateY(-6px)"
+            : computedStyle.transform;
+
+        answer.getAnimations().forEach((animation) => {
+          animation.cancel();
+        });
 
         item.classList.toggle("open", willOpen);
-        toggle.setAttribute("aria-expanded", String(willOpen));
-        answer.hidden = !willOpen;
+        toggle.setAttribute(
+          "aria-expanded",
+          String(willOpen)
+        );
+
+        if (willOpen) {
+          answer.hidden = false;
+
+          if (reduceMotion) {
+            return;
+          }
+
+          const targetPaddingBottom =
+            parseFloat(
+              window.getComputedStyle(answer).paddingBottom
+            ) || 0;
+
+          const targetHeight = answer.scrollHeight;
+
+          const animation = answer.animate(
+            [
+              {
+                height: `${currentHeight}px`,
+                opacity: currentOpacity,
+                paddingBottom: `${currentPaddingBottom}px`,
+                transform: currentTransform
+              },
+              {
+                height: `${targetHeight}px`,
+                opacity: 1,
+                paddingBottom: `${targetPaddingBottom}px`,
+                transform: "translateY(0)"
+              }
+            ],
+            {
+              duration: 440,
+              easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+              fill: "both"
+            }
+          );
+
+          animation.addEventListener(
+            "finish",
+            () => {
+              animation.cancel();
+            },
+            { once: true }
+          );
+
+          return;
+        }
+
+        if (reduceMotion) {
+          answer.hidden = true;
+          return;
+        }
+
+        const animation = answer.animate(
+          [
+            {
+              height: `${currentHeight}px`,
+              opacity: currentOpacity,
+              paddingBottom: `${currentPaddingBottom}px`,
+              transform: currentTransform
+            },
+            {
+              height: "0px",
+              opacity: 0,
+              paddingBottom: "0px",
+              transform: "translateY(-6px)"
+            }
+          ],
+          {
+            duration: 320,
+            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+            fill: "both"
+          }
+        );
+
+        animation.addEventListener(
+          "finish",
+          () => {
+            if (
+              toggle.getAttribute("aria-expanded") ===
+              "false"
+            ) {
+              answer.hidden = true;
+            }
+
+            animation.cancel();
+          },
+          { once: true }
+        );
       });
     });
   </script>
