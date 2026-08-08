@@ -2012,6 +2012,7 @@
     }
 
     .course-material-filter-list .material-choice-button {
+      position: relative;
       width: 44px;
       min-height: 44px;
       height: 44px;
@@ -2031,6 +2032,9 @@
 
     .course-material-filter-list .material-choice-button::before {
       content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
       width: 18px;
       height: 2px;
       border-radius: 999px;
@@ -2038,6 +2042,7 @@
       box-shadow:
         0 -6px 0 currentColor,
         0 6px 0 currentColor;
+      transform: translate(-50%, -50%);
     }
 
     .course-material-filter-list .material-choice-button::after {
