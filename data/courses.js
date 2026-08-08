@@ -3085,7 +3085,7 @@
           ${buildPreviewMain(
             fileView,
             title,
-            fileView.fileName,
+            "",
             metadata,
             materialType
           )}
