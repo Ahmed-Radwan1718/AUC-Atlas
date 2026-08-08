@@ -1305,7 +1305,6 @@
 
           <div class="course-recent-footer">
             <small>${escapeMaterialText(formatMaterialUploadDate(material.createdAt))}</small>
-            <span class="course-recent-arrow" aria-hidden="true">→</span>
           </div>
         </a>
       `;
