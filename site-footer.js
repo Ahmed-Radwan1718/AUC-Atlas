@@ -132,6 +132,7 @@
               <li><a href="professors.html">Professors</a></li>
               <li><a href="courses.html">Courses</a></li>
               <li><a href="gpa-calculator.html">GPA Calculator</a></li>
+              <li><a href="declaration-process.html">Declaration Process</a></li>
             </ul>
           </div>
 
