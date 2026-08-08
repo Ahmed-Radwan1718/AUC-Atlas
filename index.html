@@ -1675,7 +1675,7 @@
         </div>
 
         <p>
-          Live counts from the professors, courses, reviews, and unique visitors across AUC Atlas.
+          Live counts from the professors, courses, reviews, and visits during the current week.
         </p>
       </div>
 
@@ -1696,8 +1696,8 @@
         </article>
 
         <article class="home-stat">
-          <strong id="home-unique-visitor-count">—</strong>
-          <span>Unique visitors</span>
+          <strong id="home-weekly-visit-count">—</strong>
+          <span>Visits this week</span>
         </article>
       </div>
     </section>
@@ -1973,7 +1973,7 @@
       const professorCount = document.getElementById("home-professor-count");
       const courseCount = document.getElementById("home-course-count");
       const reviewCount = document.getElementById("home-review-count");
-      const uniqueVisitorCount = document.getElementById("home-unique-visitor-count");
+      const weeklyVisitCount = document.getElementById("home-weekly-visit-count");
       const latestReviewsRoot = document.getElementById("home-latest-reviews");
       const latestMaterialsRoot = document.getElementById("home-latest-materials");
       const latestProfessorsRoot = document.getElementById("home-latest-professors");
@@ -2251,7 +2251,7 @@
       renderLatestProfessors();
 
       Promise.resolve(
-        window.aucAtlasUniqueVisitorsPromise
+        window.aucAtlasWeeklyVisitsPromise
       )
         .then(function (count) {
           const numericCount = Number(count);
@@ -2275,22 +2275,22 @@
             .then(function (response) {
               if (!response.ok) {
                 throw new Error(
-                  "Could not load unique visitors."
+                  "Could not load weekly visits."
                 );
               }
 
               return response.json();
             })
             .then(function (data) {
-              return data.uniqueVisitors;
+              return data.weeklyVisits;
             });
         })
         .then(function (count) {
-          setHomeCount(uniqueVisitorCount, count);
+          setHomeCount(weeklyVisitCount, count);
         })
         .catch(function () {
-          if (uniqueVisitorCount) {
-            uniqueVisitorCount.textContent = "—";
+          if (weeklyVisitCount) {
+            weeklyVisitCount.textContent = "—";
           }
         });
 
