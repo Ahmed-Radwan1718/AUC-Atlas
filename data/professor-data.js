@@ -969,6 +969,7 @@
 
     body.review-modal-open {
       overflow: hidden;
+      padding-right: var(--review-scrollbar-compensation, 0px);
     }
 
     .professor-review-panel {
@@ -1032,11 +1033,8 @@
       background: rgba(247, 244, 238, 0.42);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      animation:
-        reviewBackdropIn
-        380ms
-        cubic-bezier(0.16, 1, 0.3, 1)
-        both;
+      opacity: 1;
+      animation: none;
       will-change: opacity;
     }
 
@@ -1060,13 +1058,11 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 18px;
+      opacity: 1;
+      transform: translate(-50%, -50%);
       transform-origin: center center;
-      animation:
-        reviewModalIn
-        480ms
-        cubic-bezier(0.16, 1, 0.3, 1)
-        both;
-      will-change: transform, opacity;
+      animation: none;
+      will-change: transform, opacity, border-radius;
     }
 
     .review-modal-header {
@@ -2288,11 +2284,7 @@
         scrollbar-gutter: auto;
         border-radius: 22px;
         transform: translate(-50%, -50%);
-        animation:
-          reviewModalIn
-          440ms
-          cubic-bezier(0.16, 1, 0.3, 1)
-          both;
+        animation: none;
       }
 
       .review-modal-header {
@@ -3909,7 +3901,9 @@
       }
 
       window.setTimeout(function () {
-        panel.removeAttribute("open");
+        panel.dispatchEvent(
+          new CustomEvent("review-request-close")
+        );
       }, 900);
     } catch (error) {
       if (message) {
@@ -3928,16 +3922,25 @@
     const panel = grid.querySelector(".professor-review-panel");
     const form = grid.querySelector(".professor-review-form");
     const backdrop = grid.querySelector(".review-modal-backdrop");
+    const reviewToggle = panel
+      ? panel.querySelector(".professor-review-toggle")
+      : null;
     const closeButton = form
       ? form.querySelector(".review-close-button")
       : null;
     const mobileViewport = window.matchMedia(
       "(max-width: 640px)"
     );
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
 
     let mobilePortalActive = false;
+    let formAnimation = null;
+    let backdropAnimation = null;
+    let closing = false;
 
-    if (!panel || !form) {
+    if (!panel || !form || !reviewToggle) {
       return;
     }
 
@@ -3949,6 +3952,18 @@
       event.preventDefault();
       submitProfessorReview(form, panel);
     });
+
+    function cancelModalAnimations() {
+      if (formAnimation) {
+        formAnimation.cancel();
+        formAnimation = null;
+      }
+
+      if (backdropAnimation) {
+        backdropAnimation.cancel();
+        backdropAnimation = null;
+      }
+    }
 
     function mountMobileReviewModal() {
       if (
@@ -3964,10 +3979,6 @@
 
       document.body.appendChild(form);
       mobilePortalActive = true;
-
-      window.requestAnimationFrame(function () {
-        form.scrollTop = 0;
-      });
     }
 
     function restoreReviewModal() {
@@ -3983,10 +3994,394 @@
       mobilePortalActive = false;
     }
 
-    function closeReviewModal() {
-      panel.removeAttribute("open");
-      syncReviewModalLock();
+    function clearOpenChoices() {
+      form
+        .querySelectorAll(".review-choice.open")
+        .forEach(function (choice) {
+          choice.classList.remove("open");
+        });
     }
+
+    function syncReviewModalLock() {
+      document.body.classList.toggle(
+        "review-modal-open",
+        panel.open
+      );
+
+      if (panel.open) {
+        if (mobileViewport.matches) {
+          mountMobileReviewModal();
+        }
+
+        return;
+      }
+
+      clearOpenChoices();
+      restoreReviewModal();
+
+      document.body.style.removeProperty(
+        "--review-scrollbar-compensation"
+      );
+    }
+
+    function getOriginTransform(triggerRect) {
+      const modalRect = form.getBoundingClientRect();
+
+      const buttonCenterX =
+        triggerRect.left + triggerRect.width / 2;
+      const buttonCenterY =
+        triggerRect.top + triggerRect.height / 2;
+      const modalCenterX =
+        modalRect.left + modalRect.width / 2;
+      const modalCenterY =
+        modalRect.top + modalRect.height / 2;
+
+      const originStrength =
+        mobileViewport.matches ? 0.2 : 0.88;
+
+      const x =
+        (buttonCenterX - modalCenterX) *
+        originStrength;
+      const y =
+        (buttonCenterY - modalCenterY) *
+        originStrength;
+
+      const scale =
+        mobileViewport.matches ? 0.94 : 0.68;
+
+      return {
+        transform:
+          "translate(calc(-50% + " +
+          x +
+          "px), calc(-50% + " +
+          y +
+          "px)) scale(" +
+          scale +
+          ")",
+        radius:
+          mobileViewport.matches
+            ? "32px"
+            : "999px"
+      };
+    }
+
+    function openReviewModal() {
+      if (panel.open || closing) {
+        return;
+      }
+
+      const triggerRect =
+        reviewToggle.getBoundingClientRect();
+
+      const scrollbarWidth = Math.max(
+        0,
+        window.innerWidth -
+          document.documentElement.clientWidth
+      );
+
+      document.body.style.setProperty(
+        "--review-scrollbar-compensation",
+        scrollbarWidth + "px"
+      );
+
+      form.style.opacity = "0";
+
+      if (backdrop) {
+        backdrop.style.opacity = "0";
+      }
+
+      panel.setAttribute("open", "");
+      syncReviewModalLock();
+
+      form.scrollTop = 0;
+
+      if (reducedMotion.matches) {
+        form.style.opacity = "";
+
+        if (backdrop) {
+          backdrop.style.opacity = "";
+        }
+
+        return;
+      }
+
+      const origin =
+        getOriginTransform(triggerRect);
+      const targetRadius =
+        window.getComputedStyle(form)
+          .borderRadius || "24px";
+
+      cancelModalAnimations();
+
+      form.style.opacity = "";
+
+      if (backdrop) {
+        backdrop.style.opacity = "";
+      }
+
+      formAnimation = form.animate(
+        [
+          {
+            opacity: 0,
+            transform: origin.transform,
+            borderRadius: origin.radius
+          },
+          {
+            opacity: 0.55,
+            offset: 0.16
+          },
+          {
+            opacity: 1,
+            transform:
+              "translate(-50%, -50%) scale(1)",
+            borderRadius: targetRadius
+          }
+        ],
+        {
+          duration: 560,
+          easing:
+            "cubic-bezier(0.16, 1, 0.3, 1)",
+          fill: "both"
+        }
+      );
+
+      if (backdrop) {
+        backdropAnimation = backdrop.animate(
+          [
+            { opacity: 0 },
+            { opacity: 1 }
+          ],
+          {
+            duration: 360,
+            easing:
+              "cubic-bezier(0.16, 1, 0.3, 1)",
+            fill: "both"
+          }
+        );
+      }
+
+      formAnimation.finished
+        .then(function () {
+          if (
+            !panel.open ||
+            closing ||
+            !formAnimation
+          ) {
+            return;
+          }
+
+          formAnimation.cancel();
+          formAnimation = null;
+        })
+        .catch(function () {});
+
+      if (backdropAnimation) {
+        backdropAnimation.finished
+          .then(function () {
+            if (!backdropAnimation) {
+              return;
+            }
+
+            backdropAnimation.cancel();
+            backdropAnimation = null;
+          })
+          .catch(function () {});
+      }
+    }
+
+    function finishClosingReviewModal() {
+      cancelModalAnimations();
+
+      panel.removeAttribute("open");
+      closing = false;
+
+      form.style.opacity = "";
+      form.style.transform = "";
+      form.style.borderRadius = "";
+
+      if (backdrop) {
+        backdrop.style.opacity = "";
+      }
+
+      syncReviewModalLock();
+
+      try {
+        reviewToggle.focus({
+          preventScroll: true
+        });
+      } catch (error) {
+        reviewToggle.focus();
+      }
+    }
+
+    function closeReviewModal() {
+      if (!panel.open || closing) {
+        return;
+      }
+
+      closing = true;
+      clearOpenChoices();
+
+      if (reducedMotion.matches) {
+        finishClosingReviewModal();
+        return;
+      }
+
+      const triggerRect =
+        reviewToggle.getBoundingClientRect();
+      const origin =
+        getOriginTransform(triggerRect);
+      const computedForm =
+        window.getComputedStyle(form);
+
+      const currentOpacity =
+        parseFloat(computedForm.opacity) || 1;
+      const currentTransform =
+        computedForm.transform === "none"
+          ? "translate(-50%, -50%) scale(1)"
+          : computedForm.transform;
+      const currentRadius =
+        computedForm.borderRadius || "24px";
+
+      cancelModalAnimations();
+
+      formAnimation = form.animate(
+        [
+          {
+            opacity: currentOpacity,
+            transform: currentTransform,
+            borderRadius: currentRadius
+          },
+          {
+            opacity: 0,
+            transform: origin.transform,
+            borderRadius: origin.radius
+          }
+        ],
+        {
+          duration: 340,
+          easing:
+            "cubic-bezier(0.4, 0, 0.2, 1)",
+          fill: "both"
+        }
+      );
+
+      if (backdrop) {
+        const currentBackdropOpacity =
+          parseFloat(
+            window.getComputedStyle(backdrop)
+              .opacity
+          ) || 1;
+
+        backdropAnimation = backdrop.animate(
+          [
+            {
+              opacity:
+                currentBackdropOpacity
+            },
+            {
+              opacity: 0
+            }
+          ],
+          {
+            duration: 260,
+            easing: "ease",
+            fill: "both"
+          }
+        );
+      }
+
+      formAnimation.finished
+        .then(finishClosingReviewModal)
+        .catch(function () {
+          finishClosingReviewModal();
+        });
+    }
+
+    reviewToggle.addEventListener(
+      "click",
+      function (event) {
+        event.preventDefault();
+
+        if (panel.open) {
+          closeReviewModal();
+        } else {
+          openReviewModal();
+        }
+      }
+    );
+
+    if (backdrop) {
+      backdrop.onclick = null;
+
+      backdrop.addEventListener(
+        "click",
+        closeReviewModal
+      );
+
+      backdrop.addEventListener(
+        "wheel",
+        function (event) {
+          event.preventDefault();
+        },
+        { passive: false }
+      );
+    }
+
+    if (closeButton) {
+      closeButton.onclick = null;
+
+      closeButton.addEventListener(
+        "click",
+        closeReviewModal
+      );
+    }
+
+    panel.addEventListener(
+      "review-request-close",
+      closeReviewModal
+    );
+
+    panel.addEventListener(
+      "toggle",
+      syncReviewModalLock
+    );
+
+    document.addEventListener(
+      "keydown",
+      function (event) {
+        if (
+          event.key === "Escape" &&
+          panel.open
+        ) {
+          event.preventDefault();
+          closeReviewModal();
+        }
+      }
+    );
+
+    if (
+      typeof mobileViewport.addEventListener ===
+      "function"
+    ) {
+      mobileViewport.addEventListener(
+        "change",
+        function () {
+          if (!panel.open) {
+            return;
+          }
+
+          if (mobileViewport.matches) {
+            mountMobileReviewModal();
+          } else {
+            restoreReviewModal();
+          }
+        }
+      );
+    }
+
+    syncReviewModalLock();
+  }
 
     function syncReviewModalLock() {
       document.body.classList.toggle(
