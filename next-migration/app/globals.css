@@ -669,6 +669,262 @@ a {
   font-weight: 720;
 }
 
+.tool-page-shell,
+.auth-page-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 82px 0 104px;
+}
+
+.auth-page-shell {
+  width: min(620px, calc(100% - 32px));
+  display: grid;
+  place-items: start stretch;
+}
+
+.tool-hero {
+  margin-bottom: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
+  gap: 32px;
+  align-items: end;
+}
+
+.tool-hero h1,
+.auth-card h1 {
+  margin: 0;
+  color: var(--atlas-ink);
+  font-size: clamp(3rem, 6vw, 5.6rem);
+  font-weight: 820;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+
+.tool-hero p,
+.auth-card p {
+  margin: 0;
+  color: var(--atlas-muted);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.calculator-layout,
+.degree-dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: start;
+}
+
+.calculator-panel,
+.calculator-summary,
+.degree-summary-card,
+.degree-group-card,
+.auth-card,
+.account-section-card {
+  border: 1px solid var(--atlas-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 18px 48px rgba(42, 32, 20, 0.09);
+}
+
+.calculator-panel,
+.auth-card {
+  padding: 24px;
+}
+
+.tool-panel-heading,
+.degree-group-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: start;
+}
+
+.tool-panel-heading span,
+.calculator-summary span,
+.degree-summary-card span,
+.degree-group-head span,
+.account-section-card span,
+.auth-form span {
+  color: var(--atlas-accent);
+  font-size: 0.82rem;
+  font-weight: 820;
+}
+
+.tool-panel-heading h2,
+.degree-group-head h2,
+.account-section-card h2 {
+  margin: 6px 0 0;
+  color: var(--atlas-ink);
+  font-size: 1.4rem;
+  line-height: 1.14;
+}
+
+.tool-panel-heading button,
+.auth-form button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--atlas-ink);
+  border-radius: 12px;
+  background: var(--atlas-ink);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 780;
+  cursor: pointer;
+}
+
+.gpa-row-list {
+  margin-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.gpa-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px 110px auto;
+  gap: 10px;
+}
+
+.gpa-row input,
+.gpa-row select,
+.auth-form input {
+  min-height: 46px;
+  width: 100%;
+  padding: 0 13px;
+  border: 1px solid rgba(23, 23, 23, 0.1);
+  border-radius: 12px;
+  background: rgba(247, 243, 235, 0.58);
+  color: var(--atlas-ink);
+  font: inherit;
+}
+
+.gpa-row button {
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid rgba(23, 23, 23, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--atlas-muted);
+  font: inherit;
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.calculator-summary,
+.degree-summary-card {
+  padding: 24px;
+  position: sticky;
+  top: 104px;
+}
+
+.calculator-summary strong,
+.degree-summary-card strong {
+  display: block;
+  margin-top: 12px;
+  color: var(--atlas-ink);
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.calculator-summary p,
+.degree-summary-card p,
+.account-section-card p {
+  margin: 14px 0 0;
+  color: var(--atlas-muted);
+  font-size: 0.96rem;
+  line-height: 1.62;
+}
+
+.degree-group-list {
+  display: grid;
+  gap: 12px;
+}
+
+.degree-group-card {
+  padding: 22px;
+}
+
+.degree-progress-track {
+  height: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(23, 23, 23, 0.08);
+}
+
+.degree-progress-track span {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--atlas-accent);
+  display: block;
+}
+
+.degree-group-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.degree-group-card li {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(247, 243, 235, 0.6);
+  color: var(--atlas-muted);
+  font-size: 0.94rem;
+}
+
+.auth-card {
+  margin-top: 26px;
+}
+
+.auth-card p {
+  margin-top: 18px;
+}
+
+.auth-form {
+  margin-top: 24px;
+  display: grid;
+  gap: 14px;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.auth-form button {
+  margin-top: 4px;
+}
+
+.auth-switch {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--atlas-line);
+  color: var(--atlas-muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.auth-switch a {
+  color: var(--atlas-accent);
+  font-weight: 820;
+}
+
+.account-section-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.account-section-card {
+  min-height: 230px;
+  padding: 22px;
+}
+
 .atlas-footer {
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
@@ -692,15 +948,20 @@ a {
 
   .home-page-shell,
   .courses-page-shell,
-  .professors-page-shell {
+  .professors-page-shell,
+  .tool-page-shell,
+  .auth-page-shell {
     padding: 54px 0 84px;
   }
 
   .home-hero-grid,
   .courses-hero,
   .professors-hero,
+  .tool-hero,
   .course-browser-layout,
-  .professor-filter-card {
+  .professor-filter-card,
+  .calculator-layout,
+  .degree-dashboard {
     min-height: 0;
     grid-template-columns: 1fr;
     gap: 24px;
@@ -708,7 +969,9 @@ a {
 
   .home-hero-copy h1,
   .courses-hero h1,
-  .professors-hero h1 {
+  .professors-hero h1,
+  .tool-hero h1,
+  .auth-card h1 {
     font-size: clamp(2.75rem, 15vw, 4.8rem);
   }
 
@@ -727,11 +990,14 @@ a {
     justify-content: flex-start;
   }
 
-  .course-filter-rail {
+  .course-filter-rail,
+  .calculator-summary,
+  .degree-summary-card {
     position: static;
   }
 
-  .course-row {
+  .course-row,
+  .gpa-row {
     grid-template-columns: 1fr;
   }
 
@@ -741,11 +1007,13 @@ a {
 
   .home-stat-grid,
   .feature-grid,
-  .professor-grid {
+  .professor-grid,
+  .account-section-grid {
     grid-template-columns: 1fr;
   }
 
-  .atlas-footer {
+  .atlas-footer,
+  .auth-switch {
     flex-direction: column;
   }
 }
