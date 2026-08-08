@@ -32,7 +32,7 @@
 
       .site-footer-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(160px, 0.7fr));
+        grid-template-columns: minmax(0, 1.35fr) repeat(3, minmax(140px, 0.65fr));
         gap: 34px;
       }
 
@@ -132,7 +132,14 @@
               <li><a href="professors.html">Professors</a></li>
               <li><a href="courses.html">Courses</a></li>
               <li><a href="gpa-calculator.html">GPA Calculator</a></li>
+            </ul>
+          </div>
+
+          <div class="site-footer-column">
+            <h3>Student Guidance</h3>
+            <ul class="site-footer-links">
               <li><a href="declaration-process.html">Declaration Process</a></li>
+              <li><a href="student-rights.html">Student Rights</a></li>
             </ul>
           </div>
 
@@ -140,7 +147,6 @@
             <h3>Support</h3>
             <ul class="site-footer-links">
               <li><a href="faq.html">FAQ</a></li>
-              <li><a href="student-rights.html">Student Rights</a></li>
               <li><a href="privacy.html">Privacy Policy</a></li>
               <li><a href="terms.html">Terms of Service</a></li>
             </ul>
