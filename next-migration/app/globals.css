@@ -98,47 +98,87 @@ a {
   font-weight: 760;
 }
 
-.page-shell {
+.home-page-shell {
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 96px 0;
+  padding: 82px 0 104px;
 }
 
-.hero-section {
-  max-width: 760px;
-  padding: 40px 0 52px;
+.home-hero-grid {
+  min-height: 560px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+  gap: 46px;
+  align-items: center;
+}
+
+.home-hero-copy {
+  max-width: 720px;
 }
 
 .section-kicker {
   margin: 0 0 14px;
   color: var(--atlas-accent);
-  font-size: 0.82rem;
-  font-weight: 800;
+  font-size: 0.86rem;
+  font-weight: 820;
 }
 
-.hero-section h1 {
+.home-hero-copy h1 {
   max-width: 760px;
   margin: 0;
-  font-size: clamp(3rem, 8vw, 5.4rem);
-  line-height: 1.02;
-  letter-spacing: 0;
+  color: var(--atlas-ink);
+  font-size: clamp(3.45rem, 7vw, 6.7rem);
+  font-weight: 820;
+  line-height: 0.96;
+  letter-spacing: -0.03em;
 }
 
-.hero-copy,
-.migration-panel p,
-.feature-card p {
+.home-hero-copy p {
+  max-width: 590px;
+  margin: 24px 0 0;
   color: var(--atlas-muted);
-  font-size: 1rem;
-  line-height: 1.7;
+  font-size: 1.06rem;
+  line-height: 1.75;
 }
 
-.hero-copy {
-  max-width: 620px;
-  margin: 22px 0 0;
+.home-search-preview {
+  max-width: 650px;
+  min-height: 66px;
+  margin-top: 32px;
+  padding: 8px 8px 8px 22px;
+  border: 1px solid var(--atlas-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 18px 44px rgba(42, 32, 20, 0.09);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.home-search-preview span {
+  overflow: hidden;
+  color: rgba(23, 23, 23, 0.52);
+  font-size: 0.98rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-search-preview a {
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: var(--atlas-ink);
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 780;
+  display: inline-flex;
+  align-items: center;
 }
 
 .hero-actions {
-  margin-top: 30px;
+  margin-top: 18px;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -162,58 +202,138 @@ a {
   color: var(--atlas-ink);
 }
 
+.home-signal-panel {
+  min-height: 420px;
+  padding: 28px;
+  border: 1px solid rgba(23, 23, 23, 0.11);
+  border-radius: 24px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(246, 240, 229, 0.82)),
+    var(--atlas-surface);
+  box-shadow: 0 26px 70px rgba(42, 32, 20, 0.13);
+  display: grid;
+  align-content: space-between;
+  gap: 36px;
+}
+
+.signal-panel-header {
+  display: grid;
+  gap: 10px;
+}
+
+.signal-panel-header span,
+.feature-card > span {
+  color: var(--atlas-accent);
+  font-size: 0.82rem;
+  font-weight: 820;
+}
+
+.signal-panel-header strong {
+  max-width: 300px;
+  color: var(--atlas-ink);
+  font-size: 2rem;
+  line-height: 1.08;
+}
+
+.signal-list {
+  display: grid;
+  gap: 12px;
+}
+
+.signal-list div {
+  padding: 16px;
+  border: 1px solid rgba(23, 23, 23, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.66);
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.signal-list span {
+  color: var(--atlas-accent);
+  font-size: 0.88rem;
+  font-weight: 820;
+}
+
+.signal-list p {
+  margin: 0;
+  color: var(--atlas-muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.home-stat-grid,
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
-.feature-card,
-.migration-panel {
+.home-stat-grid {
+  margin-top: 18px;
+}
+
+.stat-card,
+.feature-card {
   border: 1px solid var(--atlas-line);
-  border-radius: var(--atlas-radius);
-  background: var(--atlas-surface);
-  box-shadow: var(--atlas-shadow);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 48px rgba(42, 32, 20, 0.09);
+}
+
+.stat-card {
+  padding: 22px;
+}
+
+.stat-card strong {
+  display: block;
+  color: var(--atlas-ink);
+  font-size: 2.05rem;
+  line-height: 1;
+}
+
+.stat-card span {
+  display: block;
+  margin-top: 10px;
+  color: var(--atlas-ink);
+  font-weight: 780;
+}
+
+.stat-card p,
+.feature-card p {
+  margin: 10px 0 0;
+  color: var(--atlas-muted);
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
+.feature-grid {
+  margin-top: 16px;
 }
 
 .feature-card {
-  min-height: 230px;
-  padding: 24px;
+  min-height: 260px;
+  padding: 26px;
   display: grid;
-  align-content: space-between;
-  gap: 18px;
-  transition: transform 0.18s ease, border-color 0.18s ease;
+  align-content: start;
+  gap: 16px;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 }
 
 .feature-card:hover {
   border-color: rgba(168, 121, 56, 0.38);
+  background: rgba(255, 255, 255, 0.94);
   transform: translateY(-2px);
 }
 
-.feature-card h2,
-.migration-panel h2 {
+.feature-card h2 {
+  max-width: 320px;
   margin: 0;
-  font-size: 1.35rem;
-  line-height: 1.18;
-}
-
-.feature-card p {
-  margin: 0;
-}
-
-.feature-card span {
-  color: var(--atlas-accent);
-  font-weight: 800;
-}
-
-.migration-panel {
-  margin-top: 18px;
-  padding: 28px;
-}
-
-.migration-panel p {
-  max-width: 700px;
-  margin: 12px 0 0;
+  color: var(--atlas-ink);
+  font-size: 1.55rem;
+  line-height: 1.12;
 }
 
 .atlas-footer {
@@ -228,7 +348,7 @@ a {
   gap: 18px;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .atlas-header {
     grid-template-columns: 1fr auto;
   }
@@ -237,12 +357,32 @@ a {
     display: none;
   }
 
-  .feature-grid {
-    grid-template-columns: 1fr;
+  .home-page-shell {
+    padding: 54px 0 84px;
   }
 
-  .page-shell {
-    padding-top: 64px;
+  .home-hero-grid {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .home-hero-copy h1 {
+    font-size: clamp(2.75rem, 15vw, 4.8rem);
+  }
+
+  .home-search-preview {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .home-search-preview a {
+    justify-content: center;
+  }
+
+  .home-stat-grid,
+  .feature-grid {
+    grid-template-columns: 1fr;
   }
 
   .atlas-footer {
