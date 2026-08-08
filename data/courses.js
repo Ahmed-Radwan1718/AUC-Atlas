@@ -1235,12 +1235,63 @@
           encodeURIComponent(courseCode) +
           "#course-materials-access"
         : "courses.html";
+      const fileName = String(
+        material.fileName ||
+        material.title ||
+        "Course material"
+      ).trim();
+      const fileExtension =
+        getMaterialFileExtension(
+          fileName,
+          material.fileType
+        );
+      const fileIconMap = {
+        pdf: "pdf.png",
+        doc: "doc.png",
+        docx: "doc.png",
+        xls: "xls.png",
+        xlsx: "xls.png",
+        ppt: "ppt.png",
+        pptx: "ppt.png",
+        png: "png.png",
+        jpg: "jpg.png",
+        jpeg: "jpg.png"
+      };
+      const fileIconUrl =
+        fileIconMap[fileExtension] || "";
+      const extensionLabel =
+        fileExtension === "file"
+          ? "FILE"
+          : fileExtension
+              .slice(0, 5)
+              .toUpperCase();
+      const fileIconMarkup = fileIconUrl
+        ? `
+          <img
+            class="course-recent-file-icon-image"
+            src="${escapeMaterialText(fileIconUrl)}"
+            alt=""
+            aria-hidden="true"
+          >
+        `
+        : `
+          <span
+            class="course-recent-file-icon-fallback"
+            aria-hidden="true"
+          >
+            <strong>${escapeMaterialText(extensionLabel)}</strong>
+          </span>
+        `;
 
       return `
         <a class="course-recent-card" href="${href}">
-          <span class="course-recent-type">
-            ${escapeMaterialText(material.materialType || "Course material")}
-          </span>
+          <div class="course-recent-card-top">
+            <span class="course-recent-type">
+              ${escapeMaterialText(material.materialType || "Course material")}
+            </span>
+
+            ${fileIconMarkup}
+          </div>
 
           <h3>${escapeMaterialText(material.title || "Course material")}</h3>
           <p>${escapeMaterialText(courseLabel || "AUC course material")}</p>
