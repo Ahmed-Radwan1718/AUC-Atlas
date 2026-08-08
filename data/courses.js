@@ -2620,51 +2620,32 @@
     const list = document.getElementById(
       "course-materials-list"
     );
-    const filterButtons = Array.from(
-      document.querySelectorAll(
-        "[data-material-filter]"
-      )
+    const filterChoice = document.getElementById(
+      "course-material-filter"
     );
-    const sortChoice = document.getElementById(
-      "course-material-sort"
-    );
-    const sortButton = sortChoice
-      ? sortChoice.querySelector(
-          "[data-material-sort-button]"
+    const filterButton = filterChoice
+      ? filterChoice.querySelector(
+          "[data-material-filter-button]"
         )
       : null;
-    const sortOptions = sortChoice
+    const filterOptions = filterChoice
       ? Array.from(
-          sortChoice.querySelectorAll(
-            "[data-material-sort-option]"
+          filterChoice.querySelectorAll(
+            "[data-material-filter-option]"
           )
         )
       : [];
     const pageSize = 6;
     let visibleCount = pageSize;
-    let activeFilter = "all";
-    let sortDirection =
-      sortButton &&
-      sortButton.dataset.sortValue
-        ? sortButton.dataset.sortValue
-        : "newest";
+    let activeFilter =
+      filterButton &&
+      filterButton.dataset.materialFilterValue
+        ? filterButton.dataset.materialFilterValue
+        : "all";
+    let sortDirection = "newest";
 
     if (!list) {
       return;
-    }
-
-    const pressedFilter = filterButtons.find(
-      function (button) {
-        return button.getAttribute(
-          "aria-pressed"
-        ) === "true";
-      }
-    );
-
-    if (pressedFilter) {
-      activeFilter =
-        pressedFilter.dataset.materialFilter ||
-        "all";
     }
 
     if (!materials.length) {
