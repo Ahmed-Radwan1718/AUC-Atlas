@@ -996,6 +996,29 @@
       display: inline-flex;
       align-items: center;
       list-style: none;
+      transform: translateY(0) scale(1);
+      transform-origin: center;
+      transition:
+        transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+        background 180ms ease,
+        box-shadow 180ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .professor-review-toggle:hover {
+      background: #242424;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .professor-review-toggle:active {
+      transform: translateY(0) scale(0.965);
+      transition-duration: 90ms;
+    }
+
+    .professor-review-toggle:focus-visible {
+      outline: 3px solid rgba(192, 154, 92, 0.28);
+      outline-offset: 4px;
     }
 
     .professor-review-toggle::-webkit-details-marker {
@@ -1008,7 +1031,13 @@
       z-index: 1200;
       background: rgba(247, 244, 238, 0.42);
       backdrop-filter: blur(12px);
-      animation: reviewBackdropIn 0.24s ease both;
+      -webkit-backdrop-filter: blur(12px);
+      animation:
+        reviewBackdropIn
+        380ms
+        cubic-bezier(0.16, 1, 0.3, 1)
+        both;
+      will-change: opacity;
     }
 
     .professor-review-form {
@@ -1031,7 +1060,13 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 18px;
-      animation: reviewModalIn 0.28s ease both;
+      transform-origin: center center;
+      animation:
+        reviewModalIn
+        480ms
+        cubic-bezier(0.16, 1, 0.3, 1)
+        both;
+      will-change: transform, opacity;
     }
 
     .review-modal-header {
@@ -2140,19 +2175,43 @@
     }
 
     @keyframes reviewBackdropIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes reviewModalIn {
       from {
         opacity: 0;
-        transform: translate(-50%, -46%) scale(0.96);
       }
 
       to {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    @keyframes reviewModalIn {
+      0% {
+        opacity: 0;
+        transform:
+          translate(-50%, calc(-50% + 18px))
+          scale(0.975);
+      }
+
+      45% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 1;
+        transform:
+          translate(-50%, -50%)
+          scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .review-modal-backdrop,
+      .professor-review-form {
+        animation: none;
+      }
+
+      .professor-review-toggle {
+        transition: none;
       }
     }
 
@@ -2229,7 +2288,11 @@
         scrollbar-gutter: auto;
         border-radius: 22px;
         transform: translate(-50%, -50%);
-        animation: none;
+        animation:
+          reviewModalIn
+          440ms
+          cubic-bezier(0.16, 1, 0.3, 1)
+          both;
       }
 
       .review-modal-header {
