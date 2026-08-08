@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "next": "latest",
+    "otplib": "^12.0.1",
+    "qrcode": "^1.5.4",
+    "react": "latest",
+    "react-dom": "latest"
+  }
+}
