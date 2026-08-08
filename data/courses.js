@@ -3141,8 +3141,31 @@
           material.materialType ||
           "Material"
         );
+      const hasCompleteFileSizes =
+        files.every(function (fileMaterial) {
+          return Number(fileMaterial.size) > 0;
+        });
+      const totalFileSize =
+        files.reduce(
+          function (total, fileMaterial) {
+            return (
+              total +
+              Math.max(
+                0,
+                Number(fileMaterial.size) || 0
+              )
+            );
+          },
+          0
+        );
+      const groupFileSize =
+        hasCompleteFileSizes
+          ? formatMaterialFileSize(totalFileSize)
+          : "Size unavailable";
       const metadata =
-        buildGroupMetadata(material);
+        buildGroupMetadata(material) +
+        " · " +
+        escapeMaterialText(groupFileSize);
 
       const fileRows = files
         .map(function (fileMaterial) {
