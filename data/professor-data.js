@@ -1526,37 +1526,126 @@
 
     .professor-review-stats {
       display: grid;
+      gap: 0;
+    }
+
+    .professor-review-stat-row {
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      display: grid;
       gap: 8px;
+    }
+
+    .professor-review-stat-row:first-child {
+      padding-top: 4px;
+    }
+
+    .professor-review-stat-head {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .professor-review-stat-label {
+      min-width: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .professor-review-stat-value {
+      min-width: 0;
+      color: rgba(23, 23, 23, 0.42);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      text-align: right;
+      text-transform: uppercase;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+    }
+
+    .professor-review-stat-value strong {
+      color: #171717;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .professor-review-stat-value span:last-child {
+      color: rgba(192, 154, 92, 0.96);
+      font-weight: 900;
+    }
+
+    .professor-review-stat-track {
+      width: 100%;
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+    }
+
+    .professor-review-stat-fill {
+      width: var(--stat-width, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: #c09a5c;
+      display: block;
+      transform: scaleX(0);
+      transform-origin: left center;
+      animation:
+        professorReviewStatFill
+        0.72s
+        cubic-bezier(0.16, 1, 0.3, 1)
+        var(--stat-delay, 0ms)
+        forwards;
+    }
+
+    @keyframes professorReviewStatFill {
+      to {
+        transform: scaleX(1);
+      }
     }
 
     .professor-review-insights-more {
       display: grid;
-      gap: 8px;
+      gap: 0;
     }
 
     .professor-review-insights-hidden {
       order: 1;
       box-sizing: border-box;
       display: grid;
-      gap: 8px;
+      gap: 0;
       margin-top: 0;
       overflow: hidden;
       opacity: 1;
       transform: translateY(0);
-      transition: height 0.28s ease, opacity 0.22s ease, transform 0.22s ease;
+      transition:
+        height 0.28s ease,
+        opacity 0.22s ease,
+        transform 0.22s ease;
       will-change: height, opacity, transform;
     }
 
     .professor-review-insights-more-toggle {
       order: 2;
       width: fit-content;
-      margin-top: 2px;
+      margin-top: 14px;
       padding: 0;
       border: 0;
       background: transparent;
       color: #171717;
       font-size: 10px;
-      font-weight: 900;
+      font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
@@ -1564,17 +1653,17 @@
       align-items: center;
       gap: 8px;
       list-style: none;
-      transition: color 0.18s ease, transform 0.18s ease;
+      transition: color 0.18s ease;
     }
 
     .professor-review-insights-more-toggle::after {
       content: "";
       width: 6px;
       height: 6px;
-      border-right: 2px solid currentColor;
-      border-bottom: 2px solid currentColor;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
       transform: rotate(45deg) translateY(-2px);
-      transition: transform 0.18s ease;
+      transition: transform 0.22s ease;
     }
 
     .professor-review-insights-more[open] .professor-review-insights-more-toggle::after {
@@ -1597,120 +1686,11 @@
       display: inline;
     }
 
-    .professor-review-insight-card {
-      padding: 11px 12px;
-      border: 1px solid rgba(23, 23, 23, 0.08);
-      border-radius: 16px;
-      background: rgba(247, 244, 238, 0.5);
-      display: grid;
-      gap: 8px;
-    }
-
-    .professor-review-insight-main {
-      display: grid;
-      gap: 6px;
-    }
-
-    .professor-review-insight-main span {
-      color: rgba(192, 154, 92, 0.92);
-      font-size: 8px;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .professor-review-insight-main p {
-      margin: 0;
-      color: rgba(23, 23, 23, 0.66);
-      font-size: 12px;
-      font-weight: 700;
-      line-height: 1.35;
-    }
-
-    .professor-review-insight-main p strong {
-      color: #171717;
-      font-weight: 900;
-    }
-
-    .professor-review-detail-toggle {
-      width: fit-content;
-      min-height: auto;
-      padding: 0;
-      border-radius: 0;
-      background: transparent;
-      color: #171717;
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      list-style: none;
-    }
-
-    .professor-review-detail-toggle::after {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-right: 2px solid currentColor;
-      border-bottom: 2px solid currentColor;
-      transform: rotate(45deg) translateY(-2px);
-      transition: transform 0.18s ease;
-    }
-
-    .professor-review-detail[open] .professor-review-detail-toggle::after {
-      transform: rotate(225deg) translate(-1px, -1px);
-    }
-
-    .professor-review-detail-toggle::-webkit-details-marker {
-      display: none;
-    }
-
-    .professor-review-detail-panel {
-      box-sizing: border-box;
-      padding-top: 10px;
-      display: grid;
-      gap: 8px;
-      overflow: hidden;
-      transition: height 0.28s ease, opacity 0.22s ease, transform 0.22s ease;
-    }
-
-    .professor-review-detail-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 42px;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .professor-review-detail-row > span {
-      color: rgba(23, 23, 23, 0.7);
-      font-size: 11px;
-      font-weight: 800;
-      line-height: 1.25;
-    }
-
-    .professor-review-detail-row > strong {
-      color: #171717;
-      font-size: 11px;
-      font-weight: 900;
-      text-align: right;
-    }
-
-    .professor-review-detail-track {
-      grid-column: 1 / -1;
-      height: 6px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: rgba(23, 23, 23, 0.08);
-    }
-
-    .professor-review-detail-track span {
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, rgba(192, 154, 92, 0.96), #171717);
-      display: block;
+    @media (prefers-reduced-motion: reduce) {
+      .professor-review-stat-fill {
+        animation: none;
+        transform: scaleX(1);
+      }
     }
 
     .professor-reviews-section {
@@ -2643,36 +2623,55 @@
       return aPriority - bPriority || b.topAnswer.percent - a.topAnswer.percent || a.label.localeCompare(b.label);
     });
 
-    function renderInsightCard(row) {
+    function getCompactStatValue(value) {
+      const compactValues = {
+        "Matches class material": "Matches class",
+        "Easier than class material": "Easier than class",
+        "Harder than class material": "Harder than class",
+        "Sometimes checked": "Sometimes",
+        "Available but limited": "Limited",
+        "Did not use": "Not used",
+        "Attending means less work at home": "Worth attending",
+        "Rubric is clear": "Clear rubric"
+      };
+
+      return compactValues[value] || String(value || "").replace(/-/g, " ");
+    }
+
+    function renderStatRow(row, index) {
+      const displayValue = getCompactStatValue(row.topAnswer.value);
+      const delay = Math.min(index * 55, 275);
+
       return `
-        <article class="professor-review-insight-card">
-          <div class="professor-review-insight-main">
-            <span>${escapeHtml(row.label)}</span>
-            <p>${renderReviewInsightSummary(row.summary)}</p>
+        <div class="professor-review-stat-row">
+          <div class="professor-review-stat-head">
+            <span class="professor-review-stat-label">${escapeHtml(row.label)}</span>
+
+            <div class="professor-review-stat-value">
+              <strong>${escapeHtml(displayValue)}</strong>
+              <span aria-hidden="true">·</span>
+              <span>${escapeHtml(row.topAnswer.percent + "%")}</span>
+            </div>
           </div>
 
-          <details class="professor-review-detail">
-            <summary class="professor-review-detail-toggle">View more details</summary>
-            <div class="professor-review-detail-panel">
-              ${row.answers.map(function (answer) {
-                return `
-                  <div class="professor-review-detail-row">
-                    <span>${escapeHtml(answer.value.replace(/-/g, " "))}</span>
-                    <strong>${escapeHtml(answer.percent + "%")}</strong>
-                    <div class="professor-review-detail-track">
-                      <span style="width: ${escapeHtml(String(answer.width))}%;"></span>
-                    </div>
-                  </div>
-                `;
-              }).join("")}
-            </div>
-          </details>
-        </article>
+          <div
+            class="professor-review-stat-track"
+            role="img"
+            aria-label="${escapeHtml(row.label + ": " + displayValue + ", selected by " + row.topAnswer.percent + "% of responses")}"
+          >
+            <span
+              class="professor-review-stat-fill"
+              style="--stat-width: ${escapeHtml(String(row.topAnswer.width))}%; --stat-delay: ${delay}ms;"
+            ></span>
+          </div>
+        </div>
       `;
     }
 
     if (statsCount) {
-      statsCount.textContent = safeReviews.length ? "Top patterns from reviews" : "No review choices yet";
+      statsCount.textContent = safeReviews.length
+        ? "Based on student reviews"
+        : "No review choices yet";
     }
 
     if (!panel) {
@@ -2684,8 +2683,9 @@
       return;
     }
 
-    const visibleRows = rows.slice(0, 3);
-    const hiddenRows = rows.slice(3);
+    const visibleRows = rows.slice(0, 5);
+    const hiddenRows = rows.slice(5);
+
     const hiddenMarkup = hiddenRows.length
       ? `
         <details class="professor-review-insights-more">
@@ -2695,14 +2695,19 @@
           </summary>
 
           <div class="professor-review-insights-hidden">
-            ${hiddenRows.map(renderInsightCard).join("")}
+            ${hiddenRows.map(function (row, index) {
+              return renderStatRow(row, index + visibleRows.length);
+            }).join("")}
           </div>
         </details>
       `
       : "";
 
-    panel.innerHTML = visibleRows.map(renderInsightCard).join("") + hiddenMarkup;
-    panel.querySelectorAll(".professor-review-detail, .professor-review-insights-more").forEach(setupProfessorReviewDetailAnimation);
+    panel.innerHTML = visibleRows.map(renderStatRow).join("") + hiddenMarkup;
+
+    panel
+      .querySelectorAll(".professor-review-insights-more")
+      .forEach(setupProfessorReviewDetailAnimation);
   }
 
   function setupProfessorReviewDetailAnimation(details) {
