@@ -1959,157 +1959,95 @@
     .course-material-library-toolbar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 12px;
       flex-wrap: wrap;
     }
 
     .course-material-filter-list {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
+      position: relative;
+      width: min(100%, 250px);
     }
 
-    .course-material-filter {
-      min-height: 34px;
-      padding: 0 11px;
-      border: 1px solid rgba(23, 23, 23, 0.09);
+    .course-material-filter-list .material-choice-button {
+      min-height: 40px;
+      width: 100%;
+      padding: 0 14px 0 16px;
+      border: 1px solid #171717;
       border-radius: 999px;
-      background: rgba(247, 244, 238, 0.78);
-      color: rgba(23, 23, 23, 0.58);
+      background: #171717;
+      color: #ffffff;
       font: inherit;
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 900;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      cursor: pointer;
-      transition:
-        background 0.22s ease,
-        border-color 0.22s ease,
-        color 0.22s ease,
-        transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 0.22s ease;
-    }
-
-    .course-material-filter:hover,
-    .course-material-filter:focus-visible {
-      border-color: rgba(192, 154, 92, 0.42);
-      color: #171717;
-      outline: none;
-      transform: translateY(-1px);
-    }
-
-    .course-material-filter:active {
-      transform: translateY(0) scale(0.94);
-    }
-
-    .course-material-filter[aria-pressed="true"] {
-      border-color: #171717;
-      background: #171717;
-      color: #ffffff;
       box-shadow: 0 6px 18px rgba(23, 23, 23, 0.12);
     }
 
-    .course-material-sort-wrap {
-      min-height: 34px;
-      padding: 0 10px;
-      border: 1px solid rgba(23, 23, 23, 0.09);
-      border-radius: 999px;
-      background: rgba(247, 244, 238, 0.78);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition:
-        background 0.22s ease,
-        border-color 0.22s ease,
-        transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+    .course-material-filter-list .material-choice-button::before {
+      content: "Type";
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
-    .course-material-sort-wrap:hover,
-    .course-material-sort-wrap:has(.material-choice-button:focus-visible),
-    .course-material-sort-wrap:has(.material-choice.open) {
-      border-color: rgba(192, 154, 92, 0.42);
-      background: rgba(192, 154, 92, 0.1);
+    .course-material-filter-list .material-choice-button:hover,
+    .course-material-filter-list .material-choice-button:focus-visible,
+    .course-material-filter-list.open .material-choice-button {
+      border-color: #171717;
+      background: #171717;
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(23, 23, 23, 0.16);
+      outline: none;
       transform: translateY(-1px);
     }
 
-    .course-material-sort-wrap > span {
-      color: rgba(23, 23, 23, 0.5);
-      font-size: 9px;
-      font-weight: 900;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
+    .course-material-filter-list .material-choice-button:active {
+      transform: translateY(0) scale(0.96);
     }
 
-    .course-material-sort-choice {
-      width: 82px;
-    }
-
-    .course-material-sort-choice .material-choice-button {
-      min-height: 32px;
-      padding: 0;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      box-shadow: none;
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      transition:
-        color 0.22s ease,
-        transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .course-material-sort-choice .material-choice-button:hover,
-    .course-material-sort-choice .material-choice-button:focus-visible,
-    .course-material-sort-choice.open .material-choice-button {
-      border: 0;
-      background: transparent;
-      box-shadow: none;
-      outline: none;
-      transform: none;
-    }
-
-    .course-material-sort-choice .material-choice-button:active {
-      transform: scale(0.96);
-    }
-
-    .course-material-sort-choice .material-choice-menu {
-      right: 0;
-      left: auto;
-      width: 138px;
+    .course-material-filter-list .material-choice-menu {
+      right: auto;
+      left: 0;
+      width: min(280px, calc(100vw - 48px));
+      max-height: min(320px, 52vh);
       display: grid;
       gap: 4px;
       visibility: hidden;
       opacity: 0;
       pointer-events: none;
       transform: translateY(-7px) scale(0.96);
-      transform-origin: top right;
+      transform-origin: top left;
       transition:
         opacity 0.18s ease,
         transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
         visibility 0.18s ease;
     }
 
-    .course-material-sort-choice.open .material-choice-menu {
+    .course-material-filter-list.open .material-choice-menu {
       visibility: visible;
       opacity: 1;
       pointer-events: auto;
       transform: translateY(0) scale(1);
     }
 
-    .course-material-sort-choice .material-choice-option {
-      min-height: 36px;
+    .course-material-filter-list .material-choice-option {
+      min-height: 38px;
       font-size: 11px;
-      transition:
-        background 0.18s ease,
-        color 0.18s ease,
-        transform 0.14s ease;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
 
-    .course-material-sort-choice .material-choice-option:active {
+    .course-material-filter-list .material-choice-option[aria-selected="true"] {
+      background: #171717;
+      color: #ffffff;
+    }
+
+    .course-material-filter-list .material-choice-option:active {
       transform: scale(0.97);
     }
 
@@ -4382,116 +4320,35 @@
 
               <div class="course-material-library-toolbar">
                 <div
-                  class="course-material-filter-list"
-                  role="group"
-                  aria-label="Filter course materials"
+                  class="material-choice course-material-filter-list course-material-filter-choice"
+                  id="course-material-filter"
                 >
                   <button
-                    class="course-material-filter"
+                    class="material-choice-button"
                     type="button"
-                    data-material-filter="all"
-                    aria-pressed="true"
-                  >All</button>
-
-                  <button
-                    class="course-material-filter"
-                    type="button"
-                    data-material-filter="notes"
-                    aria-pressed="false"
-                  >Notes</button>
-
-                  <button
-                    class="course-material-filter"
-                    type="button"
-                    data-material-filter="slides"
-                    aria-pressed="false"
-                  >Slides</button>
-
-                  <button
-                    class="course-material-filter"
-                    type="button"
-                    data-material-filter="syllabus"
-                    aria-pressed="false"
-                  >Syllabus</button>
-
-                  <button
-                    class="course-material-filter"
-                    type="button"
-                    data-material-filter="past-exam"
-                    aria-pressed="false"
-                  >Past exam</button>
-
-                  <button
-                    class="course-material-filter"
-                    type="button"
-                    data-material-filter="practice-sheet"
-                    aria-pressed="false"
-                  >Practice sheet</button>
-
-                  <button
-                    class="course-material-filter"
-                    type="button"
-                    data-material-filter="lab-file"
-                    aria-pressed="false"
-                  >Lab file</button>
-
-                  <button
-                    class="course-material-filter"
-                    type="button"
-                    data-material-filter="past-assignment"
-                    aria-pressed="false"
-                  >Past assignments</button>
-
-                  <button
-                    class="course-material-filter"
-                    type="button"
-                    data-material-filter="review-sheet"
-                    aria-pressed="false"
-                  >Review sheet</button>
-                </div>
-
-                <div class="course-material-sort-wrap">
-                  <span>Sort</span>
+                    data-material-filter-button
+                    data-material-filter-value="all"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                  >
+                    All materials
+                  </button>
 
                   <div
-                    class="material-choice course-material-sort-choice"
-                    id="course-material-sort"
+                    class="material-choice-menu"
+                    data-material-filter-menu
+                    role="listbox"
+                    aria-label="Filter course materials"
                   >
-                    <button
-                      class="material-choice-button"
-                      type="button"
-                      data-material-sort-button
-                      data-sort-value="newest"
-                      aria-haspopup="listbox"
-                      aria-expanded="false"
-                    >
-                      Newest
-                    </button>
-
-                    <div
-                      class="material-choice-menu"
-                      data-material-sort-menu
-                      role="listbox"
-                      aria-label="Sort course materials"
-                    >
-                      <button
-                        class="material-choice-option"
-                        type="button"
-                        data-material-sort-option="newest"
-                        aria-selected="true"
-                      >
-                        Newest
-                      </button>
-
-                      <button
-                        class="material-choice-option"
-                        type="button"
-                        data-material-sort-option="oldest"
-                        aria-selected="false"
-                      >
-                        Oldest
-                      </button>
-                    </div>
+                    <button class="material-choice-option" type="button" data-material-filter-option="all" aria-selected="true">All materials</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="notes" aria-selected="false">Notes</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="slides" aria-selected="false">Slides</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="syllabus" aria-selected="false">Syllabus</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="past-exam" aria-selected="false">Past exam</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="practice-sheet" aria-selected="false">Practice sheet</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="lab-file" aria-selected="false">Lab file</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="past-assignment" aria-selected="false">Past assignments</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="review-sheet" aria-selected="false">Review sheet</button>
                   </div>
                 </div>
               </div>
