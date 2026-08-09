@@ -360,6 +360,64 @@ async function getProfessorReviewCount(professorId) {
   return Number(snapshot.data().count || 0);
 }
 
+async function getProfessorReviewSummaries() {
+  const snapshot = await admin.firestore()
+    .collection("professorReviews")
+    .select("professorId", "rating")
+    .get();
+  const totals = new Map();
+
+  snapshot.forEach(function (doc) {
+    const data = doc.data() || {};
+    const professorId = cleanString(
+      data.professorId,
+      80
+    );
+    const rating = Number(data.rating || 0);
+
+    if (!professorId) {
+      return;
+    }
+
+    const summary = totals.get(professorId) || {
+      reviewCount: 0,
+      ratingCount: 0,
+      ratingTotal: 0
+    };
+
+    summary.reviewCount += 1;
+
+    if (
+      Number.isFinite(rating) &&
+      rating >= 1 &&
+      rating <= 5
+    ) {
+      summary.ratingCount += 1;
+      summary.ratingTotal += rating;
+    }
+
+    totals.set(professorId, summary);
+  });
+
+  const summaries = {};
+
+  totals.forEach(function (summary, professorId) {
+    summaries[professorId] = {
+      reviewCount: summary.reviewCount,
+      averageRating: summary.ratingCount
+        ? Math.round(
+            (
+              summary.ratingTotal /
+              summary.ratingCount
+            ) * 100
+          ) / 100
+        : 0
+    };
+  });
+
+  return summaries;
+}
+
 async function getCourseReviews(courseCode) {
   const normalizedCourseCode = normalizeCourseCode(courseCode);
   const reviewsById = new Map();
@@ -519,6 +577,19 @@ module.exports = async function handler(req, res) {
     if (req.method === "GET") {
       const query = req.query || {};
       const mine = cleanString(query.mine || query.author, 20);
+      const summariesRequested = cleanString(
+        query.summaries || query.summary,
+        20
+      );
+
+      if (summariesRequested === "true") {
+        const summaries =
+          await getProfessorReviewSummaries();
+
+        return res.status(200).json({
+          summaries
+        });
+      }
 
       if (mine === "true" || mine === "me") {
         const decodedUser = await getSiteSessionUser(req, {
