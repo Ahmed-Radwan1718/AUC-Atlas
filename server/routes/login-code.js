@@ -723,6 +723,25 @@ async function verifyLoginCode(
     });
   }
 
+  if (!userRecord.emailVerified) {
+    userRecord = await admin.auth().updateUser(
+      userRecord.uid,
+      {
+        emailVerified: true
+      }
+    );
+
+    await admin.firestore()
+      .collection("users")
+      .doc(userRecord.uid)
+      .set({
+        emailVerified: true,
+        updatedAt:
+          admin.firestore.FieldValue
+            .serverTimestamp()
+      }, { merge: true });
+  }
+
   const userDoc =
     await admin.firestore()
       .collection("users")
