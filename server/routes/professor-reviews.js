@@ -1,7 +1,17 @@
 const admin = require("../_lib/firebaseAdmin");
 
 const { getSiteSessionUser } = require("../_lib/securityHelpers");
+const {
+  getRequestIp,
+  consumeSecurityRateLimit
+} = require("../_lib/securityRateLimits");
 
+const REVIEW_SUMMARY_WINDOW_MS =
+  60 * 1000;
+const REVIEW_SUMMARY_MAX_REQUESTS = 60;
+const REVIEW_MUTATION_WINDOW_MS =
+  60 * 60 * 1000;
+const REVIEW_MUTATION_MAX_REQUESTS = 30;
 const REVIEW_MAX_PER_PROFESSOR = 5;
 const REVIEW_SUBMISSION_WINDOW_MS =
   60 * 60 * 1000;
@@ -579,6 +589,17 @@ module.exports = async function handler(req, res) {
       );
 
       if (summariesRequested === "true") {
+        await consumeSecurityRateLimit({
+          scope: "professor-review-summaries-ip",
+          identifier: getRequestIp(req),
+          maxAttempts:
+            REVIEW_SUMMARY_MAX_REQUESTS,
+          windowMs:
+            REVIEW_SUMMARY_WINDOW_MS,
+          message:
+            "Too many professor-review summary requests. Please try again later."
+        });
+
         const summaries =
           await getProfessorReviewSummaries();
 
@@ -624,6 +645,22 @@ module.exports = async function handler(req, res) {
     const decodedUser = await getSiteSessionUser(req, {
       checkRevoked: true
     });
+
+    if (
+      req.method === "PATCH" ||
+      req.method === "DELETE"
+    ) {
+      await consumeSecurityRateLimit({
+        scope: "professor-review-mutation-user",
+        identifier: decodedUser.uid,
+        maxAttempts:
+          REVIEW_MUTATION_MAX_REQUESTS,
+        windowMs:
+          REVIEW_MUTATION_WINDOW_MS,
+        message:
+          "Too many professor-review changes. Please try again later."
+      });
+    }
 
     if (req.method === "DELETE") {
       const reviewId = getReviewId(req);
