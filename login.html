@@ -158,26 +158,20 @@
       display: block;
     }
 
-    .auth-password-visibility-toggle::after {
-      content: "";
-      position: absolute;
-      left: 2px;
-      top: 12px;
-      width: 23px;
-      height: 2px;
-      border-radius: 999px;
-      background: currentColor;
+    .auth-password-visibility-toggle .auth-password-eye-slash {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
       opacity: 0;
-      transform: rotate(-42deg);
-      transform-origin: center;
       transition: opacity 0.18s ease;
     }
 
-    .auth-password-visibility-toggle.password-hidden::after {
+    .auth-password-visibility-toggle.password-hidden .auth-password-eye-slash {
       opacity: 1;
     }
 
-    .auth-password-visibility-toggle.password-visible::after {
+    .auth-password-visibility-toggle.password-visible .auth-password-eye-slash {
       opacity: 0;
     }
 
@@ -490,6 +484,7 @@
                 <button class="auth-password-visibility-toggle password-hidden" type="button" data-target="login-password" aria-label="Show password">
                   <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <path d="M12 5C6 5 2.1 9.6 1 12c1.1 2.4 5 7 11 7s9.9-4.6 11-7c-1.1-2.4-5-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"/>
+                    <path class="auth-password-eye-slash" d="M4 20L20 4"/>
                   </svg>
                 </button>
               </div>
