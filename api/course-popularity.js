@@ -1,8 +1,18 @@
 const admin = require("../server/_lib/firebaseAdmin");
+const {
+  getRequestIp,
+  consumeSecurityRateLimit
+} = require("../server/_lib/securityRateLimits");
 
 const POPULARITY_TIME_ZONE = "Africa/Cairo";
 const POPULARITY_WINDOW_DAYS = 30;
 const POPULAR_COURSE_LIMIT = 8;
+const COURSE_VIEW_IP_WINDOW_MS =
+  60 * 60 * 1000;
+const COURSE_VIEW_MAX_POSTS_PER_IP = 120;
+const COURSE_VIEW_REPEAT_WINDOW_MS =
+  24 * 60 * 60 * 1000;
+const COURSE_VIEW_MAX_PER_COURSE_AND_IP = 5;
 
 function cleanString(value, maxLength) {
   return String(value || "").trim().replace(/\s+/g, " ").slice(0, maxLength);
@@ -143,6 +153,50 @@ module.exports = async function handler(req, res) {
     }
 
     const date = getCairoDateKey(new Date());
+    const requestIp = getRequestIp(req);
+
+    try {
+      await consumeSecurityRateLimit({
+        scope: "course-popularity-ip",
+        identifier: requestIp,
+        maxAttempts:
+          COURSE_VIEW_MAX_POSTS_PER_IP,
+        windowMs:
+          COURSE_VIEW_IP_WINDOW_MS,
+        message:
+          "Too many course-view requests from this connection."
+      });
+
+      await consumeSecurityRateLimit({
+        scope:
+          "course-popularity-course:" +
+          date +
+          ":" +
+          courseCode,
+        identifier: requestIp,
+        maxAttempts:
+          COURSE_VIEW_MAX_PER_COURSE_AND_IP,
+        windowMs:
+          COURSE_VIEW_REPEAT_WINDOW_MS,
+        message:
+          "This course has already received several views from this connection."
+      });
+    } catch (error) {
+      if (error.statusCode !== 429) {
+        throw error;
+      }
+
+      res.setHeader(
+        "Cache-Control",
+        "private, no-store, max-age=0"
+      );
+
+      return res.status(200).json({
+        success: true,
+        counted: false
+      });
+    }
+
     const viewRef = db
       .collection("courseDailyViews")
       .doc(date + "--" + encodeURIComponent(courseCode));
@@ -151,18 +205,24 @@ module.exports = async function handler(req, res) {
       {
         courseCode,
         date,
-        count: admin.firestore.FieldValue.increment(1),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        count:
+          admin.firestore.FieldValue.increment(1),
+        updatedAt:
+          admin.firestore.FieldValue.serverTimestamp()
       },
       {
         merge: true
       }
     );
 
-    res.setHeader("Cache-Control", "private, no-store, max-age=0");
+    res.setHeader(
+      "Cache-Control",
+      "private, no-store, max-age=0"
+    );
 
     return res.status(200).json({
-      success: true
+      success: true,
+      counted: true
     });
   } catch (error) {
     res.setHeader("Cache-Control", "private, no-store, max-age=0");
