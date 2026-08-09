@@ -1010,7 +1010,11 @@
     ["CSCE 3104", "Concepts of Programming Languages"],
     ["CSCE 3101", "Programming Language"],
     ["CSCE 4502", "Design of Web-based Systems"],
-    ["DSGN 3400", "Digital Game Design"]
+    ["DSGN 3400", "Digital Game Design"],
+    ["BIOL 3510", "Ecology and Conservation Biology"],
+    ["BIOL 4170", "Molecular Biotechnology"],
+    ["BIOL 4160", "Methods in Behavioral Neuroscience"],
+    ["BIOL 4950", "Practical Internship"]
   ];
 
   const courseDescriptions = {
@@ -1703,7 +1707,75 @@
     "CHEM 4005":
       "Several aspects in a variety of chemical industries such as pharmaceutical, petrochemical, polymer, metal catalysis, surfactants, biotechnology, and inorganic chemical industries will be discussed.",
     "CHEM 4900":
-      "This is a summer-based chemistry practical internship where students will spend 12 consecutive weeks as full-time employees-in-training in approved entities within the chemistry-related fields. The course is available to students in any of the CHEM undergraduate concentrations."
+      "This is a summer-based chemistry practical internship where students will spend 12 consecutive weeks as full-time employees-in-training in approved entities within the chemistry-related fields. The course is available to students in any of the CHEM undergraduate concentrations.",
+    "BIOL 2150":
+      "A survey of the fundamentals of classical and molecular genetics. This includes the principles of segregation, DNA structure and genetic variation, chromosome and gene organization, replication, expression, and regulation in bacteria, viruses, and humans, as well as ethical issues in genetic research.",
+    "BIOL 2151":
+      "An introduction to a broad range of genetic laboratory techniques. Additional emphasis will be given to the development of hypotheses, experimental design/data analysis, and presentation of results.",
+    "BIOL 2160":
+      "An introduction to the principles of ethics with an emphasis on bioethics. Topics include the fundamentals of scientific research, scientific writing, and ethical considerations in biological and biomedical research. A survey on the basic methods of research, data collection, interpretation, and reporting will be covered.",
+    "BIOL 2230":
+      "An in-depth study of the structure and function of the cell, including mechanisms of DNA replication and repair in prokaryotic and eukaryotic organisms and regulation of transcription and translational machinery. Protein sorting and post-translational protein modifications, mechanisms of cell-cell signaling, and their role in regulating genomic integrity and cell cycle regulation.",
+    "BIOL 2231":
+      "The identification of basic cell structures, including basic laboratory techniques for DNA and protein isolation, characterization, and computational tools in molecular biology.",
+    "BIOL 2340":
+      "This course will explore several aspects of plant biology with emphasis on structure, function, reproduction, systematics, plant metabolism and development. Students will be introduced to basic concepts of plant breeding, plant tissue culture and genetic transformation and the generation of genetically-modified crops. Detailed morphological, physiological study and greenhouse experimentation will be covered in the lab. Upon completion of this course, students will gain an appreciation for plant diversity, learning how plants are essential for supporting life on our planet and the potential impact of plant biotechnology on our life.",
+    "BIOL 3130":
+      "This course covers a spectrum of evolutionary forces at the molecular level and their impact on allele frequencies in the population. Topics the course will address include the Hardy-Weinberg principles, linkage disequilibrium, genetic drift, neutral theory of molecular evolution, mutation and natural selection, evolution of gene families, lateral gene transfer, basics of molecular phylogenetics, and origin of viruses and origin of the cell. Laboratory sessions will include computational simulations of evolutionary forces in action, population genetics, and maximum likelihood and Bayesian phylogenetic inferences.",
+    "BIOL 3310":
+      "This course provides a broad understanding of the microbial world, its application and implications. The fundamentals and principles of bacteriology, virology and mycology are addressed. Cellular and molecular aspects that contribute to selected infectious diseases and the role of the immune system in preventing such diseases are discussed. Additionally we examine the recent advances in pharmaceutical and biotechnology application of microbes.",
+    "BIOL 3326":
+      "The basic anatomy and physiology of the vertebrate body from a functional perspective. A description of the anatomy of the major organ systems found in vertebrates and explaining how the physiology of these anatomical systems enables vertebrate bodies to function in their environment. Including a survey of model organisms to compare variations in anatomy and physiology associated with different behavioral and ecological requirements.",
+    "BIOL 3327":
+      "Dissection of preserved and fresh vertebrate specimens and physiological experiments to investigate the function of various organ systems, and computer learning models, to give students in-depth experience with anatomical identification and knowledge.",
+    "BIOL 3510":
+      "The study of the distribution and interaction of organisms determined by biological and physical processes in the environment. Predicting and managing environmental changes (e.g., climate change) and the ecological interactions and mechanisms at organism, population, community, and ecosystem levels. With an emphasis on managing chemical, physical, and other human-driven factors for conservation purposes and the collection, analysis, and interpretation of ecological data using a broad array of statistical tools and applications.",
+    "BIOL 4980":
+      "Students select a research topic according to their field of interest and the availability of advisers and facilities. A research proposal is submitted to include a literature review on the topic and the design of a laboratory and/or field investigation.",
+    "BIOL 4981":
+      "The senior research thesis project is executed and presented in the form of an oral presentation and a poster session in the annual biology department senior thesis conference. A final report, written similar to an original research manuscript, to include the execution, results and conclusion of the project will be submitted.",
+    "BIOL 3600":
+      "Bioinformatics is the application of computational methods and tools to, retrieve, and analyse large quantities of sequence datasets. The course covers genomic public databases and resources, sequence alignment, protein structure and function prediction, and analysis of microarray gene expression. Concepts of programming for bioinformatics are introduced. The course provides the students with hands-on experience solving practical problems such as characterization of gene interest, identification of differentially expressed genes, prediction of secondary and tertiary structures of proteins, and tracking spatial and temporal dynamics of a virus.",
+    "BIOL 3710":
+      "An introduction to biotechnology, including the principles of recombinant DNA technology, protein engineering, directed mutagenesis, manipulation of gene expression, and large-scale production of recombinant proteins. The generation and applications of transgenic organisms and gene targeting technology, including gene knockout and knockdown.",
+    "BIOL 3750":
+      "An introduction to genome biology and applications of genomics. Topics include genome sequencing and analysis, genomics approaches to studying gene expression, and the essential applications of genomics in human health and disease, crop plant improvement, and other applications.",
+    "BIOL 4150":
+      "A comprehensive molecular biology course with emphasis on principles, processes and methodologies leading to the formation of central concepts of molecular genetics. Students are presented to the latest models of describing gene structure, genome organization and regulation of gene and protein expression, in eukaryotes and prokaryotes. Current topics such as epigenetics, RNA interference and transgenics are also exposed. Laboratory sessions cover modern techniques in recombinant DNA technology related to gene cloning, protein expression, and omics.",
+    "BIOL 3601":
+      "This interdisciplinary course is designed for students in biology, computer science, and mathematics to build the most essential concepts and practices for Bioinformatics development using Biopython and R.",
+    "BIOL 4170":
+      "An overview of molecular biotechnology’s scientific principles and techniques, with emphasis on real-world applications. Topics covered include manipulation and cloning DNA into bacteria, plants, and animals, expression of recombinant proteins, and modification of genomes, including the ethics of molecular biotechnology.",
+    "BIOL 4230":
+      "An introduction to the basic structure and function of the immune system at the molecular, cellular, tissue, and organ system levels. Topics include the processes involved in the host defense against infection, antigen-antibody structure and function, effector mechanisms, complement, major histocompatibility complexes, B-and T-cell receptors, antibody formation and immunity, cytotoxic responses, and regulation of the immune response. Other topics include different aspects of applied immunology, such as cancer immunology, immunotherapy, autoimmunity, omics, drug targeting, and vaccination.",
+    "BIOL 4330":
+      "The course provides a broad knowledge on the biological principals underlying tumor and cancer formation. The basic science of tumor at the cellular, molecular and genetic level will be addressed. The course allows students to understand the fundamental mechanisms that underlie eukaryotic cell multiplication, cell senescence and cell death, including the alterations that are involved in the initiation of uncontrolled growth and carcinogenesis. In addition, cell cycle surveillance mechanisms that ensure genomic integrity and the signaling pathways that regulate tumor development and spread will be covered.",
+    "BIOL 4930":
+      "Topics in biology chosen according to the special interests of the student and faculty.",
+    "BIOL 3540":
+      "Examination of the concept of sustainability and how the biosphere, atmosphere, hydrosphere, and lithosphere interact. Analysis of how natural resources can be sustainably used and the role of environmental ethics(e.g., food security, mineral resources management) and how they are impacted by human activities (e.g., waste disposal, pollution), and the role of biotechnology in finding sustainable solutions and alternatives.",
+    "BIOL 4540":
+      "The ecology of marine and coastal ecosystems, as encountered in Egypt and other regions of the world. Relationships between physical and chemical processes and biological mechanisms in marine ecosystems and their biological communities are analyzed, with examples from the Red Sea and the Mediterranean Sea.",
+    "BIOL 4541":
+      "Examination of the ecology of desert ecosystems with particular reference to Middle-Eastern deserts. Emphasis is placed on the strategies employed by desert-living organisms which allow them to survive and prosper under desert conditions. Field trips are an integral part of this course.",
+    "BIOL 3341":
+      "Study of ethology with emphasis on its development, control and function. Laboratory includes observations and descriptions, qualification techniques and experimentation.",
+    "BIOL 4360":
+      "A systematic study of the structure, function, and regulation of major body systems and organs, including homeostasis, nutrition, and regulation of temperature, and fluids. The structure and function of the respiratory, circulatory, and digestive systems, reproduction, hormonal and nervous control, and behavior are discussed with a focus on the human body.",
+    "BIOL 3320":
+      "An integration of Human Physiology and the underlying physics concepts. Covers the basic physics principles that underlie the mechanisms operating in the human body along with the basic knowledge of the body anatomy. Topics include the function of the Nervous, Skeletomuscular and Cardiovascular systems; foundations of Medical Physics applications by covering the basic principles of Energy-Matter interactions.",
+    "BIOL 3321":
+      "Measurement of the physical quantities related to the skeletomuscular, Cardiovascular, and Nervous systems as well as diagnosis tools in the medical field.",
+    "BIOL 3370":
+      "This course is designed to acquaint students with the mechanisms that direct the development of multicellular organisms from a single cell. The course covers the fundamental processes operating during embryonic development including cellular differentiation, development of specialized tissues, morphogenesis, and organogenesis at the cellular and molecular levels. Special attention will be on the understanding of key experiments that contributed to the current knowledge of the basic principles implicated in the development of the organism. Laboratory includes examination of various developmental biology aspects at the molecular, cellular and morphological levels.",
+    "BIOL 4098":
+      "An interdisciplinary course discussing current topics in neuroscience, through the examination of content related to neurobiology, neuroanatomy, neurophysiology. Examples of topics may be neuroscience research techniques, hormones and behavior, psychopharmacology, cognitive neuroscience, affective neuroscience, neurological disorders.",
+    "BIOL 4160":
+      "This course offers a comprehensive overview of classic and modern methods in neuroscience, including a review of the structure and function of the nervous system in health and disease. Students will explore molecular, cellular, circuit based, and whole system techniques and their applications in scientific research. This course is intended for advanced undergraduate students who are considering graduate work in the field of neuroscience. Students will critically review up-to-date literature and attend research seminars and design a research experiment. Projects will be based on the student’s areas of interest.",
+    "BIOL 4361":
+      "A comprehensive overview of the gross and microstructure and function of the major organs and systems. Activities investigate the respiratory, cardiovascular, musculoskeletal, and nervous system structure and functions.",
+    "BIOL 4950":
+      "A minimum of eight weeks or (80 hours) of training in industrial, commercial, educational, or government organizations in Egypt or abroad. A detailed report of this practical experience is presented both in written form and orally and is evaluated according to department rubrics. This course can be repeated for a total of 4 credits towards the major electives."
   };
 
   const coursePrerequisites = {
@@ -2396,7 +2468,75 @@
     "CHEM 4005":
       "CHEM 3004, CHEM 3006, CHEM 3009, CHEM 3011, CHEM 3015",
     "CHEM 4900":
-      "Senior Standing"
+      "Senior Standing",
+    "BIOL 2150":
+      "BIOL 1010 or BIOL 1011\nConcurrent: BIOL 2151 for biology major only.",
+    "BIOL 2151":
+      "None listed.\nConcurrent: Concurrent with BIOL 2150 for biology major.",
+    "BIOL 2160":
+      "BIOL 1011 or BIOL 1012",
+    "BIOL 2230":
+      "BIOL 2150\nConcurrent: BIOL 2231 for biology majors.",
+    "BIOL 2231":
+      "BIOL 2151\nConcurrent: BIOL 2230 for Biology Majors.",
+    "BIOL 2340":
+      "BIOL 1011 (or BIOL 1010) and BIOL 1012",
+    "BIOL 3130":
+      "BIOL 2230",
+    "BIOL 3310":
+      "BIOL 2230",
+    "BIOL 3326":
+      "BIOL 2230\nConcurrent: Biology Majors must take this course concurrently with BIOL 3327.",
+    "BIOL 3327":
+      "BIOL 2230\nConcurrent: BIOL 3326 for Biology major.",
+    "BIOL 3510":
+      "BIOL 1012",
+    "BIOL 4980":
+      "Senior standing in biology.",
+    "BIOL 4981":
+      "BIOL 4980",
+    "BIOL 3600":
+      "BIOL 1010 or BIOL 1011 or the instructor’s consent.",
+    "BIOL 3710":
+      "BIOL 2150 or BIOL 2230",
+    "BIOL 3750":
+      "BIOL 2150 or BIOL 2230",
+    "BIOL 4150":
+      "BIOL 2230 and CHEM 2003 or co-requisite.",
+    "BIOL 3601":
+      "BIOL 3600",
+    "BIOL 4170":
+      "BIOL 2230",
+    "BIOL 4230":
+      "BIOL 2230 and CHEM 1005",
+    "BIOL 4330":
+      "BIOL 2230 and BIOL 2150",
+    "BIOL 4930":
+      "Consent of the instructor.",
+    "BIOL 3540":
+      "BIOL 1012 or instructor’s consent.",
+    "BIOL 4540":
+      "BIOL 1012 and BIOL 3510",
+    "BIOL 4541":
+      "BIOL 3510",
+    "BIOL 3341":
+      "BIOL 1011 or BIOL 1098",
+    "BIOL 4360":
+      "BIOL 1011 or BIOL 2150\nConcurrent: BIOL 4361 for Biology major.",
+    "BIOL 3320":
+      "PHYS 1011",
+    "BIOL 3321":
+      "PHYS 1012, (BIOL 3320 or concurrent)",
+    "BIOL 3370":
+      "BIOL 2230",
+    "BIOL 4098":
+      "BIOL 1011 or BIOL 1098 or PSYC 3800",
+    "BIOL 4160":
+      "PSYC 3800",
+    "BIOL 4361":
+      "BIOL 1011 or BIOL 2151\nConcurrent: BIOL 4360 for biology major.",
+    "BIOL 4950":
+      "A minimum of 16 credits of Biology courses\nOverall GPA 2.5 or higher at the time of application\nApproval of the student’s advisor and the department chair"
   };
 
   const subjectLabels = {
