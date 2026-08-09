@@ -509,17 +509,18 @@
           throw new Error(data.error || "Could not create account. Please try again.");
         }
 
-        try {
-          localStorage.setItem("auc-atlas-signed-in", "1");
-          localStorage.setItem("aucAtlasSignedIn", "true");
-        } catch (error) {}
+        signupForm.reset();
+        window.aucAtlasCurrentUser = null;
 
-        window.aucAtlasCurrentUser = data.user || null;
-        showMessage(data.message || "Account created successfully. Check your inbox to verify your email.", "success");
+        showMessage(
+          data.message ||
+            "Account created successfully. Verify your AUC email before logging in.",
+          "success"
+        );
 
         setTimeout(function () {
-          window.location.href = "accounts.html";
-        }, 1000);
+          window.location.href = "login.html";
+        }, 2500);
       } catch (error) {
         showMessage(error.message || "Something went wrong. Please try again.", "error");
       } finally {
