@@ -791,6 +791,28 @@ async function getSiteSessionUser(req, options) {
     "continue"
   );
 
+  const userRecord = await admin.auth()
+    .getUser(decodedUser.uid);
+  const authoritativeEmail = cleanAuthEmail(
+    userRecord.email ||
+    decodedUser.email
+  );
+
+  if (
+    !userRecord.emailVerified ||
+    !isAllowedAucEmail(authoritativeEmail)
+  ) {
+    const error = new Error(
+      "Please verify your AUC email address before continuing."
+    );
+
+    error.statusCode = 403;
+    error.code =
+      "email-verification-required";
+
+    throw error;
+  }
+
   const sessionRef = admin.firestore()
     .collection("users")
     .doc(decodedUser.uid)
