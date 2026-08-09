@@ -2,6 +2,7 @@ const admin = require("../_lib/firebaseAdmin");
 
 const {
   createSiteSessionFromIdToken,
+  createLoginChallenge,
   signInWithCustomToken,
   ensureAllowedAucEmail
 } = require("../_lib/securityHelpers");
@@ -366,6 +367,11 @@ module.exports = async function handler(req, res) {
       const existingUser = userDoc.exists
         ? userDoc.data() || {}
         : {};
+      const twoFactor =
+        existingUser.twoFactor &&
+        typeof existingUser.twoFactor === "object"
+          ? existingUser.twoFactor
+          : {};
       const emailVerified = Boolean(
         userRecord.emailVerified ||
         decodedToken.email_verified
@@ -389,10 +395,40 @@ module.exports = async function handler(req, res) {
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
 
-      await createSiteSessionFromIdToken(idToken, res);
+      if (twoFactor.appEnabled) {
+        await createLoginChallenge(
+          decodedToken.uid,
+          res,
+          {
+            email,
+            authMethod:
+              "provider:" +
+              providerConfig.authProvider,
+            twoFactor: {
+              appEnabled: true,
+              emailEnabled: Boolean(
+                twoFactor.emailEnabled
+              )
+            }
+          }
+        );
+
+        return res.status(200).json({
+          success: true,
+          requiresTwoFactor: true,
+          method: "app"
+        });
+      }
+
+      await createSiteSessionFromIdToken(
+        idToken,
+        res,
+        req
+      );
 
       return res.status(200).json({
         success: true,
+        requiresTwoFactor: false,
         user: {
           uid: decodedToken.uid,
           email,
