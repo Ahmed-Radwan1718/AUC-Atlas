@@ -1072,7 +1072,7 @@
     "MENG 4667":
       "Refrigeration and Air conditioning cycles and C.O.P. Vapor compression refrigeration systems. Absorption refrigeration. Cryogenics. Design of Air conditioning systems and components. Heat pumps and heating systems. District cooling.",
     "MENG 4936":
-      "Covers specialized topics in Power engineering not covered in other listed courses.",
+      "Covers specialized topics in Power engineering not covered in other listed courses. Offered more than once for credit if contents change. Precise course description depends on course topic.",
     "MENG 4950":
       "Each student is required to spend a minimum of eight weeks in industrial training in Egypt or abroad. A complete account of the experience is reported, presented and evaluated.",
     "MENG 4980":
@@ -1272,7 +1272,65 @@
     "PENG 4423":
       "Energy use and energy patterns in modern society; Resource estimates; Engineering analysis of energy systems; Managing carbon emissions; Environmental impact and protection, Environmental remediation technologies. Supply and Demand of energy; Energy Scenarios and modeling; Energy Policy and Auditing; Sustainable development.",
     "PENG 4930":
-      "Petroleum Topics chosen from: Petroleum or Gas exploration, drilling production, simulation, recovery, and gas liquefaction. Field study including assessment, evaluation, feasibility and economic studies will be required.\nEnergy Topics chosen from: Alternative Energy resources including solar, wind, biomass, fuel cells, nuclear or geothermal energy. Field study including assessment, evaluation, feasibility and economic studies will be required."
+      "Petroleum Topics chosen from: Petroleum or Gas exploration, drilling production, simulation, recovery, and gas liquefaction. Field study including assessment, evaluation, feasibility and economic studies will be required.\nEnergy Topics chosen from: Alternative Energy resources including solar, wind, biomass, fuel cells, nuclear or geothermal energy. Field study including assessment, evaluation, feasibility and economic studies will be required.",
+    "ENGR 3222":
+      "Economic and cost concepts, the time value of money, single, multiple and series of cash flows, gradients, functional notation, nominal and effective interest rates, continuous compounding, rates of return. Computation and applications, economic feasibility of projects and worth of investments, comparison of alternatives. Replacement, deprecation and B.E. analysis. Introduction to risk analysis.",
+    "MENG 4551":
+      "Introduction to CAD/CAM and additive manufacturing techniques. CAD software and hardware. 3D Geometric modeling. Types of curves and surfaces. Data capturing techniques. Surface fitting techniques. Rapid prototyping techniques. Materials and Processes for Additive Manufacturing. Overview and utilization of typical interactive computer graphics package. Hands-on experience in using CAD software, 3D laser digitizing scanner, rapid prototyping machine, and applications of additive manufacturing.",
+    "MENG 4553":
+      "Displacement approach for simple elements in structural mechanics. Generalization to three-dimensional elements. Overview of the finite element method (FEM), variational principles, transformation, assembly, boundary conditions, solutions, convergence and stability. Isoparametric elements. Applications to solid mechanics, heat conduction and coupled problems. Pre- and post processing. Integration of FEM in Computer Aided Design.",
+    "MENG 4555":
+      "Elements of vibration measuring systems, vibrations-severity measurements, frequency analysis of mechanical vibration, measuring systems for frequency analysis, vibration of continuous systems, application of vibration measurements in condition monitoring and diagnostics, fault detection in rotating equipment, vibration control.",
+    "MENG 4756":
+      "Feedback control system and analysis in the time domain. System sensitivity to a parameter changes. PID controllers: analysis and design. State-space: analysis and design controllers. Stability and the concept of Routh-Hurwitz. Root locus analysis and design. Analysis of systems in frequency domains. Bode plots and controller design. Nyquist stability criterion. Introduction to intelligent control. Introduction to digital control systems. A term team-based project covering analysis and controller design of selected systems by each team.",
+    "MENG 4227":
+      "Mechanical failures, fracture mechanics, types of corrosion. Failure modes: fracture fatigue, creep, corrosion and wear. Diagnosis and prevention of failures. Case studies.",
+    "MENG 4239":
+      "Automation of manufacturing processes. Numerically-controlled machine tools. NC programming. Nontraditional manufacturing processes include thermal, electrical, chemical, and mechanical machining processes, laser and electron beam welding, spark erosion, and microfabrication and nanofabrication technologies.",
+    "MENG 4558":
+      "The engineering design environment. Design and manufacturing. Design pitfalls and their early identification. Design measures for improving the maintainability, reliability and environmental impact. Implementation of the principle of redundancy. Introduction to design optimization.",
+    "MENG 4565":
+      "Elements of system architecture, product versus process-driven design objectives, design of systems, synthesis and analysis in systems design, case studies.",
+    "MENG 4757":
+      "Robotics and Automation, Robot classification and technical specifications, Robotic safety, homogeneous coordinate transformation, Direct and inverse kinematics, Differential motion, Jacobian: Velocities and static forces, Trajectory planning, Manipulator dynamics: Newton-Euler and Lagrange-Euler dynamic models, robot control. A term team-based project covering the selection of a manual process and conducting planning and analysis to automate it using robots.",
+    "MENG 4931":
+      "Specialized topics in design will be discussed, e.g. advanced strength of materials, power-plant analysis and design, design of manufacturing aids, materials-handling equipment, microcomputers in control, fluid machinery and power systems, finite-elements method in engineering, etc.",
+    "MENG 4440":
+      "Introduction to operations research, Linear Programming (LP) models; LP Solution approaches; integer programming; post optimality analysis; transportation, transshipment, and assignment problems. Maximal flow, shortest route, minimum spanning tree, and travelling salesman problems. Case studies, model formulations and applications using software.",
+    "MENG 4444":
+      "Methods used in determining the most effective utilization of effort in human activity systems; work methods, analysis and design; micro motion analysis; predetermined time systems; human and rating factors; work samplings; learning curves; physiological and psychological factors; computer-aided time study.",
+    "MENG 4445":
+      "Basic concepts of production management ; forecasting; break-even analysis, aggregate production planning; inventory management; master scheduling, materials requirement planning; capacity planning; resource allocation and scheduling.",
+    "MENG 4441":
+      "Interactive computer-based engineering decision support systems (DSS), Design and development, informational data base, mathematical models including nonlinear, goal and dynamic programming problems, queuing and decision analysis, heuristics and user interface.",
+    "MENG 4442":
+      "Basic concepts of components and systems reliability. Methods of modeling systems for reliability analysis. Reliability estimation & measurement. Principal methods of reliability analysis, including fault tree and reliability block diagrams; Failure Mode and Effects Analysis (FMEA); event tree construction and evaluation; reliability data collection and analysis. Design by reliability & probabilistic design. Overview of Risk Assessment and Risk Management, relation to System Safety and Reliability Engineering measures.",
+    "MENG 4443":
+      "Basic concepts; examples of different production and service systems; pseudo random numbers; queuing models; random variate generation; discrete-event simulation; simulation languages; model validation and analysis of simulation data.",
+    "MENG 4448":
+      "Process analysis; operation analysis, job design; facility location; facility layout; materials handling systems; storage and warehousing; office layout; design principles and analytical solution procedures; computerized approaches.",
+    "MENG 4449":
+      "Maintenance Systems performance measures, types of equipment, scheduled, preventive, and predictive maintenance, work orders, planning, scheduling and control of maintenance operations, equipment safety and reliability, life cycle costing and replacement, spare parts inventory management and cost of maintenance.",
+    "MENG 4477":
+      "Computer assisted manufacturing systems NC, CNC, DNC, robotics, material handling, group technology, flexible manufacturing systems, process planning and control.",
+    "MENG 4930":
+      "Specialized topics in industrial engineering, not covered in other listed courses, will be discussed. Offered more than once for credit if contents change. Precise course description depends on course topic.",
+    "MENG 4221":
+      "This course provides the students with the knowledge and skills for designing composite products, selecting the type of composite material and its processing. Comprehensive knowledge of composite design principles is covered to tailor its properties. Composite materials, including natural composites such as wood and bone, and engineered materials from concrete to fiber and dispersion reinforced matrices are covered. The course also covers interfacial adhesion, mechanical and functional properties, defects, failure modes, and characterization to study how composite materials behave.",
+    "MENG 4229":
+      "Introduction to Nanotechnology, Nanomaterials e.g. carbon nanotubes and nanoclays. Nanostructured materials. Transition from microstructure to nanostructure. Grain refinement techniques. Paradox of strength and ductility. Multi-modal microstructures. Fabrication techniques. Overview of mechanical, thermal and structural characterization techniques. Applications.",
+    "MENG 4226":
+      "Structure-property relationship in alloy systems. Imperfections in solids. Diffusion and phase transformation. Heat treatment of ferrous and non-ferrous alloys. Structure, properties and processing of metal matrix composites (MMCs). Behavior of metallic alloys and composite materials in service. Case studies and laboratory experiments.",
+    "MENG 4232":
+      "Processing for grain refinement of engineering materials; Solidification, cooling rates and heat treatment for casting and molding; shape forming; powder, fiber, and composite processing; Joining processes; laser processes; deposition technology for coatings for various applications.",
+    "MENG 4932":
+      "This course will cover topics to be chosen based on the emerging advancements in the field of Materials and Manufacturing. Maybe taken for credit more than once if content changes.",
+    "MENG 4778":
+      "Mechatronics and digital systems, Digital logic design (Combinational and Sequential logic design), Microprocessor and Microcontroller architecture, Microcontroller selection. Introduction to embedded systems. Sensors and Interfacing techniques, A/D and D/A conversion. Memory addressing techniques, Interrupt techniques, I/O needs, and expansion, Timers. Introduction to assembly, and a term team-based project covering problem selection, design, implementation and demonstration.",
+    "MENG 4779":
+      "Mechatronics design and development process, Digital systems, Microcontrollers in Mechatronics, Programmable logic controllers (PLC), PLC and interfacing techniques, Ladder logic programming, servo motors: motion, braking and speed control, Transducers and instrumentation, Vision sensing principles, Power supplies, Pneumatic and Electro-pneumatic control. Team based project covering design, control and application of electromechanical systems. Laboratory experiments.",
+    "MENG 4937":
+      "Covers specialized topics in Mechatronics field not covered in other listed courses.\nOffered more than once for credit if contents change. Precise course description depends on course topic."
   };
 
   const coursePrerequisites = {
@@ -1485,7 +1543,129 @@
     "PENG 4423":
       "PENG 2400 and senior standing.",
     "PENG 4930":
-      "Senior standing."
+      "Senior standing.",
+    "ENGR 2102":
+      "MACT 1121 and PHYS 1011",
+    "ENGR 2104":
+      "MACT 1122 and ENGR 2102",
+    "ENGR 3212":
+      "PHYS 1021 and MACT 1122",
+    "ENGR 3222":
+      "MACT 1121",
+    "MENG 2202":
+      "PHYS 1021",
+    "MENG 2601":
+      "PHYS 1021 and ENGR 2104",
+    "MENG 2505":
+      "ENGR 1005",
+    "MENG 3207":
+      "CHEM 1005 and MENG 2112\nConcurrent: MENG 3217",
+    "MENG 3209":
+      "MENG 3207",
+    "MENG 3217":
+      "MENG 2112\nConcurrent: MENG 3207",
+    "MENG 3402":
+      "ENGR 3202 and MACT 3224",
+    "MENG 3446":
+      "MACT 3224, ENGR 3222",
+    "MENG 3502":
+      "ENGR 2104 and ENGR 3202.",
+    "MENG 3505":
+      "MENG 2112, MENG 2505, and Concurrent (or prerequisite) ENGR 3202.",
+    "MENG 3506":
+      "ENGR 2104, MENG 2505, MENG 3209, MENG 3505\nConcurrent: MENG 3209",
+    "MENG 3601":
+      "(ENGR 2122 or MENG 2601), CHEM 1005, CHEM 1015",
+    "MENG 3705":
+      "(PHYS 2211 or (PHYS 2216 and PHYS 2217)), MENG 3502",
+    "MENG 4208":
+      "MENG 3209 and MENG 3506",
+    "MENG 4507":
+      "MENG 3506 and MENG 3502",
+    "MENG 4606":
+      "ENGR 3202 and MENG 3602",
+    "MENG 4950":
+      "Prerequisite: Senior standing and completion of all ENGR in addition to a minimum of 18 credits of MENG.",
+    "MENG 4980":
+      "Co- or pre-requisites\nMENG 3446, MENG 3605 and MENG 3705",
+    "MENG 4981":
+      "MENG 4980",
+    "PHYS 2216":
+      "PHYS 1021\nConcurrent: PHYS 2217",
+    "PHYS 2217":
+      "Concurrent: PHYS 2216",
+    "MENG 4662":
+      "MENG 4606 and MENG 3605 .",
+    "MENG 4663":
+      "MENG 3605 and MENG 4606 .",
+    "MENG 5168":
+      "Consent of instructor",
+    "MENG 4661":
+      "MENG 3602",
+    "MENG 4665":
+      "MENG 3602 and MENG 3605",
+    "MENG 4666":
+      "MENG 3605 and MENG 4606.",
+    "MENG 4667":
+      "MENG 4606 and MENG 3605 .",
+    "MENG 4936":
+      "Depends on topic.",
+    "MENG 4551":
+      "Senior standing, MENG 2505 and MENG 3506",
+    "MENG 4553":
+      "MENG 3505 and ENGR 3202",
+    "MENG 4555":
+      "Senior standing and MENG 3705",
+    "MENG 4756":
+      "Senior standing and MENG 3705",
+    "MENG 4227":
+      "MENG 3209 .",
+    "MENG 4239":
+      "MENG 3209 and PHYS 2216",
+    "MENG 4558":
+      "MENG 3209 and MENG 3506",
+    "MENG 4565":
+      "MENG 3506",
+    "MENG 4757":
+      "ENGR 2104",
+    "MENG 4931":
+      "Prerequisite: senior standing in mechanical engineering.",
+    "MENG 4440":
+      "ENGR 3202",
+    "MENG 4444":
+      "MENG 3209",
+    "MENG 4445":
+      "ENGR 3202 and ENGR 3222",
+    "MENG 4441":
+      "MENG 4440 and MACT 3224 .",
+    "MENG 4442":
+      "MENG 3402",
+    "MENG 4443":
+      "MENG 3402",
+    "MENG 4448":
+      "ENGR 3202",
+    "MENG 4449":
+      "ENGR 3222",
+    "MENG 4477":
+      "MENG 3209",
+    "MENG 4930":
+      "Senior standing.",
+    "MENG 4221":
+      "MENG 3209",
+    "MENG 4229":
+      "MENG 3209",
+    "MENG 4226":
+      "MENG 3209",
+    "MENG 4232":
+      "MENG 3209",
+    "MENG 4932":
+      "MENG 3209",
+    "MENG 4778":
+      "(PHYS 2211) or (PHYS 2216 and PHYS 2217)",
+    "MENG 4779":
+      "MENG 3705 or Concurrent",
+    "MENG 4937":
+      "depends on topic"
   };
 
   const subjectLabels = {
