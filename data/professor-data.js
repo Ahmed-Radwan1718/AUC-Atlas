@@ -3490,7 +3490,6 @@
     }
 
     list.innerHTML = safeReviews.map(function (review) {
-      const authorUserId = review.authorUserId || review.authorUid || "";
       const rating = Number(review.rating || 0);
       const reviewId = escapeHtml(review.id || "");
       const reportLabel = escapeHtml(
@@ -3517,7 +3516,7 @@
         : "";
 
       return `
-        <article class="professor-review-card" data-author-user-id="${escapeHtml(authorUserId)}">
+        <article class="professor-review-card">
           <div class="professor-review-card-top">
             <div class="professor-review-author">
               ${renderReviewAvatar(review)}
