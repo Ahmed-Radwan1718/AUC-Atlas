@@ -52,18 +52,22 @@
 
     .professors-header h1 {
       max-width: 640px;
+      margin: 0;
       color: #171717;
-      font-size: clamp(30px, 3.2vw, 46px);
-      font-weight: 600;
-      line-height: 1.05;
+      font-size: clamp(26px, 3vw, 40px);
+      font-weight: 700;
+      line-height: 1.08;
       text-transform: uppercase;
     }
 
     .professors-header p {
+      max-width: 420px;
+      margin: 0;
       color: rgba(23, 23, 23, 0.66);
-      font-size: 15px;
+      font-size: 17px;
       font-weight: 400;
-      line-height: 1.6;
+      line-height: 1.7;
+      text-align: left;
     }
 
     .professors-grid {
@@ -108,44 +112,49 @@
     }
 
     .professor-card-body h2 {
-      margin-bottom: 11px;
+      margin: 0 0 10px;
       color: #171717;
-      font-size: 21px;
-      font-weight: 700;
-      line-height: 1.12;
+      font-size: 20px;
+      font-weight: 750;
+      line-height: 1.2;
     }
 
     .professor-meta {
       margin-top: 18px;
       display: flex;
-      gap: 8px;
+      gap: 0;
       align-items: center;
       flex-wrap: wrap;
     }
 
     .professor-meta span {
       min-width: 0;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(23, 23, 23, 0.08);
-      background: rgba(247, 244, 238, 0.74);
-      color: rgba(23, 23, 23, 0.62);
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-align: center;
-      text-transform: uppercase;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: normal;
+      line-height: 1.45;
+      text-align: left;
+      text-transform: none;
       white-space: nowrap;
+    }
+
+    .professor-meta span + span::before {
+      content: "•";
+      margin: 0 8px;
+      color: rgba(192, 154, 92, 0.72);
     }
 
     .professor-bio {
       margin: 0;
-      color: rgba(23, 23, 23, 0.64);
-      font-size: 14px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 15px;
       font-weight: 400;
-      line-height: 1.65;
+      line-height: 1.7;
       display: block;
       overflow: visible;
     }
