@@ -1851,7 +1851,33 @@
     "ENTR 4502":
       "The course is a quest to understand the role of innovation and technology in entrepreneurial organizations as well as in society. The course will cover the different types of innovation in an organization with a special focus on business model innovation. The concept of technology will be addressed through understanding the fundamentals of product/service and process innovation as well as technology management in prominent organizations. Also the concept of intellectual property rights management and protection as well as new product/service development will be covered as contemporary concepts affecting the organizational effectiveness.",
     "ENTR 4970":
-      "Considers selected topics of current relevance in Entrepreneurship."
+      "Considers selected topics of current relevance in Entrepreneurship.",
+    "MOIS 4202":
+      "The Course emphasizes various elements related to business information systems analysis and development in the new digital economy. Doing business is not as usual as before with the use of innovative information and communication technology tools and techniques and this course intends to introduce students to the opportunities enabled by various business information systems within the information economy.",
+    "MOIS 4704":
+      "Students will understand the fundamental concepts and technologies underlying big data and apply big data tools and techniques to real-world problems. The course combines lectures, discussions, hands-on exercises, and guest lectures from industry experts. This course covers essential techniques such as data mining and statistical analysis while fostering a critical approach by exploring the ethical considerations surrounding AI in business. The students will be equipped with the skills needed to manage and analyze vast datasets, empowering them to make data-driven decisions across various industries. They will gain proficiency in a range of industry-standard data analysis tools and platforms. Through collaborative, real-world projects, students will develop robust analytical skills and gain valuable insights into emerging AI trends. Students will acquire the expertise to become data analysis professionals, enabling them to contribute strategically to organizational decision-making in the dynamic world of AI.",
+    "MOIS 4999":
+      "The course offers the students the opportunity to participate in real-life work experience in the IS/IT field. Students in collaboration with the MOIS unit will be responsible for their own placement in an internship approved by the advisor. The internship report details everything the student did during the internship. Additionally each student will be able to analyze the business processes’ current performance, identify problems, and suggest solutions by applying foundations of information technologies and to be able employ appropriate methodologies to achieve the designed improvements. Students should submit a plan followed by progress reports and finally deliver the thesis project document and presentation of the findings.",
+    "CSCE 3422":
+      "This course introduces foundations of information security. It addresses cyber-security issues and common threats, basics of network security, general security principles and practices, basics of cryptology and cryptanalysis, information security management, and other selected topics.\nNot allowed for Computer Science or Computer Engineering students.",
+    "CSCE 3421":
+      "This course exposes attendees in breadth to the most viable systems relating to Information Technology, and their associated administration. This includes networking fundamentals and related management, operating systems, computer organization and architecture, hardware, firmware, and enterprise applications.",
+    "MOIS 3401":
+      "This course provides a business-oriented approach to Human to Machine Interaction (HMI), and Internet of Things (IoT). It merges theories and concepts with methods of design, evaluation, and implementation of any interactive business system within the IoT environment. IoT allows humans to innovate new designs; thus, influencing transportation, health care, safety, environment, energy, to name just a few. HMI combines educational and cognitive psychology, business administration, as well as ergonomics and computer science in designing the business system that can greatly increase productivity, help in decision making and gain marketing advantages. Students do not only study the theory and principles of HMI design, but also design an interactive system that enables the users to do tasks quickly and work in an environment of interacting smart devices. This course will also discuss IoT technology focusing on the importance of IoT in society, typical devices and IoT future trends. Smart device interactions, voice interaction, contactless interaction, emotional intelligence, IoT design considerations, constraints and interface will also be covered.",
+    "MOIS 3501":
+      "This course provides an introduction to the use of the geographic information systems (GIS) and its applications for business decision support. It builds working knowledge and skills in applying and managing GIS by focusing on business and people related issues. Students learn to set up geo-referenced databases, to design maps, to analyze data, to extract information. This course exposes students to the functional areas in the technology management stream and gives them a practical hands-on experience for business applications. By the end of the class students will have mastered sufficient introductory concepts and practical skills to use GIS for business decision making improvement.",
+    "MOIS 3801":
+      "This course aims to provide students with an understanding of the key concepts, practices and the role and implications of strategic management of Information Technology. It is about the strategic role of IT-enabled innovation and trends integrated with the business processes that bring about competitive advantage. Students will explore the use of ERP Systems, Business Process Management, and Business Process Re-engineering in an organization. The course focuses on the strategic impacts different information technologies can have on productivity, performance, competitiveness, and organizational growth.",
+    "MOIS 4701":
+      "This course will be dealing with Software Quality Assurance and Software Quality Control. The first part of the course will be discussing Software Quality Assurance. Main topics of this part include: the basics of software quality management and how it relates to every phase in the SDLC, quality of requirements, the importance of reviews and their main types (manual and automated). Other aspects of quality assurance will be discussed such as Data Quality problems and solutions, Configuration Management (change control process, version control and baselines), Quality Frameworks and Quality Standards such as CMMI and ISO.\nThe second part of the course will be discussing Software Quality Control. Important topics in Software Testing will include Testing Principles, Main Components of Testing, Testing Objectives, Testing Strategy, the Testing Process, Test Levels, Test Classification, Testing Types (functional, and non-functional), Automated Testing (for projects adopting the Agile Life-cycle Model). Other topics such as the Test Data, Defect Management, Testing Metrics and Test Reporting will be covered.",
+    "MOIS 4702":
+      "The IT Service Management (ITSM) course centers on the managerial standards of the quality of IT services provided to end users across any organization by examining the interrelations between people, processes, and technology. It empowers students with the required IT skills to improve service responsiveness and problem-solving to create value and support an organization’s business strategy. The multifaceted nature of ITSM offers rich content that addresses relevant topics from quality management, software engineering, change management, information security management, and management framework standards. A focal component of the course is to introduce the best practices in ITSM and its different ITSM frameworks (e.g., ITIL, COBIT, Lean, Six Sigma) to deliver and control IS services that encompass all ITSM’s aspects: service requests, incidents, problems, changes, and post-incident reviews. The course’s main objective is to expose the students to the concept of ITSM; and to enable them to analyze the technical services required within each organization’s context that meet users’ needs, leading to the selection of the approach, process of implementation, and the metrics that would successfully optimize operational performance, and maximize IT investments.",
+    "MOIS 4703":
+      "Enterprise resource planning (ERP) is an application suite developed to manage and optimize business operations and processes. The course provides an overview of Enterprise Resource Planning (ERP) systems and their role within an organization. It introduces key concepts of integrated information systems and explains why such systems are valuable to businesses. The course will also provide a discussion on various business cases in which ERP concepts can be applied.",
+    "MOIS 4705":
+      "IT Projects face significant challenges associated with many risks. This course handles project management from an IT perspective where students learn the fundamentals and best practices of project management methodology as applied to IT initiatives. Using the framework of project life cycle, the course covers various aspects pertaining to (i) project initiation, (ii) project planning (iii) project execution/tracking; and (iv) project closure. It handles all this within the Software standards and Audits such as Capability Maturity Model Integration (CMMI), it measures performance using Earned Value Management (EVM) analysis, and builds upon proposal writing skills and how to respond to Request for Proposals (RFPs).",
+    "MOIS 4970":
+      "Considers selected topics of current relevance in management of information systems."
   };
 
   const coursePrerequisites = {
@@ -2688,7 +2714,33 @@
     "ENTR 4502":
       "Junior standing",
     "ENTR 4970":
-      "Consent of Instructor."
+      "Consent of Instructor.",
+    "MOIS 4202":
+      "MOIS 3201",
+    "MOIS 4704":
+      "MOIS 3201 , MACT 2222, and CSCE 1101",
+    "MOIS 4999":
+      "MOIS 4202 and MOIS 3301",
+    "CSCE 3422":
+      "CSCE 1101 .",
+    "CSCE 3421":
+      "CSCE 1001",
+    "MOIS 3401":
+      "MOIS 2101",
+    "MOIS 3501":
+      "MOIS 2101",
+    "MOIS 3801":
+      "MOIS 2101",
+    "MOIS 4701":
+      "MOIS 4202",
+    "MOIS 4702":
+      "MOIS 3201",
+    "MOIS 4703":
+      "MOIS 3201",
+    "MOIS 4705":
+      "MOIS 4202",
+    "MOIS 4970":
+      "Prerequisite: Consent of Instructor."
   };
 
   const subjectLabels = {
