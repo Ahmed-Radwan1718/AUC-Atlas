@@ -424,11 +424,6 @@ module.exports = async function handler(req, res) {
     const userData = userDoc.exists
       ? userDoc.data() || {}
       : {};
-    const phoneLookupKey = String(
-      userData.phoneLookupKey ||
-        userData.phone ||
-        ""
-    ).replace(/\D/g, "");
     const aucIdLookupKey = String(
       userData.aucIdLookupKey ||
         userData.aucId ||
@@ -491,12 +486,6 @@ module.exports = async function handler(req, res) {
     );
 
     await Promise.all([
-      deleteOwnedReservation(
-        db,
-        "accountPhoneNumbers",
-        phoneLookupKey,
-        decodedUser.uid
-      ),
       deleteOwnedReservation(
         db,
         "accountAucIds",
