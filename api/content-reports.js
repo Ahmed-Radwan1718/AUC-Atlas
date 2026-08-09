@@ -3,6 +3,13 @@ const admin = require("../server/_lib/firebaseAdmin");
 const {
   getSiteSessionUser
 } = require("../server/_lib/securityHelpers");
+const {
+  consumeSecurityRateLimit
+} = require("../server/_lib/securityRateLimits");
+
+const CONTENT_REPORT_WINDOW_MS =
+  60 * 60 * 1000;
+const CONTENT_REPORT_MAX_REQUESTS = 10;
 
 function cleanString(value, maxLength) {
   return String(value || "")
@@ -258,6 +265,18 @@ module.exports = async function handler(
 
     const reporter =
       await getVerifiedReporter(req);
+
+    await consumeSecurityRateLimit({
+      scope: "content-report-user",
+      identifier: reporter.uid,
+      maxAttempts:
+        CONTENT_REPORT_MAX_REQUESTS,
+      windowMs:
+        CONTENT_REPORT_WINDOW_MS,
+      message:
+        "Too many content reports. Please try again later."
+    });
+
     const body = getRequestBody(req);
     const targetType = cleanString(
       body.targetType,
