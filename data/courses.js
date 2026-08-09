@@ -1006,7 +1006,11 @@
     ["ECNG 3401", "Electromagnetic Theory"],
     ["ECNG 4301", "Fundamentals of Communications I"],
     ["ECNG 4302", "Fundamentals of Communications II"],
-    ["PHYS 5142", "Computational Physics"]
+    ["PHYS 5142", "Computational Physics"],
+    ["CSCE 3104", "Concepts of Programming Languages"],
+    ["CSCE 3101", "Programming Language"],
+    ["CSCE 4502", "Design of Web-based Systems"],
+    ["DSGN 3400", "Digital Game Design"]
   ];
 
   const courseDescriptions = {
@@ -1571,7 +1575,61 @@
     "CENG 4556":
       "Water impurities, Water quality regulations, drinking water standards; process and hydraulic design of water purification works: Flash mixing, flocculation, sedimentation, clariflocculator, sand filtration, membrane filtration, and disinfection. Wastewater characterization; process and hydraulic design of wastewater treatment works: Preliminary and primary treatment; secondary biological treatment units. Layout design of water treatment plants and wastewater treatment plants.",
     "CENG 4557":
-      "Bridges and tunnels as part of road and/or rail networks, geometric features of bridges and tunnels, conceptual designs of substructure and superstructure of bridges and tunnels, geotechnical investigations; ramps, design of intersections and interchanges, earthwork configuration and stability, soil-structure interaction, methods of construction."
+      "Bridges and tunnels as part of road and/or rail networks, geometric features of bridges and tunnels, conceptual designs of substructure and superstructure of bridges and tunnels, geotechnical investigations; ramps, design of intersections and interchanges, earthwork configuration and stability, soil-structure interaction, methods of construction.",
+    "CSCE 2301":
+      "Basic logic gates, Boolean algebra, logic minimization algorithms, modular design of combinational circuits, introduction to computer arithmetic, memory elements, sequential circuits, Finite State Machines analysis and design, top-down digital systems design approach, timing aspects of digital systems. Exposure to modern Electronic Design Automation tools, Hardware Description Languages and programmable logic devices. The laboratory component will cover experiments in digital electronics.",
+    "CSCE 2302":
+      "The laboratory will cover experiments in digital design and experiments illustrating material of course CSCE 2301 .",
+    "CSCE 2303":
+      "Instruction set architecture, computer performance (affecting factors and metrics), computer arithmetics (integers and floating-point numbers), assembly programming and the corresponding machine code (RISC and CISC architectures), the instruction cycle, the interrupt cycle, the memory hierarchy, and caching.",
+    "CSCE 3104":
+      "Comparative study of abstraction, syntax, semantics, binding times, data and sequence control, run-time resources, translators, and storage of programming languages. Programming projects using selected programming languages to enhance practical aspects.",
+    "CSCE 3401":
+      "Operating systems concepts and structure. The Kernel, interrupts, system calls. Process concepts, operations, and implementation. Threads. Concurrency, interprocess communication and synchronization. Process scheduling. Resources and deadlocks. Memory management: swapping, paging, segmentation, virtual memory. File system interface, protection. Case studies: Windows, Linux, and MINIX.",
+    "CSCE 4101":
+      "Principles and practices in the design of compilers. Lexical analysis. Syntax analysis, top-down and bottom-up parsing. Syntax-directed translation and syntax trees. Declarations, types, and symbol management. Run-time environments, storage organization, parameter passing, dynamic storage allocation. Intermediate languages and intermediate code generation. Code generation and optimization.",
+    "CSCE 4950":
+      "Each student is required to spend a minimum of eight weeks in training related to the computing domain in Egypt or abroad. Students need to follow guidelines published by the department. Evidence, including references are provided demonstrating the nature and duration of training. A report followed by discussion is submitted to a departmental committee for evaluation.",
+    "CSCE 4980":
+      "Participating students select project topic according to their subject of interest and the availability of facilities and advisers. Students carry out necessary preliminary work, which involves initial design space exploration, and submit a progress report. Ethical responsibilities of a computing professional are covered by lectures and seminars and emphasized through the student’s teamwork.",
+    "CSCE 4981":
+      "Participating students carry on the plan of work they developed in CSCE 4980 . Students use all of their acquired knowledge toward the design, implementation, testing, and documentation of a product. Each participant gives an oral presentation of his/her results. On the approval of the supervisor, each group prepares and presents a complete package. Further ethical issues of the computing profession are covered and emphasized all over the course work.",
+    "CSCE 4301":
+      "This is a hands-on course on the theory and practice of developing low-power embedded systems with real-time constraints. Students will learn how to develop embedded hardware and software, interface a variety of sensors and actuators for interactive systems, communicate over embedded networks and use RTOS kernel to develop embedded software. The course will culminate with a significant project which will extend the concepts covered earlier in the course",
+    "CSCE 4302":
+      "The laboratory will cover experiments in embedded systems illustrating material of course CSCE 4301 .",
+    "CSCE 4303":
+      "Systems-on-Chip (SoCs) are at the core of most embedded computing and consumer devices nowadays. The course gives Hands-on coverage of the breadth of computer engineering within the context of SoCs, including on-chip memories and buses, I/O interfacing, RTL design of accelerators, firmware development and OS support. The course emphasizes hardware/software tradeoffs, and hardware/software codesign.",
+    "CSCE 4315":
+      "Covers introduction to networking fundamentals, Internet of Things (IoT) performance metrics, energy-efficient networking, IoT link layer protocols, e.g., IEEE 802.11, Bluetooth, Bluetooth Low Energy (BLE) and IEEE 802.15.4, IoT network layer protocols, e.g., 6LoWPAN and Routing Protocol for Low Power and Lossy Networks (RPL), transport and application layer protocols, e.g., Constrained Application Protocol (CoAP) and Message Queue Telemetry Transport (MQTT).",
+    "CSCE 3423":
+      "Secure Network Architecture and Components, Network Attacks, Router Hardening, Secure Communications, Secure Campus Network, Significance of security protocols and frameworks, Security Governance Through Principles and Policies, Personnel Security and Risk Management Concepts, Business Continuity Planning, Laws, Regulations, and Compliance, Protecting Security of Assets, Cryptography and Symmetric Key Algorithms, PKI and Cryptographic Applications, Principles of Security Models, Design, and Capabilities; Security Vulnerabilities, Threats, and Countermeasures, Controlling and Monitoring Access, Security Assessment and Testing, Preventing and Responding to Incidents, Disaster Recovery Planning.",
+    "CSCE 4421":
+      "Fundamentals of Network Security. Introduction to symmetric and public key cryptography. Analysis of network attacks such as DNS cache poisoning, malware, and DOS. Network defensive tools such as firewalls, intrusion detection systems, and endpoint detection systems. Practical implementation of network attacks. Practical configuration of defensive mechanisms.",
+    "CSCE 4423":
+      "The Scope of Computer Forensics, Windows Operating and File Systems, Handling computer Hardware, Acquiring Evidence in a Computer Forensics Lab, Online Investigations,Documenting the Investigation, Admissibility of Digital Evidence, Network Forensics, Mobile Forensics, Photograph Forensics, Video Forensics, Vehicle Forensics, Mac Forensics, Case Studies.",
+    "CSCE 4424":
+      "Fundamentals of the security of web applications. Server-side vulnerabilities such as SQL injections, Server-side request forgery, path traversal, and command injection. Client-side vulnerabilities such as cross-site scripting, cross-site request forgery, and race conditions. Defensive mechanisms such as web application filters, content security policy, and secure coding techniques. Practical implementation of penetration testing tasks and report writing.",
+    "CSCE 4702":
+      "This course introduces the main security problems found in contemporary systems and addresses how such problems are introduced and how we may work towards their eradication. The course enables students to treat security issues as an important and integral part of system design and development. It also provides them with a solid understanding of the basic ideas and techniques used in assessing and addressing security risks.",
+    "CSCE 3101":
+      "A programming language different from those studied in CSCE 1001 and CSCE 1101 will be presented according to the interest of both students and faculty.",
+    "CSCE 3103":
+      "In-depth study of a typical object-oriented programming language (C++) from a software engineering perspective, with emphasis on features supporting the development of large, efficient and reusable object-oriented applications. Principles and practice of three software development paradigms: developing classes from scratch, reuse of existing classes, incremental extension of frameworks. Encapsulation, templates, polymorphism, dynamic binding and virtual methods, operator’s overloading, complex associations, dynamic aggregation, inheritance (single and multiple), exception handling, the standard template library. Introduction to UML for describing program designs.",
+    "CSCE 3311":
+      "Overview the network protocol stack and TCP/IP. Data transmission technologies, transmission impairments and channel capacity. Basics of wired and wireless transmission media. Signal encoding techniques. Introduction to error detection and correction. LAN fundamentals, Ethernet LANs, WLANs and MAC protocols. Cellular networks fundamental concepts and evolution from 1G to 5G networks.",
+    "CSCE 3312":
+      "Covers the fundamentals of computer networking. Topics include Introduction to computer networks, historical perspective and types, switching techniques, the concept of layering, network performance metrics, data link layer, network layer, IP networking and addressing, and the transport layer.",
+    "CSCE 3313":
+      "Offers hands-on experience in the area of computer networks. This includes basic network components, equipment, and experiments on network monitoring and virtualization tools, link layer, network layer, transport layer and application layer protocols, along with well-known static and dynamic routing protocols, in use in the Internet today.",
+    "CSCE 4411":
+      "Introduction to distributed systems. Modeling, specifications, consistency, fault tolerance, interprocess communication, network and distributed operating systems, distributed mutual exclusion, distributed deadlock detection, load balancing and process migration.",
+    "CSCE 4502":
+      "Introduction to the Web as a platform, the Web as an n-tier client-server architecture, basic components of a web-based application, developing static and dynamic web pages. Enhancing Web pages using Scripting languages. Developing Web-based applications. Using Server-extension techniques and tools. Introduction to XML and its associated technologies. Emerging technologies and tools on the web. Wireless Web protocols and techniques.",
+    "CSCE 4910":
+      "Under the guidance of a faculty member, the student carries on a reading, research, or a project on a specific computer-science topic. The student will present his/her results by submitting a report or passing an examination as determined by the supervisor.",
+    "DSGN 3400":
+      "A multi-disciplinary course that guides students to form teams of designers, programmers, and illustrators to ideate, prototype, and pitch their digital games.\nThe course will include theoretical and practical components, group discussions, and assignments."
   };
 
   const coursePrerequisites = {
@@ -2136,7 +2194,61 @@
     "CENG 4556":
       "CENG 4551 - Environmental and Sanitary Engineering (3 cr.)",
     "CENG 4557":
-      "CENG 4352 - Highway Facilities (3 cr.)"
+      "CENG 4352 - Highway Facilities (3 cr.)",
+    "CSCE 2301":
+      "PHYS 2211 or concurrent. Must be taken concurrently with CSCE 2302.",
+    "CSCE 2302":
+      "Concurrent with CSCE 2301 .",
+    "CSCE 2303":
+      "CSCE 1101\nConcurrent: CSCE 2301 or ECNG 2101",
+    "CSCE 3104":
+      "CSCE 1101",
+    "CSCE 3401":
+      "CSCE 2211 and CSCE 3301",
+    "CSCE 4101":
+      "CSCE 3104 .",
+    "CSCE 4950":
+      "Junior standing and approval of instructor.",
+    "CSCE 4980":
+      "Instructor approval",
+    "CSCE 4981":
+      "CSCE 4980",
+    "CSCE 4301":
+      "CSCE 3301, CSCE 3401, CSCE 3312, and Concurrent with CSCE 4302",
+    "CSCE 4302":
+      "Concurrent with CSCE 4301",
+    "CSCE 4303":
+      "CSCE 3304 and CSCE 4301\nConcurrent: CSCE 4301",
+    "CSCE 4315":
+      "CSCE 2202",
+    "CSCE 3423":
+      "None listed.\nConcurrent: CSCE 3401",
+    "CSCE 4421":
+      "CSCE 3423",
+    "CSCE 4423":
+      "CSCE 3301",
+    "CSCE 4424":
+      "CSCE 2501",
+    "CSCE 4702":
+      "CSCE 3701 and CSCE 3401",
+    "CSCE 3101":
+      "CSCE 1001",
+    "CSCE 3103":
+      "CSCE 1101",
+    "CSCE 3311":
+      "CSCE 1101 and PHYS 2211",
+    "CSCE 3312":
+      "CSCE 1101 and (MACT 3211 or MACT 3224)\nConcurrent: CSCE 3313 for Computer Engineering students.",
+    "CSCE 3313":
+      "Concurrent with CSCE 3312.",
+    "CSCE 4411":
+      "CSCE 3401",
+    "CSCE 4502":
+      "CSCE 2501 or MOIS 3201*\n*for MICT students only",
+    "CSCE 4910":
+      "Prerequisite: consent of instructor.",
+    "DSGN 3400":
+      "DSGN 3300"
   };
 
   const subjectLabels = {
