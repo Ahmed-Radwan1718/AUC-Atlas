@@ -4592,6 +4592,8 @@
   const professorPageSize = 30;
   let professorVisibleLimit = professorPageSize;
   let professorFilterAnimationTimer = 0;
+  let professorReviewSummariesLoaded = false;
+  let professorReviewSummariesPromise = null;
 
   function getProfessorCardImageUrl(imageURL) {
     const safeImageURL =
@@ -4609,6 +4611,111 @@
     }
 
     return safeImageURL;
+  }
+
+  function getProfessorCardRatingLabel(professor) {
+    const reviewCount = Math.max(
+      0,
+      Number(professor.reviewCount || 0)
+    );
+    const averageRating = Number(
+      professor.averageRating || 0
+    );
+
+    if (
+      !reviewCount ||
+      !Number.isFinite(averageRating) ||
+      averageRating <= 0
+    ) {
+      return "No Stars Yet";
+    }
+
+    const filledStars = Math.max(
+      1,
+      Math.min(5, Math.round(averageRating))
+    );
+
+    return (
+      "★".repeat(filledStars) +
+      "☆".repeat(5 - filledStars) +
+      " " +
+      averageRating.toFixed(1)
+    );
+  }
+
+  function loadProfessorReviewSummaries() {
+    if (professorReviewSummariesLoaded) {
+      return Promise.resolve();
+    }
+
+    if (professorReviewSummariesPromise) {
+      return professorReviewSummariesPromise;
+    }
+
+    professorReviewSummariesPromise = fetch(
+      "/api/professor-reviews?summaries=true",
+      {
+        credentials: "same-origin",
+        cache: "no-store"
+      }
+    )
+      .then(function (response) {
+        return response
+          .json()
+          .catch(function () {
+            return {};
+          })
+          .then(function (data) {
+            if (!response.ok) {
+              throw new Error(
+                data.error ||
+                "Could not load professor ratings."
+              );
+            }
+
+            return data;
+          });
+      })
+      .then(function (data) {
+        const summaries =
+          data &&
+          data.summaries &&
+          typeof data.summaries === "object"
+            ? data.summaries
+            : {};
+
+        professors.forEach(function (professor) {
+          const summary =
+            summaries[getProfessorId(professor)] ||
+            {};
+          const reviewCount = Math.max(
+            0,
+            Math.floor(
+              Number(summary.reviewCount || 0)
+            )
+          );
+          const averageRating = Number(
+            summary.averageRating || 0
+          );
+
+          professor.reviewCount = reviewCount;
+          professor.averageRating =
+            Number.isFinite(averageRating) &&
+            averageRating > 0
+              ? averageRating
+              : 0;
+          professor.averageStars =
+            getProfessorCardRatingLabel(professor);
+        });
+
+        professorReviewSummariesLoaded = true;
+        renderProfessors(false, false);
+      })
+      .catch(function () {
+        professorReviewSummariesPromise = null;
+      });
+
+    return professorReviewSummariesPromise;
   }
 
   function renderProfessors(animateResults, resetVisibleLimit) {
@@ -4754,6 +4861,10 @@
     }
 
     renderProfessors(false, true);
+
+    if (!getCurrentProfessorId()) {
+      loadProfessorReviewSummaries();
+    }
   }
 
   if (document.readyState === "loading") {
