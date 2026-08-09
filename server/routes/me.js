@@ -4,6 +4,13 @@ const {
   getOptionalSiteSessionUser,
   getSiteSessionUser
 } = require("../_lib/securityHelpers");
+const {
+  consumeSecurityRateLimit
+} = require("../_lib/securityRateLimits");
+
+const PROFILE_UPDATE_WINDOW_MS =
+  60 * 60 * 1000;
+const PROFILE_MAX_UPDATES = 20;
 
 function getFirstName(fullName, email) {
   const name = String(fullName || "").trim();
@@ -152,6 +159,18 @@ module.exports = async function handler(req, res) {
       const decodedUser = await getSiteSessionUser(req, {
         checkRevoked: true
       });
+
+      await consumeSecurityRateLimit({
+        scope: "profile-update-user",
+        identifier: decodedUser.uid,
+        maxAttempts:
+          PROFILE_MAX_UPDATES,
+        windowMs:
+          PROFILE_UPDATE_WINDOW_MS,
+        message:
+          "Too many profile updates. Please try again later."
+      });
+
       const db = admin.firestore();
       const userRef = db.collection("users").doc(decodedUser.uid);
       const storedUserDoc = await userRef.get();
