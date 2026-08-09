@@ -3788,9 +3788,11 @@
     }
 
     .course-recent-uploader-avatar {
+      position: relative;
       width: 24px;
       height: 24px;
       flex: 0 0 24px;
+      overflow: hidden;
       border: 1px solid rgba(192, 154, 92, 0.22);
       border-radius: 50%;
       background: rgba(192, 154, 92, 0.1);
@@ -3800,6 +3802,16 @@
       display: grid;
       place-items: center;
       text-transform: uppercase;
+    }
+
+    .course-recent-uploader-avatar img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      object-fit: cover;
+      display: block;
     }
 
     .course-recent-uploader-name {
