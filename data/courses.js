@@ -1447,7 +1447,43 @@
     "ECNG 4302":
       "Fundamentals of Digital Communications. Geometric Representation of Signals; Binary and M-ary Modulation and their Performance Analysis and Spectral Efficiency. Introduction to Information Theory and Source and Channel Coding; Channel Capacity; Block and Convolutional Codes. Introduction to broadband communications; OFDM. A course project is assigned.",
     "PHYS 5142":
-      "Numerical methods for quadrature solution of integral and differential equations, and linear algebra. finite difference methods, finite element techniques, solving a system of equations. Use of computation and computer graphics to simulate the behavior of complex physical systems. Monte Carlo simulations."
+      "Numerical methods for quadrature solution of integral and differential equations, and linear algebra. finite difference methods, finite element techniques, solving a system of equations. Use of computation and computer graphics to simulate the behavior of complex physical systems. Monte Carlo simulations.",
+    "DSCI 2411":
+      "The amount and complexity of information produced in science, engineering, business, and everyday human activity is increasing at staggering rates. The course discusses visual representation methods and techniques that increase the understanding of complex data. Good visualizations not only present a visual interpretation of data, but do so by improving comprehension, communication, and decision making. In this course, you will learn how the human visual system processes and perceives images, good design practices for visualization, tools for visualization of data from a variety of fields, and programming of interactive visualizations using 3D.",
+    "DSCI 4416":
+      "A capstone project divided between two courses DSCI 4416 and DSCI 4417. With the approval of the advisor, topics/data in an area of applications are selected by groups of 1 to 3 students who have common interests in the same area of application. A preliminary data examination, pre-processing, and exploratory data analysis are carried out on the selected data. Students will decide on the data science techniques, models, and methods to be used for the analysis. Students will submit a brief written proposal specifying their plan of work that they will follow in DSCI 4417.",
+    "DSCI 4417":
+      "This is a continuation of DSCI 4416, where students will implement their plan for the completion of the project. Students will develop and write well-documented computer programs to illustrate the iterative process of Data Science and business solutions are sought. The students will submit a carefully written project. The project is then submitted and presented orally to the advisors.",
+    "DSCI 4950":
+      "This course consists of participation in a full-time or part-time internship experience, related to the student’s field of study under the supervision of both an approved internship provider and a faculty adviser. This culminating course provides practical, hands-on training in a relevant industry to enhance classroom learning and allows senior students to apply the knowledge and skills they have acquired in their program to real-world problems.",
+    "CSCE 2501":
+      "Basic concepts, database system environment, DBMS. Components and architecture access structures, indexing and hashing, high-level data models, ER, the relational model, relational languages, relational algebra, relational calculus, SQL, functional dependencies and normalization, database security, query evaluation and optimization techniques, distributed database systems architecture and an introduction to NOSQL Databases.",
+    "ACCT 2001":
+      "The course introduces accounting as a discipline and the various uses of accounting information. It covers the accumulation, processing, and communication of accounting information. The measurement of assets, liabilities, equities and income are emphasized.",
+    "ACCT 3007":
+      "Data analytics is an analytical process by which data, information technology and statistical analysis are used to help managers gain improved insight about their operations and make better data driven decisions. Given the dramatic effect that data analytics is having on financial reporting, managerial accounting, auditing and taxation, accounting professionals are expected to know how data is created, collected, cleaned and analyzed. This course is designed to help students gain sufficient understanding of the analytical mindset. Additionally, this course offers both theoretical and hands-on learning experience on data collection, exploration, preparation and analysis as pre-requisites to formulate and solve business problems in general and accounting problems in particular.\nThis course offers the students the necessary background and hands-on experience to work with datasets that showcase how analytics could be applied to different areas of accounting that have been covered in other accounting courses like financial accounting, managerial accounting, fraud detection, auditing and taxation.",
+    "BIOL 2090":
+      "This course discusses essential concepts in experimental design and hypothesis testing and introduces quantitative skills for processing, analysing, and visualizing data generated by biological and medical experiments, focusing on the analysis of gene expression data. The open-source bioinformatics and computing platform R will be introduced and used throughout the course in the laboratory sessions.",
+    "CSCE 2211":
+      "In depth coverage of applied data structures needed by computing professionals. Includes but not limited to: Abstract data types and classes, analysis of algorithms, trees, binary search trees, dictionaries, self-balancing trees, B-Trees, red black trees, heaps, priority queues, sets, and graphs. Practical usage of the data structures is covered.",
+    "CSCE 4501":
+      "Data Cluster architectures, scheduling and resource management, big data stacks such as Hadoop, HDFS and Spark, big data processing techniques such as MapReduce, and an introduction to big data analytics.",
+    "CSCE 4930":
+      "Topics chosen according to special interests of faculty and major students. May be repeated for credit more than once if content changes.",
+    "DSCI 3413":
+      "This course is an introduction to important topics in biological, medical, health, and environmental statistical concepts and reasoning. Topics include: Introduction to Biological data Processing and Analysis, Hypothesis testing, nonparametric tests, Logistic regression, Poisson regression, Statistical methodologies in analysis of survival data (Kaplan-Meier estimator, Cox’s proportional hazards models, time-dependent covariates, multiple failure outcomes). Typical biomedical applications, including clinical trials. The course includes an applied project using computer programming language such as R or Python.",
+    "DSCI 4980":
+      "The Senior Thesis serves as a culminating course that allows senior students to put together the knowledge and skills they have acquired in their program. Students work under the direction of a faculty adviser to plan and conduct research on a topic of interest. The senior thesis could be an application of data science in various domains such as business, computer science, mathematics, sciences (biology, physics, chemistry) or engineering. This research effort begins with creative inquiry and systematic research. It culminates in a written thesis and an oral defense.",
+    "FINC 2101":
+      "The study of the principles of finance and their application to business enterprises. Special emphasis on financial analysis, management of working capital, cost of capital, capital budgeting, long term financing, dividend policy and internal finance.",
+    "MKTG 2101":
+      "The nature and scope of marketing. Marketing systems and the marketing environment, definition of a market, market segmentation, and buyer behavior. The marketing mix: product, place, price, and promotion. Marketing research and marketing information systems. The application of these topics to the Egyptian environment constitutes an important part of the study. Some of the class discussions and projects will incorporate entrepreneurial issues in Marketing.",
+    "MOIS 2101":
+      "This course is an introduction to information systems/technology and its applications for business students. The course explores the computer base applications in the major functional areas of business including accounting, finance, marketing, production, and personnel. It aims at the development of computer end-users and systems managers through a comprehensive coverage of business processes, systems concepts, systems types, applications software, database concepts, electronic commerce and competitive advantage.",
+    "MOIS 3201":
+      "The course aims at defining a framework of management information systems with emphasis on the organization. It relates to a number of important organizational aspects such as the human and technological infrastructure and the needs and requirements of an organizational information system. The course also covers the relational database model, with special emphasis on the design and querying of relational databases and exploration of the relationship of database to the rest of the system.",
+    "MOIS 3601":
+      "The course establishes a foundation for understanding analyzing and designing an Intelligent Decision Support Systems (IDSS). It also provides an overview of technical and organizational aspects of decision support systems (DSS), including individual, group and organizational DSS as well as executive information systems (EIS). It examines the integration of Experts Systems (ES) with Statistical models, the use of MS SQL data mining/warehousing, and the implementation of Information Technology (IT) based systems that support managerial and professional work, including Communications-Driven and Group Decision Support Systems (GDSS), Data-Driven DSS, Model-Driven DSS and Knowledge-Driven DSS."
   };
 
   const coursePrerequisites = {
@@ -1888,7 +1924,43 @@
     "ECNG 4302":
       "ECNG 4301",
     "PHYS 5142":
-      "MACT 2141, MACT 3143 or consent of instructor."
+      "MACT 2141, MACT 3143 or consent of instructor.",
+    "DSCI 2411":
+      "DSCI 2410 and (MACT 2222 or MACT 3223 or MACT 3224)",
+    "DSCI 4416":
+      "Senior standing",
+    "DSCI 4417":
+      "DSCI 4416",
+    "DSCI 4950":
+      "Consent of department chair or program director.",
+    "CSCE 2501":
+      "CSCE 1101 or DSCI 2410",
+    "ACCT 2001":
+      "None listed.",
+    "ACCT 3007":
+      "ACCT 2001, ACCT 2002, MACT 2222",
+    "BIOL 2090":
+      "BIOL 2150",
+    "CSCE 2211":
+      "CSCE 1101",
+    "CSCE 4501":
+      "CSCE 2501",
+    "CSCE 4930":
+      "Junior standing or higher.",
+    "DSCI 3413":
+      "MACT 4231",
+    "DSCI 4980":
+      "Restricted to seniors.",
+    "FINC 2101":
+      "ACCT 2001 and ((MACT 2222 or DSCI 1411) or (MACT 4231 and MACT 4233) or MACT 3224 or PSYC 2000 or SOC 3103) and (ENGR 3222 or ECON 2011 or ECON 2021)",
+    "MKTG 2101":
+      "None listed.",
+    "MOIS 2101":
+      "None listed.",
+    "MOIS 3201":
+      "MOIS 2101",
+    "MOIS 3601":
+      "MOIS 2101"
   };
 
   const subjectLabels = {
