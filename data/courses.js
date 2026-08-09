@@ -1483,7 +1483,95 @@
     "MOIS 3201":
       "The course aims at defining a framework of management information systems with emphasis on the organization. It relates to a number of important organizational aspects such as the human and technological infrastructure and the needs and requirements of an organizational information system. The course also covers the relational database model, with special emphasis on the design and querying of relational databases and exploration of the relationship of database to the rest of the system.",
     "MOIS 3601":
-      "The course establishes a foundation for understanding analyzing and designing an Intelligent Decision Support Systems (IDSS). It also provides an overview of technical and organizational aspects of decision support systems (DSS), including individual, group and organizational DSS as well as executive information systems (EIS). It examines the integration of Experts Systems (ES) with Statistical models, the use of MS SQL data mining/warehousing, and the implementation of Information Technology (IT) based systems that support managerial and professional work, including Communications-Driven and Group Decision Support Systems (GDSS), Data-Driven DSS, Model-Driven DSS and Knowledge-Driven DSS."
+      "The course establishes a foundation for understanding analyzing and designing an Intelligent Decision Support Systems (IDSS). It also provides an overview of technical and organizational aspects of decision support systems (DSS), including individual, group and organizational DSS as well as executive information systems (EIS). It examines the integration of Experts Systems (ES) with Statistical models, the use of MS SQL data mining/warehousing, and the implementation of Information Technology (IT) based systems that support managerial and professional work, including Communications-Driven and Group Decision Support Systems (GDSS), Data-Driven DSS, Model-Driven DSS and Knowledge-Driven DSS.",
+    "ARCH 3562":
+      "Role of the architect and other engineers in building construction. Introduction to the factors influencing architectural design. Building components, materials and assemblies. Architectural drawing and detailing.",
+    "CENG 1001":
+      "History of engineering. Engineering fields of specialization and curricula. The engineering profession: team work, professionalism, ethics, licensing, communication and societal obligations. Engineering support. Engineering approach to problem solving. Examples of major engineering projects. Course project.",
+    "CENG 1251":
+      "Orthographic and pictorial drawing, sectional views, auxiliary views, and conventions, dimensioning and dimensional sensitivity skills, free hand sketching, and computer-aided drafting.",
+    "CENG 2111":
+      "Statics: Fundamentals of engineering mechanics. Equilibrium of practices, forces in space, equivalent systems, equilibrium of rigid bodies. Distributed forces, center of gravity, Distributed moments, moment of inertia. Internal actions in trusses and beams, analysis of simple structures. Friction. Dynamics: Kinematics and kinetics of a particle, rigid bodies. Energy and momentum methods.",
+    "CENG 2211":
+      "Concept of stress and strain in components, mechanical behavior of materials under tensile, compressive, and shear loads, hardness, impact loading, fracture and fatigue. Analysis of stresses and the corresponding deformations in components, axial loading, torsion, bending, and transverse loading. Statically indeterminate problems. Transformation of plane stresses, and Mohr’s circle. Construction engineering applications.",
+    "CENG 2251":
+      "Architectural and structural drawings. Roads and hydraulic works drawings. Construction details. Electro-mechanical drawings for construction.",
+    "CENG 2311":
+      "Principles of plane surveying; methods of measuring distances, angles and differences in heights (levels); traverse computations; setting out horizontal and vertical curves; earthwork computation; setting out engineering structures and construction projects.",
+    "CENG 2511":
+      "Fluid properties, fluid statics, fluid flow. Conservation of momentum, energy, continuity and Bernoulli’s equations. Viscous efforts for laminar and turbulent flow. Steady-state closed conduit and open channel flow. Application to construction engineering.",
+    "CENG 2558":
+      "The science of environmental pollution, contamination and their chemical sources, Environmental quality parameters, Laboratory techniques for sample analysis, Interpretation of laboratory results.",
+    "CENG 3011":
+      "A study of electrical and mechanical systems used in both residential and commercial construction. Lectures cover the basic principles of electrical distribution, artificial lighting, fire protection, plumbing systems and heating, ventilating and air conditioning (HVAC) systems. Course content will include system design, component selection and utilization for energy conservation. Techniques of application and installation will be included as well as site visits and workshops.",
+    "CENG 3153":
+      "Properties of plain and reinforced concrete, behavior of composite sections, ultimate strength and working stress design of structural elements, beams, columns, one-way and two-way solid slabs, detailing of reinforcing steel. Concept of elastic design of steel structures, structural systems for steel buildings and bridges, elastic design and analysis of steel tension members, compression members, beams, columns, and connections.",
+    "CENG 3211":
+      "Types and properties of construction materials and components. Concepts of quality control, statistical evaluation and corresponding experimental work. Aggregates types, sources and quality. Inorganic cements. Concrete mix design, admixtures and quality control. Asphalt cement, asphalt concrete mix design and quality control. Steel in construction. Masonry materials, timber, insulation materials and coatings.",
+    "CENG 3312":
+      "Minerals and rock types, superficial deposits, interpretation of geologic maps, structural geology, geologic exploration, ground water cycle, geology of Egypt and greater Cairo.",
+    "CENG 4158":
+      "Structural design process, structural performance criteria, choice of structural system, design topics for reinforced concrete and steel structures including: rigid frames, ribbed and flat floor systems, torsion, biaxial bending, deflections, composite construction.",
+    "CENG 4252":
+      "Techniques of building construction. Methods, materials, tools and equipment of construction. Traditional, mechanized and prefabrication construction systems. Applications on site management and safety, Selection of construction equipment. Applications on influence of construction methods on design and details. Emphasis in applications will be provided based on student Program.",
+    "CENG 4253":
+      "Civil construction; methods, materials, tools and equipment; traditional and modern construction technologies. Evaluation and selection of appropriate construction technology. Sizing, operation and maintenance of construction equipment, design of temporary construction elements such as: concrete formwork, scaffolding systems, cofferdams.",
+    "CENG 4314":
+      "Subsurface soil exploration and reporting; types of foundations systems and design criteria; theory of bearing capacity, design of shallow foundations, dimensioning footings; structural design of footings; isolated, combined and strap beam, design of deep foundations; bases for design of retaining structures; construction methods; effects of construction of nearby structures.",
+    "CENG 4351":
+      "Introduction to transportation planning and engineering; transportation planning tools, concepts of geometric and structural design and construction of highways, and concepts of geometric design of railways.",
+    "CENG 4410":
+      "Introduction to construction management: participants involved types of construction project life cycle. Estimating techniques and procedures: approximate estimating, quantity surveying, detailed estimating procedure, costing of labor, material, equipment, overhead costs, cash flow analysis, financing costs, cost recording and cost accounts, Quality Management, and Safety Management; basics of company’s organization and HR management.",
+    "CENG 4420":
+      "Participants in a construction contract. Contract definition. Types of contracts; formation principles of a contract, performance or breach of contractual obligations. Analysis and comparison of the different kinds of construction contracts. Bidding logistics. Legal organizational structures. Different types and uses of specifications. Different forms of contracts utilized in construction.",
+    "CENG 4440":
+      "Project definition and work breakdown structure, deterministic and probabilistic scheduling and control models and techniques. Resource allocation and levelling, optimal schedules, documentation and reporting, time and cost control, progress monitoring and evaluation. Computer applications.",
+    "CENG 4460":
+      "Basic accounting terminology, accounting cycle and process, financial statements and analysis, unique aspects of accounting for the construction industry methods of revenue recognition for construction, percentage of completion computations, unbalanced items in construction: costs in excess and billings in excess.",
+    "CENG 4551":
+      "Water quality. Material balance relationships and water pollution control. Water demand. Drinking water: collection, treatment, distribution and quality assurance. Domestic and industrial wastewater collection, treatment and disposal. Environmental Impact Assessment.",
+    "CENG 4951":
+      "Each student is required to spend a minimum of eight weeks in industrial training in Egypt or abroad. A complete account of the experience is reported, presented and evaluated. Professional ethics: theories and analysis of ethical case studies.",
+    "CENG 4980":
+      "A capstone project. Topics are selected by groups of students according to their area of interest upon advisors’ approval. Projects address solutions to open ended applications using an integrated engineering approach.",
+    "CENG 4981":
+      "An applied cap stone project. Continuation of senior project I topics is encouraged. Actual construction projects are selected by groups of students upon advisors’ approval for analysis. The management and technology aspects of construction are simulated and investigated.",
+    "CENG 4154":
+      "Prestressed concrete: basic concepts of prestressing, fibre stresses in a prestressed beam, load balancing, permissible stress in concrete and steel, prestressing systems, prestress partial losses, flexure, shear and torsion design of prestressed concrete elements, indeterminate PC structures, prestressed concrete slabs. Concrete water structures: design considerations and parameters, water tightness, analysis and design of circular and rectangular tanks.",
+    "CENG 4212":
+      "Various types of advanced concrete, metals, and highway materials. Examples are concrete admixtures, special concretes, special construction alloys, soil stabilizers, and bituminous materials and high strength low alloy steels. Advanced mechanics of components incorporating innovative materials. Environmental-friendly use of materials and incorporation of waste materials. Advanced quality control techniques. Laboratory experiments are conducted for demonstration purposes.",
+    "CENG 4113":
+      "Structural Mechanics: normal stress and strain due to normal force and bending moment, shear stress and strain due to shear force and torsion, shear center, shear stress in thin-walled sections, general stress state, principal stresses and stress invariants, failure criteria for brittle and ductile materials.\nStability of Structures: overall buckling of columns, local buckling of thin-walled sections, lateral torsion-flexure buckling of beams.\nStructural Dynamics: single degree of freedom systems, damping, response to harmonic excitation, response to support excitation, response spectra, multi-degree of freedom systems, modal analysis, mass participation and earthquake analysis.\nIntroduction to fracture mechanics: Beams on elastic foundation and raft analysis; Introduction to theory of plates and shells.",
+    "CENG 4155":
+      "Types of bridges. Loads; dead, live, impact, wind and other loading. Basic design and construction of various types of bridges; truss, beam and plate girder, slab, box girder. bearings and expansion details.",
+    "CENG 4157":
+      "Structural systems for modern tall buildings: gravity load systems; transfer floor systems; lateral load systems for resisting wind and earthquake forces; design considerations for tall buildings. Roof systems for large span areas and arenas: shell structures; folded plates; tensile structures and canopies.",
+    "CENG 4315":
+      "Geotechnical analysis and design concepts applied to engineering projects: stability of natural and man-made soil and rock slopes, reinforced earth, deep soil stabilization, cofferdams, mat foundation, deep foundation under various loading conditions.",
+    "CENG 4911":
+      "Specialized topics in construction engineering will be selected and presented.",
+    "CENG 4952":
+      "Students will spend 12 weeks as full-time engineers-in-training in construction companies. During their engagement, the students will partake in activities related to one or more experience areas related to construction engineering, such as Tendering, Planning and Progress Control, Contract Administration, Construction Execution, Advanced Construction Materials, Technical Office, BIM Engineering, Procurement, Quality Management, Pre-stressing, Structural Design, Infrastructure Systems.\nStudents will be assigned daily tasks and responsibilities, and they will actively contribute to the progress of their assigned construction projects.",
+    "CENG 4430":
+      "Introduction to Risk and Uncertainty. Process of Risk Management: Risk Identification, Risk Analysis (Qualitative and Quantitative), Risk Response Planning, Risk Monitoring and Control, Tools and Techniques: Decision Tree, modeling, optimization, linear programming, network optimization, and inventory models. Monte Carlo Simulation and Application. Accounting for Project Risks. Introduction to Risk Analysis packages (Crystal Ball, PERT Master). Analyzing the Bidding Behavior of Key Competitors and Estimating Optimum Markup.",
+    "CENG 4450":
+      "Building Information Modeling, Computer modeling of construction processes, 4D Simulation of construction operations, Productivity modeling, measuring and forecasting, Sequencing and coordination of construction systems, Post-Optimality Analysis of Integer and Linear Programming Models in construction, discrete event simulation of construction processes.",
+    "CENG 4470":
+      "Construction project parties’ responsibilities pursuant to Civil Code and the Law of Tenders and Auctions (No. 89/1998), tendering procedures, contract negotiation and drafting, document control, international form of contracts (FIDIC), management of the variation process, Claims preparation and evaluation, disputes resolution methods.",
+    "CENG 4352":
+      "Analysis of factors in developing highway transportation facilities, traffic estimates and assignment, problems of highway geometric and design standards, planning and location principles, intersection design factors, structural design of pavement and highway maintenance.",
+    "CENG 4552":
+      "Introduction to water resources engineering. Design of irrigation systems and canals. Hydraulic structures: types, functions, hydraulic design, environmental impact. Urban and rural drainage systems associated with public infrastructure projects: types, design considerations, and hydraulic design.",
+    "CENG 4553":
+      "Theory and design of unit operations and processes in environmental engineering, emphasizing water and wastewater treatment; namely: physical, chemical and biological unit processes, sludge handling processes.",
+    "CENG 4554":
+      "Sanitary, storm water and combined sewerage systems: selection, elements, layout, computer-assisted hydraulic modeling and design. Water supply and distribution systems: hydraulic modeling and design. Pipeline asset management, GIS application in pipeline management and Life Cycle Cost Analysis. Pipeline rehabilitation and repair methods. Planning and construction considerations.",
+    "CENG 4555":
+      "Solid wastes - Nature, generation and collection. Local and regional management strategies including recycling and recovery of useful products, landfilling, and incineration. Hazardous wastes - Nature, generation and collection. Risk assessment. Management strategies including source reduction, treatment, recovery, landfilling, and incineration.",
+    "CENG 4556":
+      "Water impurities, Water quality regulations, drinking water standards; process and hydraulic design of water purification works: Flash mixing, flocculation, sedimentation, clariflocculator, sand filtration, membrane filtration, and disinfection. Wastewater characterization; process and hydraulic design of wastewater treatment works: Preliminary and primary treatment; secondary biological treatment units. Layout design of water treatment plants and wastewater treatment plants.",
+    "CENG 4557":
+      "Bridges and tunnels as part of road and/or rail networks, geometric features of bridges and tunnels, conceptual designs of substructure and superstructure of bridges and tunnels, geotechnical investigations; ramps, design of intersections and interchanges, earthwork configuration and stability, soil-structure interaction, methods of construction."
   };
 
   const coursePrerequisites = {
@@ -1960,7 +2048,95 @@
     "MOIS 3201":
       "MOIS 2101",
     "MOIS 3601":
-      "MOIS 2101"
+      "MOIS 2101",
+    "ARCH 3562":
+      "CENG 2251",
+    "CENG 1001":
+      "Should be taken in one of the first two semesters in the program.",
+    "CENG 1251":
+      "None listed.",
+    "CENG 2111":
+      "MACT 1121 and PHYS 1011",
+    "CENG 2211":
+      "CENG 2111 or ENGR 2102",
+    "CENG 2251":
+      "CENG 1251 or ENGR 1005",
+    "CENG 2311":
+      "MACT 1121",
+    "CENG 2511":
+      "PHYS 1021, CENG 2111 or ENGR 2104",
+    "CENG 2558":
+      "CHEM 1005 and CHEM 1015",
+    "CENG 3011":
+      "ARCH 3562 , CENG 2511",
+    "CENG 3153":
+      "CENG 3111, CENG 3211",
+    "CENG 3211":
+      "CENG 2211",
+    "CENG 3312":
+      "CENG 2311",
+    "CENG 4158":
+      "CENG 3152 or CENG 3153",
+    "CENG 4252":
+      "ARCH 2551 or ARCH 3562 , CENG 3112 or CENG 3153\nConcurrent: ARCH 3331 or CENG 3211",
+    "CENG 4253":
+      "CENG 4252",
+    "CENG 4314":
+      "CENG 4313",
+    "CENG 4351":
+      "CENG 2111 and CENG 3211",
+    "CENG 4410":
+      "ENGR 3222, (CENG 3153 or CENG 3151), (ARCH 3562 or ARCH 2551)",
+    "CENG 4420":
+      "CENG 4410",
+    "CENG 4440":
+      "CENG 4410",
+    "CENG 4460":
+      "CENG 4420",
+    "CENG 4551":
+      "CENG 2558 and CENG 3511",
+    "CENG 4951":
+      "Prerequisite: completion of 96 credit hours.",
+    "CENG 4980":
+      "At least 4 of the 5 following courses CENG 3211 , CENG 4351 , CENG 4158 , CENG 4314 ,CENG 4551",
+    "CENG 4981":
+      "CENG 4980, CENG 4440, CENG 4420, CENG 4252\nConcurrent: CENG 4460",
+    "CENG 4154":
+      "CENG 4158 - Structural Systems and Advanced Design (3 cr.)",
+    "CENG 4212":
+      "CENG 3211",
+    "CENG 4113":
+      "CENG 3153",
+    "CENG 4155":
+      "CENG 3153",
+    "CENG 4157":
+      "CENG 3152 or CENG 3153",
+    "CENG 4315":
+      "CENG 4314 or concurrent.",
+    "CENG 4911":
+      "Prerequisite: senior standing.",
+    "CENG 4952":
+      "Department Approval",
+    "CENG 4430":
+      "CENG 4410 and CENG 4440",
+    "CENG 4450":
+      "CENG 3113 and CENG 4252",
+    "CENG 4470":
+      "CENG 4420 or concurrent.",
+    "CENG 4352":
+      "CENG 4351",
+    "CENG 4552":
+      "CENG 4313",
+    "CENG 4553":
+      "CENG 4551 concurrent.",
+    "CENG 4554":
+      "CENG 3511 and CENG 4410 .",
+    "CENG 4555":
+      "Senior standing.",
+    "CENG 4556":
+      "CENG 4551 - Environmental and Sanitary Engineering (3 cr.)",
+    "CENG 4557":
+      "CENG 4352 - Highway Facilities (3 cr.)"
   };
 
   const subjectLabels = {
