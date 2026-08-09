@@ -1629,7 +1629,81 @@
     "CSCE 4910":
       "Under the guidance of a faculty member, the student carries on a reading, research, or a project on a specific computer-science topic. The student will present his/her results by submitting a report or passing an examination as determined by the supervisor.",
     "DSGN 3400":
-      "A multi-disciplinary course that guides students to form teams of designers, programmers, and illustrators to ideate, prototype, and pitch their digital games.\nThe course will include theoretical and practical components, group discussions, and assignments."
+      "A multi-disciplinary course that guides students to form teams of designers, programmers, and illustrators to ideate, prototype, and pitch their digital games.\nThe course will include theoretical and practical components, group discussions, and assignments.",
+    "CHEM 2003":
+      "Aliphatic and aromatic hydrocarbons, stereochemistry and conformational analysis, ionic and free-radical substitution and addition reactions.",
+    "CHEM 2006":
+      "Ionic equilibria: solubility, activity and ionic strength. Gravimetry: nucleation and crystal growth, methodology, colloids. Acid-base, complexation, oxidation-reduction and precipitation equilibria and titrations. Introduction to separations in analytical chemistry.",
+    "CHEM 2013":
+      "Characterization of organic compounds by classification tests.",
+    "CHEM 2016":
+      "Acid-base, oxidation-reduction, complexometric and precipitation titrations; gravimetric analysis; potentiometric titrations.",
+    "CHEM 3003":
+      "Gas laws, state variables and equations of state, energy and the first law, thermochemistry; entropy and the second and third laws; spontaneity and equilibrium; physical transformation of pure substances, phase rule, phase equilibria.",
+    "CHEM 3005":
+      "Introduction to computational chemistry techniques and their applications to chemical and biochemical areas; Principles of Density Functional Theory; Thermochemistry modeling in Chemistry; Generating and Analyzing a Molecular Dynamics Trajectory; Mass transport in material science; Basics of Monte Carlo Sampling Techniques; Binding Energies in Biochemistry; Combined QM/MM Simulation; Enzyme Reaction Mechanism.",
+    "CHEM 3006":
+      "Stereochemistry, aromaticity, electrophilic aromatic substitution; spectroscopy and structure; SN1, SN2, E1, and E2 reactions.",
+    "CHEM 3009":
+      "Basic principles of quantum mechanics as applied to hydrogenic and polyelectron atoms, atomic orbitals, electron-electron interactions, atomic parameters. Molecular orbital theory as applied to diatomic and polyatomic molecules and to solids, bond properties, molecular shape and symmetry, introduction to applications of molecular symmetry in chemistry. The structures of simple solids; acids & bases; oxidation-reduction. Overview of methods of molecular structure determination.",
+    "CHEM 3011":
+      "Instrumental methods of chemical analysis: visible, ultraviolet, and infrared absorption spectroscopy, atomic absorption and emission spectrometry, fluorimetry, X-ray diffraction and fluorescence; mass spectrometry, gas chromatography, thermometric and electrochemical methods.",
+    "CHEM 3012":
+      "Analytical measurements using instrumental methods of chemical analysis such as visible, ultraviolet and infrared absorption spectroscopy; atomic absorption, and emission spectrometry; fluorimetry, X-ray diffraction, and fluorescence; mass spectrometry, gas chromatography, thermometric and electrochemical methods.",
+    "CHEM 3013":
+      "Experiments in physical chemistry, thermodynamics and error analyses.",
+    "CHEM 3014":
+      "Experiments in electrochemistry. One three-hour lab period.",
+    "CHEM 3015":
+      "The living cell, structure of biomolecules and their relationship to biological functions; biochemical energetics; metabolism of major cellular components and their relationship to clinical conditions.",
+    "CHEM 3016":
+      "Systematic identification of organic compounds, analysis of mixtures (qualitative and quantitative).",
+    "CHEM 3018":
+      "Preparations, reactions, and characterization of some inorganic compounds; ion-exchange; chromatography; measurements of stability constants.",
+    "CHEM 3940":
+      "Weekly one-hour seminars in different areas of science and technology with emphasis on chemistry to be given by faculty and invited speakers from industries and other scientific communities.",
+    "CHEM 4004":
+      "Basic concepts and theory of quantum mechanics, applications to atomic and molecular spectroscopy; introduction to statistical thermodynamics.",
+    "CHEM 4006":
+      "A continuation of the chemistry of monofunctional and polyfunctional compounds, including the chemistry of carbanions, condensation reactions, nucleophiic addition and multistep syntheses.",
+    "CHEM 4008":
+      "Coordination chemistry, transition metals and their complexes, theories of metal-ligand bonding, complexes of pi-acceptor ligands and organometallic compounds, reaction mechanisms of d-block complexes. Selected topics in nanochemistry, solid state chemistry, bioinorganic chemistry and/ or catalysis.",
+    "CHEM 4013":
+      "Experiments in physical chemistry emphasizing chemical kinetics.",
+    "CHEM 4016":
+      "Organic Synthesis of compounds through one step or multistep, using different techniques for separation and purification. Several spectroscopic tools, (MS, IR, NMR & C13) are used to confirm the structure of synthesized compounds.",
+    "CHEM 4980":
+      "A capstone course. Each student selects a topic in his/her field of interest under the supervision of a faculty member. In this course, the student prepares an outline, assembles a bibliography, and develops a study plan under the supervision of the faculty advisor to be followed in preparing his/her project. The students are also expected to compose a theoretical background section that illustrates his/her knowledge of the range of equipment and techniques that will be used in obtaining and reporting the results of research. Each student is expected to deliver a seminar by the end of the semester that provides an overview of the research topic, anticipated outcomes and evaluation criteria.",
+    "CHEM 4981":
+      "A capstone course. Students will embark in this course on performing the actual work on the project topics selected in CHEM 4980 . After completion of this research study, the students are expected to compose in accordance with the departmental guidelines, a full thesis and give an oral presentation of the main results achieved.",
+    "BADM 2001":
+      "The course is designed to be an introductory course for students with no prior knowledge in business. The course starts by defining the business organization and its role in society as well as entrepreneurship and its role in the economy. The course then covers some of the business functions including research and development, marketing, production, finance. The four basic functions of a manager, namely planning, organizing, leading and controlling are also introduced. The ethical and social responsibility if business if emphasized. The course is meant to give students who are considering majoring or minoring in Business or Entrepreneurship an introductory overview about the field , that gives a practical and integrated view of the profession and the field of study.",
+    "ENTR 3102":
+      "This is an interdisciplinary course combining skills from all areas of business. It focuses on the creation of new business ventures with an emphasis on personal rather than corporate goals. Special focus is placed on problems encountered by the entrepreneurs in the Middle East and development of solutions to those problems. The course also prepares students for intrapreneur or entrepreneur business careers in startups and small and large corporations. It offers and understanding of the stages of business formation and what activities are appropriate at each stage of business development to meet financial goals including preparations of feasibility studies for business start-ups.",
+    "CHEM 3522":
+      "An overview of planning scale-up from laboratory to pilot plant, to production plant, with a focus on models for determining profitability of new projects, new products and new processes. Selected topics from: process design, plant layout and flowsheets, material and energy balances, mass and heat transfer, reactor kinetics, chemical economics, process design strategies and waste management.",
+    "CHEM 3523":
+      "Crude oil processing and production of basic, intermediate, and final petrochemicals; ethylene, propylene, butenes, benzene, toluene, xylene; non-hydrocarbon intermediates; higher paraffin-based chemicals; C4 olefins and diolefin-based chemicals; process technologies in petrochemical industries including thermal and catalytic cracking, reforming, dehydrogenation",
+    "CHEM 4524":
+      "Mechanisms and kinetics of polymerization reactions of monomers; principles, limitations and advantages of various methods for molecular weight characterization; structure - physical properties relationship; specific catalysis for the control of polymeric stereo-specificity and morphology; polymer production and processing techniques",
+    "CHEM 2020":
+      "An overview of the interdisciplinary nature of food science. The chemical and physical properties of foods. An overview of food regulation. Concepts and applications of food chemistry, food analysis, food processing, biotechnology, sensory evaluation, food packaging, food product development and food engineering. Global food situation with an emphasis on the Egyptian context.",
+    "CHEM 3020":
+      "This course covers the chemistry of food constituents, the changes these constituents undergo during processing, the chemistry and technology of meat and meat products, dairy products, fruit and vegetables, cereal products and alcoholic/non-alcoholic beverages. It also covers the basic chemistry of color, odor and taste (sensory properties of foodstuffs).",
+    "CHEM 4007":
+      "An overview of fruit, vegetable, cereal, dairy, seafood and meat science and technology. The principles of food processes, including refrigeration, freezing, heat processing, dehydration, fermentation, high pressure, irradiation, pulsed electric field and packaging. Commercial preservation technologies used in the preservation of minimally processed and processed foods.",
+    "CHEM 3002":
+      "Characterization of metals, minerals, pigments, glass, stone, dyes. Dating techniques: thermoluminescence, radiocarbon, amino-acid, Obsedian hydration and potassium/argon. Introduction to Mossbauer spectroscopy and neutron activation analysis.",
+    "CHEM 3910":
+      "Under faculty guidance, the student(s) will carry out a group individual project on an environmental related topic. The student(s) will present their results by submitting a common/individual report or by passing an examination, as determined by the supervisor.",
+    "CHEM 4910":
+      "In exceptional circumstances some senior Chemistry students, with departmental approval, may arrange to study a selected topic outside of the regular course offerings. The student and faculty member will select a topic of mutual interest and the student will be guided in research and readings. The student would demonstrate achievement either by submitting a report or passing an examination, according to the decision of the supervisor.",
+    "CHEM 4930":
+      "Topics chosen according to special interests of faculty and students..",
+    "CHEM 4005":
+      "Several aspects in a variety of chemical industries such as pharmaceutical, petrochemical, polymer, metal catalysis, surfactants, biotechnology, and inorganic chemical industries will be discussed.",
+    "CHEM 4900":
+      "This is a summer-based chemistry practical internship where students will spend 12 consecutive weeks as full-time employees-in-training in approved entities within the chemistry-related fields. The course is available to students in any of the CHEM undergraduate concentrations."
   };
 
   const coursePrerequisites = {
@@ -2248,7 +2322,81 @@
     "CSCE 4910":
       "Prerequisite: consent of instructor.",
     "DSGN 3400":
-      "DSGN 3300"
+      "DSGN 3300",
+    "CHEM 2003":
+      "CHEM 1005",
+    "CHEM 2006":
+      "CHEM 1006 and to be taken concurrently with CHEM 2016",
+    "CHEM 2013":
+      "None listed.\nConcurrent: CHEM 2003",
+    "CHEM 2016":
+      "CHEM 1016 and concurrent with CHEM 2006",
+    "CHEM 3003":
+      "CHEM 1006 and MACT 1122\nConcurrent: CHEM 3013",
+    "CHEM 3005":
+      "CHEM 3003 and CSCE 1001 .",
+    "CHEM 3006":
+      "CHEM 2003",
+    "CHEM 3009":
+      "CHEM 1006",
+    "CHEM 3011":
+      "CHEM 2006 and CHEM 2016.",
+    "CHEM 3012":
+      "CHEM 2006, CHEM 2016\nConcurrent: CHEM 3011",
+    "CHEM 3013":
+      "CHEM 1006 ,CHEM 2016 and concurrent with CHEM 3003 .",
+    "CHEM 3014":
+      "CHEM 3013 and concurrent with CHEM 3004 .",
+    "CHEM 3015":
+      "CHEM 2003",
+    "CHEM 3016":
+      "CHEM 2013",
+    "CHEM 3018":
+      "None listed.\nConcurrent: CHEM 3009",
+    "CHEM 3940":
+      "Junior standing",
+    "CHEM 4004":
+      "CHEM 3004, PHYS 2221",
+    "CHEM 4006":
+      "CHEM 3006",
+    "CHEM 4008":
+      "CHEM 3009",
+    "CHEM 4013":
+      "CHEM 3014 and concurrent with CHEM 4003 .",
+    "CHEM 4016":
+      "CHEM 3016 and CHEM 4006 .",
+    "CHEM 4980":
+      "Senior standing.",
+    "CHEM 4981":
+      "CHEM 4980 .",
+    "BADM 2001":
+      "None listed.",
+    "ENTR 3102":
+      "MGMT 3201 or BADM 2001",
+    "CHEM 3522":
+      "CHEM 1006 .",
+    "CHEM 3523":
+      "CHEM 3003",
+    "CHEM 4524":
+      "(CHEM 3003 and CHEM 3522) or equivalent",
+    "CHEM 2020":
+      "CHEM 1005 .",
+    "CHEM 3020":
+      "CHEM 1005 .",
+    "CHEM 4007":
+      "CHEM 1006 .",
+    "CHEM 3002":
+      "CHEM 1006 .",
+    "CHEM 3910":
+      "None listed.",
+    "CHEM 4910":
+      "Consent of instructor, senior standing.",
+    "CHEM 4930":
+      "Prerequisite: consent of instructor.",
+    "CHEM 4005":
+      "CHEM 3004, CHEM 3006, CHEM 3009, CHEM 3011, CHEM 3015",
+    "CHEM 4900":
+      "Senior Standing"
   };
 
   const subjectLabels = {
