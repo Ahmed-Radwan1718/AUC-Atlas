@@ -1,6 +1,13 @@
 const admin = require("../server/_lib/firebaseAdmin");
+const {
+  getRequestIp,
+  consumeSecurityRateLimit
+} = require("../server/_lib/securityRateLimits");
 
 const VISITOR_TIME_ZONE = "Africa/Cairo";
+const VISITOR_RATE_LIMIT_WINDOW_MS =
+  60 * 60 * 1000;
+const VISITOR_MAX_POSTS_PER_WINDOW = 30;
 
 function getCurrentWeekStart() {
   const dateParts = new Intl.DateTimeFormat("en-US", {
@@ -70,6 +77,30 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    try {
+      await consumeSecurityRateLimit({
+        scope: "weekly-visitors-ip",
+        identifier: getRequestIp(req),
+        maxAttempts:
+          VISITOR_MAX_POSTS_PER_WINDOW,
+        windowMs:
+          VISITOR_RATE_LIMIT_WINDOW_MS,
+        message:
+          "Too many visitor-count requests from this connection."
+      });
+    } catch (error) {
+      if (error.statusCode !== 429) {
+        throw error;
+      }
+
+      return res.status(200).json({
+        weeklyVisits:
+          await getWeeklyVisitCount(countRef),
+        weekStart,
+        counted: false
+      });
+    }
+
     let weeklyVisits = 0;
 
     await db.runTransaction(async function (transaction) {
@@ -102,7 +133,8 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({
       weeklyVisits,
-      weekStart
+      weekStart,
+      counted: true
     });
   } catch (error) {
     return res.status(500).json({
