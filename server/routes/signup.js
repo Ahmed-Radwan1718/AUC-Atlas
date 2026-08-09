@@ -31,53 +31,18 @@ function cleanPassword(value) {
   return String(value || "");
 }
 
-function cleanPhone(value) {
-  return cleanString(value, 30);
-}
-
 function cleanAucId(value) {
   return String(value || "").replace(/\D/g, "").slice(0, 9);
-}
-
-function hasValidPhoneFormat(value) {
-  const phone = cleanPhone(value);
-  const phoneDigits = phone.replace(/\D/g, "");
-
-  return Boolean(
-    phone &&
-    /^\+?[0-9][0-9\s().-]{7,28}$/.test(phone) &&
-    phoneDigits.length >= 10 &&
-    phoneDigits.length <= 15 &&
-    !/^(\d)\1+$/.test(phoneDigits)
-  );
 }
 
 function hasValidAucIdFormat(value) {
   return /^900\d{6}$/.test(cleanAucId(value));
 }
 
-function getPhoneLookupKey(value) {
-  const phone = cleanPhone(value);
-
-  return hasValidPhoneFormat(phone) ? phone.replace(/\D/g, "") : "";
-}
-
 function getAucIdLookupKey(value) {
   const aucId = cleanAucId(value);
 
   return hasValidAucIdFormat(aucId) ? aucId : "";
-}
-
-function createInvalidPhoneError() {
-  const error = new Error("Please enter a valid phone number.");
-  error.statusCode = 400;
-  return error;
-}
-
-function createPhoneInUseError() {
-  const error = new Error("This phone number is already used by another account.");
-  error.statusCode = 409;
-  return error;
 }
 
 function createInvalidAucIdError() {
@@ -90,33 +55,6 @@ function createAucIdInUseError() {
   const error = new Error("This AUC ID number is already used by another account.");
   error.statusCode = 409;
   return error;
-}
-
-async function ensurePhoneCanCreateAccount(phone) {
-  const phoneLookupKey = getPhoneLookupKey(phone);
-
-  if (!phoneLookupKey) {
-    throw createInvalidPhoneError();
-  }
-
-  const db = admin.firestore();
-  const phoneReservationRef = db.collection("accountPhoneNumbers").doc(phoneLookupKey);
-  const phoneReservationDoc = await phoneReservationRef.get();
-
-  if (phoneReservationDoc.exists) {
-    throw createPhoneInUseError();
-  }
-
-  const [exactPhoneSnapshot, normalizedPhoneSnapshot] = await Promise.all([
-    db.collection("users").where("phone", "==", phone).limit(1).get(),
-    db.collection("users").where("phoneLookupKey", "==", phoneLookupKey).limit(1).get()
-  ]);
-
-  if (!exactPhoneSnapshot.empty || !normalizedPhoneSnapshot.empty) {
-    throw createPhoneInUseError();
-  }
-
-  return phoneLookupKey;
 }
 
 async function ensureAucIdCanCreateAccount(aucId) {
@@ -144,28 +82,6 @@ async function ensureAucIdCanCreateAccount(aucId) {
   }
 
   return aucIdLookupKey;
-}
-
-async function reserveAccountPhone(phone, uid) {
-  const phoneLookupKey = await ensurePhoneCanCreateAccount(phone);
-  const phoneRef = admin.firestore().collection("accountPhoneNumbers").doc(phoneLookupKey);
-
-  try {
-    await phoneRef.create({
-      uid,
-      phone,
-      phoneLookupKey,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-  } catch (error) {
-    if (String(error.code) === "6" || error.code === "already-exists" || /already exists/i.test(error.message || "")) {
-      throw createPhoneInUseError();
-    }
-
-    throw error;
-  }
-
-  return { phoneLookupKey, phoneRef };
 }
 
 async function reserveAccountAucId(aucId, uid) {
@@ -386,7 +302,6 @@ module.exports = async function handler(req, res) {
 
       await userRef.set({
         fullName: existingUser.fullName || fullName,
-        phone: existingUser.phone || "",
         email,
         photoURL: existingUser.photoURL || photoURL,
         authProvider: existingUser.authProvider || providerConfig.authProvider,
@@ -441,13 +356,12 @@ module.exports = async function handler(req, res) {
 
     const fullName = cleanString((req.body || {}).fullName, 80);
     const aucId = cleanAucId((req.body || {}).aucId);
-    const phone = cleanPhone((req.body || {}).phone);
     const email = cleanEmail((req.body || {}).email);
     const password = cleanPassword((req.body || {}).password);
     const confirmPassword = cleanPassword((req.body || {}).confirmPassword);
     const consentAccepted = (req.body || {}).consentAccepted === true;
 
-    if (!fullName || !aucId || !phone || !email || !password || !confirmPassword) {
+    if (!fullName || !aucId || !email || !password || !confirmPassword) {
       return res.status(400).json({ error: "Please complete all required fields." });
     }
 
@@ -483,7 +397,6 @@ module.exports = async function handler(req, res) {
       email
     );
     await ensureAucIdCanCreateAccount(aucId);
-    await ensurePhoneCanCreateAccount(phone);
     await ensureEmailCanCreateAccount(email);
 
     const userRecord = await admin.auth().createUser({
@@ -493,20 +406,16 @@ module.exports = async function handler(req, res) {
       emailVerified: false
     });
 
-    let phoneReservation = null;
     let aucIdReservation = null;
     const userRef = admin.firestore().collection("users").doc(userRecord.uid);
 
     try {
-      phoneReservation = await reserveAccountPhone(phone, userRecord.uid);
       aucIdReservation = await reserveAccountAucId(aucId, userRecord.uid);
 
       await userRef.set({
         fullName,
         aucId,
         aucIdLookupKey: aucIdReservation.aucIdLookupKey,
-        phone,
-        phoneLookupKey: phoneReservation.phoneLookupKey,
         email,
         authProvider: "password",
         emailVerified: false,
@@ -516,10 +425,6 @@ module.exports = async function handler(req, res) {
 
       await sendFirebaseSignupVerificationEmail(userRecord.uid);
     } catch (error) {
-      if (phoneReservation && phoneReservation.phoneRef) {
-        await phoneReservation.phoneRef.delete().catch(function () {});
-      }
-
       if (aucIdReservation && aucIdReservation.aucIdRef) {
         await aucIdReservation.aucIdRef.delete().catch(function () {});
       }
