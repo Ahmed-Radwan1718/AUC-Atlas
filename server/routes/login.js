@@ -88,6 +88,13 @@ module.exports = async function handler(req, res) {
     }
 
     const userRecord = await admin.auth().getUser(uid);
+
+    if (!userRecord.emailVerified) {
+      return res.status(403).json({
+        error: "Please verify your AUC email address before logging in. You can also use an email sign-in code to verify your address."
+      });
+    }
+
     const userDoc = await admin.firestore().collection("users").doc(uid).get();
     const userData = userDoc.exists ? userDoc.data() || {} : {};
     const twoFactor = userData.twoFactor && typeof userData.twoFactor === "object" ? userData.twoFactor : {};
