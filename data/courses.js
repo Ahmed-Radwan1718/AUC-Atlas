@@ -1809,7 +1809,49 @@
     "MGMT 4202":
       "This course focuses on dynamics of personality, group dynamics, team building, organization culture, motivation, leadership, and communication, what is the human capital, strategic human resource management, HR planning, job analysis, recruitment, selection, training, development, performance management and compensation.",
     "MKTG 3201":
-      "The nature and scope of marketing research. The scientific method and its application in the field of marketing, research design, basic methods of collecting data, marketing research procedures, applications of marketing research."
+      "The nature and scope of marketing research. The scientific method and its application in the field of marketing, research design, basic methods of collecting data, marketing research procedures, applications of marketing research.",
+    "MACT 2222":
+      "The course aims at acquainting the students with the basic statistical methods in a business context. The course demonstrates the relevance of the statistical methods in making decisions in the different areas of business: accounting, finance, human resource management, marketing, operations, management of information systems, and more. The course covers the following: descriptive statistics, random variables and continuous probability distributions, sampling distributions, estimation and confidence intervals, one-sample hypothesis testing, inferences from two samples, Chi-Square tests, analysis of variance and simple linear regression.",
+    "BADM 3002":
+      "The social, cultural, political, legal, and technological environment of international business. The theoretical relationship underlying international business transactions and the integration of functional activities in international firms.",
+    "BADM 3003":
+      "In today’s rapidly evolving world, organizations face complex challenges that require sustainable solutions. This course provides students with the frameworks, tools, and strategies needed to make informed and responsible decisions that balance profitability with environmental and social impact. By the end of the course, students will be equipped to implement decision-making processes that contribute to long-term organizational resilience, sustainability, and positive societal impact.",
+    "BADM 4001":
+      "A capstone course, which integrates all business functions. Emphasis is on developing business strategies, discussing different levels of strategies, and developing a business plan for organizations.",
+    "BADM 4900":
+      "The graduation project course will enable students to develop an extensive and comprehensive project relating to their field of study with professional benchmark. The course will be designed to integrate all business functions. It aims to provide students with a platform to apply and practice the multidisciplinary business competencies acquired throughout the program within a comprehensive and practical context. The graduation project will either be a consultancy project offering business solutions or marketing plans for real established companies or developing business plans for startups. Corporate and Social Partners’ representatives would be invited to participate in the projects and offer a platform for the students to work on a real-life case.",
+    "BADM 4999":
+      "This course offers business students an opportunity to complement their academic studies with practical application and demonstrate knowledge attained in areas of global awareness and responsible citizenship.\nCourse will be graded on pass/fail basis.",
+    "ENTR 4302":
+      "The course aims at understanding the DNA of entrepreneurial firms through answering the questions of what are the characteristics of renowned corporates, why there is a need for developing corporate innovation and venturing strategies and how to construct the elements of entrepreneurial innovative adaptive strategies. The course will stress on the related issues to creating intrapreneurship through leadership, strategic, financial, organizational as well as other managerial functions. The course will also tackle strategies for sustaining competitive advantage within the business world.",
+    "ENTR 4503":
+      "This course focuses on the key skills, tools, methods, needed for creating effective digital innovations and building digital platforms that will boost customer acquisition and engagement and the diverse business models for sustaining these platforms. The course will deliberately expose the students to a large number of digital tools and tactics with the aim of addressing digital strategy from a 360 degree view analyzing and improving the design and content of every touch point of your digital platforms.",
+    "MGMT 3301":
+      "The nature, formation, and application of the law. Topics include: law and the Egyptian business environment, contracts, agency, forms of business organization, fiscal policy, taxation, commercial transaction, and governmental regulation of business.",
+    "MGMT 4203":
+      "This course provides students with the tools needed to help understand the psychology of the workplace and influence the actions of individuals and groups in an organizational setting to help each employee reach their full potential. Students will learn how to manage people, information, AI, and processes to accomplish organizational goals under conditions or timeframes that are not of their choosing. In this course, an increased focus is on the diagnosis and problem-solving skills related to the major challenges faced in managing people in contemporary organizations. Topics that shall be covered include motivational system design, team building and teamwork, conflict management, political dynamics, and corporate culture.",
+    "MKTG 4602":
+      "An integrative capstone course for students seeking a marketing specialization. Provides a transitional experience between the marketing concepts and techniques introduced in prior courses and the practice of marketing in real-world business situations. Students learn to integrate the various elements of marketing and the other functional areas of business and develop critical decision-making abilities in strategic marketing in the context of a rapidly changing marketplace.",
+    "MOIS 3301":
+      "This course introduces the basics of modern business in a networked environment which is changing the landscape of business operation. Students will explore the foundations of digital transformation and the nature of the competitive life cycle. The course focuses on the important electronic business issues with a broad understanding of the concepts, technologies, tools, techniques and strategies associated with electronic business, students learn how to exploit the business development potentials of the new information based society and how to develop simple IT solutions to some of the most significant business problems. Students will explore emerging trends and technologies, what is probable in the future, and what we are currently experiencing in practice. Hence, students get to exercise needs finding methods, brainstorming and concept creation, understanding and interpreting IT business needs, analysis and feasibility, basic software prototyping and market assessment.",
+    "OPMG 3201":
+      "Sustainable Operations Management focuses on the efficient and ethical management of business processes to drive sustainability. The course addresses the urgent need to align operations and business strategies with social and environmental goals while extending the core topics of operations management. Using real business cases, it explores key areas such as forecasting techniques, product and service design incorporating recycling and re-manufacturing principles, optimality in capacity planning and facility layouts, and effective inventory management. Additionally, it emphasizes quality management that maintains safety and ethical standards and provides smart applications within Industry 4.0 and green systems that allow organizations to optimize profitability while adhering to sustainability standards. In this course, students will learn to formulate sustainable operations strategies and manage tactical and operational activities, enhancing sustainability performance overtime.",
+    "OPMG 4301":
+      "The integrative managerial issues and challenges related to developing and implementing a firm’s supply chain strategy. Attention is directed to the supply chain strategy mission confronted by varied types of business organizations.",
+    "BUSC 4000":
+      "This is an experiential learning course whereby students are directly engaged, on a full-time basis for at least six months, with external entities including but not limited to multinational corporations, startups, financial institutions, governmental entities, professional services firms, think tanks, local/international economic and monetary bodies, and non-profit organizations. During this engagement, students will be assigned specific tasks relevant to their fields of study providing realistic on the job training. Students are co-evaluated on key learning objectives by an academic faculty and an external entity counterpart ultimately yielding a pass/ fail grade.",
+    "ENTR 3201":
+      "This course teaches about financing of new entrepreneurial ventures. The course will examine both the entrepreneur’s and investor’s perspective with special emphasis on the venture capital process.",
+    "ENTR 4301":
+      "This course is specially intended for non-business students, minors in entrepreneurship, and students writing business plans for new ventures. It concentrates on the mechanics of constructing a creative, realistic and effective business plans for a new concept that the student team has generated and developed. Thus, it is intended as a “hands-on” experience that explores the process that a person must go through to put together a proper business plan for a start-up venture.",
+    "ENTR 4303":
+      "This course introduces students to the social entrepreneurship phenomenon which combines the passion of a social mission with an image of business-like discipline, innovation, and sustainability. The course discusses how social entrepreneurial practices blur the traditional lines between nonprofit enterprise, government and private sector contributes to the generation of a unique set of opportunities and challenges that characterize this new landscape of entrepreneurship.",
+    "ENTR 4501":
+      "This course will examine the causes and consequences of the creation of family fortunes, with a focus on the practical implications for family decision-making and how to create an institutional organization. The course will address challenges facing the family business with an insight on the succession planning and governance. The course will present several case studies of successful family business as well as failures with a stress on the cultural aspects associated with the local Egyptian one. The course also discusses the organizational behavior issues related to family businesses and what are their impacts on the business sustainability.",
+    "ENTR 4502":
+      "The course is a quest to understand the role of innovation and technology in entrepreneurial organizations as well as in society. The course will cover the different types of innovation in an organization with a special focus on business model innovation. The concept of technology will be addressed through understanding the fundamentals of product/service and process innovation as well as technology management in prominent organizations. Also the concept of intellectual property rights management and protection as well as new product/service development will be covered as contemporary concepts affecting the organizational effectiveness.",
+    "ENTR 4970":
+      "Considers selected topics of current relevance in Entrepreneurship."
   };
 
   const coursePrerequisites = {
@@ -2604,7 +2646,49 @@
     "MGMT 4202":
       "MGMT 3201 or BADM 2001",
     "MKTG 3201":
-      "MKTG 2101 AND (MACT 3224 or MACT 2222)"
+      "MKTG 2101 AND (MACT 3224 or MACT 2222)",
+    "MACT 2222":
+      "None listed.",
+    "BADM 3002":
+      "MGMT 3201 or BADM 2001 along with MKTG 2101",
+    "BADM 3003":
+      "BADM 2001 or MGMT 3201",
+    "BADM 4001":
+      "Graduating senior standing and MKTG 2101, FINC 2101, OPMG 3201",
+    "BADM 4900":
+      "All Business Core courses and graduating senior standing",
+    "BADM 4999":
+      "Junior standing",
+    "ENTR 4302":
+      "ENTR 3102 or instructor approval.",
+    "ENTR 4503":
+      "ENTR 3102",
+    "MGMT 3301":
+      "BADM 2001 - Introduction to Business (3 cr.) or MGMT 3201 - Management Fundamentals (3 cr.)",
+    "MGMT 4203":
+      "BADM 2001",
+    "MKTG 4602":
+      "MKTG 3201 , FINC 2101 and Senior standing.",
+    "MOIS 3301":
+      "MOIS 2101",
+    "OPMG 3201":
+      "ECON 2061 or MACT 2222",
+    "OPMG 4301":
+      "OPMG 3201 and Senior standing",
+    "BUSC 4000":
+      "Junior standing and consent of the course instructor.",
+    "ENTR 3201":
+      "FINC 2101 or instructor approval.",
+    "ENTR 4301":
+      "ENTR 3102",
+    "ENTR 4303":
+      "Junior standing",
+    "ENTR 4501":
+      "ENTR 3102",
+    "ENTR 4502":
+      "Junior standing",
+    "ENTR 4970":
+      "Consent of Instructor."
   };
 
   const subjectLabels = {
