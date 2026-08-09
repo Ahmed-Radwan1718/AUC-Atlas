@@ -7,6 +7,13 @@ const {
   requireSecurityPanelAccess,
   revokeUserSiteSession
 } = require("../_lib/securityHelpers");
+const {
+  consumeSecurityRateLimit
+} = require("../_lib/securityRateLimits");
+
+const SESSION_REVOCATION_WINDOW_MS =
+  60 * 60 * 1000;
+const SESSION_MAX_REVOCATIONS = 20;
 
 function getRequestBody(req) {
   if (req.body && typeof req.body === "object") {
@@ -45,6 +52,17 @@ module.exports = async function handler(req, res) {
         sessions
       });
     }
+
+    await consumeSecurityRateLimit({
+      scope: "session-revocation-user",
+      identifier: decodedUser.uid,
+      maxAttempts:
+        SESSION_MAX_REVOCATIONS,
+      windowMs:
+        SESSION_REVOCATION_WINDOW_MS,
+      message:
+        "Too many session revocations. Please try again later."
+    });
 
     const body = getRequestBody(req);
     const sessionId = String(body.sessionId || "").trim();
