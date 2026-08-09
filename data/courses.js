@@ -1945,7 +1945,139 @@
     "PSYC 4150":
       "Study of psychometrics, including measurement statistics, reliability, validity. Overview of test construction and development. Introduction to types of testing including intellectual/cognitive; achievement; and personality measures. Ethical and cultural issues in assessment.",
     "ANTH 2101":
-      "Cultural anthropology is an exploration of human diversity and what we have in common.  It is a journey of questioning, understanding, and respecting the rich and complex tapestry of human practices, beliefs, and expressions we call “culture.”  In this course we will encounter a wide variety of practices and beliefs, including our own, and we will examine how these are related to global power relations; also, we will explore how anthropologists, with their own particular ideological and theoretical perspectives, attempt to understand these matters."
+      "Cultural anthropology is an exploration of human diversity and what we have in common.  It is a journey of questioning, understanding, and respecting the rich and complex tapestry of human practices, beliefs, and expressions we call “culture.”  In this course we will encounter a wide variety of practices and beliefs, including our own, and we will examine how these are related to global power relations; also, we will explore how anthropologists, with their own particular ideological and theoretical perspectives, attempt to understand these matters.",
+    "POLS 4030":
+      "Selected topics to be investigated under the guidance of a faculty member.",
+    "POLS 4640":
+      "This course investigates special issues or themes in international relations under the guidance of a faculty member.",
+    "POLS 5130":
+      "This course investigates special topics under the guidance of a faculty member.",
+    "POLS 5140":
+      "Selected topics to be investigated under the guidance of a faculty member.",
+    "POLS 2003":
+      "This course is reserved for students who have completed 30 credit hours who wish to major in Political Science, but cannot be taken if students have already taken POLS 1001. Students who are not eligible to register in POLS 1001 can take POLS 2003 during their freshman year.",
+    "POLS 2104":
+      "The course is an introductory course intended for students seeking a career in political science-related fields. The key purpose of the course is to introduce students to main methods of scientific political enquiry. Using existing data sources, qualitative and quantitative research methods are the main topics to be covered in this course.",
+    "POLS 2405":
+      "This course provides students with a foundational understanding of the historical events that gave shape to international politics and that today form the discipline of International Relations. It will give students the historical and conceptual foundations necessary to pursue a specialization in International Relations by introducing key events and their consequences in international politics.",
+    "POLS 3201":
+      "This course analyzes the major ancient and medieval thinkers and texts in the history of political thought. Students will study works by representative authors such as Plato, Aristotle, Cicero, Augustine, Aquinas, and Averroes. Topics and themes examined in the course include justice, equality, liberty, wisdom, the city, and the good life.",
+    "POLS 3202":
+      "This course analyses major modern and late modern texts in the history of political thought. Students will study works by representative thinkers such as Machiavelli, Hobbes, Locke, Rousseau, Wollstonecraft, Kant, Hegel, Marx, and Mill. Topics and themes of the course include the state, individual rights, security, equality, revolution, commerce, cosmopolitanism, gender, and communism.",
+    "POLS 3401":
+      "This course provides an introduction to the analysis of comparative politics, exploring differences in the institutional make-up and the workings of political systems worldwide. Topics covered include an examination of the key institutions of the state, executive-legislative relations, the different tiers of government, the media in politics, interest group and party politics and political transitions.",
+    "POLS 3408":
+      "Comparative study of government and ideologies, social stratification, and institutions in the Middle East. Also includes a study of the problems of modernization and political development.",
+    "POLS 3510":
+      "Introduces students to development dilemmas in the “Global South,” using a political economy approach. Questions raised include: What is development? How to measure it? Why are some nations “developed” and others are not? The course covers theories of Modernization, Dependency, Neo-Liberalism, and Statism, as well experiences of various countries.",
+    "POLS 3550":
+      "This course introduces students to the main approaches of political economy and the interconnections between power and wealth. It surveys the main schools of thought in political economy, their evolution, convergence, and divergence. The course covers issues essential to the understanding of the interaction between politics and economics in today’s world, including wealth accumulation and distribution, the state, markets, gender, labor, and the environment.",
+    "POLS 3620":
+      "This course provides students with a foundational understanding of international relations theories. Students will engage in discussions of how these theories are applied to cases throughout history, gaining a thorough knowledge of the explanatory capabilities and limits of each of the major theories.",
+    "POLS 4371":
+      "Introduces students to the practice and theoretical foundations of public International law, covering such topics as source doctrine (customary International law, treaty law, etc.), international personality, jurisdiction, state responsibility, self-determination and the use of force. This course may be counted toward the Dual Degree Option combining a BA in Political Science and an MA in International Human Rights Law.",
+    "POLS 4608":
+      "This course subverts and critiques Eurocentrism in global politics and provides students with the full scope of critical scholarship available in the field. With this course, students will become familiar with the contemporary transformations of the discipline of International Relations and will be prepared for further engagement, independent research, and possible graduate studies.",
+    "POLS 4609":
+      "This course examines the structure and evolution international organizations, both intergovernmental (IOs) and non-governmental (NGOs), with an emphasis on the United Nations system, its specialized agencies, and recent issues of global governance.",
+    "POLS 4610":
+      "This course encompasses the study of international crises, conflict, war, and global insecurities. It covers critical security studies to understand the challenges underpinning traditional approaches to security. Diverse topics including human security, migration, climate change, and international terrorism will be studied with a focus on the changing nature of international security.",
+    "POLS 4611":
+      "This course investigates the processes involved in foreign policy decision-making. This focus will be on understanding the contexts, constraints, and influences which foreign policy decision-makers have to deal with. This is combined with specialized knowledge of the post-1945 foreign policies of major and emerging states in the international system.",
+    "POLS 4605":
+      "This course examines the relationships of the Middle East to the great powers of our time, with emphasis on the political, military, economic and cultural impact of these powers on shaping the region, and its future.",
+    "POLS 4614":
+      "This course examines the main themes of Egyptian foreign policy from 1952 to the present. This includes: Egypt’s relations with the great powers; inter-Arab relations, the Arab League, and the Gulf Cooperation Council; the effects on foreign policy of the Arab-Israeli conflict; relations with the Non-Aligned Movement, the Islamic Conference, and the Organization of African Unity. It also covers policy concerns of the national interest including Nile waters and the Suez Canal.",
+    "POLS 4615":
+      "This course examines the major issues and processes of U.S. foreign policy. It focuses on the post World War II era, including processes of policy formulation and the values that are manifested in U.S. foreign policy. This is explored in the context of specific issue areas.",
+    "POLS 4435":
+      "The concept of the State is at the center of the study of politics and of our understandings of political and socio-economic problems like ethnic conflict, sectarian strife, law enforcement, economic development and democratization. This course offers a critical study of theories from Marx, Weber, and other social scientists about the State, its institutions, and its interactions with its society and its citizens.",
+    "POLS 4403":
+      "Formation and implementation of public policy, with attention to the structure, powers, and functions of the presidency, the bureaucracy, the Congress, and the federal courts and the forces that influence their actions.",
+    "POLS 4405":
+      "Introduction to the social arena within which politics occurs and the political arena which helps to shape society in Africa today. Focuses on understanding continuity and change in African politics and societies, and sheds light on both the significant potential of Africa, and the enormous challenges the continent faces.",
+    "POLS 4420":
+      "Selected Topics in Middle East Politics investigated under the guidance of a faculty member. May be offered as a seminar.",
+    "POLS 4423":
+      "The government and politics of selected countries in the developing world (Middle East, Africa, Asia, Latin America). Subjects covered may include the structural and functional characteristics of executive, legislative, and judicial institutions; bureaucracy, political parties, mass movements, political culture, the role of public opinion, foreign policy.",
+    "POLS 4424":
+      "The collapse of communism and post-communist political and economic developments. Transition to democracy and market economy. Ethnicity, nationalism and the emergence of nation states. Consideration of the government and politics of selected countries.",
+    "POLS 4425":
+      "Examination of structure and process of the Egyptian government and political life including: the executive, legislative and judicial institutions and their powers; the legislative process; executive policy making; electoral processes; parties and interest groups; and other selected aspects of the interaction between state and society.",
+    "POLS 4432":
+      "Selected topics in the field of comparative politics or policies, with concentration on a single country, problem, or policy.",
+    "POLS 4437":
+      "This course is designed to provide an overview of politics and governments in different countries of Asia. There will be some historical coverage but we will concentrate on postwar developments. The course will cover all the major countries and a primary focus will be on democratic developments and transitions.",
+    "POLS 4438":
+      "An examination of the evolution of modern China’s political system in the light of Chinese history. Areas for consideration will include the structure of Chinese political culture, how communism has served China, how China’s past may continue to determine China’s future. When there is sufficient interest, and such arrangements are possible, the course will include a two- to three- week trip to China.",
+    "POLS 4439":
+      "The policy of colonization and the collapse of the Soviet multi ethnic empire. New nation states in the post communist era including their relations with the Middle East.",
+    "POLS 4444":
+      "This course introduces students to the fundamentals of political systems in Latin America. As the most unequal region of the world it has been home to a number of important political phenomena, including military coups, democratic transitions, and popular uprisings. In line with the comparative nature of the course, students will be looking at different countries in the region, as well as cross-regional comparisons.",
+    "POLS 4480":
+      "This course offers an analytic view of a wide variety of political and social aspects of Israel’s domestic setting, including: Israel’s political system; economy; civil-military relations; new immigrants; as well as the main political and social divisions.",
+    "ARIC 5142":
+      "A survey of the origins of Jurisprudence in Islam and its development up to the founding of the four schools. The course covers the main sources of fiqh, Qur’an and Sunna, together with ijma’ and qiyas, and the study of the growth of the Maliki, Hanafi, Shafi’i and Hanbali schools.",
+    "POLS 4372":
+      "An in-depth treatment of selected issues of contemporary international law. Provides students with an understanding of specialized areas of international law including the use of force and dispute resolution, acquisition of territory, state succession, law of the sea, and international human rights law by focusing on specific issues relevant to the Middle East.",
+    "POLS 4375":
+      "The Egyptian legal system will be considered according to its present structure and historical development including institutions, processes, laws, and the courts. There will be special emphasis on developments in constitutional law and the role played by the constitution in the political context of present day Egypt. The course also offers an introduction to Islamic jurisprudence in the classical doctrine, in the pre-modern Egyptian legal system, and in contemporary Egypt. This course may be counted toward the Dual Degree option combining a BA in Political Science and an MA in International Human Rights Law.",
+    "POLS 4377":
+      "This course will explore the interface between law and processes of development. by looking critically at what is meant by “law”, we will explore the impact of law (however defined) on social and economic development. In so doing, the beneficial and detrimental impacts of law on development will be assessed. The influence of law in the domains of population, constitutionalism, and the environment, among others, will be considered.",
+    "POLS 4422":
+      "This course examines the politics of the Egyptian Revolution in 2011; its antecedents, dynamics and aftermath. Aspects of continuity and change in Egyptian politics are examined in light of theories drawn a wide range of cases of political transformation across the world.",
+    "POLS 4525":
+      "This course offers an overview of international economic relations from the end of the Second World War to contemporary economic globalization and global production networks that have instituted a new international division of labor. The first portion of the course examines trade, protectionism, and monetary relations. In the second portion, students also examine the consequences of globalization in terms of new developmental opportunities; income inequality across all countries; and regulatory issues relating to labor flows, environment, and sustainability.",
+    "POLS 4526":
+      "This course covers the political economy of the main regions and countries of the South, including Latin America, Africa, East Asia, and China, and the theoretical models pertinent to them. It is centred around global political and economic processes that have shaped the current contours of the Global South, such as colonialism, Southern perspectives on global capital accumulation, competing development narratives, foreign aid and humanitarian intervention, rentierism, globalization, and global inequality. The course also focuses on key issues such as poverty, migration, informality, cities, and gender.",
+    "POLS 4551":
+      "This course provides an in-depth look into the theories of modern political economy. It introduces the methodological and ideological diversity of schools and traditions of political economy, ranging from the left to the right. The syllabus covers key topics tackled by political economy, such as free markets, industrialization, the state, labor-capital relations, revolutions, and economic development. The course allows students to engage immediately and critically with political economy’s formative texts and their basic concepts.",
+    "POLS 4502":
+      "This course applies political economy’s approaches and tools to the study of Egypt and the contemporary Middle East. It cuts across domestic, regional, and international dynamics within and around the country by tackling the topics of rentierism, the impacts of neoliberal globalization on development and democratization, state-business and capital-labor relations, revolutions, and popular uprisings. In doing so it examines the political economy of states, regimes, and societies of Egypt and the region.",
+    "POLS 4513":
+      "The politics of international economics, focusing on the role of the IMF, World Bank, WTO, and other multinational institutions as well as regional financial and economic integration with emphasis on European Union and Middle East and Islamic finance and banking. Special attention will be given to the political dimensions of such issues as debt rescheduling, structural adjustment, international trade regulations, foreign aid, trade wars and embargoes.",
+    "POLS 4523":
+      "This course surveys different conceptualizations of poverty and inequality. It covers the different approaches to studying the issue on both global and national levels. Some of the major issues included are: the socio-economic and political characterization of the poor; poverty alleviation; the impact of globalization on poverty and inequality, poverty and gender, and urban and rural poverty; and different approaches to poverty reduction.",
+    "POLS 4542":
+      "This course analyses environmental politics in an international arena. It examines the policies and tactics of a range of actors, including national and local governments, non-governmental and intergovernmental organizations, corporations, mass movements and scientists.",
+    "POLS 4378":
+      "The course provides an overview of the major human rights treaties, customary norms, international institutions and mechanisms of enforcement, while at the same time encouraging a critical stance that questions the role and effect of human rights in a world of distress and inequality. This course may be counted towards the Dual Degree Option combining a BA in Political Science and an MA in International Human Rights Law.",
+    "HIST 2204":
+      "A historical tour of how we got where we are today. The course starts with the late pre-modern Arab world and Ottoman empire, and moves through various forms of threat, influence, change, and modernization to the present. Events in the Arab world are examined in their wider, global context.",
+    "HIST 2301":
+      "This course will examine the history of sub-Saharan Africa from the eve of the European colonization to the present day. In combining a thematic and chronological approach students will discover the complex history of various people and regions in Africa during this period. Topics range from the imperial scramble to colonize Africa to the integration of African societies into the colonial and global economy; from Western perceptions of Africa and Africans to the social, political and economical impacts of colonial policies; and from Africans’ struggles for freedom during decolonization to Africa’s post independence experience.",
+    "HIST 2502":
+      "A survey of events leading to the creation of a distinct American culture as the United States meets the challenges of moral crisis, the industrial revolution, and world leadership from the nineteenth century to the present.",
+    "HIST 3207":
+      "This course uses various methodologies and a wide range of sources to introduce students to the history of geographical Palestine. Students engage with textual primary sources, oral histories, architecture, cultural heritage, literary narratives, and cinematic representations. This course provides students with the tools to understand formations of nation and history in Palestine.",
+    "HIST 3208":
+      "The Zionist ideology and movement in its own terms, and in the context of modern Judaism. The course places Zionism in its historical and religious contexts, and examines its varieties. The Zionist movement is followed from its origins to the establishment of Israel. Related aspects of Israeli politics are then examined, with especial reference to ideological and religious debates.",
+    "HIST 3214":
+      "Beginning with the Young Turk and Iran’s Constitutional revolutions, this course follows the fate of Middle Eastern societies and states during the twentieth century, with a special focus on colonialism and nationalism; independence movements and decolonization; the Arab-Israeli conflict; society, politics, and culture.",
+    "HIST 3288":
+      "Focuses on theme or topic in the history of the Middle East. May be repeated for credit when topic changes.",
+    "HIST 3302":
+      "This course will explore the complexities of violent conflicts on the African continent in the past 125 years. As violence, conflicts and wars seem to be crucial elements of Africa’s modern history; students will for example investigate if this means that Africans are inherently more violent than the rest of the world - or if such an assumption only disguises the complex historical roots of war and conflicts? Moreover, students will also discover that Africans have historically resisted violence and oppression just as often as they have promoted it. Students can expect to engage with a variety of interdisciplinary material and will be introduced to different African regions to get a deeper understanding of contexts of violence in Africa’s past and present. By the end of the course students will be able to critically analyze common narratives about “the violent continent” reproduced by mass media.",
+    "HIST 4107":
+      "An examination of the relationship between humans and the environment from the Agricultural Revolution (c. 10,000 BCE) to the present with an emphasis on the Industrial Revolution and the modern world.",
+    "HIST 4188":
+      "None listed.",
+    "HIST 4216":
+      "This course provides grounding in the methodologies and sources of urban history while allowing students to explore Cairo’s rich past and bewildering present. Times is spent outside the classroom on field trips and in projects with local associations working on urban heritage and development.",
+    "HIST 4217":
+      "This course tackles colonialism and imperialism from a global perspective. Its basic premise is that the colonial encounter was transformative for both colonizer and colonized, and is best understood as a history of tension and conflicts, in which both colonizer and colonized had agency. In this course, students will study not only the political and military aspects of that encounter, but also its ideological and cultural ones. Topics touched upon include: cultural imperialism, medicine, law, urban planning, and gender.",
+    "HIST 4219":
+      "Trends of thought and activism that developed throughout the Muslim world from the eighteenth century onward and identified themselves as Islamic. This course looks at intellectual roots, affiliations, and differences. It investigates modernity, reform, statehood, and social change as addressed by state and non-state actors, in theory and in practice.",
+    "HIST 4288":
+      "None listed.",
+    "HIST 4290":
+      "Topics to be chosen according to specific interest, such as: the making of the modern Egyptian nation; cities, towns and villages in modern Egyptian history; social and cultural history of modern Egypt. The course involves Arabic material and the narratives could be in Arabic.",
+    "HIST 4303":
+      "In this seminar students will explore the relationship between the rise of capitalism and the integration of Sub-Saharan Africa’s labor and natural resources into the global economy in the nineteenth and twentieth century. We will be especially interested in two distinct but related issues: First, we want to explore the role of African labor, minerals, and agricultural products for the economic growth of the Global North. Second, we want to examine how oversea markets and foreign influences shaped local economies and “working lives” in different regions in Africa, and explore how Africans confronted these changes.",
+    "HIST 4488":
+      "None listed.",
+    "HIST 4588":
+      "None listed."
   };
 
   const coursePrerequisites = {
@@ -2876,6 +3008,138 @@
     "PSYC 4150":
       "PSYC 1000, PSYC 2000, and PSYC 2100",
     "ANTH 2101":
+      "None listed.",
+    "POLS 4030":
+      "RHET 1020 and 6 credits at 3000 level in POLS",
+    "POLS 4640":
+      "RHET 1020 and POLS 3620",
+    "POLS 5130":
+      "Junior standing, RHET 1020, 6 credits at the 3000 level in POLS (if taken towards fulfillment of an undergraduate degree).",
+    "POLS 5140":
+      "RHET 1020, POLS 3620, Junior standing (if taken towards fulfilment of an undergraduate degree).",
+    "POLS 2003":
+      "ENGL 0210",
+    "POLS 2104":
+      "POLS 1001 or POLS 2003, RHET 1010",
+    "POLS 2405":
+      "RHET 1010",
+    "POLS 3201":
+      "RHET 1020, POLS 1001 or POLS 2003",
+    "POLS 3202":
+      "RHET 1020, POLS 1001 or POLS 2003",
+    "POLS 3401":
+      "POLS 1001 or POLS 2003, RHET 1010",
+    "POLS 3408":
+      "POLS 1001 or POLS 2003, RHET 1020",
+    "POLS 3510":
+      "POLS 1001 or POLS 2003, RHET 1020",
+    "POLS 3550":
+      "POLS 1001 or POLS 2003, ECON 2021 and RHET 1010",
+    "POLS 3620":
+      "POLS 1001 or POLS 2003, RHET 1010, POLS 2405",
+    "POLS 4371":
+      "RHET 1020 and POLS 3620",
+    "POLS 4608":
+      "RHET 1020 and POLS 3620",
+    "POLS 4609":
+      "RHET 1020 and POLS 3620",
+    "POLS 4610":
+      "RHET 1020 and POLS 3620",
+    "POLS 4611":
+      "RHET 1020, POLS 3620",
+    "POLS 4605":
+      "RHET 1020 and POLS 3620",
+    "POLS 4614":
+      "RHET 1020 and POLS 4611",
+    "POLS 4615":
+      "RHET 1020 and POLS 4611",
+    "POLS 4435":
+      "RHET 1020, POLS 3401, 3 credits at the 3000 level in POLS.\nConsent of Instructor.",
+    "POLS 4403":
+      "POLS 1001 or POLS 2003, RHET 1020, POLS 3401 or instructor approval for non political science majors.",
+    "POLS 4405":
+      "POLS 1001 or POLS 2003, RHET 1020, POLS 3401 (or instructor approval for non political science majors who have not taken POLS 3401)",
+    "POLS 4420":
+      "RHET 1020 and POLS 3401",
+    "POLS 4423":
+      "POLS 1001 or POLS 2003, RHET 1020, POLS 3401 (or instructor approval for non political science majors)",
+    "POLS 4424":
+      "POLS 1001 or POLS 2003, RHET 1020, POLS 3401 (or instructor approval for non political science majors)",
+    "POLS 4425":
+      "POLS 1001 or POLS 2003, RHET 1020, POLS 3401 (or instructor approval for non political science majors)",
+    "POLS 4432":
+      "RHET 1020, POLS 3401",
+    "POLS 4437":
+      "POLS 1001 or POLS 2003, RHET 1020, POLS 3401 or instructor approval for non political science majors",
+    "POLS 4438":
+      "RHET 1020, POLS 3401, 3 credits at the 3000 level in POLS.\nConsent of Instructor.",
+    "POLS 4439":
+      "POLS 1001 / POLS 2003, RHET 1020, POLS 3401, 3 credits at the 3000 level in POLS.\nConsent of Instructor.",
+    "POLS 4444":
+      "POLS 1001 or POLS 2003, RHET 1020, POLS 3401 or instructor approval for non political science majors",
+    "POLS 4480":
+      "RHET 1020, POLS 3401 and 3 credits at 3000 level in POLS.\nConsent of Instructor.",
+    "ARIC 5142":
+      "Prerequisite: consent of instructor.",
+    "POLS 4372":
+      "RHET 1020 and POLS 4371",
+    "POLS 4375":
+      "RHET 1020, 6 credits at the 3000 level in POLS\nPOLS 3408\nConsent of Instructor",
+    "POLS 4377":
+      "RHET 1020, POLS 3510 and POLS 4371",
+    "POLS 4422":
+      "RHET 1020, POLS 3401, 3 credits at the 3000 level in POLS (or instructor approval for non political science majors)",
+    "POLS 4525":
+      "RHET 1020, POLS 3620, POLS 3550",
+    "POLS 4526":
+      "RHET 1020, POLS 3510 and POLS 3550",
+    "POLS 4551":
+      "RHET 1020, POLS 3550",
+    "POLS 4502":
+      "RHET 1020, POLS 3510, POLS 3550",
+    "POLS 4513":
+      "RHET 1020, ECON 2021, POLS 3620, POLS 3550",
+    "POLS 4523":
+      "RHET 1020, POLS 3510, POLS 3550",
+    "POLS 4542":
+      "RHET 1020, POLS 3550, one 3000 level Political Science Course.\nConsent of Instructor.",
+    "POLS 4378":
+      "RHET 1020",
+    "HIST 2204":
+      "None listed.",
+    "HIST 2301":
+      "None listed.",
+    "HIST 2502":
+      "None listed.",
+    "HIST 3207":
+      "None listed.",
+    "HIST 3208":
+      "None listed.",
+    "HIST 3214":
+      "None listed.",
+    "HIST 3288":
+      "None listed.",
+    "HIST 3302":
+      "None listed.",
+    "HIST 4107":
+      "None listed.",
+    "HIST 4188":
+      "None listed.",
+    "HIST 4216":
+      "None listed.",
+    "HIST 4217":
+      "None listed.",
+    "HIST 4219":
+      "HIST 3213 or HIST 3214 or equivalent background.",
+    "HIST 4288":
+      "None listed.",
+    "HIST 4290":
+      "Consent of Instructor.",
+    "HIST 4303":
+      "None listed.",
+    "HIST 4488":
+      "None listed.",
+    "HIST 4588":
       "None listed."
   };
 
