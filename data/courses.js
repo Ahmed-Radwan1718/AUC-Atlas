@@ -1775,7 +1775,41 @@
     "BIOL 4361":
       "A comprehensive overview of the gross and microstructure and function of the major organs and systems. Activities investigate the respiratory, cardiovascular, musculoskeletal, and nervous system structure and functions.",
     "BIOL 4950":
-      "A minimum of eight weeks or (80 hours) of training in industrial, commercial, educational, or government organizations in Egypt or abroad. A detailed report of this practical experience is presented both in written form and orally and is evaluated according to department rubrics. This course can be repeated for a total of 4 credits towards the major electives."
+      "A minimum of eight weeks or (80 hours) of training in industrial, commercial, educational, or government organizations in Egypt or abroad. A detailed report of this practical experience is presented both in written form and orally and is evaluated according to department rubrics. This course can be repeated for a total of 4 credits towards the major electives.",
+    "MACT 4323":
+      "Pension Plans and Retirement Benefits. Universal Life Insurance. Option Pricing Fundamentals. Embedded Options in Life Insurance and Annuity Products.",
+    "ECON 2011":
+      "Fundamental economic concepts and methods of economic analysis with emphasis on microeconomic issues. Analyzes basic principles of market economics including resource allocation, opportunity cost, core elements of demand and supply, market equilibrium, elasticity, pricing, market structure, and trade exchange. Labor and capital markets, market efficiency, regulation, and social welfare implications.",
+    "ECON 2021":
+      "Fundamental economic concepts and methods of economic analysis with emphasis on macroeconomic issues. Analyzes aggregate economic activity in relation to the level, stability and growth of national income. Topics analyzed include the determination and effects of national income, consumption, investment, unemployment, inflation, interest rates, and how these may be influenced by monetary, fiscal and other policies.",
+    "ECON 3011":
+      "Preferences, utility theory, and derivation of consumer demand. Convergence conditions in consumer choice. Slutsky decomposition. Supply, cost structure, factor inputs, and technology. Properties of production functions including the Euler Theorem. Monopoly, duopoly (Bertrand and Cournot), oligopoly, monopolistic, and competitive markets. The extent of market entry. Labor choice, the capital asset pricing model, and technological innovation. Introduction to game theory. General equilibrium and welfare economics.",
+    "ECON 3021":
+      "This course covers aggregate economic behavior using Keynesian and Neoclassical macroeconomic analysis. Various theories of how a nation’s income, employment and price level behave under static and dynamic conditions are examined. Topics covered include: income determination, unemployment, price stability, budget deficits, balance of payments equilibrium and economic growth, in addition to the impact of fiscal, monetary and exchange rate policy on macroeconomic performance.",
+    "FINC 3201":
+      "Introduction to the theory of investments. Topics include risk and return, the theory of portfolio selection, asset pricing models, valuation for stocks, bond pricing and the term structure of interest rates and options.",
+    "ACCT 2002":
+      "Introduction to management accounting in terms of modern cost accounting and budgetary systems. The course emphasizes management uses of accounting information in the planning and controlling of business operations in the manufacturing and services sectors.",
+    "ECON 3041":
+      "This course emphasizes the evolution of money, the payment system and the commercial banking. The role of central banks, use of monetary tools, the interaction between banking sector and financial markets in impacting domestic macroeconomic performance and the global economy. Topics include: monetary theory and policy; central banking; management of the banking system; financial regulations; and the nexus between monetary policy, financial markets and macroeconomic performance. The course combines theoretical formalization with empirical investigations.",
+    "ECON 3081":
+      "The course covers regression methods for analyzing data in economics, including multiple regression with indicator variables, regression with heteroskedastic  and correlated errors, hypothesis and diagnostic testing. The course emphasizes practical applications using econometrics software.",
+    "ECON 4031":
+      "International Trade Theory: Mercantilist Theory, comparative costs, and post- Ricardian theories including economies of scale and imperfect competition. Protection Theory; Effective Protection. Terms of trade, national income and the balance of payments. Fluctuations in trade. Foreign exchange markets, exchange rates and adjustment in the balance of payments. International resource movements.",
+    "FINC 3401":
+      "Measuring returns and risks in banking, evaluation of a bank’s performance, introduction to lending techniques and risk rating methods. Analyzing creditworthiness of business firms and financial institutions. Credit-management techniques such as asset protection, asset conversion and cash-flow analysis are introduced.",
+    "FINC 3501":
+      "The effect of the international financial environment on the major financial decisions of business. The international financial institution and their effect on firms operating in the international environment.",
+    "FINC 4204":
+      "Portfolio Theory provides students with basic concepts and models of financial theory and introduces them to the evaluation of quantity risk and return decisions. Subjects that are offered in this course: Capital assets Pricing Theory; Arbitrage Pricing Theory; Derivatives and Portfolio Selection and Management.",
+    "FINC 4301":
+      "The course introduces students to basic concepts of corporate finance in the Egyptian environment. The course will cover the theory and application of capital budgeting techniques and capital structure choice of firms.",
+    "MGMT 3201":
+      "Aims at acquainting the student with the basic management functions and processes with a focus on planning, organizing, leading and controlling. Stresses how communication, motivation, and teamwork affect the organization, how organizations are managed, and how managers apply their skills and knowledge to meet the organizational objectives. Emphasis on the environmental constraints imposed on the Egyptian manager and applying principles of management in Egyptian enterprises.",
+    "MGMT 4202":
+      "This course focuses on dynamics of personality, group dynamics, team building, organization culture, motivation, leadership, and communication, what is the human capital, strategic human resource management, HR planning, job analysis, recruitment, selection, training, development, performance management and compensation.",
+    "MKTG 3201":
+      "The nature and scope of marketing research. The scientific method and its application in the field of marketing, research design, basic methods of collecting data, marketing research procedures, applications of marketing research."
   };
 
   const coursePrerequisites = {
@@ -2536,7 +2570,41 @@
     "BIOL 4361":
       "BIOL 1011 or BIOL 2151\nConcurrent: BIOL 4360 for biology major.",
     "BIOL 4950":
-      "A minimum of 16 credits of Biology courses\nOverall GPA 2.5 or higher at the time of application\nApproval of the student’s advisor and the department chair"
+      "A minimum of 16 credits of Biology courses\nOverall GPA 2.5 or higher at the time of application\nApproval of the student’s advisor and the department chair",
+    "MACT 4323":
+      "MACT 4322",
+    "ECON 2011":
+      "None listed.",
+    "ECON 2021":
+      "None listed.",
+    "ECON 3011":
+      "For Economics students ECON 2011 and ECON 3061\nFor Actuarial science students ECON 2011 and (MACT 2132 or ECON 3061)",
+    "ECON 3021":
+      "ECON 2021 and (ECON 2061 or MACT 1121).",
+    "FINC 3201":
+      "FINC 2101",
+    "ACCT 2002":
+      "ACCT 2001",
+    "ECON 3041":
+      "FINC 2101 plus ECON 2021 and ECON 2011",
+    "ECON 3081":
+      "(ECON 2081 or (MACT 3211 and MACT 3223)) and (ECON 3061)",
+    "ECON 4031":
+      "ECON 3021 and ECON 3011",
+    "FINC 3401":
+      "FINC 2101",
+    "FINC 3501":
+      "FINC 2101",
+    "FINC 4204":
+      "FINC 3201",
+    "FINC 4301":
+      "FINC 2101",
+    "MGMT 3201":
+      "None listed.",
+    "MGMT 4202":
+      "MGMT 3201 or BADM 2001",
+    "MKTG 3201":
+      "MKTG 2101 AND (MACT 3224 or MACT 2222)"
   };
 
   const subjectLabels = {
