@@ -2,6 +2,13 @@ const crypto = require("crypto");
 const admin = require("../_lib/firebaseAdmin");
 
 const { getSiteSessionUser } = require("../_lib/securityHelpers");
+const {
+  consumeSecurityRateLimit
+} = require("../_lib/securityRateLimits");
+
+const MATERIAL_DOWNLOAD_WINDOW_MS =
+  60 * 60 * 1000;
+const MATERIAL_DOWNLOAD_MAX_REQUESTS = 60;
 
 function createDownloadError(message, statusCode) {
   const error = new Error(message);
@@ -333,6 +340,17 @@ module.exports = async function handler(req, res) {
 
     const decodedUser =
       await ensureVerifiedAucUser(req);
+
+    await consumeSecurityRateLimit({
+      scope: "course-material-download-user",
+      identifier: decodedUser.uid,
+      maxAttempts:
+        MATERIAL_DOWNLOAD_MAX_REQUESTS,
+      windowMs:
+        MATERIAL_DOWNLOAD_WINDOW_MS,
+      message:
+        "Too many course-material downloads. Please try again later."
+    });
 
     const materialId = cleanString(
       getQueryValue(req, "id"),
