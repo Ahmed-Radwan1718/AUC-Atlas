@@ -4,6 +4,9 @@ const admin = require("../_lib/firebaseAdmin");
 const {
   getSiteSessionUser
 } = require("../_lib/securityHelpers");
+const {
+  consumeSecurityRateLimit
+} = require("../_lib/securityRateLimits");
 
 const PROFILE_PHOTO_PUBLIC_ID_PREFIX = "auc-atlas/profile-photos";
 const PROFILE_PHOTO_UPLOAD_PRESET = String(
@@ -19,6 +22,8 @@ const PROFILE_PHOTO_ALLOWED_FORMATS = [
 ];
 const PROFILE_PHOTO_UPLOADS_PER_HOUR = 5;
 const PROFILE_PHOTO_UPLOAD_WINDOW_MS = 60 * 60 * 1000;
+const PROFILE_PHOTO_MUTATIONS_PER_HOUR = 10;
+const PROFILE_PHOTO_MUTATION_WINDOW_MS = 60 * 60 * 1000;
 
 function getFirstName(fullName, email) {
   const name = String(fullName || "").trim();
@@ -409,6 +414,19 @@ module.exports = async function handler(req, res) {
     const config = getCloudinaryConfig();
 
     res.setHeader("Cache-Control", "no-store");
+
+    if (action === "save" || action === "remove") {
+      await consumeSecurityRateLimit({
+        scope: "profile-photo-mutation-user",
+        identifier: decodedUser.uid,
+        maxAttempts:
+          PROFILE_PHOTO_MUTATIONS_PER_HOUR,
+        windowMs:
+          PROFILE_PHOTO_MUTATION_WINDOW_MS,
+        message:
+          "Too many profile photo changes. Please try again later."
+      });
+    }
 
     if (action === "signature") {
       await consumeProfilePhotoUploadAttempt(
