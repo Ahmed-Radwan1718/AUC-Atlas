@@ -397,6 +397,11 @@ module.exports = async function handler(req, res) {
     const action = String((req.body || {}).action || "").trim();
 
     if (action === "setup") {
+      await consumeAuthenticatorAttempt(
+        decodedUser.uid,
+        "setup-initiation"
+      );
+
       requireRecentAuthenticatorSetup(
         decodedUser
       );
