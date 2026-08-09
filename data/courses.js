@@ -1919,7 +1919,33 @@
     "ARTV 5110":
       "An examination of contemporary issues in Arab art within its historical-political geographic terrain and its contemporary diaspora communities. We will explore various kinds of visual and built environments including art works, exhibitions, literature and popular culture. Students will develop visual and analytic skills needed to examine contemporary issues in Arab art in relation to the local, regional and global markets and discourse.",
     "DSGN 2250":
-      "In this course students will be introduced to the basics of digital image making, core layout-design principles and simple animation. Students will work across multiple software applications to understand each’s strength, scope of usage and workflow to produce for both print and digital."
+      "In this course students will be introduced to the basics of digital image making, core layout-design principles and simple animation. Students will work across multiple software applications to understand each’s strength, scope of usage and workflow to produce for both print and digital.",
+    "PSYC 1000":
+      "Survey of the general field of psychology. Topics include the history of psychology, research methods, biological aspects of behavior, sensation and perception, learning and memory, cognition and language, consciousness and cognitive abilities, motivation and emotion, human development, health and stress, personality, psychological disorders and their treatment, and the social aspects of behavior.",
+    "PSYC 2000":
+      "Basic Introduction to the application and interpretation of statistical analysis in psychology. Begins with statistical methodology, branches of statistics, definition of a variable and its measurement. Topics include frequency tables and graphs, central tendency, variability, probability distributions, normal distribution, estimation, significant tests, comparison of two or more groups, association between categorical variables, regression, correlation. Use of SPSS software.",
+    "PSYC 2100":
+      "Review of qualitative and quantitative research methods that form the empirical basis of contemporary psychology. Progresses from the logic of scientific discovery and comprehension of research literature to the formulation, design, conduct, analysis, and reporting of specific research projects. The laboratory will provide applied exercises to facilitate an understanding of the research methods and mentorship in the comprehensive development and implementation of student research project required for this class.",
+    "PSYC 3003":
+      "This course will introduce students to theory and practice in community psychology. The practice of community psychology is directed towards the design and evaluation of strategies to prevent social pathologies such as crime, widespread drug abuse, and domestic violence, and promote community empowerment and healthy group coping strategies. While these strategies are, of course, aimed at promoting mental health in the individual, the idea is to target the social system of which he/she is a part and thus create a psychologically healthy setting for many individuals.",
+    "PSYC 3040":
+      "The study of human growth and development across the lifespan with emphasis on normal growth and milestones achieved in the physical, cognitive, social, and emotional systems. Educational and familial contexts are highlighted. Students will develop an understanding of the concepts, methods, and research findings central to the study of developmental psychology.",
+    "PSYC 3080":
+      "Current research and theory concerning mental processing and mental structures. Emphasis on the processes of perceiving, learning, remembering, and thinking. The merits and limitations of studying these processes from an information-processing perspective.",
+    "PSYC 3130":
+      "Reviews the fundamentals of the processes of learning, memory and conditioning, emphasizing both classical and operant conditioning in human and animal models. It is followed by an exploration of the techniques and theories of behavioral psychology in the applied setting.",
+    "PSYC 3270":
+      "The study of the development and dynamics of personality from a variety of theoretical perspectives, including psychoanalytic, cognitive, behavioral, trait, biological, and humanistic. A critical analysis of the theories includes discussion of cultural and historical contexts and examination of scientific evidence.",
+    "PSYC 3420":
+      "Formerly known as “Abnormal Psychology”. Different theoretical approaches and empirical studies of causes, symptoms, and treatment of psychopathology. Problems and advantages of creating a classification scheme for psychological disorders. The major diagnostic categories and review of the more common patterns of psychopathology. How such disorders arise from subtle interactions between organic or psychological predispositions.",
+    "PSYC 3800":
+      "This course explores the relationship between the nervous system and behavior. Topics include biopsychology as a neuroscience, brain structures and functions, sensory and motor systems, human motivation, cognition, emotion and mental health.",
+    "PSYC 4030":
+      "The course covers the history, methods, and content of modern psychological theory, research, and application. It also reviews schools of psychology (e.g., structuralism, functionalism, behaviourism, Gestalt psychology) and central theories of psychology in their historical and philosophical context. The course goals are to familiarize students with how the social and intellectual forces throughout history have shaped the field of psychology and how psychology today is rooted in them.",
+    "PSYC 4150":
+      "Study of psychometrics, including measurement statistics, reliability, validity. Overview of test construction and development. Introduction to types of testing including intellectual/cognitive; achievement; and personality measures. Ethical and cultural issues in assessment.",
+    "ANTH 2101":
+      "Cultural anthropology is an exploration of human diversity and what we have in common.  It is a journey of questioning, understanding, and respecting the rich and complex tapestry of human practices, beliefs, and expressions we call “culture.”  In this course we will encounter a wide variety of practices and beliefs, including our own, and we will examine how these are related to global power relations; also, we will explore how anthropologists, with their own particular ideological and theoretical perspectives, attempt to understand these matters."
   };
 
   const coursePrerequisites = {
@@ -2824,6 +2850,32 @@
     "ARTV 5110":
       "None listed.",
     "DSGN 2250":
+      "None listed.",
+    "PSYC 1000":
+      "None listed.",
+    "PSYC 2000":
+      "None listed.",
+    "PSYC 2100":
+      "PSYC 1000 and PSYC 2000",
+    "PSYC 3003":
+      "PSYC 1000",
+    "PSYC 3040":
+      "PSYC 1000 .",
+    "PSYC 3080":
+      "PSYC 2100",
+    "PSYC 3130":
+      "None listed.",
+    "PSYC 3270":
+      "PSYC 1000",
+    "PSYC 3420":
+      "PSYC 1000",
+    "PSYC 3800":
+      "BIOL 1011 or BIOL 1098/PSYC 1098 and PSYC 1000",
+    "PSYC 4030":
+      "Junior or senior standing and 15 hours of psychology.",
+    "PSYC 4150":
+      "PSYC 1000, PSYC 2000, and PSYC 2100",
+    "ANTH 2101":
       "None listed."
   };
 
