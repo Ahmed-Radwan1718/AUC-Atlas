@@ -3,6 +3,13 @@ const admin = require("../_lib/firebaseAdmin");
 const {
   getSiteSessionUser
 } = require("../_lib/securityHelpers");
+const {
+  consumeSecurityRateLimit
+} = require("../_lib/securityRateLimits");
+
+const ACADEMIC_PROGRESS_WRITE_WINDOW_MS =
+  60 * 60 * 1000;
+const ACADEMIC_PROGRESS_MAX_WRITES = 120;
 
 const VALID_GPA_GRADES = new Set([
   "",
@@ -225,6 +232,17 @@ module.exports = async function handler(
         error: "Method not allowed"
       });
     }
+
+    await consumeSecurityRateLimit({
+      scope: "academic-progress-write-user",
+      identifier: decodedUser.uid,
+      maxAttempts:
+        ACADEMIC_PROGRESS_MAX_WRITES,
+      windowMs:
+        ACADEMIC_PROGRESS_WRITE_WINDOW_MS,
+      message:
+        "Too many academic-progress updates. Please try again later."
+    });
 
     const requestBody = req.body || {};
     const type = cleanString(
