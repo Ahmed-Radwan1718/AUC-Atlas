@@ -3,6 +3,9 @@ const admin = require("../server/_lib/firebaseAdmin");
 
 const { getSiteSessionUser } = require("../server/_lib/securityHelpers");
 const {
+  consumeSecurityRateLimit
+} = require("../server/_lib/securityRateLimits");
+const {
   MATERIAL_MAX_FILE_BYTES,
   MATERIAL_USER_QUOTA_BYTES,
   MATERIAL_UPLOAD_AUTH_TTL_SECONDS,
@@ -11,6 +14,10 @@ const {
   isAllowedMaterialFileName,
   buildImageKitUploadChecks
 } = require("../server/_lib/courseMaterialUploadPolicy");
+
+const MATERIAL_UPLOAD_AUTHORIZATION_WINDOW_MS =
+  60 * 60 * 1000;
+const MATERIAL_UPLOAD_MAX_AUTHORIZATIONS = 20;
 
 const MATERIAL_TYPE_CHOICES = [
   "Notes",
@@ -495,6 +502,18 @@ module.exports = async function handler(req, res) {
 
       return res.status(200).json({ success: true });
     }
+
+    await consumeSecurityRateLimit({
+      scope:
+        "material-upload-authorization-user",
+      identifier: uploader.uid,
+      maxAttempts:
+        MATERIAL_UPLOAD_MAX_AUTHORIZATIONS,
+      windowMs:
+        MATERIAL_UPLOAD_AUTHORIZATION_WINDOW_MS,
+      message:
+        "Too many course-material upload requests. Please try again later."
+    });
 
     const config = getImageKitConfig();
     const courseCode = cleanString(
