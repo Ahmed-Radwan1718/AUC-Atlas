@@ -2,7 +2,13 @@ const admin = require("../server/_lib/firebaseAdmin");
 const {
   getOptionalSiteSessionUser
 } = require("../server/_lib/securityHelpers");
+const {
+  consumeSecurityRateLimit
+} = require("../server/_lib/securityRateLimits");
 
+const MATERIAL_SEARCH_WINDOW_MS =
+  60 * 1000;
+const MATERIAL_SEARCH_MAX_REQUESTS = 60;
 const MATERIAL_CACHE_DURATION_MS = 60 * 1000;
 
 let materialIndexCache = {
@@ -191,6 +197,17 @@ module.exports = async function handler(req, res) {
         materialsLocked: true
       });
     }
+
+    await consumeSecurityRateLimit({
+      scope: "material-search-user",
+      identifier: decodedUser.uid,
+      maxAttempts:
+        MATERIAL_SEARCH_MAX_REQUESTS,
+      windowMs:
+        MATERIAL_SEARCH_WINDOW_MS,
+      message:
+        "Too many material searches. Please try again shortly."
+    });
 
     const materialIndex = await getMaterialIndex();
     const materials = [];
