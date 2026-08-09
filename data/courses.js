@@ -1877,7 +1877,49 @@
     "MOIS 4705":
       "IT Projects face significant challenges associated with many risks. This course handles project management from an IT perspective where students learn the fundamentals and best practices of project management methodology as applied to IT initiatives. Using the framework of project life cycle, the course covers various aspects pertaining to (i) project initiation, (ii) project planning (iii) project execution/tracking; and (iv) project closure. It handles all this within the Software standards and Audits such as Capability Maturity Model Integration (CMMI), it measures performance using Earned Value Management (EVM) analysis, and builds upon proposal writing skills and how to respond to Request for Proposals (RFPs).",
     "MOIS 4970":
-      "Considers selected topics of current relevance in management of information systems."
+      "Considers selected topics of current relevance in management of information systems.",
+    "ARTV 2113":
+      "This lecture course provides a primer in visual literacy across media, introducing students to key terms and methods for critically reading the visual world including iconology, formal analysis, art history, ideological analysis, and semiotics. Students gain fluency in understanding how images work in cultural context to communicate meaning, to express a sense of self, to convey pleasure, to sell things, and to distribute power. Questions of the effect of specific visual technologies are also engaged, particularly their impact on perception and conduct. Examples are drawn from fine art, advertising, film, popular culture, and new media.",
+    "ARTV 2200":
+      "This studio course introduces students to the foundations of art creation in a cross-disciplinary environment and media. Students will conduct extensive visual research throughout the semester, which will enable them to harness their creative potential. Students will develop their skills in the expressive use of analogue and digital media within art creation.",
+    "ARTV 2214":
+      "This introductory art history course aims at exploring Visual Art Practices from the Ancient Period to the late 19th century in a wide range of media such as architecture, sculpture, painting, print-making and photography. The works will be studied from a formal, conceptual, and expressive standpoint but also as evidences of a historical context. The course will be based on students’ research, lectures and field trips. The field trips are designed to introduce students to their heritage and to explore the relationship between geography and artistic practice.",
+    "ARTV 3115":
+      "Offers an introduction to art theory from the start of the twentieth-century up until the present. Emphasis is on reading theoretical texts and interpreting their application to modern and contemporary artistic practices. The course is writing intensive.",
+    "ARTV 3311":
+      "This course provides students with practical and advanced study of new techniques and concepts in contemporary painting and drawing, such as collage, assemblage and three dimensional installation art.\nStudents will study the theories of painting in contemporary art and its relation to contemporary painting methodologies.",
+    "ARTV 3312":
+      "This course is the first course in a series of advanced 3 sequential courses, and is an introduction to cross-medium studio practices and mediums. It introduces students to the basics of visual, conceptual and theoretical language as it relates to multiple types of contemporary studio practices. Concepts/ ideas are examined through diverse approaches to painting, drawing, sound, installation/ sculpture, video, performance and alternative practices. The class structure will be a combination of lectures, tutorials critical reports and studio practices.",
+    "ARTV 3313":
+      "This advanced studio course looks at archives and collections as creative practice, specifically looking at the archive itself as an object of critical analysis. Using interdisciplinary methods and readings on archival practice, students will be challenged to look critically at a range of archival collections to interrogate the motivations behind collecting and curating arts.\nThrough class discussions and projects, students will engage in various theoretical and practical contexts within a contemporary discourse on art and archival practices.",
+    "ARTV 3314":
+      "This is an advanced course that further develops students’ studio practices with an initial multidisciplinary collaborative working process. Particular focus is given to newer mediums such as immaterial, conceptual, interventionist and performative practices: new media; and collaborative and cross-disciplinary work. Students develop critical thinking skills about context, space and location. Increasingly sophisticated and ambitious studio practice is expected. The class is conducted through a combination of lectures, group project assignments, and studio practice. This course is required to be taught in Sharjah Art Gallery.",
+    "ARTV 3316":
+      "This course aims to explore Visual Art Practices of the Modern and the Contemporary Period. We are going to start our exploration with the movement of Impressionism in France and finish in the ever-changing global World Wide Web. We will analyze artistic methodologies, technologies and their impact upon artistic creation. The course focuses on exposing the dynamic interplay between visual research, politics, intellectual theories, and societal changes. The range of media that is covered is very wide: photography, performance, conceptual proposals, installation art, film, video, digital practices and appropriations from mass culture alongside painting and sculpture. The course is based on practical assignments, field trips and lectures.",
+    "ARTV 4269":
+      "The first in the advanced Senior Project A and B sequence that is required for the Visual Art major. Course is devoted to the processes of research, experimentation, reflection and critical feedback necessary for successful completion of ARTV 4270. Preparation for subsequent professional life will also be emphasized, including writing and portfolio assignments and studio visits with practicing artists.",
+    "ARTV 4270":
+      "A continuation of ARTV 4269, students develop and exhibit a final body of work that expresses a thorough conceptual and technical process. The course culminates in a group exhibition of senior projects, typically to be installed in the Sharjah Art Gallery. This course is the equivalent of a “thesis” or a “capstone” class.",
+    "ARTV 2201":
+      "An introduction to the technical and observational skills of drawing in a variety of mediums. Concepts of line, value and composition will be explored in objective, non-objective, still life, and landscape drawing exercises.",
+    "ARTV 2202":
+      "An introduction to the technical, aesthetic, and historical aspects of painting in a variety of mediums. Formal concepts of composition, pictorial space and color interaction are applied to subjects such as still life, landscape and the figure.",
+    "ARTV 2203":
+      "An introduction to the contemporary practices in Sculpture. Offers a focused practice for students that addresses the origins and history of sculpture within the context of the gallery/museum and alternate environments.",
+    "ARTV 2204":
+      "Introduces students to the creative practice of video art in a production studio environment, including both concepts and techniques. Classes include workshops on camera, lighting, video effects, and sound recording techniques. Students create individual video projects.",
+    "ARTV 2207":
+      "This course aims to explore the various techniques and concepts of ceramics, with an emphasis on basic skills and crafts of clay. The course includes introductory information and experiments in clay free-hand technique related to ceramics arts, starting from making building techniques, glazing techniques and kiln firing operations. Students will be introduced to ceramic art history and its long-term cultural traditions, as well as contemporary ceramics concepts and ceramics installation arts. This course has a minimum of two filed trips to Fustat, an “ancient ceramics area in old Cairo” to explore the historical and local Craft of ceramic art and Egypt’s social history in relation to the field.",
+    "ARTV 2208":
+      "Internship at established independent contemporary art institutions for a specific period during the semester. Students will be expected to work on tasks such as archiving professional work, organizing public workshops and screenings, curating public exhibitions, and investigating the importance of archives and their various applications in exhibitions.",
+    "ARTV 2230":
+      "Introduces photographic practices in a digital environment. Explores camera, tools, techniques and conceptual approaches related to image capture and printing. A digital camera is required.",
+    "ARTV 3270":
+      "An in-depth examination of specific topics in Art determined by the special interests and expertise of the faculty.",
+    "ARTV 5110":
+      "An examination of contemporary issues in Arab art within its historical-political geographic terrain and its contemporary diaspora communities. We will explore various kinds of visual and built environments including art works, exhibitions, literature and popular culture. Students will develop visual and analytic skills needed to examine contemporary issues in Arab art in relation to the local, regional and global markets and discourse.",
+    "DSGN 2250":
+      "In this course students will be introduced to the basics of digital image making, core layout-design principles and simple animation. Students will work across multiple software applications to understand each’s strength, scope of usage and workflow to produce for both print and digital."
   };
 
   const coursePrerequisites = {
@@ -2740,7 +2782,49 @@
     "MOIS 4705":
       "MOIS 4202",
     "MOIS 4970":
-      "Prerequisite: Consent of Instructor."
+      "Prerequisite: Consent of Instructor.",
+    "ARTV 2113":
+      "None listed.",
+    "ARTV 2200":
+      "None listed.",
+    "ARTV 2214":
+      "None listed.",
+    "ARTV 3115":
+      "ARTV 2113",
+    "ARTV 3311":
+      "ARTV 2201 - Introduction to Drawing (3 cr.) or ARTV 2202 - Introduction to Painting (3 cr.)",
+    "ARTV 3312":
+      "ARTV 2200, ARTV 2201",
+    "ARTV 3313":
+      "ARTV 2200",
+    "ARTV 3314":
+      "ARTV 2200",
+    "ARTV 3316":
+      "ARTV 2214 or ARTV 2113",
+    "ARTV 4269":
+      "None listed.",
+    "ARTV 4270":
+      "ARTV 4269",
+    "ARTV 2201":
+      "None listed.",
+    "ARTV 2202":
+      "ARTV 2201",
+    "ARTV 2203":
+      "ARTV 2200",
+    "ARTV 2204":
+      "None listed.",
+    "ARTV 2207":
+      "None listed.",
+    "ARTV 2208":
+      "Visual Arts major declaration.",
+    "ARTV 2230":
+      "None listed.",
+    "ARTV 3270":
+      "None listed.",
+    "ARTV 5110":
+      "None listed.",
+    "DSGN 2250":
+      "None listed."
   };
 
   const subjectLabels = {
