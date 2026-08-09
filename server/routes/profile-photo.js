@@ -317,7 +317,6 @@ async function getAccountUser(uid, fallbackEmail) {
     fullName,
     photoURL: userData.photoURL || userRecord.photoURL || "",
     firstName: getFirstName(fullName, email),
-    phone: userData.phone || "",
     major: userData.major || "",
     authProvider: userData.authProvider || "password",
     twoFactor: {
