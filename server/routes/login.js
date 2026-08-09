@@ -106,7 +106,7 @@ module.exports = async function handler(req, res) {
     if (twoFactor.appEnabled) {
       await createLoginChallenge(uid, res, {
         email: emailAddress,
-        idToken: loginResult.idToken,
+        authMethod: "password",
         twoFactor: {
           appEnabled: true,
           emailEnabled: Boolean(twoFactor.emailEnabled)
