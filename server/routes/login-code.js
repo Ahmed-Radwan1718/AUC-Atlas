@@ -4,7 +4,6 @@ const admin = require("../_lib/firebaseAdmin");
 const {
   ensureAllowedAucEmail,
   createLoginChallenge,
-  createSiteSessionFromIdToken,
   createSiteSessionForUid,
   getLoginChallenge,
   consumeLoginChallenge,
@@ -338,7 +337,7 @@ async function requestLoginCode(
     if (
       !loginChallenge ||
       !loginChallenge.uid ||
-      !loginChallenge.idToken ||
+      loginChallenge.authMethod !== "password" ||
       !loginChallenge.twoFactor ||
       !loginChallenge.twoFactor.appEnabled
     ) {
@@ -506,7 +505,7 @@ async function verifyLoginCode(
     if (
       !loginChallenge ||
       !loginChallenge.uid ||
-      !loginChallenge.idToken ||
+      loginChallenge.authMethod !== "password" ||
       !loginChallenge.twoFactor ||
       !loginChallenge.twoFactor.appEnabled
     ) {
@@ -780,8 +779,8 @@ async function verifyLoginCode(
       loginChallenge
     );
 
-    await createSiteSessionFromIdToken(
-      loginChallenge.idToken,
+    await createSiteSessionForUid(
+      userRecord.uid,
       res,
       req
     );
