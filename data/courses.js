@@ -2298,6 +2298,35 @@
       ).trim();
       const uploaderInitial =
         uploaderName.charAt(0).toUpperCase() || "A";
+      const uploaderPhotoURL =
+        material.isAnonymous
+          ? ""
+          : String(
+              material.uploaderPhotoURL || ""
+            ).trim();
+      const uploaderPhotoSrc =
+        uploaderPhotoURL.includes(
+          "res.cloudinary.com"
+        ) &&
+        uploaderPhotoURL.includes(
+          "/image/upload/"
+        )
+          ? uploaderPhotoURL.replace(
+              "/image/upload/",
+              "/image/upload/f_auto,q_auto:eco,c_fill,g_face,w_72,h_72/"
+            )
+          : uploaderPhotoURL;
+      const uploaderPhotoMarkup =
+        uploaderPhotoSrc
+          ? `
+              <img
+                src="${escapeMaterialText(uploaderPhotoSrc)}"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              >
+            `
+          : "";
 
       return `
         <a class="course-recent-card" href="${href}">
@@ -2323,6 +2352,7 @@
             <span class="course-recent-uploader">
               <span class="course-recent-uploader-avatar" aria-hidden="true">
                 ${escapeMaterialText(uploaderInitial)}
+                ${uploaderPhotoMarkup}
               </span>
               <span class="course-recent-uploader-name">
                 Uploaded by ${escapeMaterialText(uploaderName)}
