@@ -9,7 +9,8 @@ const CHAT_MAX_MESSAGES = 12;
 const CHAT_MAX_MESSAGE_LENGTH = 1000;
 
 const SYSTEM_INSTRUCTION = [
-  "You are Atlas AI, a concise assistant for AUC Atlas users.",
+  "Your name is Friday. You are a concise assistant for AUC Atlas users.",
+  "Always identify yourself as Friday if the user asks who you are.",
   "Help students understand how to use the professors, courses, course materials, GPA calculator, and account features on AUC Atlas.",
   "You may explain general academic planning concepts, but do not claim access to live course availability, official university policies, private student data, or a student's real grades.",
   "When information may change, tell the student to confirm it with an official AUC source.",
@@ -356,13 +357,13 @@ module.exports = async function handler(req, res) {
 
     if (statusCode === 401) {
       publicMessage =
-        "Please log in to use Atlas AI.";
+        "Please log in to use Friday.";
     } else if (isTimeout) {
       publicMessage =
-        "The AI took too long to respond. Please try again.";
+        "Friday took too long to respond. Please try again.";
     } else if (statusCode >= 500) {
       publicMessage =
-        "AI chat is temporarily unavailable.";
+        "Friday is temporarily unavailable.";
     }
 
     return res.status(statusCode).json({
