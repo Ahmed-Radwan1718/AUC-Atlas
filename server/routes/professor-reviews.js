@@ -269,8 +269,6 @@ function serializeReview(doc) {
   const data = doc.data() || {};
   const createdAtMillis = getTimestampMillis(data.createdAt);
   const isAnonymous = cleanBoolean(data.isAnonymous);
-  const savedAuthorUid = data.authorUid || data.authorUserId || "";
-  const authorUid = isAnonymous ? "" : savedAuthorUid;
 
   return {
     id: doc.id,
@@ -292,8 +290,6 @@ function serializeReview(doc) {
     feedbackQuality: data.feedbackQuality || "",
     studentNote: data.studentNote || "",
     isAnonymous,
-    authorUid,
-    authorUserId: authorUid,
     authorName: isAnonymous ? "Anonymous student" : (data.authorName || "AUC student"),
     authorPhotoURL: isAnonymous ? "" : (data.authorPhotoURL || ""),
     createdAt: createdAtMillis ? new Date(createdAtMillis).toISOString() : (data.createdAtIso || "")
