@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Campus Rules | AUC Atlas</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .info-page {
+      min-height: 100vh;
+      padding: 126px 0 86px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+      overflow-x: clip;
+    }
+
+    .info-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .info-header {
+      max-width: none;
+      margin: 0 0 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      grid-template-areas:
+        "kicker copy"
+        "title copy";
+      column-gap: 28px;
+      align-items: end;
+    }
+
+    .info-kicker {
+      grid-area: kicker;
+      margin: 0 0 16px;
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .info-header h1 {
+      grid-area: title;
+      max-width: 720px;
+      color: #171717;
+      font-size: clamp(34px, 4.8vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .info-header > p:last-child {
+      grid-area: copy;
+      max-width: 420px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .info-content {
+      padding: 8px 28px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 18px 48px rgba(42, 32, 20, 0.08);
+      display: grid;
+      gap: 0;
+    }
+
+    .info-section {
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: transparent;
+    }
+
+    .info-section:last-child {
+      border-bottom: 0;
+    }
+
+    .info-section h2 {
+      margin: 0;
+      color: #171717;
+      font-size: inherit;
+      line-height: inherit;
+    }
+
+    .info-toggle {
+      width: 100%;
+      padding: 22px 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #171717;
+      font-family: inherit;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .info-toggle:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.9);
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    .info-toggle span:first-child {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+      transition: color 0.2s ease;
+    }
+
+    .info-toggle:hover span:first-child,
+    .info-section.open .info-toggle span:first-child {
+      color: #a67c39;
+    }
+
+    .info-toggle-icon {
+      color: rgba(192, 154, 92, 0.94);
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      transition:
+        transform 0.24s ease,
+        color 0.24s ease;
+    }
+
+    .info-toggle-icon::before,
+    .info-toggle[aria-expanded="true"] .info-toggle-icon::before {
+      content: "+";
+    }
+
+    .info-toggle:hover .info-toggle-icon,
+    .info-section.open .info-toggle-icon {
+      color: #a67c39;
+    }
+
+    .info-section.open .info-toggle-icon {
+      transform: rotate(45deg);
+    }
+
+    .info-answer {
+      max-height: none;
+      padding: 0 56px 24px 0;
+      overflow: hidden;
+      opacity: 1;
+      transition: none;
+      will-change: height, opacity;
+    }
+
+    .info-answer[hidden] {
+      display: none;
+    }
+
+    .info-answer p {
+      max-width: 820px;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.78);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .info-answer p + p,
+    .info-answer ul + p,
+    .info-answer p + ul {
+      margin-top: 14px;
+    }
+
+    .info-answer strong {
+      color: rgba(23, 23, 23, 0.82);
+      font-weight: 700;
+    }
+
+    .info-answer a,
+    .info-answer a:visited {
+      color: #a67c39;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .info-answer a:hover {
+      color: #171717;
+    }
+
+    @media (max-width: 760px) {
+      .info-page {
+        padding: 104px 0 64px;
+      }
+
+      .info-inner {
+        width: min(100% - 24px, 1180px);
+      }
+
+      .info-header {
+        margin-bottom: 26px;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "kicker"
+          "title"
+          "copy";
+      }
+
+      .info-header h1 {
+        margin-bottom: 14px;
+      }
+
+      .info-content {
+        padding: 6px 18px;
+        border-radius: 22px;
+      }
+
+      .info-toggle {
+        padding: 20px 0;
+        gap: 16px;
+      }
+
+      .info-toggle span:first-child {
+        font-size: 16px;
+      }
+
+      .info-answer {
+        padding: 0 0 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="site-header-root"></div>
+  <script src="site-header.js"></script>
+
+  <main class="info-page">
+    <div class="info-inner">
+      <section class="info-header">
+        <p class="info-kicker">University policy</p>
+        <h1>Campus Rules</h1>
+        <p>A practical overview of rules governing conduct, access and activities on AUC campuses, based on published AUC policies and official university resources. These rules are focused on the physical campus and apply to members of the AUC community, visitors or anyone using campus facilities where applicable. Last updated: August 9, 2026.</p>
+      </section>
+
+      <section class="info-content">
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-1"><span>1. Campus Access Must Be Authorized</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-1" hidden>
+            <p>Access to AUC campuses is controlled by the University. Students, faculty, staff, alumni, visitors, contractors and other individuals enter under different forms of authorization depending on their relationship with AUC.</p>
+            <p>Being a member of the public does not create a general right to enter or remain on campus. AUC may control access to its campuses, buildings and facilities for security and operational purposes.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/campus-access">AUC Campus Access</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-2"><span>2. Visitors Must Be Registered</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-2" hidden>
+            <p>Campus visitors are required to be registered through AUC's visitor-management process before entering campus. A faculty or staff host normally submits the visitor's information before the visit.</p>
+            <p>Registered visitors receive a one-time QR code that is verified at the entrance before Security facilitates access to campus.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/campus-access">AUC Campus Access</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-3"><span>3. Visitors Must Use Authorized Entrances</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-3" hidden>
+            <p>Visitors must enter through the gates designated by AUC for visitor access and comply with the University's entry procedures.</p>
+            <p>The particular entrances used may depend on the campus and current access arrangements, so visitors are expected to follow Security instructions when entering.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/campus-access">AUC Campus Access</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-4"><span>4. AUC Identification Must Be Used for Campus Access</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-4" hidden>
+            <p>Current students and employees are issued AUC identification cards programmed for access to the places and times for which they are authorized.</p>
+            <p>AUC may require community members to scan or present their IDs at campus entrances and other controlled access points.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/campus-access">AUC Campus Access</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-5"><span>5. Everyone on Campus Must Be Visually Identifiable</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-5" hidden>
+            <p>AUC requires people present on its campuses or using University transportation to remain visually identifiable.</p>
+            <p>This requirement applies to both members of the AUC community and visitors and forms part of AUC's campus security and access rules.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/media/media-releases/statement-campus-access-policy">AUC Statement on Campus Access Policy</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-6"><span>6. Campus Security Procedures Must Be Followed</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-6" hidden>
+            <p>Entry to AUC is subject to University security procedures. Vehicle occupants and other people entering through controlled entrances may be subject to the applicable access and security checks.</p>
+            <p>People on campus are expected to comply with legitimate Security directions concerning access, safety and use of University property.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/parking">AUC Parking and Campus Access</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-7"><span>7. Firearms, Explosives and Weapons Are Prohibited Without Authorization</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-7" hidden>
+            <p>Members of the University community and visitors may not possess firearms, explosives or weapons on University premises without explicit advance authorization from AUC.</p>
+            <p>This prohibition applies regardless of whether the individual has otherwise received a license or authorization to possess the weapon outside AUC.</p>
+            <p><strong>Source:</strong> <a href="https://sce.aucegypt.edu/learner-handbook/code-of-conduct">AUC Firearms and Weapons Rules</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-8"><span>8. Smoking Is Restricted to Designated Smoking Areas</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-8" hidden>
+            <p>AUC describes itself as a tobacco-free community and currently states that smoking is permitted only in designated smoking areas.</p>
+            <p>Smoking elsewhere on campus is not permitted. AUC has located designated smoking areas around or within parking areas as part of its tobacco-control system.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/sustainability/tobacco-free-community">AUC Tobacco-Free Community</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-9"><span>9. Harassment Is Prohibited</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-9" hidden>
+            <p>AUC prohibits harassment within its educational and working environment and applies its Anti-Harassment and Non-Discrimination Policy across the University community.</p>
+            <p>The University's institutional-equity system covers allegations involving students, faculty, staff, alumni and campus visitors.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/institutional-equity">AUC Office of Institutional Equity</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-10"><span>10. Discrimination Is Prohibited</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-10" hidden>
+            <p>Conduct amounting to prohibited discrimination is not permitted within AUC's learning or working environment.</p>
+            <p>AUC states that its Anti-Harassment and Non-Discrimination Policy establishes conduct expectations for the University community and mechanisms for responding when those expectations are violated.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/institutional-equity">AUC Office of Institutional Equity</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-11"><span>11. Sexual Harassment Is Prohibited</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-11" hidden>
+            <p>AUC maintains a zero-tolerance position toward sexual harassment and treats sexual harassment and related misconduct as violations of University policy.</p>
+            <p>Reports may be investigated through the Office of Institutional Equity, which is responsible for administering AUC's Anti-Harassment and Non-Discrimination Policy.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/speakup">AUC SpeakUp</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-12"><span>12. Freedom of Expression Does Not Override Other Campus Rules</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-12" hidden>
+            <p>Members of the AUC community may express ideas and viewpoints on campus, but freedom of expression does not exempt a person from University policies or applicable law.</p>
+            <p>AUC may impose viewpoint-neutral restrictions relating to safety, access, disruption and the normal operation of University activities.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-13"><span>13. Peaceful Demonstrations and Assemblies Are Permitted</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-13" hidden>
+            <p>Members of the AUC community may organize and participate in peaceful demonstrations, rallies and assemblies on campus.</p>
+            <p>Participation must remain peaceful and is subject to requirements concerning safety, access, disruption and University operations.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-14"><span>14. Planned Demonstrations Require Advance Notification</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-14" hidden>
+            <p>Organizers of planned demonstrations, assemblies or rallies must provide written notification to AUC Security at least three working days in advance. Student events also require notification to the Dean of Students Office.</p>
+            <p>AUC states that this notification exists for safety, scheduling and logistical coordination and does not constitute University approval of the participants' viewpoint or message.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-15"><span>15. Violence and Credible Threats Are Prohibited During Expressive Activities</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-15" hidden>
+            <p>Demonstrations, protests and other expressive activities may not involve violence or credible threats of violence.</p>
+            <p>Freedom of expression does not protect threatening or violent conduct simply because it occurs as part of a protest, speech or political activity.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-16"><span>16. Property May Not Be Damaged During Demonstrations or Other Activities</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-16" hidden>
+            <p>Expressive activity may not involve damaging University property.</p>
+            <p>The right to demonstrate or express a viewpoint does not give participants permission to damage buildings, facilities, equipment or other University property.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-17"><span>17. Access to University Facilities May Not Be Obstructed</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-17" hidden>
+            <p>Protests, demonstrations, distribution of materials and other activities cannot block entrances, walkways or access to University facilities.</p>
+            <p>AUC may take measures necessary to preserve safe movement through campus and continued access to buildings and facilities.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-18"><span>18. Classes and University Operations May Not Be Materially Disrupted</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-18" hidden>
+            <p>Freedom of expression does not include a right to materially disrupt classes, examinations, research, University events, administrative functions or other University operations.</p>
+            <p>AUC may intervene when conduct substantially interferes with academic or administrative activities or prevents others from using University facilities.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-19"><span>19. People May Not Prevent Others From Speaking or Participating</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-19" hidden>
+            <p>AUC protects the ability of different individuals and groups to express their views.</p>
+            <p>Conduct that prevents other people from speaking, assembling or participating in University activities can fall outside the protection of AUC's freedom-of-expression rules.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-20"><span>20. Counter-Protests Are Permitted but Cannot Shut Down Another Event</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-20" hidden>
+            <p>Peaceful counter-protests and competing expression are permitted on campus.</p>
+            <p>A counter-protest may not materially disrupt the original activity, block access to it or prevent speakers from being heard.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-21"><span>21. Printed Materials and Petitions May Be Distributed Subject to Conduct Rules</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-21" hidden>
+            <p>Members of the AUC community may distribute printed materials, circulate petitions and engage in expressive speech without first obtaining approval.</p>
+            <p>Distribution cannot involve harassment, intimidation, bullying, credible threats, violence, obstruction of walkways or interference with classes and scheduled activities.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-22"><span>22. Posters and Signs Cannot Be Placed Anywhere You Choose</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-22" hidden>
+            <p>Materials posted on campus must comply with AUC's space-reservation and posting requirements. Unauthorized materials may be removed.</p>
+            <p>For campus events, signs and stickers may only be placed in approved locations and cannot be attached to walls, trees or other non-approved surfaces.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a> and <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-23"><span>23. Event Promotional Material Requires Approval and Reservation</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-23" hidden>
+            <p>Promotional designs for campus events must receive the required approval from Marketing Communications or, where applicable, Student Life.</p>
+            <p>Banners, stands and boards must be reserved through AUC's event system, and AUC's published event guidelines establish limits on how and for how long promotional material may be displayed.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-24"><span>24. Guest Speakers Must Be Invited Through an AUC-Recognized Entity</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-24" hidden>
+            <p>Guest speakers appearing through University events must be invited through a University-recognized entity.</p>
+            <p>Relevant University offices must also be notified for coordination and safety planning. AUC's procedures state that the Dean of Students Office should generally receive notice at least ten working days in advance.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-25"><span>25. Events Involving Government Officials Require Additional Notification</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-25" hidden>
+            <p>When a government official is invited to a University event, the Office of the President must be notified at least ten working days in advance.</p>
+            <p>This requirement operates as part of AUC's event coordination and security procedures.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-26"><span>26. AUC May Regulate the Time, Place and Manner of Activities</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-26" hidden>
+            <p>AUC may impose content-neutral changes to the location, timing, security arrangements or access conditions of an activity when necessary for safety, access or University operations.</p>
+            <p>These measures are supposed to address operational circumstances rather than whether the University agrees with the viewpoint being expressed.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-27"><span>27. Security May Stop, Relocate or Disperse Unsafe or Disruptive Activities</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-27" hidden>
+            <p>University officials may respond to unsafe or materially disruptive conduct through measures such as requests for compliance, warnings, directions to cease an activity or directions to relocate.</p>
+            <p>Where necessary to protect safety or restore normal operations, authorized officials may direct individuals or groups to disperse, relocate or leave a particular part of campus.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/freedom-expression-policy/procedures">AUC Freedom of Expression Procedures</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-28"><span>28. Campus Event Spaces Must Be Properly Reserved</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-28" hidden>
+            <p>Organized campus events must use AUC's event-planning and space-reservation procedures.</p>
+            <p>AUC uses the ADASTRA system for venue requests, setup, audiovisual services, signage and other event requirements, and event organizers are expected to use approved spaces for their activities.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-management">AUC Events Management</a> and <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-29"><span>29. Event Organizers Are Responsible for Cleanup and Damage</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-29" hidden>
+            <p>Organizers are responsible for cleaning their event area after an activity.</p>
+            <p>AUC may impose charges when an event requires additional cleaning or causes damage to University facilities or property.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-30"><span>30. Food and Drinks Are Prohibited in Certain Event Venues</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-30" hidden>
+            <p>AUC's campus-event rules prohibit food and drinks in Bassily Auditorium, lecture halls and Ewart Memorial Hall.</p>
+            <p>Event organizers and attendees using those spaces are expected to comply with the venue-specific restriction.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-31"><span>31. Outdoor Amplified Sound Cannot Disrupt Academic or Library Activities</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-31" hidden>
+            <p>Amplified sound may be used outdoors only when it does not interfere with academic activities or Library operations.</p>
+            <p>Certain areas have additional restrictions. For example, AUC states that amplification at the Henkel Egypt Platform is permitted only after classes and Library hours.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-32"><span>32. Campus Lawns, Landscaping and Trees Must Be Protected</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-32" hidden>
+            <p>Event equipment should not be placed directly on grass or landscaped areas unless the area is approved for that use. Heavy traffic and games are similarly restricted to appropriate surfaces.</p>
+            <p>Ropes, signs, nails and other items cannot be attached to trees, and AUC does not permit event carpets on lawns.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-33"><span>33. Heavy Outdoor Structures Must Use Appropriate Surfaces</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-33" hidden>
+            <p>Outdoor event structures weighing more than 50 kilograms must be placed on tiled or paved areas.</p>
+            <p>This forms part of AUC's safety and grounds-protection rules for temporary structures and event installations.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-34"><span>34. Event Tents Must Meet Fire-Safety Requirements</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-34" hidden>
+            <p>Tents used for campus events must be fire-retardant.</p>
+            <p>AUC also maintains a separate Tents on Campus Policy, and temporary structures remain subject to University safety and event requirements.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a> and <a href="https://www.aucegypt.edu/about/university-policies">AUC University Policies</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-35"><span>35. Certain Event Construction Must Be Supervised by Environmental Health and Safety</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-35" hidden>
+            <p>AUC's published event guidelines require covered construction activities to take place during the permitted setup period and under Environmental Health and Safety supervision.</p>
+            <p>This requirement is intended to ensure that temporary structures and installations do not create avoidable safety risks.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-36"><span>36. Candles, Fireworks and Lasers Require Explicit Safety Approval</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-36" hidden>
+            <p>Candles, fireworks and lasers cannot be used as ordinary campus-event equipment.</p>
+            <p>Their use requires explicit approval from AUC's Office of Environmental Health and Safety.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-37"><span>37. Event Electrical Installations Must Be Safety Tested</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-37" hidden>
+            <p>Electrical setups used for events must undergo AUC's required safety testing before the event.</p>
+            <p>The published guidelines require on-site simulations involving electrical cabling at least three working days in advance where applicable.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-38"><span>38. Sponsor Booths Require Prior Approval</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-38" hidden>
+            <p>Commercial sponsor booths cannot simply be established on campus without authorization.</p>
+            <p>AUC's event guidelines require sponsor booths to receive prior approval through the Office of Events Management.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/events-planning/guidelines">AUC General Guidelines for Campus Events</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-39"><span>39. Unauthorized Commercial Advertising and Product Promotion Is Not Permitted</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-39" hidden>
+            <p>AUC states that it does not permit ordinary advertising or product promotions on campus.</p>
+            <p>Commercial activity therefore cannot be carried out simply because an individual or company has physical access to campus; applicable University approval and sponsorship procedures must be followed.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/communications/faqs">AUC Communications FAQs</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-40"><span>40. Filming and Photography May Be Subject to University Permission</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-40" hidden>
+            <p>AUC maintains a specific Campus Filming and Photography Policy governing shoots conducted on University property.</p>
+            <p>AUC directs individuals seeking to conduct non-media shoots on campus to obtain permission through that policy rather than treating the campus as an unrestricted filming location.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/communications/faqs">AUC Communications FAQs</a> and <a href="https://www.aucegypt.edu/about/university-policies">AUC University Policies</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-41"><span>41. Drivers Must Follow Campus Entry Procedures</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-41" hidden>
+            <p>Drivers entering the New Cairo campus must comply with AUC's vehicle-access system and applicable security procedures.</p>
+            <p>AUC community members driving onto campus are required to scan their AUC IDs at the entry gates.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/parking">AUC Parking</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-42"><span>42. Vehicles Must Be Parked in Authorized Spaces</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-42" hidden>
+            <p>Vehicles must be parked correctly within designated parking areas.</p>
+            <p>Parking in unauthorized locations such as lawns, sidewalks and green spaces is a parking violation and may result in a fine.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/parking">AUC Parking</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-43"><span>43. Accessible Parking and Access Areas Cannot Be Blocked</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-43" hidden>
+            <p>Vehicles cannot block spaces designated for people with disabilities, accessibility ramps or designated drop-off areas.</p>
+            <p>AUC treats obstruction of these areas as a serious parking violation.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/parking">AUC Parking</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-44"><span>44. Fire and Emergency Access Areas Cannot Be Blocked</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-44" hidden>
+            <p>Vehicles cannot park in or obstruct fire lanes, access to fire hydrants or designated Clinic ambulance areas.</p>
+            <p>These restrictions preserve emergency access to campus buildings and facilities.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/parking">AUC Parking</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-45"><span>45. Overnight Parking Requires Permission</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-45" hidden>
+            <p>Leaving a vehicle parked on campus overnight without authorization is a violation of AUC's parking rules.</p>
+            <p>Permission must therefore be obtained where a vehicle needs to remain on campus overnight.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/parking">AUC Parking</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-46"><span>46. Private Drivers Cannot Wait on Campus After Drop-Off</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-46" hidden>
+            <p>Private drivers are not permitted to remain on campus waiting after dropping off passengers.</p>
+            <p>They are required to exit campus after completing the drop-off.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/parking">AUC Parking</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-47"><span>47. Repeated Parking Violations Can Result in Loss of Parking Access</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-47" hidden>
+            <p>Parking violations are subject to AUC's published fine system.</p>
+            <p>Individuals who repeatedly violate parking regulations may also be prevented from accessing campus parking.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/parking">AUC Parking</a></p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="rules-answer-48"><span>48. Campus Activities Remain Subject to Other Applicable AUC Policies</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="rules-answer-48" hidden>
+            <p>AUC's campus rules do not operate independently from one another. An activity permitted under one policy may still have to comply with rules concerning security, harassment, safety, space use, events or applicable law.</p>
+            <p>AUC's official policy directory includes additional policies covering matters such as firearms and weapons, tents, filming and photography, meeting facilities, space use, video surveillance and other University operations. Some full policy documents are available through AUC's internal SharePoint system rather than as publicly readable webpages.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/about/university-policies">AUC University Policies</a></p>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    document.querySelectorAll(".info-toggle").forEach((toggle) => {
+      const item = toggle.closest(".info-section");
+      const answer = document.getElementById(
+        toggle.getAttribute("aria-controls")
+      );
+
+      if (!item || !answer) {
+        return;
+      }
+
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      toggle.setAttribute("aria-expanded", "false");
+      answer.hidden = true;
+
+      toggle.addEventListener("click", () => {
+        const willOpen =
+          toggle.getAttribute("aria-expanded") !== "true";
+
+        const computedStyle = answer.hidden
+          ? null
+          : window.getComputedStyle(answer);
+
+        const currentHeight = answer.hidden
+          ? 0
+          : answer.getBoundingClientRect().height;
+
+        const currentOpacity = answer.hidden
+          ? 0
+          : parseFloat(computedStyle.opacity) || 1;
+
+        const currentPaddingBottom = answer.hidden
+          ? 0
+          : parseFloat(computedStyle.paddingBottom) || 0;
+
+        const currentTransform =
+          answer.hidden || computedStyle.transform === "none"
+            ? "translateY(-6px)"
+            : computedStyle.transform;
+
+        answer.getAnimations().forEach((animation) => {
+          animation.cancel();
+        });
+
+        item.classList.toggle("open", willOpen);
+        toggle.setAttribute("aria-expanded", String(willOpen));
+
+        if (willOpen) {
+          answer.hidden = false;
+
+          if (reduceMotion) {
+            return;
+          }
+
+          const targetPaddingBottom =
+            parseFloat(window.getComputedStyle(answer).paddingBottom) || 0;
+
+          const targetHeight = answer.scrollHeight;
+
+          const animation = answer.animate(
+            [
+              {
+                height: `${currentHeight}px`,
+                opacity: currentOpacity,
+                paddingBottom: `${currentPaddingBottom}px`,
+                transform: currentTransform
+              },
+              {
+                height: `${targetHeight}px`,
+                opacity: 1,
+                paddingBottom: `${targetPaddingBottom}px`,
+                transform: "translateY(0)"
+              }
+            ],
+            {
+              duration: 440,
+              easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+              fill: "both"
+            }
+          );
+
+          animation.addEventListener(
+            "finish",
+            () => {
+              animation.cancel();
+            },
+            { once: true }
+          );
+
+          return;
+        }
+
+        if (reduceMotion) {
+          answer.hidden = true;
+          return;
+        }
+
+        const animation = answer.animate(
+          [
+            {
+              height: `${currentHeight}px`,
+              opacity: currentOpacity,
+              paddingBottom: `${currentPaddingBottom}px`,
+              transform: currentTransform
+            },
+            {
+              height: "0px",
+              opacity: 0,
+              paddingBottom: "0px",
+              transform: "translateY(-6px)"
+            }
+          ],
+          {
+            duration: 320,
+            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+            fill: "both"
+          }
+        );
+
+        animation.addEventListener(
+          "finish",
+          () => {
+            if (toggle.getAttribute("aria-expanded") === "false") {
+              answer.hidden = true;
+            }
+
+            animation.cancel();
+          },
+          { once: true }
+        );
+      });
+    });
+  </script>
+
+  <div id="site-footer-root"></div>
+  <script src="site-footer.js"></script>
+</body>
+</html>
