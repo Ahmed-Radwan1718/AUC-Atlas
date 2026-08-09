@@ -5,6 +5,7 @@ const routeLoaders = {
   "course-material-download": function () { return require("../server/routes/course-material-download"); },
   "delete-account": function () { return require("../server/routes/delete-account"); },
   "forgot-password": function () { return require("../server/routes/forgot-password"); },
+  "gemini-chat": function () { return require("../server/routes/gemini-chat"); },
   "login": function () { return require("../server/routes/login"); },
   "login-code": function () { return require("../server/routes/login-code"); },
   "logout": function () { return require("../server/routes/logout"); },
