@@ -1202,7 +1202,77 @@
     "PENG 3211":
       "Basic petroleum fluid properties including petroleum fluid composition, phase behavior, phase envelopes, classification of reservoir fluids, ideal gas and real gas laws, z-factor, dry gas properties, modification for wet gases, black-oil PVT properties definition, PVT properties from correlations, oil formation volume factor and solution gas oil ratio corrections, and formation water properties. Fluid sampling. PVT and other reservoir fluid properties laboratory measurement and reporting.",
     "PENG 3411":
-      "Thermodynamic fundamentals, concepts, and definitions, first and the second law of thermodynamics, volumetric properties of fluids, thermodynamics of flow processes, solution thermodynamics, phase equilibria, and flash calculations."
+      "Thermodynamic fundamentals, concepts, and definitions, first and the second law of thermodynamics, volumetric properties of fluids, thermodynamics of flow processes, solution thermodynamics, phase equilibria, and flash calculations.",
+    "ENGR 2105":
+      "Fundamentals of mechanics, statics of particles and rigid bodies, center of gravity and moment of inertia, internal forces in members, kinematics and kinetics of particles and rigid bodies. Engineering applications.",
+    "ENGR 2122":
+      "Fluid properties, fluid statics, fluid flow. Conservation of momentum, energy, continuity and Bernoulli’s equations. Viscous efforts for laminar and turbulent flow. Steady state closed conduit and open channel flow.",
+    "ENGR 2412":
+      "This lab is intended for students with no programming background. It teaches students problem-solving via the principle of programming and computing employing a programming language and techniques of current use in engineering. Topics covered include data types, arithmetic, scripts, user- defined functions, inputs, outputs, conditionals, loops, arrays, and modular programming. An emphasis is given to the visualization and graphical representation. Basics of software engineering introduced (code maintenance, debugging, and documentation). Accuracy and speed are discussed as limitations of engineering/scientific computation.",
+    "PENG 3430":
+      "The fundamental aspects of health and safety at work and identification of different types of workplace hazards and their control systems. Explores different sustainability topics such as climate change, global warming, energy, water, waste, socially responsible business, CO2 emissions, and capture and sequestration among others. Examples of creative and integrated strategies on local, national, and global environmental levels (to create a sustainable future); are shown through environmental impact assessment of oil and gas projects.",
+    "SCI 2005":
+      "The environment of Earth and the natural forces that shape it; Earth’s materials, origin and its 4.5 billion years history; geological events and their implications in finding oil and gas and other natural energy resources; economic contributions of geology to the environment; special case studies with emphasis on Egypt are discussed.",
+    "PENG 2400":
+      "Introduction to the fundamentals of petroleum and renewable energy resources and related business activities. Introduction to the trends of energy mix with emphasis on challenges, environmental impacts, and integrated solutions.",
+    "PENG 3011":
+      "History of petroleum geology, the occurrence of petroleum, source rock, migration and accumulation, reservoir rocks, reservoir pore space, reservoir fluids, stratigraphic traps, structural traps, hydrodynamic traps, combination traps, subsurface geology and mapping, and reservoir appraisal. Exploration engineering, gravity surveying, magnetic surveying, seismic data acquisition, seismic data. Introduction to logging and formation testing, hydrocarbon indicators, exploration risk, and analysis.",
+    "PENG 3021":
+      "Basic petrophysical properties of reservoir rocks including porosity, permeability, fluid saturation, electrical properties, surface tension, wettability, capillary pressure, relative permeability, compressibility, and Other SCAL properties. Routine and core analysis and SCAL reports. Laboratory measurement of the reservoir rock properties.",
+    "PENG 3111":
+      "Basic concepts of, rig types, rig components, drilling tools, well head equipment, drilling fluids, practices of well drilling operations, drilling techniques and well control equipment. Fundamental concepts of rotary drilling bits, drill string, bottom-hole assembly, casing, cementing operations. Completion concepts, types, equipment, and work-over operations.",
+    "PENG 3112":
+      "Mud program design, Mud rheology tests (e.g. viscosity, Mud Balance, sand content, etc.); well control simulation, bits dulling, bits selection.",
+    "PENG 3215":
+      "This course covers the main methods to estimate oil-in-place and reserves such as volumetric methods and material balance. It explains the different natural drive mechanisms in reservoirs focusing on saturated, undersaturated, and gas reservoirs. The course covers the basics to understand the differences between steady-state, pseudo-steady state, and unsteady-state flow. Water influx calculations are also introduced. The course also introduces waterflood as a displacement mechanism.",
+    "PENG 3227":
+      "This course provides the students with the understanding of the modern well logging tools, measurements, and interpretation. It starts with Borehole environment, environmental corrections of each measurement then the petrophysical evaluation of formation properties using the logging measurements. The evaluation part of the course covers the Clay volume and types, formation porosity and types, fluids distributions and types, rock mechanical properties, core to log calibration.",
+    "PENG 3228":
+      "This course provides the students with hands-on applications on the material covered in the formation evaluation course. The applications are performed on industry petrophysical software(s). It includes Data Loading and Extracting, Borehole Environmental Corrections of all measurements for all service companies and Petrophysical Evaluation of all formation properties. The evaluation part of the laboratory covers the Clay volume and types, formation porosity and types, fluids distributions and types and core to log calibration.",
+    "PENG 3311":
+      "The course covers production system components: inflow, outflow, and choke performance. Inflow Performance Relationships (IPR) for oil and gas wells are included. Nodal analysis of the entire production system is reviewed. Formation damage in vertical and horizontal wells and introduction to Well stimulation and artificial lift methods are covered. A review of production problems is covered.",
+    "PENG 4121":
+      "Rig systems; advanced drilling tools; well control and BOP equipment and calculations; casing design; cementing calculations and operations; bits design; well drilling operations techniques and process optimization for directional drilling, horizontal drilling, multilateral drilling; predicting and over-coming drilling problems (e.g. hole stability, lost circulation, swelling, kicks, etc.); controlled drilling, geo-steering; offshore drilling; well survey; MWD and LWD tools; well trajectory calculations.",
+    "PENG 4223":
+      "Reservoir simulation fundamentals, input and output for reservoir simulation, understanding reservoir simulation, simulation equations, IMPES method, introduction to reservoir simulation matrix solvers, history matching, reservoir simulation prediction, types of simulators, static models, grid models, exercise on the use of a commercial simulator in single well and full field applications.",
+    "PENG 4224":
+      "Diffusivity equation, skin factor, radius of investigation, types of well tests, semi-log analysis for drawdown and build up tests, gas well testing, dimensionless variables, type curve analysis, derivative plots, hydraulically fractured wells, DST, well test design. Data Analysis and Modeling Exercises using the state of the art well testing software.",
+    "PENG 4225":
+      "The course presents all aspects of enhanced oil recovery (EOR) processes of chemical, miscible, and thermal. It covers secondary recovery by water flooding and calculations of reservoir heterogeneity using V-number and Lorenz techniques. It also presents how to use mobility ratio and capillary number to maximize oil recovery for mature oil fields under development.\nThe course also presents principles, application, and screening depleted oil reservoir for application of different EOR processes. More materials will be assigned as technical report for updating the participants with edge technology and EOR actual field cases.",
+    "PENG 4226":
+      "The dynamics of energy prices; Demand and supply for primary energy sources; Energy business and structure of energy companies; Time value of money; Cash flow analysis, Inflation, interest rate, CAPEX and OPEX; Investments choices and performance metrics (Yardsticks); Reserves and resources classification; International contracts and concession agreements; Risk analysis in energy projects",
+    "PENG 4227":
+      "This course provides the students with the methodologies and basics of the reservoir description and characterization for both clastics and carbonates. The course integrates geology, reservoir rock properties and formation evaluation to better characterize the reservoir. The in depth understanding of core description, depositional environment from both core and logs and the comparison between core and logging calculations are the core of this course. The geo-statistics part of this course concentrates on building and analyzing the histograms and the variograms and their roles in the reservoir characterization.",
+    "PENG 4314":
+      "Artificial Lift (AL) methods theory. Artificial lift applicability, screening criteria, operation, design, and field applications. Well stimulation methods which involve matrix acidizing, hydraulic fracturing, and acid fracturing. Software applications for production system modeling and artificial lift design are introduced.",
+    "PENG 4324":
+      "Oil and gas separation systems, mechanical design of pressure vessels, crude emulsion treatment, stabilization and desalting of crude oil, produced water treatment, and gas processing plants that include: gas specifications, gas test methods, natural gas liquids, gas treating, gas gathering and gas injection.",
+    "PENG 4950":
+      "Each student is required to spend a minimum of eight weeks of industrial training in Egypt or abroad. A detailed report is presented and evaluated. Students are also introduced to professional ethics, various moral issues and codes of ethics.",
+    "PENG 4980":
+      "In the capstone projects, students are required to work with field data that cover the life cycle of a petroleum reservoir. Students perform several analyses and design different system components in the areas of geology, formation evaluation, and drilling. Report submission and oral presentation are required.",
+    "PENG 4981":
+      "Senior Project II is a continuation of the capstone project. Students perform analyses and integrate the results of Senior Project I to design different system components in the areas of reservoir engineering, production engineering, and surface facilities. Report submission and oral presentation are required.",
+    "PENG 3415":
+      "Fundamentals of material balances: single-phase systems, and multiphase systems. Energy and energy balances: balances on nonreactive processes, balances on reactive processes, computer-aided balance calculations, balances on transient systems. Energy storage systems.",
+    "PENG 4015":
+      "Fundamental seismic principles and its exploration methods, oil exploration and sub-surface imaging. the elastic wave equation, the acquisition and processing of seismic reflection data and seismic, tomography data. Introduction to seismic stratigraphy, seismic inversion and attribute analysis, role of seismic in reservoir properties and facies modeling. Data acquisition, processing, and interpretation of gravity data, Data acquisition, processing, and interpretation of magnetic data. Introduction to electromagnetics and their applications in petroleum industry.",
+    "PENG 4125":
+      "Advanced well planning; rig selections; well cost estimation; advanced well design of horizontal and multi-lateral wells; deep water drilling techniques; HPHT wells; drilling operations optimizations; well control predictions and solutions (e.g. relief wells); cement evaluation; advanced geo-steering design and operations; drilling software.",
+    "PENG 4229":
+      "This course provides the students with the understanding of the unconventional reservoirs from definitions to evaluation and production. The course includes classifications of unconventional reservoirs, signature of unconventional reservoirs on logging measurements, evaluation of hydrocarbon potential. Total organic carbon (TOC) evaluation and determination, pyrolysis analysis of S1, S2, S3 for evaluation of hydrocarbon saturation are covered. The course also covers evaluation of rock mechanical properties including brittleness, drilling unconventional reservoirs.",
+    "PENG 4313":
+      "Pipe line transport, pipe line design, calculation of the pressure drop through the pipes, fittings, valves, and bends, pipe line construction, pumping and boosting stations, gas transmission lines, metering, pipe line automation, tanker and railroad transportation, pipeline safety, regulations, specifications of the pipeline for onshore and offshore networks, examples of international pipelines, pipeline operations and maintenance, crude oil storage type, temporary storage of crude oil, crude oil stock calculations.",
+    "PENG 4325":
+      "Well stimulation involves matrix acidizing, hydraulic fracturing proppant, and acid fracturing in vertical and horizontal wells. New applications in the multistage frac, unconventional frac, Candidate selection, treatment design and execution of acidizing and hydraulic fracturing treatments. selection of acid additives, lab testing, QA/QC, and treatment evaluation",
+    "PENG 4333":
+      "Design of efficient production and use of energy, predominantly strategies in the oil and gas business. It covers the development of Transport, water, and energy efficiency policies. Technical and economic calculations of energy efficiency, management and optimization of energy costs, and environmental impact assessment in the oil and gas industry. Implementation of international standards in energy management supported with successful and industry best practices.",
+    "PENG 4421":
+      "Principles of Renewable and Alternative Energy Systems: Wind, Solar, Biogas, Geothermal, Fuel Cells, and Hydrogen Technologies. Economic Aspects; Efficiency; Introduction to Nuclear Energy. Connection to Grid, Smart Grids and intermittency.",
+    "PENG 4423":
+      "Energy use and energy patterns in modern society; Resource estimates; Engineering analysis of energy systems; Managing carbon emissions; Environmental impact and protection, Environmental remediation technologies. Supply and Demand of energy; Energy Scenarios and modeling; Energy Policy and Auditing; Sustainable development.",
+    "PENG 4930":
+      "Petroleum Topics chosen from: Petroleum or Gas exploration, drilling production, simulation, recovery, and gas liquefaction. Field study including assessment, evaluation, feasibility and economic studies will be required.\nEnergy Topics chosen from: Alternative Energy resources including solar, wind, biomass, fuel cells, nuclear or geothermal energy. Field study including assessment, evaluation, feasibility and economic studies will be required."
   };
 
   const coursePrerequisites = {
@@ -1339,7 +1409,83 @@
     "PENG 3211":
       "PENG 2013 or PENG 2400",
     "PENG 3411":
-      "ENGR 2122 and CHEM 1005"
+      "ENGR 2122 and CHEM 1005",
+    "ENGR 1005":
+      "None listed.",
+    "ENGR 2105":
+      "MACT 1122 and PHYS 1011",
+    "ENGR 2122":
+      "PHYS 1021 and (ENGR 2104 or ENGR 2105)",
+    "ENGR 2412":
+      "MACT 1121",
+    "ENGR 3202":
+      "CSCE 1001 (or MENG 2202 or ENGR 2412) and MACT 2141",
+    "MENG 2112":
+      "ENGR 2102 or ENGR 2105",
+    "PENG 3430":
+      "PENG 2013 or PENG 2400",
+    "SCI 2005":
+      "None listed.",
+    "PENG 2400":
+      "None listed.",
+    "PENG 3011":
+      "SCI 2005",
+    "PENG 3021":
+      "SCI 2005 and PENG 2400",
+    "PENG 3111":
+      "PENG 3021",
+    "PENG 3112":
+      "Concurrent with PENG 3111",
+    "PENG 3215":
+      "PENG 3211, PENG 3021 or concurrent",
+    "PENG 3227":
+      "PENG 3011 and PENG 3021\nConcurrent: PENG 3228",
+    "PENG 3228":
+      "Concurrent with PENG 3227",
+    "PENG 3311":
+      "PENG 3211",
+    "PENG 4121":
+      "PENG 3111",
+    "PENG 4223":
+      "ENGR 3202 and PENG 4224",
+    "PENG 4224":
+      "PENG 3215",
+    "PENG 4225":
+      "PENG 3215",
+    "PENG 4226":
+      "PENG 2400 and senior standing.",
+    "PENG 4227":
+      "PENG 3227",
+    "PENG 4314":
+      "PENG 3311",
+    "PENG 4324":
+      "PENG 3311 and PENG 3411",
+    "PENG 4950":
+      "A minimum of 12 credits of PENG courses.",
+    "PENG 4980":
+      "Consent of Department Chair",
+    "PENG 4981":
+      "PENG 4980",
+    "PENG 3415":
+      "PENG 2400",
+    "PENG 4015":
+      "PENG 3011",
+    "PENG 4125":
+      "PENG 4121",
+    "PENG 4229":
+      "PENG 3215 and PENG 3227",
+    "PENG 4313":
+      "PENG 3311",
+    "PENG 4325":
+      "PENG 3311 and PENG 3227",
+    "PENG 4333":
+      "PENG 3411",
+    "PENG 4421":
+      "PENG 2400 and senior standing.",
+    "PENG 4423":
+      "PENG 2400 and senior standing.",
+    "PENG 4930":
+      "Senior standing."
   };
 
   const subjectLabels = {
