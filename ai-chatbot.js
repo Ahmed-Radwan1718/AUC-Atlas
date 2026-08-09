@@ -82,17 +82,6 @@
       gap: 18px;
     }
 
-    .ai-chatbot-kicker {
-      display: block;
-      margin-bottom: 4px;
-      color: rgba(192, 154, 92, 0.96);
-      font-size: 9px;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      line-height: 1.4;
-      text-transform: uppercase;
-    }
-
     .ai-chatbot-header h2 {
       margin: 0;
       color: #171717;
@@ -258,10 +247,10 @@
     <button
       class="ai-chatbot-toggle"
       type="button"
-      aria-label="Open Atlas AI chat"
+      aria-label="Open Friday chat"
       aria-controls="ai-chatbot-panel"
       aria-expanded="false"
-    >AI</button>
+    >F</button>
 
     <section
       class="ai-chatbot-panel"
@@ -271,15 +260,12 @@
       hidden
     >
       <header class="ai-chatbot-header">
-        <div>
-          <span class="ai-chatbot-kicker">Powered by Gemini</span>
-          <h2 id="ai-chatbot-title">Atlas AI</h2>
-        </div>
+        <h2 id="ai-chatbot-title">Friday</h2>
 
         <button
           class="ai-chatbot-close"
           type="button"
-          aria-label="Close Atlas AI chat"
+          aria-label="Close Friday chat"
         >×</button>
       </header>
 
@@ -289,21 +275,21 @@
         aria-live="polite"
         aria-relevant="additions"
       >
-        <div class="ai-chat-message assistant">Hi — I’m Atlas AI. Ask me how to use AUC Atlas or about general academic planning.</div>
+        <div class="ai-chat-message assistant">Hi — I’m Friday. Ask me how to use AUC Atlas or about general academic planning.</div>
       </div>
 
       <form class="ai-chatbot-form">
         <label
           class="ai-chatbot-sr-only"
           for="ai-chatbot-input"
-        >Message Atlas AI</label>
+        >Message Friday</label>
 
         <textarea
           class="ai-chatbot-input"
           id="ai-chatbot-input"
           rows="1"
           maxlength="1000"
-          placeholder="Ask Atlas AI..."
+          placeholder="Ask Friday..."
         ></textarea>
 
         <button
@@ -313,7 +299,7 @@
         >↑</button>
       </form>
 
-      <p class="ai-chatbot-note">AI can make mistakes. Verify important information with official AUC sources.</p>
+      <p class="ai-chatbot-note">Friday can make mistakes. Verify important information with official AUC sources.</p>
     </section>
   `;
 
@@ -361,8 +347,8 @@
     toggleButton.setAttribute(
       "aria-label",
       isOpen
-        ? "Close Atlas AI chat"
-        : "Open Atlas AI chat"
+        ? "Close Friday chat"
+        : "Open Friday chat"
     );
 
     if (isOpen) {
@@ -520,7 +506,7 @@
         if (!response.ok) {
           throw new Error(
             data.error ||
-              "Atlas AI could not respond right now."
+              "Friday could not respond right now."
           );
         }
 
@@ -530,7 +516,7 @@
 
         if (!reply) {
           throw new Error(
-            "Atlas AI returned an empty response. Please try again."
+            "Friday returned an empty response. Please try again."
           );
         }
 
@@ -564,7 +550,7 @@
           "assistant",
           String(
             error && error.message ||
-              "Atlas AI could not respond right now."
+              "Friday could not respond right now."
           ),
           false
         );
