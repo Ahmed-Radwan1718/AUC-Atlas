@@ -7,7 +7,6 @@ const {
   clearLoginChallenge,
   consumeAuthenticatorAttempt,
   clearAuthenticatorAttempts,
-  createSiteSessionFromIdToken,
   createSiteSessionForUid,
   getAuthenticatorSecret
 } = require("../_lib/securityHelpers");
@@ -60,19 +59,11 @@ module.exports = async function handler(req, res) {
       "login"
     );
 
-    if (challenge.idToken) {
-      await createSiteSessionFromIdToken(
-        challenge.idToken,
-        res,
-        req
-      );
-    } else {
-      await createSiteSessionForUid(
-        challenge.uid,
-        res,
-        req
-      );
-    }
+    await createSiteSessionForUid(
+      challenge.uid,
+      res,
+      req
+    );
 
     await clearLoginChallenge(req, res);
 
