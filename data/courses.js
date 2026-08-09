@@ -2361,7 +2361,429 @@
     "HIST 2000":
       "This course teaches how to think, write, and speak historically. By stepping into the time machine, students get to learn how to do history, which makes of this course an essential step on their journey toward becoming historian, and a primer for humanities major/minor. This course provides students with the necessary toolkit to investigate the past, and will open up new perspectives for students interested in this discipline and the humanities at large.",
     "HIST 4801":
-      "Seminar on historical thought from its emergence in the classical world to the present, including consideration of the Arab historical tradition. Covers schools of historical interpretation and methodological approaches. Major Capstone."
+      "Seminar on historical thought from its emergence in the classical world to the present, including consideration of the Arab historical tradition. Covers schools of historical interpretation and methodological approaches. Major Capstone.",
+    "DSGN 2113":
+      "This lecture course provides a primer in visual literacy across media, introducing students to key terms and methods for critically reading the visual world including iconology, formal analysis, art history, ideological analysis, and semiotics. Students gain fluency in understanding how images work in cultural context to communicate meaning, to express a sense of self, to convey pleasure, to sell things, and to distribute power. Questions of the effect of specific visual technologies are also engaged, particularly their impact on perception and conduct. Examples are drawn from fine art, advertising, film, popular culture, and new media.",
+    "DSGN 2115":
+      "This course introduces students to the conceptual and critical aspects of graphic design through the discourse of history and theory of visual communication. It addresses how international graphic design went hand in hand with social, political and technological developments around it. It is a chronological survey of graphic design through slide lectures and research.",
+    "DSGN 2200":
+      "This introductory studio course introduces students to the foundations of design in a cross-disciplinary environment through various media forms. Understanding the creative potential visual research holds, students undertake a continuous visual research project throughout the course. By means of lectures, group presentations, group discussions, class exercises and technical workshops, students develop their skills in the expressive use of analogue and various media as they realize several diverse design projects.",
+    "DSGN 2201":
+      "This course encourages students to apply previously acquired knowledge of fundamental principles of graphic design to effectively communicate concepts in a visual representation that range from two-dimensional images to three-dimensional objects and site-specific installations. Through research, class exercises and critique, technical workshop, and design projects, students will learn to develop work plans and explore with cross-disciplinary expressions, production techniques, and materials in order to achieve communication goals.",
+    "DSGN 2210":
+      "This course is an introduction to and experimentation with different aspects of Latin and Arabic typography. It addresses letter forms and their legibility, visual organization, classification and text applications. Projects will explore the fundamentals of Latin and Arabic typography in terms of history, theory and practice.",
+    "DSGN 2240":
+      "A series of experiences devoted to the development of the perception of color and its use as a tool for the graphic designer. The physics of color, colored light, colored pigments and the color wheel. The study of Johannes Litten’s color theory and Labert Munsell’s color solid, the psychology of color and application of its relations to different design fields. There will be an emphasis on using gouache paint and matching paint colors with digital color and printing as well as exploring digital color on the computer.",
+    "DSGN 3220":
+      "This studio course covers the fundamentals of type, its characteristics, vocabulary, and terminology, as well as creative uses of type and how it is integrated into successful Latin and Arabic designs. It will introduce students to the history and current practice of typography in all areas of communication design: from editorial design to advanced information graphics and screen-based interactive media.\nThe course contains a combination of projects, class assignments, and presentations that focus on refining students’ abilities to understand and use fonts and typesetting software to create and analyse typographic prototypes for print, screen, and three-dimensional design. Students will develop an understanding of the interrelationship between text, content, and audience in context and functions, considering coordination factors, visual hierarchy, speed, clarity, print systems, colour media, and materials.",
+    "DSGN 4269":
+      "Independent research with a topic approved by the department. Students are requested to work independently and submit a comprehensive paper on their chosen topic.",
+    "DSGN 4270":
+      "Independent design project as a continuation of researched topics approved previously by the department. Visiting critics will be invited to review as assess the final project.",
+    "DSGN 2300":
+      "This multidisciplinary course teaches students how to generate ideas and test them through rapid prototyping methods to reach a Minimum Viable Product focusing on analog games.\nThe course allows graphic design students to work collaboratively with various engineering students at an early stage in their academic years. This can help them see the potential of multidisciplinary team work.\nWith an overview of game history and theory, the students will explore diverse analog tools to enable them to migrate between theory and practice and understand the cre­ative potential of an interdisciplinary studio practice.\nThe course includes lectures, group presentations, group discussions, class exercises and techni­cal analog workshops.",
+    "DSGN 3202":
+      "This course will prepare students to design logos and establish visual identities within the guidelines of brands, across a variety of media and applications.\nThe course offers real client-designer experience. Students will have the chance to work with clients on real briefs and will learn to exercise and develop their visual problem solving and time management skills to meet clients’ expectations and deadlines. They will learn to handle the pressure of overlapping assignments.",
+    "DSGN 3203":
+      "The course focuses on the different formats that a printed word can appear in on different items like magazines, newspapers, books and web/digital publishing. Students are given briefs that push for exploration of the thinking process (Content, Message, Organization) the reading process (Typography and Layout of publications), and building process (Structure and Integration).",
+    "DSGN 3204":
+      "Understanding shelf-life and presence, this studio course is based on designing and understanding communication graphics for packaged products. Students experiment with structures of products and the application of type, color, and image on different media like paper, plastic, nylon etc. Projects may be based on real market client briefs and/or experimental ideas.",
+    "DSGN 3205":
+      "This course is concerned with the design and user experience of a retail space. It can contain several branches of design like architecture, interior design, industrial design, advertising and graphic design.",
+    "DSGN 3210":
+      "The information design course will focus on communicating complex information with visually appealing graphics. Participants will develop a deep understanding and broad knowledge of data visualization and pictorial language in theory and practice. They will learn how to create clear and meaningful visualizations for specific topics, target groups, and applications.",
+    "DSGN 3213":
+      "This course provides an overview of core design principles on how to create a User Experience that includes a digital product. The students will learn about the complete design process from User-centred Research and its methods, problem definition, concept ideation, Concept Prototyping and Testing, User Interface Design to presentation and documentation of such a project. In specific this course focuses on how to create Mobile Applications using most relevant application for prototyping.",
+    "DSGN 3230":
+      "This course will cover the study and design of Arabic typefaces including Arabic type design, its aesthetics, and functional strengths, as well as introduce students to the rules of Arabic calligraphy. Students will learn how to adapt their Arabic type designs to the needs of their communities and as means through which their ideas are communicated.",
+    "DSGN 3266":
+      "This studio course focuses on how design can be a powerful tool to address social, cultural, and environmental issues. Students will explore the intersection of design and activism, using visual communication and design strategies to create impactful solutions that foster social change. Through four hands-on projects, students will engage with real-world challenges and learn how to design with empathy, cultural sensitivity, and a systems-thinking approach. The four projects that students are required to submit during the course cover varying topics, from heritage preservation to environmental and social concerns.",
+    "DSGN 3270":
+      "This course is an in-depth examination of specific topics in Design determined by the special interests and expertise of the faculty. This course may be repeated or taken concurrently when course content is different.",
+    "DSGN 4200":
+      "This course exposes students to different design communities around the world. It is field research-based. It will introduce students to new and emerging design practices and methodologies while building their international design network by collaborating with academic design institutions, professionals, and students in different countries.",
+    "DSGN 2245":
+      "Students explore the different media of illustration for different end products in this studio course.",
+    "DSGN 3235":
+      "A course for students to learn the basics of 3D Design and 3D animation and concepts. It will introduce them to the role of 3D and animation in the field of Graphic Design.",
+    "DSGN 3250":
+      "In this course students will receive advanced level instructions using software for layout and digital image making. The students will work on multiple image formats producing digital and print outcome. The learning outcome will support the execution and production of their creative work. This course will work across multiple computer design applications.",
+    "DSGN 3260":
+      "How to write a photography brief, what is a product shot, how to cast the right model for your concept, food styling and photography, and working with different photographers. How and when to work with photo banks. Students will learn how to work as designers with different specialized photographers and understand the different needs of each photo assignment.",
+    "DSGN 3300":
+      "A multidisciplinary course that introduces students to current digital prototyping tools used in digital game design. The course will start with an overview of the history of digital game design accompanied by analytical insights and discussions. Students will learn about current digital prototyping tools through the ideation of basic 2D and 3D digital games, and explore elements such as game mechanics, level design and puzzle design. The course will utilize visual programming methods that are accessible to all students.",
+    "DSGN 4210":
+      "This course helps students create and promote their image in the market through discussions on career pathways. It will prepare students for the professional world guiding them on how to design a digital and printed portfolio, a resume and a personal corporate identity.",
+    "ARIC 3268":
+      "While focusing on Persian book painting from the Mongols to the Safavids, the course will also briefly consider Arab, Turkish and Mughal arts of the book. In addition to the history of painting it explores matters related to patronage, book production, calligraphy and illumination.",
+    "DSGN 3118":
+      "A Slide-lecture based course that will introduce students to the history of Arabic calligraphy from the early Quran scripts, through highlights of the creative output of different Islamic dynasties until the introduction of the printing press. It will discuss the aesthetics of the calligraphic Arabic word and different stages of development of the script on paper and different media.",
+    "DSGN 5115":
+      "Exploring a relatively new field in the region, this course explores the history of graphic design in the Arab world by looking at publication design, political posters, children’s books and commercial design that have been instrumental in the development of social and political ideas in the region. The course presents to students a thorough review on the work of particular time periods and designers in the Arab world shedding light on the origins of printing and typography, Islamic manuscripts design, Arabic calligraphy and its revival, Modern art and its impact in design, visual identity and conceptual images, postmodern design and the digital revolution.",
+    "FILM 2120":
+      "An introduction to the art of cinema, covering basic film language, aesthetics, history and theory. Narrative feature (fiction), documentary (non-fiction), and avant-garde modes are analyzed in detail, and relevant films are screened in class to stimulate learning and discussion.",
+    "FILM 2121":
+      "This practice-based course offers an introduction to fiction filmmaking addressing basic concepts of narrative storytelling and its technical skills, including writing, directing, editing, and a survey of camera, lighting and sound. In addition to in-class exercises and assignments, students are expected to produce a short fiction film as a final project.",
+    "FILM 2123":
+      "This practice-based course introduces alternative forms to traditional fiction narrative films by surveying approaches and methods of non-fiction, experimental, and hybrid filmmaking. Students are expected to work on film essays, documentaries, and archive-based projects.",
+    "FILM 3110":
+      "A survey of key international cinemas from the post-Second World War period to the present day, which have come to be understood retrospectively, during the contemporary period, as “world cinema.” Students will gain critical exposure to films and film movements such as Third World cinema, European New Waves and art films, the Japanese New Wave, Brazilian cinema novo, and the more recent North American “indie” cinema. In the process, students will learn how to locate and subject the socio-economic and ideologico-political conditions of world cinema to serious analysis and critique.",
+    "FILM 3130":
+      "This course provides a critical overview of major theoretical approaches to the analysis and critique of cinematic art, including early theories of aesthetics, structure and form; modernist political and avant-garde critiques; theories of audience and spectatorship and the cinematic apparatus; contemporary cultural studies. Films will be screened in class to facilitate understanding of the assigned theoretical readings. Required for Film majors.",
+    "FILM 3132":
+      "An exploration of film theory through texts by Eisenstein, Bazin, Walter Benjamin, Serge Daney, Pascal Bonitzer, Michel Chion, Gilles Deleuze, Laura Mulvey, covering such concepts and subjects as the ontology of the photographic image; montage; the close-up; the acousmatic voice; the crisis of the action-image; the off-screen, both relative and absolute. Full films or excerpts of films will be screened in class to facilitate understanding of the assigned theoretical readings.",
+    "ANTH 3070":
+      "The history and practice of film in anthropology; film as ethnography; comparison of films and analytical ethnographies. Additional Mandatory Lab Sessions for Film Screening.",
+    "ARIC 3106":
+      "Looks at the intersection between literature and film as two modes of representation. Readings of Arabic literary texts, and in class screenings of films.",
+    "ECLT 3030":
+      "The course investigates the relationship between literature and cinema and how they complement each other in representing textually and visually a broad theme, a historical period, or a national concern.",
+    "FILM 3070":
+      "In-depth examination of specific topics in film determined by the special interests and expertise of the faculty..",
+    "FILM 3115":
+      "This course provides various outlooks on American Cinema. The topics can include areas that deal with history, genres, filmmakers, trends, political changes, industry, as well as other considerations. This course is designed for students from across disciplines and carries no prerequisites.",
+    "FILM 3120":
+      "This course examines various aspects of cinema in Egypt and the Arab World in order to understand its history, and determine the themes, the styles, and the character of this cinema which has been historically among the most influential in national world cinemas. Topics could include areas such as New Arab Cinemas, classical Egyptian cinema, the Arab film industry, independent Arab cinema, among others.",
+    "FILM 3125":
+      "This course variably focuses on a specific national and, where appropriate, regional cinema, such as that of Germany, France, Argentina, Brazil, Japan,Italy, England, Sub-Saharan Africa, India, China, Canada, Mexico, Cuba, Eastern Europe, Iran, Turkey, Russia or Scandinavia. The course considers recent shifts in the study of national cinemas that accounts for understanding the notion of “identity” in a global context. The course is open to students from across disciplines.",
+    "FILM 3150":
+      "This course provides a basic history and theorization of issues relating to gender in cinema, including representation, filmmaking, theory, and historical development. The course can engage in various issues relating to gender and provides the basis for mapping out historical and/or perceptual assessments of the significance of gender in filmmaking practices. The course is open to students from across disciplines and should be of strong appeal to students majoring in psychology, sociology, anthropology, and comparative literature.",
+    "FILM 3160":
+      "A detailed study of the themes, the characteristic style, development, and influence of the director within the world of cinema. The course will assess, compare, and/or contrast combinations of two to three filmmakers.",
+    "FILM 4402":
+      "With departmental approval, advanced students may arrange an individualized course topic to be completed under faculty supervision.",
+    "FILM 3201":
+      "This practice-based course takes students through the various stages of fiction film production to explore the thinking behind every artistic and technical decision the filmmaker takes. Students will develop a deep understanding of the filmmakers’ tools and elements that form their vision and cinematic language. Students will learn different techniques in script analysis, visualization process, working with actors, managing crew, and creating audiovisual style.",
+    "FILM 3252":
+      "Mastering how to write stories considering the audiovisual nature of the cinematic language is a cornerstone in filmmaking. In this practice-based course, students will explore the essential elements of scriptwriting, including dramatic structure, plot development, building character, use of conflict, film treatment, and scene drafting.",
+    "FILM 3254":
+      "This course aims to combine the learning of editing techniques with a reflection on the artistic contribution of the editor to a film project. Topics include editing workflows, media management, operating editing software, sound editing, and exporting. In addition, montage theory, history, and aesthetics will be surveyed.",
+    "FILM 3402":
+      "Building on FILM 2123, this critique-based course offers students advanced training to practice with hybrid film forms, moving between fiction, non-fiction, experimental, and essay films. Students will explore their cinematic voices through feedback, discussions, readings, site visits, screenings, assignments, and projects.",
+    "FILM 3071":
+      "In-depth examination of specific topics in filmmaking determined by the special interests and expertise of the faculty.",
+    "FILM 3253":
+      "Cinematography is an essential component of a film’s structure, often defining its visual language and atmosphere. Creating images that meet the artistic concept of a project is the challenge of any Director of Photography. This practice-based course addresses the aesthetics and technical aspects of cinematography, covering light, optics, and the diverse range of film formats.",
+    "FILM 3255":
+      "This course addresses the producer’s role in different production models in the film industry. Within a workshop format and through individual and group exercises, students will develop skills and knowledge about the producer’s mission and how to balance creativity and strategy throughout the journey of the film.",
+    "FILM 3355":
+      "This course is designed to provide students with the opportunity to gain practical experience and to work and learn within the film community (production, festivals, administration, archives, research) as interns, paid employees, or volunteers. Students interested in enrolling in this course should submit a proposal to the Film Program. The proposal should be submitted for approval at least one month in advance of beginning the work. Students should also include an official letter from the host institution, which has agreed to supervise their project, indicating approval of the proposed student project. The host institution should also agree to provide an evaluation of the quality of the student’s performance within two weeks after the end of the student project.",
+    "FILM 5170":
+      "This course is designed to provide students with an opportunity to survey and investigate various and specialized areas of film studies. Topics may include history, theory, filmmakers, national cinemas, women in film, etc. Seminars may also discuss film industry and distribution, film media, festivals, production systems, etc. Within the framework of the seminar’s general topic, each student develops his/her more focused research project. This project builds upon and develops the material discussed in class and in the required readings.",
+    "FILM 4250":
+      "Final film projects are essential in presenting film graduates to the local and international film scene. In this critique-based course mentored by experienced film practitioners, students will work individually and collectively on the development and pre-production phases of their graduation films.",
+    "FILM 4260":
+      "This critique-based course builds on FILM 4250 - Senior Film Project I (3 cr.) and is mentored by experienced film practitioners. Students will work individually and collectively on the production and post-production phases of their films. This course brings together all the experiences students have learned throughout the production courses to leave the program with a short film that could present them to the local and international film scene.",
+    "ECLT 2010":
+      "For students interested in literature but not necessarily intending to major in the field, this course will enable the student to acquire the tools and learn the methods which would help him/her understand poetry, fiction and drama and develop a deeper appreciation of great literary texts from various places and times.",
+    "ECLT 2011":
+      "The course introduces students to a selection of major works in British Literature from its beginnings to the present. It instructs students to analyze and interpret influential novels, plays, poems, and essays. The course presents the development of British literature historically while emphasizing the cultural and aesthetic dimensions of the texts.",
+    "ECLT 3001":
+      "The course introduces the student to the literary culture and counter-culture of the Middle Ages through reading selected autobiographical and fictional texts from St. Augustine, Abelard, Heloise, Dante, Chaucer, Attar and *The Arabian Nights.*",
+    "ECLT 5106":
+      "Major works of Greek literature since 700 B.C., chosen on the basis of merit and influence and studied in the most artistic translations.",
+    "ECLT 3002":
+      "A survey of Renaissance authors, beginning with Petrarch and the origins of the Renaissance in Italy. The course traces this cultural revolution as it spread from Italy to other parts of the European continent and finally to Tudor England.",
+    "ECLT 3005":
+      "Major European and American ideas and literary works of the period 1760-1848.\nWorks not originally written in English will be read in English translations.",
+    "ECLT 3006":
+      "Major European works of fiction, poetry and drama from the period between 1789-1914.\nWorks not originally written in English will be read in English translations.",
+    "ECLT 3008":
+      "Selected readings of American and European authors representing literary trends from 1900 to the present",
+    "ECLT 3048":
+      "The course explores literary texts which marked the period following World War II as well as very recent European and American works in a comparative context.",
+    "ECLT 3010":
+      "Selected readings of literary works beginning with pre-Columbian oral traditions and moving from the colonial era to the early national period through to the late nineteenth century.",
+    "ECLT 3011":
+      "Works of twentieth-century American writers. The reading list may be chosen to reflect changing ethnic and cultural phenomena and will vary from year to year.",
+    "ECLT 5108":
+      "Study of central documents in the history of literary criticism, from Plato to the Romantics.",
+    "ECLT 5109":
+      "Analysis of the major trends in modern literary theory, such as Russian formalism, new criticism and post-structuralism.",
+    "ECLT 2019":
+      "This interdisciplinary course is designed to introduce students to key events and texts in the history and culture of the United States. Using films, literature and historical texts, the course will examine American culture within a historical context.",
+    "ECLT 3032":
+      "The course covers seminal literary works in both Western and non-Western canons, assigned in editions of excellent English translations.",
+    "ECLT 3033":
+      "The course concentrates on modern literature of the African continent with special emphasis on sub-Saharan literary works, including their correspondence to North African literature. Texts by prominent writers from Africa (men and women/ black and white) will be analyzed in relation to the indigenous culture and oral creativity, as well as in relation to the colonial and post-colonial experience.",
+    "ECLT 3045":
+      "The course investigates gender roles in literary texts and the image of women in different historical periods and cultural settings. Readings include Feminist and anti-Feminist literary and theoretical texts drawn from the North and the South.",
+    "ECLT 3046":
+      "The course analyzes Third World literary texts from Asia, Africa and South America in their historical context and their contribution to post-colonial discourse.",
+    "ECLT 3052":
+      "The course revolves around a selected literary theme (such as Romance, Friendship, or Loss among others), recurring in different cultures and regions of the world or/and recurring through the ages. The literary theme might be in one genre (drama, fiction, or poetry) or in a combination of genres.",
+    "ECLT 3053":
+      "A study of mainly European drama in the period from Ibsen to the present, including plays by Shaw, Chekhov, Strindberg, Pirandello, Brecht, Sartre, Beckett, Pinter and others, and dealing with related developments in theatre, cultures and society.",
+    "ECLT 3070":
+      "A course on literary writing designed to accommodate the needs of diverse students. Emphasis is on developing one’s own story-telling, play-writing, and/or poetic skills by studying the craft of influential authors from different regions and traditions. The students will meet and interact with Cairo-based emerging and established creative writers as part of their course work.",
+    "ECLT 3099":
+      "Examination of specific topics in genre and other areas of special interest and expertise of the faculty. May be repeated for credit if content changes. In recent years, the following have been offered under this heading: \\*The Arabian Nights, \\*The Lyrical Mode (in English, Arabic and French), Autobiographies, Literature and Cultural History, Literature and the Visual Arts, Literature and Urban Culture, Theory of Narrative, The European Novel, Figures of the Scared, T. S. Eliot, The Bloomsbury Group and Albert Camus.",
+    "ECLT 4099":
+      "Examination of specific themes and other topics of special interest. This coure is designed to meet the requirements of a capstone seminar for the core curriculm. May be repeated for credit if content changes.",
+    "EGPT 2250":
+      "The course will analyze Ancient Egyptian literary texts, including folk tales, myths, wisdom literature and poetry, in order to present ancient Egyptian culture through its literature and make students appreciate the depth and high level of this advanced culture in such an early period of Egypt’s long history.",
+    "EGPT 2251":
+      "The course introduces the student to the study of classical Egyptian script, grammar and hieroglyphic texts of the Middle Kingdom.",
+    "EGPT 2252":
+      "The course is a continuation of EGPT 2251 . Students will concentrate on the verbal forms of classical Egyptian.",
+    "EGPT 3201":
+      "The course covers the period between the Predynastic and the Middle Kingdom and includes: reliefs, statuary, architecture, and minor arts, illustrated with images. The class focuses on learning how to look at and to analyze Egyptian art and to place it in its context. This course involves a significant amount of memorization that enables the student to create a mental data-bank that is useful when putting excavated material in context and in analyzing Egyptian art. There will be field-trips to the museum and to Giza and Saqqara durign the semester.",
+    "EGPT 3202":
+      "The course covers the period betweem the Middle Kingdom and the Ptolemaic Period. It includes: reliefs, statuary, architecture, and minor arts, illustrated with images. The class focuses on identifying the basic principles of Egyptian art and architecture, learning how to look at and to analyze Egyptian art and to place it in its context. There will be field-trips to the museum and to other sites, possibly including Luxor, during the semester.",
+    "EGPT 3211":
+      "This course covers the history of Egypt from the Predynastic period to the Middle Kingdom. The course focuses on the ‘official’ history of Egypt rather than the cultural/social history which is covered in a separate course. The scope of ‘official’ history includes: the rise of the Egyptian state, the different rulers of Egypt and their contributions to the state in terms of buildings, religious changes and foreign policy, the economy, social organization, and Egypt’s foreign relations. Literary souces will be augmented by archaeological evidence. Field trips to archaeological sites in the Cairo area are an obligatory aspect of the course.",
+    "EGPT 3212":
+      "This course covers the history of Egypt from the Middle Kingdom to the end of Pharaonic history. The course focuses on the ‘official’ history of Egypt rather than the cultural/social history that is covered in a separate course. The scope of ‘official’ history includes: the different rulers of Egypt and their contributions to the state in terms of buildings, religious changes and foreign policy, the economy, social organization, and Egypt’s foreign relations. Literary sources will be augmented by archaeological evidence. Field trips to archaeological sites are an important component of the course.",
+    "EGPT 5100":
+      "The course will cover the cultural, technological, and social history of ancient Egypt, with an emphasis on using primary sources and, if appropriate, experimental work. The subject matter covered includes the social organization of Egypt, the economy, agriculture, food, medicine, crafts, building methods, family structure, etc.",
+    "EGPT 5130":
+      "This course provides students with an overview of the prehistory and early historical periods of the ancient Near East. Considerable attention is given to the fundamental transitions which occurred in this region. In particular, we will examine: (1) the first emergence of settled village life, hierarchical social organization and the domestication of plants and animals during the Neolithic period; (2) the rise of urban centers, temple and palace elites and writing; (3) the emergence and spread of the states and subsequent militaristic empires which became the dominant political force in the ancient Near East for several millennia. This course examines both archaeological and historical evidence with a heavy emphasis on material culture, primary archaeological and historical data and the process of scholarly interpretation.",
+    "EGPT 5144":
+      "The course will examine in detail the beliefs and religious institutions of the Ancient Egyptians. Special attention will be devoted to official and popular religions, and to their manifestation in architecture as well as in the literature of Ancient Egypt.",
+    "EGPT 5151":
+      "Students will read a number of Egyptian texts and learn how to translate and interpret written documents.",
+    "EGPT 5153":
+      "The course consists of further reading of Egyptian texts with an introduction to the new Egyptian language of the later periods of Pharaonic history. In order to introduce students to epigraphy, they are required to copy and study texts from the Cairo Museum.",
+    "EGPT 2020":
+      "An introduction to history, society, religion, art and architecture of Ancient Egypt, including a description of the nature and character of the field of Egyptology. The continuing impact of Ancient Egypt on subsequent societies and cultures including that of modern Egypt will be examined.",
+    "EGPT 2210":
+      "The methods and theories of archaeological excavation and interpretation; archaeological evidence of human cultural development; archaeology as a social science.",
+    "EGPT 3010":
+      "The class examines Egypt’s history and geography and devotes special attention to the effect of geography and natural resources upon the development of Ancient Egyptian history, art, and civilization.\nPrerequisites instructors consent",
+    "EGPT 4030":
+      "Independent research projects in Egyptology, with consent of instructor and student’s adviser.",
+    "EGPT 5110":
+      "The course covers the history of Egypt during the first millennium BC (1069-332 BC), a period characterized by much internal conflict and long periods of foreign domination. It examines the factors that led to the demise of Egypt’s New Kingdom, traces the rise of the Libyan and Nubian dynasties, and the subsequent annexation of Egypt by the Persian Empire. Special Attention will be devoted to the last dynasties of the Pharaonic tradition, Dynasties XXI-XXX.",
+    "EGPT 5120":
+      "The course will study the history of Egypt in the Graeco-Roman period and the momentous confrontation between Greek and Egyptian culture between 300 BC and 700 AD. It will also examine the social consequences of the spread of Christianity in Egypt and the rise of Coptic culture.",
+    "EGPT 5140":
+      "This course is intended to serve as a broad survey of the development of history, culture and society in Nubia and the Northern Sudan from the earliest era of food production (ca. 6000-4000 BCE/BC) to the development of the medieval kingdoms of Nubia (ca. 600-700 CE/AD). Special attention will be devoted to the question of the relations - cultural, commercial, technological, political - between Ancient Egypt and Ancient Nubia. For the purposes of this class, the term “Nubia” will mean the long stretch of the Nile Valley that extends between the Nile’s First Cataract (located in Southern Egypt just south of the city of Aswan) and its Sixth Cataract (located in the Sudan some distance north of the city of Khartoum). The term “Nubian” will describe the people of this specific area as well as all the distinctive languages and cultures that flourished here from the beginning of recorded history to the early modern period.",
+    "EGPT 5150":
+      "Coptic represents the last stage of the ancient Egyptian language. The course will include reading of selected texts in two Coptic dialects.",
+    "EGPT 5152":
+      "Hieratic is a script derived from hieroglyphics used mainly on papyrus. The course is a study of this script through reading selected texts literary, religious, or administrative- related to daily life in ancient Egypt .",
+    "EGPT 5160":
+      "This course allows instructors to offer a topic in Coptic Studies. The topic will be chosen from year to year in coordination with the departments concerned and the dean of the School of HUSS, and according to the individual interests and areas of expertise of the instructors. Topics chosen may include various aspects of Coptic art and history, monasticism, folklore, or other subjects. The course may be taken more than once if the topic changes.",
+    "EGPT 5170":
+      "The course deals with different types of cultural heritage present in Egypt and their physical and cultural environment, and with the various methods of managing them in order to ensure their proper preservation while making them accessible to tourists and scholars. At the instructor’s discretion, the course may also provide an understanding of the role of museums in the modern world and the basic methodology and practice of museum management.",
+    "EGPT 5191":
+      "This course allows students to gain hands-on experience and engage in practical aspects of fieldwork, offering qualified students the opportunity to participate in archaeological and epigraphic projects as well as museum internships. Preference will be given to majors in Egyptology, anthropology, and related fields. Inquiries concerning the course must be made no fewer than seven months prior to the start of the summer semester for participation in archaeological and/or epigraphic fieldwork in Egypt. Sites and projects will vary.",
+    "EGPT 5199":
+      "None listed.",
+    "ECON 2061":
+      "Algebraic methods. Calculus of a single variable. Composite functions, limits and asymptotes, continuity, simple and implicit differentiation, Taylor’s theorem, maxima and minima and points of inflection, logarithmic and exponential functions. Introduction to integral calculus. Applications to economic theory and business finance.\nStudents cannot take both MACT 1121 and ECON 2061 for credit.",
+    "ECON 2081":
+      "The course covers descriptive and sample inferential statistical techniques, including main descriptive statistics and data sources and types. Topics include point estimation and statistical estimators’ desirable properties, hypothesis testing, correlation, and analysis of variance (ANOVA). Applications in Economics and Business are emphasized.",
+    "ECON 3053":
+      "Major economic problems of developing countries. Alternative explanations of underdevelopment and theories of development. Major domestic and international aspects of development including population growth, capital accumulation and international economic relations. Sustainable development.",
+    "ECON 3061":
+      "The first part of the course is matrix algebra which covers the following: determinant, rank, matrix inverse, Cramer’s rule, eigenvalues and eigenvectors. The second part discusses multivariate functions and partial derivatives as well as unconstrained and constrained optimization. Homogeneous and homothetic properties of multivariate functions are also discussed. The third part of the course is advanced integral calculus. Economic applications are emphasized throughout the course.",
+    "ECON 3071":
+      "The course offers a general treatment of modern theoretical and empirical labor economics. Topics to be covered include: operation of labor markets; wage determination; firm, industry and public sector labor demand; human capital investment; race and gender employment and wage discrimination; public policy effects. The relation of labor market outcomes and attendant public policy to poverty, income distribution and economic growth is covered. (The course includes community-based learning components)",
+    "ECON 3082":
+      "This practicum is structured to run parallel with ECON 3081. It is conduced as an application of the tools studied in ECON 3081 to solve practical problems using econometrics software.",
+    "ECON 4091":
+      "This course investigates the historical evolution of economic theory by examining the development of Mercantilism, Physiocracy, Classical, Marxian, Neoclassical theory, Austrian-Keynesian and post-Keynesian economics.",
+    "ECON 3054":
+      "The course discusses basic environmental and natural resource models and environmental policies as applied to energy, minerals, water, fisheries, pollution control, and sustainable development. It includes an Community Based Learning (CBL).",
+    "ECON 3055":
+      "This course examines the impact of digital technologies, particularly Artificial Intelligence (AI), on global economies and development, with a focus on developing countries. Key themes include the future of work, gig and cloud work, big data, digital inclusion, and the digital gender divide. It explores how AI and data-driven innovations are transforming business models, market structures, and societal dynamics, raising critical questions about equity and inequality in the digital age.",
+    "ECON 3099":
+      "Guided reading and research of special topics chosen by the instructor in theoretical policy or applied economics.",
+    "ECON 4012":
+      "This course develops the analytical tools and applied case study analysis to financial and economic project evaluation. Cost-benefit analysis, shadow pricing, multiple criteria for project feasibility, economic worth of investment projects, cash flow discounting, and financial and economic rates of return. Applications to real life cases including investment and development projects as well as entrepreneurship ventures and risk assessment.",
+    "ECON 4013":
+      "The course will expose students to the science of behavioral economics. It will cover a range of topics including individual decisions, markets and public choice. Topics include extensions and shortcomings of the rational choice model and deviations from the Expected Utility Theory; Prospect theory and preference dependence; time preferences; social preferences, behavioral trust and fairness.",
+    "ECON 4014":
+      "This course covers analysis of public policy with special focus on Egypt and the MENA Region. It discusses issues related to market failure, equity and efficiency, public goods, tax policy and externalities. The course gives students the chance to do applied policy research in this area.",
+    "ECON 4015":
+      "This is an application course where students use real world examples and put into practice theories they learned in statistics and econometrics courses. It concentrates on expanding students’ experience of practical applications of key econometrics methods in the different fields of economics such as microeconomics, macroeconomics, labor, development, and program impact evaluation.",
+    "ECON 4041":
+      "This course provides a rigorous introduction to modern financial economics. It is designed to equip students with theoretical tools and practical case studies necessary to understand the dynamics of financial markets and their interaction with other spheres of the economy including asset pricing, risk management, and financial regulation schemes.",
+    "ECON 4050":
+      "The course examines ways in which the copyright system seeks to stimulate and regulate creative expression, impacting creative industries and pertinent business models. The course also critically reviews the main theories of copyright, with emphasis on the economics of knowledge production in varying contexts. Students engage with world issues and debates related to copyright and creativity, with an eye to the interests of developing countries and their position in global debates. A central question raised in the course is whether and how copyright legislation should be reformed to address new technologies, incentivize novel business models and help bridge the developmental divide. Students will gain an understanding of the basic principles of copyright and how it affects creativity and innovation in a wide variety of artistic and technical fields. While there will be reference to US law in the recorded video lectures, supplementary class discussions and reading materials will provide students with understandings of the legal copyright systems in Egypt and other countries.",
+    "ECON 4061":
+      "The course starts with a discussion of quasiconcave programming (Kuhn-Tucker theorem), then moves on to linear (first- and second-order) and nonlinear difference equations. This is followed by linear and nonlinear differential equations, including stability analysis, steady-state equilibrium, convergence and phase diagrams. In addition, systems of differential equations (the saddle path) are also studied. The final component of the course is dynamic optimization covering finite- and infinite-horizon problems as well as discounting. Economic applications are emphasized throughout the course.",
+    "ECON 4081":
+      "The first part of the course covers extensions of the classical linear model including departures from the basic assumptions of the general model: multicollinearity, autocorrelation, heteroskedasticity, endogenous regressors and GMM estimation. The second part discusses models with limited dependent variables (e.g. logit and probit models) and their applications. The third part explores panel data, covering issues related to estimation and inference in panel datasets as well as applications.",
+    "ECON 4094":
+      "This course is an application of economic tools to explore the performance, analyze major problems and propose reform agendas for the contemporary Egyptian economy. Among the topics discussed are the path of economic development, macroeconomic performance, sectorial behavior, and institutional restructuring since the Nasser era and up to the present time. The course gives the students a chance to conduct applied research and to design policy solutions related to challenges facing the Egyptian economy.",
+    "ECON 4099":
+      "Guided reading, research, and discussion of specific topics chosen by the instructor in theoretical policy or applied economics.\nThe course is offered as a research based, writing intensive course.",
+    "ECON 5241":
+      "Analysis of financial assets and institutions. The course emphasizes modern asset valuation theory and the role of financial intermediaries, and their regulation, in the financial system. State-preference theory and optimal portfolio decision mean-variance portfolio theory, measuring portfolio risk and return, Capital Asset Pricing model (CAPM), Arbitrage Pricing Theory (APT), Option Pricing Theory, the Black-Scholes formula, Asymmetric information and rational expectations, term structure of interest rates.",
+    "ANTH 4020":
+      "This course examines the analytical object “violence” in its differentiated dimensions. What we think of as violence encompasses multiple phenomena that cannot only be understood as forces of destruction: violence must be grasped as also generative of life-worlds. The course inquires into the nature of violence, explores its epistemological and existential, sensual and structural, exceptional and ordinary dimensions, and forms.",
+    "ANTH 4065":
+      "Examination of how anthropology has approached the study of economic practices, ideas and institutions in different cultural contexts. By following the main theoretical paradigms in economic anthropology, the course will address the cultural assumptions and power dynamics in defining what an economy is and how people go about producing, consuming and exchanging goods, commodities, gifts, services, as well as social relationships. Ethnographic case studies will explicate the power relations underlying the pursuit of economic lives, the centrality of gender, class, race, kinship and ethnic relations in shaping production, consumption and exchange, and the ramifications of global markets on peoples’ livelihoods and identities.",
+    "ANTH 4099":
+      ".Topics to be chosen according to specific interest, such as: agrarian transformation, desert development, sex roles, cognitive anthropology, anthropology and education; nationalism, colonialism and postcolonialism; tourism in social science; and anthropology of the city.",
+    "ANTH 3104":
+      ".Introduces major theories and theorists in the recent history of anthropology and provides a broad vision of the development of the discipline and of contemporary anthropological thought. The course also covers the development of the ethnographic method, important paradigms such as structural-functionalism, and recent critical theory.",
+    "ANTH 3105":
+      "Logic and philosophy of qualitative methodology in anthropology and other social sciences. The process of research design, data collection, analysis and interpretation of results and final write-up is elaborated with specific reference to research conducted in Egypt, the wider Arab and Middle Eastern worlds and elsewhere. Discussion of the politics and ethics of fieldwork, including protection of the rights of human participants in research projects.",
+    "ANTH 3302":
+      "Analysis of contemporary debates in anthropological engagements with and in Africa. The course explores the histories of ethnographic research in Africa, colonialism and post-independence experiences, power and representation, performance and the arts, religious sensibilities and kinship networks.",
+    "ANTH 2005":
+      "Description and analysis of social and cultural characteristics and problems of contemporary Arab Society, taking into consideration the specific historical, economic, and ideological forces that shape it. The social basis for Arab unity and identity. Introduction to basic concepts and principles for understanding social phenomena.",
+    "ANTH 2006":
+      "This course explores the conceptual and methodological approaches to the study of youth cultures over the last one hundred years in order to be able to interpret and understand youth cultures in the Arab world. The course covers literature on youth cultures , subcultures and countercultures in the 20th and 21st centuries, covering domains such as music, arts, ideas and politics of young people from a range of cultural settings. The course also examines generational conflict, social inequality and authoritarianism, a globalizing economy and mass media, and continuity and change in the way young people experience self, group and social structures.",
+    "ANTH 2007":
+      "What do Northeastern Syria and Gaza have to do with Ferguson Missouri and Black Mesa Arizona? Taking examples from ongoing occupations globally, this course will build on a comparative approach, treating occupation as a strategy forged in exchanges of instruments and techniques between occupying powers, and tracing the way resistance and refusal give rise to unlikely (and unplanned) solidarities from occupied Palestine to the inner cities of the US, from native reservations in North America to the mining towns of Southern Africa.",
+    "ANTH 2099":
+      "Course addressing broad intellectual concerns and accessible to all students, irrespective of major.",
+    "ANTH 2201":
+      "Introduces the students to the different concepts and approaches to community development as well as to community organizing. Utilizes a critically reflective framework as part of the curriculum to overcome the potential division between theory and practice. Identifies the key issues that the students are likely to confront in community development and organizing work.",
+    "ANTH 3015":
+      "Transformation of family and kin structures and relations in present-day globalization. Impacts of urbanization, international migration, consumerism, economic and other factors on families and kin groups. Why and how people legitimize their kin relationships in the eyes of their community, their state, and their religion, and how different family structures are tied to naturalizing certain forms of power. Comparative perspectives from the Middle East and other world areas.",
+    "ANTH 3075":
+      "The role played by language in humankind’s symbolic relation to the world. Emphasis on linguistic analysis, ethnosemantics, sociolinguistics, expressive speech and language and socialization as these elucidate patterns of cognitive orientation.",
+    "ANTH 3080":
+      "An introduction to the study of gender ideologies, including a cross-cultural comparison of how genders are constructed to create different norms of masculine, feminine, and other categories linked to various forms of sexuality. Focus on analyzing how inequalities are maintained and contested over time through gendered discourses and practices at home, at work, and at local, national and international levels. Special emphasis on the uses of gender in justifying and challenging development agendas in the Global South.",
+    "ANTH 3090":
+      "Cultural dynamics involved in social and economic change with special reference to Egypt and the Middle East. Community development, cooperatives, population studies, resettlement, health and education are some of the problems that may be discussed. Case studies and fieldwork.",
+    "ANTH 3095":
+      "“What makes us human?” We may think that it is our ability to use language, or our capacity for abstract thinking, making history, crafting art, and developing religions, or is it our cognitive facility to conceptualize ‘death’ and ultimately seek immortality? This course aims to answer these questions by exploring the ‘deep history’ of death from prehistory to the present. Realizing that this question goes beyond the capacity of any single academic discipline, we turn to history, cultural anthropology, archaeology, palaeontology, developmental psychology, and comparative religions to explore the universal human search for the meaning of death and seeking immortality.",
+    "ANTH 3305":
+      "Areas to be chosen according to specific interest and faculty expertise. Examples of possible areas are: Anthropology of Food.",
+    "ANTH 4070":
+      "This course examines the contribution of anthropology to the comparative study of political organization and the exercise of power. It reviews classical anthropological approaches to politics in non-state and non-Western state societies. The course also examines political organization in postcolonial and global contexts, including such topics as nationalism, migration, transnational mobilization, ethnic identity and flexible citizenship, and the use of media technologies in developing political subjectivities. There is an emphasis on theoretical perspectives.",
+    "ANTH 4075":
+      "The course examines the experiences and relationships of people who move across states and national boundaries and whose identifying labels range from migrants, transnationals, guest-workers, exiles, refugees, and diaspora, among others. One underlying thread is that of dislocation and movement, while maintaining connections - real, symbolic and imagined - between disparate places and peoples.",
+    "ANTH 4085":
+      "Many researchers work with textual material in the form of interview transcripts, ethnographic field notes and other types of semiotic material like archives, social media, newspapers, film and images. Yet a persistent challenge for young scholars is establishing a systematic and well evidenced approach to analyzing their research material.\nDiscourse analysis is a broad approach to language in use. It helps us to to unravel the form and functions of particular discursive constructions to chart their implication in particular social contexts. Importantly DA provides a step by step process to analysis and encourages researchers to think carefully about their material, how it can be analyzed in a well evidenced manner and how to be transparent about your claims.\nTextual material cannot be understood as unproblematic representation of behavior, social relations and cognition. Discourse analysis approaches problematise texts, suggesting that they may have performative or rhetorical functions like mitigating blame, justifying or reflecting power relations, creating consensus, regimes of truth and so on.\nIn this course we will read about the various ways in which textual material can be analyzed and we will invest considerable time in the practice of conducting discourse analysis. We will cover five main approaches to discourse analysis:\n1. Working with interviews and transcripts\n2. Foucauldian discourse analysis\n3. Critical discourse analysis\n4. Multi-sensory multimodal and social semiotics\n5. Doing Discourse Analysis",
+    "ANTH 4405":
+      "In exceptional circumstances some senior majors with departmental approval may arrange to study beyond the regular course offerings.",
+    "ARCH 3231":
+      "In-depth exploration of building performance, with a focus on energy efficiency, sustainability, and occupant comfort. Principles and practices that contribute to high-performance buildings, including the application of building envelope design, HVAC systems, lighting systems, renewable energy technologies, heat transfer, fluid dynamics, acoustics and building automation systems. Design and evaluation of the performance of buildings using latest technologies in terms of energy efficiency, water conservation, indoor environmental quality, and sustainability.",
+    "ARCH 3422":
+      "Introduction to the real estate development model, management, and processes. Land use and planning dimensions, marketing priorities, facility operations and management, community management, and legislative framework and laws governing the sector. Financial feasibility model and the various cost analysis models that contribute to the decision making.",
+    "ARCH 4422":
+      "Introduction to the business context of architectural practice including business and professional ethics, organizational theory and behavior, strategic, marketing and financial management, business planning, and the generations and management of work in an architectural practice.",
+    "CENG 2115":
+      "Fundamentals of mechanics, Equilibrium of practices, Forces in space, Equilibrium of rigid bodies, Mechanical properties of areas including center of gravity, moment of inertia and section moduli, Stability Concepts, Classification of structures according to determinacy, Internal forces, Analysis of determinate structures including trusses, beams, frames, arches, and cables, Deflections of structural members. Introduction to indeterminate structures.",
+    "ARCH 1511":
+      "Manual drawing, projections and manual visual communication for designers. Three primary modules covering projections, conceptual diagramming, idea sketching; tools for diagrammatic analysis; and, rendering and final presentation using engineering drawing techniques.",
+    "ARCH 1521":
+      "An introduction to different forms of digital representation in architecture: architectural drawings, 3D-modeling, rendering, sheet layout design and fundamentals in animation and image editing. Introduction to Building Information Modeling (BIM) and graphical representation software. Such techniques are utilized as design tools for the creative development of projects and communication with clients and consultants from different disciplines in architectural practice.",
+    "ARCH 2512":
+      "Basic concepts and fundamentals of visualization, thinking, and design of simple forms in three dimensions. Presentation, communication and basic design skills using simple three dimensional modeling exercises in manual formats. Balance between aesthetic and functional design criteria. No previous modeling or digital experience is required.",
+    "ARCH 2551":
+      "Architectural design stages. Leadership role of architects in project delivery. Influence of site location on design. Influence of project related factors on design. Design of simple buildings. Introduction to basic building components and assemblies. Introduction to building code requirements.",
+    "ARCH 2411":
+      "Basics of surveying theory, recording field data and representation of data. Digital mapping production and contouring. Surveying applications including field work of detail surveying, stakeout, and parcel boundaries. Survey planning and associated survey computations. Operation of automatic level, total station and GPS. Introduction to 3D scanning of buildings.",
+    "ARCH 2552":
+      "Studio on designing in behavioral and socio-cultural contexts. “Inside-out” approach to Architecture. Design through the study of behavioral use of space. Age, sex, culture and individuality as well as complex functional relationships influence on architectural design. Study of the nature of human behavior and how it can be incorporated, facilitated, modified and influenced through architectural design. Design for special needs populations. Introduction to developing project brief through definition of the needs of society, users and clients.",
+    "ARCH 3522":
+      "The course involves in-depth investigations focused on the capabilities of computation in architectural design. It provides an overview of computational tools and methodologies of design, involving topics such as parametric and generative modelling, algorithmic thinking, visualization and digital fabrication. Hands-on implementation of computational tools is exercised during lab sessions by means of parametric modelling and digital fabrication software. Students work back and forth between physical material experimentation and digital translation of parameters, rules, constraints and relationships to develop their solutions in applied design projects. In the process, students learn how to automatically extract data from parametric models for multiple purposes, including but not limited to digital fabrication, environmental analysis, and documentation and detailing.",
+    "ARCH 3553":
+      "Studio on form, space and composition. “Outside-in” approach to architecture. The architectural form and its composition. The compositional aspects of spatial design- expression, language, intent, dynamics etc. and their use as tools of concept and functional accommodation. Three-dimensional models and design development. Spatial approach to design. Meaning, message and symbolism. Work with architectural precedents through analysis of various works of architects. Contemporary design theory as a premise for design.",
+    "ARCH 3554":
+      "Studio on Environment and Sustainability. This studio will allow students to investigate various aspects of the environment and ‘sustainability’ as a force within the architectural profession. Recent increases in global climatic and social pressures have necessitated environmental awareness as well as new architectural design solutions. Using current sustainable design strategies as a foundation, students will analyze and implement their own environmentally responsible analysis and designs. Conservation and recycling of materials and waste management. Field trip to gain hand on experience on the sustainable design and waste management is a requirement.",
+    "ARCH 4532":
+      "This course is intended to teach students the basics of urban design and landscape architecture using a set of lectures and a design project. In the first part, ethnographic fieldwork, designing for inclusive communities and placemaking approaches are discussed through the analysis of visual elements, urban form, grain, texture, and social fabric of existing lively streets. Students apply tactical urbanism and urban acupuncture as strategies for surgical intervention and urban development. In the second part, students learn to design a sustainable masterplan for an urban design problem in the city tackling: urban informality, heritage site, or new desert development by engaging with community issues, economic forces, and environmental factors. Urban design solutions are generated through experimentation, contextual physical models and graphic representation. Students work in teams and present their ideas and design schemes collectively.",
+    "ARCH 4541":
+      "Historical background of Interior Design Styles. Concepts and principles of interior design. Space planning and design. Aesthetics of Interior Design. Color and lighting. Materials selection. Function, material and layout of furniture and textiles. Ergonomics and design. Mood Board design.",
+    "ARCH 4561":
+      "Development of design foundations and theoretical frameworks for Contextual Analysis based on a critical review of works, theories and polemics in architecture. Developing designs of buildings, spaces, structures within specific settings. Study of components and drivers of design. Development of a space and functional program. Development of schenmatic designs based on structural tectonics.",
+    "ARCH 4562":
+      "Design builds on the innovative approach and theoretical position developed in one of three areas of interest: building design: human and environmental studies, tectonics and computational design, and architecture and urban heritage design. Development of advanced schematic design using innovative spatial and formal arrangements. Design development and innovative detail exploration. Integrated systems and code requirements.",
+    "ARCH 4980":
+      "First part of an advanced capstone vertical design studio sequence with the senior project. Design adopts an innovative approach and a theoretical position in one of three areas of interest: building design: human and environmental studies, tectonics and computational design, and architecture and urban heritage design. Development of design foundations and theoretical frameworks based on a critical review of works, theories and polemics in architecture, and case studies of buildings, spaces,structures within specific settings. Study of components and drivers of design. Development of a space and functional program. Production of a preliminary schematic design.",
+    "ARCH 4981":
+      "Second part of the advanced capstone vertical design studio sequence. Design builds on the innovative approach and theoretical position that was developed in the senior design studio in one of three areas of interest: human and environmental studies, tectonics and computational design, and architecture and urban heritage design. Development of advanced schematic design using innovative spatial and formal arrangements. Design development and innovative detail exploration.",
+    "ARCH 2211":
+      "A history of architecture from Pre-historic Times to Enlightenment. Introduction to the historical development of global architecture from the first known settlement to the early nineteenth century, including its social, technological, and conceptual aspects. Special emphasis on studying different paradigms, individual architects, buildings, and theoretical writings. Traditional, local vernacular, and contemporary vernacular architecture are also studied. Special emphasis on Ancient Egyptian Architecture and Islamic Architecture & Urbanism.",
+    "ARCH 2212":
+      "A history of architecture and urbanism from the enlightenment to our present day. Introduction to the historical development of twentieth-century and twenty-first architecture and urbanism globally, including its social, technological, and conceptual aspects. Special emphasis on studying different paradigms, individual architects, buildings, and theoretical writings. Traditional, local vernacular, and contemporary vernacular architecture are also studied.",
+    "ARCH 2221":
+      "Introduction to architectural design related environment-behavior issues. Critical and practical consideration of human aspects in design: users’ needs, emotions, power dynamics, space and place, privacy, (dis)ability, territoriality, social interaction, social differences (including gender, race, class), perception, ergonomics, proxemics. Effects of cultural processes on architecture and urban design. Use of environment-behaviour research methods from disciplines of the humanities in architecture and urban design. Design applications, architectural programming and post-occupancy evaluation.",
+    "ARCH 2231":
+      "Basic principles and application of environmental systems: acoustic, lighting, HVAC, energy use, and their integration with the building envelop. Performance of the building envelops materials and assemblies. Introduction to LEED and similar systems. Sustainable design principles and its applications. Sustainable design project.",
+    "ARCH 3311":
+      "Construction details, materials selection, and methods of construction of building finishes: floors, walls, ceiling; stairs, openings, installations, specialty works. Design and detailing of architectural components. Both manual drawings and CAD are used to develop the construction details.",
+    "ARCH 3321":
+      "Basic principles of plumbing, electrical, and mechanical systems in buildings. Integration of building systems. Assessment, selection and integration of structural systems, building envelop, environmental, life safety, and building systems into building design.",
+    "ARCH 3331":
+      "Concepts of mechanics of materials and properties and evaluation of construction materials. Fundamental principles of stresses and strains encompassing shear, bearing, axial, bending, and torsion forces, and their impact on materials and components. Prosperities of construction materials including aggregates, Portland cement, Portland cement concrete, and asphalt cement. Quality control combining experimental laboratory work and statistical evaluation. Topics such timber, steel, masonry materials, insulating materials, decorative and finishing materials for architecture are explored. Laboratory experiments and reporting are conducted to assess the performance and adequacy for sound applications.",
+    "ARCH 3950":
+      "Each student is required to spend a minimum of 4 weeks of internship in Egypt or abroad. These should include substantial practical training in construction activities. A complete account of the experience is reported, reflected on, and evaluated.",
+    "ARCH 4312":
+      "Development of design into technical documents. Production of construction documents. Design of construction assemblies, constructability aspects and choice of materials. Building coordination and integration using Building Information Modeling applications. Drawing conventions and symbols. Building permit package. Basics of technical specifications.",
+    "ARCH 4421":
+      "Architect’s responsibilities, liabilities, and rights pursuant to the Egyptian Laws. International and National Building Codes with emphasis on Fire Protection. Ethics and Social Responsibility of Architects.",
+    "ARCH 4423":
+      "The business of conducting an architectural practice. Understanding the organization of professional architectural firms in Egypt and the US guided by the AIA Handbook for Professional Practice and the Code of Ethics in both countries. Methods of design management, contracts, compensation, professional ethics, insurance, and relationships with consultants and contractors. Weaves theory into practice and includes a number of course talks with practice architects.",
+    "ARCH 4951":
+      "Each student is required to spend a minimum of 8 weeks of internship in Egypt or abroad. The internship should include substantial practical training in technical drawing and design. Introduction to professional ethics, professional judgment and the social responsibilities of architects. A complete account of the experience with a reflection on its learning outcomes is reported on, presented and evaluated.",
+    "CENG 2252":
+      "Techniques of building construction. Methods, materials of construction. Site & Setting, Simple Structural Systems including Frame skeleton, Wooden Structures, Wall Bearing. Basics of Foundation Systems, Floor Systems, Wall Systems and Roof Systems. Applications on influence of construction methods on design and details.",
+    "CENG 3151":
+      "The structural design process, Structural systems, RC structural members, Flooring systems and concept design, lateral load resisting systems, Types of loads on structures and load combinations, Concept design of RC members and slabs, Reinforcement details, Introduction to steel Structures, Properties of steel, Steel sections and bolts, General layout of steel structures, Gravity and lateral load resisting systems, Concept design of steel members, Types of steel connections.",
+    "CENG 3152":
+      "Flooring systems: flat slabs, ribbed slabs, paneled beams, and stairs. Long-span structures: frames, arches, and domes. Lateral load resisting systems in reinforced concrete and steel structures. Foundation systems: soil types and exploration, foundation design considerations, types of foundations, and introduction to foundation design.",
+    "ARCH 4801":
+      "Theoretical framework on state of the art research in human and environmentally responsive design. Definition of a critical theoretical position on a research subject and expression of the position through a theoretical foundation. Development a structured methodology for investigation. Production of a well-written dissertation about a selected topic related to building design with emphasis on human and environmental studies.",
+    "ARCH 2501":
+      "This seminar-based course aims to familiarize students with the evolving concerns related to sustainability in the built environment and urban contexts. Specifically, it aims to bridge the theory-action gap around sustainability issues by allowing students to engage in a reflection-in-action learning experience centered around our daily actions in the city. While city living provides us with much convenience, the course aims to reveal to students how sustainability is a collective endeavor - advanced by our individual actions. While following a design-based pedagogy, it seeks to cross the disciplines of design, environmental sciences, business, as well as the humanities and social science, to provide a contemporary understanding of sustainability as it crosses the environmental, social, cultural and economic dimensions.",
+    "ARCH 4932":
+      "The aim of this course is for students to understand the context and the process within which sustainable landscape environments are conceived and designed, from concept to preparation of construction documents stage and to apply this knowledge in a specific landscape design project with emphasis on establishing sustainable sites consideration.",
+    "ARCH 4936":
+      "An applied studio on the design and application of interior design concepts and technical aspects. Lighting and texture in the design of interior spaces. Principles of furniture design and manufacturing. Utilization of textiles and accessories in interior spaces. Integration of finish materials & elements. Sustainability in the design of interior spaces. Creating an image and signage systems. Design for the disabled.\nHours: 1 hr lecture and 3 hrs studio",
+    "ARCH 4942":
+      "Broaden the understanding of the user beyond the normative. Human environment relationship rooted in neurodiversity. Utilizing the university campus as an open laboratory exploring its sensory landscape and the notion of refuge as prospect. Working within the broad framework of the ASPECTSS Design Index defining the built environment as a series of sensory affordances between prospect and refuge. Framed pedagogically by two foundational processes: Pattern Language and Design Thinking, three modules are explored: the theoretical, the experiential and the experimental.",
+    "ARCH 4943":
+      "Principles, methodologies, aesthetics, and practices of participatory design in a global south context. Participatory approaches at the intersection of community, agency, economics and politics, between international and local experiences. The architect as an enabler. Skills necessary to involve diverse stakeholders in the design process. Create spaces that are accessible, equitable, and responsive to the gendered, raced, and classed needs of identified users. Explore how to engage communities and prioritize marginalized voices. Application on real-world architectural and urban design problems.",
+    "ARCH 4971":
+      "Specialized topics in Human and Environmental Studies will be selected and presented",
+    "ARCH 4802":
+      "Theoretical framework on state of the art research in tectonics and computational design. Definition of a critical theoretical position on a research subject and expression of the position through a theoretical foundation. Development a structured methodology for investigation. Production of a well-written dissertation about a selected topic related to building design with emphasis on human and environmental studies.",
+    "ARCH 4937":
+      "This course attempts to question the assumption that local architects and designers have little value to add to the global design discourse. Readings and discussions over the presentations of a number of local designers on their works and design directions will be the channel to debate this issue against the backdrop of the concurrent global discourse. Students should emerge with a critical understanding of the contemporary architecture discourse in Egypt and express such an understanding within an effective theoretical format.",
+    "ARCH 4939":
+      "Advanced computing concepts in architecture including interactive and responsive architecture, artificial intelligence and machine learning, architectural robotics, building automation, generative design, spatial computing, and material-based computation. Students engage in a series of readings and discussions with expert researchers and professionals, implement coding and visual programming to develop interactive architecture prototypes, and develop extended abstracts with the prospect of scientific publication.",
+    "ARCH 4972":
+      "Specialized topics in Tectonics and Computational Design will be selected and presented.",
+    "ARCH 4803":
+      "Theoretical framework on state of the art research in architecture and urban heritage studies and design. Definition of a critical theoretical position on a research subject and expression of the position through a theoretical foundation. Development a structured methodology for investigation. Production of a well-written dissertation about a selected topic related to building design with emphasis on human and environmental studies.",
+    "ARCH 4931":
+      "Egypt is one of the richest countries in its cultural heritage. Monuments, buildings of value, archaeological remains, and preserved urban tissues are dispersed along its geographical areas dating back from pre-history, Ancient Egyptian, Coptic, Islamic, Colonial and Modern periods, in addition to the vernacular settlements. Although this gift is an asset for its development, challenges for comprehensive conservation and valorization are great. Poverty, demographic pressure, lack of awareness, deteriorating services, environmental hazards, and difficult bureaucratic procedures are among other difficulties facing heritage successful preservation.",
+    "ARCH 4933":
+      "The objective of this course is to introduce students to a departure from conventional architecture to the vernacular. By exploring architecture without architects, the vernacular will be discussed not as a style or even an architectural approach, but an attitude. Using examples from different geographic regions and different historical periods, as well as contemporary interpretations, students will engage in a series of lectures, debates, research and design.",
+    "ARCH 4934":
+      "This course examines the city of Cairo through the lens of the juxtopolis pedagogy. It defines the city as a multi-layered series of juxtapositions representing often colliding and oppositional urban conditions. Students are expected to apply various mapping tools to document these urban juxtapositions through a series of thematic investigations that change every semester.",
+    "ARCH 4935":
+      "The course offers an interdisciplinary undergraduate course to students majoring in either art or architecture, as the theme of the course covers the study of architectural forms and elements of Coptic churches, construction and roofing systems, as well as portraits, iconography, wall paintings, decorative patterns, wood and stone carving.",
+    "ARCH 4938":
+      "This course introduces students to the field of “heritage” and how it has emerged as a concept and mechanism to organize the city since the nineteenth century till our present time. Emphasis will be on understanding the role of heritage in the city, its underpinning politics, and the key role it plays in constructing new forms of historical knowledge. The course foregrounds the theoretical debates around the topic and invites experts in the field to discuss their projects and researches. The course adopts the possibility of heritage in becoming a gateway for the past, a mode of development for the present and social action for the future. It offers students a platform to investigate, question and imagine how heritage projects can re-map the city and its spaces, transform it and become a means of civic engagement and empowerment to its citizens.",
+    "ARCH 4973":
+      "Specialized topics in Architecture and Urban Heritage Design will be selected and presented",
+    "ARIC 3272":
+      "This course examines developments in the Islamic architecture and decorative styles in Egypt and Syria under the Ayyubid and Mamluk dynaties (late 12th - early 16th centuries), and features field trips to Cairo monuments.",
+    "ARIC 5124":
+      "Religious and secular architecture and decoration of Islamic Spain and North Africa; discussion of formative impulses from Byzantium and Umayyad Syria.",
+    "ACCT 3001":
+      "An in-depth coverage of accounting valuation processes, accounting income measurement, and disclosure issues in financial reports.",
+    "ACCT 3002":
+      "A continuation of Intermediate Accounting I (ACCT 3002), focusing on the liabilities and equity sections in various types of ownership.",
+    "ACCT 3003":
+      "This course focuses on accounting aspects of equity investments, mergers and acquisitions, and intercompany transactions. Topics include the preparation and analysis of consolidated financial statements and other advanced accounting issues such as special purpose entities (SPEs) and foreign currency transactions and translations.",
+    "ACCT 3004":
+      "Analysis of management accounting reports for decision making purposes. Cost analysis techniques, budgeting and performance evaluation and cost data for quantitative models and control systems.",
+    "ACCT 3005":
+      "The course introduces the basics of assurance and attestation services and the role of auditing in enhancing the credibility of financial statements. Topics covered will include factors affecting the auditing profession, auditor’s characteristics, types of audit evidence, the audit process and the auditor’s report.",
+    "ACCT 3006":
+      "The main objective of this course is to present an in-depth analysis of how tax laws and regulations affect a business enterprise. The course introduces theoretical tax concepts that support the understanding of taxation in general and the Egyptian tax system in particular. Tax implications on both individuals and businesses are examined.",
+    "ACCT 4000":
+      "This course focuses on the application of financial accounting in businesses using Enterprise Resource Planning (ERP) systems as a platform to manage the financial resources and controls of a business entity. It starts with the conceptual foundations of accounting information systems, internal controls and auditing with a focus on the computerization of core accounting cycles. The course requires students to utilize their knowledge in accounting to analyze and use ERP systems through a complete cycle of transaction processing and reporting. The course emphasizes the application of information technology in financial accounting.",
+    "ACCT 4001":
+      "This course highlights the practical and governance aspects of the auditing function and its role in promoting financial transparency. Topics covered will include professional ethics, materiality and risk, fraud auditing, sampling techniques, auditing in IT environment, auditing some operational cycles and forensic accounting techniques.",
+    "ACCT 4002":
+      "This course builds on its prerequisite Principles of Taxation (ACCT 3006). The course focuses on advanced topics such as the effects of taxation on investment, business planning and decision-making within an Egyptian corporate setting. International taxation concepts and applications are also introduced.",
+    "ACCT 4004":
+      "This interdisciplinary course introduces accounting measures for the three dimensions of corporate performance; economic, social, and environmental. On the economic front, various financial statement analysis techniques are covered with a focus on ratio analysis. Methods of earnings management are also presented. On the social and environmental fronts, the course covers sustainability accounting analysis methods such as the life-cycle assessment (LCA), the social return on investment (SROI), and the concept of carbon accounting. This course combines lecturing and hands-on teaching methods to provide a comprehensive overview of existing knowledge in corporate sustainability performance.",
+    "ACCT 4005":
+      "This is a capstone course that will engage students in analysis of a wide range of contemporary issues in financial accounting and reporting by expanding and integrating students’ knowledge of the Egyptian Accounting Standards and International Financial Reporting Standards (IFRS) in a rigorous study of the current and advanced financial reporting issues that relate to Assets, Liabilities, Equity, Income and Disclosures."
   };
 
   const coursePrerequisites = {
@@ -3668,7 +4090,429 @@
     "HIST 2000":
       "None listed.",
     "HIST 4801":
-      "Prerequisite: To be taken in senior year"
+      "Prerequisite: To be taken in senior year",
+    "DSGN 2113":
+      "None listed.",
+    "DSGN 2115":
+      "DSGN 2113",
+    "DSGN 2200":
+      "None listed.",
+    "DSGN 2201":
+      "DSGN 2200",
+    "DSGN 2210":
+      "DSGN 2200",
+    "DSGN 2240":
+      "None listed.",
+    "DSGN 3220":
+      "DSGN 2210, DSGN 2250",
+    "DSGN 4269":
+      "1. Completion of all 2000 and 3000 level of concentration courses.\n2\\. Completion of at least four studio courses.\n3\\. Completion of at least two technical courses (Senior Standing).",
+    "DSGN 4270":
+      "DSGN 4269",
+    "DSGN 2300":
+      "DSGN 2113 or DSGN 2200",
+    "DSGN 3202":
+      "DSGN 2201 , DSGN 2115, DSGN 2210 and DSGN 2250",
+    "DSGN 3203":
+      "DSGN 2115, DSGN 2201, DSGN 3220",
+    "DSGN 3204":
+      "DSGN 2201 DSGN 2115 DSGN 2210 and DSGN 2250",
+    "DSGN 3205":
+      "DSGN 2201. The instructor’s approval is required.",
+    "DSGN 3210":
+      "DSGN 2115, DSGN 2201, DSGN 3220",
+    "DSGN 3213":
+      "DSGN 3250",
+    "DSGN 3230":
+      "DSGN 3220",
+    "DSGN 3266":
+      "DSGN 2250 and DSGN 2210",
+    "DSGN 3270":
+      "Consent of Instructor.",
+    "DSGN 4200":
+      "Completion of at least two “Professional Practice” courses.",
+    "DSGN 2245":
+      "None listed.",
+    "DSGN 3235":
+      "DSGN 2250",
+    "DSGN 3250":
+      "DSGN 2250",
+    "DSGN 3260":
+      "None listed.",
+    "DSGN 3300":
+      "None listed.",
+    "DSGN 4210":
+      "Completion of all major courses.",
+    "ARIC 3268":
+      "None listed.",
+    "DSGN 3118":
+      "None listed.",
+    "DSGN 5115":
+      "DSGN 2115",
+    "FILM 2120":
+      "None listed.",
+    "FILM 2121":
+      "None listed.",
+    "FILM 2123":
+      "None listed.",
+    "FILM 3110":
+      "FILM 2120",
+    "FILM 3130":
+      "FILM 2120",
+    "FILM 3132":
+      "FILM 2120",
+    "ANTH 3070":
+      "Three hours of Social Sciences.",
+    "ARIC 3106":
+      "None listed.",
+    "ECLT 3030":
+      "None listed.",
+    "FILM 3070":
+      "None listed.",
+    "FILM 3115":
+      "None listed.",
+    "FILM 3120":
+      "None listed.",
+    "FILM 3125":
+      "None listed.",
+    "FILM 3150":
+      "None listed.",
+    "FILM 3160":
+      "None listed.",
+    "FILM 4402":
+      "This course is restricted to senior level students in the Film Major or Minor. Departmental approval required.",
+    "FILM 3201":
+      "FILM 3252 , FILM 3254 , and at least TWO courses of the Film Studies Required Courses: FILM 3110, FILM 3130, and FILM 3132",
+    "FILM 3252":
+      "FILM 2121 and FILM 2123",
+    "FILM 3254":
+      "FILM 2121 and FILM 2123 or consent of the Director of the Film Program.",
+    "FILM 3402":
+      "FILM 3252 , FILM 3254, and at least TWO courses of the Film Studies Required Courses: FILM 3110, FILM 3130, and FILM 3132",
+    "FILM 3071":
+      "FILM 2121\nFILM 2123",
+    "FILM 3253":
+      "FILM 2123 and FILM 2121",
+    "FILM 3255":
+      "FILM 2123, FILM 2121 and FILM 3252",
+    "FILM 3355":
+      "FILM 3201, FILM 3252, FILM 3254, FILM 3402, or consent of the Director of the Film Program.",
+    "FILM 5170":
+      "Fourth-year Film majors only, or consent of the instructor.",
+    "FILM 4250":
+      "FILM 3252, FILM 3254, FILM 3201, FILM 3402 + 2 courses of level 3000 from the Film Production Electives.",
+    "FILM 4260":
+      "FILM 4250 + completing 2 courses of level 3000 from the Film Production Electives.",
+    "ECLT 2010":
+      "None listed.",
+    "ECLT 2011":
+      "None listed.",
+    "ECLT 3001":
+      "None listed.",
+    "ECLT 5106":
+      "None listed.",
+    "ECLT 3002":
+      "None listed.",
+    "ECLT 3005":
+      "None listed.",
+    "ECLT 3006":
+      "None listed.",
+    "ECLT 3008":
+      "None listed.",
+    "ECLT 3048":
+      "None listed.",
+    "ECLT 3010":
+      "None listed.",
+    "ECLT 3011":
+      "None listed.",
+    "ECLT 5108":
+      "None listed.",
+    "ECLT 5109":
+      "None listed.",
+    "ECLT 2019":
+      "None listed.",
+    "ECLT 3032":
+      "None listed.",
+    "ECLT 3033":
+      "None listed.",
+    "ECLT 3045":
+      "None listed.",
+    "ECLT 3046":
+      "None listed.",
+    "ECLT 3052":
+      "None listed.",
+    "ECLT 3053":
+      "None listed.",
+    "ECLT 3070":
+      "None listed.",
+    "ECLT 3099":
+      "None listed.",
+    "ECLT 4099":
+      "None listed.",
+    "EGPT 2250":
+      "None listed.",
+    "EGPT 2251":
+      "None listed.",
+    "EGPT 2252":
+      "EGPT 2251",
+    "EGPT 3201":
+      "EGPT 2020 or consent of instructor.",
+    "EGPT 3202":
+      "EGPT 2020 or consent of instructor.",
+    "EGPT 3211":
+      "None listed.",
+    "EGPT 3212":
+      "None listed.",
+    "EGPT 5100":
+      "Consent of instructor.",
+    "EGPT 5130":
+      "Consent of instructor.",
+    "EGPT 5144":
+      "Instructor’s permission.",
+    "EGPT 5151":
+      "EGPT 2252",
+    "EGPT 5153":
+      "EGPT 5151 .",
+    "EGPT 2020":
+      "None listed.",
+    "EGPT 2210":
+      "None listed.",
+    "EGPT 3010":
+      "Instructor’s consent",
+    "EGPT 4030":
+      "None listed.",
+    "EGPT 5110":
+      "EGPT 3211 and EGPT 3212 , or instructor’s consent.",
+    "EGPT 5120":
+      "EGPT 3211 and EGPT 3212 , or instructor’s consent.",
+    "EGPT 5140":
+      "Consent of instructor.",
+    "EGPT 5150":
+      "EGPT 2252",
+    "EGPT 5152":
+      "EGPT 2252",
+    "EGPT 5160":
+      "None listed.",
+    "EGPT 5170":
+      "Consent of instructor.",
+    "EGPT 5191":
+      "Permission of instructor.",
+    "EGPT 5199":
+      "Junior standing and/or consent of instructor.",
+    "ECON 2061":
+      "MACT 1111 or equivalent.",
+    "ECON 2081":
+      "MACT 2222 or DSCI 1411",
+    "ECON 3053":
+      "ECON 2021 and ECON 2011",
+    "ECON 3061":
+      "MACT 1121 or ECON 2061",
+    "ECON 3071":
+      "ECON 2021 and ECON 2011",
+    "ECON 3082":
+      "None listed.\nConcurrent: ECON 3081",
+    "ECON 4091":
+      "ECON 2021 and ECON 2011",
+    "ECON 3054":
+      "ECON 2021 and ECON 2011",
+    "ECON 3055":
+      "ECON 2021",
+    "ECON 3099":
+      "Pre-requisites vary depending on the topic of the course.",
+    "ECON 4012":
+      "ECON 2011 and ECON 2021",
+    "ECON 4013":
+      "ECON 2011",
+    "ECON 4014":
+      "ECON 2021 and ECON 2011",
+    "ECON 4015":
+      "ECON 3081",
+    "ECON 4041":
+      "ECON 2081, ECON 3011 and FINC 2101 .",
+    "ECON 4050":
+      "Minimum junior standing.",
+    "ECON 4061":
+      "ECON 3061",
+    "ECON 4081":
+      "ECON 3081 and concurrent with ECON 4082",
+    "ECON 4094":
+      "ECON 2021 and ECON 2011 . Junior standing or higher.",
+    "ECON 4099":
+      "Pre-requisites vary depending on the topic of the course",
+    "ECON 5241":
+      "ECON 4061 and consent of instructor",
+    "ANTH 4020":
+      "9 hours of social science",
+    "ANTH 4065":
+      "9 hours of social sciences and junior or senior standing.",
+    "ANTH 4099":
+      "Prerequisites: 9 hours of social sciences, and junior or senior standing.",
+    "ANTH 3104":
+      "ANTH 3102 or consent of instructor.",
+    "ANTH 3105":
+      "ANTH 2101 and 6 credit hours of social sciences.",
+    "ANTH 3302":
+      "Three hours of Social Sciences.",
+    "ANTH 2005":
+      "RHET 1020 or concurrent.",
+    "ANTH 2006":
+      "None listed.",
+    "ANTH 2007":
+      "None listed.",
+    "ANTH 2099":
+      "None listed.",
+    "ANTH 2201":
+      "None listed.",
+    "ANTH 3015":
+      "Three hours of Social Sciences.",
+    "ANTH 3075":
+      "Three hours of Social Sciences.",
+    "ANTH 3080":
+      "Three hours of Social Sciences.",
+    "ANTH 3090":
+      "Three hours of Social Sciences.",
+    "ANTH 3095":
+      "Three hours of social sciences.",
+    "ANTH 3305":
+      "Three hours of Social Sciences.",
+    "ANTH 4070":
+      "9 hours of Social Sciences and Junior or Senior standing.",
+    "ANTH 4075":
+      "9 hours of Social Sciences and Junior or Senior standing.",
+    "ANTH 4085":
+      "None listed.",
+    "ANTH 4405":
+      "Prerequisites: a minimum B average, consent of the instructor, and approval by the unit head and the department chair.",
+    "ARCH 3231":
+      "ARCH 2231",
+    "ARCH 3422":
+      "ARCH 4532",
+    "ARCH 4422":
+      "ARCH 3422",
+    "CENG 2115":
+      "None listed.",
+    "ARCH 1511":
+      "None listed.",
+    "ARCH 1521":
+      "None listed.",
+    "ARCH 2512":
+      "None listed.",
+    "ARCH 2551":
+      "ARCH 1521 - Digital Representation Tools for Architects (2 cr.)\nARCH 2512 - Foundations of 3-Dimensional Design (2 cr.)\nARCH 1511 - Engineering Drawing & Visual Representation for Architects (2 cr.)",
+    "ARCH 2411":
+      "MACT 1121",
+    "ARCH 2552":
+      "ARCH 2221 - Human Aspects in Architectural Design (3 cr.) , ARCH 2551 - Introduction to Architectural Design (3 cr.)",
+    "ARCH 3522":
+      "ARCH 3554",
+    "ARCH 3553":
+      "ARCH 2211, ARCH 2552",
+    "ARCH 3554":
+      "ARCH 3231 and ARCH 3553",
+    "ARCH 4532":
+      "ARCH 2411, ARCH 3553",
+    "ARCH 4541":
+      "ARCH 2551 or (ARCH 1521 and DSGN 2201)",
+    "ARCH 4561":
+      "ARCH 2212, ARCH 3554, ARCH 4532, CENG 3151",
+    "ARCH 4562":
+      "ARCH 3321, ARCH 3422, ARCH 4421, ARCH 4561, CENG 3152",
+    "ARCH 4980":
+      "ARCH 3522, ARCH 4312, ARCH 4541, ARCH 4562",
+    "ARCH 4981":
+      "ARCH 4801, ARCH 4802, ARCH 4803, ARCH 4980, A minimum of three credits from the concentration elective stream.",
+    "ARCH 2211":
+      "None listed.",
+    "ARCH 2212":
+      "ARCH 2211",
+    "ARCH 2221":
+      "ARCH 1521, ARCH 1511",
+    "ARCH 2231":
+      "PHYS 1011, MACT 1121 and ARCH 2551",
+    "ARCH 3311":
+      "ARCH 2552, CENG 2115, CENG 2252",
+    "ARCH 3321":
+      "ARCH 3311",
+    "ARCH 3331":
+      "CENG 2115",
+    "ARCH 3950":
+      "CENG 2115, CENG 2252",
+    "ARCH 4312":
+      "ARCH 3321, ARCH 3331, CENG 3152",
+    "ARCH 4421":
+      "ARCH 3554",
+    "ARCH 4423":
+      "ARCH 4421",
+    "ARCH 4951":
+      "ARCH 3311",
+    "CENG 2252":
+      "None listed.",
+    "CENG 3151":
+      "CENG 2115 or CENG 3112",
+    "CENG 3152":
+      "CENG 3151",
+    "ARCH 4801":
+      "ARCH 4562",
+    "ARCH 2501":
+      "None listed.",
+    "ARCH 4932":
+      "None listed.",
+    "ARCH 4936":
+      "ARCH 4541 - Introduction to Interior Design (3 cr.)",
+    "ARCH 4942":
+      "Senior Standing.",
+    "ARCH 4943":
+      "Senior Standing.",
+    "ARCH 4971":
+      "Senior standing",
+    "ARCH 4802":
+      "ARCH 4562",
+    "ARCH 4937":
+      "ARCH 3553 - Architectural Design Studio II (4 cr.)",
+    "ARCH 4939":
+      "ARCH 3522",
+    "ARCH 4972":
+      "Senior standing",
+    "ARCH 4803":
+      "ARCH 4562",
+    "ARCH 4931":
+      "None listed.",
+    "ARCH 4933":
+      "None listed.",
+    "ARCH 4934":
+      "None listed.",
+    "ARCH 4935":
+      "None listed.",
+    "ARCH 4938":
+      "ARCH 4532",
+    "ARCH 4973":
+      "Senior standing",
+    "ARIC 3272":
+      "None listed.",
+    "ARIC 5124":
+      "ARIC 2270 or consent of instructor.",
+    "ACCT 3001":
+      "ACCT 2001",
+    "ACCT 3002":
+      "ACCT 3001",
+    "ACCT 3003":
+      "ACCT 3002",
+    "ACCT 3004":
+      "ACCT 2002",
+    "ACCT 3005":
+      "ACCT 3002",
+    "ACCT 3006":
+      "ACCT 3002 - Intermediate Accounting II (3 cr.)",
+    "ACCT 4000":
+      "MOIS 2101 and ACCT 3002",
+    "ACCT 4001":
+      "ACCT 3005",
+    "ACCT 4002":
+      "ACCT 3006",
+    "ACCT 4004":
+      "ACCT 3002 and FINC 3201",
+    "ACCT 4005":
+      "Graduating Senior."
   };
 
   const subjectLabels = {
