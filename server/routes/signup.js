@@ -1,7 +1,6 @@
 const admin = require("../_lib/firebaseAdmin");
 
 const {
-  createSiteSessionForUid,
   createSiteSessionFromIdToken,
   signInWithCustomToken,
   ensureAllowedAucEmail
@@ -494,12 +493,10 @@ module.exports = async function handler(req, res) {
       throw error;
     }
 
-    await createSiteSessionForUid(userRecord.uid, res);
-
     return res.status(200).json({
       success: true,
       requiresEmailVerification: true,
-      message: "Account created. Check your inbox for the verification link.",
+      message: "Account created. Verify your AUC email before logging in.",
       user: {
         uid: userRecord.uid,
         email,
