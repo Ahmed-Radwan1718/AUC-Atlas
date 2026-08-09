@@ -78,6 +78,13 @@
     document.head.appendChild(footerScript);
   }
 
+  if (!isAdminPage && !document.querySelector('script[src="ai-chatbot.js"]')) {
+    const chatbotScript = document.createElement("script");
+    chatbotScript.src = "ai-chatbot.js";
+    chatbotScript.defer = true;
+    document.head.appendChild(chatbotScript);
+  }
+
   const headerRoot = document.getElementById("site-header-root");
 
   if (!headerRoot) {
