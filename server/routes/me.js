@@ -26,35 +26,12 @@ function cleanString(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
-function cleanPhone(value) {
-  return cleanString(value, 30);
-}
-
 function cleanAucId(value) {
   return String(value || "").replace(/\D/g, "").slice(0, 9);
 }
 
-function hasValidPhoneFormat(value) {
-  const phone = cleanPhone(value);
-  const phoneDigits = phone.replace(/\D/g, "");
-
-  return Boolean(
-    phone &&
-    /^\+?[0-9][0-9\s().-]{7,28}$/.test(phone) &&
-    phoneDigits.length >= 10 &&
-    phoneDigits.length <= 15 &&
-    !/^(\d)\1+$/.test(phoneDigits)
-  );
-}
-
 function hasValidAucIdFormat(value) {
   return /^900\d{6}$/.test(cleanAucId(value));
-}
-
-function getPhoneLookupKey(value) {
-  const phone = cleanPhone(value);
-
-  return hasValidPhoneFormat(phone) ? phone.replace(/\D/g, "") : "";
 }
 
 function getAucIdLookupKey(value) {
@@ -192,22 +169,6 @@ module.exports = async function handler(req, res) {
       const requestedAucId = aucIdWasSubmitted
         ? cleanAucId(requestBody.aucId)
         : "";
-      const phone = cleanPhone(
-        storedUserData.phone ||
-        (
-          storedUserData.phoneLookupKey
-            ? "+" + storedUserData.phoneLookupKey
-            : ""
-        )
-      );
-      const phoneWasSubmitted =
-        Object.prototype.hasOwnProperty.call(
-          requestBody,
-          "phone"
-        );
-      const requestedPhone = phoneWasSubmitted
-        ? cleanPhone(requestBody.phone)
-        : "";
       const major = cleanString(requestBody.major, 100);
 
       if (!fullName) {
@@ -224,17 +185,6 @@ module.exports = async function handler(req, res) {
         );
       }
 
-      if (
-        phoneWasSubmitted &&
-        getPhoneLookupKey(requestedPhone) !==
-          getPhoneLookupKey(phone)
-      ) {
-        throw createProfileError(
-          "Phone number cannot be changed.",
-          400
-        );
-      }
-
       if (aucId && !hasValidAucIdFormat(aucId)) {
         throw createProfileError(
           "The saved AUC ID is invalid.",
@@ -242,16 +192,7 @@ module.exports = async function handler(req, res) {
         );
       }
 
-      if (phone && !hasValidPhoneFormat(phone)) {
-        throw createProfileError(
-          "The saved phone number is invalid.",
-          500
-        );
-      }
-
-      const phoneLookupKey = phone ? getPhoneLookupKey(phone) : "";
       const aucIdLookupKey = getAucIdLookupKey(aucId);
-      const phoneReservations = db.collection("accountPhoneNumbers");
       const aucIdReservations = db.collection("accountAucIds");
       const existingUserRecord = await admin.auth().getUser(decodedUser.uid);
       let displayNameChanged = false;
@@ -260,9 +201,6 @@ module.exports = async function handler(req, res) {
       await db.runTransaction(async function (transaction) {
         const userDoc = await transaction.get(userRef);
         const userData = userDoc.exists ? userDoc.data() || {} : {};
-        const currentPhoneLookupKey = userData.phoneLookupKey || getPhoneLookupKey(userData.phone || "");
-        const oldPhoneRef = currentPhoneLookupKey ? phoneReservations.doc(currentPhoneLookupKey) : null;
-        const nextPhoneRef = phoneLookupKey ? phoneReservations.doc(phoneLookupKey) : null;
         const currentAucIdLookupKey = userData.aucIdLookupKey || getAucIdLookupKey(userData.aucId || "");
         const oldAucIdRef = currentAucIdLookupKey ? aucIdReservations.doc(currentAucIdLookupKey) : null;
         const nextAucIdRef = aucIdLookupKey ? aucIdReservations.doc(aucIdLookupKey) : null;
@@ -292,15 +230,6 @@ module.exports = async function handler(req, res) {
           }
         }
 
-        if (nextPhoneRef && phoneLookupKey !== currentPhoneLookupKey) {
-          const phoneDoc = await transaction.get(nextPhoneRef);
-          const phoneData = phoneDoc.exists ? phoneDoc.data() || {} : {};
-
-          if (phoneDoc.exists && (phoneData.uid || "") !== decodedUser.uid) {
-            throw createProfileError("This phone number is already used by another account.", 409);
-          }
-        }
-
         if (nextAucIdRef && aucIdLookupKey !== currentAucIdLookupKey) {
           const aucIdDoc = await transaction.get(nextAucIdRef);
           const aucIdData = aucIdDoc.exists ? aucIdDoc.data() || {} : {};
@@ -315,8 +244,6 @@ module.exports = async function handler(req, res) {
           fullName,
           aucId,
           aucIdLookupKey,
-          phone,
-          phoneLookupKey,
           major,
           updatedAt: now
         };
@@ -337,21 +264,8 @@ module.exports = async function handler(req, res) {
 
         transaction.set(userRef, updateData, { merge: true });
 
-        if (oldPhoneRef && currentPhoneLookupKey !== phoneLookupKey) {
-          transaction.delete(oldPhoneRef);
-        }
-
         if (oldAucIdRef && currentAucIdLookupKey !== aucIdLookupKey) {
           transaction.delete(oldAucIdRef);
-        }
-
-        if (nextPhoneRef) {
-          transaction.set(nextPhoneRef, {
-            uid: decodedUser.uid,
-            phone,
-            phoneLookupKey,
-            updatedAt: now
-          }, { merge: true });
         }
 
         if (nextAucIdRef) {
@@ -372,7 +286,6 @@ module.exports = async function handler(req, res) {
       const savedFullName = userData.fullName || userRecord.displayName || fullName;
       const email = userRecord.email || userData.email || decodedUser.email || "";
       const photoURL = userData.photoURL || userRecord.photoURL || "";
-      const savedPhone = userData.phone || "";
       const savedMajor = userData.major || "";
       const savedAucId = userData.aucId || userData.aucIdLookupKey || "";
       const authProvider = userData.authProvider || "password";
@@ -393,7 +306,6 @@ module.exports = async function handler(req, res) {
           fullName: savedFullName,
           photoURL,
           firstName: getFirstName(savedFullName, email),
-          phone: savedPhone,
           major: savedMajor,
           aucId: savedAucId,
           authProvider,
@@ -419,7 +331,6 @@ module.exports = async function handler(req, res) {
     const fullName = userData.fullName || userRecord.displayName || "";
     const email = userRecord.email || userData.email || decodedUser.email || "";
     const photoURL = userData.photoURL || userRecord.photoURL || "";
-    const phone = userData.phone || "";
     const major = userData.major || "";
     const aucId = userData.aucId || userData.aucIdLookupKey || "";
     const authProvider = userData.authProvider || "password";
@@ -439,7 +350,6 @@ module.exports = async function handler(req, res) {
         fullName,
         photoURL,
         firstName: getFirstName(fullName, email),
-        phone,
         major,
         aucId,
         authProvider,
