@@ -914,9 +914,9 @@ async function createLoginChallenge(
       details && details.email
         ? details.email
         : "",
-    idToken:
-      details && details.idToken
-        ? details.idToken
+    authMethod:
+      details && details.authMethod
+        ? String(details.authMethod).slice(0, 40)
         : "",
     twoFactor:
       details && details.twoFactor
@@ -1058,7 +1058,7 @@ async function getLoginChallenge(req) {
     ref: challengeRef,
     uid: data.uid || "",
     email: data.email || "",
-    idToken: data.idToken || "",
+    authMethod: data.authMethod || "",
     twoFactor: data.twoFactor || {}
   };
 }
