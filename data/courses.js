@@ -993,7 +993,20 @@
     ["SOC 2402", "Family, Kin and Friends in Egypt"],
     ["SOC 2403", "Social Issues in Egypt"],
     ["THTR 1099", "Selected Topics for Core Curriculum"],
-    ["THTR 1101", "The World of the Theatre"]
+    ["THTR 1101", "The World of the Theatre"],
+    ["MACT 4126", "Real Analysis I"],
+    ["MACT 4127", "Real Analysis II"],
+    ["MACT 3142", "Introduction to PDE and Boundary-Value Problems"],
+    ["MACT 3940", "Seminar in Mathematics"],
+    ["CSCE 5221", "Algorithms and Complexity Theory"],
+    ["CSCE 5269", "Pattern Analysis"],
+    ["DSCI 4415", "Advanced Machine Learning"],
+    ["ECNG 3201", "Signals and Systems"],
+    ["ECNG 3202", "Automatic Control Systems"],
+    ["ECNG 3401", "Electromagnetic Theory"],
+    ["ECNG 4301", "Fundamentals of Communications I"],
+    ["ECNG 4302", "Fundamentals of Communications II"],
+    ["PHYS 5142", "Computational Physics"]
   ];
 
   const courseDescriptions = {
@@ -1012,7 +1025,7 @@
     "ENGR 3212":
       "Active, reactive and apparent power, three-phase systems, electrical measurements, transformers, motors: types, performance and selection generation, transmission and distribution of Electrical Energy, protective and earthing systems, energy management and cost.",
     "MACT 1121":
-      "Limits of one variable functions. Continuity and differentiability. Implicit differentiation. Differentiation of trigonometric, exponential, and logarithmic functions. Higher derivatives. Applications of derivatives: related rates, linear approximations, the Mean Value Theorem, l'Hopital's Rule, maxima and minima, curve sketching and optimization problems. Definite and indefinite integrals, Riemann Sums, the Fundamental Theorem of Calculus.",
+      "Limits of one variable functions. Continuity and differentiability. Implicit differentiation. Differentiation of trigonometric, exponential, and logarithmic functions. Higher derivatives. Applications of derivatives: related rates, linear approximations, the Mean Value Theorem, l’Hopital’s Rule, maxima and minima, curve sketching and optimization problems. Definite and indefinite integrals, Riemann Sums, the Fundamental Theorem of Calculus.",
     "MACT 1122":
       "The calculus of inverse trigonometric and hyperbolic functions. Applications of the definite integral for finding areas and volumes of revolutions. Techniques of integration. Improper integrals. Sequences and series: Convergence tests, power series, Taylor series with applications. Vectors and the three-dimensional space: Dot and cross products, lines and planes.",
     "MACT 2123":
@@ -1330,7 +1343,111 @@
     "MENG 4779":
       "Mechatronics design and development process, Digital systems, Microcontrollers in Mechatronics, Programmable logic controllers (PLC), PLC and interfacing techniques, Ladder logic programming, servo motors: motion, braking and speed control, Transducers and instrumentation, Vision sensing principles, Power supplies, Pneumatic and Electro-pneumatic control. Team based project covering design, control and application of electromechanical systems. Laboratory experiments.",
     "MENG 4937":
-      "Covers specialized topics in Mechatronics field not covered in other listed courses.\nOffered more than once for credit if contents change. Precise course description depends on course topic."
+      "Covers specialized topics in Mechatronics field not covered in other listed courses.\nOffered more than once for credit if contents change. Precise course description depends on course topic.",
+    "CSCE 1001":
+      "Introduces fundamental concepts and principles of computing systems, grand challenges in computing, analyzing and formulating solutions to multidisciplinary problems, basic algorithms for solving problems, as well as designing, implementing, and testing programs using one prime language and other supplementary languages. Using data and procedural abstractions as basic design principles, students learn how to design and implement basic data structures such as stacks and queues, and to apply various algorithms for operating on them. Also covers some numbering systems, data representation, and basic computer organization. The course uses the imperative and object-oriented paradigms.",
+    "MACT 4126":
+      "A first semester course in Real Analysis covering: Structure of the real number line, sequences and series, limits, continuity, differentiation, sequences and series of functions, uniform convergence, the Darboux and Riemann integrals and the Fundamental Theorem of Calculus.",
+    "MACT 4127":
+      "A second semester course in Real Analysis covering: Further topics in Riemann integration, Riemann-Stieltjes integral, Picard-Lindeloff Theorem, metric and topological spaces, Stone-Weierstrass Theorem, calculus of several variables including Taylor’s theorem, Green’s theorem, and a brief introduction to measure theory.",
+    "MACT 4134":
+      "Sets, integers, groups. Integral domains. Fields. Rings and ideals. Homomorphisms. Quotient groups and quotient rings.",
+    "BIOL 1011":
+      "Introduction to the basic concepts of biology, molecules of life, cell structure and function, photosynthesis, cell respiration, cell cycle and cancer are presented. Basis and applications of genetics and molecular biology are addressed. The course introduces students to the fundamental concepts, principles and processes upon which the unity of life is based: the relationship of the course material to their day-to-day world: and how to apply scientific methods. Laboratories introduces students to basic principles of plant and animal structure and function and build on the principles of inheritance to the structure and function of tissues and organ systems.",
+    "BIOL 1012":
+      "Based on the diversity of life: viruses, bacteria, protistans, fungi, plants and animals are studied. The course concentrates on characteristics of different domains of life, structure, and function of plants and animals, population genetics, ecology and the environment. Laboratories introduce students to evolution, structure and function of different populations of organisms and ecosystems. Some field applications are examined.",
+    "CHEM 1006":
+      "Gases; thermochemistry; liquids and solids, properties of solutions; introduction to chemical kinetics, chemical equilibria, environmental pollution.",
+    "CHEM 1016":
+      "Semi-micro qualitative analysis of selected salts and mixtures.",
+    "CSCE 1101":
+      "Introduces concepts and techniques for developing larger software systems. The object-oriented paradigm is further utilized using a modern programming language such as Java or C++. Covers topics that include classes and objects, inheritance, encapsulation, polymorphism, more algorithms, basic design patterns, generics, testing. Also covers the design and implementation of data structures including but not limited to lists, trees, and graphs.",
+    "CSCE 1102":
+      "The laboratory will contribute to the capacity building and practice of knowledge units covered in CSCE 1101 (Fundamentals of Computing II).",
+    "CSCE 2202":
+      "Analysis and complexity bounds of basic classes of algorithms. Basic algorithm design methodologies: Brute force, Transform and Conquer, Divide and conquer, and Greedy methods. Dynamic Programming, Backtracking and Branch and Bound methods. Applications to problems such as sorting and searching, traveling salesperson, knapsack, optimal merge patterns and graph algorithms. Introduction to the theory of complexity.",
+    "CSCE 2203":
+      "The laboratory will contribute to the capacity building and practice of knowledge units covered in CSCE 2202 (Analysis and Design of Algorithms).",
+    "DSCI 1411":
+      "Introduction to the fundamentals of the data science domain. Fundamentals of the R programming language and related tools for usage in Data Science. Problem Solving using R. Basic statistics, data gathering, preparation, and analysis, data visualization, case studies, and some ethical issues.",
+    "DSCI 2410":
+      "Fundamentals of Python programming in the context of Data Science with a focus on relevant packages. Coverage of techniques for database handling, data manipulation, visualization and summarization. Study of statistical inference including confidence intervals, hypothesis testing and goodness of fit tests. Applications in Business.",
+    "MACT 3223":
+      "Sampling distribution. Point and interval estimation, methods of moments and MLE. Hypothesis testing, Uniformly Most Powerful (UMP), generalized likelihood ratio tests and order statistics.",
+    "MACT 4212":
+      "Introduction to stochastic process, discrete time Markov chain, Poisson process, Compound Poisson Processes and Renewal Processes, continuous-time Markov Chain, Transition probabilities and limiting behavior for Markov Chains, Martingales, Brownian Motion, applications in finance and insurance.",
+    "MACT 4233":
+      "Techniques of multivariate statistical analysis illustrated by examples from various fields. Topics include: Multivariate normal distribution. Sample geometry and multivariate distances. Inference about a mean vector. Comparison of several multivariate means, variances, and covariances. Detection of multivariate outliers. Principle components. Multidimensional scaling. Factor analysis. Canonical correlation. Discriminant analysis. and Clustering. Course includes an applied project (a thorough analysis of real-life data sets using computer-packaged programs).",
+    "DSCI 4413":
+      "The analysis of discretely measured responses such as counts, proportions, nominal variables, ordinal variables, discrete interval variables with few values, continuous variables grouped into a small number of categories, etc. Topics include: Detection of outliers in categorical data; Inference and distributions for discrete data; Inference for contingency tables; Generalized linear models for count data; Models for binary and multinomial response (logistic regression, Poisson regression, Loglinear models); Classification and regression trees; Cluster analysis for categorical data; The course includes an applied project using computer programming language such as R or Python.",
+    "MACT 2146":
+      "Formulation of linear programming problems, graphical solutions, simplex method, duality theory, sensitivity analysis, integer programming, deterministic dynamic programming. An intro to nonlinear programming and combinatorial optimization.",
+    "MACT 3142":
+      "Special functions. Partial differential equations. Fourier series and integrals. Diffusion, potential and wave equations in rectangular, cylindrical, and spherical coordinates. Numerical methods.",
+    "MACT 3146":
+      "Combinatorial optimization problems such as scheduling, matching, resource allocation, network and assignment problems, with real life applications. Graph modeling, minimum cost network flow problems and its reduction to shortest path and maximum flow problems. Discussion of graph algorithms as well as dual formulations such as the minimum cut problem. The course concludes with an intro to stochastic programming with examples.",
+    "MACT 3311":
+      "The most commonly used mathematical functions for computing interest and discount rates are discussed. This includes simple, compound, and other forms of interest used in financial valuations, accumulated value and present value, annuities, sinking funds, amortization of debt, and determination of yield rates on securities. The theory developed in the first part of the course is then applied to the valuation of bonds, mortgages, capital budgeting, depreciation methods, and other financial instruments. Zero-coupon bond, term structure of interest rates, coupon bonds, modified and Macaulay durations, convexity.",
+    "MACT 3940":
+      "Weekly one hour seminar in different areas of Mathematics to be given by faculty or invited speakers from industries and other scientific communities.",
+    "MACT 4133":
+      "Introduction to the goals and methods of mathematical logic. Propositional and predicate calculus (first order logic) are presented in detail. Goedel’s completeness and incompleteness theorems, and some of the philosophico-mathematical problems in set theory, and alternative logics are discussed.",
+    "MACT 4135":
+      "Set-theoretic definition of a graph. Bipartite graph, directed acyclic graph, and tournament. Matchings, Hall’s Theorem and Berge’s Theorem, as well as the algorithms of Prim, Dijkstra, Kruskal, and Ford-Fulkerson. Trees, connectivity and Menger’s Theorem. Planarity and chromatic number. Choice of topics among: Graph Ramsey Theory, dynamic programming, Bayesian Belief Propagation, and treewidth.",
+    "MACT 4213":
+      "Introduction to stochastic modeling and its real-life applications. Overview of discrete- and continuous-time models, including random walks, Brownian motion, and Poisson and compound Poisson processes. Introduction to stochastic differential equations, Itô calculus, and diffusion processes. Mathematical modeling of various real-life problems.",
+    "MACT 4314":
+      "Financial modeling, Excel functions, Simulation models, Applications of financial modeling in practice.",
+    "MACT 4321":
+      "Survival models, analytical mortality laws, life table, fractional age assumptions, non-parametric estimation of survival models, continuous and discrete life insurances, continuous and discrete life annuities, loss random variable, net single premium and gross premiums.",
+    "MACT 4322":
+      "Policy values for life insurance policies and Reserves, Multiple life models, Multiple decrement models, Multi-state models including Pension Plans and Retirement and Profit Analysis.",
+    "MACT 4331":
+      "The course aims to introduce students to severity models and frequency models and how they are used in short-term insurance applications. The course introduces aggregate models, risk measures and coverage modifications. The course introduces simulation techniques.",
+    "MACT 4332":
+      "The course aims to introduce students to parametric estimation for complete/incomplete data; Credibility theory, Bühlmann models and Bayesian credibility; Short term insurance arrangements: property and casualty, homeowners, health and disability and finally techniques for pricing and reserving for short-term insurance coverage.",
+    "MACT 4910":
+      "Under guidance of a faculty member and with approval of the Chairman, the student carries on reading or research on a specific mathematics topic. Student should demonstrate achievements by presenting results, submitting a report, or passing an examination as determined by the supervisor..",
+    "MACT 4930":
+      "Topics chosen according to interests of students and faculty.",
+    "MACT 4931":
+      "Under guidance of a faculty member and with approval of the Chairman, the student carries on reading or research on a specific actuarial science topic. Student should demonstrate achievements by presenting results, submitting a report, or passing an examination as determined by the supervisor.",
+    "MACT 4950":
+      "This course consists of participation in a full-time or part-time internship experience, related to the student’s field of study under the supervision of both an approved internship provider and a faculty adviser. This culminating course provides practical, hands-on training in a relevant industry to enhance classroom learning and allows senior students to apply the knowledge and skills they have acquired in the actuarial science program to real-world problems.",
+    "MACT 4980":
+      "The Senior Thesis serves as a culminating course that is intended in particular for senior students who may have the intention to pursue graduate studies or research-oriented careers. With the approval of a faculty advisor, students work independently under their guidance to plan and conduct deeper studies on a topic of contemporary interest. This research effort begins with creative inquiry and systematic research, includes documentation of substantive scholarly effort, and culminates in a written thesis and an oral defense. Students may choose to work alone or in a group of maximum 3 (in which case the contribution of each participant should be substantial and well identified).",
+    "MACT 4990":
+      "The course introduces students to the concept of risk and the role of enterprise risk management (ERM) in mitigating loss and optimizing opportunity across a business. The course covers the development of an ERM framework, identification, measurement and management of risk within risk-bearing enterprises. Students will participate in a mock risk committee, practice the risk control process in a case study group and gain hands-on experience drafting an ERM framework.",
+    "CENG 3113":
+      "Numerical techniques and algorithms for solving systems of linear and non-linear equations, curve fitting and interpolation, numerical integration and differentiation, numerical solutions for initial and boundary-value ordinary differential equations, and introduction to numerical techniques for partial differential equations.",
+    "CSCE 3611":
+      "Characterizations of signals, ADC and DAC, Fourier series and Fourier transform for discrete and continuous time signals, sampling, Digital spectrum analysis, discrete transforms, digital filters, audio and image processing applications.",
+    "CSCE 4201":
+      "Finite automata and regular expressions, context-free grammars and push-down automata, nondeterminism. Context-sensitive grammars and the Chomsky hierarchy of grammars. Turing machine and the halting problem. Undecidable problems. Church’s Conjecture and its implications.",
+    "CSCE 4602":
+      "An introduction to basic concepts in the design, analysis, and application for computational neural networks. Mathematical models of biological neurons. Multilayer perceptrons backward error propagation. Hopfield networks and Boltzmann machines. Radial-basis function networks. Kohonen self-organizing feature maps. Adaptive Resonance Theory networks.",
+    "CSCE 4604":
+      "Supervised and Unsupervised learning, Logistic and soft-max regression, Perception and multilayer neural networks, Back-propagation, Convolutional Neural Network (CNN), Recurrent Neural Network, Generative models, Reinforcement Learning, case studies.",
+    "CSCE 5221":
+      "Correctness and complexity of algorithms, amortized analysis, graph algorithms and their proofs, NP-completeness and intractability, NPC reductions and introduction to approximation algorithms and optimization problems.",
+    "CSCE 5269":
+      "Decision Theory, Linear Discriminants, Logistic Regression, Principal Components Analysis, Support Vector Machines, Vector Quantization, Mixture of Gaussian, Expectation-Maximization, Clustering, Mixture of Gaussian, Case Studies and applications: object classification.",
+    "DSCI 3415":
+      "Data Preparation and Preprocessing, Feature Extraction and Engineering, Supervised Learning Methods including Probabilistic Classifiers (Naive Bayes and Bayesian Networks), Rule-based Methods (Decision Trees and Random Forests), Instance Based Learning (KNNs), Support Vector Machines, and Introduction to Neural Networks, Unsupervised Learning Methods including k-means Clustering, MLE, Expectation Maximization, and Affinity Propagation.",
+    "DSCI 4415":
+      "Perceptron and multilayer neural networks, Gradient descent, Back-propagation, Convolutional Neural Network (CNN), pooling layers, CNN applications, Recurrent Neural Networks (RNN), vanishing gradient problem, case studies: object detection, and stock price estimation, GANs.",
+    "ECNG 3201":
+      "Basic properties of signals and systems, linearity, stability, step and impulse response,superposition integral, block diagrams, Fourier series and Fourier transform for discrete and continuous time signals, sampling theorem, Z-transform.",
+    "ECNG 3202":
+      "Principles of closed-loop feedback control systems, control systems design criteria, block diagrams, signal flow graphs, state space representation of linear systems, general feedback theory, transfer functions of control systems, Routh criterion, root locus theory and methods. Several experiments are conducted in the Control Lab to illustrate material covered in the course.",
+    "ECNG 3401":
+      "Electric field and potential. Gauss’s law; divergence. Conductors, dielectrics and capacitance. Poisson’s and Laplace’s equations. Electrostatic analogs. Magnetic field and vector potential. Time varying fields; displacement current. Maxwell’s equations in differential form, Poynting’s theorem and Electromagnetic waves in vacuum and in matter.",
+    "ECNG 4301":
+      "Review of signal representation and classification, time and frequency domains, Fourier transform; Energy and power spectral density. Basics of analog communication: amplitude, angle, and pulse modulation; modulators and demodulators; frequency division multiplexing. Introduction to digital communication: Review of sampling and quantization; pulse code modulation (PCM), Delta Modulation, Differential PCM, time division multiplexing, line codes; the matched filter. Introduction to Random Processes. Noise in communication systems.",
+    "ECNG 4302":
+      "Fundamentals of Digital Communications. Geometric Representation of Signals; Binary and M-ary Modulation and their Performance Analysis and Spectral Efficiency. Introduction to Information Theory and Source and Channel Coding; Channel Capacity; Block and Convolutional Codes. Introduction to broadband communications; OFDM. A course project is assigned.",
+    "PHYS 5142":
+      "Numerical methods for quadrature solution of integral and differential equations, and linear algebra. finite difference methods, finite element techniques, solving a system of equations. Use of computation and computer graphics to simulate the behavior of complex physical systems. Monte Carlo simulations."
   };
 
   const coursePrerequisites = {
@@ -1665,7 +1782,113 @@
     "MENG 4779":
       "MENG 3705 or Concurrent",
     "MENG 4937":
-      "depends on topic"
+      "depends on topic",
+    "CSCE 1001":
+      "College level preparation course in Mathematics or MACT 1111.",
+    "MACT 1121":
+      "Thanawiya Amma Science or equivalent or exemption exam",
+    "MACT 4126":
+      "MACT 2123, MACT 2131 and MACT 2132.",
+    "MACT 4127":
+      "MACT 4126",
+    "MACT 4134":
+      "MACT 2131 and MACT 2132.",
+    "BIOL 1011":
+      "None listed.",
+    "BIOL 1012":
+      "BIOL 1011 or exemption",
+    "CHEM 1006":
+      "CHEM 1005",
+    "CHEM 1016":
+      "CHEM 1015",
+    "CSCE 1101":
+      "CSCE 1001 and concurrent with CSCE 1102",
+    "CSCE 1102":
+      "Concurrent with CSCE 1101",
+    "CSCE 2202":
+      "MACT 2131 (or concurrent) and CSCE 2211\nConcurrent: CSCE 2203",
+    "CSCE 2203":
+      "MACT 2131 or concurrent, and concurrent with CSCE 2202",
+    "DSCI 1411":
+      "None listed.",
+    "DSCI 2410":
+      "DSCI 1411 or MACT 2222",
+    "MACT 3223":
+      "MACT 3211",
+    "MACT 4212":
+      "MACT 2132 and (MACT 3211 or MACT 3224)",
+    "MACT 4233":
+      "(MACT 2132 or ECON 3061) and (MACT 3223 or MACT 3224 or ECON 2081)",
+    "DSCI 4413":
+      "(MACT 2132 or ECON 3061) and (MACT 3223 or MACT 3224 or ECON 2081)",
+    "MACT 2146":
+      "MACT 1122 and MACT 2132",
+    "MACT 3142":
+      "MACT 2141",
+    "MACT 3146":
+      "MACT 2146",
+    "MACT 3311":
+      "MACT 1122 or concurrently.\nConcurrent: MACT 1122",
+    "MACT 3940":
+      "Prerequisite: junior standing",
+    "MACT 4133":
+      "MACT 2131",
+    "MACT 4135":
+      "MACT 2131 and MACT 2132 .",
+    "MACT 4213":
+      "MACT 2132 and MACT 4212",
+    "MACT 4314":
+      "FINC 3201",
+    "MACT 4321":
+      "MACT 3211 and MACT 3311",
+    "MACT 4322":
+      "MACT 4212 and MACT 4321",
+    "MACT 4331":
+      "MACT 3211 - Applied Probability (3 cr.)",
+    "MACT 4332":
+      "MACT 3223 - Statistical Inference (3 cr.) and MACT 4331 - Short Term Actuarial Mathematics I (3 cr.)",
+    "MACT 4910":
+      "Prerequisite: senior standing and consent of supervisor.",
+    "MACT 4930":
+      "Prerequisite: consent of instructor.",
+    "MACT 4931":
+      "Senior standing and consent of supervisor.",
+    "MACT 4950":
+      "Consent of department chairperson or program director.",
+    "MACT 4980":
+      "Restricted to seniors.",
+    "MACT 4990":
+      "Senior standing and consent of adviser and instructor.",
+    "CENG 3113":
+      "CSCE 1001 and MACT 2141",
+    "CSCE 3611":
+      "PHYS 2211 and junior standing.",
+    "CSCE 4201":
+      "MACT 2131 and Senior standing.",
+    "CSCE 4602":
+      "(CSCE 3602 or DSCI 3415) and MACT 2132",
+    "CSCE 4604":
+      "CSCE 3602 or DSCI 3415",
+    "CSCE 5221":
+      "None listed.",
+    "CSCE 5269":
+      "None listed.",
+    "DSCI 3415":
+      "(DSCI 2410 or CSCE 1101) and (MACT 3223 or MACT 3224)",
+    "DSCI 4415":
+      "DSCI 3415",
+    "ECNG 3201":
+      "ECNG 2105 and MACT 2141",
+    "ECNG 3202":
+      "ECNG 3201",
+    "ECNG 3401":
+      "PHYS 2221 and MACT 2123",
+    "ECNG 4301":
+      "ECNG 3201 , MACT 3224 ,ENGR 3202 , concurrent with ECNG 4314L",
+    "ECNG 4302":
+      "ECNG 4301",
+    "PHYS 5142":
+      "MACT 2141, MACT 3143 or consent of instructor."
   };
 
   const subjectLabels = {
