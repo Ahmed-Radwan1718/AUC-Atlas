@@ -2,12 +2,22 @@ const admin = require("../server/_lib/firebaseAdmin");
 
 const { getSiteSessionUser } = require("../server/_lib/securityHelpers");
 const {
+  consumeSecurityRateLimit
+} = require("../server/_lib/securityRateLimits");
+const {
   MATERIAL_MAX_FILE_BYTES,
   cleanMaterialFileName,
   normalizeMaterialMimeType,
   isAllowedMaterialMimeType,
   doesMaterialMimeMatchFileName
 } = require("../server/_lib/courseMaterialUploadPolicy");
+
+const MATERIAL_RANDOM_READ_WINDOW_MS =
+  10 * 60 * 1000;
+const MATERIAL_RANDOM_READ_MAX_REQUESTS = 30;
+const MATERIAL_MUTATION_WINDOW_MS =
+  60 * 60 * 1000;
+const MATERIAL_MUTATION_MAX_REQUESTS = 30;
 
 function cleanString(value, maxLength) {
   return String(value || "").trim().replace(/\s+/g, " ").slice(0, maxLength);
@@ -892,6 +902,17 @@ module.exports = async function handler(req, res) {
       }
 
       if (random) {
+        await consumeSecurityRateLimit({
+          scope: "course-material-random-user",
+          identifier: decodedUser.uid,
+          maxAttempts:
+            MATERIAL_RANDOM_READ_MAX_REQUESTS,
+          windowMs:
+            MATERIAL_RANDOM_READ_WINDOW_MS,
+          message:
+            "Too many random course-material requests. Please try again later."
+        });
+
         return res.status(200).json({
           materials: await getRandomCourseMaterials(query.limit)
         });
@@ -908,6 +929,22 @@ module.exports = async function handler(req, res) {
 
       return res.status(200).json({
         materials: await getCourseMaterials(courseCode)
+      });
+    }
+
+    if (
+      req.method === "PATCH" ||
+      req.method === "DELETE"
+    ) {
+      await consumeSecurityRateLimit({
+        scope: "course-material-mutation-user",
+        identifier: decodedUser.uid,
+        maxAttempts:
+          MATERIAL_MUTATION_MAX_REQUESTS,
+        windowMs:
+          MATERIAL_MUTATION_WINDOW_MS,
+        message:
+          "Too many course-material changes. Please try again later."
       });
     }
 
