@@ -74,8 +74,38 @@
     ["PHYS 1012", "General Physics Laboratory I"],
     ["PHYS 1021", "Physics 2: Electricity and Magnetism"],
     ["PHYS 1022", "General Physics Laboratory II"],
+    ["PHYS 2041", "Foundations of Modern Physics"],
+    ["PHYS 2042", "Modern Physics Laboratory"],
+    ["PHYS 2211", "Introduction to Electronics"],
+    ["PHYS 2213", "Electronics Lab"],
     ["PHYS 2216", "Fundamentals of Circuits and Electronics"],
     ["PHYS 2217", "Fundamentals of Circuits and Electronics Lab"],
+    ["PHYS 2221", "Waves and Optics"],
+    ["PHYS 2222", "Optics Laboratory"],
+    ["PHYS 3013", "Theoretical Mechanics"],
+    ["PHYS 3023", "Electromagnetic Theory"],
+    ["PHYS 3031", "Thermodynamics and Statistical Mechanics"],
+    ["PHYS 3052", "Nuclear Physics Lab"],
+    ["PHYS 3223", "Advanced Optics"],
+    ["PHYS 3232", "Advanced Physics Lab"],
+    ["PHYS 3241", "Computational Methods in Physics"],
+    ["PHYS 4042", "Quantum Mechanics I"],
+    ["PHYS 4043", "Quantum Mechanics II"],
+    ["PHYS 4051", "Nuclear and Particle Physics"],
+    ["PHYS 4071", "General Relativity and Cosmology"],
+    ["PHYS 4224", "Photonics"],
+    ["PHYS 4225", "Photonics and Optical Communication Laboratory"],
+    ["PHYS 4226", "Fundamentals of Quantum Computing and Big Data"],
+    ["PHYS 4231", "Introduction to Solid-State Physics"],
+    ["PHYS 4233", "Semiconductor Physics"],
+    ["PHYS 4234", "Solar Energy Lab"],
+    ["PHYS 4241", "Introduction to Solar Energy"],
+    ["PHYS 4242", "Introduction to Nanophysics"],
+    ["PHYS 4243", "Physics of Solar Energy Conversion Systems"],
+    ["PHYS 4244", "Introduction to Nanotechnology"],
+    ["PHYS 4281", "Experimental Methods in Physics"],
+    ["PHYS 4980", "Research Skills"],
+    ["PHYS 4981", "Senior Thesis"],
     ["CHEM 1006", "General Chemistry II"],
     ["CHEM 1016", "General Chemistry II-Laboratory"],
     ["CHEM 2003", "Organic Chemistry I"],
@@ -850,13 +880,20 @@
     ["CSCE 4423", "Digital Forensics"],
     ["CSCE 4424", "Web Security"],
     ["CSCE 4702", "Secure Systems Engineering"],
+    ["CSCE 3102", "Programming in Java"],
     ["CSCE 3103", "Object Oriented Programming"],
+    ["CSCE 3303", "Fundamental Microelectronics"],
+    ["CSCE 3304", "Digital Design II"],
     ["CSCE 3311", "Data and Computer Communications"],
+    ["CSCE 3701", "Software Engineering"],
     ["CSCE 4101", "Compiler Design"],
     ["CSCE 4201", "Theory of Computing"],
     ["CSCE 4910", "Guided Studies in Computer Science and Engineering"],
+    ["ECNG 3106", "Electronics II: Analog Circuits"],
     ["ECNG 4103", "Testing of Digital Circuits"],
+    ["ECNG 4402", "Electromagnetic Waves"],
     ["ECNG 4930", "Selected Topics in Electronics and Communications Engineering"],
+    ["MACT 4125", "Complex-Function Theory"],
     ["MACT 4134", "Modern Algebra"],
     ["BIOL 1010", "Introduction to Life Sciences"],
     ["BIOL 1011", "Introductory Biology I"],
@@ -1055,12 +1092,254 @@
     "PHYS 2216":
       "Foundation of circuit analysis and Theorems, AC theory and circuits analysis, Introduction to semiconductor basics and diodes, Metal-Oxide-Semiconductor Structure, Transistors, Operational amplifiers, Digital Electronic fundamentals, and Logic gates.",
     "PHYS 2217":
-      "Basic experiments demonstrating the fundamental theory of circuits and electronics for mechanical engineering students."
+      "Basic experiments demonstrating the fundamental theory of circuits and electronics for mechanical engineering students.",
+    "PHYS 2041":
+      "Introduction to special relativity and quantum physics, experimental basis of relativity, Einstein’s Postulates, Lorentz transformation, relativistic momentum and energy, experimental evidence of quantization, wave-particle duality, and Schrodinger equation.",
+    "PHYS 2042":
+      "Quantization of electric charge, thermal radiation law, quantization of energy, particle nature of light, spin.",
+    "PHYS 2211":
+      "Foundation of DC and AC Circuit Analysis, Resonance and Filter Circuits, Semiconductor Basics, Diode and transistor fundamentals and applications, and feedback oscillators.",
+    "PHYS 2213":
+      "Basic experiments in circuits and electronics.",
+    "PHYS 2221":
+      "Wave phenomena; EM waves, geometrical and physical optics, and matter waves.",
+    "PHYS 2222":
+      "Basic experiments in physical optics with special emphasis on laser optics.",
+    "PHYS 3013":
+      "Newton’s laws of motion, projectiles and charged particles, momentum and angular momentum, energy, oscillations, calculus of variations, Lagrange’s equations, Hamiltonian mechanics, mechanics in noninertial frames.",
+    "PHYS 3023":
+      "Electric field and potential. Gauss’s law; divergence. Conductors, dielectrics and capacitance. Poisson’s and Laplace’s equations. Electrostatic analogs. Magnetic field and vector potential. Time varying fields; displacement current. Maxwell’s equations in differential form, Poynting’s theorem, Electromagnetic waves in vacuum and in matter.",
+    "PHYS 3031":
+      "A macroscopic and microscopic study of equilibrium thermal physics, fundamental laws of thermodynamics, and statistical mechanics applied to various systems.",
+    "PHYS 3052":
+      "Experiments in atomic and nuclear physics.",
+    "PHYS 3232":
+      "Experiments in solid-state physics and semiconductor devices.",
+    "PHYS 3241":
+      "Principles of programming and computing employing MATLAB. Topics covered include data types, arithmetic, scripts, user-defined functions, inputs, outputs, conditionals, loops, arrays, and modular programming. An emphasis is given to the visualization and graphical representation. Linear systems of equations and matrices; eigenvalues and eigenvectors; numerical errors; numerical solution of linear and nonlinear equations; curve fitting; numerical differentiation and integration; numerical solution of ordinary differential equations; applications in various fields of physics. MATLAB will mostly be used as a programming language in the weekly computer laboratory sessions.",
+    "PHYS 4042":
+      "Stern-Gerlach experiments, operators and measurement, Schrödinger time evolution, quantized energies and particle in potential wells, unbound states, angular momentum, Hydrogen atom, harmonic oscillator.",
+    "PHYS 4051":
+      "A modern view of the fundamental structure of matter, nuclear structure, nuclear models, nuclear decay and radioactivity, nuclear reactions; quarks, gluons, leptons; accelerators, particle interactions with matter, detectors; weak, electromagnetic and strong interactions.",
+    "PHYS 4225":
+      "Experiments in fiber optics illustrating concepts pertaining to fiber dispersion, attenuation measurements, characterization of light sources (LEDs and laser diodes) and detectors (photodiodes), optical multiplexing and de-multiplexing, optical and interferometric sensors.",
+    "PHYS 4231":
+      "Classification of materials and their structural characteristics, symmetry and properties of materials, free-electron theory, band theory, dielectric processes, optical processes in material.",
+    "PHYS 4980":
+      "A capstone course, essential research methods such as preparing a literature survey, assembling a bibliography, using order of magnitude estimates and dimensional analysis. Each student selects a topic in his/her field of interest under the supervision of a faculty member. The student submits a written study plan and delivers a seminar in which this plan is presented for departmental approval. The approved plan is carried out in the student’s Senior Thesis PHYS 4981",
+    "PHYS 4981":
+      "A capstone course. A continuation of PHYS 4980 where the approved study plan from this course is carried out. After finishing this research project, an oral presentation, defense, and a written thesis are required of each candidate in accordance with the departmental guidelines.",
+    "PHYS 4043":
+      "Perturbation theory, hyperfine structure and the addition of angular momenta, perturbation of Hydrogen, identical particles, time-dependent perturbation theory, periodic systems, modern applications of quantum mechanics.",
+    "PHYS 4071":
+      "Coordinate symmetries, the principle of equivalence and its implications, metric description of a curved spacetime, Geodesic equation and Einstein field equation, applications of spacetime outside a spherical star, Hubble’s law, dark matter, Robertson-walker metric, the expanding universe and thermal relics, inflation and the accelerated universe.",
+    "PHYS 4233":
+      "Fundamental theory and characteristics of elemental and compound semiconductors. Semiconductor technology. P-N junctions and transistors.",
+    "PHYS 4234":
+      "Experiments on solar energy systems and photovoltaic technology.",
+    "PHYS 4241":
+      "Working principle of a solar cell, fabrication of solar cells, PV module construction and the design of a PV system. The suitable semiconductor materials, device physics, and fabrication technologies for solar cells are presented. The cost aspects, market development, and the application areas of solar cells are also presented.",
+    "PHYS 4242":
+      "Nanophysics fundamentals, physics nanostructures, thermodynamics of nanostructures, monocrystalline structures, Quantum nanostructures, Nano optics, nanoplasmonics.",
+    "PHYS 4243":
+      "Atomic structures, basics of energy conversions, fundamental of nanoscience and nanotechnology, wave optics, light-matter interactions, diffractions and interference, Solar cell physics and design.",
+    "PHYS 4244":
+      "Fabrication methods of nanomaterials and nano devices, properties of nanoparticles, nanowires and nanotubes. Electronic transport in nanostructures, nanoelectronics and nanophotonics, nanomagnetism.",
+    "PHYS 3223":
+      "Geometric optics: generalized paraxial formulas, matrix formalism of Gaussian optics. Imaging properties of lens systems: lens combination, the vector nature of light: polarization effects, diffraction effects, superposition of waves: interference, spatial and temporal coherence length, and multilayer structures.",
+    "PHYS 4224":
+      "Light sources and transmitters, receivers, laser diodes, LEDs and photodiodes. Electromagnetic mode theory for optical propagation. Optical fiber measurements: fiber materials, multimode fibers, single-mode fibers. Fabrication, cabling, connectors and couplers. Optical amplifiers, Erbium-Doped fiber amplifiers. Modulation of light, multiplexing and de-multiplexing, fiber networking.",
+    "PHYS 4226":
+      "Introduces the physics of quantum computing systems, quantum information, states and, entanglement, quantum gates and quantum circuits, quantum cryptography, quantum computing models, quantum computing techniques and quantum error correction. The big data part includes an introduction to Big data, w’s of big data (what is Big data? why Big-Data? and when Big-Data is really a problem); Techniques; Tools; Applications; Literature; Big Data meets Quantum Physics.",
+    "PHYS 4281":
+      "Experimental techniques for studying thermal, optical, magnetic and electric properties of matter. Low temperature physics: gas liquefaction, storage of liquefied gases, cryostats for low temperature studies, applied cryogenics.",
+    "CENG 3111":
+      "Analysis of statically determinate structures under static loads, member forces in trusses, shear and moment diagrams, live loads and influence lines, deflections, analysis of statically indeterminate structures by three-moment equation, the method of consistent deformation, slope-deflection, and moment distribution. Approximate analysis of statically indeterminate structures. Matrix force and displacement methods with computer applications.",
+    "CENG 3511":
+      "Introduction to water resources projects, pipelines and pipe networks, pumps, open channel flow, hydraulic structures, water flow in soil media, seepage, wells and dewatering systems.",
+    "CENG 4313":
+      "Soils’ index properties and engineering classification; soil composition and structure; lab and field soil compaction; water seepage and water flow net in soil media, stresses in soil, soil stress-strain properties; consolidation in soil; shear strength of soils, basic theory of lateral earth pressure of soils; analysis of soil slope stability. Experimental testing, measurements and reporting.",
+    "CHEM 3004":
+      "Chemical potential and equilibria, solutions and colligative properties, electrochemical systems.",
+    "CHEM 4003":
+      "The kinetic theory of gases, chemical kinetics and dynamics, photochemistry, homogeneous and heterogeneous catalysis, surface chemistry including adsorption.",
+    "CSCE 3102":
+      "This course offers intermediate programming concepts in the Java programming language to include virtual machines, dynamic type checking, object serialization, inheritance and polymorphism, file manipulation, interfaces and packages. Java Applets, event handling, multithreading and network-based application development in Java are also covered along with a set of selected topics such as remote method invocation and remote database access using the language.",
+    "CSCE 3303":
+      "The course covers topics related to electronic devices and their applications such as diodes, transistors (BJT and MOSFET), and operational amplifiers with an emphasis on digital CMOS circuits design, simulation and analysis.",
+    "CSCE 3304":
+      "VLSI fabrication, Design of complex CMOS cells, Combinational and Sequential logic structures in VLSI; Introduction of ASIC design techniques and tools; design and programming of FPGAs using CAD tools; timing in sequential circuits; Digital systems design; Modeling and simulation; Fault models and testing.",
+    "CSCE 3601":
+      "The course will introduce students to the main foundational concepts and techniques used in Artificial Intelligence including searching and problem solving methods, representing knowledge, dealing with uncertainty, probabilistic reasoning, planning, learning decision rules from data, and statistical learning.",
+    "CSCE 3701":
+      "Basic concepts of software engineering project management, ethical and social issues as well as the software development life cycle. Techniques for software specification, design, implementation, validation, verification and documentation. State-of-the art tools for computer-aided software engineering (CASE tools) are used to support term projects.",
+    "CSCE 4603":
+      "Image acquisition, image transformations, gray level operations, histogram equalization, spatial filtering, edge detection, line and circle detection, generalized Hough transform, connected components labeling. Haar features, object detection with Adaboost, applications: face detection, open CV programming.",
+    "DSCI 3411":
+      "This course is an introduction to fundamental tools in designing, conducting, and interpreting simulation experiments. Topics covered include Random number generation; Continuous, discrete, and rare event simulations. Variance reduction techniques, Bootstrap and Jacknife; Simulation; Markov Chain Monte Carlo. The course includes an applied project (a thorough application of simulation to real-world problems such as finance, statistics) using computer programming language such as R or Python).",
+    "DSCI 4411":
+      "Introduction to the fundamental concepts of data mining, motivation for and applications of data mining, text and web mining, and survey of techniques and models. Topics include: data pre-processing, frequent pattern mining, clustering, classification, and case studies using data sets taken from real-life applications, and use of data mining software.",
+    "DSCI 4412":
+      "The course introduces Big Data problems and associated frameworks and technologies. First, the course motivates the topic using real-world big data problems. Second, it sheds light on handling big data, from data collection, to monitoring, storage, analysis and reporting. The course also includes programming models used for scalable big data analysis. It also introduces one of the most common Big Data frameworks, namely Hadoop, in addition to the Map-Reduce Programming Model. Finally, it solves sample case studies using the covered Big Data analytics tools.",
+    "ECNG 3106":
+      "Differential and Multistage Amplifiers, Frequency Response, Feedback, Output Stages and Power Amplifiers, Analog Integrated Circuits, Filters and Tuned Amplifiers, Signal Generators and Waveform Shaping Circuits.",
+    "ECNG 4402":
+      "Review of Maxwell’s equations. Transmission lines. Signal matching, Smith chart, Stub matching. Parallel plate, rectangular, and optical waveguides. Antennas and radiation of electromagnetic energy. Boundary Value problems. Several experiments are conducted in the Microwave Lab to illustrate material covered in the course.",
+    "MACT 2131":
+      "Logic and Proofs: Basic propositional and predicate logic, rules of inference, direct and indirect proof methods (including contraposition and contradiction). Sets: Set operations, functions, sequences and finite series, infinite cardinalities, and matrices. Integers: divisibility and modular arithmetic, primes and the Fundamental Theorem of Arithmetic, the greatest common divisor, proofs by regular and strong mathematical induction. Combinatorics: Permutations and combinations, the Pigeonhole Principle. Relations and their properties, representing relations using Boolean matrices and digraphs, equivalence relations.",
+    "MACT 2132":
+      "Solutions of systems of linear equations. Matrices and determinants. The space Rn, vector spaces and subspaces. Linear independence, basis and dimension. Inner product and orthonormal bases. Linear transformations. Eigenvalues and eigenvectors. Diagonalization. Various applications.",
+    "MACT 3143":
+      "Number systems and types of errors. Solution of nonlinear equations. Interpolation and the Lagrange Polynomial. Systems of linear equations. Numerical Differentiation and integration. Numerical solutions of ordinary differential equations: Runge Kutta and Multistep Methods. Numerical solutions of partial differential equations: finite difference and elements of the Spectral Method. The course includes a programming based project.",
+    "MACT 3211":
+      "Sample space, probability axioms, combinatorial techniques, conditional probability, independence and Bayes’ theorem. Random variables. Distribution functions, moments and generating functions. Discrete probability distributions. Continuous probability distributions. Discrete joint distributions. Continuous Joint distributions. Applications of probability in the social and engineering sciences.",
+    "MACT 4125":
+      "The complex plane, analytic functions, and Cauchy-Riemann equations. Elementary functions, complex integration. Cauchy’s theorem and Cauchy’s integral formula. Taylor and Laurent series. The calculus of residues.",
+    "MACT 4231":
+      "Standard least squares method and application to problems arising from social, biological and engineering sciences. Deviation from assumption of multicollinearity. Variable selection methods. Analysis of variance, Generalized linear models including logistic regression models. Course includes an applied project (a thorough analysis of real-life data using computer packaged programs).",
+    "MACT 4232":
+      "This course is a continuation of MACT 4231. It deals with the problems of modelling and forecasting time series data. Computer program packages are used as an aid for obtaining solutions. Topics include serial correlation, seasonal adjustments, exponential smoothing and extrapolation, state space models, moving average, autoregressive, ARMA and ARIMA models, and nonlinear time series, including ARCH models and chaos. Emphasis on model building, diagnostic checking, and model selection.",
+    "PENG 3211":
+      "Basic petroleum fluid properties including petroleum fluid composition, phase behavior, phase envelopes, classification of reservoir fluids, ideal gas and real gas laws, z-factor, dry gas properties, modification for wet gases, black-oil PVT properties definition, PVT properties from correlations, oil formation volume factor and solution gas oil ratio corrections, and formation water properties. Fluid sampling. PVT and other reservoir fluid properties laboratory measurement and reporting.",
+    "PENG 3411":
+      "Thermodynamic fundamentals, concepts, and definitions, first and the second law of thermodynamics, volumetric properties of fluids, thermodynamics of flow processes, solution thermodynamics, phase equilibria, and flash calculations."
   };
 
   const coursePrerequisites = {
+    "PHYS 1011":
+      "MACT 1121\nPHYS 1012 to be taken concurrently",
+    "PHYS 1012":
+      "Concurrent with PHYS 1011",
+    "PHYS 1021":
+      "PHYS 1011, PHYS 1012, MACT 1122 or concurrent.\nConcurrent with PHYS 1022",
+    "PHYS 1022":
+      "Concurrent with PHYS 1021",
+    "PHYS 2041":
+      "PHYS 1021. Co-requisite MACT 2141.",
+    "PHYS 2042":
+      "PHYS 1022",
+    "PHYS 2211":
+      "PHYS 1021\nConcurrent: PHYS 2213",
+    "PHYS 2213":
+      "Concurrent: PHYS 2211",
+    "PHYS 2221":
+      "PHYS 1021",
+    "PHYS 2222":
+      "PHYS 2221 or concurrent.",
+    "PHYS 3013":
+      "MACT 2141; MACT 2123",
+    "PHYS 3023":
+      "PHYS 2221 and MACT 2123",
+    "PHYS 3031":
+      "Concurrent PHYS 4042",
+    "PHYS 3052":
+      "PHYS 2041 or concurrent.",
+    "PHYS 3232":
+      "PHYS 2042",
+    "PHYS 3241":
+      "MACT 2132, MACT 2141",
+    "PHYS 4042":
+      "PHYS 2041, MACT 2132, PHYS 3013",
+    "PHYS 4051":
+      "PHYS 4042",
+    "PHYS 4225":
+      "PHYS 2222",
+    "PHYS 4231":
+      "PHYS 3031",
+    "CHEM 1005":
+      "Thanawiya Amma Science or equivalent.",
+    "CHEM 1015":
+      "Thanawiya Amma Science or equivalent",
     "MACT 1122":
-      "Calculus I (MACT 1121) or Calculus I exemption."
+      "MACT 1121 or exemption.",
+    "MACT 2123":
+      "MACT 1122",
+    "MACT 2132":
+      "MACT 1122 or concurrent",
+    "MACT 2141":
+      "MACT 1122",
+    "PHYS 4980":
+      "Senior standing.",
+    "PHYS 4981":
+      "PHYS 4980",
+    "PHYS 4043":
+      "PHYS 4042",
+    "PHYS 4071":
+      "MACT 2132 and PHYS 3023",
+    "PHYS 4233":
+      "PHYS 2211 and PHYS 2041",
+    "PHYS 4234":
+      "PHYS 1022",
+    "PHYS 4241":
+      "PHYS 2221",
+    "PHYS 4242":
+      "PHYS 2221, PHYS 2041",
+    "PHYS 4243":
+      "PHYS 2221",
+    "PHYS 4244":
+      "PHYS 2221, PHYS 2041 and (PHYS 2211 or PHYS 2216 or ECNG 3105)",
+    "PHYS 3223":
+      "PHYS 2222, PHYS 2221",
+    "PHYS 4224":
+      "PHYS 2221 or consent of instructor.",
+    "PHYS 4226":
+      "PHYS 2041, MACT 2132",
+    "PHYS 4281":
+      "Junior standing. Consent of instructor.",
+    "CENG 3111":
+      "CENG 2111 and CENG 2211 or concurrent",
+    "CENG 3511":
+      "CENG 2511 or ENGR 2122",
+    "CENG 4313":
+      "CENG 2211, CENG 3511, CENG 3312",
+    "CHEM 3004":
+      "CHEM 2006,CHEM 3003, PHYS 1021.\nConcurrent: Concurrent with CHEM 3014",
+    "CHEM 4003":
+      "CHEM 3004\nConcurrent: Concurrent with CHEM 4013",
+    "CSCE 3102":
+      "CSCE 1101",
+    "CSCE 3303":
+      "PHYS 2211 and CSCE 2301 or concurrent",
+    "CSCE 3304":
+      "CSCE 3301 and CSCE 3303",
+    "CSCE 3601":
+      "CSCE 1101 or DSCI 2410",
+    "CSCE 3701":
+      "CSCE 1101",
+    "CSCE 4603":
+      "CSCE 1101 or DSCI 2410",
+    "DSCI 3411":
+      "DSCI 1411 and MACT 2132 and (MACT 3223 or MACT 3224)",
+    "DSCI 4411":
+      "DSCI 3415 or CSCE 3602",
+    "DSCI 4412":
+      "(DSCI 1411 or CSCE 1101) and (DSCI 2410 or MACT 2222 or MACT 3223 or MACT 3224)",
+    "ECNG 3106":
+      "ECNG 3105, concurrent with ECNG 3109L.",
+    "ECNG 4402":
+      "ECNG 3401",
+    "MACT 2131":
+      "MACT 1121 (concurrent or exemption)",
+    "MACT 3143":
+      "Pre-requisites or concurrent: CSCE 1001, MACT 2141 and MACT 2132",
+    "MACT 3211":
+      "MACT 2123 or concurrently.",
+    "MACT 3224":
+      "MACT 1122 or ECON 3061",
+    "MACT 4125":
+      "MACT 2123",
+    "MACT 4231":
+      "(MACT 2132 or ECON 3061) and (MACT 3224 or ECON 2081 or concurrent with MACT 3223)",
+    "MACT 4232":
+      "MACT 4231 or ECON 3081",
+    "MENG 3602":
+      "(ENGR 2122 or MENG 2601), MENG 3601",
+    "MENG 3605":
+      "MENG 3601",
+    "PENG 3211":
+      "PENG 2013 or PENG 2400",
+    "PENG 3411":
+      "ENGR 2122 and CHEM 1005"
   };
 
   const subjectLabels = {
