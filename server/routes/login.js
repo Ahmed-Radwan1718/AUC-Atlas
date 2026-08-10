@@ -102,21 +102,24 @@ module.exports = async function handler(req, res) {
     const fullName = userData.fullName || userRecord.displayName || "";
     const emailAddress = userRecord.email || userData.email || email;
     const photoURL = userData.photoURL || userRecord.photoURL || "";
+    const appEnabled = Boolean(twoFactor.appEnabled);
+    const emailEnabled = Boolean(twoFactor.emailEnabled);
 
-    if (twoFactor.appEnabled) {
+    if (appEnabled || emailEnabled) {
       await createLoginChallenge(uid, res, {
         email: emailAddress,
         authMethod: "password",
         twoFactor: {
-          appEnabled: true,
-          emailEnabled: Boolean(twoFactor.emailEnabled)
+          appEnabled,
+          emailEnabled
         }
       });
 
       return res.status(200).json({
         success: true,
         requiresTwoFactor: true,
-        method: "app"
+        method: appEnabled ? "app" : "email",
+        emailRecoveryAvailable: emailEnabled
       });
     }
 
