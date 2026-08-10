@@ -384,6 +384,66 @@ async function handleDisable(req, res, decodedUser) {
   });
 }
 
+async function handleEmailTwoFactor(req, res, decodedUser, enabled) {
+  const state = await getTwoFactorState(decodedUser.uid);
+
+  if (state.twoFactor.appEnabled) {
+    await requireSecurityPanelAccess(req, decodedUser);
+  }
+
+  if (enabled) {
+    const userRecord = await admin.auth().getUser(decodedUser.uid);
+    const email = String(
+      userRecord.email ||
+      decodedUser.email ||
+      state.userData.email ||
+      ""
+    ).trim();
+
+    if (!email || !userRecord.emailVerified) {
+      return res.status(400).json({
+        error: "Verify your AUC email address before enabling email two-factor authentication."
+      });
+    }
+
+    if (
+      !String(process.env.RESEND_API_KEY || "").trim() ||
+      !String(process.env.RESEND_FROM_EMAIL || "").trim()
+    ) {
+      return res.status(503).json({
+        error: "Email verification codes are not configured."
+      });
+    }
+  }
+
+  const nextTwoFactor = Object.assign({}, state.twoFactor, {
+    emailEnabled: Boolean(enabled),
+    emailUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+
+  if (enabled) {
+    nextTwoFactor.emailEnabledAt =
+      state.twoFactor.emailEnabledAt ||
+      admin.firestore.FieldValue.serverTimestamp();
+  } else {
+    nextTwoFactor.emailDisabledAt =
+      admin.firestore.FieldValue.serverTimestamp();
+  }
+
+  await state.userRef.set({
+    twoFactor: nextTwoFactor,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  return res.status(200).json({
+    success: true,
+    twoFactor: {
+      appEnabled: Boolean(nextTwoFactor.appEnabled),
+      emailEnabled: Boolean(nextTwoFactor.emailEnabled)
+    }
+  });
+}
+
 module.exports = async function handler(req, res) {
   try {
     if (req.method !== "POST") {
@@ -429,7 +489,25 @@ module.exports = async function handler(req, res) {
       return await handleDisable(req, res, decodedUser);
     }
 
-    return res.status(400).json({ error: "Unknown authenticator action." });
+    if (action === "enable-email") {
+      return await handleEmailTwoFactor(
+        req,
+        res,
+        decodedUser,
+        true
+      );
+    }
+
+    if (action === "disable-email") {
+      return await handleEmailTwoFactor(
+        req,
+        res,
+        decodedUser,
+        false
+      );
+    }
+
+    return res.status(400).json({ error: "Unknown two-factor authentication action." });
   } catch (error) {
     if (error.retryAfterSeconds) {
       res.setHeader(
@@ -443,7 +521,7 @@ module.exports = async function handler(req, res) {
       .json({
         error:
           error.message ||
-          "Could not update authenticator app."
+          "Could not update two-factor authentication."
       });
   }
 };
