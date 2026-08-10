@@ -1335,7 +1335,7 @@
 
   function renderDashboard() {
     const adminUser = state.dashboard.admin || {};
-    identity.textContent = [adminUser.email, adminUser.uid].filter(Boolean).join(" · ");
+    identity.textContent = adminUser.email || "";
     renderStats();
     renderAuditLogs();
     renderReports();
