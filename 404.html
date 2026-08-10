@@ -412,10 +412,48 @@
       line-height: 0.78;
       letter-spacing: -0.09em;
       user-select: none;
+      transform-origin: center;
+      will-change: transform;
+      animation:
+        errorNumberPulse
+        4.8s
+        cubic-bezier(0.45, 0, 0.55, 1)
+        infinite;
     }
 
     .error-number span {
       color: rgba(192, 154, 92, 0.94);
+    }
+
+    @keyframes errorNumberPulse {
+      0%,
+      100% {
+        transform:
+          translate3d(0, 0, 0)
+          scale(1)
+          rotate(0);
+      }
+
+      25% {
+        transform:
+          translate3d(4px, -5px, 0)
+          scale(1.02)
+          rotate(-0.25deg);
+      }
+
+      50% {
+        transform:
+          translate3d(-3px, 3px, 0)
+          scale(0.99)
+          rotate(0.2deg);
+      }
+
+      75% {
+        transform:
+          translate3d(3px, 4px, 0)
+          scale(1.015)
+          rotate(-0.15deg);
+      }
     }
 
     .error-message {
@@ -423,6 +461,12 @@
       font-size: clamp(20px, 3vw, 30px);
       font-weight: 700;
       line-height: 1.2;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .error-number {
+        animation: none;
+      }
     }
   </style>
 </head>
