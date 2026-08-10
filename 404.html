@@ -410,50 +410,26 @@
       font-size: clamp(150px, 32vw, 360px);
       font-weight: 900;
       line-height: 0.78;
-      letter-spacing: -0.09em;
       user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .error-digit {
+      display: inline-block;
+      margin-right: -0.09em;
+      transform: translate3d(0, 0, 0);
       transform-origin: center;
       will-change: transform;
-      animation:
-        errorNumberPulse
-        4.8s
-        cubic-bezier(0.45, 0, 0.55, 1)
-        infinite;
     }
 
-    .error-number span {
+    .error-digit:last-child {
+      margin-right: 0;
+    }
+
+    .error-digit-middle {
       color: rgba(192, 154, 92, 0.94);
-    }
-
-    @keyframes errorNumberPulse {
-      0%,
-      100% {
-        transform:
-          translate3d(0, 0, 0)
-          scale(1)
-          rotate(0);
-      }
-
-      25% {
-        transform:
-          translate3d(4px, -5px, 0)
-          scale(1.02)
-          rotate(-0.25deg);
-      }
-
-      50% {
-        transform:
-          translate3d(-3px, 3px, 0)
-          scale(0.99)
-          rotate(0.2deg);
-      }
-
-      75% {
-        transform:
-          translate3d(3px, 4px, 0)
-          scale(1.015)
-          rotate(-0.15deg);
-      }
     }
 
     .error-message {
@@ -461,12 +437,6 @@
       font-size: clamp(20px, 3vw, 30px);
       font-weight: 700;
       line-height: 1.2;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .error-number {
-        animation: none;
-      }
     }
   </style>
 </head>
@@ -479,7 +449,7 @@
     <div class="error-inner">
       <section class="error-card" aria-labelledby="error-title">
         <div class="error-number" aria-hidden="true">
-          4<span>0</span>4
+          <span class="error-digit">4</span><span class="error-digit error-digit-middle">0</span><span class="error-digit">4</span>
         </div>
 
         <h1 class="error-message" id="error-title">
@@ -491,19 +461,115 @@
 
   <script>
     (function () {
-      const missingPagePath =
-        document.getElementById("missing-page-path");
+      const digits = Array.from(
+        document.querySelectorAll(".error-digit")
+      );
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      );
 
-      if (!missingPagePath) {
-        return;
+      let motionStopped = reducedMotion.matches;
+
+      function randomBetween(minimum, maximum) {
+        return (
+          minimum +
+          Math.random() * (maximum - minimum)
+        );
       }
 
-      const requestedAddress =
-        window.location.pathname +
-        window.location.search;
+      function scheduleJiggle(digit) {
+        const delay = randomBetween(500, 2800);
 
-      missingPagePath.textContent =
-        requestedAddress || "/";
+        window.setTimeout(function () {
+          if (motionStopped || document.hidden) {
+            scheduleJiggle(digit);
+            return;
+          }
+
+          const direction =
+            Math.random() < 0.5 ? -1 : 1;
+          const distance =
+            direction * randomBetween(2, 9);
+          const rebound = distance * -0.32;
+          const rotation =
+            direction * randomBetween(0.1, 0.45);
+          const duration = randomBetween(130, 280);
+
+          const animation = digit.animate(
+            [
+              {
+                transform:
+                  "translate3d(0, 0, 0) rotate(0)"
+              },
+              {
+                transform:
+                  "translate3d(" +
+                  distance +
+                  "px, 0, 0) rotate(" +
+                  rotation +
+                  "deg)",
+                offset: 0.38
+              },
+              {
+                transform:
+                  "translate3d(" +
+                  rebound +
+                  "px, 0, 0) rotate(" +
+                  rotation * -0.35 +
+                  "deg)",
+                offset: 0.72
+              },
+              {
+                transform:
+                  "translate3d(0, 0, 0) rotate(0)"
+              }
+            ],
+            {
+              duration: duration,
+              easing:
+                "cubic-bezier(0.22, 1, 0.36, 1)"
+            }
+          );
+
+          animation.finished
+            .catch(function () {})
+            .then(function () {
+              scheduleJiggle(digit);
+            });
+        }, delay);
+      }
+
+      if (
+        digits.length &&
+        typeof document.documentElement.animate ===
+          "function" &&
+        !motionStopped
+      ) {
+        digits.forEach(function (digit) {
+          scheduleJiggle(digit);
+        });
+      }
+
+      reducedMotion.addEventListener(
+        "change",
+        function (event) {
+          motionStopped = event.matches;
+
+          if (motionStopped) {
+            digits.forEach(function (digit) {
+              digit
+                .getAnimations()
+                .forEach(function (animation) {
+                  animation.cancel();
+                });
+            });
+          } else {
+            digits.forEach(function (digit) {
+              scheduleJiggle(digit);
+            });
+          }
+        }
+      );
     })();
   </script>
 </body>
