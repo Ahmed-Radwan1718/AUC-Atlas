@@ -382,16 +382,47 @@
       }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .error-orbit,
-      .error-orbit-secondary,
-      .error-marker {
-        animation: none;
-      }
+    .error-page {
+      min-height: 100vh;
+      padding: 96px 20px 40px;
+      display: grid;
+      place-items: center;
+    }
 
-      .error-button {
-        transition: none;
-      }
+    .error-inner {
+      width: 100%;
+      margin: 0;
+    }
+
+    .error-card {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      place-items: center;
+      text-align: center;
+    }
+
+    .error-number {
+      position: relative;
+      z-index: 1;
+      color: #171717;
+      font-size: clamp(150px, 32vw, 360px);
+      font-weight: 900;
+      line-height: 0.78;
+      letter-spacing: -0.09em;
+      user-select: none;
+    }
+
+    .error-number span {
+      color: rgba(192, 154, 92, 0.94);
+    }
+
+    .error-message {
+      color: #171717;
+      font-size: clamp(20px, 3vw, 30px);
+      font-weight: 700;
+      line-height: 1.2;
     }
   </style>
 </head>
@@ -403,45 +434,13 @@
   <main class="error-page">
     <div class="error-inner">
       <section class="error-card" aria-labelledby="error-title">
-        <div class="error-content">
-          <p class="error-kicker">Page not found</p>
-
-          <h1 id="error-title">
-            This page went off course.
-          </h1>
-
-          <p class="error-copy">
-            The address may be incorrect, the page may have moved,
-            or the content may no longer be available.
-          </p>
-
-          <p class="error-path">
-            Requested address:
-            <code id="missing-page-path">Unknown page</code>
-          </p>
-
-          <div class="error-actions">
-            <a class="error-button error-button-primary" href="/">
-              Back to home
-            </a>
-
-            <a class="error-button error-button-secondary" href="/courses">
-              Browse courses
-            </a>
-
-            <a class="error-button error-button-secondary" href="/professors">
-              Find professors
-            </a>
-          </div>
+        <div class="error-number" aria-hidden="true">
+          4<span>0</span>4
         </div>
 
-        <div class="error-visual" aria-hidden="true">
-          <div class="error-grid"></div>
-
-          <div class="error-number">
-            4<span>0</span>4
-          </div>
-        </div>
+        <h1 class="error-message" id="error-title">
+          Ackk, page not found.
+        </h1>
       </section>
     </div>
   </main>
