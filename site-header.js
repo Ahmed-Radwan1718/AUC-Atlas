@@ -279,9 +279,10 @@
       outline-offset: 2px;
     }
 
-    .site-notification-button svg {
+    .site-notification-button img {
       width: 22px;
       height: 22px;
+      object-fit: contain;
       display: block;
     }
 
@@ -686,10 +687,7 @@
 
   <div class="site-header-actions">
     <a class="site-notification-button" id="site-notification-button" href="notifications.html" aria-label="Notifications">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-      </svg>
+      <img src="bell.png" alt="">
       <span class="site-notification-badge" id="site-notification-badge" hidden>0</span>
     </a>
 
