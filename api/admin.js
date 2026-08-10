@@ -346,6 +346,148 @@ async function revokeStoredSessions(uid, reason) {
   await batch.commit();
 }
 
+async function listAllUsers(actor) {
+  const userRecords = [];
+  let pageToken;
+
+  do {
+    const page = await admin
+      .auth()
+      .listUsers(1000, pageToken);
+
+    userRecords.push.apply(
+      userRecords,
+      page.users || []
+    );
+    pageToken = page.pageToken;
+  } while (pageToken);
+
+  const configuredAdminUids = new Set(
+    String(process.env.ADMIN_UIDS || "")
+      .split(/[\s,]+/)
+      .map(function (uid) {
+        return uid.trim();
+      })
+      .filter(Boolean)
+  );
+  const db = admin.firestore();
+  const users = [];
+
+  for (
+    let index = 0;
+    index < userRecords.length;
+    index += 25
+  ) {
+    const userBatch = await Promise.all(
+      userRecords
+        .slice(index, index + 25)
+        .map(async function (userRecord) {
+          const userRef = db
+            .collection("users")
+            .doc(userRecord.uid);
+          const details = await Promise.all([
+            userRef.get(),
+            userRef
+              .collection("sessions")
+              .count()
+              .get()
+          ]);
+          const userDoc = details[0];
+          const sessionCountSnapshot =
+            details[1];
+          const userData = userDoc.exists
+            ? userDoc.data() || {}
+            : {};
+          const moderation =
+            userData.moderation &&
+            typeof userData.moderation ===
+              "object"
+              ? userData.moderation
+              : {};
+
+          return {
+            uid: userRecord.uid,
+            email:
+              userRecord.email ||
+              userData.email ||
+              "",
+            displayName:
+              userData.fullName ||
+              userData.displayName ||
+              userRecord.displayName ||
+              "AUC student",
+            photoURL:
+              userData.photoURL ||
+              userRecord.photoURL ||
+              "",
+            major: userData.major || "",
+            aucId:
+              userData.aucId ||
+              userData.aucIdLookupKey ||
+              "",
+            disabled:
+              Boolean(userRecord.disabled),
+            emailVerified:
+              Boolean(
+                userRecord.emailVerified
+              ),
+            isAdmin:
+              userRecord.uid === actor.uid ||
+              configuredAdminUids.has(
+                userRecord.uid
+              ) ||
+              Boolean(
+                userRecord.customClaims &&
+                userRecord.customClaims
+                  .admin === true
+              ),
+            activeSessionRecords:
+              Number(
+                sessionCountSnapshot
+                  .data()
+                  .count || 0
+              ),
+            banReason:
+              moderation.reason || "",
+            banUpdatedAt:
+              getTimestampIso(
+                moderation.updatedAt ||
+                moderation.updatedAtIso
+              ),
+            createdAt:
+              userRecord.metadata &&
+              userRecord.metadata.creationTime
+                ? new Date(
+                    userRecord.metadata
+                      .creationTime
+                  ).toISOString()
+                : "",
+            lastSignInAt:
+              userRecord.metadata &&
+              userRecord.metadata
+                .lastSignInTime
+                ? new Date(
+                    userRecord.metadata
+                      .lastSignInTime
+                  ).toISOString()
+                : ""
+          };
+        })
+    );
+
+    users.push.apply(users, userBatch);
+  }
+
+  users.sort(function (a, b) {
+    return (
+      getTimestampMillis(b.createdAt) -
+      getTimestampMillis(a.createdAt)
+    );
+  });
+
+  return users;
+}
+
 async function getDashboardData(actor) {
   const db = admin.firestore();
   const results = await Promise.all([
@@ -357,7 +499,8 @@ async function getDashboardData(actor) {
     db.collection("adminAuditLogs").orderBy("createdAt", "desc").limit(30).get(),
     db.collection("siteSettings").doc("donationCounter").get(),
     db.collection("siteNotifications").orderBy("createdAtIso", "desc").limit(100).get(),
-    getImageKitMaterials()
+    getImageKitMaterials(),
+    listAllUsers(actor)
   ]);
 
   const userCountSnapshot = results[0];
@@ -369,6 +512,7 @@ async function getDashboardData(actor) {
   const donationDoc = results[6];
   const notificationsSnapshot = results[7];
   const imageKitMaterials = results[8];
+  const users = results[9];
   const reviews = [];
   const firestoreMaterials = [];
   const reports = [];
@@ -431,11 +575,14 @@ async function getDashboardData(actor) {
       displayName: actor.displayName
     },
     stats: {
-      users: Number(userCountSnapshot.data().count || 0),
+      users: users.length,
       reviews: reviews.length,
       materials: materials.length,
-      bannedUsers: Number(bannedUserCountSnapshot.data().count || 0)
+      bannedUsers: users.filter(function (user) {
+        return user.disabled;
+      }).length
     },
+    users,
     reports: reports.slice(0, 250),
     reviews: reviews.slice(0, 250),
     materials: materials.slice(0, 250),
