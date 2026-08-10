@@ -86,6 +86,45 @@
 
   const headerStyles = document.createElement("style");
   headerStyles.textContent = `
+    :where(
+      button,
+      [role="button"],
+      input[type="button"],
+      input[type="submit"],
+      input[type="reset"]
+    ) {
+      -webkit-tap-highlight-color: transparent;
+      transition:
+        color 0.2s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    :where(
+      button,
+      [role="button"],
+      input[type="button"],
+      input[type="submit"],
+      input[type="reset"]
+    ):not([class*="backdrop"]):not(:disabled):not([aria-disabled="true"]):active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      :where(
+        button,
+        [role="button"],
+        input[type="button"],
+        input[type="submit"],
+        input[type="reset"]
+      ) {
+        transition-duration: 0.01ms !important;
+      }
+    }
+
     .site-header {
       position: fixed;
       top: 22px;
