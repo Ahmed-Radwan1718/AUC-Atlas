@@ -2183,6 +2183,18 @@
       -webkit-backdrop-filter: blur(24px);
     }
 
+    body:has(#security-access-modal:not([hidden])) .site-header,
+    body:has(#security-access-modal:not([hidden])) .account-page {
+      filter: blur(12px);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    body:has(#security-access-modal:not([hidden])) .account-page {
+      transform: scale(1.015);
+      transform-origin: center;
+    }
+
     #security-access-modal:not([hidden]) .account-authenticator-modal-backdrop {
       animation: securityAccessBackdropIn 0.32s ease both;
     }
