@@ -912,8 +912,18 @@
         }
 
         if (data.requiresTwoFactor) {
+          if (data.method === "email") {
+            if (typeof window.startLoginEmailTwoFactor !== "function") {
+              throw new Error("Email verification could not be opened.");
+            }
+
+            awaitingAuthenticatorCode = true;
+            await window.startLoginEmailTwoFactor();
+            return;
+          }
+
           openTwoFactorPanel({
-            emailRecoveryAvailable: true
+            emailRecoveryAvailable: Boolean(data.emailRecoveryAvailable)
           });
           return;
         }
