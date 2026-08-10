@@ -135,6 +135,46 @@
     document.getElementById(
       "admin-user-result"
     );
+  const notificationForm =
+    document.getElementById(
+      "admin-notification-form"
+    );
+  const notificationTitleInput =
+    document.getElementById(
+      "admin-notification-title"
+    );
+  const notificationMessageInput =
+    document.getElementById(
+      "admin-notification-message"
+    );
+  const notificationTypeInput =
+    document.getElementById(
+      "admin-notification-type"
+    );
+  const notificationLinkUrlInput =
+    document.getElementById(
+      "admin-notification-link-url"
+    );
+  const notificationLinkLabelInput =
+    document.getElementById(
+      "admin-notification-link-label"
+    );
+  const notificationExpiresAtInput =
+    document.getElementById(
+      "admin-notification-expires-at"
+    );
+  const notificationSubmit =
+    document.getElementById(
+      "admin-notification-submit"
+    );
+  const notificationFormMessage =
+    document.getElementById(
+      "admin-notification-form-message"
+    );
+  const notificationList =
+    document.getElementById(
+      "admin-notification-list"
+    );
   const donationForm =
     document.getElementById(
       "admin-donation-form"
@@ -1120,6 +1160,109 @@
     }).join("");
   }
 
+  function renderNotifications() {
+    const notifications = Array.isArray(
+      state.dashboard.notifications
+    )
+      ? state.dashboard.notifications
+      : [];
+
+    if (!notifications.length) {
+      notificationList.innerHTML =
+        '<div class="admin-empty">No site notifications have been published yet.</div>';
+      return;
+    }
+
+    notificationList.innerHTML =
+      notifications.map(
+        function (notification) {
+          const type =
+            normalizeSearch(
+              notification.type || "info"
+            );
+          const typeLabel =
+            type === "important"
+              ? "Important"
+              : type === "maintenance"
+                ? "Maintenance"
+                : "Information";
+          const typeClass =
+            type === "important"
+              ? " is-danger"
+              : "";
+          const statusClass =
+            notification.active
+              ? " is-success"
+              : "";
+
+          return [
+            '<article class="admin-item">',
+              '<div class="admin-item-main">',
+                '<div class="admin-item-title">',
+                  escapeHtml(
+                    notification.title ||
+                    "Site notification"
+                  ),
+                '</div>',
+                '<div class="admin-meta">',
+                  '<span class="admin-badge',
+                    typeClass,
+                  '">',
+                    escapeHtml(typeLabel),
+                  '</span>',
+                  '<span class="admin-badge',
+                    statusClass,
+                  '">',
+                    notification.active
+                      ? "Active"
+                      : "Expired",
+                  '</span>',
+                  '<span>',
+                    escapeHtml(
+                      formatDate(
+                        notification.createdAt
+                      )
+                    ),
+                  '</span>',
+                  notification.expiresAt
+                    ? '<span>Expires ' +
+                      escapeHtml(
+                        formatDate(
+                          notification.expiresAt
+                        )
+                      ) +
+                      '</span>'
+                    : '',
+                '</div>',
+                '<p class="admin-item-copy admin-notification-message">',
+                  escapeHtml(
+                    notification.message || ""
+                  ),
+                '</p>',
+                notification.linkUrl
+                  ? '<p class="admin-item-copy"><strong>Link:</strong> ' +
+                    escapeHtml(
+                      notification.linkUrl
+                    ) +
+                    ' · ' +
+                    escapeHtml(
+                      notification.linkLabel ||
+                      "View details"
+                    ) +
+                    '</p>'
+                  : '',
+              '</div>',
+              '<div class="admin-item-actions">',
+                '<button class="admin-button danger" type="button" data-delete-notification="',
+                  escapeHtml(notification.id),
+                '">Delete notification</button>',
+              '</div>',
+            '</article>'
+          ].join("");
+        }
+      ).join("");
+  }
+
   function renderDonation() {
     const donation = state.dashboard.donation || {
       currentAmount: 0,
@@ -1198,6 +1341,7 @@
     renderReports();
     renderReviews();
     renderMaterials();
+    renderNotifications();
     renderDonation();
     switchPanel(state.activePanel);
   }
@@ -1503,6 +1647,123 @@
         showToast(error.message || "Could not revoke the sessions.");
       });
     }
+  });
+
+  notificationForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    setMessage(
+      notificationFormMessage,
+      "",
+      ""
+    );
+
+    let expiresAt = "";
+
+    if (
+      notificationExpiresAtInput.value
+    ) {
+      const expiresAtDate = new Date(
+        notificationExpiresAtInput.value
+      );
+
+      if (
+        Number.isNaN(
+          expiresAtDate.getTime()
+        ) ||
+        expiresAtDate.getTime() <=
+          Date.now()
+      ) {
+        setMessage(
+          notificationFormMessage,
+          "Choose a future expiration date and time.",
+          "error"
+        );
+        return;
+      }
+
+      expiresAt =
+        expiresAtDate.toISOString();
+    }
+
+    runBusy(
+      notificationSubmit,
+      async function () {
+        await postAction({
+          action:
+            "createNotification",
+          title:
+            notificationTitleInput.value,
+          message:
+            notificationMessageInput.value,
+          type:
+            notificationTypeInput.value,
+          linkUrl:
+            notificationLinkUrlInput.value,
+          linkLabel:
+            notificationLinkLabelInput.value,
+          expiresAt
+        });
+
+        notificationForm.reset();
+
+        setMessage(
+          notificationFormMessage,
+          "Notification published.",
+          "success"
+        );
+
+        await loadDashboard({
+          message:
+            "Notification published."
+        });
+      }
+    ).catch(function (error) {
+      setMessage(
+        notificationFormMessage,
+        error.message ||
+          "Could not publish the notification.",
+        "error"
+      );
+    });
+  });
+
+  notificationList.addEventListener("click", function (event) {
+    const deleteButton =
+      event.target.closest(
+        "[data-delete-notification]"
+      );
+
+    if (
+      !deleteButton ||
+      !window.confirm(
+        "Delete this notification for everyone?"
+      )
+    ) {
+      return;
+    }
+
+    runBusy(
+      deleteButton,
+      async function () {
+        await postAction({
+          action:
+            "deleteNotification",
+          notificationId:
+            deleteButton.dataset
+              .deleteNotification
+        });
+
+        await loadDashboard({
+          message:
+            "Notification deleted."
+        });
+      }
+    ).catch(function (error) {
+      showToast(
+        error.message ||
+          "Could not delete the notification."
+      );
+    });
   });
 
   donationForm.addEventListener("submit", function (event) {
