@@ -2868,22 +2868,13 @@
       return compactValues[value] || String(value || "").replace(/-/g, " ");
     }
 
-    function getResponseLabel(count) {
-      return Number(count) === 1
-        ? "1 response"
-        : count + " responses";
-    }
-
     function renderStatBreakdown(row) {
       const answers = Array.isArray(row.answers) ? row.answers : [];
-      const total = Number(row.total || 0);
-      const totalLabel = getResponseLabel(total);
       const answerMarkup = answers.map(function (answer) {
         const answerValue = getCompactStatValue(answer.value);
-        const answerCount = Number(answer.count || 0);
         const answerPercent = Number(answer.percent || 0);
         const answerWidth = Math.max(0, Math.min(100, Number(answer.width || 0)));
-        const answerMeta = answerCount + " of " + total + " · " + answerPercent + "%";
+        const answerMeta = answerPercent + "%";
 
         return `
           <div class="professor-review-stat-answer">
@@ -2914,24 +2905,6 @@
           </summary>
 
           <div class="professor-review-stat-breakdown">
-            <div class="professor-review-stat-total">
-              <div class="professor-review-stat-answer-head">
-                <span>Total responses</span>
-                <span>${escapeHtml(totalLabel)}</span>
-              </div>
-
-              <div
-                class="professor-review-stat-answer-track"
-                role="img"
-                aria-label="${escapeHtml(row.label + ": " + totalLabel + " answered this question")}"
-              >
-                <span
-                  class="professor-review-stat-answer-fill professor-review-stat-total-fill"
-                  style="--stat-width: 100%;"
-                ></span>
-              </div>
-            </div>
-
             ${answerMarkup}
           </div>
         </details>
