@@ -230,6 +230,31 @@
       border-color: rgba(192, 154, 92, 0.38);
     }
 
+    .auth-google-button {
+      width: 100%;
+      min-height: 44px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-google-button[hidden] {
+      display: none;
+    }
+
+    .auth-google-button iframe {
+      max-width: 100% !important;
+    }
+
+    .auth-google-note {
+      margin-top: -4px;
+      color: rgba(23, 23, 23, 0.52);
+      font-size: 12px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
     .auth-divider {
       display: flex;
       align-items: center;
@@ -457,6 +482,7 @@
 <body>
   <div id="site-header-root"></div>
   <script src="site-header.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <main class="auth-page">
     <section class="auth-section">
@@ -494,6 +520,19 @@
               <button class="auth-button" type="submit" id="login-submit">
                 Log In
               </button>
+
+              <div class="auth-divider"><span>or</span></div>
+
+              <div
+                class="auth-google-button"
+                id="login-google-button"
+                aria-label="Sign in with Google"
+                aria-busy="true"
+              ></div>
+
+              <p class="auth-google-note">
+                Google login works after you connect your AUC Google account from My Account.
+              </p>
 
               <div class="auth-divider"><span>or</span></div>
 
@@ -717,6 +756,152 @@
       setTimeout(function () {
         window.location.href = getLoginRedirectTarget();
       }, 700);
+    }
+
+    function waitForGoogleIdentity() {
+      return new Promise(function (resolve, reject) {
+        let attempts = 0;
+
+        function checkGoogleIdentity() {
+          if (
+            window.google &&
+            window.google.accounts &&
+            window.google.accounts.id
+          ) {
+            resolve();
+            return;
+          }
+
+          attempts += 1;
+
+          if (attempts >= 50) {
+            reject(new Error("Google sign-in could not be loaded."));
+            return;
+          }
+
+          window.setTimeout(checkGoogleIdentity, 100);
+        }
+
+        checkGoogleIdentity();
+      });
+    }
+
+    async function handleGoogleLoginCredential(response) {
+      const credential = response && response.credential
+        ? response.credential
+        : "";
+
+      if (!credential) {
+        showMessage("Choose a Google account.", "error");
+        return;
+      }
+
+      clearLocalSignedInState();
+      showMessage("Signing in with Google...", "");
+
+      try {
+        const loginResponse = await fetch("/api/google-auth", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            action: "login",
+            credential: credential
+          })
+        });
+        const data = await loginResponse.json().catch(function () {
+          return {};
+        });
+
+        if (!loginResponse.ok || !data.success) {
+          throw new Error(data.error || "Google sign-in failed.");
+        }
+
+        if (data.requiresTwoFactor) {
+          if (data.method === "email") {
+            if (typeof window.startLoginEmailTwoFactor !== "function") {
+              throw new Error("Email verification could not be opened.");
+            }
+
+            awaitingAuthenticatorCode = true;
+            await window.startLoginEmailTwoFactor();
+            return;
+          }
+
+          openTwoFactorPanel({
+            emailRecoveryAvailable: Boolean(data.emailRecoveryAvailable)
+          });
+          return;
+        }
+
+        finishLogin(data.user || null);
+      } catch (error) {
+        clearLocalSignedInState();
+        showMessage(error.message || "Google sign-in failed.", "error");
+      }
+    }
+
+    async function initializeGoogleLogin() {
+      const googleButton = document.getElementById("login-google-button");
+
+      if (!googleButton) {
+        return;
+      }
+
+      try {
+        const configResponse = await fetch("/api/google-auth", {
+          method: "GET",
+          credentials: "same-origin",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+        const config = await configResponse.json().catch(function () {
+          return {};
+        });
+
+        if (!configResponse.ok || !config.clientId) {
+          throw new Error(
+            config.error || "Google sign-in is unavailable."
+          );
+        }
+
+        await waitForGoogleIdentity();
+
+        window.google.accounts.id.initialize({
+          client_id: config.clientId,
+          callback: handleGoogleLoginCredential,
+          auto_select: false,
+          cancel_on_tap_outside: true
+        });
+
+        window.google.accounts.id.renderButton(googleButton, {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          text: "signin_with",
+          shape: "pill",
+          width: Math.max(
+            240,
+            Math.min(
+              400,
+              Math.round(
+                googleButton.getBoundingClientRect().width || 400
+              )
+            )
+          )
+        });
+
+        googleButton.setAttribute("aria-busy", "false");
+      } catch (error) {
+        googleButton.hidden = true;
+        showMessage(
+          error.message || "Google sign-in is unavailable.",
+          "error"
+        );
+      }
     }
 
     function clearTwoFactorCodeInputs() {
@@ -944,6 +1129,8 @@
       event.preventDefault();
       await verifyAuthenticatorLogin();
     });
+
+    initializeGoogleLogin();
 
   </script>
   <script src="login-code.js"></script>
