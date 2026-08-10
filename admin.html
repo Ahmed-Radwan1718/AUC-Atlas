@@ -1115,6 +1115,14 @@
       font-weight: 700;
     }
 
+    .admin-notification-list {
+      margin-top: 22px;
+    }
+
+    .admin-notification-message {
+      white-space: pre-wrap;
+    }
+
     .admin-two-factor-panel {
       background: rgba(23, 23, 23, 0.56);
       backdrop-filter: blur(18px);
@@ -1164,7 +1172,7 @@
 
       .admin-sidebar {
         position: static;
-        grid-template-columns: repeat(6, minmax(140px, 1fr));
+        grid-template-columns: repeat(7, minmax(140px, 1fr));
         overflow-x: auto;
       }
 
@@ -1332,6 +1340,7 @@
             <button class="admin-nav-button" type="button" data-admin-panel="reviews">Reviews</button>
             <button class="admin-nav-button" type="button" data-admin-panel="materials">Uploads</button>
             <button class="admin-nav-button" type="button" data-admin-panel="users">Users</button>
+            <button class="admin-nav-button" type="button" data-admin-panel="notifications">Notifications</button>
             <button class="admin-nav-button" type="button" data-admin-panel="donation">Donation</button>
           </aside>
 
@@ -1401,6 +1410,56 @@
               </div>
 
               <div class="admin-user-result" id="admin-user-result" hidden></div>
+            </article>
+
+            <article class="admin-panel" id="admin-panel-notifications">
+              <div class="admin-panel-heading">
+                <div>
+                  <h2>Site notifications</h2>
+                  <p>Publish an announcement for every visitor. Signed-in users keep their read state across devices.</p>
+                </div>
+              </div>
+
+              <div class="admin-form-card">
+                <form class="admin-form" id="admin-notification-form">
+                  <div class="admin-form-grid">
+                    <div class="admin-field">
+                      <label for="admin-notification-title">Title</label>
+                      <input id="admin-notification-title" type="text" maxlength="120" autocomplete="off" required>
+                    </div>
+                    <div class="admin-field">
+                      <label for="admin-notification-type">Type</label>
+                      <select id="admin-notification-type">
+                        <option value="info">Information</option>
+                        <option value="important">Important</option>
+                        <option value="maintenance">Maintenance</option>
+                      </select>
+                    </div>
+                    <div class="admin-field full">
+                      <label for="admin-notification-message">Message</label>
+                      <textarea id="admin-notification-message" maxlength="1600" placeholder="Write the notification shown to users." required></textarea>
+                    </div>
+                    <div class="admin-field">
+                      <label for="admin-notification-link-url">Internal link</label>
+                      <input id="admin-notification-link-url" type="text" maxlength="500" autocomplete="off" placeholder="courses.html">
+                    </div>
+                    <div class="admin-field">
+                      <label for="admin-notification-link-label">Link label</label>
+                      <input id="admin-notification-link-label" type="text" maxlength="60" autocomplete="off" placeholder="View details">
+                    </div>
+                    <div class="admin-field full">
+                      <label for="admin-notification-expires-at">Expires at</label>
+                      <input id="admin-notification-expires-at" type="datetime-local">
+                    </div>
+                  </div>
+                  <div>
+                    <button class="admin-button primary" id="admin-notification-submit" type="submit">Publish notification</button>
+                  </div>
+                  <p class="admin-message" id="admin-notification-form-message" aria-live="polite"></p>
+                </form>
+              </div>
+
+              <div class="admin-list admin-notification-list" id="admin-notification-list"></div>
             </article>
 
             <article class="admin-panel" id="admin-panel-donation">
