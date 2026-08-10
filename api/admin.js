@@ -385,16 +385,8 @@ async function listAllUsers(actor) {
           const userRef = db
             .collection("users")
             .doc(userRecord.uid);
-          const details = await Promise.all([
-            userRef.get(),
-            userRef
-              .collection("sessions")
-              .count()
-              .get()
-          ]);
-          const userDoc = details[0];
-          const sessionCountSnapshot =
-            details[1];
+          const userDoc =
+            await userRef.get();
           const userData = userDoc.exists
             ? userDoc.data() || {}
             : {};
@@ -441,12 +433,7 @@ async function listAllUsers(actor) {
                 userRecord.customClaims
                   .admin === true
               ),
-            activeSessionRecords:
-              Number(
-                sessionCountSnapshot
-                  .data()
-                  .count || 0
-              ),
+            activeSessionRecords: null,
             banReason:
               moderation.reason || "",
             banUpdatedAt:
@@ -491,28 +478,24 @@ async function listAllUsers(actor) {
 async function getDashboardData(actor) {
   const db = admin.firestore();
   const results = await Promise.all([
-    db.collection("users").count().get(),
-    db.collection("users").where("moderation.banned", "==", true).count().get(),
-    db.collection("professorReviews").limit(500).get(),
-    db.collection("courseMaterials").limit(500).get(),
-    db.collection("contentReports").where("status", "==", "open").limit(500).get(),
-    db.collection("adminAuditLogs").orderBy("createdAt", "desc").limit(30).get(),
+    db.collection("professorReviews").limit(25).get(),
+    db.collection("courseMaterials").limit(25).get(),
+    db.collection("contentReports").where("status", "==", "open").limit(25).get(),
+    db.collection("adminAuditLogs").orderBy("createdAt", "desc").limit(10).get(),
     db.collection("siteSettings").doc("donationCounter").get(),
-    db.collection("siteNotifications").orderBy("createdAtIso", "desc").limit(100).get(),
+    db.collection("siteNotifications").orderBy("createdAtIso", "desc").limit(25).get(),
     getImageKitMaterials(),
     listAllUsers(actor)
   ]);
 
-  const userCountSnapshot = results[0];
-  const bannedUserCountSnapshot = results[1];
-  const reviewsSnapshot = results[2];
-  const materialsSnapshot = results[3];
-  const reportsSnapshot = results[4];
-  const auditSnapshot = results[5];
-  const donationDoc = results[6];
-  const notificationsSnapshot = results[7];
-  const imageKitMaterials = results[8];
-  const users = results[9];
+  const reviewsSnapshot = results[0];
+  const materialsSnapshot = results[1];
+  const reportsSnapshot = results[2];
+  const auditSnapshot = results[3];
+  const donationDoc = results[4];
+  const notificationsSnapshot = results[5];
+  const imageKitMaterials = results[6];
+  const users = results[7];
   const reviews = [];
   const firestoreMaterials = [];
   const reports = [];
