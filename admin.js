@@ -73,10 +73,6 @@
     document.getElementById(
       "admin-app"
     );
-  const identity =
-    document.getElementById(
-      "admin-identity"
-    );
   const navButtons = Array.from(
     document.querySelectorAll(
       "[data-admin-panel]"
@@ -1334,8 +1330,6 @@
   }
 
   function renderDashboard() {
-    const adminUser = state.dashboard.admin || {};
-    identity.textContent = adminUser.email || "";
     renderStats();
     renderAuditLogs();
     renderReports();
