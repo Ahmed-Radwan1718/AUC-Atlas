@@ -1522,8 +1522,34 @@
       overflow: hidden;
     }
 
-    .account-review-editor[hidden] {
+    .account-review-editor[hidden],
+    .account-authenticator-modal[hidden] {
       display: none;
+      opacity: 0;
+    }
+
+    .account-review-editor,
+    .account-authenticator-modal {
+      opacity: 1;
+      transition:
+        opacity 0.24s ease,
+        display 0.24s;
+      transition-behavior: allow-discrete;
+      will-change: opacity;
+    }
+
+    @starting-style {
+      .account-review-editor:not([hidden]),
+      .account-authenticator-modal:not([hidden]) {
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .account-review-editor,
+      .account-authenticator-modal {
+        transition: none;
+      }
     }
 
     .account-review-editor {
