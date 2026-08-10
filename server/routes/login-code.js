@@ -339,10 +339,10 @@ async function requestLoginCode(
       !loginChallenge.uid ||
       loginChallenge.authMethod !== "password" ||
       !loginChallenge.twoFactor ||
-      !loginChallenge.twoFactor.appEnabled
+      !loginChallenge.twoFactor.emailEnabled
     ) {
       throw createHttpError(
-        "Log in with your password again to receive a recovery code.",
+        "Log in with your password again to receive an email verification code.",
         403
       );
     }
@@ -427,7 +427,7 @@ async function requestLoginCode(
       code
     ),
     purpose: recovery
-      ? "authenticator-recovery"
+      ? "login-email-two-factor"
       : "passwordless",
     loginChallengeId:
       recovery && loginChallenge
@@ -507,10 +507,10 @@ async function verifyLoginCode(
       !loginChallenge.uid ||
       loginChallenge.authMethod !== "password" ||
       !loginChallenge.twoFactor ||
-      !loginChallenge.twoFactor.appEnabled
+      !loginChallenge.twoFactor.emailEnabled
     ) {
       throw createHttpError(
-        "Log in with your password again to use email recovery.",
+        "Log in with your password again to use email verification.",
         403
       );
     }
@@ -610,7 +610,7 @@ async function verifyLoginCode(
 
           const expectedPurpose =
             recovery
-              ? "authenticator-recovery"
+              ? "login-email-two-factor"
               : "passwordless";
 
           if (
