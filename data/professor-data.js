@@ -2014,10 +2014,29 @@
       padding: 24px;
       display: grid;
       place-items: center;
+      opacity: 1;
+      transition:
+        opacity 0.24s ease,
+        display 0.24s;
+      transition-behavior: allow-discrete;
+      will-change: opacity;
     }
 
     .course-report-modal[hidden] {
       display: none;
+      opacity: 0;
+    }
+
+    @starting-style {
+      .course-report-modal:not([hidden]) {
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-report-modal {
+        transition: none;
+      }
     }
 
     .course-report-backdrop {
