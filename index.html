@@ -1179,6 +1179,7 @@
 
     .support-donation-modal[hidden] {
       display: none;
+      opacity: 0;
     }
 
     .support-donation-modal {
@@ -1189,6 +1190,24 @@
       display: grid;
       place-items: center;
       isolation: isolate;
+      opacity: 1;
+      transition:
+        opacity 0.24s ease,
+        display 0.24s;
+      transition-behavior: allow-discrete;
+      will-change: opacity;
+    }
+
+    @starting-style {
+      .support-donation-modal:not([hidden]) {
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .support-donation-modal {
+        transition: none;
+      }
     }
 
     .support-donation-backdrop {
