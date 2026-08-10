@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications | AUC Atlas</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .notifications-page {
+      min-height: 100vh;
+      padding: 126px 0 86px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+    }
+
+    .notifications-inner {
+      width: min(980px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .notifications-header {
+      margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 28px;
+      align-items: end;
+    }
+
+    .notifications-kicker {
+      margin-bottom: 16px;
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .notifications-header h1 {
+      color: #171717;
+      font-size: clamp(30px, 3.2vw, 46px);
+      font-weight: 600;
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .notifications-header-copy {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.6;
+      text-align: right;
+    }
+
+    .notifications-toolbar {
+      min-height: 76px;
+      margin-bottom: 18px;
+      padding: 14px 18px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 20px 54px rgba(42, 32, 20, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .notifications-summary {
+      display: grid;
+      gap: 5px;
+    }
+
+    .notifications-summary span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .notifications-summary strong {
+      color: #171717;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .notifications-button,
+    .notification-link {
+      min-height: 42px;
+      padding: 0 18px;
+      border: 1px solid #171717;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .notifications-button:hover,
+    .notification-link:hover {
+      background: #000000;
+      border-color: #000000;
+      transform: translateY(-1px);
+    }
+
+    .notifications-button:disabled {
+      cursor: default;
+      opacity: 0.38;
+      transform: none;
+    }
+
+    .notifications-status {
+      margin: 4px 0 18px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .notifications-status.is-error {
+      color: #ad2525;
+    }
+
+    .notifications-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .notification-card,
+    .notifications-empty {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+    }
+
+    .notification-card {
+      padding: 22px;
+      border-left: 4px solid rgba(23, 23, 23, 0.14);
+      display: grid;
+      gap: 14px;
+      transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease;
+    }
+
+    .notification-card.is-unread {
+      border-left-color: rgba(192, 154, 92, 0.92);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .notification-card:hover {
+      border-color: rgba(192, 154, 92, 0.32);
+      border-left-color: rgba(192, 154, 92, 0.92);
+      transform: translateY(-1px);
+    }
+
+    .notification-card-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .notification-card-title {
+      color: #171717;
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .notification-type {
+      flex: 0 0 auto;
+      padding: 7px 9px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.74);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .notification-type.is-important {
+      border-color: rgba(173, 37, 37, 0.2);
+      background: rgba(173, 37, 37, 0.08);
+      color: #ad2525;
+    }
+
+    .notification-type.is-maintenance {
+      border-color: rgba(192, 154, 92, 0.3);
+      background: rgba(192, 154, 92, 0.14);
+      color: rgba(126, 86, 26, 0.96);
+    }
+
+    .notification-message {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .notification-card-footer {
+      padding-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .notification-date {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .notification-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .notification-read-button {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: #171717;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .notification-read-button:hover {
+      border-color: rgba(192, 154, 92, 0.34);
+      background: rgba(192, 154, 92, 0.14);
+    }
+
+    .notification-link {
+      min-height: 40px;
+      padding: 0 14px;
+      font-size: 10px;
+    }
+
+    .notifications-empty {
+      padding: 28px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.65;
+    }
+
+    @media (max-width: 720px) {
+      .notifications-page {
+        padding: 96px 0 72px;
+      }
+
+      .notifications-header {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .notifications-header-copy {
+        text-align: left;
+      }
+
+      .notifications-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .notifications-button {
+        width: 100%;
+      }
+
+      .notification-card-heading {
+        display: grid;
+        gap: 10px;
+      }
+
+      .notification-type {
+        width: fit-content;
+      }
+
+      .notification-card-footer {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .notification-actions {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="site-header-root"></div>
+
+  <main class="notifications-page">
+    <div class="notifications-inner">
+      <header class="notifications-header">
+        <div>
+          <p class="notifications-kicker">AUC Atlas updates</p>
+          <h1>Notifications</h1>
+        </div>
+
+        <p class="notifications-header-copy">
+          Announcements, important updates, and scheduled maintenance from the AUC Atlas team.
+        </p>
+      </header>
+
+      <section class="notifications-toolbar" aria-label="Notification controls">
+        <div class="notifications-summary">
+          <span>Inbox</span>
+          <strong id="notifications-count">Loading notifications...</strong>
+        </div>
+
+        <button class="notifications-button" id="notifications-mark-all" type="button" disabled>
+          Mark all as read
+        </button>
+      </section>
+
+      <p class="notifications-status" id="notifications-status" aria-live="polite">
+        Loading notifications...
+      </p>
+
+      <section class="notifications-list" id="notifications-list" aria-live="polite"></section>
+    </div>
+  </main>
+
+  <script src="site-header.js"></script>
+  <script>
+    (function () {
+      const readStorageKey =
+        "auc-atlas-read-notifications";
+      const state = {
+        signedIn: false,
+        notifications: []
+      };
+      const countElement =
+        document.getElementById(
+          "notifications-count"
+        );
+      const markAllButton =
+        document.getElementById(
+          "notifications-mark-all"
+        );
+      const statusElement =
+        document.getElementById(
+          "notifications-status"
+        );
+      const listElement =
+        document.getElementById(
+          "notifications-list"
+        );
+
+      function escapeHtml(value) {
+        return String(
+          value == null ? "" : value
+        )
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function formatDate(value) {
+        const date = new Date(value || "");
+
+        if (
+          Number.isNaN(date.getTime())
+        ) {
+          return "Date unavailable";
+        }
+
+        return date.toLocaleString(
+          "en-US",
+          {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+          }
+        );
+      }
+
+      function getGuestReadIds() {
+        try {
+          const saved = JSON.parse(
+            localStorage.getItem(
+              readStorageKey
+            ) || "[]"
+          );
+
+          return new Set(
+            Array.isArray(saved)
+              ? saved.filter(
+                  function (id) {
+                    return (
+                      typeof id ===
+                        "string" &&
+                      id.length <= 180
+                    );
+                  }
+                )
+              : []
+          );
+        } catch (error) {
+          return new Set();
+        }
+      }
+
+      function saveGuestReadIds(ids) {
+        try {
+          localStorage.setItem(
+            readStorageKey,
+            JSON.stringify(
+              Array.from(ids).slice(-500)
+            )
+          );
+        } catch (error) {}
+      }
+
+      function dispatchNotificationUpdate() {
+        window.dispatchEvent(
+          new CustomEvent(
+            "aucAtlasNotificationsUpdated"
+          )
+        );
+      }
+
+      function getUnreadNotifications() {
+        return state.notifications.filter(
+          function (notification) {
+            return !notification.read;
+          }
+        );
+      }
+
+      function renderNotifications() {
+        const unreadCount =
+          getUnreadNotifications().length;
+        const totalCount =
+          state.notifications.length;
+
+        countElement.textContent =
+          unreadCount +
+          " unread · " +
+          totalCount +
+          (
+            totalCount === 1
+              ? " notification"
+              : " notifications"
+          );
+        markAllButton.disabled =
+          unreadCount === 0;
+
+        if (!totalCount) {
+          listElement.innerHTML =
+            '<div class="notifications-empty">There are no active notifications right now.</div>';
+          return;
+        }
+
+        listElement.innerHTML =
+          state.notifications.map(
+            function (notification) {
+              const type =
+                notification.type ===
+                  "important"
+                  ? "important"
+                  : notification.type ===
+                      "maintenance"
+                    ? "maintenance"
+                    : "info";
+              const typeLabel =
+                type === "important"
+                  ? "Important"
+                  : type ===
+                      "maintenance"
+                    ? "Maintenance"
+                    : "Information";
+              const typeClass =
+                type === "info"
+                  ? ""
+                  : " is-" + type;
+              const actions = [
+                notification.read
+                  ? ""
+                  : '<button class="notification-read-button" type="button" data-mark-notification="' +
+                    escapeHtml(
+                      notification.id
+                    ) +
+                    '">Mark as read</button>',
+                notification.linkUrl
+                  ? '<a class="notification-link" href="' +
+                    escapeHtml(
+                      notification.linkUrl
+                    ) +
+                    '" data-notification-link="' +
+                    escapeHtml(
+                      notification.id
+                    ) +
+                    '">' +
+                    escapeHtml(
+                      notification.linkLabel ||
+                      "View details"
+                    ) +
+                    '</a>'
+                  : ""
+              ]
+                .filter(Boolean)
+                .join("");
+
+              return [
+                '<article class="notification-card',
+                  notification.read
+                    ? ""
+                    : " is-unread",
+                '">',
+                  '<div class="notification-card-heading">',
+                    '<h2 class="notification-card-title">',
+                      escapeHtml(
+                        notification.title ||
+                        "AUC Atlas update"
+                      ),
+                    '</h2>',
+                    '<span class="notification-type',
+                      typeClass,
+                    '">',
+                      escapeHtml(typeLabel),
+                    '</span>',
+                  '</div>',
+                  '<p class="notification-message">',
+                    escapeHtml(
+                      notification.message || ""
+                    ),
+                  '</p>',
+                  '<div class="notification-card-footer">',
+                    '<span class="notification-date">',
+                      escapeHtml(
+                        formatDate(
+                          notification.createdAt
+                        )
+                      ),
+                    '</span>',
+                    actions
+                      ? '<div class="notification-actions">' +
+                        actions +
+                        '</div>'
+                      : '',
+                  '</div>',
+                '</article>'
+              ].join("");
+            }
+          ).join("");
+      }
+
+      async function requestJson(
+        options
+      ) {
+        const response = await fetch(
+          "/api/notifications",
+          Object.assign(
+            {
+              credentials: "same-origin",
+              cache: "no-store",
+              headers: {
+                Accept:
+                  "application/json"
+              }
+            },
+            options || {}
+          )
+        );
+        const data = await response
+          .json()
+          .catch(function () {
+            return {};
+          });
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ||
+            "Could not update notifications."
+          );
+        }
+
+        return data;
+      }
+
+      async function loadNotifications() {
+        statusElement.hidden = false;
+        statusElement.classList.remove(
+          "is-error"
+        );
+        statusElement.textContent =
+          "Loading notifications...";
+
+        try {
+          const data =
+            await requestJson();
+          const guestReadIds =
+            getGuestReadIds();
+
+          state.signedIn =
+            Boolean(data.signedIn);
+          state.notifications =
+            (
+              Array.isArray(
+                data.notifications
+              )
+                ? data.notifications
+                : []
+            ).map(
+              function (notification) {
+                return Object.assign(
+                  {},
+                  notification,
+                  {
+                    read:
+                      state.signedIn
+                        ? Boolean(
+                            notification.read
+                          )
+                        : guestReadIds.has(
+                            notification.id
+                          )
+                  }
+                );
+              }
+            );
+
+          statusElement.hidden = true;
+          renderNotifications();
+        } catch (error) {
+          state.notifications = [];
+          countElement.textContent =
+            "Unavailable";
+          markAllButton.disabled = true;
+          listElement.innerHTML = "";
+          statusElement.hidden = false;
+          statusElement.classList.add(
+            "is-error"
+          );
+          statusElement.textContent =
+            error.message ||
+            "Could not load notifications.";
+        }
+      }
+
+      async function markNotificationRead(
+        notificationId
+      ) {
+        if (state.signedIn) {
+          await requestJson({
+            method: "POST",
+            headers: {
+              Accept:
+                "application/json",
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              action: "markRead",
+              notificationId
+            })
+          });
+        } else {
+          const guestReadIds =
+            getGuestReadIds();
+
+          guestReadIds.add(
+            notificationId
+          );
+          saveGuestReadIds(
+            guestReadIds
+          );
+        }
+
+        state.notifications =
+          state.notifications.map(
+            function (notification) {
+              return notification.id ===
+                notificationId
+                ? Object.assign(
+                    {},
+                    notification,
+                    {
+                      read: true
+                    }
+                  )
+                : notification;
+            }
+          );
+
+        renderNotifications();
+        dispatchNotificationUpdate();
+      }
+
+      async function markAllRead() {
+        if (state.signedIn) {
+          await requestJson({
+            method: "POST",
+            headers: {
+              Accept:
+                "application/json",
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              action: "markAllRead"
+            })
+          });
+        } else {
+          const guestReadIds =
+            getGuestReadIds();
+
+          state.notifications.forEach(
+            function (notification) {
+              guestReadIds.add(
+                notification.id
+              );
+            }
+          );
+
+          saveGuestReadIds(
+            guestReadIds
+          );
+        }
+
+        state.notifications =
+          state.notifications.map(
+            function (notification) {
+              return Object.assign(
+                {},
+                notification,
+                {
+                  read: true
+                }
+              );
+            }
+          );
+
+        renderNotifications();
+        dispatchNotificationUpdate();
+      }
+
+      listElement.addEventListener(
+        "click",
+        function (event) {
+          const readButton =
+            event.target.closest(
+              "[data-mark-notification]"
+            );
+
+          if (readButton) {
+            readButton.disabled = true;
+
+            markNotificationRead(
+              readButton.dataset
+                .markNotification
+            ).catch(
+              function (error) {
+                readButton.disabled =
+                  false;
+                statusElement.hidden =
+                  false;
+                statusElement.classList.add(
+                  "is-error"
+                );
+                statusElement.textContent =
+                  error.message ||
+                  "Could not mark the notification as read.";
+              }
+            );
+
+            return;
+          }
+
+          const notificationLink =
+            event.target.closest(
+              "[data-notification-link]"
+            );
+
+          if (!notificationLink) {
+            return;
+          }
+
+          const notificationId =
+            notificationLink.dataset
+              .notificationLink;
+
+          if (state.signedIn) {
+            fetch(
+              "/api/notifications",
+              {
+                method: "POST",
+                credentials:
+                  "same-origin",
+                keepalive: true,
+                headers: {
+                  Accept:
+                    "application/json",
+                  "Content-Type":
+                    "application/json"
+                },
+                body: JSON.stringify({
+                  action: "markRead",
+                  notificationId
+                })
+              }
+            ).catch(function () {});
+          } else {
+            const guestReadIds =
+              getGuestReadIds();
+
+            guestReadIds.add(
+              notificationId
+            );
+            saveGuestReadIds(
+              guestReadIds
+            );
+          }
+        }
+      );
+
+      markAllButton.addEventListener(
+        "click",
+        function () {
+          markAllButton.disabled = true;
+
+          markAllRead().catch(
+            function (error) {
+              markAllButton.disabled =
+                false;
+              statusElement.hidden =
+                false;
+              statusElement.classList.add(
+                "is-error"
+              );
+              statusElement.textContent =
+                error.message ||
+                "Could not mark all notifications as read.";
+            }
+          );
+        }
+      );
+
+      loadNotifications();
+    })();
+  </script>
+</body>
+</html>
