@@ -62,6 +62,56 @@ function getDonationData(data) {
   };
 }
 
+function cleanNotificationType(value) {
+  const type = cleanString(value, 20).toLowerCase();
+
+  return ["info", "important", "maintenance"].includes(type)
+    ? type
+    : "info";
+}
+
+function cleanNotificationLink(value) {
+  const link = cleanString(value, 500);
+
+  if (!link) {
+    return "";
+  }
+
+  const normalized = link.replace(/^\/+/, "");
+
+  if (
+    !normalized ||
+    /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(link) ||
+    /[\s\\]/.test(link) ||
+    !/^[A-Za-z0-9][A-Za-z0-9._~!$&'()*+,;=:@%/?#-]*$/.test(normalized)
+  ) {
+    throw createAdminError(
+      "Notification links must be internal site paths such as courses.html.",
+      400
+    );
+  }
+
+  return normalized;
+}
+
+function serializeNotification(doc) {
+  const data = doc.data() || {};
+  const expiresAt = getTimestampIso(data.expiresAt || data.expiresAtIso);
+  const expiresAtMillis = getTimestampMillis(expiresAt);
+
+  return {
+    id: doc.id,
+    title: cleanString(data.title, 120),
+    message: cleanMultiline(data.message, 1600),
+    type: cleanNotificationType(data.type),
+    linkUrl: cleanNotificationLink(data.linkUrl),
+    linkLabel: cleanString(data.linkLabel, 60),
+    createdAt: getTimestampIso(data.createdAt || data.createdAtIso),
+    expiresAt,
+    active: data.published !== false && (!expiresAtMillis || expiresAtMillis > Date.now())
+  };
+}
+
 function serializeReview(doc) {
   const data = doc.data() || {};
 
@@ -306,6 +356,7 @@ async function getDashboardData(actor) {
     db.collection("contentReports").where("status", "==", "open").limit(500).get(),
     db.collection("adminAuditLogs").orderBy("createdAt", "desc").limit(30).get(),
     db.collection("siteSettings").doc("donationCounter").get(),
+    db.collection("siteNotifications").orderBy("createdAtIso", "desc").limit(100).get(),
     getImageKitMaterials()
   ]);
 
@@ -316,11 +367,13 @@ async function getDashboardData(actor) {
   const reportsSnapshot = results[4];
   const auditSnapshot = results[5];
   const donationDoc = results[6];
-  const imageKitMaterials = results[7];
+  const notificationsSnapshot = results[7];
+  const imageKitMaterials = results[8];
   const reviews = [];
   const firestoreMaterials = [];
   const reports = [];
   const audits = [];
+  const notifications = [];
   const knownImageKitFileIds = new Set();
 
   reviewsSnapshot.forEach(function (doc) {
@@ -342,6 +395,10 @@ async function getDashboardData(actor) {
 
   auditSnapshot.forEach(function (doc) {
     audits.push(serializeAudit(doc));
+  });
+
+  notificationsSnapshot.forEach(function (doc) {
+    notifications.push(serializeNotification(doc));
   });
 
   const materials = firestoreMaterials
@@ -382,6 +439,7 @@ async function getDashboardData(actor) {
     reports: reports.slice(0, 250),
     reviews: reviews.slice(0, 250),
     materials: materials.slice(0, 250),
+    notifications,
     auditLogs: audits,
     donation: getDonationData(
       donationDoc.exists ? donationDoc.data() || {} : {}
@@ -896,6 +954,127 @@ async function handleRevokeUserSessions(actor, body) {
   };
 }
 
+async function handleCreateNotification(actor, body) {
+  const title = cleanString(body.title, 120);
+  const message = cleanMultiline(body.message, 1600);
+  const type = cleanNotificationType(body.type);
+  const linkUrl = cleanNotificationLink(body.linkUrl);
+  const linkLabel = linkUrl
+    ? cleanString(body.linkLabel, 60) || "View details"
+    : "";
+  const expiresAtInput = cleanString(body.expiresAt, 80);
+
+  if (!title || !message) {
+    throw createAdminError(
+      "Enter a notification title and message.",
+      400
+    );
+  }
+
+  let expiresAt = null;
+  let expiresAtIso = "";
+
+  if (expiresAtInput) {
+    const expiresAtDate = new Date(expiresAtInput);
+
+    if (
+      Number.isNaN(expiresAtDate.getTime()) ||
+      expiresAtDate.getTime() <= Date.now()
+    ) {
+      throw createAdminError(
+        "Choose a future expiration date and time.",
+        400
+      );
+    }
+
+    expiresAt = admin.firestore.Timestamp.fromDate(expiresAtDate);
+    expiresAtIso = expiresAtDate.toISOString();
+  }
+
+  const createdAtIso = new Date().toISOString();
+  const notificationRef = admin
+    .firestore()
+    .collection("siteNotifications")
+    .doc();
+
+  await notificationRef.set({
+    title,
+    message,
+    type,
+    linkUrl,
+    linkLabel,
+    published: true,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAtIso,
+    expiresAt,
+    expiresAtIso,
+    createdByAdminUid: actor.uid,
+    createdByAdminEmail: actor.email
+  });
+
+  const savedNotification = await notificationRef.get();
+
+  await writeAuditLog(actor, {
+    action: "create_notification",
+    targetType: "site_notification",
+    targetId: notificationRef.id,
+    targetLabel: title,
+    reason: ""
+  });
+
+  return {
+    success: true,
+    notification: serializeNotification(savedNotification)
+  };
+}
+
+async function handleDeleteNotification(actor, body) {
+  const notificationId = cleanString(
+    body.notificationId,
+    180
+  );
+
+  if (
+    !/^[A-Za-z0-9_-]{6,180}$/.test(notificationId)
+  ) {
+    throw createAdminError(
+      "Notification not found.",
+      400
+    );
+  }
+
+  const notificationRef = admin
+    .firestore()
+    .collection("siteNotifications")
+    .doc(notificationId);
+  const notificationDoc = await notificationRef.get();
+
+  if (!notificationDoc.exists) {
+    throw createAdminError(
+      "Notification not found.",
+      404
+    );
+  }
+
+  const notification = serializeNotification(
+    notificationDoc
+  );
+
+  await notificationRef.delete();
+
+  await writeAuditLog(actor, {
+    action: "delete_notification",
+    targetType: "site_notification",
+    targetId: notificationId,
+    targetLabel: notification.title,
+    reason: ""
+  });
+
+  return {
+    success: true
+  };
+}
+
 async function handleUpdateDonation(actor, body) {
   const currentAmount = cleanAmount(body.currentAmount, -1);
   const goalAmount = cleanAmount(body.goalAmount, -1);
@@ -1073,6 +1252,22 @@ module.exports = async function handler(req, res) {
     ) {
       result =
         await handleDismissReport(
+          actor,
+          body
+        );
+    } else if (
+      action === "createNotification"
+    ) {
+      result =
+        await handleCreateNotification(
+          actor,
+          body
+        );
+    } else if (
+      action === "deleteNotification"
+    ) {
+      result =
+        await handleDeleteNotification(
           actor,
           body
         );
