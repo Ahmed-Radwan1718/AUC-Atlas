@@ -8,6 +8,35 @@ const VISITOR_TIME_ZONE = "Africa/Cairo";
 const VISITOR_RATE_LIMIT_WINDOW_MS =
   60 * 60 * 1000;
 const VISITOR_MAX_POSTS_PER_WINDOW = 30;
+const AUTOMATED_VISITOR_PATTERN =
+  /(bot|crawler|spider|slurp|archiver|preview|fetcher|monitor|headless|phantomjs|selenium|playwright|puppeteer|lighthouse|pagespeed|google-extended|chatgpt-user|anthropic-ai|claude-user|cohere-ai|perplexity-user|bytespider|ccbot|diffbot|imagesiftbot|omgilibot|youbot|applebot-extended|meta-externalagent|facebookexternalhit|bingpreview|python-requests|python-urllib|curl\/|wget\/|node-fetch|axios\/|postmanruntime)/i;
+
+function getRequestUserAgent(req) {
+  const headers =
+    req && req.headers
+      ? req.headers
+      : {};
+  const value =
+    headers["user-agent"] ||
+    headers["User-Agent"] ||
+    "";
+
+  return Array.isArray(value)
+    ? String(value[0] || "")
+    : String(value || "");
+}
+
+function isAutomatedVisitor(req) {
+  const userAgent =
+    getRequestUserAgent(req).trim();
+
+  return (
+    !userAgent ||
+    AUTOMATED_VISITOR_PATTERN.test(
+      userAgent
+    )
+  );
+}
 
 function getCurrentWeekStart() {
   const dateParts = new Intl.DateTimeFormat("en-US", {
@@ -74,6 +103,15 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({
         weeklyVisits,
         weekStart
+      });
+    }
+
+    if (isAutomatedVisitor(req)) {
+      return res.status(200).json({
+        weeklyVisits:
+          await getWeeklyVisitCount(countRef),
+        weekStart,
+        counted: false
       });
     }
 
