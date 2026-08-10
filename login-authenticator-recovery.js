@@ -28,6 +28,7 @@
   let activeChallengeId = "";
   let requestingCode = false;
   let verifyingCode = false;
+  let emailOnlyMode = false;
 
   function restoreRecoveryButtonLabel() {
     recoveryButton.innerHTML =
@@ -67,6 +68,10 @@
       (email || "your AUC email address") +
       ". It expires in 10 minutes.";
 
+    recoveryBack.textContent = emailOnlyMode
+      ? "Cancel sign in"
+      : "Back to authenticator app";
+
     clearRecoveryInputs();
     showTwoFactorMessage("", "");
     showRecoveryMessage("Code sent. Check your inbox.", "success");
@@ -80,10 +85,12 @@
   }
 
   function closeRecoveryPanel() {
+    const wasEmailOnlyMode = emailOnlyMode;
+
     recoveryPanel.hidden = true;
-    twoFactorPanel.hidden = false;
     activeChallengeId = "";
     verifyingCode = false;
+    emailOnlyMode = false;
 
     clearRecoveryInputs();
     showRecoveryMessage("", "");
@@ -95,6 +102,16 @@
     recoveryButton.disabled = false;
     restoreRecoveryButtonLabel();
 
+    if (wasEmailOnlyMode) {
+      twoFactorPanel.hidden = true;
+      awaitingAuthenticatorCode = false;
+      loginButton.disabled = false;
+      loginButton.textContent = "Log In";
+      showMessage("Sign in cancelled.", "error");
+      return;
+    }
+
+    twoFactorPanel.hidden = false;
     setTimeout(focusFirstTwoFactorCodeInput, 50);
   }
 
@@ -110,7 +127,7 @@
     if (fromPanel) {
       recoveryResend.textContent = "Sending...";
       showRecoveryMessage("", "");
-    } else {
+    } else if (!emailOnlyMode) {
       recoveryButton.textContent = "Sending code...";
       showTwoFactorMessage("", "");
     }
@@ -137,7 +154,7 @@
         !data.success ||
         !/^[a-f0-9]{64}$/i.test(data.challengeId || "")
       ) {
-        throw new Error(data.error || "Could not send the recovery code.");
+        throw new Error(data.error || "Could not send the email verification code.");
       }
 
       activeChallengeId = data.challengeId;
@@ -145,9 +162,15 @@
     } catch (error) {
       const message =
         error.message ||
-        "Could not send the recovery code. Please try again.";
+        "Could not send the email verification code. Please try again.";
 
-      if (recoveryPanel.hidden) {
+      if (recoveryPanel.hidden && emailOnlyMode) {
+        emailOnlyMode = false;
+        awaitingAuthenticatorCode = false;
+        loginButton.disabled = false;
+        loginButton.textContent = "Log In";
+        showMessage(message, "error");
+      } else if (recoveryPanel.hidden) {
         showTwoFactorMessage(message, "error");
       } else {
         showRecoveryMessage(message, "error");
@@ -206,13 +229,14 @@
       if (!response.ok || !data.success) {
         throw new Error(
           data.error ||
-          "The recovery code is invalid or has expired."
+          "The email verification code is invalid or has expired."
         );
       }
 
       recoveryPanel.hidden = true;
       activeChallengeId = "";
       awaitingAuthenticatorCode = false;
+      emailOnlyMode = false;
       clearRecoveryInputs();
       showRecoveryMessage("", "");
       finishLogin(data.user || null);
@@ -280,7 +304,13 @@
     });
   });
 
+  window.startLoginEmailTwoFactor = function () {
+    emailOnlyMode = true;
+    return requestRecoveryCode(false);
+  };
+
   recoveryButton.addEventListener("click", function () {
+    emailOnlyMode = false;
     requestRecoveryCode(false);
   });
 
