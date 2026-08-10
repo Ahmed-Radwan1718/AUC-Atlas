@@ -674,7 +674,7 @@
     }
 
     .admin-user-result {
-      margin-top: 16px;
+      margin-top: 0;
     }
 
     .admin-user-head {
@@ -1370,7 +1370,7 @@
 
       .admin-sidebar {
         position: static;
-        grid-template-columns: repeat(7, minmax(140px, 1fr));
+        grid-template-columns: repeat(6, minmax(140px, 1fr));
         overflow-x: auto;
       }
 
@@ -1507,7 +1507,7 @@
           </div>
 
           <div class="admin-header-copy">
-            Moderate reviews and uploads, manage users by Firebase UID, and update the public donation goal.
+            Review registered users, moderate reviews and uploads, and update the public donation goal.
           </div>
         </header>
 
@@ -1532,26 +1532,15 @@
 
         <div class="admin-layout">
           <aside class="admin-sidebar" aria-label="Admin sections">
-            <button class="admin-nav-button active" type="button" data-admin-panel="overview">Overview</button>
+            <button class="admin-nav-button active" type="button" data-admin-panel="users">Users</button>
             <button class="admin-nav-button" type="button" data-admin-panel="reports">Reports</button>
             <button class="admin-nav-button" type="button" data-admin-panel="reviews">Reviews</button>
             <button class="admin-nav-button" type="button" data-admin-panel="materials">Uploads</button>
-            <button class="admin-nav-button" type="button" data-admin-panel="users">Users</button>
             <button class="admin-nav-button" type="button" data-admin-panel="notifications">Notifications</button>
             <button class="admin-nav-button" type="button" data-admin-panel="donation">Donation</button>
           </aside>
 
           <section>
-            <article class="admin-panel active" id="admin-panel-overview">
-              <div class="admin-panel-heading">
-                <div>
-                  <h2>Recent actions</h2>
-                  <p>Every destructive or account-level administrator action is recorded here.</p>
-                </div>
-              </div>
-              <div class="admin-list" id="admin-audit-list"></div>
-            </article>
-
             <article class="admin-panel" id="admin-panel-reports">
               <div class="admin-panel-heading">
                 <div>
@@ -1585,28 +1574,18 @@
               <div class="admin-list" id="admin-material-list"></div>
             </article>
 
-            <article class="admin-panel" id="admin-panel-users">
+            <article class="admin-panel active" id="admin-panel-users">
               <div class="admin-panel-heading">
                 <div>
-                  <h2>User moderation</h2>
-                  <p>Look up a Firebase account by its exact UID, then ban, unban, or revoke all sessions.</p>
+                  <h2>Registered users</h2>
+                  <p>Every registered Firebase account is loaded automatically with its profile, account status, and moderation controls.</p>
                 </div>
+                <input class="admin-search" id="admin-user-search" type="search" placeholder="Filter users" aria-label="Filter registered users">
               </div>
 
-              <div class="admin-form-card">
-                <form class="admin-form" id="admin-user-lookup-form">
-                  <div class="admin-field">
-                    <label for="admin-user-uid">Firebase UID</label>
-                    <input id="admin-user-uid" type="text" maxlength="160" autocomplete="off" required>
-                  </div>
-                  <div>
-                    <button class="admin-button primary" id="admin-user-lookup-button" type="submit">Look up user</button>
-                  </div>
-                  <p class="admin-message" id="admin-user-message" aria-live="polite"></p>
-                </form>
+              <div class="admin-list" id="admin-user-list">
+                <div class="admin-empty">Loading registered users...</div>
               </div>
-
-              <div class="admin-user-result" id="admin-user-result" hidden></div>
             </article>
 
             <article class="admin-panel" id="admin-panel-notifications">
