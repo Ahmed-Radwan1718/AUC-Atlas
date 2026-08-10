@@ -745,10 +745,9 @@
             </button>
           </h2>
           <div class="info-answer" id="privacy-answer-4" hidden>
-            <p>When you create or maintain an account, AUC Atlas may process your full name, AUC email address, AUC ID number, major, profile photograph, internal user ID, email-verification status, authentication provider, account timestamps, and account-security settings.</p>
+            <p>When you create or maintain an account, AUC Atlas may process your full name, AUC email address, AUC ID number, major, profile photograph, internal user ID, email-verification status, account timestamps, and account-security settings.</p>
             <p>AUC Atlas may maintain a normalized or lookup version of your AUC ID to prevent duplicate accounts and enforce account-uniqueness rules.</p>
-            <p>If you create a password-based account, password authentication is handled through the configured authentication provider. The AUC Atlas application database is not intended to store your plaintext password.</p>
-            <p>If you use a supported third-party sign-in provider such as Google, GitHub, or Facebook, AUC Atlas may receive information made available by that provider, such as your provider user identifier, name, email address, email-verification information, and profile photograph, depending on the provider and permissions you use.</p>
+            <p>Password authentication is handled through Firebase Authentication. The AUC Atlas application database is not intended to store your plaintext password.</p>
           </div>
         </article>
 
@@ -866,7 +865,6 @@
             <p>AUC Atlas may receive personal data indirectly rather than directly from you.</p>
             <p>Possible sources include:</p>
             <ul>
-              <li>Google, GitHub, Facebook, or another supported authentication provider if you choose that sign-in method.</li>
               <li>Firebase Authentication and related authentication infrastructure.</li>
               <li>Publicly available AUC or faculty information used for professor and academic profiles.</li>
               <li>Other users who submit professor reviews, course materials, reports, or other community content.</li>
@@ -960,7 +958,6 @@
               <li>Cloudinary where used to store and serve user profile photographs.</li>
               <li>ImageKit where used to store, verify, or deliver course-material files.</li>
               <li>Hosting, network, deployment, email, security, and infrastructure providers used to operate the Service.</li>
-              <li>Google, GitHub, Facebook, or another authentication provider when you voluntarily choose that provider.</li>
               <li>Other AUC Atlas users where information is intentionally made public through a review, upload, profile, or other community feature.</li>
               <li>Professional advisers, insurers, auditors, or legal representatives where reasonably necessary for a lawful purpose.</li>
               <li>Courts, the PDPC, law-enforcement bodies, investigative authorities, regulators, or other public authorities where disclosure is lawfully required.</li>
