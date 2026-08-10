@@ -828,15 +828,16 @@
         <article class="info-section">
           <h2>
             <button class="info-toggle" type="button" aria-expanded="false" aria-controls="privacy-answer-10">
-              <span>10. Weekly Visit Counting</span>
+              <span>10. Weekly Unique-Browser Counting</span>
               <span class="info-toggle-icon" aria-hidden="true"></span>
             </button>
           </h2>
           <div class="info-answer" id="privacy-answer-10" hidden>
-            <p>AUC Atlas counts non-admin page visits during each weekly period to understand basic Service usage.</p>
-            <p>Each page load may increase the current week's aggregate visit total. Repeat visits, page navigation, and page refreshes may therefore be counted more than once.</p>
-            <p>The weekly counting function does not generate or store a persistent browser identifier and does not attempt to identify unique people, devices, browsers, or accounts.</p>
-            <p>A new weekly total begins every Monday at midnight in the Africa/Cairo time zone. Previous aggregate weekly totals may be retained for historical analytics.</p>
+            <p>AUC Atlas counts anonymous non-admin browsers during each weekly period to understand basic Service usage.</p>
+            <p>When a browser is first counted, AUC Atlas places a random first-party identifier in an HTTP-only cookie. The identifier does not contain a name, email address, account identifier, or other directly identifying information.</p>
+            <p>For each week, the server derives a one-way, week-specific value from the random identifier. This value is used to prevent repeat page loads, navigation, and refreshes from increasing the total again during the same week.</p>
+            <p>Different devices, browsers, private-browsing sessions, or browsers whose cookies have been cleared may be counted separately. A shared browser may be counted only once, so the displayed total is an estimate of unique browsers rather than an exact count of individual people.</p>
+            <p>IP addresses and browser user-agent information may be used for bot filtering and abuse prevention but are not used as the persistent visitor identifier. A new weekly total begins every Monday at midnight in the Africa/Cairo time zone.</p>
           </div>
         </article>
 
@@ -848,7 +849,8 @@
             </button>
           </h2>
           <div class="info-answer" id="privacy-answer-11" hidden>
-            <p>AUC Atlas may use cookies, local storage, session storage, and similar browser mechanisms where reasonably necessary to provide authentication, account features, session security, login challenges, preferences, and other Service functionality.</p>
+            <p>AUC Atlas may use cookies, local storage, session storage, and similar browser mechanisms where reasonably necessary to provide authentication, account features, session security, login challenges, preferences, analytics, and other Service functionality.</p>
+            <p>The weekly unique-browser counter uses an HTTP-only, same-site, first-party cookie containing a random opaque identifier. The cookie may remain for up to one year unless it is cleared earlier through the browser.</p>
             <p>Authentication and security cookies may contain random or cryptographically protected identifiers used to recognize a valid session or security challenge. AUC Atlas does not intend to place plaintext passwords inside browser cookies or local storage.</p>
             <p>Where Egyptian law requires consent for a particular non-essential storage or tracking activity, AUC Atlas will obtain the legally required consent before using that mechanism.</p>
           </div>
@@ -897,7 +899,7 @@
               <li>Responding to reports, complaints, rights requests, and support communications.</li>
               <li>Preventing fraud, spam, harassment, unauthorized access, automated abuse, duplicate accounts, and other misuse.</li>
               <li>Applying rate limits and investigating security incidents.</li>
-              <li>Counting weekly page visits and understanding basic Service usage.</li>
+              <li>Counting weekly unique browsers and understanding basic Service usage.</li>
               <li>Maintaining, debugging, protecting, and improving the reliability of AUC Atlas.</li>
               <li>Complying with applicable legal duties, judicial orders, investigative requests, or regulatory obligations.</li>
               <li>Establishing, exercising, or defending legal rights and claims.</li>
@@ -1003,7 +1005,7 @@
               <li>Rate-limit and anti-abuse information may be retained for the applicable security window and, where necessary, for a longer period to investigate serious abuse or defend legal rights.</li>
               <li>Professor reviews and course materials may remain available until deleted by the user where available, removed through moderation, deleted with the associated account, or otherwise no longer necessary.</li>
               <li>Content-report and moderation records may be retained for as long as reasonably necessary to resolve reports, prevent repeated abuse, maintain an appropriate moderation record, or establish or defend legal claims.</li>
-              <li>Aggregated weekly visit totals may be retained for historical analytics while they remain reasonably necessary for that purpose.</li>
+              <li>Aggregated weekly unique-browser totals and week-specific pseudonymous deduplication records may be retained for historical analytics and repeat-count prevention while they remain reasonably necessary for those purposes.</li>
               <li>Backup copies may persist for a limited technical period after deletion until overwritten or removed through normal backup processes.</li>
             </ul>
             <p>Independent service providers may maintain their own technical or security records in accordance with their legal obligations and applicable retention rules.</p>
