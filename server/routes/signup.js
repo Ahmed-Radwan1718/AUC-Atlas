@@ -1,8 +1,6 @@
 const admin = require("../_lib/firebaseAdmin");
 
 const {
-  createSiteSessionFromIdToken,
-  createLoginChallenge,
   signInWithCustomToken,
   ensureAllowedAucEmail
 } = require("../_lib/securityHelpers");
@@ -15,9 +13,6 @@ const SIGNUP_RATE_LIMIT_WINDOW_MS =
   30 * 60 * 1000;
 const SIGNUP_MAX_EMAIL_ATTEMPTS = 5;
 const SIGNUP_MAX_IP_ATTEMPTS = 20;
-const PROVIDER_REQUEST_WINDOW_MS =
-  15 * 60 * 1000;
-const PROVIDER_MAX_IP_ATTEMPTS = 100;
 
 function cleanString(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
@@ -133,21 +128,6 @@ async function consumeSignupRateLimits(
   });
 }
 
-async function consumeProviderRequestRateLimit(
-  req
-) {
-  await consumeSecurityRateLimit({
-    scope: "provider-auth-ip",
-    identifier: getRequestIp(req),
-    maxAttempts:
-      PROVIDER_MAX_IP_ATTEMPTS,
-    windowMs:
-      PROVIDER_REQUEST_WINDOW_MS,
-    message:
-      "Too many provider sign-in attempts from this connection. Please try again later."
-  });
-}
-
 async function ensureEmailCanCreateAccount(email) {
   try {
     await admin.auth().getUserByEmail(email);
@@ -218,140 +198,6 @@ module.exports = async function handler(req, res) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method not allowed" });
-    }
-
-    const provider = cleanString((req.body || {}).provider, 30);
-    const idToken = cleanString((req.body || {}).idToken, 4000);
-
-    const providerConfigs = {
-      google: {
-        name: "Google",
-        firebaseProviderId: "google.com",
-        authProvider: "google"
-      },
-      github: {
-        name: "GitHub",
-        firebaseProviderId: "github.com",
-        authProvider: "github"
-      },
-      facebook: {
-        name: "Facebook",
-        firebaseProviderId: "facebook.com",
-        authProvider: "facebook"
-      }
-    };
-    const providerConfig =
-      providerConfigs[provider];
-
-    if (providerConfig) {
-      await consumeProviderRequestRateLimit(
-        req
-      );
-
-      if (!idToken) {
-        return res.status(400).json({ error: providerConfig.name + " sign-in could not be verified." });
-      }
-
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
-      const signInProvider =
-        decodedToken.firebase && decodedToken.firebase.sign_in_provider
-          ? decodedToken.firebase.sign_in_provider
-          : "";
-
-      if (signInProvider !== providerConfig.firebaseProviderId) {
-        return res.status(400).json({ error: "Please sign in with " + providerConfig.name + "." });
-      }
-
-      const userRecord = await admin.auth().getUser(decodedToken.uid);
-      const email = cleanEmail(userRecord.email || decodedToken.email);
-      const fullName = cleanString(
-        userRecord.displayName || decodedToken.name || email.split("@")[0] || providerConfig.name + " User",
-        80
-      );
-      const photoURL = cleanString(userRecord.photoURL || decodedToken.picture, 600);
-
-      if (!email) {
-        return res.status(400).json({ error: providerConfig.name + " account email is required." });
-      }
-
-      ensureAllowedAucEmail(email, "create an account");
-
-      const userRef = admin.firestore()
-        .collection("users")
-        .doc(decodedToken.uid);
-      const userDoc = await userRef.get();
-      const existingUser = userDoc.exists
-        ? userDoc.data() || {}
-        : {};
-      const twoFactor =
-        existingUser.twoFactor &&
-        typeof existingUser.twoFactor === "object"
-          ? existingUser.twoFactor
-          : {};
-      const emailVerified = Boolean(
-        userRecord.emailVerified ||
-        decodedToken.email_verified
-      );
-
-      if (!userDoc.exists) {
-        await consumeSignupRateLimits(
-          req,
-          email
-        );
-      }
-
-      await userRef.set({
-        fullName: existingUser.fullName || fullName,
-        email,
-        photoURL: existingUser.photoURL || photoURL,
-        authProvider: existingUser.authProvider || providerConfig.authProvider,
-        emailVerified,
-        createdAt: existingUser.createdAt || admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-
-      if (twoFactor.appEnabled) {
-        await createLoginChallenge(
-          decodedToken.uid,
-          res,
-          {
-            email,
-            authMethod:
-              "provider:" +
-              providerConfig.authProvider,
-            twoFactor: {
-              appEnabled: true,
-              emailEnabled: Boolean(
-                twoFactor.emailEnabled
-              )
-            }
-          }
-        );
-
-        return res.status(200).json({
-          success: true,
-          requiresTwoFactor: true,
-          method: "app"
-        });
-      }
-
-      await createSiteSessionFromIdToken(
-        idToken,
-        res,
-        req
-      );
-
-      return res.status(200).json({
-        success: true,
-        requiresTwoFactor: false,
-        user: {
-          uid: decodedToken.uid,
-          email,
-          displayName: existingUser.fullName || fullName,
-          emailVerified,
-          photoURL: existingUser.photoURL || photoURL
-        }
-      });
     }
 
     const fullName = cleanString((req.body || {}).fullName, 80);
