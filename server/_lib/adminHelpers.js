@@ -11,6 +11,8 @@ const {
 } = require("./securityHelpers");
 
 const ADMIN_ACCESS_EXPIRES_MS =
+  5 * 60 * 60 * 1000;
+const ADMIN_CHALLENGE_EXPIRES_MS =
   10 * 60 * 1000;
 const ADMIN_ACCESS_HEADER_NAME =
   "x-auc-admin-access";
@@ -409,7 +411,7 @@ async function createAdminChallenge(
     .toString("hex");
   const expiresAt = new Date(
     Date.now() +
-      ADMIN_ACCESS_EXPIRES_MS
+      ADMIN_CHALLENGE_EXPIRES_MS
   );
   const accessRef =
     getAdminAccessRef(actor);
