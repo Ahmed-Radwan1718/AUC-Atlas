@@ -9,6 +9,7 @@ const routeLoaders = {
   "login-code": function () { return require("../server/routes/login-code"); },
   "logout": function () { return require("../server/routes/logout"); },
   "me": function () { return require("../server/routes/me"); },
+  "notifications": function () { return require("../server/routes/notifications"); },
   "profile-photo": function () { return require("../server/routes/profile-photo"); },
   "professor-reviews": function () { return require("../server/routes/professor-reviews"); },
   "sessions": function () { return require("../server/routes/sessions"); },
