@@ -1341,7 +1341,7 @@
               '<div class="admin-user-detail"><span>Email verified</span><strong>', user.emailVerified ? 'Yes' : 'No', '</strong></div>',
               '<div class="admin-user-detail"><span>Major</span><strong>', escapeHtml(user.major || "Not provided"), '</strong></div>',
               '<div class="admin-user-detail"><span>AUC ID</span><strong>', escapeHtml(user.aucId || "Not provided"), '</strong></div>',
-              '<div class="admin-user-detail"><span>Session records</span><strong>', escapeHtml(user.activeSessionRecords), '</strong></div>',
+              '<div class="admin-user-detail"><span>Session records</span><strong>', user.activeSessionRecords === null ? 'Not loaded' : escapeHtml(user.activeSessionRecords), '</strong></div>',
               '<div class="admin-user-detail"><span>Created</span><strong>', escapeHtml(formatDate(user.createdAt)), '</strong></div>',
               '<div class="admin-user-detail"><span>Last sign in</span><strong>', escapeHtml(formatDate(user.lastSignInAt)), '</strong></div>',
               '<div class="admin-user-detail"><span>Ban reason</span><strong>', escapeHtml(user.banReason || "Not banned"), '</strong></div>',
