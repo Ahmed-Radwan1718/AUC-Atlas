@@ -1,8 +1,7 @@
 (function () {
   const state = {
     dashboard: null,
-    selectedUser: null,
-    activePanel: "overview",
+    activePanel: "users",
     busy: false,
     authenticationBusy: false,
     requiresTwoFactor: false,
@@ -111,25 +110,13 @@
     document.getElementById(
       "admin-material-search"
     );
-  const userLookupForm =
+  const userSearch =
     document.getElementById(
-      "admin-user-lookup-form"
+      "admin-user-search"
     );
-  const userUidInput =
+  const userList =
     document.getElementById(
-      "admin-user-uid"
-    );
-  const userLookupButton =
-    document.getElementById(
-      "admin-user-lookup-button"
-    );
-  const userMessage =
-    document.getElementById(
-      "admin-user-message"
-    );
-  const userResult =
-    document.getElementById(
-      "admin-user-result"
+      "admin-user-list"
     );
   const notificationForm =
     document.getElementById(
@@ -1284,54 +1271,91 @@
     donationPreviewFill.style.width = percentage + "%";
   }
 
-  function renderUser(user) {
-    state.selectedUser = user;
+  function renderUsers() {
+    const users = Array.isArray(
+      state.dashboard.users
+    )
+      ? state.dashboard.users
+      : [];
+    const search = normalizeSearch(
+      userSearch.value
+    );
+    const filtered = users.filter(
+      function (user) {
+        return (
+          !search ||
+          normalizeSearch(
+            [
+              user.displayName,
+              user.email,
+              user.uid,
+              user.major,
+              user.aucId,
+              user.banReason
+            ].join(" ")
+          ).includes(search)
+        );
+      }
+    );
 
-    if (!user) {
-      userResult.hidden = true;
-      userResult.innerHTML = "";
+    if (!filtered.length) {
+      userList.innerHTML =
+        '<div class="admin-empty">' +
+        (
+          search
+            ? "No registered users match this filter."
+            : "No registered Firebase users were found."
+        ) +
+        '</div>';
       return;
     }
 
-    const statusBadge = user.disabled
-      ? '<span class="admin-badge is-danger">Banned</span>'
-      : '<span class="admin-badge is-success">Active</span>';
-    const adminBadge = user.isAdmin
-      ? '<span class="admin-badge">Administrator</span>'
-      : '';
-    const moderationButtons = user.isAdmin
-      ? '<p class="admin-item-copy">Administrator accounts are protected from moderation actions.</p>'
-      : [
-          '<div class="admin-user-actions">',
-            '<button class="admin-button ', user.disabled ? 'primary' : 'danger', '" type="button" data-user-ban-action="', user.disabled ? 'unban' : 'ban', '" data-user-uid="', escapeHtml(user.uid), '">', user.disabled ? 'Unban user' : 'Ban user', '</button>',
-            '<button class="admin-button" type="button" data-user-revoke-sessions="', escapeHtml(user.uid), '">Revoke all sessions</button>',
-          '</div>'
-        ].join("");
+    userList.innerHTML = filtered
+      .map(function (user) {
+        const statusBadge = user.disabled
+          ? '<span class="admin-badge is-danger">Banned</span>'
+          : '<span class="admin-badge is-success">Active</span>';
+        const adminBadge = user.isAdmin
+          ? '<span class="admin-badge">Administrator</span>'
+          : '';
+        const moderationButtons = user.isAdmin
+          ? '<p class="admin-item-copy">Administrator accounts are protected from moderation actions.</p>'
+          : [
+              '<div class="admin-user-actions">',
+                '<button class="admin-button ', user.disabled ? 'primary' : 'danger', '" type="button" data-user-ban-action="', user.disabled ? 'unban' : 'ban', '" data-user-uid="', escapeHtml(user.uid), '">', user.disabled ? 'Unban user' : 'Ban user', '</button>',
+                '<button class="admin-button" type="button" data-user-revoke-sessions="', escapeHtml(user.uid), '">Revoke all sessions</button>',
+              '</div>'
+            ].join("");
 
-    userResult.innerHTML = [
-      '<div class="admin-user-head">',
-        '<div>',
-          '<h3>', escapeHtml(user.displayName || user.email || user.uid), '</h3>',
-          '<p class="admin-item-copy">', escapeHtml(user.email || "Email unavailable"), '</p>',
-        '</div>',
-        '<div class="admin-meta">', statusBadge, adminBadge, '</div>',
-      '</div>',
-      '<div class="admin-user-details">',
-        '<div class="admin-user-detail"><span>Firebase UID</span><strong>', escapeHtml(user.uid), '</strong></div>',
-        '<div class="admin-user-detail"><span>Email verified</span><strong>', user.emailVerified ? 'Yes' : 'No', '</strong></div>',
-        '<div class="admin-user-detail"><span>Session records</span><strong>', escapeHtml(user.activeSessionRecords), '</strong></div>',
-        '<div class="admin-user-detail"><span>Created</span><strong>', escapeHtml(formatDate(user.createdAt)), '</strong></div>',
-        '<div class="admin-user-detail"><span>Last sign in</span><strong>', escapeHtml(formatDate(user.lastSignInAt)), '</strong></div>',
-        '<div class="admin-user-detail"><span>Ban reason</span><strong>', escapeHtml(user.banReason || "Not banned"), '</strong></div>',
-      '</div>',
-      moderationButtons
-    ].join("");
-    userResult.hidden = false;
+        return [
+          '<article class="admin-user-result">',
+            '<div class="admin-user-head">',
+              '<div>',
+                '<h3>', escapeHtml(user.displayName || user.email || user.uid), '</h3>',
+                '<p class="admin-item-copy">', escapeHtml(user.email || "Email unavailable"), '</p>',
+              '</div>',
+              '<div class="admin-meta">', statusBadge, adminBadge, '</div>',
+            '</div>',
+            '<div class="admin-user-details">',
+              '<div class="admin-user-detail"><span>Firebase UID</span><strong>', escapeHtml(user.uid), '</strong></div>',
+              '<div class="admin-user-detail"><span>Email verified</span><strong>', user.emailVerified ? 'Yes' : 'No', '</strong></div>',
+              '<div class="admin-user-detail"><span>Major</span><strong>', escapeHtml(user.major || "Not provided"), '</strong></div>',
+              '<div class="admin-user-detail"><span>AUC ID</span><strong>', escapeHtml(user.aucId || "Not provided"), '</strong></div>',
+              '<div class="admin-user-detail"><span>Session records</span><strong>', escapeHtml(user.activeSessionRecords), '</strong></div>',
+              '<div class="admin-user-detail"><span>Created</span><strong>', escapeHtml(formatDate(user.createdAt)), '</strong></div>',
+              '<div class="admin-user-detail"><span>Last sign in</span><strong>', escapeHtml(formatDate(user.lastSignInAt)), '</strong></div>',
+              '<div class="admin-user-detail"><span>Ban reason</span><strong>', escapeHtml(user.banReason || "Not banned"), '</strong></div>',
+            '</div>',
+            moderationButtons,
+          '</article>'
+        ].join("");
+      })
+      .join("");
   }
 
   function renderDashboard() {
     renderStats();
-    renderAuditLogs();
+    renderUsers();
     renderReports();
     renderReviews();
     renderMaterials();
@@ -1411,6 +1435,7 @@
   reportSearch.addEventListener("input", renderReports);
   reviewSearch.addEventListener("input", renderReviews);
   materialSearch.addEventListener("input", renderMaterials);
+  userSearch.addEventListener("input", renderUsers);
   donationCurrentInput.addEventListener("input", updateDonationPreview);
   donationGoalInput.addEventListener("input", updateDonationPreview);
   donationCurrencyInput.addEventListener("change", updateDonationPreview);
@@ -1570,26 +1595,7 @@
     });
   });
 
-  userLookupForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-    const uid = userUidInput.value.trim();
-
-    setMessage(userMessage, "", "");
-    renderUser(null);
-
-    runBusy(userLookupButton, async function () {
-      const data = await postAction({
-        action: "lookupUser",
-        uid
-      });
-      renderUser(data.user);
-      setMessage(userMessage, "User loaded.", "success");
-    }).catch(function (error) {
-      setMessage(userMessage, error.message || "Could not find that user.", "error");
-    });
-  });
-
-  userResult.addEventListener("click", function (event) {
+  userList.addEventListener("click", function (event) {
     const banButton = event.target.closest("[data-user-ban-action]");
     const revokeButton = event.target.closest("[data-user-revoke-sessions]");
 
@@ -1605,15 +1611,18 @@
       }
 
       runBusy(banButton, async function () {
-        const data = await postAction({
+        await postAction({
           action: "setUserBan",
           uid: banButton.dataset.userUid,
           banned: isBanning,
           reason
         });
-        renderUser(data.user);
-        await loadDashboard({ message: isBanning ? "User banned." : "User unbanned." });
-        renderUser(data.user);
+
+        await loadDashboard({
+          message: isBanning
+            ? "User banned."
+            : "User unbanned."
+        });
       }).catch(function (error) {
         showToast(error.message || "Could not update the user.");
       });
@@ -1629,14 +1638,15 @@
       }
 
       runBusy(revokeButton, async function () {
-        const data = await postAction({
+        await postAction({
           action: "revokeUserSessions",
           uid: revokeButton.dataset.userRevokeSessions,
           reason
         });
-        renderUser(data.user);
-        await loadDashboard({ message: "All user sessions were revoked." });
-        renderUser(data.user);
+
+        await loadDashboard({
+          message: "All user sessions were revoked."
+        });
       }).catch(function (error) {
         showToast(error.message || "Could not revoke the sessions.");
       });
