@@ -250,7 +250,56 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 8px;
+    }
+
+    .site-notification-button,
+    .site-notification-button:visited {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      color: #171717;
+      text-decoration: none;
+      display: grid;
+      place-items: center;
+      transition:
+        background 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-notification-button:hover {
+      background: rgba(192, 154, 92, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .site-notification-button:focus-visible {
+      outline: 3px solid rgba(192, 154, 92, 0.32);
+      outline-offset: 2px;
+    }
+
+    .site-notification-button svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+
+    .site-notification-badge {
+      position: absolute;
+      top: -2px;
+      right: -3px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border: 2px solid #ffffff;
+      border-radius: 999px;
+      background: #ad2525;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 14px;
+      text-align: center;
     }
 
     .floating-account-widget {
@@ -522,7 +571,7 @@
         padding: 0 10px;
         transform: none;
         display: grid;
-        grid-template-columns: 52px minmax(0, 1fr) 52px;
+        grid-template-columns: 92px minmax(0, 1fr) 92px;
         align-items: center;
         gap: 0;
       }
@@ -544,6 +593,7 @@
       .site-header-actions {
         grid-column: 3;
         justify-self: end;
+        gap: 2px;
         display: flex;
       }
 
@@ -635,6 +685,14 @@
   </nav>
 
   <div class="site-header-actions">
+    <a class="site-notification-button" id="site-notification-button" href="notifications.html" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+      <span class="site-notification-badge" id="site-notification-badge" hidden>0</span>
+    </a>
+
     <div class="floating-account-widget" id="floating-account-widget">
       <button class="floating-account-button" id="floating-account-button" type="button" aria-label="Open account menu" aria-expanded="false">
         <img src="user.png" alt="Account" id="floating-account-photo">
@@ -690,6 +748,8 @@
   const menuButton = document.querySelector(".hamburger-toggle");
   const menuOverlay = document.querySelector(".nav-menu-overlay");
   const menuLinks = document.querySelectorAll(".nav-menu-link");
+  const notificationButton = document.getElementById("site-notification-button");
+  const notificationBadge = document.getElementById("site-notification-badge");
   const accountButton = document.getElementById("floating-account-button");
   const accountPhoto = document.getElementById("floating-account-photo");
   const accountMenu = document.getElementById("floating-account-menu");
@@ -850,6 +910,152 @@
     showLoggedOutAccountState();
     return null;
   }
+
+  const notificationReadStorageKey =
+    "auc-atlas-read-notifications";
+
+  function getLocalReadNotificationIds() {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem(
+          notificationReadStorageKey
+        ) || "[]"
+      );
+
+      return new Set(
+        Array.isArray(saved)
+          ? saved.filter(function (id) {
+              return (
+                typeof id === "string" &&
+                id.length <= 180
+              );
+            })
+          : []
+      );
+    } catch (error) {
+      return new Set();
+    }
+  }
+
+  function setNotificationBadge(count) {
+    if (
+      !notificationButton ||
+      !notificationBadge
+    ) {
+      return;
+    }
+
+    const safeCount = Math.max(
+      0,
+      Math.floor(Number(count) || 0)
+    );
+
+    notificationBadge.textContent =
+      safeCount > 99
+        ? "99+"
+        : String(safeCount);
+    notificationBadge.hidden =
+      safeCount === 0;
+    notificationButton.setAttribute(
+      "aria-label",
+      safeCount
+        ? "Notifications, " +
+          safeCount +
+          " unread"
+        : "Notifications"
+    );
+  }
+
+  async function loadNotificationState() {
+    try {
+      const response = await fetch(
+        "/api/notifications?summary=1",
+        {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            Accept: "application/json"
+          }
+        }
+      );
+      const data = await response
+        .json()
+        .catch(function () {
+          return {};
+        });
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+          "Could not load notifications."
+        );
+      }
+
+      const notificationIds =
+        Array.isArray(
+          data.notificationIds
+        )
+          ? data.notificationIds.filter(
+              function (id) {
+                return (
+                  typeof id === "string" &&
+                  id.length <= 180
+                );
+              }
+            )
+          : [];
+      const localReadNotificationIds =
+        getLocalReadNotificationIds();
+      const unreadCount = data.signedIn
+        ? Math.max(
+            0,
+            Number(data.unreadCount) || 0
+          )
+        : notificationIds.filter(
+            function (id) {
+              return !localReadNotificationIds.has(
+                id
+              );
+            }
+          ).length;
+
+      setNotificationBadge(
+        unreadCount
+      );
+    } catch (error) {
+      setNotificationBadge(0);
+    }
+  }
+
+  loadNotificationState();
+
+  window.setInterval(
+    loadNotificationState,
+    60000
+  );
+
+  window.addEventListener(
+    "focus",
+    loadNotificationState
+  );
+
+  window.addEventListener(
+    "aucAtlasNotificationsUpdated",
+    loadNotificationState
+  );
+
+  window.addEventListener(
+    "storage",
+    function (event) {
+      if (
+        event.key ===
+        notificationReadStorageKey
+      ) {
+        loadNotificationState();
+      }
+    }
+  );
 
   if (menuButton && menuOverlay) {
     menuButton.addEventListener("click", function () {
