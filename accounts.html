@@ -3338,6 +3338,7 @@
     const twoFactorAppStatus = document.getElementById("two-factor-app-status");
     const twoFactorEmailStatus = document.getElementById("two-factor-email-status");
     const twoFactorAppButton = document.getElementById("two-factor-app-button");
+    const twoFactorEmailButton = document.getElementById("two-factor-email-button");
     const authenticatorModal = document.getElementById("authenticator-modal");
     const authenticatorModalBackdrop = document.getElementById("authenticator-modal-backdrop");
     const authenticatorModalClose = document.getElementById("authenticator-modal-close");
@@ -5376,6 +5377,11 @@
         twoFactorAppButton.textContent = accountTwoFactor.appEnabled ? "Disable app" : "Set up app";
         twoFactorAppButton.classList.toggle("is-danger", accountTwoFactor.appEnabled);
       }
+
+      if (twoFactorEmailButton) {
+        twoFactorEmailButton.textContent = accountTwoFactor.emailEnabled ? "Disable" : "Enable";
+        twoFactorEmailButton.classList.toggle("is-danger", accountTwoFactor.emailEnabled);
+      }
     }
 
     function hydrateAccountDetails(user) {
@@ -6053,7 +6059,7 @@
       });
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error || "Could not update authenticator app.");
+        throw new Error(data.error || "Could not update two-factor authentication.");
       }
 
       return data;
@@ -6107,6 +6113,47 @@
 
         startAuthenticatorSetup();
       });
+    }
+
+    async function updateEmailTwoFactor() {
+      const enabling = !accountTwoFactor.emailEnabled;
+
+      twoFactorEmailButton.disabled = true;
+      twoFactorEmailButton.textContent = enabling ? "Enabling..." : "Disabling...";
+      showMessage(securityMessage, "", "");
+
+      try {
+        const data = await requestAuthenticatorAction(
+          enabling ? "enable-email" : "disable-email"
+        );
+
+        syncTwoFactorState(data.twoFactor || {
+          appEnabled: accountTwoFactor.appEnabled,
+          emailEnabled: enabling
+        });
+
+        showMessage(
+          securityMessage,
+          enabling
+            ? "Email two-factor authentication enabled."
+            : "Email two-factor authentication disabled.",
+          "success"
+        );
+      } catch (error) {
+        showMessage(
+          securityMessage,
+          error.message || "Could not update email two-factor authentication.",
+          "error"
+        );
+      } finally {
+        twoFactorEmailButton.disabled = false;
+        twoFactorEmailButton.textContent =
+          accountTwoFactor.emailEnabled ? "Disable" : "Enable";
+      }
+    }
+
+    if (twoFactorEmailButton) {
+      twoFactorEmailButton.addEventListener("click", updateEmailTwoFactor);
     }
 
     if (authenticatorSetupForm) {
@@ -6315,7 +6362,10 @@
     });
 
     document.querySelectorAll("[data-account-action]").forEach(function (button) {
-      if (button.id === "two-factor-app-button") {
+      if (
+        button.id === "two-factor-app-button" ||
+        button.id === "two-factor-email-button"
+      ) {
         return;
       }
 
