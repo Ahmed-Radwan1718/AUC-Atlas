@@ -863,6 +863,29 @@
       color: rgba(27, 112, 62, 0.96);
     }
 
+    .account-connected-badge:not(.is-connected) {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(23, 23, 23, 0.05);
+      color: rgba(23, 23, 23, 0.56);
+    }
+
+    .account-google-button {
+      min-width: 220px;
+      min-height: 44px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .account-google-button[hidden] {
+      display: none;
+    }
+
+    .account-google-button iframe {
+      max-width: 100% !important;
+    }
+
     .account-login-session-card {
       padding: 20px;
       border-radius: 22px;
@@ -2547,6 +2570,7 @@
 <body>
   <div id="site-header-root"></div>
   <script src="site-header.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <main class="account-page">
     <section class="account-section">
@@ -2729,6 +2753,26 @@
 
                     <div class="account-connected-actions">
                       <span class="account-connected-badge is-connected">Connected</span>
+                    </div>
+                  </div>
+
+                  <div class="account-connected-account-card" id="connected-google-card">
+                    <div class="account-connected-account-main">
+                      <div class="account-connected-title">
+                        <span>Google Account</span>
+                      </div>
+                      <strong id="connected-google-heading">Not connected</strong>
+                      <p>Connect the Google account using the exact same AUC email address as this Atlas account.</p>
+                    </div>
+
+                    <div class="account-connected-actions">
+                      <span class="account-connected-badge" id="connected-google-status">Not connected</span>
+                      <div
+                        class="account-google-button"
+                        id="connected-google-button"
+                        aria-label="Connect Google account"
+                        aria-busy="true"
+                      ></div>
                     </div>
                   </div>
                 </div>
@@ -3354,6 +3398,9 @@
     const accountMajorValue = document.getElementById("account-major-value");
     const accountMajorMenu = document.getElementById("account-major-menu");
     const accountAucIdInput = document.getElementById("account-auc-id");
+    const googleAccountHeading = document.getElementById("connected-google-heading");
+    const googleAccountStatus = document.getElementById("connected-google-status");
+    const googleAccountButton = document.getElementById("connected-google-button");
     const securityMessage = document.getElementById("security-message");
     const deleteAccountButton = document.getElementById("delete-account-button");
     const deleteAccountModal = document.getElementById("delete-account-modal");
@@ -3425,6 +3472,8 @@
 
     let accountCurrentUser = null;
     let accountTwoFactor = { appEnabled: false, emailEnabled: false };
+    let accountGoogleLinked = false;
+    let googleAccountInitialized = false;
     let securityPanelAccessToken = "";
     let securityAccessResolver = null;
     let activePhotoPreviewUrl = "";
@@ -5423,6 +5472,179 @@
       }
     }
 
+    function waitForGoogleIdentity() {
+      return new Promise(function (resolve, reject) {
+        let attempts = 0;
+
+        function checkGoogleIdentity() {
+          if (
+            window.google &&
+            window.google.accounts &&
+            window.google.accounts.id
+          ) {
+            resolve();
+            return;
+          }
+
+          attempts += 1;
+
+          if (attempts >= 50) {
+            reject(new Error("Google account linking could not be loaded."));
+            return;
+          }
+
+          window.setTimeout(checkGoogleIdentity, 100);
+        }
+
+        checkGoogleIdentity();
+      });
+    }
+
+    function syncGoogleAccountState(isLinked) {
+      accountGoogleLinked = Boolean(isLinked);
+
+      if (googleAccountHeading) {
+        googleAccountHeading.textContent = accountGoogleLinked
+          ? "Connected"
+          : "Not connected";
+      }
+
+      if (googleAccountStatus) {
+        googleAccountStatus.textContent = accountGoogleLinked
+          ? "Connected"
+          : "Not connected";
+        googleAccountStatus.classList.toggle(
+          "is-connected",
+          accountGoogleLinked
+        );
+      }
+
+      if (googleAccountButton) {
+        googleAccountButton.hidden = accountGoogleLinked;
+
+        if (accountGoogleLinked) {
+          googleAccountButton.innerHTML = "";
+        } else {
+          initializeGoogleAccountButton();
+        }
+      }
+    }
+
+    async function handleGoogleLinkCredential(response) {
+      const credential = response && response.credential
+        ? response.credential
+        : "";
+
+      if (!credential) {
+        showMessage(detailsMessage, "Choose a Google account.", "error");
+        return;
+      }
+
+      showMessage(detailsMessage, "Connecting Google...", "");
+
+      try {
+        const linkResponse = await fetch("/api/google-auth", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            action: "link",
+            credential: credential
+          })
+        });
+        const data = await linkResponse.json().catch(function () {
+          return {};
+        });
+
+        if (!linkResponse.ok || !data.success) {
+          throw new Error(
+            data.error || "Google could not be connected."
+          );
+        }
+
+        if (accountCurrentUser) {
+          accountCurrentUser.googleLinked = true;
+        }
+
+        syncGoogleAccountState(true);
+        showMessage(
+          detailsMessage,
+          "Google connected successfully. You can now use it to log in.",
+          "success"
+        );
+      } catch (error) {
+        showMessage(
+          detailsMessage,
+          error.message || "Google could not be connected.",
+          "error"
+        );
+      }
+    }
+
+    async function initializeGoogleAccountButton() {
+      if (
+        !googleAccountButton ||
+        accountGoogleLinked ||
+        googleAccountInitialized
+      ) {
+        return;
+      }
+
+      googleAccountInitialized = true;
+
+      try {
+        const configResponse = await fetch("/api/google-auth", {
+          method: "GET",
+          credentials: "same-origin",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+        const config = await configResponse.json().catch(function () {
+          return {};
+        });
+
+        if (!configResponse.ok || !config.clientId) {
+          throw new Error(
+            config.error || "Google account linking is unavailable."
+          );
+        }
+
+        await waitForGoogleIdentity();
+
+        window.google.accounts.id.initialize({
+          client_id: config.clientId,
+          callback: handleGoogleLinkCredential,
+          auto_select: false,
+          cancel_on_tap_outside: true
+        });
+
+        window.google.accounts.id.renderButton(
+          googleAccountButton,
+          {
+            type: "standard",
+            theme: "outline",
+            size: "large",
+            text: "continue_with",
+            shape: "pill",
+            width: 220
+          }
+        );
+
+        googleAccountButton.setAttribute("aria-busy", "false");
+      } catch (error) {
+        googleAccountInitialized = false;
+        googleAccountButton.hidden = true;
+        showMessage(
+          detailsMessage,
+          error.message || "Google account linking is unavailable.",
+          "error"
+        );
+      }
+    }
+
     function hydrateAccountDetails(user) {
       const displayName = user.fullName || user.displayName || String(user.email || "").split("@")[0] || "AUC Student";
       const savedAucId = user.aucId || user.aucIdLookupKey || "";
@@ -5445,6 +5667,7 @@
       }
 
       syncTwoFactorState(user.twoFactor || {});
+      syncGoogleAccountState(user.googleLinked);
 
       clearTemporaryProfilePhotoPreview();
       photoInitial.textContent = getAccountInitials(user);
