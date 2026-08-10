@@ -2678,8 +2678,38 @@
       place-items: center;
     }
 
-    .course-material-preview-modal[hidden] {
+    .course-material-preview-modal[hidden],
+    .course-report-modal[hidden],
+    .quick-material-upload-modal[hidden] {
       display: none;
+      opacity: 0;
+    }
+
+    .course-material-preview-modal,
+    .course-report-modal,
+    .quick-material-upload-modal {
+      opacity: 1;
+      transition:
+        opacity 0.24s ease,
+        display 0.24s;
+      transition-behavior: allow-discrete;
+      will-change: opacity;
+    }
+
+    @starting-style {
+      .course-material-preview-modal:not([hidden]),
+      .course-report-modal:not([hidden]),
+      .quick-material-upload-modal:not([hidden]) {
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-material-preview-modal,
+      .course-report-modal,
+      .quick-material-upload-modal {
+        transition: none;
+      }
     }
 
     .course-material-preview-backdrop {
