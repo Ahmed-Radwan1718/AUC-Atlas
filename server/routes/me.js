@@ -309,6 +309,7 @@ module.exports = async function handler(req, res) {
           major: savedMajor,
           aucId: savedAucId,
           authProvider,
+          googleLinked: Boolean(userData.googleLinked),
           twoFactor,
           displayNameLastChangedAt,
           aucIdLastChangedAt
@@ -353,6 +354,7 @@ module.exports = async function handler(req, res) {
         major,
         aucId,
         authProvider,
+        googleLinked: Boolean(userData.googleLinked),
         twoFactor,
         displayNameLastChangedAt,
         aucIdLastChangedAt
