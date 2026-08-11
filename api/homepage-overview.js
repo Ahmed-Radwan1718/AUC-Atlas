@@ -81,11 +81,30 @@ async function getLatestReviews(limit) {
 }
 
 async function getLatestMaterials(limit) {
-  const snapshot = await admin.firestore()
-    .collection("courseMaterials")
-    .orderBy("createdAt", "desc")
-    .limit(100)
-    .get();
+  const safeLimit = Math.max(
+    1,
+    Math.min(
+      12,
+      Math.floor(Number(limit) || 3)
+    )
+  );
+  const collection = admin.firestore()
+    .collection("courseMaterials");
+  let snapshot;
+
+  try {
+    snapshot = await collection
+      .where("status", "==", "approved")
+      .orderBy("createdAt", "desc")
+      .limit(safeLimit)
+      .get();
+  } catch (error) {
+    snapshot = await collection
+      .orderBy("createdAt", "desc")
+      .limit(20)
+      .get();
+  }
+
   const materials = [];
 
   snapshot.forEach(function (doc) {
@@ -103,13 +122,14 @@ async function getLatestMaterials(limit) {
     materials.push(serializeMaterial(doc));
   });
 
-  return materials.slice(
-    0,
-    Math.max(
-      1,
-      Math.min(12, limit)
-    )
-  );
+  materials.sort(function (a, b) {
+    return (
+      getTimestampMillis(b.createdAt) -
+      getTimestampMillis(a.createdAt)
+    );
+  });
+
+  return materials.slice(0, safeLimit);
 }
 
 module.exports = async function handler(req, res) {
