@@ -758,7 +758,7 @@
 
     .account-connected-grid {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
     }
 
@@ -871,6 +871,56 @@
       border: 1px solid rgba(23, 23, 23, 0.1);
       background: rgba(23, 23, 23, 0.05);
       color: rgba(23, 23, 23, 0.56);
+    }
+
+    .account-connected-action-button {
+      min-height: 32px;
+      padding: 0 13px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .account-connected-action-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .account-connected-action-button:disabled {
+      opacity: 0.52;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .account-connected-action-button.is-connect {
+      border: 1px solid rgba(192, 154, 92, 0.42);
+      background: rgba(192, 154, 92, 0.16);
+      color: #765121;
+    }
+
+    .account-connected-action-button.is-connect:hover {
+      border-color: rgba(192, 154, 92, 0.62);
+      background: rgba(192, 154, 92, 0.24);
+    }
+
+    .account-connected-action-button.is-disconnect {
+      border: 1px solid rgba(157, 59, 59, 0.3);
+      background: rgba(157, 59, 59, 0.09);
+      color: #9d3b3b;
+    }
+
+    .account-connected-action-button.is-disconnect:hover {
+      border-color: rgba(157, 59, 59, 0.48);
+      background: rgba(157, 59, 59, 0.14);
     }
 
     .account-login-session-card {
@@ -2739,6 +2789,22 @@
 
                     <div class="account-connected-actions">
                       <span class="account-connected-badge is-connected">Connected</span>
+                    </div>
+                  </div>
+
+                  <div class="account-connected-account-card" id="connected-google-card">
+                    <div class="account-connected-account-main">
+                      <div class="account-connected-title">
+                        <img class="account-connected-icon" src="google-logo.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                        <span>Google</span>
+                      </div>
+                      <strong id="connected-google-status">Not Connected</strong>
+                      <p>Use your Google account to sign in faster.</p>
+                    </div>
+
+                    <div class="account-connected-actions">
+                      <span class="account-connected-badge" id="connected-google-badge">Not Connected</span>
+                      <button class="account-connected-action-button is-connect" type="button" id="connected-google-action" data-provider="google">Connect</button>
                     </div>
                   </div>
                 </div>
