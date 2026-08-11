@@ -309,7 +309,6 @@ module.exports = async function handler(req, res) {
           major: savedMajor,
           aucId: savedAucId,
           authProvider,
-          googleLinked: Boolean(userData.googleLinked),
           twoFactor,
           displayNameLastChangedAt,
           aucIdLastChangedAt
@@ -335,22 +334,6 @@ module.exports = async function handler(req, res) {
     const major = userData.major || "";
     const aucId = userData.aucId || userData.aucIdLookupKey || "";
     const authProvider = userData.authProvider || "password";
-    const googleProvider =
-      Array.isArray(userRecord.providerData)
-        ? userRecord.providerData.find(function (provider) {
-            return (
-              provider &&
-              provider.providerId === "google.com"
-            );
-          }) || null
-        : null;
-    const googleLinked =
-      Boolean(googleProvider);
-    const googleLinkedEmail =
-      cleanString(
-        googleProvider && googleProvider.email,
-        320
-      ).toLowerCase();
     const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
     const aucIdLastChangedAt = userData.aucIdLastChangedAt || null;
     const twoFactor = await getTwoFactorResponse(decodedUser.uid, userData);
@@ -370,8 +353,6 @@ module.exports = async function handler(req, res) {
         major,
         aucId,
         authProvider,
-        googleLinked,
-        googleLinkedEmail,
         twoFactor,
         displayNameLastChangedAt,
         aucIdLastChangedAt
