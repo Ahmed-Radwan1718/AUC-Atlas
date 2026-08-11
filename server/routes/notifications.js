@@ -181,7 +181,7 @@ async function getActiveNotifications() {
     .firestore()
     .collection("siteNotifications")
     .orderBy("createdAtIso", "desc")
-    .limit(100)
+    .limit(20)
     .get();
   const notifications = [];
 
@@ -204,9 +204,32 @@ async function getActiveNotifications() {
 }
 
 async function getReadNotificationIds(
-  uid
+  uid,
+  notificationIds
 ) {
-  if (!uid) {
+  const safeNotificationIds =
+    Array.from(
+      new Set(
+        (
+          Array.isArray(notificationIds)
+            ? notificationIds
+            : []
+        )
+          .map(function (id) {
+            return cleanString(id, 180);
+          })
+          .filter(function (id) {
+            return /^[A-Za-z0-9_-]{6,180}$/.test(
+              id
+            );
+          })
+      )
+    ).slice(0, 20);
+
+  if (
+    !uid ||
+    !safeNotificationIds.length
+  ) {
     return new Set();
   }
 
@@ -215,7 +238,11 @@ async function getReadNotificationIds(
     .collection("users")
     .doc(uid)
     .collection("notificationReads")
-    .limit(500)
+    .where(
+      admin.firestore.FieldPath.documentId(),
+      "in",
+      safeNotificationIds
+    )
     .get();
   const ids = new Set();
 
@@ -246,9 +273,16 @@ module.exports = async function handler(
         );
       const activeNotifications =
         await getActiveNotifications();
+      const activeNotificationIds =
+        activeNotifications.map(
+          function (entry) {
+            return entry.doc.id;
+          }
+        );
       const readNotificationIds =
         await getReadNotificationIds(
-          viewer ? viewer.uid : ""
+          viewer ? viewer.uid : "",
+          activeNotificationIds
         );
       const summaryOnly =
         String(
