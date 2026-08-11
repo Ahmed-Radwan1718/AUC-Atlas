@@ -898,75 +898,138 @@
     }
 
     #admin-auth {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
-      grid-template-areas:
-        "kicker copy"
-        "title copy"
-        "form form";
-      column-gap: 28px;
-      align-items: center;
+      width: min(500px, calc(100% - 8px));
+      margin: 0 auto;
+      display: block;
     }
 
     #admin-auth > .admin-kicker {
-      grid-area: kicker;
-      margin-bottom: 12px;
-      align-self: end;
+      display: none;
     }
 
     #admin-auth > h1 {
-      grid-area: title;
-      max-width: 520px;
-      margin: 0;
-      align-self: start;
+      max-width: 620px;
+      margin: 0 0 22px;
+      color: #171717;
+      font-size: clamp(30px, 3.2vw, 46px);
+      font-weight: 600;
+      line-height: 1.05;
+      text-transform: uppercase;
     }
 
     #admin-auth > p:not(.admin-kicker) {
-      grid-area: copy;
-      max-width: 430px;
-      margin: 0 0 0 auto;
+      max-width: 560px;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.66);
       font-size: 15px;
+      font-weight: 400;
       line-height: 1.6;
-      text-align: right;
+      text-align: left;
     }
 
     #admin-auth .admin-auth-form {
-      grid-area: form;
       width: 100%;
-      margin: 32px 0 0;
-      padding: 18px;
+      margin: 34px 0 0;
+      padding: 30px;
       border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 28px;
-      background: rgba(255, 255, 255, 0.76);
-      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.12);
       text-align: left;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 180px;
-      grid-template-areas:
-        "field submit"
-        "message message";
-      gap: 10px 12px;
-      align-items: end;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      align-items: stretch;
     }
 
     #admin-auth .admin-auth-form .admin-field {
-      grid-area: field;
+      grid-area: auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    #admin-auth .admin-auth-form .admin-field label {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    #admin-auth .admin-auth-form .admin-field input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 18px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      outline: none;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    #admin-auth .admin-auth-form .admin-field input:focus {
+      background: white;
+      border-color: rgba(192, 154, 92, 0.84);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
     }
 
     #admin-auth .admin-auth-submit {
-      grid-area: submit;
+      grid-area: auto;
       width: 100%;
       min-height: 52px;
+      margin-top: 4px;
+      border: 1px solid rgba(192, 154, 92, 0.84);
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.84);
+      color: white;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    #admin-auth .admin-auth-submit:hover {
+      border-color: rgba(171, 132, 70, 0.92);
+      background: rgba(171, 132, 70, 0.92);
+      opacity: 1;
+    }
+
+    #admin-auth .admin-auth-submit:active {
+      transform: translateY(1px);
+    }
+
+    #admin-auth .admin-auth-submit:disabled {
+      cursor: wait;
+      opacity: 0.58;
+      transform: none;
     }
 
     #admin-auth .admin-auth-form .admin-message {
-      grid-area: message;
-      min-height: 0;
+      grid-area: auto;
+      min-height: 22px;
       margin: 0;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
     }
 
-    #admin-auth .admin-auth-form .admin-message:empty {
-      display: none;
+    #admin-auth .admin-auth-form .admin-message.error {
+      color: #9d3b3b;
     }
 
     .admin-state-card a {
@@ -986,9 +1049,15 @@
       transform: translateY(-1px);
     }
 
-    #admin-auth .admin-auth-submit:hover {
-      border-color: rgba(178, 139, 74, 0.94);
-      background: rgba(178, 139, 74, 0.94);
+    @media (max-width: 900px) {
+      #admin-auth > h1 {
+        font-size: 34px;
+      }
+
+      #admin-auth .admin-auth-form {
+        padding: 22px;
+        border-radius: 22px;
+      }
     }
 
     .admin-header {
@@ -1529,42 +1598,19 @@
         align-items: start;
       }
 
-      #admin-loading,
-      #admin-auth {
-        grid-template-columns: 1fr;
-        align-items: start;
-      }
-
       #admin-loading {
+        grid-template-columns: 1fr;
         grid-template-areas:
           "kicker"
           "title"
           "copy";
+        align-items: start;
       }
 
-      #admin-auth {
-        grid-template-areas:
-          "kicker"
-          "title"
-          "copy"
-          "form";
-      }
-
-      #admin-loading > p:not(.admin-kicker),
-      #admin-auth > p:not(.admin-kicker) {
+      #admin-loading > p:not(.admin-kicker) {
         max-width: 560px;
         margin: 18px 0 0;
         text-align: left;
-      }
-
-      #admin-auth .admin-auth-form {
-        margin-top: 26px;
-        padding: 18px;
-        grid-template-columns: 1fr;
-        grid-template-areas:
-          "field"
-          "submit"
-          "message";
       }
 
       .admin-header-copy {
