@@ -134,18 +134,6 @@
     document.getElementById(
       "admin-notification-type"
     );
-  const notificationLinkUrlInput =
-    document.getElementById(
-      "admin-notification-link-url"
-    );
-  const notificationLinkLabelInput =
-    document.getElementById(
-      "admin-notification-link-label"
-    );
-  const notificationExpiresAtInput =
-    document.getElementById(
-      "admin-notification-expires-at"
-    );
   const notificationSubmit =
     document.getElementById(
       "admin-notification-submit"
@@ -1661,34 +1649,6 @@
       ""
     );
 
-    let expiresAt = "";
-
-    if (
-      notificationExpiresAtInput.value
-    ) {
-      const expiresAtDate = new Date(
-        notificationExpiresAtInput.value
-      );
-
-      if (
-        Number.isNaN(
-          expiresAtDate.getTime()
-        ) ||
-        expiresAtDate.getTime() <=
-          Date.now()
-      ) {
-        setMessage(
-          notificationFormMessage,
-          "Choose a future expiration date and time.",
-          "error"
-        );
-        return;
-      }
-
-      expiresAt =
-        expiresAtDate.toISOString();
-    }
-
     runBusy(
       notificationSubmit,
       async function () {
@@ -1700,12 +1660,7 @@
           message:
             notificationMessageInput.value,
           type:
-            notificationTypeInput.value,
-          linkUrl:
-            notificationLinkUrlInput.value,
-          linkLabel:
-            notificationLinkLabelInput.value,
-          expiresAt
+            notificationTypeInput.value
         });
 
         notificationForm.reset();
