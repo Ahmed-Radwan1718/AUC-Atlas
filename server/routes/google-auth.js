@@ -41,14 +41,24 @@ function createGoogleAuthError(message, statusCode) {
   return error;
 }
 
-function getGoogleClientId() {
-  const clientId = cleanString(process.env.GOOGLE_CLIENT_ID, 300);
+function getFirebaseWebConfig() {
+  const projectId = cleanString(
+    process.env.FIREBASE_PROJECT_ID,
+    200
+  );
 
-  if (!/^[A-Za-z0-9.-]+\.apps\.googleusercontent\.com$/.test(clientId)) {
-    throw createGoogleAuthError("Google sign-in is not configured.", 500);
+  if (!/^[a-z0-9-]+$/i.test(projectId)) {
+    throw createGoogleAuthError(
+      "Firebase login is not configured.",
+      500
+    );
   }
 
-  return clientId;
+  return {
+    apiKey: getFirebaseWebApiKey(),
+    authDomain: projectId + ".firebaseapp.com",
+    projectId
+  };
 }
 
 function getFirebaseWebApiKey() {
@@ -87,7 +97,6 @@ function decodeGoogleCredential(credential) {
     payload.email_verified === "true";
 
   if (
-    payload.aud !== getGoogleClientId() ||
     !emailVerified ||
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   ) {
@@ -379,50 +388,6 @@ async function handleGoogleLink(req, res, credential) {
   });
 }
 
-  const customToken = await admin.auth().createCustomToken(
-    decodedUser.uid
-  );
-  const currentSignIn = await signInWithCustomToken(customToken);
-
-  if (!currentSignIn.idToken) {
-    throw createGoogleAuthError(
-      "Could not verify your Atlas account.",
-      500
-    );
-  }
-
-  const linkedResult = await exchangeGoogleCredential(
-    credential,
-    currentSignIn.idToken
-  );
-
-  if (linkedResult.data.localId !== decodedUser.uid) {
-    throw createGoogleAuthError(
-      "Google could not be connected to this Atlas account.",
-      409
-    );
-  }
-
-  const linkedUserRecord = await admin.auth().getUser(
-    decodedUser.uid
-  );
-
-  if (!hasGoogleProvider(linkedUserRecord)) {
-    throw createGoogleAuthError(
-      "Google could not be connected to this Atlas account.",
-      409
-    );
-  }
-
-  await saveGoogleLinked(decodedUser.uid);
-
-  return res.status(200).json({
-    success: true,
-    linked: true,
-    email: atlasEmail
-  });
-}
-
 async function handleGoogleLogin(req, res, credential) {
   await consumeSecurityRateLimit({
     scope: "google-login-ip",
@@ -559,7 +524,7 @@ module.exports = async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        clientId: getGoogleClientId()
+        firebaseConfig: getFirebaseWebConfig()
       });
     }
 
