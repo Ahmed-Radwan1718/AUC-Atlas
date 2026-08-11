@@ -71,7 +71,8 @@
 
   const professorReviewCountCache = new Map();
   const professorReviewCountRequests = new Map();
-  const professorReviewCountCacheLifetime = 15000;
+  const professorReviewCountCacheLifetime =
+    15 * 60 * 1000;
 
   function getReviewCountLabel(count) {
     return count + " " + (count === 1 ? "review" : "reviews");
@@ -496,7 +497,7 @@
 
     materialSearchTimer = window.setTimeout(function () {
       searchMaterials(query, requestNumber);
-    }, 220);
+    }, 650);
   }
 
   form.addEventListener("submit", function (event) {
