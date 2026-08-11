@@ -119,88 +119,104 @@ function getRequestBody(req) {
   return req.body || {};
 }
 
-function getImageKitConfig() {
-  const privateKey = cleanString(
-    process.env.IMAGEKIT_PRIVATE_KEY,
-    500
-  );
-  const publicKey = cleanString(
-    process.env.IMAGEKIT_PUBLIC_KEY,
-    500
-  );
-  const urlEndpoint = cleanString(
-    process.env.IMAGEKIT_URL_ENDPOINT,
+function getStorageConfig() {
+  const url = cleanString(
+    process.env.COURSE_MATERIAL_STORAGE_URL,
     1000
-  );
+  ).replace(/\/+$/, "");
+  const secret = cleanString(
+    process.env.COURSE_MATERIAL_STORAGE_SECRET,
+    500
+  ).toLowerCase();
 
-  if (!privateKey || !publicKey || !urlEndpoint) {
+  let parsedUrl = null;
+
+  try {
+    parsedUrl = new URL(url);
+  } catch (error) {
+    parsedUrl = null;
+  }
+
+  if (
+    !parsedUrl ||
+    parsedUrl.protocol !== "https:" ||
+    parsedUrl.username ||
+    parsedUrl.password ||
+    !/^[a-f0-9]{64}$/.test(secret)
+  ) {
     throw createImageKitAuthError(
-      "ImageKit environment variables are missing.",
+      "Course-material storage is not configured.",
       500
     );
   }
 
-  return { privateKey, publicKey, urlEndpoint };
+  return {
+    url: parsedUrl.origin,
+    secret
+  };
 }
 
-function getImageKitAuthorizationHeader(privateKey) {
-  return "Basic " +
-    Buffer.from(privateKey + ":").toString("base64");
-}
+function getMaterialMimeType(fileName) {
+  const mimeTypes = {
+    pdf: "application/pdf",
+    doc: "application/msword",
+    docx:
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ppt: "application/vnd.ms-powerpoint",
+    pptx:
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    xls: "application/vnd.ms-excel",
+    xlsx:
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png"
+  };
 
-function buildImageKitFileName(fileName) {
-  const safeFileName = cleanMaterialFileName(fileName);
-  const extension = getMaterialFileExtension(safeFileName);
-  const baseName = safeFileName
-    .replace(/\.[A-Za-z0-9]+$/, "")
-    .replace(/[^A-Za-z0-9-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 180) || "course-material";
-
-  return baseName + "." + extension;
-}
-
-function base64UrlEncode(value) {
-  const buffer = Buffer.from(
-    typeof value === "string"
-      ? value
-      : JSON.stringify(value)
+  return (
+    mimeTypes[getMaterialFileExtension(fileName)] ||
+    ""
   );
-
-  return buffer
-    .toString("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
 }
 
-function createImageKitV2Token(
-  uploadPayload,
-  publicKey,
-  privateKey,
-  issuedAt,
-  expiresAt
-) {
-  const encodedHeader = base64UrlEncode({
-    alg: "HS256",
-    typ: "JWT",
-    kid: publicKey
+function createStorageSignature(secret, parts) {
+  return crypto
+    .createHmac("sha256", secret)
+    .update(parts.join("\n"))
+    .digest("hex");
+}
+
+function buildStorageUploadUrl(config, data) {
+  const query = new URLSearchParams({
+    key: data.storageKey,
+    filename: data.fileName,
+    size: String(data.fileSize),
+    type: data.fileType,
+    expires: String(data.expiresAt),
+    nonce: data.nonce
   });
-  const encodedPayload = base64UrlEncode(
-    Object.assign({}, uploadPayload, {
-      iat: issuedAt,
-      exp: expiresAt
-    })
-  );
-  const signature = crypto
-    .createHmac("sha256", privateKey)
-    .update(encodedHeader + "." + encodedPayload)
-    .digest("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
 
-  return encodedHeader + "." + encodedPayload + "." + signature;
+  query.set(
+    "signature",
+    createStorageSignature(
+      config.secret,
+      [
+        "upload",
+        data.storageKey,
+        data.fileName,
+        String(data.fileSize),
+        data.fileType,
+        String(data.expiresAt),
+        data.nonce
+      ]
+    )
+  );
+
+  return (
+    config.url +
+    "/upload?" +
+    query.toString()
+  );
 }
 
 async function ensureVerifiedAucUser(req) {
@@ -256,67 +272,35 @@ async function ensureVerifiedAucUser(req) {
   };
 }
 
-async function getImageKitStoredBytesForUploader(
-  privateKey,
-  uploaderTag
+async function getStoredBytesForUploader(
+  uploaderUid
 ) {
-  const pageSize = 1000;
-  let skip = 0;
+  const snapshot = await admin
+    .firestore()
+    .collection("courseMaterials")
+    .where("uploaderUid", "==", uploaderUid)
+    .get();
+
   let totalBytes = 0;
 
-  while (true) {
-    const query = new URLSearchParams({
-      tags: uploaderTag,
-      type: "file",
-      limit: String(pageSize),
-      skip: String(skip),
-      sort: "DESC_CREATED"
-    });
-    const response = await fetch(
-      "https://api.imagekit.io/v1/files?" +
-        query.toString(),
-      {
-        headers: {
-          Accept: "application/json",
-          Authorization:
-            getImageKitAuthorizationHeader(privateKey)
-        }
-      }
-    );
+  snapshot.forEach(function (doc) {
+    const data = doc.data() || {};
+    const status = cleanString(
+      data.status,
+      40
+    ).toLowerCase();
 
-    if (!response.ok) {
-      throw createImageKitAuthError(
-        "Could not verify your current upload quota.",
-        502
-      );
+    if (status === "rejected") {
+      return;
     }
 
-    const files = await response.json().catch(
-      function () {
-        return [];
-      }
+    totalBytes += Math.max(
+      0,
+      Number(data.size) || 0
     );
-    const safeFiles = Array.isArray(files)
-      ? files
-      : [];
+  });
 
-    totalBytes += safeFiles.reduce(
-      function (pageBytes, file) {
-        return pageBytes +
-          Math.max(
-            0,
-            Number(file && file.size) || 0
-          );
-      },
-      0
-    );
-
-    if (safeFiles.length < pageSize) {
-      return totalBytes;
-    }
-
-    skip += pageSize;
-  }
+  return totalBytes;
 }
 
 async function reserveMaterialUploadAuthorization(data) {
@@ -390,9 +374,11 @@ async function reserveMaterialUploadAuthorization(data) {
       materialType: data.materialType,
       title: data.title,
       fileName: data.fileName,
-      uploadFileName: data.uploadFileName,
+      uploadFileName: data.fileName,
       fileSize: data.fileSize,
-      folder: data.folder,
+      fileType: data.fileType,
+      storageKey: data.storageKey,
+      folder: "",
       isAnonymous: cleanBoolean(data.isAnonymous),
       uploaderDisplayName: data.uploaderDisplayName,
       uploaderPhotoURL: data.uploaderPhotoURL,
@@ -515,7 +501,7 @@ module.exports = async function handler(req, res) {
         "Too many course-material upload requests. Please try again later."
     });
 
-    const config = getImageKitConfig();
+    const config = getStorageConfig();
     const courseCode = cleanString(
       body.courseCode,
       40
@@ -537,6 +523,7 @@ module.exports = async function handler(req, res) {
     const title = cleanString(body.title, 160);
     const fileName = cleanMaterialFileName(body.fileName);
     const fileSize = Number(body.fileSize);
+    const fileType = getMaterialMimeType(fileName);
 
     if (
       !courseCode ||
@@ -545,6 +532,7 @@ module.exports = async function handler(req, res) {
       !materialType ||
       !title ||
       !isAllowedMaterialFileName(fileName) ||
+      !fileType ||
       !Number.isSafeInteger(fileSize) ||
       fileSize <= 0 ||
       fileSize > MATERIAL_MAX_FILE_BYTES
@@ -557,65 +545,16 @@ module.exports = async function handler(req, res) {
 
     const authorizationId =
       crypto.randomBytes(18).toString("hex");
-    const courseSlug = slugifyMaterialValue(courseCode);
-    const professorSlug = slugifyMaterialValue(professor);
-    const semesterSlug = slugifyMaterialValue(semester);
-    const uploaderTag =
-      "uploader-" +
-      slugifyMaterialValue(uploader.uid);
-    const folder =
-      "/auc-atlas/materials/" +
-      courseSlug +
-      "/" +
-      professorSlug +
-      "/" +
-      semesterSlug;
-    const tags = [
-      "auc-atlas-material",
-      "status-approved",
-      "course-" + courseSlug,
-      "professor-" + professorSlug,
-      "semester-" + semesterSlug,
-      "material-type-" +
-        slugifyMaterialValue(materialType),
-      uploaderTag,
-      "upload-auth-" + authorizationId
-    ];
-
-    const description = [
-      cleanDescriptionPart(title, 160),
-      cleanDescriptionPart(courseCode, 40),
-      cleanDescriptionPart(professor, 120),
-      cleanDescriptionPart(semester, 80),
-      cleanDescriptionPart(materialType, 80),
-      cleanDescriptionPart(
-        uploader.displayName,
-        80
-      ),
-      cleanDescriptionPart(uploader.photoURL, 500),
-      cleanDescriptionPart(uploader.uid, 160),
-      cleanDescriptionPart(fileName, 240)
-    ].join(" | ");
-    const uploadFileName =
-      buildImageKitFileName(fileName);
-    const checks = buildImageKitUploadChecks(fileSize);
-    const issuedAt = Math.floor(Date.now() / 1000);
+    const nonce =
+      crypto.randomBytes(18).toString("hex");
+    const issuedAt =
+      Math.floor(Date.now() / 1000);
     const expiresAt =
       issuedAt + MATERIAL_UPLOAD_AUTH_TTL_SECONDS;
     const expiresAtMs = expiresAt * 1000;
-    const uploadPayload = {
-      fileName: uploadFileName,
-      useUniqueFileName: "true",
-      folder,
-      isPrivateFile: "true",
-      tags: tags.join(","),
-      checks,
-      description
-    };
     const currentStoredBytes =
-      await getImageKitStoredBytesForUploader(
-        config.privateKey,
-        uploaderTag
+      await getStoredBytesForUploader(
+        uploader.uid
       );
 
     await reserveMaterialUploadAuthorization({
@@ -631,24 +570,30 @@ module.exports = async function handler(req, res) {
       isAnonymous,
       title,
       fileName,
-      uploadFileName,
       fileSize,
-      folder,
+      fileType,
+      storageKey: authorizationId,
       expiresAtMs,
       currentStoredBytes
     });
 
+    const uploadUrl = buildStorageUploadUrl(
+      config,
+      {
+        storageKey: authorizationId,
+        fileName,
+        fileSize,
+        fileType,
+        expiresAt,
+        nonce
+      }
+    );
+
     return res.status(200).json({
-      token: createImageKitV2Token(
-        uploadPayload,
-        config.publicKey,
-        config.privateKey,
-        issuedAt,
-        expiresAt
-      ),
       authorizationId,
-      uploadPayload,
-      urlEndpoint: config.urlEndpoint,
+      storageKey: authorizationId,
+      uploadUrl,
+      fileType,
       expiresAt: new Date(expiresAtMs).toISOString(),
       limits: {
         maxFileBytes: MATERIAL_MAX_FILE_BYTES,
