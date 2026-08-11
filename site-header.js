@@ -6,6 +6,10 @@
   document.head.appendChild(faviconLink);
 
   const isAdminPage = /\/admin(?:\.html)?\/?$/.test(window.location.pathname);
+  const weeklyVisitCacheKey =
+    "aucAtlasWeeklyVisitCache";
+  const weeklyVisitCacheDurationMs =
+    30 * 60 * 1000;
 
   function clearLegacyUniqueVisitorId() {
     try {
@@ -25,12 +29,70 @@
     }
   }
 
+  function getCachedWeeklyVisitCount() {
+    try {
+      const cached = JSON.parse(
+        window.sessionStorage.getItem(
+          weeklyVisitCacheKey
+        ) || "null"
+      );
+      const savedAt = Number(
+        cached && cached.savedAt
+      );
+      const weeklyVisits = Number(
+        cached && cached.weeklyVisits
+      );
+
+      if (
+        !cached ||
+        !Number.isFinite(savedAt) ||
+        Date.now() - savedAt >
+          weeklyVisitCacheDurationMs ||
+        !Number.isFinite(weeklyVisits)
+      ) {
+        return null;
+      }
+
+      return Math.max(0, weeklyVisits);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function cacheWeeklyVisitCount(
+    weeklyVisits
+  ) {
+    try {
+      window.sessionStorage.setItem(
+        weeklyVisitCacheKey,
+        JSON.stringify({
+          savedAt: Date.now(),
+          weeklyVisits
+        })
+      );
+    } catch (error) {
+      // Session storage is unavailable.
+    }
+  }
+
   function trackWeeklyVisit() {
     if (
       isAdminPage ||
       typeof window.fetch !== "function"
     ) {
       return Promise.resolve(null);
+    }
+
+    const cachedWeeklyVisits =
+      getCachedWeeklyVisitCount();
+
+    if (cachedWeeklyVisits !== null) {
+      window.aucAtlasWeeklyVisits =
+        cachedWeeklyVisits;
+
+      return Promise.resolve(
+        cachedWeeklyVisits
+      );
     }
 
     return fetch("/api/weekly-visitors", {
@@ -58,6 +120,9 @@
 
         window.aucAtlasWeeklyVisits =
           weeklyVisits;
+        cacheWeeklyVisitCount(
+          weeklyVisits
+        );
 
         return weeklyVisits;
       })
@@ -911,6 +976,14 @@
 
   const notificationReadStorageKey =
     "auc-atlas-read-notifications";
+  const notificationSummaryStorageKey =
+    "auc-atlas-notification-summary";
+  const notificationSummaryCacheDurationMs =
+    30 * 60 * 1000;
+  const isNotificationsPage =
+    /\/notifications(?:\.html)?\/?$/.test(
+      window.location.pathname
+    );
 
   function getLocalReadNotificationIds() {
     try {
@@ -932,6 +1005,55 @@
       );
     } catch (error) {
       return new Set();
+    }
+  }
+
+  function getCachedNotificationSummary() {
+    try {
+      const cached = JSON.parse(
+        sessionStorage.getItem(
+          notificationSummaryStorageKey
+        ) || "null"
+      );
+
+      if (
+        !cached ||
+        !cached.data ||
+        typeof cached.data !== "object" ||
+        Date.now() -
+          Number(cached.savedAt || 0) >
+          notificationSummaryCacheDurationMs
+      ) {
+        return null;
+      }
+
+      return cached.data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function cacheNotificationSummary(data) {
+    try {
+      sessionStorage.setItem(
+        notificationSummaryStorageKey,
+        JSON.stringify({
+          savedAt: Date.now(),
+          data
+        })
+      );
+    } catch (error) {
+      // Session storage is unavailable.
+    }
+  }
+
+  function clearNotificationSummaryCache() {
+    try {
+      sessionStorage.removeItem(
+        notificationSummaryStorageKey
+      );
+    } catch (error) {
+      // Session storage is unavailable.
     }
   }
 
@@ -964,30 +1086,43 @@
     );
   }
 
-  async function loadNotificationState() {
-    try {
-      const response = await fetch(
-        "/api/notifications?summary=1",
-        {
-          method: "GET",
-          credentials: "same-origin",
-          cache: "no-store",
-          headers: {
-            Accept: "application/json"
-          }
-        }
-      );
-      const data = await response
-        .json()
-        .catch(function () {
-          return {};
-        });
+  async function loadNotificationState(
+    options
+  ) {
+    const settings = options || {};
 
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-          "Could not load notifications."
+    try {
+      let data = settings.force
+        ? null
+        : getCachedNotificationSummary();
+
+      if (!data) {
+        const response = await fetch(
+          "/api/notifications?summary=1",
+          {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+              Accept: "application/json"
+            }
+          }
         );
+
+        data = await response
+          .json()
+          .catch(function () {
+            return {};
+          });
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ||
+            "Could not load notifications."
+          );
+        }
+
+        cacheNotificationSummary(data);
       }
 
       const notificationIds =
@@ -1026,21 +1161,21 @@
     }
   }
 
-  loadNotificationState();
-
-  window.setInterval(
-    loadNotificationState,
-    60000
-  );
-
-  window.addEventListener(
-    "focus",
-    loadNotificationState
-  );
+  if (!isNotificationsPage) {
+    loadNotificationState();
+  }
 
   window.addEventListener(
     "aucAtlasNotificationsUpdated",
-    loadNotificationState
+    function () {
+      clearNotificationSummaryCache();
+
+      if (!isNotificationsPage) {
+        loadNotificationState({
+          force: true
+        });
+      }
+    }
   );
 
   window.addEventListener(
@@ -1050,7 +1185,13 @@
         event.key ===
         notificationReadStorageKey
       ) {
-        loadNotificationState();
+        clearNotificationSummaryCache();
+
+        if (!isNotificationsPage) {
+          loadNotificationState({
+            force: true
+          });
+        }
       }
     }
   );
