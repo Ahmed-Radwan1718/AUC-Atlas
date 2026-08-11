@@ -830,18 +830,35 @@
     }
 
     .admin-state-card {
+      width: min(500px, 100%);
+      margin: 72px auto 0;
       padding: 30px;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.76);
-      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.12);
+      text-align: left;
+    }
+
+    #admin-loading,
+    #admin-auth {
+      width: min(500px, 100%);
+      margin: 72px auto 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      text-align: left;
     }
 
     .admin-state-card h1 {
-      margin-bottom: 12px;
+      margin-bottom: 18px;
       color: #171717;
       font-size: clamp(30px, 3.2vw, 46px);
       font-weight: 600;
       line-height: 1.05;
+      text-transform: uppercase;
     }
 
     .admin-state-card p {
@@ -849,6 +866,37 @@
       font-size: 15px;
       font-weight: 400;
       line-height: 1.6;
+    }
+
+    #admin-auth {
+      display: block;
+    }
+
+    #admin-auth > .admin-kicker {
+      margin-bottom: 12px;
+    }
+
+    #admin-auth > h1 {
+      max-width: none;
+      margin: 0 0 18px;
+    }
+
+    #admin-auth > p:not(.admin-kicker) {
+      max-width: 500px;
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    #admin-auth .admin-auth-form {
+      width: 100%;
+      margin: 30px 0 0;
+      padding: 30px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.12);
+      text-align: left;
     }
 
     .admin-state-card a {
