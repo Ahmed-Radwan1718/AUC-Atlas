@@ -78,17 +78,21 @@ function decodeGoogleCredential(credential) {
     throw createGoogleAuthError("Google could not verify this account.", 401);
   }
 
-  const email = ensureAllowedAucEmail(
+  const email = cleanString(
     payload.email,
-    "use Google sign-in"
-  );
+    320
+  ).toLowerCase();
   const emailVerified =
     payload.email_verified === true ||
     payload.email_verified === "true";
 
-  if (payload.aud !== getGoogleClientId() || !emailVerified) {
+  if (
+    payload.aud !== getGoogleClientId() ||
+    !emailVerified ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  ) {
     throw createGoogleAuthError(
-      "Choose your verified AUC Google account.",
+      "Choose a verified Google account.",
       403
     );
   }
@@ -194,14 +198,38 @@ async function exchangeGoogleCredential(
   };
 }
 
+function getGoogleProvider(userRecord) {
+  if (
+    !userRecord ||
+    !Array.isArray(userRecord.providerData)
+  ) {
+    return null;
+  }
+
+  return userRecord.providerData.find(
+    function (provider) {
+      return (
+        provider &&
+        provider.providerId === "google.com"
+      );
+    }
+  ) || null;
+}
+
 function hasGoogleProvider(userRecord) {
   return Boolean(
-    userRecord &&
-    Array.isArray(userRecord.providerData) &&
-    userRecord.providerData.some(function (provider) {
-      return provider && provider.providerId === "google.com";
-    })
+    getGoogleProvider(userRecord)
   );
+}
+
+function getGoogleProviderEmail(userRecord) {
+  const provider =
+    getGoogleProvider(userRecord);
+
+  return cleanString(
+    provider && provider.email,
+    320
+  ).toLowerCase();
 }
 
 function getTwoFactorState(userData) {
@@ -218,10 +246,18 @@ function getTwoFactorState(userData) {
   };
 }
 
-async function saveGoogleLinked(uid) {
+async function saveGoogleLinked(
+  uid,
+  googleEmail
+) {
   await admin.firestore().collection("users").doc(uid).set(
     {
       googleLinked: true,
+      googleLinkedEmail:
+        cleanString(
+          googleEmail,
+          320
+        ).toLowerCase(),
       googleLinkedAt:
         admin.firestore.FieldValue.serverTimestamp()
     },
@@ -250,24 +286,98 @@ async function handleGoogleLink(req, res, credential) {
     userRecord.email || decodedUser.email,
     "connect Google"
   );
-  const googleCredential = decodeGoogleCredential(credential);
-
-  if (googleCredential.email !== atlasEmail) {
-    throw createGoogleAuthError(
-      "Choose the Google account with the same AUC email address as your Atlas account.",
-      409
-    );
-  }
+  const googleCredential =
+    decodeGoogleCredential(credential);
 
   if (hasGoogleProvider(userRecord)) {
-    await saveGoogleLinked(decodedUser.uid);
+    const existingGoogleEmail =
+      getGoogleProviderEmail(userRecord);
+
+    if (
+      !existingGoogleEmail ||
+      existingGoogleEmail !==
+        googleCredential.email
+    ) {
+      throw createGoogleAuthError(
+        "A different Google account is already connected to this Atlas account.",
+        409
+      );
+    }
+
+    await saveGoogleLinked(
+      decodedUser.uid,
+      existingGoogleEmail
+    );
 
     return res.status(200).json({
       success: true,
       linked: true,
-      email: atlasEmail
+      email: existingGoogleEmail
     });
   }
+
+  const customToken = await admin.auth().createCustomToken(
+    decodedUser.uid
+  );
+  const currentSignIn = await signInWithCustomToken(customToken);
+
+  if (!currentSignIn.idToken) {
+    throw createGoogleAuthError(
+      "Could not verify your Atlas account.",
+      500
+    );
+  }
+
+  const linkedResult = await exchangeGoogleCredential(
+    credential,
+    currentSignIn.idToken
+  );
+
+  if (linkedResult.data.localId !== decodedUser.uid) {
+    throw createGoogleAuthError(
+      "Google could not be connected to this Atlas account.",
+      409
+    );
+  }
+
+  await admin.auth().updateUser(
+    decodedUser.uid,
+    {
+      email: atlasEmail,
+      emailVerified: true
+    }
+  );
+
+  const linkedUserRecord = await admin.auth().getUser(
+    decodedUser.uid
+  );
+  const linkedGoogleEmail =
+    getGoogleProviderEmail(
+      linkedUserRecord
+    );
+
+  if (
+    !hasGoogleProvider(linkedUserRecord) ||
+    linkedGoogleEmail !==
+      googleCredential.email
+  ) {
+    throw createGoogleAuthError(
+      "Google could not be connected to this Atlas account.",
+      409
+    );
+  }
+
+  await saveGoogleLinked(
+    decodedUser.uid,
+    linkedGoogleEmail
+  );
+
+  return res.status(200).json({
+    success: true,
+    linked: true,
+    email: linkedGoogleEmail
+  });
+}
 
   const customToken = await admin.auth().createCustomToken(
     decodedUser.uid
@@ -346,22 +456,16 @@ async function handleGoogleLogin(req, res, credential) {
   }
 
   const userRecord = await admin.auth().getUser(uid);
+  const googleEmail =
+    getGoogleProviderEmail(userRecord);
 
-  if (!hasGoogleProvider(userRecord)) {
+  if (
+    !hasGoogleProvider(userRecord) ||
+    !googleEmail ||
+    googleEmail !== loginResult.email
+  ) {
     throw createGoogleAuthError(
       "This Google account is not connected to Atlas yet. Log in normally and connect it from My Account.",
-      403
-    );
-  }
-
-  const email = ensureAllowedAucEmail(
-    userRecord.email || loginResult.email,
-    "log in with Google"
-  );
-
-  if (!userRecord.emailVerified || email !== loginResult.email) {
-    throw createGoogleAuthError(
-      "Choose your verified AUC Google account.",
       403
     );
   }
@@ -379,6 +483,10 @@ async function handleGoogleLogin(req, res, credential) {
   }
 
   const userData = userDoc.data() || {};
+  const email = ensureAllowedAucEmail(
+    userData.email || userRecord.email,
+    "log in with Google"
+  );
   const twoFactor = getTwoFactorState(userData);
   const fullName =
     userData.fullName ||
@@ -388,6 +496,11 @@ async function handleGoogleLogin(req, res, credential) {
     userData.photoURL ||
     userRecord.photoURL ||
     "";
+
+  await admin.auth().updateUser(uid, {
+    email,
+    emailVerified: true
+  });
 
   if (twoFactor.appEnabled || twoFactor.emailEnabled) {
     await createLoginChallenge(uid, res, {
@@ -404,8 +517,20 @@ async function handleGoogleLogin(req, res, credential) {
     });
   }
 
+  const customToken =
+    await admin.auth().createCustomToken(uid);
+  const currentSignIn =
+    await signInWithCustomToken(customToken);
+
+  if (!currentSignIn.idToken) {
+    throw createGoogleAuthError(
+      "Could not start your Atlas session.",
+      500
+    );
+  }
+
   await createSiteSessionFromIdToken(
-    loginResult.data.idToken,
+    currentSignIn.idToken,
     res,
     req
   );
