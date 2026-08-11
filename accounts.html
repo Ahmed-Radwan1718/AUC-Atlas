@@ -2762,12 +2762,12 @@
                         <img class="account-connected-icon" src="google-logo.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
                         <span>Google Account</span>
                       </div>
-                      <strong id="connected-google-heading">Not connected</strong>
-                      <p>Connect the Google account using the exact same AUC email address as this Atlas account.</p>
+                      <strong id="connected-google-heading">Connect Google</strong>
+                      <p>Connect any verified Google account to use it as another way to log in to this Atlas account.</p>
                     </div>
 
                     <div class="account-connected-actions">
-                      <span class="account-connected-badge" id="connected-google-status">Not connected</span>
+                      <span class="account-connected-badge is-connected" id="connected-google-status" hidden>Connected</span>
                       <div
                         class="account-google-button"
                         id="connected-google-button"
@@ -5507,13 +5507,13 @@
       if (googleAccountHeading) {
         googleAccountHeading.textContent = accountGoogleLinked
           ? "Connected"
-          : "Not connected";
+          : "Connect Google";
       }
 
       if (googleAccountStatus) {
-        googleAccountStatus.textContent = accountGoogleLinked
-          ? "Connected"
-          : "Not connected";
+        googleAccountStatus.textContent = "Connected";
+        googleAccountStatus.hidden =
+          !accountGoogleLinked;
         googleAccountStatus.classList.toggle(
           "is-connected",
           accountGoogleLinked
