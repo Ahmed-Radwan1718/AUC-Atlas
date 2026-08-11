@@ -330,11 +330,27 @@ module.exports = async function handler(req, res) {
     const userData = userDoc.exists ? userDoc.data() || {} : {};
 
     const fullName = userData.fullName || userRecord.displayName || "";
-    const email = userRecord.email || userData.email || decodedUser.email || "";
+    const email = userData.email || userRecord.email || decodedUser.email || "";
     const photoURL = userData.photoURL || userRecord.photoURL || "";
     const major = userData.major || "";
     const aucId = userData.aucId || userData.aucIdLookupKey || "";
     const authProvider = userData.authProvider || "password";
+    const googleProvider =
+      Array.isArray(userRecord.providerData)
+        ? userRecord.providerData.find(function (provider) {
+            return (
+              provider &&
+              provider.providerId === "google.com"
+            );
+          }) || null
+        : null;
+    const googleLinked =
+      Boolean(googleProvider);
+    const googleLinkedEmail =
+      cleanString(
+        googleProvider && googleProvider.email,
+        320
+      ).toLowerCase();
     const displayNameLastChangedAt = userData.displayNameLastChangedAt || userData.usernameLastChangedAt || null;
     const aucIdLastChangedAt = userData.aucIdLastChangedAt || null;
     const twoFactor = await getTwoFactorResponse(decodedUser.uid, userData);
@@ -354,7 +370,8 @@ module.exports = async function handler(req, res) {
         major,
         aucId,
         authProvider,
-        googleLinked: Boolean(userData.googleLinked),
+        googleLinked,
+        googleLinkedEmail,
         twoFactor,
         displayNameLastChangedAt,
         aucIdLastChangedAt
