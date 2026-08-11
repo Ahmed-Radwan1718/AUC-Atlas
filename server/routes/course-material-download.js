@@ -384,21 +384,10 @@ module.exports = async function handler(req, res) {
       material.status,
       40
     ).toLowerCase();
-    const isOwner =
-      cleanString(
-        material.uploaderUid,
-        160
-      ) ===
-      cleanString(
-        decodedUser.uid,
-        160
-      );
     const canDownload =
+      !status ||
       status === "approved" ||
-      (
-        status === "pending" &&
-        isOwner
-      );
+      status === "pending";
 
     if (
       !canDownload ||
