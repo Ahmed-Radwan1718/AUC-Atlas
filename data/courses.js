@@ -7628,53 +7628,92 @@
     }
   }
 
-  function uploadMaterialFormData(formData, onProgress) {
+  function uploadMaterialFile(
+    uploadUrl,
+    file,
+    fileType,
+    onProgress
+  ) {
     return new Promise(function (resolve, reject) {
       const request = new XMLHttpRequest();
 
       request.open(
         "POST",
-        "https://upload.imagekit.io/api/v2/files/upload"
+        uploadUrl
       );
 
-      request.upload.addEventListener("progress", function (event) {
-        if (event.lengthComputable && typeof onProgress === "function") {
-          onProgress(event.loaded / event.total);
+      request.setRequestHeader(
+        "Content-Type",
+        fileType
+      );
+
+      request.upload.addEventListener(
+        "progress",
+        function (event) {
+          if (
+            event.lengthComputable &&
+            typeof onProgress === "function"
+          ) {
+            onProgress(
+              event.loaded / event.total
+            );
+          }
         }
-      });
+      );
 
-      request.addEventListener("load", function () {
-        let responseData = {};
+      request.addEventListener(
+        "load",
+        function () {
+          let responseData = {};
 
-        try {
-          responseData = JSON.parse(request.responseText || "{}");
-        } catch (error) {
-          responseData = {};
-        }
+          try {
+            responseData = JSON.parse(
+              request.responseText || "{}"
+            );
+          } catch (error) {
+            responseData = {};
+          }
 
-        if (request.status >= 200 && request.status < 300) {
-          resolve(responseData);
-          return;
-        }
+          if (
+            request.status >= 200 &&
+            request.status < 300
+          ) {
+            resolve(responseData);
+            return;
+          }
 
-        reject(
-          new Error(
-            responseData.message ||
+          reject(
+            new Error(
               responseData.error ||
-              "ImageKit rejected the upload."
-          )
-        );
-      });
+                "The storage server rejected the upload."
+            )
+          );
+        }
+      );
 
-      request.addEventListener("error", function () {
-        reject(new Error("The upload connection failed."));
-      });
+      request.addEventListener(
+        "error",
+        function () {
+          reject(
+            new Error(
+              "The upload connection failed."
+            )
+          );
+        }
+      );
 
-      request.addEventListener("abort", function () {
-        reject(new Error("The upload was cancelled."));
-      });
+      request.addEventListener(
+        "abort",
+        function () {
+          reject(
+            new Error(
+              "The upload was cancelled."
+            )
+          );
+        }
+      );
 
-      request.send(formData);
+      request.send(file);
     });
   }
 
@@ -7929,13 +7968,18 @@
               );
             }
 
-            const uploadPayload =
-              auth &&
-              auth.uploadPayload &&
-              typeof auth.uploadPayload ===
-                "object"
-                ? auth.uploadPayload
-                : {};
+            const uploadUrl =
+              String(
+                auth.uploadUrl || ""
+              ).trim();
+            const storageKey =
+              String(
+                auth.storageKey || ""
+              ).trim();
+            const fileType =
+              String(
+                auth.fileType || ""
+              ).trim();
 
             activeAuthorizationId =
               String(
@@ -7943,38 +7987,25 @@
               ).trim();
 
             if (
-              !auth.token ||
               !activeAuthorizationId ||
-              !uploadPayload.fileName
+              !/^[a-f0-9]{36}$/i.test(
+                storageKey
+              ) ||
+              !uploadUrl.startsWith(
+                "https://storage.aucatlas.com/upload?"
+              ) ||
+              !fileType
             ) {
               throw new Error(
                 "The secure upload authorization is incomplete."
               );
             }
 
-            const formData =
-              new FormData();
-
-            formData.append("file", file);
-            formData.append(
-              "token",
-              auth.token
-            );
-
-            Object.keys(
-              uploadPayload
-            ).forEach(function (key) {
-              formData.append(
-                key,
-                String(
-                  uploadPayload[key]
-                )
-              );
-            });
-
             const uploadedFile =
-              await uploadMaterialFormData(
-                formData,
+              await uploadMaterialFile(
+                uploadUrl,
+                file,
+                fileType,
                 function (
                   fileProgress
                 ) {
@@ -8015,9 +8046,9 @@
                       activeAuthorizationId,
                     uploadGroupId:
                       uploadGroupId,
-                    fileId:
-                      uploadedFile.fileId ||
-                      ""
+                    storageKey:
+                      uploadedFile.storageKey ||
+                      storageKey
                   })
                 }
               );
