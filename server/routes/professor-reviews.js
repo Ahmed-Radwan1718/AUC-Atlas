@@ -366,7 +366,24 @@ async function getProfessorReviewCount(professorId) {
   return Number(snapshot.data().count || 0);
 }
 
+const PROFESSOR_REVIEW_SUMMARY_CACHE_DURATION_MS =
+  60 * 60 * 1000;
+
+let professorReviewSummaryCache = {
+  expiresAt: 0,
+  summaries: null
+};
+
 async function getProfessorReviewSummaries() {
+  if (
+    professorReviewSummaryCache.summaries &&
+    professorReviewSummaryCache.expiresAt >
+      Date.now()
+  ) {
+    return professorReviewSummaryCache
+      .summaries;
+  }
+
   const snapshot = await admin.firestore()
     .collection("professorReviews")
     .select("professorId", "rating")
@@ -420,6 +437,13 @@ async function getProfessorReviewSummaries() {
         : 0
     };
   });
+
+  professorReviewSummaryCache = {
+    expiresAt:
+      Date.now() +
+      PROFESSOR_REVIEW_SUMMARY_CACHE_DURATION_MS,
+    summaries
+  };
 
   return summaries;
 }
@@ -602,6 +626,11 @@ module.exports = async function handler(req, res) {
 
         const summaries =
           await getProfessorReviewSummaries();
+
+        res.setHeader(
+          "Cache-Control",
+          "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
+        );
 
         return res.status(200).json({
           summaries
