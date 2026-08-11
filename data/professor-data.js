@@ -4646,8 +4646,7 @@
     professorReviewSummariesPromise = fetch(
       "/api/professor-reviews?summaries=true",
       {
-        credentials: "same-origin",
-        cache: "no-store"
+        credentials: "same-origin"
       }
     )
       .then(function (response) {
