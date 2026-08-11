@@ -230,31 +230,6 @@
       border-color: rgba(192, 154, 92, 0.38);
     }
 
-    .auth-google-button {
-      width: 100%;
-      min-height: 44px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .auth-google-button[hidden] {
-      display: none;
-    }
-
-    .auth-google-button iframe {
-      max-width: 100% !important;
-    }
-
-    .auth-google-note {
-      margin-top: -4px;
-      color: rgba(23, 23, 23, 0.52);
-      font-size: 12px;
-      line-height: 1.55;
-      text-align: center;
-    }
-
     .auth-divider {
       display: flex;
       align-items: center;
@@ -482,7 +457,6 @@
 <body>
   <div id="site-header-root"></div>
   <script src="site-header.js"></script>
-  <script src="firebase-google-auth.js"></script>
 
   <main class="auth-page">
     <section class="auth-section">
@@ -520,20 +494,6 @@
               <button class="auth-button" type="submit" id="login-submit">
                 Log In
               </button>
-
-              <div class="auth-divider"><span>or</span></div>
-
-              <button
-                class="auth-passwordless-button auth-google-button"
-                id="login-google-button"
-                type="button"
-                aria-label="Sign in with Google"
-                aria-busy="false"
-              >Continue with Google</button>
-
-              <p class="auth-google-note">
-                Google login works after you connect any verified Google account from My Account.
-              </p>
 
               <div class="auth-divider"><span>or</span></div>
 
@@ -757,111 +717,6 @@
       setTimeout(function () {
         window.location.href = getLoginRedirectTarget();
       }, 700);
-    }
-
-    async function handleGoogleLoginCredential() {
-      const googleButton =
-        document.getElementById("login-google-button");
-
-      if (
-        !window.aucAtlasFirebaseGoogle ||
-        typeof window.aucAtlasFirebaseGoogle.getCredential !== "function"
-      ) {
-        showMessage(
-          "Google sign-in could not be loaded.",
-          "error"
-        );
-        return;
-      }
-
-      googleButton.disabled = true;
-      googleButton.textContent = "Signing in...";
-      googleButton.setAttribute("aria-busy", "true");
-      clearLocalSignedInState();
-      showMessage("Signing in with Google...", "");
-
-      try {
-        const credential =
-          await window.aucAtlasFirebaseGoogle.getCredential();
-
-        if (!credential) {
-          throw new Error("Choose a Google account.");
-        }
-
-        const loginResponse = await fetch("/api/google-auth", {
-          method: "POST",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            action: "login",
-            credential
-          })
-        });
-        const data = await loginResponse.json().catch(function () {
-          return {};
-        });
-
-        if (!loginResponse.ok || !data.success) {
-          throw new Error(
-            data.error || "Google sign-in failed."
-          );
-        }
-
-        if (data.requiresTwoFactor) {
-          if (data.method === "email") {
-            if (typeof window.startLoginEmailTwoFactor !== "function") {
-              throw new Error(
-                "Email verification could not be opened."
-              );
-            }
-
-            awaitingAuthenticatorCode = true;
-            await window.startLoginEmailTwoFactor();
-            return;
-          }
-
-          openTwoFactorPanel({
-            emailRecoveryAvailable:
-              Boolean(data.emailRecoveryAvailable)
-          });
-          return;
-        }
-
-        finishLogin(data.user || null);
-      } catch (error) {
-        clearLocalSignedInState();
-        showMessage(
-          error.message || "Google sign-in failed.",
-          "error"
-        );
-      } finally {
-        googleButton.disabled = false;
-        googleButton.textContent = "Continue with Google";
-        googleButton.setAttribute("aria-busy", "false");
-      }
-    }
-
-    function initializeGoogleLogin() {
-      const googleButton =
-        document.getElementById("login-google-button");
-
-      if (
-        !googleButton ||
-        googleButton.dataset.googleInitialized === "true"
-      ) {
-        return;
-      }
-
-      googleButton.dataset.googleInitialized = "true";
-      googleButton.hidden = false;
-      googleButton.disabled = false;
-      googleButton.setAttribute("aria-busy", "false");
-      googleButton.addEventListener(
-        "click",
-        handleGoogleLoginCredential
-      );
     }
 
     function clearTwoFactorCodeInputs() {
@@ -1089,8 +944,6 @@
       event.preventDefault();
       await verifyAuthenticatorLogin();
     });
-
-    initializeGoogleLogin();
 
   </script>
   <script src="login-code.js"></script>
