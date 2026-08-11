@@ -30,7 +30,10 @@ module.exports = async function handler(req, res) {
       .get();
     const counterData = counterDoc.exists ? counterDoc.data() || {} : {};
 
-    res.setHeader("Cache-Control", "no-store");
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
+    );
     return res.status(200).json({
       currentAmount: cleanAmount(counterData.currentAmount, 0),
       goalAmount: cleanAmount(counterData.goalAmount, 100),
