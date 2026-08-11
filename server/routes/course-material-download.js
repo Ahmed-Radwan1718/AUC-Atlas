@@ -331,6 +331,95 @@ function getSignedImageKitUrl(filePath) {
   );
 }
 
+function getStorageConfig() {
+  const url = cleanString(
+    process.env.COURSE_MATERIAL_STORAGE_URL,
+    1000
+  ).replace(/\/+$/, "");
+  const secret = cleanString(
+    process.env.COURSE_MATERIAL_STORAGE_SECRET,
+    500
+  ).toLowerCase();
+
+  let parsedUrl = null;
+
+  try {
+    parsedUrl = new URL(url);
+  } catch (error) {
+    parsedUrl = null;
+  }
+
+  if (
+    !parsedUrl ||
+    parsedUrl.protocol !== "https:" ||
+    parsedUrl.username ||
+    parsedUrl.password ||
+    !/^[a-f0-9]{64}$/.test(secret)
+  ) {
+    throw createDownloadError(
+      "Course-material storage is not configured.",
+      500
+    );
+  }
+
+  return {
+    url: parsedUrl.origin,
+    secret
+  };
+}
+
+function getSignedStorageUrl(
+  storageKey,
+  dispositionType
+) {
+  const safeStorageKey = cleanString(
+    storageKey,
+    80
+  );
+  const disposition =
+    dispositionType === "inline"
+      ? "inline"
+      : "attachment";
+
+  if (!/^[a-f0-9]{36}$/i.test(safeStorageKey)) {
+    throw createDownloadError(
+      "Course material file not found.",
+      404
+    );
+  }
+
+  const config = getStorageConfig();
+  const expiresAt =
+    Math.floor(Date.now() / 1000) + 5 * 60;
+  const signature = crypto
+    .createHmac(
+      "sha256",
+      config.secret
+    )
+    .update(
+      [
+        "download",
+        safeStorageKey,
+        String(expiresAt),
+        disposition
+      ].join("\n")
+    )
+    .digest("hex");
+
+  const query = new URLSearchParams({
+    key: safeStorageKey,
+    expires: String(expiresAt),
+    disposition,
+    signature
+  });
+
+  return (
+    config.url +
+    "/download?" +
+    query.toString()
+  );
+}
+
 module.exports = async function handler(req, res) {
   try {
     if (req.method !== "GET") {
@@ -388,36 +477,77 @@ module.exports = async function handler(req, res) {
       !status ||
       status === "approved" ||
       status === "pending";
+    const storageKey = cleanString(
+      material.storageKey,
+      80
+    );
+    const fileId = cleanString(
+      material.fileId,
+      160
+    );
+    const dispositionType =
+      cleanString(
+        getQueryValue(req, "disposition"),
+        20
+      ).toLowerCase() === "inline"
+        ? "inline"
+        : "attachment";
 
-    if (
-      !canDownload ||
-      !/^[A-Za-z0-9_-]{6,160}$/.test(
-        cleanString(material.fileId, 160)
-      )
-    ) {
+    if (!canDownload) {
       throw createDownloadError(
         "Course material file not found.",
         404
       );
     }
 
-    const file = await getImageKitFileDetails(
-      material.fileId
-    );
+    let signedUrl = "";
 
-    filePath = validateImageKitMaterialFile(
-      file,
-      material
-    );
+    if (
+      /^[a-f0-9]{36}$/i.test(storageKey)
+    ) {
+      downloadFileName = cleanString(
+        material.fileName ||
+        "course-material",
+        240
+      ).replace(/[\r\n]/g, " ");
 
-    downloadFileName = cleanString(
-      material.fileName ||
-      file.name ||
-      "course-material",
-      240
-    ).replace(/[\r\n]/g, " ");
+      signedUrl = getSignedStorageUrl(
+        storageKey,
+        dispositionType
+      );
+    } else {
+      if (
+        !/^[A-Za-z0-9_-]{6,160}$/.test(
+          fileId
+        )
+      ) {
+        throw createDownloadError(
+          "Course material file not found.",
+          404
+        );
+      }
 
-    const signedUrl = getSignedImageKitUrl(filePath);
+      const file = await getImageKitFileDetails(
+        fileId
+      );
+
+      filePath = validateImageKitMaterialFile(
+        file,
+        material
+      );
+
+      downloadFileName = cleanString(
+        material.fileName ||
+        file.name ||
+        "course-material",
+        240
+      ).replace(/[\r\n]/g, " ");
+
+      signedUrl = getSignedImageKitUrl(
+        filePath
+      );
+    }
+
     const rangeHeader = String(
       req.headers && req.headers.range
         ? req.headers.range
@@ -446,14 +576,6 @@ module.exports = async function handler(req, res) {
         502
       );
     }
-
-    const dispositionType =
-      cleanString(
-        getQueryValue(req, "disposition"),
-        20
-      ).toLowerCase() === "inline"
-        ? "inline"
-        : "attachment";
     const safeAsciiFileName = downloadFileName
       .replace(/[^\x20-\x7E]/g, "_")
       .replace(/["\\]/g, "_");
