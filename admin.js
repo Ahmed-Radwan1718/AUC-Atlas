@@ -1,4 +1,78 @@
 (function () {
+  const ADMIN_ACCESS_STORAGE_KEY =
+    "auc-atlas-admin-access";
+
+  function clearStoredAdminAccess() {
+    try {
+      window.sessionStorage.removeItem(
+        ADMIN_ACCESS_STORAGE_KEY
+      );
+    } catch (error) {}
+  }
+
+  function readStoredAdminAccess() {
+    try {
+      const storedAccess = JSON.parse(
+        window.sessionStorage.getItem(
+          ADMIN_ACCESS_STORAGE_KEY
+        ) || "{}"
+      );
+      const token = String(
+        storedAccess.token || ""
+      );
+      const expiresAt = String(
+        storedAccess.expiresAt || ""
+      );
+      const expiresAtTime =
+        new Date(expiresAt).getTime();
+
+      if (
+        !/^[a-f0-9]{64}$/i.test(token) ||
+        !Number.isFinite(expiresAtTime) ||
+        expiresAtTime <= Date.now()
+      ) {
+        clearStoredAdminAccess();
+
+        return {
+          token: "",
+          expiresAt: ""
+        };
+      }
+
+      return {
+        token,
+        expiresAt
+      };
+    } catch (error) {
+      clearStoredAdminAccess();
+
+      return {
+        token: "",
+        expiresAt: ""
+      };
+    }
+  }
+
+  function storeAdminAccess(
+    token,
+    expiresAt
+  ) {
+    try {
+      window.sessionStorage.setItem(
+        ADMIN_ACCESS_STORAGE_KEY,
+        JSON.stringify({
+          token: String(token || ""),
+          expiresAt: String(
+            expiresAt || ""
+          )
+        })
+      );
+    } catch (error) {}
+  }
+
+  const storedAdminAccess =
+    readStoredAdminAccess();
+
   const state = {
     dashboard: null,
     activePanel: "users",
@@ -6,8 +80,10 @@
     authenticationBusy: false,
     requiresTwoFactor: false,
     adminChallengeToken: "",
-    adminAccessToken: "",
-    adminAccessExpiresAt: ""
+    adminAccessToken:
+      storedAdminAccess.token,
+    adminAccessExpiresAt:
+      storedAdminAccess.expiresAt
   };
 
   const loadingState =
@@ -329,6 +405,7 @@
     state.adminChallengeToken = "";
     state.adminAccessToken = "";
     state.adminAccessExpiresAt = "";
+    clearStoredAdminAccess();
 
     closeTwoFactorPanel();
 
@@ -347,6 +424,7 @@
     state.adminChallengeToken = "";
     state.adminAccessToken = "";
     state.adminAccessExpiresAt = "";
+    clearStoredAdminAccess();
 
     closeTwoFactorPanel();
 
@@ -441,6 +519,11 @@
     authState.hidden = true;
     deniedState.hidden = true;
     app.hidden = true;
+
+    if (state.adminAccessToken) {
+      await loadDashboard();
+      return;
+    }
 
     try {
       const data = await requestJson(
@@ -538,6 +621,11 @@
       Boolean(
         data.requiresTwoFactor
       );
+
+    storeAdminAccess(
+      state.adminAccessToken,
+      state.adminAccessExpiresAt
+    );
 
     authPasswordInput.value = "";
     closeTwoFactorPanel();
