@@ -758,7 +758,7 @@
 
     .account-connected-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 14px;
     }
 
@@ -871,23 +871,6 @@
       border: 1px solid rgba(23, 23, 23, 0.1);
       background: rgba(23, 23, 23, 0.05);
       color: rgba(23, 23, 23, 0.56);
-    }
-
-    .account-google-button {
-      min-width: 220px;
-      min-height: 44px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-    }
-
-    .account-google-button[hidden] {
-      display: none;
-    }
-
-    .account-google-button iframe {
-      max-width: 100% !important;
     }
 
     .account-login-session-card {
@@ -2574,7 +2557,6 @@
 <body>
   <div id="site-header-root"></div>
   <script src="site-header.js"></script>
-  <script src="firebase-google-auth.js"></script>
 
   <main class="account-page">
     <section class="account-section">
@@ -2757,28 +2739,6 @@
 
                     <div class="account-connected-actions">
                       <span class="account-connected-badge is-connected">Connected</span>
-                    </div>
-                  </div>
-
-                  <div class="account-connected-account-card" id="connected-google-card">
-                    <div class="account-connected-account-main">
-                      <div class="account-connected-title">
-                        <img class="account-connected-icon" src="google-logo.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
-                        <span>Google Account</span>
-                      </div>
-                      <strong id="connected-google-heading">Connect Google</strong>
-                      <p>Connect any verified Google account to use it as another way to log in to this Atlas account.</p>
-                    </div>
-
-                    <div class="account-connected-actions">
-                      <span class="account-connected-badge is-connected" id="connected-google-status" hidden>Connected</span>
-                      <button
-                        class="account-primary-button account-google-button"
-                        id="connected-google-button"
-                        type="button"
-                        aria-label="Connect Google account"
-                        aria-busy="false"
-                      >Connect</button>
                     </div>
                   </div>
                   </div>
@@ -3405,9 +3365,6 @@
     const accountMajorValue = document.getElementById("account-major-value");
     const accountMajorMenu = document.getElementById("account-major-menu");
     const accountAucIdInput = document.getElementById("account-auc-id");
-    const googleAccountHeading = document.getElementById("connected-google-heading");
-    const googleAccountStatus = document.getElementById("connected-google-status");
-    const googleAccountButton = document.getElementById("connected-google-button");
     const securityMessage = document.getElementById("security-message");
     const deleteAccountButton = document.getElementById("delete-account-button");
     const deleteAccountModal = document.getElementById("delete-account-modal");
@@ -3479,8 +3436,6 @@
 
     let accountCurrentUser = null;
     let accountTwoFactor = { appEnabled: false, emailEnabled: false };
-    let accountGoogleLinked = false;
-    let googleAccountInitialized = false;
     let securityPanelAccessToken = "";
     let securityAccessResolver = null;
     let activePhotoPreviewUrl = "";
@@ -5479,142 +5434,6 @@
       }
     }
 
-    function syncGoogleAccountState(isLinked) {
-      accountGoogleLinked = Boolean(isLinked);
-
-      if (googleAccountHeading) {
-        googleAccountHeading.textContent = accountGoogleLinked
-          ? "Connected"
-          : "Connect Google";
-      }
-
-      if (googleAccountStatus) {
-        googleAccountStatus.textContent = "Connected";
-        googleAccountStatus.hidden = !accountGoogleLinked;
-        googleAccountStatus.classList.toggle(
-          "is-connected",
-          accountGoogleLinked
-        );
-      }
-
-      if (googleAccountButton) {
-        googleAccountButton.hidden = accountGoogleLinked;
-        googleAccountButton.disabled = accountGoogleLinked;
-        googleAccountButton.textContent = "Connect";
-        googleAccountButton.setAttribute(
-          "aria-busy",
-          "false"
-        );
-
-        if (!accountGoogleLinked) {
-          initializeGoogleAccountButton();
-        }
-      }
-    }
-
-    async function handleGoogleLinkCredential() {
-      if (
-        !window.aucAtlasFirebaseGoogle ||
-        typeof window.aucAtlasFirebaseGoogle.getCredential !== "function"
-      ) {
-        showMessage(
-          detailsMessage,
-          "Google account linking could not be loaded.",
-          "error"
-        );
-        return;
-      }
-
-      googleAccountButton.disabled = true;
-      googleAccountButton.textContent = "Connecting...";
-      googleAccountButton.setAttribute(
-        "aria-busy",
-        "true"
-      );
-      showMessage(detailsMessage, "Connecting Google...", "");
-
-      try {
-        const credential =
-          await window.aucAtlasFirebaseGoogle.getCredential();
-
-        if (!credential) {
-          throw new Error("Choose a Google account.");
-        }
-
-        const linkResponse = await fetch("/api/google-auth", {
-          method: "POST",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            action: "link",
-            credential
-          })
-        });
-        const data = await linkResponse.json().catch(function () {
-          return {};
-        });
-
-        if (!linkResponse.ok || !data.success) {
-          throw new Error(
-            data.error || "Google could not be connected."
-          );
-        }
-
-        if (accountCurrentUser) {
-          accountCurrentUser.googleLinked = true;
-          accountCurrentUser.googleLinkedEmail =
-            data.email || "";
-        }
-
-        syncGoogleAccountState(true);
-        showMessage(
-          detailsMessage,
-          "Google connected successfully. You can now use it to log in.",
-          "success"
-        );
-      } catch (error) {
-        showMessage(
-          detailsMessage,
-          error.message || "Google could not be connected.",
-          "error"
-        );
-      } finally {
-        if (!accountGoogleLinked && googleAccountButton) {
-          googleAccountButton.disabled = false;
-          googleAccountButton.textContent = "Connect";
-          googleAccountButton.setAttribute(
-            "aria-busy",
-            "false"
-          );
-        }
-      }
-    }
-
-    function initializeGoogleAccountButton() {
-      if (
-        !googleAccountButton ||
-        accountGoogleLinked ||
-        googleAccountInitialized
-      ) {
-        return;
-      }
-
-      googleAccountInitialized = true;
-      googleAccountButton.hidden = false;
-      googleAccountButton.disabled = false;
-      googleAccountButton.textContent = "Connect";
-      googleAccountButton.setAttribute(
-        "aria-busy",
-        "false"
-      );
-      googleAccountButton.addEventListener(
-        "click",
-        handleGoogleLinkCredential
-      );
-    }
-
     function hydrateAccountDetails(user) {
       const displayName = user.fullName || user.displayName || String(user.email || "").split("@")[0] || "AUC Student";
       const savedAucId = user.aucId || user.aucIdLookupKey || "";
@@ -5637,7 +5456,6 @@
       }
 
       syncTwoFactorState(user.twoFactor || {});
-      syncGoogleAccountState(user.googleLinked);
 
       clearTemporaryProfilePhotoPreview();
       photoInitial.textContent = getAccountInitials(user);
