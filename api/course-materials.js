@@ -82,11 +82,13 @@ function serializeMaterialData(id, data) {
     fileName: data.fileName || "",
     fileUrl: "",
     downloadUrl: id ? "/api/course-material-download?id=" + encodeURIComponent(id) : "",
-    filePath: "",
     fileId: "",
     size: Number(data.size || 0),
     fileType: data.fileType || "",
-    status: data.status || "pending",
+    status:
+      data.status === "rejected"
+        ? "rejected"
+        : "approved",
     isAnonymous,
     uploaderUid: isAnonymous
       ? ""
@@ -599,7 +601,7 @@ async function verifyImageKitMaterialUpload(data) {
   );
   const expectedTags = [
     "auc-atlas-material",
-    "status-pending",
+    "status-approved",
     "course-" + slugifyMaterialValue(data.courseCode),
     "professor-" + slugifyMaterialValue(data.professor),
     "semester-" + slugifyMaterialValue(data.semester),
@@ -709,7 +711,7 @@ function buildImageKitMaterialDescription(data) {
 function buildImageKitMaterialTags(data) {
   return [
     "auc-atlas-material",
-    "status-" + slugifyMaterialValue(data.status || "pending"),
+    "status-" + slugifyMaterialValue(data.status || "approved"),
     data.courseCode
       ? "course-" + slugifyMaterialValue(data.courseCode)
       : "",
@@ -973,13 +975,13 @@ module.exports = async function handler(req, res) {
       const updatedAtIso = new Date().toISOString();
       const currentStatus =
         cleanString(
-          ownedMaterial.data.status || "pending",
+          ownedMaterial.data.status || "approved",
           40
-        ).toLowerCase() || "pending";
+        ).toLowerCase() || "approved";
       const nextStatus =
-        currentStatus === "approved"
-          ? "pending"
-          : currentStatus;
+        currentStatus === "rejected"
+          ? "rejected"
+          : "approved";
       const updatedData = Object.assign(
         {},
         ownedMaterial.data,
@@ -997,17 +999,6 @@ module.exports = async function handler(req, res) {
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         updatedAtIso
       };
-
-      if (currentStatus === "approved") {
-        firestoreUpdate.approvedAt =
-          admin.firestore.FieldValue.delete();
-        firestoreUpdate.approvedAtIso =
-          admin.firestore.FieldValue.delete();
-        firestoreUpdate.approvedByAdminUid =
-          admin.firestore.FieldValue.delete();
-        firestoreUpdate.approvedByAdminEmail =
-          admin.firestore.FieldValue.delete();
-      }
 
       await ownedMaterial.ref.update(
         firestoreUpdate
@@ -1171,7 +1162,7 @@ module.exports = async function handler(req, res) {
       fileId: verifiedFile.fileId,
       size: verifiedFile.size,
       fileType: verifiedFile.fileType,
-      status: "pending",
+      status: "approved",
       uploaderUid: decodedUser.uid,
       uploaderDisplayName: uploader.displayName,
       uploaderPhotoURL: uploader.photoURL,
