@@ -67,9 +67,11 @@
         auth,
         authModule
       };
-    }).catch(function (error) {
+    }).catch(function () {
       firebaseGoogleAuthPromise = null;
-      throw error;
+      throw new Error(
+        "Google sign-in could not be loaded. Refresh the page and try again."
+      );
     });
 
     return firebaseGoogleAuthPromise;
