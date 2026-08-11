@@ -596,10 +596,6 @@ function validateReviewFields(reviewFields) {
   if (reviewFields.recommendation === "Depends" && !reviewFields.recommendationReason) {
     throw createReviewError("Please explain what it depends on.", 400);
   }
-
-  if (!reviewFields.studentNote) {
-    throw createReviewError("Please add a short note for students.", 400);
-  }
 }
 
 module.exports = async function handler(req, res) {
