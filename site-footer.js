@@ -140,6 +140,7 @@
             <ul class="site-footer-links">
               <li><a href="declaration-process.html">Declaration Process</a></li>
               <li><a href="student-rights.html">Student Rights</a></li>
+              <li><a href="auc-benefits.html">AUC Benefits</a></li>
               <li><a href="university-policy.html">Campus Rules</a></li>
             </ul>
           </div>
