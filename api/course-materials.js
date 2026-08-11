@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const admin = require("../server/_lib/firebaseAdmin");
 
 const { getSiteSessionUser } = require("../server/_lib/securityHelpers");
@@ -385,6 +386,186 @@ async function getRandomCourseMaterials(limit) {
   return groupedMaterials.slice(0, safeLimit);
 }
 
+function getStorageConfig() {
+  const url = cleanString(
+    process.env.COURSE_MATERIAL_STORAGE_URL,
+    1000
+  ).replace(/\/+$/, "");
+  const secret = cleanString(
+    process.env.COURSE_MATERIAL_STORAGE_SECRET,
+    500
+  ).toLowerCase();
+
+  let parsedUrl = null;
+
+  try {
+    parsedUrl = new URL(url);
+  } catch (error) {
+    parsedUrl = null;
+  }
+
+  if (
+    !parsedUrl ||
+    parsedUrl.protocol !== "https:" ||
+    parsedUrl.username ||
+    parsedUrl.password ||
+    !/^[a-f0-9]{64}$/.test(secret)
+  ) {
+    throw createMaterialError(
+      "Course-material storage is not configured.",
+      500
+    );
+  }
+
+  return {
+    url: parsedUrl.origin,
+    secret
+  };
+}
+
+function createStorageSignature(secret, parts) {
+  return crypto
+    .createHmac("sha256", secret)
+    .update(parts.join("\n"))
+    .digest("hex");
+}
+
+function buildStorageSignedRequestUrl(
+  config,
+  pathname,
+  action,
+  storageKey
+) {
+  const expires =
+    Math.floor(Date.now() / 1000) + 5 * 60;
+
+  const query = new URLSearchParams({
+    key: storageKey,
+    expires: String(expires)
+  });
+
+  query.set(
+    "signature",
+    createStorageSignature(
+      config.secret,
+      [
+        action,
+        storageKey,
+        String(expires)
+      ]
+    )
+  );
+
+  return (
+    config.url +
+    pathname +
+    "?" +
+    query.toString()
+  );
+}
+
+async function getStorageFileDetails(storageKey) {
+  const safeStorageKey = cleanString(
+    storageKey,
+    80
+  );
+
+  if (!/^[a-f0-9]{36}$/i.test(safeStorageKey)) {
+    throw createMaterialError(
+      "Could not verify the uploaded course material.",
+      400
+    );
+  }
+
+  const config = getStorageConfig();
+
+  const response = await fetch(
+    buildStorageSignedRequestUrl(
+      config,
+      "/metadata",
+      "metadata",
+      safeStorageKey
+    ),
+    {
+      headers: {
+        Accept: "application/json"
+      }
+    }
+  );
+
+  if (response.status === 404) {
+    throw createMaterialError(
+      "Could not verify the uploaded course material.",
+      400
+    );
+  }
+
+  if (!response.ok) {
+    throw createMaterialError(
+      "Could not verify the stored course material.",
+      502
+    );
+  }
+
+  const file = await response
+    .json()
+    .catch(function () {
+      return {};
+    });
+
+  return {
+    storageKey: cleanString(
+      file.storageKey,
+      80
+    ),
+    fileName: cleanMaterialFileName(
+      file.fileName
+    ),
+    size: Math.max(
+      0,
+      Number(file.size) || 0
+    ),
+    fileType: normalizeMaterialMimeType(
+      file.type
+    )
+  };
+}
+
+async function deleteStorageMaterial(storageKey) {
+  const safeStorageKey = cleanString(
+    storageKey,
+    80
+  );
+
+  if (!/^[a-f0-9]{36}$/i.test(safeStorageKey)) {
+    return;
+  }
+
+  const config = getStorageConfig();
+
+  const response = await fetch(
+    buildStorageSignedRequestUrl(
+      config,
+      "/file",
+      "delete",
+      safeStorageKey
+    ),
+    {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json"
+      }
+    }
+  );
+
+  if (!response.ok && response.status !== 404) {
+    throw createMaterialError(
+      "Could not delete the stored course material.",
+      502
+    );
+  }
+}
+
 function getImageKitAuthorizationHeader() {
   const privateKey = cleanString(
     process.env.IMAGEKIT_PRIVATE_KEY,
@@ -580,82 +761,28 @@ async function getMaterialUploadAuthorization(
   };
 }
 
-async function verifyImageKitMaterialUpload(data) {
-  const file = await getImageKitFileDetails(data.fileId);
-  const filePath = normalizeImageKitPath(file.filePath);
-  const expectedFolder =
-    getExpectedImageKitMaterialFolder(data);
-  const pathParts = filePath.split("/");
-  const actualFolder = filePath.slice(
-    0,
-    filePath.lastIndexOf("/") + 1
+async function verifyStorageMaterialUpload(data) {
+  const safeStorageKey = cleanString(
+    data.storageKey,
+    80
   );
-  const descriptionParts =
-    getImageKitDescriptionParts(file);
-  const tags = new Set(
-    (Array.isArray(file.tags) ? file.tags : []).map(
-      function (tag) {
-        return cleanString(tag, 160);
-      }
-    )
+  const file = await getStorageFileDetails(
+    safeStorageKey
   );
-  const expectedTags = [
-    "auc-atlas-material",
-    "status-approved",
-    "course-" + slugifyMaterialValue(data.courseCode),
-    "professor-" + slugifyMaterialValue(data.professor),
-    "semester-" + slugifyMaterialValue(data.semester),
-    "material-type-" +
-      slugifyMaterialValue(data.materialType),
-    "uploader-" + slugifyMaterialValue(data.uploaderUid),
-    "upload-auth-" + data.uploadAuthorizationId
-  ];
 
-  const verifiedFileName = cleanMaterialFileName(
-    descriptionParts[8]
-  );
+  const verifiedFileName =
+    cleanMaterialFileName(file.fileName);
   const actualSize = Math.max(
     0,
     Number(file.size) || 0
   );
-  const actualMimeType = normalizeMaterialMimeType(
-    file.mime
-  );
-  const metadataMatches =
-    cleanString(descriptionParts[0], 160) ===
-      cleanString(data.title, 160) &&
-    cleanString(descriptionParts[1], 40).toUpperCase() ===
-      cleanString(data.courseCode, 40).toUpperCase() &&
-    cleanString(descriptionParts[2], 120) ===
-      cleanString(data.professor, 120) &&
-    cleanString(descriptionParts[3], 80) ===
-      cleanString(data.semester, 80) &&
-    cleanString(descriptionParts[4], 80) ===
-      cleanString(data.materialType, 80) &&
-    cleanString(descriptionParts[7], 160) ===
-      cleanString(data.uploaderUid, 160) &&
-    verifiedFileName ===
-      cleanMaterialFileName(data.fileName);
+  const actualMimeType =
+    normalizeMaterialMimeType(file.fileType);
 
   if (
-    actualFolder !== expectedFolder ||
-    pathParts.includes(".") ||
-    pathParts.includes("..") ||
-    /%2e/i.test(filePath) ||
-    filePath.endsWith("/") ||
-    file.isPrivateFile !== true ||
-    !expectedTags.every(function (tag) {
-      return tags.has(tag);
-    }) ||
-    !metadataMatches
-  ) {
-    throw createMaterialError(
-      "Could not verify ownership of the uploaded course material.",
-      403
-    );
-  }
-
-  if (
+    file.storageKey !== safeStorageKey ||
+    verifiedFileName !==
+      cleanMaterialFileName(data.fileName) ||
     actualSize !== Number(data.fileSize) ||
     actualSize <= 0 ||
     actualSize > MATERIAL_MAX_FILE_BYTES ||
@@ -665,9 +792,9 @@ async function verifyImageKitMaterialUpload(data) {
       actualMimeType
     )
   ) {
-    await deleteImageKitMaterial(file.fileId).catch(
-      function () {}
-    );
+    await deleteStorageMaterial(
+      safeStorageKey
+    ).catch(function () {});
 
     throw createMaterialError(
       "The uploaded file type or size is not allowed.",
@@ -676,10 +803,11 @@ async function verifyImageKitMaterialUpload(data) {
   }
 
   return {
-    fileId: cleanString(file.fileId, 160),
+    storageKey: safeStorageKey,
+    fileId: safeStorageKey,
     fileName: verifiedFileName,
-    fileUrl: cleanUrl(file.url),
-    filePath,
+    fileUrl: "",
+    filePath: "",
     size: actualSize,
     fileType: actualMimeType
   };
@@ -1004,13 +1132,20 @@ module.exports = async function handler(req, res) {
         firestoreUpdate
       );
 
-      try {
-        await updateImageKitMaterial(
-          ownedMaterial.data.fileId,
-          updatedData
-        );
-      } catch (error) {
-        // The Firestore record remains the source used by the site.
+      if (
+        !cleanString(
+          ownedMaterial.data.storageKey,
+          80
+        )
+      ) {
+        try {
+          await updateImageKitMaterial(
+            ownedMaterial.data.fileId,
+            updatedData
+          );
+        } catch (error) {
+          // The Firestore record remains the source used by the site.
+        }
       }
 
       return res.status(200).json({
@@ -1028,9 +1163,20 @@ module.exports = async function handler(req, res) {
       const deletedAtIso = new Date().toISOString();
 
       try {
-        await deleteImageKitMaterial(
-          ownedMaterial.data.fileId
+        const storageKey = cleanString(
+          ownedMaterial.data.storageKey,
+          80
         );
+
+        if (storageKey) {
+          await deleteStorageMaterial(
+            storageKey
+          );
+        } else {
+          await deleteImageKitMaterial(
+            ownedMaterial.data.fileId
+          );
+        }
       } catch (error) {
         // The rejected Firestore record prevents the file from returning.
       }
@@ -1055,16 +1201,19 @@ module.exports = async function handler(req, res) {
       body.uploadAuthorizationId,
       80
     );
-    const submittedFileId = cleanString(
-      body.fileId,
-      160
+    const submittedStorageKey = cleanString(
+      body.storageKey,
+      80
     );
     const requestedUploadGroupId = cleanString(
       body.uploadGroupId,
       80
     );
 
-    if (!uploadAuthorizationId || !submittedFileId) {
+    if (
+      !uploadAuthorizationId ||
+      !submittedStorageKey
+    ) {
       throw createMaterialError(
         "Could not save this course material.",
         400
@@ -1114,6 +1263,13 @@ module.exports = async function handler(req, res) {
     const fileSize = Number(
       authorizationData.fileSize
     );
+    const fileType = normalizeMaterialMimeType(
+      authorizationData.fileType
+    );
+    const storageKey = cleanString(
+      authorizationData.storageKey,
+      80
+    );
 
     if (
       !courseCode ||
@@ -1122,9 +1278,16 @@ module.exports = async function handler(req, res) {
       !materialType ||
       !title ||
       !fileName ||
+      !/^[a-f0-9]{36}$/i.test(storageKey) ||
+      submittedStorageKey !== storageKey ||
       !Number.isSafeInteger(fileSize) ||
       fileSize <= 0 ||
-      fileSize > MATERIAL_MAX_FILE_BYTES
+      fileSize > MATERIAL_MAX_FILE_BYTES ||
+      !isAllowedMaterialMimeType(fileType) ||
+      !doesMaterialMimeMatchFileName(
+        fileName,
+        fileType
+      )
     ) {
       throw createMaterialError(
         "Could not verify this upload authorization.",
@@ -1133,16 +1296,8 @@ module.exports = async function handler(req, res) {
     }
 
     const verifiedFile =
-      await verifyImageKitMaterialUpload({
-        fileId: submittedFileId,
-        uploadAuthorizationId,
-        uploaderUid: decodedUser.uid,
-        courseCode,
-        professor,
-        semester,
-        materialType,
-        isAnonymous,
-        title,
+      await verifyStorageMaterialUpload({
+        storageKey,
         fileName,
         fileSize
       });
@@ -1157,9 +1312,10 @@ module.exports = async function handler(req, res) {
       isAnonymous,
       title,
       fileName: verifiedFile.fileName,
-      fileUrl: verifiedFile.fileUrl,
-      filePath: verifiedFile.filePath,
+      fileUrl: "",
+      filePath: "",
       fileId: verifiedFile.fileId,
+      storageKey: verifiedFile.storageKey,
       size: verifiedFile.size,
       fileType: verifiedFile.fileType,
       status: "approved",
@@ -1172,7 +1328,7 @@ module.exports = async function handler(req, res) {
     const db = admin.firestore();
     const materialRef = db
       .collection("courseMaterials")
-      .doc("imagekit-" + verifiedFile.fileId);
+      .doc("storage-" + verifiedFile.storageKey);
     const uploadLimitRef = db
       .collection("materialUploadLimits")
       .doc(decodedUser.uid);
@@ -1224,6 +1380,8 @@ module.exports = async function handler(req, res) {
         consumedAt:
           admin.firestore.FieldValue.serverTimestamp(),
         registeredFileId: verifiedFile.fileId,
+        registeredStorageKey:
+          verifiedFile.storageKey,
         registeredMaterialId: materialRef.id
       });
 
