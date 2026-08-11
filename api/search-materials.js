@@ -8,8 +8,9 @@ const {
 
 const MATERIAL_SEARCH_WINDOW_MS =
   60 * 1000;
-const MATERIAL_SEARCH_MAX_REQUESTS = 60;
-const MATERIAL_CACHE_DURATION_MS = 60 * 1000;
+const MATERIAL_SEARCH_MAX_REQUESTS = 20;
+const MATERIAL_CACHE_DURATION_MS =
+  15 * 60 * 1000;
 
 let materialIndexCache = {
   expiresAt: 0,
@@ -112,12 +113,14 @@ async function getMaterialIndex() {
 
   try {
     snapshot = await collection
+      .where("status", "==", "approved")
       .orderBy("createdAt", "desc")
-      .limit(500)
+      .limit(100)
       .get();
   } catch (error) {
     snapshot = await collection
-      .limit(500)
+      .orderBy("createdAt", "desc")
+      .limit(100)
       .get();
   }
 
