@@ -572,7 +572,7 @@ module.exports = async function handler(req, res) {
       semesterSlug;
     const tags = [
       "auc-atlas-material",
-      "status-pending",
+      "status-approved",
       "course-" + courseSlug,
       "professor-" + professorSlug,
       "semester-" + semesterSlug,
