@@ -482,7 +482,7 @@
 <body>
   <div id="site-header-root"></div>
   <script src="site-header.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="firebase-google-auth.js"></script>
 
   <main class="auth-page">
     <section class="auth-section">
@@ -523,12 +523,13 @@
 
               <div class="auth-divider"><span>or</span></div>
 
-              <div
-                class="auth-google-button"
+              <button
+                class="auth-passwordless-button auth-google-button"
                 id="login-google-button"
+                type="button"
                 aria-label="Sign in with Google"
-                aria-busy="true"
-              ></div>
+                aria-busy="false"
+              >Continue with Google</button>
 
               <p class="auth-google-note">
                 Google login works after you connect any verified Google account from My Account.
@@ -758,48 +759,35 @@
       }, 700);
     }
 
-    function waitForGoogleIdentity() {
-      return new Promise(function (resolve, reject) {
-        let attempts = 0;
+    async function handleGoogleLoginCredential() {
+      const googleButton =
+        document.getElementById("login-google-button");
 
-        function checkGoogleIdentity() {
-          if (
-            window.google &&
-            window.google.accounts &&
-            window.google.accounts.id
-          ) {
-            resolve();
-            return;
-          }
-
-          attempts += 1;
-
-          if (attempts >= 50) {
-            reject(new Error("Google sign-in could not be loaded."));
-            return;
-          }
-
-          window.setTimeout(checkGoogleIdentity, 100);
-        }
-
-        checkGoogleIdentity();
-      });
-    }
-
-    async function handleGoogleLoginCredential(response) {
-      const credential = response && response.credential
-        ? response.credential
-        : "";
-
-      if (!credential) {
-        showMessage("Choose a Google account.", "error");
+      if (
+        !window.aucAtlasFirebaseGoogle ||
+        typeof window.aucAtlasFirebaseGoogle.getCredential !== "function"
+      ) {
+        showMessage(
+          "Google sign-in could not be loaded.",
+          "error"
+        );
         return;
       }
 
+      googleButton.disabled = true;
+      googleButton.textContent = "Signing in...";
+      googleButton.setAttribute("aria-busy", "true");
       clearLocalSignedInState();
       showMessage("Signing in with Google...", "");
 
       try {
+        const credential =
+          await window.aucAtlasFirebaseGoogle.getCredential();
+
+        if (!credential) {
+          throw new Error("Choose a Google account.");
+        }
+
         const loginResponse = await fetch("/api/google-auth", {
           method: "POST",
           credentials: "same-origin",
@@ -808,7 +796,7 @@
           },
           body: JSON.stringify({
             action: "login",
-            credential: credential
+            credential
           })
         });
         const data = await loginResponse.json().catch(function () {
@@ -816,13 +804,17 @@
         });
 
         if (!loginResponse.ok || !data.success) {
-          throw new Error(data.error || "Google sign-in failed.");
+          throw new Error(
+            data.error || "Google sign-in failed."
+          );
         }
 
         if (data.requiresTwoFactor) {
           if (data.method === "email") {
             if (typeof window.startLoginEmailTwoFactor !== "function") {
-              throw new Error("Email verification could not be opened.");
+              throw new Error(
+                "Email verification could not be opened."
+              );
             }
 
             awaitingAuthenticatorCode = true;
@@ -831,7 +823,8 @@
           }
 
           openTwoFactorPanel({
-            emailRecoveryAvailable: Boolean(data.emailRecoveryAvailable)
+            emailRecoveryAvailable:
+              Boolean(data.emailRecoveryAvailable)
           });
           return;
         }
@@ -839,69 +832,36 @@
         finishLogin(data.user || null);
       } catch (error) {
         clearLocalSignedInState();
-        showMessage(error.message || "Google sign-in failed.", "error");
+        showMessage(
+          error.message || "Google sign-in failed.",
+          "error"
+        );
+      } finally {
+        googleButton.disabled = false;
+        googleButton.textContent = "Continue with Google";
+        googleButton.setAttribute("aria-busy", "false");
       }
     }
 
-    async function initializeGoogleLogin() {
-      const googleButton = document.getElementById("login-google-button");
+    function initializeGoogleLogin() {
+      const googleButton =
+        document.getElementById("login-google-button");
 
-      if (!googleButton) {
+      if (
+        !googleButton ||
+        googleButton.dataset.googleInitialized === "true"
+      ) {
         return;
       }
 
-      try {
-        const configResponse = await fetch("/api/google-auth", {
-          method: "GET",
-          credentials: "same-origin",
-          headers: {
-            "Accept": "application/json"
-          }
-        });
-        const config = await configResponse.json().catch(function () {
-          return {};
-        });
-
-        if (!configResponse.ok || !config.clientId) {
-          throw new Error(
-            config.error || "Google sign-in is unavailable."
-          );
-        }
-
-        await waitForGoogleIdentity();
-
-        window.google.accounts.id.initialize({
-          client_id: config.clientId,
-          callback: handleGoogleLoginCredential,
-          auto_select: false,
-          cancel_on_tap_outside: true
-        });
-
-        window.google.accounts.id.renderButton(googleButton, {
-          type: "standard",
-          theme: "outline",
-          size: "large",
-          text: "signin_with",
-          shape: "pill",
-          width: Math.max(
-            240,
-            Math.min(
-              400,
-              Math.round(
-                googleButton.getBoundingClientRect().width || 400
-              )
-            )
-          )
-        });
-
-        googleButton.setAttribute("aria-busy", "false");
-      } catch (error) {
-        googleButton.hidden = true;
-        showMessage(
-          error.message || "Google sign-in is unavailable.",
-          "error"
-        );
-      }
+      googleButton.dataset.googleInitialized = "true";
+      googleButton.hidden = false;
+      googleButton.disabled = false;
+      googleButton.setAttribute("aria-busy", "false");
+      googleButton.addEventListener(
+        "click",
+        handleGoogleLoginCredential
+      );
     }
 
     function clearTwoFactorCodeInputs() {
