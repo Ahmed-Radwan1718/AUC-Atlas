@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>AUC Benefits | AUC Atlas</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .info-page {
+      min-height: 100vh;
+      padding: 126px 0 86px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+      overflow-x: clip;
+    }
+
+    .info-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .info-header {
+      max-width: none;
+      margin: 0 0 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      grid-template-areas:
+        "kicker copy"
+        "title copy";
+      column-gap: 28px;
+      align-items: end;
+    }
+
+    .info-kicker {
+      grid-area: kicker;
+      margin: 0 0 16px;
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .info-header h1 {
+      grid-area: title;
+      max-width: 640px;
+      margin: 0;
+      color: #171717;
+      font-size: clamp(26px, 3vw, 40px);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .info-header > p:last-child {
+      grid-area: copy;
+      max-width: 420px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .info-content {
+      padding: 8px 28px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 18px 48px rgba(42, 32, 20, 0.08);
+      display: grid;
+      gap: 0;
+    }
+
+    .info-section {
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: transparent;
+    }
+
+    .info-section:last-child {
+      border-bottom: 0;
+    }
+
+    .info-section h2 {
+      margin: 0;
+      color: #171717;
+      font-size: inherit;
+      line-height: inherit;
+    }
+
+    .info-toggle {
+      width: 100%;
+      padding: 22px 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #171717;
+      font-family: inherit;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .info-toggle:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.9);
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    .info-toggle span:first-child {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+      transition: color 0.2s ease;
+    }
+
+    .info-toggle:hover span:first-child,
+    .info-section.open .info-toggle span:first-child {
+      color: #a67c39;
+    }
+
+    .info-toggle-icon {
+      color: rgba(192, 154, 92, 0.94);
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      transition:
+        transform 0.24s ease,
+        color 0.24s ease;
+    }
+
+    .info-toggle-icon::before,
+    .info-toggle[aria-expanded="true"] .info-toggle-icon::before {
+      content: "+";
+    }
+
+    .info-toggle:hover .info-toggle-icon,
+    .info-section.open .info-toggle-icon {
+      color: #a67c39;
+    }
+
+    .info-section.open .info-toggle-icon {
+      transform: rotate(45deg);
+    }
+
+    .info-answer {
+      max-height: none;
+      padding: 0 56px 24px 0;
+      overflow: hidden;
+      opacity: 1;
+      transition: none;
+      will-change: height, opacity;
+    }
+
+    .info-answer[hidden] {
+      display: none;
+    }
+
+    .info-answer p,
+    .info-answer li {
+      max-width: 900px;
+      color: rgba(23, 23, 23, 0.78);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .info-answer p {
+      margin: 0;
+    }
+
+    .info-answer p + p,
+    .info-answer ul + p,
+    .info-answer p + ul,
+    .info-answer ul + ul {
+      margin-top: 14px;
+    }
+
+    .info-answer ul {
+      max-width: 900px;
+      margin: 10px 0 0 20px;
+      padding: 0;
+    }
+
+    .info-answer li + li {
+      margin-top: 8px;
+    }
+
+    .info-answer strong {
+      color: rgba(23, 23, 23, 0.88);
+      font-weight: 700;
+    }
+
+    .info-answer a,
+    .info-answer a:visited {
+      color: #a67c39;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .info-answer a:hover {
+      color: #171717;
+    }
+
+    .benefit-entry + .benefit-entry {
+      margin-top: 22px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(23, 23, 23, 0.07);
+    }
+
+    .benefit-entry h3 {
+      max-width: 900px;
+      margin: 0 0 8px;
+      color: #171717;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 760px) {
+      .info-page {
+        padding: 104px 0 64px;
+      }
+
+      .info-inner {
+        width: min(100% - 24px, 1180px);
+      }
+
+      .info-header {
+        margin-bottom: 26px;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "kicker"
+          "title"
+          "copy";
+      }
+
+      .info-header h1 {
+        margin-bottom: 14px;
+      }
+
+      .info-content {
+        padding: 6px 18px;
+        border-radius: 22px;
+      }
+
+      .info-toggle {
+        padding: 20px 0;
+        gap: 16px;
+      }
+
+      .info-toggle span:first-child {
+        font-size: 16px;
+      }
+
+      .info-answer {
+        padding: 0 0 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="site-header-root"></div>
+  <script src="site-header.js"></script>
+
+  <main class="info-page">
+    <div class="info-inner">
+      <section class="info-header">
+        <p class="info-kicker">Student guidance</p>
+        <h1>AUC Benefits</h1>
+        <p>A detailed guide to software, AI tools, student discounts, campus services and other benefits available to AUC students. Offers and eligibility can change over time. Last updated: August 12, 2026.</p>
+      </section>
+
+      <section class="info-content">
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-1"><span>1. AUC Software and Digital Services</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-1" hidden>
+            <div class="benefit-entry">
+              <h3>Microsoft Office 365 — Free</h3>
+              <p>AUC students are eligible to use Microsoft Office 365 through their university account. This includes applications such as Word, Excel, PowerPoint, Teams and OneDrive.</p>
+              <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/digital-transformation/software-solutions">AUC Software Solutions</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Microsoft Teams — Included</h3>
+              <p>Your AUC Microsoft account includes Teams for meetings, collaboration, file sharing and communication.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>OneDrive — Included</h3>
+              <p>AUC's Microsoft 365 environment includes OneDrive cloud storage. The exact storage allowance may depend on AUC's current Microsoft configuration.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>MATLAB — AUC Access</h3>
+              <p>MATLAB is available within AUC's software and technology environment. Students who need MATLAB should check AUC access before purchasing an individual license.</p>
+              <p><strong>Source:</strong> <a href="https://library.aucegypt.edu/services/available-tech-tools">AUC Library Available Technology</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>IBM SPSS — AUC Access</h3>
+              <p>AUC provides access to IBM SPSS for statistical analysis through its technology infrastructure.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>STATA — AUC Access</h3>
+              <p>STATA is also listed among AUC's available research and statistical software.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Adobe Creative Cloud — AUC Facilities</h3>
+              <p>AUC lists Adobe Creative Cloud in its Multimedia Lab. This can provide access to professional Adobe applications such as Photoshop, Illustrator, Premiere Pro and other Creative Cloud tools available on university systems.</p>
+              <p>This should not be confused with a guaranteed personal Creative Cloud subscription for every student's own computer.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Autodesk Software — AUC Facilities</h3>
+              <p>AUC's Multimedia Lab lists Autodesk software, including design and entertainment creation tools.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Final Cut Studio</h3>
+              <p>Final Cut video-production software is available through AUC's Multimedia Lab environment.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Camtasia</h3>
+              <p>Camtasia is available for screen recording, tutorial creation, presentation recording and video editing.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Turnitin</h3>
+              <p>AUC provides access to Turnitin through its academic technology infrastructure.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Panopto</h3>
+              <p>Panopto lecture-capture and video technology is part of AUC's digital learning environment.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>VoiceThread</h3>
+              <p>AUC lists VoiceThread as an available teaching and learning technology.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Articulate</h3>
+              <p>Articulate tools are available through AUC for interactive learning and presentation content.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-2"><span>2. AI Tools and Student AI Offers</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-2" hidden>
+            <div class="benefit-entry">
+              <h3>Google AI Pro — Student Offer</h3>
+              <p>Google has offered a student Google AI Pro program in supported countries, including Egypt under its current student information and promotional pages. Eligible students may receive promotional access after verifying their student status.</p>
+              <p>Google AI Pro provides higher Gemini limits and access to Google's premium AI ecosystem. Because student promotions can have eligibility windows and deadlines, students should check their current eligibility directly with Google.</p>
+              <p><strong>Source:</strong> <a href="https://one.google.com/intl/ar_eg/about/articles/google-ai-for-students/">Google AI for Students — Egypt</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>GitHub Copilot Student</h3>
+              <p>Verified students through GitHub Education may qualify for GitHub's student Copilot offering, providing AI-assisted programming tools.</p>
+              <p><strong>Source:</strong> <a href="https://github.com/education/students">GitHub Education</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Perplexity Education Pro</h3>
+              <p>Perplexity offers a student-focused Education Pro tier for verified students. It is generally a discounted educational plan rather than a permanent free subscription.</p>
+              <p><strong>Source:</strong> <a href="https://www.perplexity.ai/help-center/en/articles/12590157-what-is-education-pro">Perplexity Education Pro</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Deepnote Team</h3>
+              <p>GitHub Student benefits have included Deepnote Team access for students. Deepnote provides collaborative cloud notebooks useful for Python, data analysis, research and Jupyter-style workflows.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Camber Student</h3>
+              <p>GitHub Education has included student benefits from Camber for scientific computing, cloud CPU resources, storage and AI/LLM usage.</p>
+            </div>
+
+            <p><strong>Important:</strong> AI offers change frequently. Verify the current terms before relying on any promotional duration or usage allowance.</p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-3"><span>3. GitHub Student Developer Pack</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-3" hidden>
+            <div class="benefit-entry">
+              <h3>GitHub Student Developer Pack — Free</h3>
+              <p>Eligible university students can apply to GitHub Education and receive the Student Developer Pack. Your AUC enrollment and university email can help verify your student status.</p>
+              <p><strong>Apply:</strong> <a href="https://education.github.com/pack/join">GitHub Student Developer Pack</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>GitHub Pro</h3>
+              <p>Verified students receive GitHub account benefits associated with GitHub Education and its professional developer ecosystem.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>GitHub Copilot Student</h3>
+              <p>Eligible verified students can access GitHub's student Copilot offering for AI-assisted coding.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>GitHub Codespaces</h3>
+              <p>Students can receive development-environment benefits for GitHub Codespaces subject to GitHub's current Student Pack allowances.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>GitHub Pages</h3>
+              <p>GitHub Pages allows students to host static websites directly from GitHub repositories. It can be used for portfolios, CV websites, research projects, documentation and university projects.</p>
+            </div>
+
+            <p>The exact partner catalog changes regularly, so students should open the live Student Developer Pack after verification rather than relying on old lists of offers.</p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-4"><span>4. Cloud Computing, Hosting and Server Credits</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-4" hidden>
+            <div class="benefit-entry">
+              <h3>Microsoft Azure for Students — $100 Credit</h3>
+              <p>Azure for Students provides eligible university students with $100 in Azure credit for 12 months without requiring a credit card. Microsoft also includes free monthly usage allowances for a range of Azure services.</p>
+              <p>Eligible students may be able to renew their student subscription while they remain enrolled.</p>
+              <p><strong>Source:</strong> <a href="https://azure.microsoft.com/en-us/free/students">Azure for Students</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Heroku Student Benefits</h3>
+              <p>Heroku has participated in GitHub Education with student cloud-hosting benefits and credits. Check the current GitHub Student Pack for the active value and duration.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>MongoDB Student Benefits</h3>
+              <p>MongoDB has participated in GitHub Education with Atlas cloud credits, educational resources and certification-related offers.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>DigitalOcean Student Promotions</h3>
+              <p>DigitalOcean has previously offered substantial platform credits through GitHub Education. These offers are time-sensitive, so check the current GitHub Student Pack before assuming a specific amount is still available.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>New Relic Student Benefits</h3>
+              <p>GitHub Education has offered New Relic access for students for application and server monitoring.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Datadog</h3>
+              <p>GitHub Student offers have included Datadog monitoring benefits for servers, applications and infrastructure.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Appwrite</h3>
+              <p>Student Pack offers have included Appwrite backend-as-a-service resources for student developers.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>LocalStack</h3>
+              <p>LocalStack allows developers to emulate AWS services locally and has participated in GitHub Education.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-5"><span>5. Professional Programming Tools</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-5" hidden>
+            <div class="benefit-entry">
+              <h3>JetBrains Professional IDEs — Free Educational License</h3>
+              <p>Eligible students can obtain JetBrains educational licenses for professional development software.</p>
+              <ul>
+                <li>PyCharm Professional</li>
+                <li>IntelliJ IDEA</li>
+                <li>WebStorm</li>
+                <li>CLion</li>
+                <li>DataGrip</li>
+                <li>Rider</li>
+                <li>PhpStorm</li>
+                <li>RubyMine</li>
+              </ul>
+              <p><strong>Source:</strong> <a href="https://www.jetbrains.com/community/education/">JetBrains Education</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Termius</h3>
+              <p>GitHub Education offers have included Termius benefits. Termius is useful for SSH connections, remote Linux servers, VPS systems, Raspberry Pis and home servers.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Sentry</h3>
+              <p>Sentry provides application-error monitoring and has participated in GitHub's Student Developer Pack.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>BrowserStack</h3>
+              <p>BrowserStack lets developers test websites and applications across browsers and devices without owning every physical device.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>LambdaTest</h3>
+              <p>LambdaTest provides cross-browser and device testing and has offered student benefits through GitHub Education.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Clerk</h3>
+              <p>Clerk provides user authentication and account-management tools for software projects and has participated in GitHub Student offers.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Bootstrap Studio</h3>
+              <p>Bootstrap Studio is a visual web-development application that has been included among GitHub Education benefits.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Polypane</h3>
+              <p>Polypane is a professional browser designed for responsive web development and has participated in GitHub Education offers.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-6"><span>6. Design, CAD and Creative Software</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-6" hidden>
+            <div class="benefit-entry">
+              <h3>Figma Professional — Free for Eligible Students</h3>
+              <p>Figma for Education provides eligible higher-education students with access to Figma's Professional plan after verification.</p>
+              <p><strong>Source:</strong> <a href="https://help.figma.com/hc/en-us/articles/360041061214-Figma-for-Education">Figma for Education</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Autodesk Education — Free Educational Access</h3>
+              <p>Eligible university students can obtain renewable educational access to Autodesk software. Available products can include AutoCAD, Fusion, Revit and other Autodesk applications.</p>
+              <p>The education versions generally provide the same core software functionality as commercial versions, but educational licenses are restricted to educational use and should not be used for commercial or for-profit professional work.</p>
+              <p><strong>Source:</strong> <a href="https://www.autodesk.com/education/students">Autodesk Education</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Icons8</h3>
+              <p>GitHub Education has included temporary premium access to Icons8 assets such as icons, illustrations, photos and creative resources.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>IconScout</h3>
+              <p>IconScout has participated in GitHub Student offers with premium design-asset benefits.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Visme</h3>
+              <p>Visme has offered student benefits for presentations, graphics and visual documents through GitHub Education.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-7"><span>7. Productivity and Organization Tools</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-7" hidden>
+            <div class="benefit-entry">
+              <h3>Notion Plus Education — Free</h3>
+              <p>Eligible university students at recognized institutions can receive a free Notion Plus Education plan for an individual workspace using an educational email address.</p>
+              <p>The Education plan can include benefits such as unlimited file uploads, longer page-history retention and increased guest limits compared with Notion's standard free plan.</p>
+              <p><strong>Source:</strong> <a href="https://www.notion.com/help/notion-for-education">Notion for Education</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Notion for Student Organizations</h3>
+              <p>Verified student organizations may qualify for Notion education workspaces designed for organizations and larger teams.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Notion AI — Important Limitation</h3>
+              <p>Receiving Notion Plus through the education program should not be assumed to include unlimited Notion AI. AI allowances depend on Notion's current plan rules.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>1Password</h3>
+              <p>GitHub Education has included student benefits from 1Password for password management and developer tools.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>PomoDone</h3>
+              <p>GitHub Student benefits have included focus and Pomodoro productivity software such as PomoDone.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-8"><span>8. Canva — What AUC Students Actually Get</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-8" hidden>
+            <div class="benefit-entry">
+              <h3>Canva Free</h3>
+              <p>AUC students can use Canva's standard free plan like any other user.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Canva Pro Is Not Automatically Free for University Students</h3>
+              <p>A university email by itself does not normally provide individual Canva Pro access. Canva's free Education premium program is primarily designed for eligible K–12 users.</p>
+              <p>Higher-education students may receive expanded access only if their university participates in Canva for Campus or another institutional program.</p>
+              <p><strong>Source:</strong> <a href="https://www.canva.com/education/students/">Canva for Students</a></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-9"><span>9. Free Domains and Website Tools</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-9" hidden>
+            <div class="benefit-entry">
+              <h3>Name.com Student Domains</h3>
+              <p>GitHub Education has included free domain registration from selected domain extensions through Name.com.</p>
+              <p>Available extensions can change, so check the current Student Developer Pack before choosing or purchasing a domain.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Namecheap Student Offers</h3>
+              <p>Namecheap has participated in GitHub Education with student domain and SSL-related benefits.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>.TECH and Other Student Domains</h3>
+              <p>GitHub Education has periodically included free first-year registrations for selected domain extensions such as .TECH and others.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>GitHub Pages — Free Static Hosting</h3>
+              <p>GitHub Pages can host static websites at no additional hosting cost and works well for personal portfolios, project pages and documentation.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-10"><span>10. Online Courses and Training</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-10" hidden>
+            <div class="benefit-entry">
+              <h3>LinkedIn Learning — AUC Access</h3>
+              <p>Degree-seeking AUC students can access LinkedIn Learning through the university, providing a large catalog of courses in business, design, technology, programming and professional skills.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>DataCamp</h3>
+              <p>GitHub Education has included temporary premium DataCamp access for Python, R, SQL, data science, statistics and machine-learning courses.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Frontend Masters</h3>
+              <p>Frontend Masters has participated in the GitHub Student Developer Pack with temporary full-course access.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Educative</h3>
+              <p>Educative provides interactive browser-based programming courses and has offered free student periods followed by education discounts.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Codédex</h3>
+              <p>Codédex offers interactive programming courses and has participated in GitHub Student benefits.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Boot.dev</h3>
+              <p>Boot.dev focuses on backend programming, Python, Go, DevOps and software-engineering fundamentals and has participated in GitHub Education.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Scrimba</h3>
+              <p>Scrimba provides interactive frontend-development courses covering areas such as HTML, CSS, JavaScript and React and has participated in GitHub Student offers.</p>
+            </div>
+
+            <p>The free duration of GitHub Education course offers can change. Always check the live Student Pack before activating an offer.</p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-11"><span>11. Hardware, Electronics and Maker Tools</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-11" hidden>
+            <div class="benefit-entry">
+              <h3>Arduino Student Benefits</h3>
+              <p>GitHub Education has included Arduino Cloud access and selected hardware-related discounts for students.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Adafruit IO+</h3>
+              <p>Adafruit has participated in GitHub Student benefits with Adafruit IO+ access and hardware-related educational offers.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-12"><span>12. Music and Entertainment Discounts</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-12" hidden>
+            <div class="benefit-entry">
+              <h3>Spotify Premium Student</h3>
+              <p>Spotify offers a discounted Premium Student subscription in Egypt for eligible higher-education students. Students must verify their eligibility periodically.</p>
+              <p><strong>Source:</strong> <a href="https://www.spotify.com/eg-en/student/">Spotify Premium Student Egypt</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Apple Music Student</h3>
+              <p>Apple offers a discounted Apple Music Student subscription for verified university students in Egypt.</p>
+              <p><strong>Source:</strong> <a href="https://music.apple.com/eg/student">Apple Music Student Egypt</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Apple TV with Apple Music Student</h3>
+              <p>Apple has included access to Apple TV content with qualifying Apple Music Student subscriptions at no additional charge under its current student terms. This benefit can change and should be checked before subscribing.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>YouTube Premium Student</h3>
+              <p>YouTube offers student memberships in supported markets. Pricing and eligibility are shown according to the country associated with the student's Google account.</p>
+              <p><strong>Source:</strong> <a href="https://www.youtube.com/premium/student">YouTube Premium Student</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Anghami Student</h3>
+              <p>Anghami has offered a dedicated student subscription tier for eligible students in supported markets including Egypt.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-13"><span>13. AUC Library and Research Benefits</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-13" hidden>
+            <div class="benefit-entry">
+              <h3>Licensed Academic Databases</h3>
+              <p>Currently enrolled AUC students receive access to university-licensed research databases that can otherwise be expensive or unavailable to individuals.</p>
+              <p><strong>Source:</strong> <a href="https://library.aucegypt.edu/research/off-campus-access-rights">AUC Library Off-Campus Access</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Academic Journals</h3>
+              <p>AUC Library subscriptions provide students with access to scholarly journal articles that may otherwise sit behind institutional paywalls.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Academic Ebooks</h3>
+              <p>Students can access electronic book collections licensed by AUC Library.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Research Indexes and Abstract Databases</h3>
+              <p>AUC provides research databases that can help students conduct systematic literature searches rather than relying only on general web search engines.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Statistical Databases</h3>
+              <p>AUC Library provides access to subscribed statistical and data resources useful for research projects and theses.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Off-Campus Access</h3>
+              <p>Currently enrolled students can access many licensed resources remotely using their AUC credentials.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Use These Resources Before Graduation</h3>
+              <p>AUC states that alumni do not receive the same off-campus access to licensed electronic databases as currently enrolled students. Students should therefore take advantage of these resources while their enrollment is active.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Rare Books and Special Collections</h3>
+              <p>AUC students can use the Rare Books and Special Collections Library and its archives, rare books and specialized research collections.</p>
+              <p><strong>Source:</strong> <a href="https://library.aucegypt.edu/rare-books-special-collections/visiting-and-doing-research/students">AUC Rare Books and Special Collections</a></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-14"><span>14. Free Peer Tutoring</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-14" hidden>
+            <div class="benefit-entry">
+              <h3>One-on-One Peer Tutoring — Free</h3>
+              <p>AUC offers peer tutoring with trained students who have demonstrated strong performance in supported subjects. AUC states that peer tutoring sessions are free of charge.</p>
+              <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/academics/peer-tutoring/about">AUC Peer Tutoring</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Personalized Sessions</h3>
+              <p>Tutoring sessions can be customized around the student's needs and may be available face-to-face or online.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Science and Computing Courses</h3>
+              <p>Supported courses can include biology, chemistry, science, computer science and engineering subjects depending on the current semester's tutor availability.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Business Courses</h3>
+              <p>Peer tutoring can include accounting, economics, business finance, statistics and information-systems courses.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Other Disciplines</h3>
+              <p>AUC's supported tutoring subjects can also extend to psychology, statistics and other disciplines depending on current availability.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-15"><span>15. Free Writing and Communication Support</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-15" hidden>
+            <div class="benefit-entry">
+              <h3>AUC Writing and Communication Center — Free</h3>
+              <p>AUC provides writing support for eligible degree-seeking undergraduate and graduate students.</p>
+              <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/academics/mohamed-taymour-writing-and-communication-center">AUC Writing and Communication Center</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Essay Support</h3>
+              <p>Students can receive help with brainstorming, organization, outlining, sources, citations, revision, proofreading and grammar.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Thesis and Thesis Proposal Support</h3>
+              <p>The center can support students working on theses and thesis proposals, not only ordinary course essays.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Literature Reviews</h3>
+              <p>Students can receive feedback on the structure and communication of literature reviews.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Research Proposals</h3>
+              <p>The Writing and Communication Center can assist students working on research proposals and other academic documents.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Cover Letters</h3>
+              <p>Students can use the center for support with professional documents such as cover letters.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Presentations</h3>
+              <p>The center can also provide feedback on presentations and communication rather than only written assignments.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-16"><span>16. AUC Career Center</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-16" hidden>
+            <div class="benefit-entry">
+              <h3>Career Advising</h3>
+              <p>AUC's Career Center supports enrolled students with career planning and professional development.</p>
+              <p><strong>Source:</strong> <a href="https://careercenter.aucegypt.edu/">AUC Career Center</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Career Planning</h3>
+              <p>Students can use Career Center services to explore career paths and understand how their education and interests connect to employment opportunities.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Internship and Work-Experience Opportunities</h3>
+              <p>The Career Center helps students access internship and work-experience opportunities during university and in preparation for graduation.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Employer Connections</h3>
+              <p>AUC works with regional and international employers and provides students with opportunities to connect with organizations interested in AUC talent.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Career Events</h3>
+              <p>Students can access employer events, career programs and other Career Center activities.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-17"><span>17. Sports Complex, Gym and Athletic Facilities</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-17" hidden>
+            <div class="benefit-entry">
+              <h3>AUC Sports Complex</h3>
+              <p>Full-time AUC students have access to university athletic facilities under the University's student athletics arrangements rather than ordinary outside membership pricing.</p>
+              <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/student-life/athletics/sports-facilities">AUC Sports Facilities</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Cardio Room</h3>
+              <p>AUC provides cardio-training facilities within its Sports Complex.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Strength and Conditioning Room</h3>
+              <p>Students can use dedicated strength and conditioning facilities.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Women-Only Gym</h3>
+              <p>AUC also operates a dedicated women-only gym.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>50-Meter Swimming Pool</h3>
+              <p>The New Cairo campus includes a 50-meter swimming pool.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Squash Courts</h3>
+              <p>AUC's athletic facilities include multiple squash courts.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Tennis Courts</h3>
+              <p>Students have access to outdoor tennis facilities.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>400-Meter Running Track</h3>
+              <p>AUC provides a full outdoor athletics track.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Basketball</h3>
+              <p>Indoor and outdoor basketball facilities are available.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Volleyball</h3>
+              <p>AUC facilities include volleyball and beach-volleyball spaces.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Handball</h3>
+              <p>The main gymnasium supports handball and other indoor sports.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Football</h3>
+              <p>AUC provides fields and multipurpose outdoor spaces suitable for football.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Table Tennis and Billiards</h3>
+              <p>Students can access table-tennis and billiards facilities within the Sports Complex.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Aerobics Room</h3>
+              <p>A dedicated aerobics space is available within AUC's athletic facilities.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Sports Equipment Checkout</h3>
+              <p>AUC states that selected sports equipment can be checked out using a valid AUC ID, with equipment available free of charge under applicable facility rules.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-18"><span>18. Medical Services and Campus Clinics</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-18" hidden>
+            <div class="benefit-entry">
+              <h3>AUC Campus Clinics</h3>
+              <p>AUC operates medical clinics serving members of the university community.</p>
+              <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/clinics/medical-services">AUC Medical Services</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Student Clinical Examinations</h3>
+              <p>Students can receive clinical examinations and, where appropriate, prescriptions or referrals for further testing and treatment.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>24/7 New Cairo Emergency Service</h3>
+              <p>AUC states that the New Cairo clinic provides emergency medical services 24 hours a day, seven days a week.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Emergency Stabilization and Ambulance Transfer</h3>
+              <p>AUC emergency medical services include stabilization and ambulance transfer when medically necessary.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Study-Abroad Medical Forms</h3>
+              <p>The clinic can assist with medical documentation and forms required for certain study-abroad applications.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-19"><span>19. Student Health Insurance</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-19" hidden>
+            <div class="benefit-entry">
+              <h3>AUC Student Medical Insurance</h3>
+              <p>AUC enrolls eligible students in its student health-insurance arrangement unless an applicable exemption applies. Insurance providers, prices and coverage terms may change by academic year.</p>
+              <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/student-life/office/health-insurance">AUC Student Health Insurance</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Potential Covered Services</h3>
+              <p>Depending on the current policy and its rules, student insurance can involve services such as:</p>
+              <ul>
+                <li>Hospital admission and inpatient treatment</li>
+                <li>Emergency-room treatment</li>
+                <li>Ambulance services</li>
+                <li>Outpatient visits</li>
+                <li>Medications</li>
+                <li>Laboratory testing</li>
+                <li>Medical imaging</li>
+                <li>Physiotherapy</li>
+                <li>Dental services under applicable limits</li>
+                <li>Optical services under applicable limits</li>
+              </ul>
+              <p>Students should check the current AUC insurance guide before paying privately for a service that may be covered.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-20"><span>20. AUC Restaurant and Dining Discounts</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-20" hidden>
+            <p>AUC maintains an Exclusive Dining Offers program for members of the AUC community. Students generally need to present a valid AUC ID. Offers can change, so verify the current AUC page before visiting.</p>
+            <p><strong>Current offers page:</strong> <a href="https://www.aucegypt.edu/services/travel/dining-offers">AUC Exclusive Dining Offers</a></p>
+
+            <div class="benefit-entry">
+              <h3>Shagaret El Dor — 15% Discount</h3>
+              <p>AUC has listed a 15% discount at Shagaret El Dor at Point 90.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Izmir Saray — 15% Discount</h3>
+              <p>AUC has listed a 15% offer at participating Izmir Saray locations including EDNC and New Giza.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Yangtze Qu — 10% Discount</h3>
+              <p>AUC has listed a 10% discount at Yangtze Qu in Nox Mall.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Granita / Al Azhar Park</h3>
+              <p>AUC has listed special rates associated with Granita and Al Azhar Park.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Khan Al Khalili and Gamaliya Offers</h3>
+              <p>AUC has listed additional participating restaurants in the Khan Al Khalili and Gamaliya area with AUC community discounts.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-21"><span>21. AUC Hotel and Travel Discounts</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-21" hidden>
+            <p>AUC's Travel Office negotiates corporate hotel rates for the AUC community. Rates, participating hotels, blackout periods and booking requirements change, so students should always check the current page before booking.</p>
+            <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/travel/corporate-hotel-rates">AUC Corporate Hotel Rates</a></p>
+
+            <div class="benefit-entry">
+              <h3>JW Marriott</h3>
+              <p>AUC's hotel program has included negotiated corporate rates at JW Marriott.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>The Westin Cairo</h3>
+              <p>AUC's corporate hotel program has included negotiated rates at The Westin Cairo.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Staybridge Suites Cairo Citystars</h3>
+              <p>AUC has listed corporate pricing at Staybridge Suites, with rates potentially varying according to stay length and booking period.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Voco Cairo Arabella Plaza</h3>
+              <p>AUC has listed corporate accommodation rates at Voco Cairo Arabella Plaza.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Voco Cairo Arabella Plaza — Food and Beverage Discount</h3>
+              <p>AUC has also listed a 25% food-and-beverage discount for AUC cardholders under applicable exclusions.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Radisson Blu</h3>
+              <p>AUC's corporate hotel program has included Radisson Blu properties.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Tolip Hotels</h3>
+              <p>AUC has published negotiated rates at participating Tolip properties including Tolip El Galaa and Tolip El Narges.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Triumph Luxury</h3>
+              <p>Participating Triumph properties have appeared in AUC's corporate hotel agreements.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Steigenberger Resort Achti</h3>
+              <p>AUC has listed negotiated rates for Steigenberger Resort Achti in Luxor.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Ain Sokhna Resorts</h3>
+              <p>AUC's corporate travel program also includes selected resort properties outside Cairo, including Ain Sokhna.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>SUNRISE Resorts</h3>
+              <p>AUC has listed promotional or corporate booking arrangements at participating SUNRISE properties.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>JAZ Little Venice</h3>
+              <p>AUC has listed discounted published rates at JAZ Little Venice under its applicable agreement.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Kempinski Soma Bay</h3>
+              <p>AUC has listed discounts against published rates at Kempinski Soma Bay for eligible dates and bookings.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-22"><span>22. AUC Transportation Benefits</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-22" hidden>
+            <div class="benefit-entry">
+              <h3>AUC Bus Network</h3>
+              <p>AUC operates a large private transportation network connecting the New Cairo campus with multiple areas around Greater Cairo.</p>
+              <p><strong>Source:</strong> <a href="https://www.aucegypt.edu/services/bus">AUC Bus Service</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Areas Served</h3>
+              <p>Routes can include areas such as:</p>
+              <ul>
+                <li>Maadi</li>
+                <li>Haram</li>
+                <li>Rehab</li>
+                <li>Mokattam</li>
+                <li>Heliopolis</li>
+                <li>Nasr City</li>
+                <li>Shoubra</li>
+                <li>Zamalek and Agouza</li>
+                <li>Dokki</li>
+                <li>Ghamra</li>
+                <li>Downtown and Tahrir</li>
+                <li>6th of October</li>
+              </ul>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Wi-Fi on AUC Buses</h3>
+              <p>AUC states that its coaches include Wi-Fi and other passenger amenities.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>Semester and Annual Subscriptions</h3>
+              <p>Students who use the service regularly can compare subscription pricing with individual ticket pricing. AUC advises regular riders to consider subscriptions where they provide a lower effective trip cost.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-23"><span>23. Psychological Counseling</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-23" hidden>
+            <div class="benefit-entry">
+              <h3>Free and Confidential Counseling</h3>
+              <p>AUC's Psychological Counseling Services and Training Center provides counseling services delivered by trained master's-level clinicians under professional supervision.</p>
+              <p>Services can include individual, couple, family and group counseling, workshops and psychological assessment.</p>
+              <p><strong>Source:</strong> <a href="https://huss.aucegypt.edu/about/centers/psychological-counseling-services-training-center">AUC Psychological Counseling Services and Training Center</a></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-24"><span>24. Student Discount Verification Platforms</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-24" hidden>
+            <div class="benefit-entry">
+              <h3>UNiDAYS Egypt</h3>
+              <p>Students can create a UNiDAYS account and attempt to verify their AUC enrollment. UNiDAYS provides rotating student discounts across participating technology, fashion, subscription and consumer brands.</p>
+              <p>Because offers change frequently, search UNiDAYS before purchasing an expensive product or service.</p>
+              <p><strong>Source:</strong> <a href="https://www.myunidays.com/EG/en-GB">UNiDAYS Egypt</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>ISIC — International Student Identity Card</h3>
+              <p>AUC students are eligible to obtain an International Student Identity Card if they meet ISIC's student requirements. ISIC can unlock student discounts internationally and may be particularly useful while traveling.</p>
+              <p><strong>Source:</strong> <a href="https://www.isic.org/">ISIC</a></p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>SheerID</h3>
+              <p>Many international companies use SheerID to verify student status. AUC enrollment documents or your university email may be useful when claiming eligible student offers.</p>
+            </div>
+
+            <div class="benefit-entry">
+              <h3>GitHub Education Verification</h3>
+              <p>Once GitHub verifies your student status, GitHub Education becomes a gateway to many additional student software and development offers.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-25"><span>25. Documents Worth Keeping Ready for Student Verification</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-25" hidden>
+            <p>Student discounts often require more than simply typing an educational email address. Keep current digital copies of the following available:</p>
+            <ul>
+              <li>Your AUC student ID.</li>
+              <li>An enrollment verification document.</li>
+              <li>A current transcript or other document showing active enrollment when appropriate.</li>
+              <li>Access to your active <strong>@aucegypt.edu</strong> email account.</li>
+            </ul>
+            <p>Different services use different verification platforms and may require periodic re-verification.</p>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-26"><span>26. Highest-Priority Benefits to Claim</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-26" hidden>
+            <p>If you do not want to activate dozens of services, these are among the highest-value benefits worth checking first:</p>
+            <ul>
+              <li><strong>Google AI Pro student eligibility</strong> — check the current Egypt student promotion.</li>
+              <li><strong>GitHub Student Developer Pack</strong> — free for eligible verified students.</li>
+              <li><strong>GitHub Copilot Student</strong> — check current verified-student eligibility.</li>
+              <li><strong>Microsoft Office 365</strong> — included through AUC.</li>
+              <li><strong>Figma Professional</strong> — free for eligible education accounts.</li>
+              <li><strong>Notion Plus Education</strong> — free for eligible university students.</li>
+              <li><strong>Autodesk Education</strong> — free educational access to professional Autodesk software.</li>
+              <li><strong>Azure for Students</strong> — includes student cloud credit.</li>
+              <li><strong>JetBrains educational license</strong> — professional IDEs for eligible students.</li>
+              <li><strong>MATLAB</strong> — check AUC's software access before purchasing.</li>
+              <li><strong>SPSS and STATA</strong> — available within AUC's technology environment.</li>
+              <li><strong>AUC Library databases</strong> — use them heavily while actively enrolled.</li>
+              <li><strong>LinkedIn Learning</strong> — available through AUC.</li>
+              <li><strong>AUC Sports Complex</strong> — take advantage of facilities you would otherwise pay for elsewhere.</li>
+              <li><strong>Peer Tutoring</strong> — free academic support.</li>
+              <li><strong>Writing and Communication Center</strong> — free academic and professional writing support.</li>
+              <li><strong>Career Center</strong> — internships, career advising and employer connections.</li>
+              <li><strong>Counseling services</strong> — confidential student support.</li>
+              <li><strong>Spotify, Apple Music and YouTube student plans</strong> — check before paying standard subscription prices.</li>
+              <li><strong>AUC dining discounts</strong> — present your AUC ID at participating locations.</li>
+              <li><strong>AUC corporate hotel rates</strong> — check before booking hotels independently.</li>
+              <li><strong>UNiDAYS</strong> — useful for discovering additional rotating student discounts.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="info-section">
+          <h2><button class="info-toggle" type="button" aria-expanded="false" aria-controls="benefits-answer-27"><span>27. Important Reminder About Expiring Student Benefits</span><span class="info-toggle-icon" aria-hidden="true"></span></button></h2>
+          <div class="info-answer" id="benefits-answer-27" hidden>
+            <p>Many of the most valuable benefits on this page depend on active student status. GitHub Education, Autodesk, Figma, Notion, discounted subscriptions and similar programs can require current enrollment or periodic re-verification.</p>
+            <p>AUC Library access is especially important to use before graduation because currently enrolled students receive substantially broader remote access to licensed research resources than alumni.</p>
+            <p>Whenever possible, verify and activate useful education benefits while your AUC student status and university email remain active.</p>
+          </div>
+        </article>
+
+      </section>
+    </div>
+  </main>
+
+  <script>
+    document.querySelectorAll(".info-toggle").forEach((toggle) => {
+      const item = toggle.closest(".info-section");
+      const answer = document.getElementById(
+        toggle.getAttribute("aria-controls")
+      );
+
+      if (!item || !answer) {
+        return;
+      }
+
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      toggle.setAttribute("aria-expanded", "false");
+      answer.hidden = true;
+
+      toggle.addEventListener("click", () => {
+        const willOpen =
+          toggle.getAttribute("aria-expanded") !== "true";
+
+        const computedStyle = answer.hidden
+          ? null
+          : window.getComputedStyle(answer);
+
+        const currentHeight = answer.hidden
+          ? 0
+          : answer.getBoundingClientRect().height;
+
+        const currentOpacity = answer.hidden
+          ? 0
+          : parseFloat(computedStyle.opacity) || 1;
+
+        const currentPaddingBottom = answer.hidden
+          ? 0
+          : parseFloat(computedStyle.paddingBottom) || 0;
+
+        const currentTransform =
+          answer.hidden || computedStyle.transform === "none"
+            ? "translateY(-6px)"
+            : computedStyle.transform;
+
+        answer.getAnimations().forEach((animation) => {
+          animation.cancel();
+        });
+
+        item.classList.toggle("open", willOpen);
+        toggle.setAttribute("aria-expanded", String(willOpen));
+
+        if (willOpen) {
+          answer.hidden = false;
+
+          if (reduceMotion) {
+            return;
+          }
+
+          const targetPaddingBottom =
+            parseFloat(window.getComputedStyle(answer).paddingBottom) || 0;
+
+          const targetHeight = answer.scrollHeight;
+
+          const animation = answer.animate(
+            [
+              {
+                height: `${currentHeight}px`,
+                opacity: currentOpacity,
+                paddingBottom: `${currentPaddingBottom}px`,
+                transform: currentTransform
+              },
+              {
+                height: `${targetHeight}px`,
+                opacity: 1,
+                paddingBottom: `${targetPaddingBottom}px`,
+                transform: "translateY(0)"
+              }
+            ],
+            {
+              duration: 440,
+              easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+              fill: "both"
+            }
+          );
+
+          animation.addEventListener(
+            "finish",
+            () => {
+              animation.cancel();
+            },
+            { once: true }
+          );
+
+          return;
+        }
+
+        if (reduceMotion) {
+          answer.hidden = true;
+          return;
+        }
+
+        const animation = answer.animate(
+          [
+            {
+              height: `${currentHeight}px`,
+              opacity: currentOpacity,
+              paddingBottom: `${currentPaddingBottom}px`,
+              transform: currentTransform
+            },
+            {
+              height: "0px",
+              opacity: 0,
+              paddingBottom: "0px",
+              transform: "translateY(-6px)"
+            }
+          ],
+          {
+            duration: 320,
+            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+            fill: "both"
+          }
+        );
+
+        animation.addEventListener(
+          "finish",
+          () => {
+            if (toggle.getAttribute("aria-expanded") === "false") {
+              answer.hidden = true;
+            }
+
+            animation.cancel();
+          },
+          { once: true }
+        );
+      });
+    });
+  </script>
+
+  <div id="site-footer-root"></div>
+  <script src="site-footer.js"></script>
+</body>
+</html>
