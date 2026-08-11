@@ -912,6 +912,14 @@
       background: rgba(192, 154, 92, 0.24);
     }
 
+    .account-connected-action-button.is-connected {
+      border: 1px solid rgba(47, 146, 85, 0.28);
+      background: rgba(185, 255, 202, 0.28);
+      color: rgba(27, 112, 62, 0.96);
+      cursor: default;
+      opacity: 1;
+    }
+
     .account-connected-action-button.is-disconnect {
       border: 1px solid rgba(157, 59, 59, 0.3);
       background: rgba(157, 59, 59, 0.09);
@@ -6530,6 +6538,397 @@
     }
 
     initializeAccountPage();
+  </script>
+
+  <script type="module">
+    import {
+      getApp,
+      getApps,
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+
+    import {
+      GoogleAuthProvider,
+      getAuth,
+      inMemoryPersistence,
+      linkWithPopup,
+      setPersistence,
+      signInWithCustomToken,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    const googleConnectionStatus =
+      document.getElementById(
+        "connected-google-status"
+      );
+
+    const googleConnectionButton =
+      document.getElementById(
+        "connected-google-action"
+      );
+
+    const googleConnectionMessage =
+      document.getElementById(
+        "account-details-message"
+      );
+
+    let googleConnected = false;
+    let firebaseClientAuth = null;
+
+    function showGoogleConnectionMessage(
+      message,
+      type
+    ) {
+      if (!googleConnectionMessage) {
+        return;
+      }
+
+      googleConnectionMessage.textContent =
+        message;
+
+      googleConnectionMessage.className =
+        "account-message" +
+        (
+          type
+            ? " " + type
+            : ""
+        );
+    }
+
+    function setGoogleConnectionState(
+      connected,
+      googleEmail
+    ) {
+      googleConnected =
+        Boolean(connected);
+
+      if (googleConnectionStatus) {
+        googleConnectionStatus.textContent =
+          googleConnected
+            ? "Connected"
+            : "Not Connected";
+      }
+
+      if (!googleConnectionButton) {
+        return;
+      }
+
+      googleConnectionButton.disabled =
+        googleConnected;
+
+      googleConnectionButton.textContent =
+        googleConnected
+          ? "Connected"
+          : "Connect";
+
+      googleConnectionButton.classList.toggle(
+        "is-connect",
+        !googleConnected
+      );
+
+      googleConnectionButton.classList.toggle(
+        "is-connected",
+        googleConnected
+      );
+
+      if (
+        googleConnected &&
+        googleEmail
+      ) {
+        googleConnectionButton.title =
+          "Connected to " +
+          googleEmail;
+      } else {
+        googleConnectionButton.removeAttribute(
+          "title"
+        );
+      }
+    }
+
+    async function getGoogleAuthData() {
+      const response = await fetch(
+        "/api/google-auth",
+        {
+          method: "GET",
+          credentials:
+            "same-origin",
+          headers: {
+            "Accept":
+              "application/json"
+          }
+        }
+      );
+
+      const data =
+        await response
+          .json()
+          .catch(function () {
+            return {};
+          });
+
+      if (
+        !response.ok ||
+        !data.firebase
+      ) {
+        throw new Error(
+          data.error ||
+          "Could not open the Google connection."
+        );
+      }
+
+      return data;
+    }
+
+    async function getFirebaseClientAuth(
+      firebase,
+      customToken
+    ) {
+      const appName =
+        "aucAtlasGoogleConnection";
+
+      const existingApp =
+        getApps().find(function (app) {
+          return app.name === appName;
+        });
+
+      const firebaseApp =
+        existingApp ||
+        initializeApp(
+          firebase,
+          appName
+        );
+
+      const auth =
+        getAuth(firebaseApp);
+
+      await setPersistence(
+        auth,
+        inMemoryPersistence
+      );
+
+      if (!customToken) {
+        throw new Error(
+          "Please log in again before connecting Google."
+        );
+      }
+
+      await signInWithCustomToken(
+        auth,
+        customToken
+      );
+
+      firebaseClientAuth = auth;
+
+      return auth;
+    }
+
+    function getGoogleConnectionError(
+      error
+    ) {
+      if (
+        error &&
+        error.code ===
+          "auth/popup-closed-by-user"
+      ) {
+        return "Google connection was closed before it finished.";
+      }
+
+      if (
+        error &&
+        error.code ===
+          "auth/popup-blocked"
+      ) {
+        return "Your browser blocked the Google popup. Please allow popups and try again.";
+      }
+
+      if (
+        error &&
+        (
+          error.code ===
+            "auth/credential-already-in-use" ||
+          error.code ===
+            "auth/account-exists-with-different-credential"
+        )
+      ) {
+        return "That Google account is already connected to another AUC Atlas account.";
+      }
+
+      return (
+        error.message ||
+        "Could not connect Google. Please try again."
+      );
+    }
+
+    async function connectGoogleAccount() {
+      if (
+        !googleConnectionButton ||
+        googleConnected
+      ) {
+        return;
+      }
+
+      googleConnectionButton.disabled =
+        true;
+
+      googleConnectionButton.textContent =
+        "Connecting...";
+
+      showGoogleConnectionMessage(
+        "",
+        ""
+      );
+
+      try {
+        const authData =
+          await getGoogleAuthData();
+
+        const auth =
+          await getFirebaseClientAuth(
+            authData.firebase,
+            authData.customToken
+          );
+
+        const alreadyLinked =
+          Boolean(
+            auth.currentUser &&
+            auth.currentUser.providerData
+              .some(function (provider) {
+                return (
+                  provider &&
+                  provider.providerId ===
+                    "google.com"
+                );
+              })
+          );
+
+        if (!alreadyLinked) {
+          const provider =
+            new GoogleAuthProvider();
+
+          provider.setCustomParameters({
+            prompt: "select_account"
+          });
+
+          await linkWithPopup(
+            auth.currentUser,
+            provider
+          );
+        }
+
+        const idToken =
+          await auth.currentUser
+            .getIdToken(true);
+
+        const response = await fetch(
+          "/api/google-auth",
+          {
+            method: "POST",
+            credentials:
+              "same-origin",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              action: "connect",
+              idToken
+            })
+          }
+        );
+
+        const data =
+          await response
+            .json()
+            .catch(function () {
+              return {};
+            });
+
+        if (
+          !response.ok ||
+          !data.success ||
+          !data.connected
+        ) {
+          throw new Error(
+            data.error ||
+            "Could not confirm the Google connection."
+          );
+        }
+
+        setGoogleConnectionState(
+          true,
+          data.googleEmail || ""
+        );
+
+        showGoogleConnectionMessage(
+          "Google connected successfully. You can now use it to log in.",
+          "success"
+        );
+      } catch (error) {
+        setGoogleConnectionState(
+          false,
+          ""
+        );
+
+        showGoogleConnectionMessage(
+          getGoogleConnectionError(
+            error
+          ),
+          "error"
+        );
+      } finally {
+        if (firebaseClientAuth) {
+          await signOut(
+            firebaseClientAuth
+          ).catch(function () {});
+
+          firebaseClientAuth = null;
+        }
+
+        if (
+          googleConnectionButton &&
+          !googleConnected
+        ) {
+          googleConnectionButton.disabled =
+            false;
+
+          googleConnectionButton.textContent =
+            "Connect";
+        }
+      }
+    }
+
+    async function loadGoogleConnectionState() {
+      if (
+        !googleConnectionButton ||
+        !googleConnectionStatus
+      ) {
+        return;
+      }
+
+      try {
+        const data =
+          await getGoogleAuthData();
+
+        setGoogleConnectionState(
+          Boolean(data.connected),
+          data.googleEmail || ""
+        );
+      } catch (error) {
+        setGoogleConnectionState(
+          false,
+          ""
+        );
+      }
+    }
+
+    if (googleConnectionButton) {
+      googleConnectionButton.addEventListener(
+        "click",
+        connectGoogleAccount
+      );
+    }
+
+    loadGoogleConnectionState();
   </script>
 </body>
 </html>
