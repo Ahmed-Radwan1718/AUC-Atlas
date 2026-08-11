@@ -161,7 +161,7 @@ module.exports = async function handler(req, res) {
 
     res.setHeader(
       "Cache-Control",
-      "public, max-age=60, s-maxage=300, stale-while-revalidate=600"
+      "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
     );
 
     return res.status(200).json({
