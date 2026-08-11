@@ -2767,7 +2767,7 @@
                     </div>
 
                     <div class="account-connected-actions">
-                      <span class="account-connected-badge is-connected" id="connected-google-status" hidden>Connected</span>
+                      <span class="account-connected-badge" id="connected-google-status">Connect</span>
                       <div
                         class="account-google-button"
                         id="connected-google-button"
@@ -5511,9 +5511,11 @@
       }
 
       if (googleAccountStatus) {
-        googleAccountStatus.textContent = "Connected";
-        googleAccountStatus.hidden =
-          !accountGoogleLinked;
+        googleAccountStatus.textContent =
+          accountGoogleLinked
+            ? "Connected"
+            : "Connect";
+        googleAccountStatus.hidden = false;
         googleAccountStatus.classList.toggle(
           "is-connected",
           accountGoogleLinked
@@ -5640,8 +5642,8 @@
         googleAccountButton.hidden = true;
         showMessage(
           detailsMessage,
-          error.message || "Google account linking is unavailable.",
-          "error"
+          "",
+          ""
         );
       }
     }
