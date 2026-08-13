@@ -1137,24 +1137,6 @@ function renderForumPage(actor) {
         </div>
       </section>
 
-      <section
-        class="forum-demo-notice"
-        aria-label="Demo status"
-      >
-        <p>
-          <strong>
-            Administrator-only demo.
-          </strong>
-          Posts and replies are saved only
-          in this browser and are not
-          published to Firestore.
-        </p>
-
-        <span class="admin-preview-badge">
-          Admin preview
-        </span>
-      </section>
-
       <div class="forum-layout">
         <aside>
           <section class="forum-panel is-sticky">
@@ -1207,19 +1189,6 @@ function renderForumPage(actor) {
 
         <aside class="forum-right">
           <section class="forum-panel is-sticky">
-            <div class="side-section">
-              <p class="panel-kicker">
-                Previewing as
-              </p>
-              <h3 id="admin-name"></h3>
-              <p class="side-copy">
-                Only accounts configured
-                through <strong>ADMIN_UIDS</strong>
-                or the Firebase admin claim
-                can open this page.
-              </p>
-            </div>
-
             <div class="side-section">
               <h3>Community rules</h3>
               <ol class="rule-list">
