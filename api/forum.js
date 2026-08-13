@@ -57,6 +57,124 @@ function createForumError(
   return error;
 }
 
+async function moderateForumContent(parts) {
+  const apiKey = String(
+    process.env.OPENAI_API_KEY || ""
+  ).trim();
+
+  if (!apiKey) {
+    throw createForumError(
+      "Forum moderation is temporarily unavailable.",
+      503
+    );
+  }
+
+  const input = (
+    Array.isArray(parts)
+      ? parts
+      : [parts]
+  )
+    .map(function (part) {
+      return String(part || "").trim();
+    })
+    .filter(Boolean)
+    .join("\n\n")
+    .slice(0, 7000);
+
+  if (!input) {
+    return;
+  }
+
+  const controller =
+    new AbortController();
+
+  const timeoutId = setTimeout(
+    function () {
+      controller.abort();
+    },
+    10000
+  );
+
+  let response;
+
+  try {
+    response = await fetch(
+      "https://api.openai.com/v1/moderations",
+      {
+        method: "POST",
+        headers: {
+          Authorization:
+            "Bearer " + apiKey,
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify({
+          model:
+            "omni-moderation-latest",
+          input
+        }),
+        signal: controller.signal
+      }
+    );
+  } catch (error) {
+    throw createForumError(
+      "Forum moderation is temporarily unavailable.",
+      503
+    );
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  let data;
+
+  try {
+    data = await response.json();
+  } catch (error) {
+    throw createForumError(
+      "Forum moderation is temporarily unavailable.",
+      503
+    );
+  }
+
+  if (!response.ok) {
+    console.error(
+      "Forum moderation request failed:",
+      response.status,
+      data && data.error
+        ? data.error.type || "api-error"
+        : "api-error"
+    );
+
+    throw createForumError(
+      "Forum moderation is temporarily unavailable.",
+      503
+    );
+  }
+
+  const result =
+    data &&
+    Array.isArray(data.results)
+      ? data.results[0]
+      : null;
+
+  if (
+    !result ||
+    typeof result.flagged !== "boolean"
+  ) {
+    throw createForumError(
+      "Forum moderation is temporarily unavailable.",
+      503
+    );
+  }
+
+  if (result.flagged) {
+    throw createForumError(
+      "This content cannot be published because it may violate the community rules.",
+      422
+    );
+  }
+}
+
 function getTimestampMillis(value) {
   if (!value) return 0;
 
@@ -534,6 +652,14 @@ async function createForumPost(
     );
   }
 
+  await moderateForumContent([
+    "Forum post title:\n" + title,
+    tag
+      ? "Forum post tag:\n" + tag
+      : "",
+    "Forum post body:\n" + postBody
+  ]);
+
   const postRef = admin.firestore()
     .collection("forumPosts")
     .doc();
@@ -596,6 +722,10 @@ async function createForumReply(
       400
     );
   }
+
+  await moderateForumContent([
+    "Forum reply:\n" + replyBody
+  ]);
 
   const db = admin.firestore();
 
