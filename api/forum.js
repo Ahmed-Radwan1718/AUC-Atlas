@@ -1450,6 +1450,7 @@ function renderForumPage(actor) {
       font-size: 11px;
       font-weight: 700;
       text-align: left;
+      text-decoration: none;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1837,6 +1838,8 @@ function renderForumPage(actor) {
     .discussion-sidebar {
       position: sticky;
       top: 112px;
+      display: grid;
+      gap: 20px;
     }
 
     .discussion-sidebar .forum-panel {
@@ -2454,6 +2457,14 @@ function renderForumPage(actor) {
 
         <aside class="discussion-sidebar">
           <section class="forum-panel">
+            <h2>Categories</h2>
+            <div
+              class="category-list"
+              id="discussion-category-list"
+            ></div>
+          </section>
+
+          <section class="forum-panel">
             <div class="side-section">
               <p class="panel-kicker">
                 AUC Atlas Community
@@ -2508,9 +2519,9 @@ function renderForumPage(actor) {
 
       var state = {
         posts: [],
-        category: "All Discussions",
+        category: "Trending",
         search: "",
-        sort: "latest",
+        sort: "popular",
         activePostId: "",
         collapsedReplyIds: {},
         openReplyBranches: {},
@@ -2522,6 +2533,11 @@ function renderForumPage(actor) {
       var categoryList =
         document.getElementById(
           "category-list"
+        );
+
+      var discussionCategoryList =
+        document.getElementById(
+          "discussion-category-list"
         );
 
       var postList =
@@ -2834,6 +2850,45 @@ function renderForumPage(actor) {
         window.scrollTo(0, 0);
       }
 
+      function getCategorySlug(
+        category
+      ) {
+        return String(category || "")
+          .toLowerCase()
+          .replace(/&/g, " and ")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
+
+      function getRequestedCategory() {
+        var path =
+          String(
+            window.location.pathname ||
+              ""
+          ).replace(/\/+$/, "");
+        var prefix = "/forum/";
+
+        if (!path.startsWith(prefix)) {
+          return "";
+        }
+
+        var requestedSlug =
+          path
+            .slice(prefix.length)
+            .toLowerCase();
+
+        return (
+          categories.find(
+            function (category) {
+              return (
+                getCategorySlug(category) ===
+                requestedSlug
+              );
+            }
+          ) || ""
+        );
+      }
+
       function getFilteredPosts() {
         var search =
           state.search.toLowerCase();
@@ -2843,7 +2898,7 @@ function renderForumPage(actor) {
             function (post) {
               var matchesCategory =
                 state.category ===
-                  "All Discussions" ||
+                  "Trending" ||
                 post.category ===
                   state.category;
 
@@ -2918,15 +2973,14 @@ function renderForumPage(actor) {
 
       function renderCategories() {
         var allCategories = [
-          "All Discussions"
+          "Trending"
         ].concat(categories);
 
-        categoryList.innerHTML =
+        var categoryMarkup =
           allCategories
             .map(function (category) {
               var count =
-                category ===
-                  "All Discussions"
+                category === "Trending"
                   ? state.posts.length
                   : state.posts.filter(
                       function (post) {
@@ -2937,24 +2991,46 @@ function renderForumPage(actor) {
                       }
                     ).length;
 
+              var categoryUrl =
+                category === "Trending"
+                  ? "/forum"
+                  : "/forum/" +
+                    getCategorySlug(
+                      category
+                    );
+
               return [
-                '<button class="category-button',
+                '<a class="category-button',
                 category === state.category
                   ? ' active'
                   : '',
-                '" type="button" data-category="',
-                escapeHtml(category),
-                '">',
+                '" href="',
+                escapeHtml(categoryUrl),
+                '"',
+                category === state.category
+                  ? ' aria-current="page"'
+                  : '',
+                '>',
                   '<span>',
                     escapeHtml(category),
                   '</span>',
                   '<span class="category-count">',
                     count,
                   '</span>',
-                '</button>'
+                '</a>'
               ].join("");
             })
             .join("");
+
+        [
+          categoryList,
+          discussionCategoryList
+        ].forEach(function (list) {
+          if (list) {
+            list.innerHTML =
+              categoryMarkup;
+          }
+        });
       }
 
       function renderPostCard(post) {
@@ -4074,6 +4150,8 @@ function renderForumPage(actor) {
           new URLSearchParams(
             window.location.search
           );
+        var requestedCategory =
+          getRequestedCategory();
         var requestedPostId =
           String(
             parameters.get("post") ||
@@ -4118,7 +4196,10 @@ function renderForumPage(actor) {
           if (requestedPost) {
             state.activePostId =
               requestedPostId;
+            state.category =
+              requestedPost.category;
 
+            renderCategories();
             showForumView(
               "discussion"
             );
@@ -4136,16 +4217,34 @@ function renderForumPage(actor) {
           window.history.replaceState(
             {},
             "",
-            "/forum"
+            requestedCategory
+              ? "/forum/" +
+                getCategorySlug(
+                  requestedCategory
+                )
+              : "/forum"
           );
         }
 
         state.activePostId = "";
+        state.category =
+          requestedCategory ||
+          "Trending";
+        state.sort =
+          requestedCategory
+            ? "latest"
+            : "popular";
+        sortInput.value =
+          state.sort;
+
         showForumView("feed");
         renderFeed();
 
         document.title =
-          "AUC Atlas Community";
+          requestedCategory
+            ? requestedCategory +
+              " | AUC Atlas Community"
+            : "Trending Discussions | AUC Atlas";
       }
 
       postCategory.innerHTML =
