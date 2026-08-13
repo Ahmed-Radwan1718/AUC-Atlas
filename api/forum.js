@@ -454,33 +454,39 @@ function renderForumPage(actor) {
 
     .post-list {
       display: grid;
-      gap: 0;
-      border-bottom: 1px solid
-        rgba(23, 23, 23, 0.12);
+      gap: 14px;
     }
 
     .post-card {
       padding: 0;
-      border: 0;
-      border-top: 1px solid
-        rgba(23, 23, 23, 0.12);
-      border-radius: 0;
-      background: #fff;
-      box-shadow: none;
+      border: 1px solid
+        rgba(23, 23, 23, 0.1);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow:
+        0 12px 34px
+        rgba(42, 32, 20, 0.07);
       overflow: hidden;
-      transition: background 0.18s ease;
+      transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
     }
 
     .post-card:hover {
       border-color:
-        rgba(23, 23, 23, 0.12);
-      background: rgba(192, 154, 92, 0.05);
-      transform: none;
+        rgba(192, 154, 92, 0.3);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow:
+        0 16px 40px
+        rgba(42, 32, 20, 0.1);
+      transform: translateY(-2px);
     }
 
     .post-card-link {
       min-width: 0;
-      padding: 22px 0 20px;
+      padding: 22px 24px 20px;
       color: inherit;
       text-decoration: none;
       display: block;
