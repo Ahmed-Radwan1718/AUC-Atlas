@@ -2029,9 +2029,13 @@ function renderForumPage(actor) {
       display: none !important;
     }
 
-    .forum-page-inner,
-    .discussion-shell {
+    .forum-page-inner {
       width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .discussion-shell {
+      width: min(1360px, calc(100% - 32px));
       margin: 0 auto;
     }
 
@@ -2088,8 +2092,9 @@ function renderForumPage(actor) {
     .discussion-layout {
       display: grid;
       grid-template-columns:
+        236px
         minmax(0, 1fr)
-        286px;
+        270px;
       gap: 20px;
       align-items: start;
     }
@@ -2372,14 +2377,20 @@ function renderForumPage(actor) {
     }
 
     @media (max-width: 1080px) {
-      .forum-layout {
+      .forum-layout,
+      .discussion-layout {
         grid-template-columns:
           220px
           minmax(0, 1fr);
       }
 
-      .forum-right {
+      .forum-right,
+      .discussion-sidebar {
         grid-column: 1 / -1;
+      }
+
+      .discussion-sidebar {
+        position: static;
       }
 
       .forum-right .forum-panel {
@@ -2810,6 +2821,16 @@ function renderForumPage(actor) {
       </a>
 
       <div class="discussion-layout">
+        <aside class="discussion-categories">
+          <section class="forum-panel is-sticky">
+            <h2>Categories</h2>
+            <div
+              class="category-list"
+              id="discussion-category-list"
+            ></div>
+          </section>
+        </aside>
+
         <section
           class="discussion-main"
           aria-label="Discussion"
@@ -2818,14 +2839,6 @@ function renderForumPage(actor) {
         </section>
 
         <aside class="discussion-sidebar">
-          <section class="forum-panel">
-            <h2>Categories</h2>
-            <div
-              class="category-list"
-              id="discussion-category-list"
-            ></div>
-          </section>
-
           <section class="forum-panel">
             <div class="side-section">
               <p class="panel-kicker">
