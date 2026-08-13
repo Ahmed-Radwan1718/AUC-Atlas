@@ -9,6 +9,10 @@
     {
       "source": "/forum",
       "destination": "/api/forum"
+    },
+    {
+      "source": "/forum/:category",
+      "destination": "/api/forum"
     }
   ],
   "git": {
