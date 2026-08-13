@@ -544,7 +544,7 @@ function buildReviewFields(body, existingData) {
 
   const recommendation = cleanChoice(getValue("recommendation"), "recommendation");
   const recommendationReason = recommendation === "Depends"
-    ? cleanNote(getValue("recommendationReason"), 3000)
+    ? cleanNote(getValue("recommendationReason"), 5000)
     : "";
   const courseCode = normalizeCourseCode(
     getValue("courseCode") || getValue("courseTaken")
@@ -568,7 +568,7 @@ function buildReviewFields(body, existingData) {
     examDifficulty: cleanChoice(getValue("examDifficulty"), "examDifficulty"),
     gradingTransparency: cleanChoice(getValue("gradingTransparency"), "gradingTransparency"),
     feedbackQuality: cleanChoice(getValue("feedbackQuality"), "feedbackQuality"),
-    studentNote: cleanNote(getValue("studentNote"), 3000)
+    studentNote: cleanNote(getValue("studentNote"), 5000)
   };
 }
 
