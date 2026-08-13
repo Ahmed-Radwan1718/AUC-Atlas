@@ -1274,6 +1274,58 @@
   </main>
 
   <script>
+    const benefitsContent = document.querySelector(".info-content");
+
+    if (benefitsContent) {
+      const benefitEntries = Array.from(
+        benefitsContent.querySelectorAll(".benefit-entry")
+      );
+
+      const benefitSections = benefitEntries.map((entry, index) => {
+        const entryHeading = entry.querySelector("h3");
+
+        if (!entryHeading) {
+          return null;
+        }
+
+        const benefitNumber = index + 1;
+        const answerId = `benefits-answer-${benefitNumber}`;
+        const section = document.createElement("article");
+        const heading = document.createElement("h2");
+        const toggle = document.createElement("button");
+        const title = document.createElement("span");
+        const icon = document.createElement("span");
+        const answer = document.createElement("div");
+
+        section.className = "info-section";
+
+        toggle.className = "info-toggle";
+        toggle.type = "button";
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.setAttribute("aria-controls", answerId);
+
+        title.textContent =
+          `${benefitNumber}. ${entryHeading.textContent.trim()}`;
+
+        icon.className = "info-toggle-icon";
+        icon.setAttribute("aria-hidden", "true");
+
+        answer.className = "info-answer";
+        answer.id = answerId;
+        answer.hidden = true;
+
+        entryHeading.remove();
+        answer.appendChild(entry);
+        toggle.append(title, icon);
+        heading.appendChild(toggle);
+        section.append(heading, answer);
+
+        return section;
+      }).filter(Boolean);
+
+      benefitsContent.replaceChildren(...benefitSections);
+    }
+
     document.querySelectorAll(".info-toggle").forEach((toggle) => {
       const item = toggle.closest(".info-section");
       const answer = document.getElementById(
