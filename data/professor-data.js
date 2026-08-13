@@ -3814,7 +3814,7 @@
 
               <div class="review-field full">
                 <label for="review-note">Additional comments (optional)</label>
-                <textarea id="review-note" name="studentNote" maxlength="360"></textarea>
+                <textarea id="review-note" name="studentNote" maxlength="5000"></textarea>
               </div>
 
               <label class="review-anonymous-option">
