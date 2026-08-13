@@ -1278,7 +1278,7 @@
     }
 
     #discussion-page .discussion-shell {
-      width: min(760px, 100%);
+      width: min(1360px, calc(100% - 32px));
     }
 
     #discussion-page .discussion-main {
@@ -1928,20 +1928,57 @@
     hidden
   >
     <div class="discussion-shell">
-      <section
-        class="discussion-main"
-        aria-label="Discussion"
-      >
-        <a
-          class="forum-back-link"
-          href="/forum"
-          aria-label="Back to Community"
-        >
-          <span aria-hidden="true">&larr;</span>
-        </a>
+      <div class="discussion-layout">
+        <aside>
+          <section class="forum-panel is-sticky">
+            <h2>Categories</h2>
+            <div
+              class="category-list"
+              id="discussion-category-list"
+            ></div>
+          </section>
+        </aside>
 
-        <div id="detail-content"></div>
-      </section>
+        <section
+          class="discussion-main"
+          aria-label="Discussion"
+        >
+          <a
+            class="forum-back-link"
+            href="/forum"
+            aria-label="Back to Community"
+          >
+            <span aria-hidden="true">&larr;</span>
+          </a>
+
+          <div id="detail-content"></div>
+        </section>
+
+        <aside class="forum-right">
+          <section class="forum-panel is-sticky">
+            <div class="side-section">
+              <h3>Community rules</h3>
+              <ol class="rule-list">
+                <li>
+                  Be respectful and helpful.
+                </li>
+                <li>
+                  Do not expose private
+                  information.
+                </li>
+                <li>
+                  No cheating, scams,
+                  harassment, or spam.
+                </li>
+                <li>
+                  Use the closest matching
+                  category.
+                </li>
+              </ol>
+            </div>
+          </section>
+        </aside>
+      </div>
     </div>
   </main>
 
