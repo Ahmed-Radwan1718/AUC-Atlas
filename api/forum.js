@@ -1,6 +1,36 @@
+const crypto = require("crypto");
+const admin = require(
+  "../server/_lib/firebaseAdmin"
+);
+
 const {
-  ensureAdminUser
-} = require("../server/_lib/adminHelpers");
+  getOptionalSiteSessionUser,
+  getSiteSessionUser
+} = require(
+  "../server/_lib/securityHelpers"
+);
+const {
+  isAdminUid
+} = require(
+  "../server/_lib/adminHelpers"
+);
+const {
+  consumeSecurityRateLimit
+} = require(
+  "../server/_lib/securityRateLimits"
+);
+
+const FORUM_CATEGORIES = [
+  "Academics & Courses",
+  "Registration & Professors",
+  "Campus Life",
+  "Clubs & Events",
+  "Opportunities",
+  "Buy, Sell & Exchange",
+  "Housing & Transportation",
+  "Technology & Gaming",
+  "General Discussion"
+];
 
 function safeJson(value) {
   return JSON.stringify(value)
@@ -9,108 +39,881 @@ function safeJson(value) {
     .replace(/&/g, "\\u0026");
 }
 
-function renderAccessPage(statusCode) {
-  const heading = statusCode === 401
-    ? "Sign in required"
-    : "Administrator access required";
-  const message = statusCode === 401
-    ? "Sign in with an administrator account to open the forum demo."
-    : "This forum preview is currently available only to AUC Atlas administrators.";
+function cleanForumString(
+  value,
+  maxLength
+) {
+  return String(value || "")
+    .trim()
+    .slice(0, maxLength);
+}
 
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Forum Access | AUC Atlas</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <style>
-    * { box-sizing: border-box; }
+function createForumError(
+  message,
+  statusCode
+) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+}
 
-    body {
-      min-height: 100vh;
-      margin: 0;
-      padding: 28px;
-      background:
-        linear-gradient(
-          180deg,
-          rgba(192, 154, 92, 0.16),
-          rgba(247, 244, 238, 0) 380px
+function getTimestampMillis(value) {
+  if (!value) return 0;
+
+  if (
+    typeof value.toMillis === "function"
+  ) {
+    return value.toMillis();
+  }
+
+  if (
+    typeof value.toDate === "function"
+  ) {
+    return value.toDate().getTime();
+  }
+
+  if (typeof value.seconds === "number") {
+    return value.seconds * 1000;
+  }
+
+  if (
+    typeof value._seconds === "number"
+  ) {
+    return value._seconds * 1000;
+  }
+
+  const parsed = new Date(value);
+
+  return Number.isNaN(parsed.getTime())
+    ? 0
+    : parsed.getTime();
+}
+
+function getStoredDate(value, fallback) {
+  const millis =
+    getTimestampMillis(value);
+
+  if (millis) {
+    return new Date(millis)
+      .toISOString();
+  }
+
+  if (!fallback) {
+    return "";
+  }
+
+  const fallbackDate =
+    new Date(fallback);
+
+  return Number.isNaN(
+    fallbackDate.getTime()
+  )
+    ? ""
+    : fallbackDate.toISOString();
+}
+
+function getForumBody(req) {
+  if (
+    req.body &&
+    typeof req.body === "object"
+  ) {
+    return req.body;
+  }
+
+  if (typeof req.body === "string") {
+    try {
+      return JSON.parse(req.body);
+    } catch (error) {
+      throw createForumError(
+        "The request body is invalid.",
+        400
+      );
+    }
+  }
+
+  return {};
+}
+
+function cleanForumId(value) {
+  const id = cleanForumString(
+    value,
+    160
+  );
+
+  if (
+    !id ||
+    !/^[A-Za-z0-9_-]+$/.test(id)
+  ) {
+    throw createForumError(
+      "Discussion not found.",
+      404
+    );
+  }
+
+  return id;
+}
+
+function getVoteKey(
+  targetType,
+  postId,
+  replyId
+) {
+  return [
+    targetType,
+    postId,
+    replyId || ""
+  ].join(":");
+}
+
+function getVoteDocumentId(
+  uid,
+  targetType,
+  postId,
+  replyId
+) {
+  return crypto
+    .createHash("sha256")
+    .update(
+      [
+        uid,
+        targetType,
+        postId,
+        replyId || ""
+      ].join(":")
+    )
+    .digest("hex");
+}
+
+async function getForumActor(
+  req,
+  required
+) {
+  const decodedUser = required
+    ? await getSiteSessionUser(req, {
+        checkRevoked: true
+      })
+    : await getOptionalSiteSessionUser(
+        req,
+        {
+          checkRevoked: true
+        }
+      );
+
+  if (!decodedUser) {
+    return null;
+  }
+
+  const userRef = admin.firestore()
+    .collection("users")
+    .doc(decodedUser.uid);
+
+  const results = await Promise.all([
+    admin.auth().getUser(
+      decodedUser.uid
+    ),
+    userRef.get(),
+    isAdminUid(decodedUser.uid)
+  ]);
+
+  const userRecord = results[0];
+  const userDoc = results[1];
+  const userData = userDoc.exists
+    ? userDoc.data() || {}
+    : {};
+
+  const displayName =
+    cleanForumString(
+      userData.fullName ||
+        userRecord.displayName ||
+        userRecord.email ||
+        decodedUser.email ||
+        "AUC student",
+      80
+    );
+
+  return {
+    uid: decodedUser.uid,
+    displayName,
+    isAdmin: Boolean(results[2])
+  };
+}
+
+async function consumeForumLimit(
+  actor,
+  action,
+  maxAttempts,
+  windowMs
+) {
+  await consumeSecurityRateLimit({
+    scope: "forum-" + action,
+    identifier: actor.uid,
+    maxAttempts,
+    windowMs,
+    message:
+      "Too many forum actions. Please try again later."
+  });
+}
+
+async function getForumVoteMap(actor) {
+  const voteMap = new Map();
+
+  if (!actor) {
+    return voteMap;
+  }
+
+  const snapshot = await admin.firestore()
+    .collection("forumVotes")
+    .where(
+      "userUid",
+      "==",
+      actor.uid
+    )
+    .limit(1000)
+    .get();
+
+  snapshot.forEach(function (doc) {
+    const data = doc.data() || {};
+    const value =
+      Number(data.value || 0);
+
+    if (value !== 1 && value !== -1) {
+      return;
+    }
+
+    voteMap.set(
+      getVoteKey(
+        cleanForumString(
+          data.targetType,
+          20
         ),
-        #f7f4ee;
-      color: #171717;
-      font-family: Arial, sans-serif;
-      display: grid;
-      place-items: center;
-    }
+        cleanForumString(
+          data.postId,
+          160
+        ),
+        cleanForumString(
+          data.replyId,
+          160
+        )
+      ),
+      value
+    );
+  });
 
-    .access-card {
-      width: min(620px, 100%);
-      padding: 38px;
-      border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 28px;
-      background: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 28px 80px rgba(42, 32, 20, 0.12);
-      text-align: center;
-    }
+  return voteMap;
+}
 
-    .access-kicker {
-      margin: 0 0 14px;
-      color: rgba(192, 154, 92, 0.94);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
+async function getForumPosts(
+  actor,
+  requestedPostIdValue
+) {
+  const db = admin.firestore();
+  let requestedPostId = "";
 
-    h1 {
-      margin: 0 0 14px;
-      font-size: clamp(32px, 6vw, 52px);
-      line-height: 1.04;
-      text-transform: uppercase;
-    }
+  if (requestedPostIdValue) {
+    try {
+      requestedPostId = cleanForumId(
+        requestedPostIdValue
+      );
+    } catch (error) {}
+  }
 
-    p {
-      margin: 0;
-      color: rgba(23, 23, 23, 0.64);
-      font-size: 15px;
-      line-height: 1.7;
-    }
+  const results = await Promise.all([
+    db.collection("forumPosts")
+      .orderBy("createdAt", "desc")
+      .limit(75)
+      .get(),
+    getForumVoteMap(actor),
+    requestedPostId
+      ? db.collection("forumPosts")
+          .doc(requestedPostId)
+          .get()
+      : Promise.resolve(null)
+  ]);
 
-    a {
-      min-height: 48px;
-      margin-top: 24px;
-      padding: 0 22px;
-      border-radius: 999px;
-      background: #171717;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-decoration: none;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+  const postSnapshot = results[0];
+  const voteMap = results[1];
+  const requestedPostDoc = results[2];
+  const postDocs =
+    postSnapshot.docs.slice();
+
+  if (
+    requestedPostDoc &&
+    requestedPostDoc.exists &&
+    !postDocs.some(function (postDoc) {
+      return (
+        postDoc.id ===
+        requestedPostDoc.id
+      );
+    })
+  ) {
+    postDocs.push(requestedPostDoc);
+  }
+
+  return Promise.all(
+    postDocs.map(
+      async function (postDoc) {
+        const postData =
+          postDoc.data() || {};
+
+        const replySnapshot =
+          await postDoc.ref
+            .collection("replies")
+            .orderBy(
+              "createdAt",
+              "asc"
+            )
+            .limit(300)
+            .get();
+
+        const canManage = Boolean(
+          actor &&
+          (
+            actor.isAdmin ||
+            actor.uid ===
+              cleanForumString(
+                postData.authorUid,
+                160
+              )
+          )
+        );
+
+        const replies =
+          replySnapshot.docs.map(
+            function (replyDoc) {
+              const replyData =
+                replyDoc.data() || {};
+
+              const replyVote =
+                voteMap.get(
+                  getVoteKey(
+                    "reply",
+                    postDoc.id,
+                    replyDoc.id
+                  )
+                ) || 0;
+
+              return {
+                id: replyDoc.id,
+                parentId:
+                  cleanForumString(
+                    replyData.parentId,
+                    160
+                  ),
+                author:
+                  cleanForumString(
+                    replyData.authorName ||
+                      "AUC student",
+                    80
+                  ),
+                body:
+                  cleanForumString(
+                    replyData.body,
+                    2000
+                  ),
+                createdAt:
+                  getStoredDate(
+                    replyData.createdAt,
+                    replyData.createdAtIso
+                  ),
+                likes: Number(
+                  replyData.score || 0
+                ),
+                liked:
+                  replyVote === 1,
+                userVote: replyVote
+              };
+            }
+          );
+
+        const postVote =
+          voteMap.get(
+            getVoteKey(
+              "post",
+              postDoc.id,
+              ""
+            )
+          ) || 0;
+
+        return {
+          id: postDoc.id,
+          category:
+            cleanForumString(
+              postData.category,
+              80
+            ),
+          tag: cleanForumString(
+            postData.tag,
+            28
+          ),
+          title: cleanForumString(
+            postData.title,
+            120
+          ),
+          body: cleanForumString(
+            postData.body,
+            4000
+          ),
+          author:
+            cleanForumString(
+              postData.authorName ||
+                "AUC student",
+              80
+            ),
+          createdAt:
+            getStoredDate(
+              postData.createdAt,
+              postData.createdAtIso
+            ),
+          likes: Number(
+            postData.score || 0
+          ),
+          liked: postVote === 1,
+          userVote: postVote,
+          views: Number(
+            postData.viewCount || 0
+          ),
+          pinned:
+            Boolean(postData.pinned),
+          solved:
+            Boolean(postData.solved),
+          canManage,
+          replies
+        };
+      }
+    )
+  );
+}
+
+async function createForumPost(
+  actor,
+  body
+) {
+  await consumeForumLimit(
+    actor,
+    "create-post",
+    10,
+    60 * 60 * 1000
+  );
+
+  const category =
+    cleanForumString(
+      body.category,
+      80
+    );
+  const title = cleanForumString(
+    body.title,
+    120
+  );
+  const postBody =
+    cleanForumString(
+      body.body,
+      4000
+    );
+  const tag = cleanForumString(
+    body.tag,
+    28
+  );
+  const anonymous =
+    body.anonymous === true;
+
+  if (
+    !FORUM_CATEGORIES.includes(
+      category
+    )
+  ) {
+    throw createForumError(
+      "Choose a valid forum category.",
+      400
+    );
+  }
+
+  if (!title || !postBody) {
+    throw createForumError(
+      "Enter a title and post body.",
+      400
+    );
+  }
+
+  const postRef = admin.firestore()
+    .collection("forumPosts")
+    .doc();
+
+  const createdAtIso =
+    new Date().toISOString();
+
+  await postRef.set({
+    category,
+    tag,
+    title,
+    body: postBody,
+    authorUid: actor.uid,
+    authorName: anonymous
+      ? "Anonymous"
+      : actor.displayName,
+    anonymous,
+    createdAt:
+      admin.firestore.FieldValue
+        .serverTimestamp(),
+    createdAtIso,
+    score: 0,
+    replyCount: 0,
+    viewCount: 0,
+    pinned: false,
+    solved: false
+  });
+
+  return postRef.id;
+}
+
+async function createForumReply(
+  actor,
+  body
+) {
+  await consumeForumLimit(
+    actor,
+    "create-reply",
+    60,
+    60 * 60 * 1000
+  );
+
+  const postId = cleanForumId(
+    body.postId
+  );
+  const parentId =
+    cleanForumString(
+      body.parentId,
+      160
+    );
+  const replyBody =
+    cleanForumString(
+      body.body,
+      2000
+    );
+
+  if (!replyBody) {
+    throw createForumError(
+      "Enter a reply.",
+      400
+    );
+  }
+
+  const db = admin.firestore();
+
+  const postRef = db
+    .collection("forumPosts")
+    .doc(postId);
+
+  const postDoc = await postRef.get();
+
+  if (!postDoc.exists) {
+    throw createForumError(
+      "Discussion not found.",
+      404
+    );
+  }
+
+  if (parentId) {
+    const parentDoc = await postRef
+      .collection("replies")
+      .doc(cleanForumId(parentId))
+      .get();
+
+    if (!parentDoc.exists) {
+      throw createForumError(
+        "The comment you are replying to no longer exists.",
+        404
+      );
     }
-  </style>
-</head>
-<body>
-  <main class="access-card">
-    <p class="access-kicker">Restricted preview</p>
-    <h1>${heading}</h1>
-    <p>${message}</p>
-    <a href="/admin.html">Open Admin Dashboard</a>
-  </main>
-</body>
-</html>`;
+  }
+
+  const replyRef = postRef
+    .collection("replies")
+    .doc();
+
+  const batch = db.batch();
+
+  batch.set(replyRef, {
+    parentId,
+    body: replyBody,
+    authorUid: actor.uid,
+    authorName: actor.displayName,
+    createdAt:
+      admin.firestore.FieldValue
+        .serverTimestamp(),
+    createdAtIso:
+      new Date().toISOString(),
+    score: 0
+  });
+
+  batch.update(postRef, {
+    replyCount:
+      admin.firestore.FieldValue
+        .increment(1)
+  });
+
+  await batch.commit();
+
+  return replyRef.id;
+}
+
+async function voteForumTarget(
+  actor,
+  body,
+  targetType
+) {
+  await consumeForumLimit(
+    actor,
+    "vote",
+    300,
+    60 * 60 * 1000
+  );
+
+  const postId = cleanForumId(
+    body.postId
+  );
+
+  const replyId =
+    targetType === "reply"
+      ? cleanForumId(body.replyId)
+      : "";
+
+  const requestedVote =
+    Number(body.direction) === -1
+      ? -1
+      : 1;
+
+  const db = admin.firestore();
+
+  const postRef = db
+    .collection("forumPosts")
+    .doc(postId);
+
+  const targetRef =
+    targetType === "reply"
+      ? postRef
+          .collection("replies")
+          .doc(replyId)
+      : postRef;
+
+  const voteRef = db
+    .collection("forumVotes")
+    .doc(
+      getVoteDocumentId(
+        actor.uid,
+        targetType,
+        postId,
+        replyId
+      )
+    );
+
+  return db.runTransaction(
+    async function (transaction) {
+      const targetDoc =
+        await transaction.get(
+          targetRef
+        );
+
+      const voteDoc =
+        await transaction.get(
+          voteRef
+        );
+
+      if (!targetDoc.exists) {
+        throw createForumError(
+          targetType === "reply"
+            ? "Comment not found."
+            : "Discussion not found.",
+          404
+        );
+      }
+
+      const currentVote =
+        voteDoc.exists
+          ? Number(
+              (
+                voteDoc.data() || {}
+              ).value || 0
+            )
+          : 0;
+
+      const nextVote =
+        currentVote ===
+          requestedVote
+          ? 0
+          : requestedVote;
+
+      const difference =
+        nextVote - currentVote;
+
+      if (nextVote) {
+        transaction.set(
+          voteRef,
+          {
+            userUid: actor.uid,
+            targetType,
+            postId,
+            replyId,
+            value: nextVote,
+            updatedAt:
+              admin.firestore
+                .FieldValue
+                .serverTimestamp()
+          }
+        );
+      } else {
+        transaction.delete(voteRef);
+      }
+
+      transaction.update(
+        targetRef,
+        {
+          score:
+            admin.firestore
+              .FieldValue
+              .increment(difference)
+        }
+      );
+
+      return nextVote;
+    }
+  );
+}
+
+async function getManageablePost(
+  actor,
+  postIdValue
+) {
+  const postId = cleanForumId(
+    postIdValue
+  );
+
+  const postRef = admin.firestore()
+    .collection("forumPosts")
+    .doc(postId);
+
+  const postDoc = await postRef.get();
+
+  if (!postDoc.exists) {
+    throw createForumError(
+      "Discussion not found.",
+      404
+    );
+  }
+
+  const postData =
+    postDoc.data() || {};
+
+  if (
+    !actor.isAdmin &&
+    cleanForumString(
+      postData.authorUid,
+      160
+    ) !== actor.uid
+  ) {
+    throw createForumError(
+      "You cannot change this discussion.",
+      403
+    );
+  }
+
+  return {
+    id: postId,
+    ref: postRef,
+    data: postData
+  };
+}
+
+async function toggleForumSolved(
+  actor,
+  body
+) {
+  const post =
+    await getManageablePost(
+      actor,
+      body.postId
+    );
+
+  const solved = !Boolean(
+    post.data.solved
+  );
+
+  await post.ref.update({ solved });
+
+  return solved;
+}
+
+async function deleteForumPost(
+  actor,
+  body
+) {
+  const post =
+    await getManageablePost(
+      actor,
+      body.postId
+    );
+
+  const db = admin.firestore();
+
+  const voteSnapshot = await db
+    .collection("forumVotes")
+    .where(
+      "postId",
+      "==",
+      post.id
+    )
+    .limit(1000)
+    .get();
+
+  const batch = db.batch();
+
+  voteSnapshot.docs.forEach(
+    function (voteDoc) {
+      batch.delete(voteDoc.ref);
+    }
+  );
+
+  if (!voteSnapshot.empty) {
+    await batch.commit();
+  }
+
+  await db.recursiveDelete(post.ref);
+}
+
+async function incrementForumView(
+  postIdValue
+) {
+  if (!postIdValue) return;
+
+  let postId;
+
+  try {
+    postId = cleanForumId(
+      postIdValue
+    );
+  } catch (error) {
+    return;
+  }
+
+  await admin.firestore()
+    .collection("forumPosts")
+    .doc(postId)
+    .update({
+      viewCount:
+        admin.firestore.FieldValue
+          .increment(1)
+    })
+    .catch(function () {});
 }
 
 function renderForumPage(actor) {
-  const forumAdmin = safeJson({
-    uid: actor.uid,
-    displayName:
-      actor.displayName || "AUC Atlas Admin"
+  const forumUser = safeJson({
+    uid: actor ? actor.uid : "",
+    displayName: actor
+      ? actor.displayName
+      : "",
+    isAdmin: Boolean(
+      actor && actor.isAdmin
+    )
   });
 
   return `<!DOCTYPE html>
@@ -121,7 +924,7 @@ function renderForumPage(actor) {
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   >
-  <title>Community Forum Demo | AUC Atlas</title>
+  <title>Community Forum | AUC Atlas</title>
   <link
     rel="icon"
     type="image/svg+xml"
@@ -1223,14 +2026,6 @@ function renderForumPage(actor) {
                 class="trending-list"
                 id="trending-list"
               ></div>
-
-              <button
-                class="text-button danger-button"
-                id="reset-demo"
-                type="button"
-              >
-                Reset Demo Data
-              </button>
             </div>
           </section>
         </aside>
@@ -1318,17 +2113,14 @@ function renderForumPage(actor) {
                 id="post-anonymous"
                 type="checkbox"
               >
-              Post anonymously in the
-              community preview
+              Post anonymously
             </label>
           </div>
 
           <p class="form-note">
-            This demo stores content in your
-            browser only. Anonymous posts still
-            remain attributable to administrators
-            in a future production moderation
-            system.
+            Anonymous posts hide your name from
+            the community but remain linked to
+            your account for moderation.
           </p>
 
           <div class="form-actions">
@@ -1343,7 +2135,7 @@ function renderForumPage(actor) {
               class="primary-button"
               type="submit"
             >
-              Publish Demo Post
+              Publish Post
             </button>
           </div>
         </form>
@@ -1401,17 +2193,6 @@ function renderForumPage(actor) {
                 </li>
               </ol>
             </div>
-
-            <div class="side-section">
-              <p class="panel-kicker">
-                Previewing as
-              </p>
-              <h3 id="discussion-admin-name"></h3>
-              <p class="side-copy">
-                This browser-only demo remains
-                restricted to administrators.
-              </p>
-            </div>
           </section>
         </aside>
       </div>
@@ -1427,27 +2208,15 @@ function renderForumPage(actor) {
   <script src="/site-header.js"></script>
 
   <script>
-    window.aucAtlasForumAdmin =
-      ${forumAdmin};
+    window.aucAtlasForumUser =
+      ${forumUser};
 
     (function () {
-      var STORAGE_KEY =
-        "auc-atlas-forum-demo-v1";
+      var categories =
+        ${safeJson(FORUM_CATEGORIES)};
 
-      var categories = [
-        "Academics & Courses",
-        "Registration & Professors",
-        "Campus Life",
-        "Clubs & Events",
-        "Opportunities",
-        "Buy, Sell & Exchange",
-        "Housing & Transportation",
-        "Technology & Gaming",
-        "General Discussion"
-      ];
-
-      var admin =
-        window.aucAtlasForumAdmin || {};
+      var user =
+        window.aucAtlasForumUser || {};
 
       var state = {
         posts: [],
@@ -1527,167 +2296,168 @@ function renderForumPage(actor) {
           "forum-toast"
         );
 
-      function createSeedPosts() {
-        var now = Date.now();
-
-        return [
-          {
-            id: "demo-registration",
-            category:
-              "Registration & Professors",
-            tag: "Fall registration",
-            title:
-              "What is your best strategy for building a balanced schedule?",
-            body:
-              "I am testing a schedule with two demanding major courses and two core requirements. How do you normally balance workload, gaps, and instructor preferences?",
-            author: "AUC Atlas Admin",
-            createdAt:
-              new Date(
-                now - 42 * 60 * 1000
-              ).toISOString(),
-            likes: 14,
-            liked: false,
-            views: 86,
-            pinned: true,
-            solved: false,
-            replies: [
-              {
-                id:
-                  "reply-registration-1",
-                author: "Demo Student",
-                body:
-                  "I start with the fixed major courses, then use core requirements to avoid having three heavy days in a row.",
-                createdAt:
-                  new Date(
-                    now - 24 * 60 * 1000
-                  ).toISOString()
-              }
-            ]
-          },
-          {
-            id: "demo-clubs",
-            category: "Clubs & Events",
-            tag: "New students",
-            title:
-              "Which student clubs are welcoming new members this semester?",
-            body:
-              "Share clubs, communities, and upcoming events that would be helpful for students who want to meet people and try something new.",
-            author: "Anonymous",
-            createdAt:
-              new Date(
-                now - 3 * 60 * 60 * 1000
-              ).toISOString(),
-            likes: 9,
-            liked: false,
-            views: 53,
-            pinned: false,
-            solved: false,
-            replies: []
-          },
-          {
-            id: "demo-course",
-            category:
-              "Academics & Courses",
-            tag: "CSCE 1101",
-            title:
-              "Study-group planning for introductory programming",
-            body:
-              "Would anyone be interested in a weekly study group focused on practice, explaining concepts, and reviewing mistakes without sharing graded solutions?",
-            author: "AUC Atlas Admin",
-            createdAt:
-              new Date(
-                now - 7 * 60 * 60 * 1000
-              ).toISOString(),
-            likes: 21,
-            liked: false,
-            views: 124,
-            pinned: false,
-            solved: true,
-            replies: [
-              {
-                id: "reply-course-1",
-                parentId: "",
-                author: "Demo Student",
-                body:
-                  "A weekly session before the lab would be useful. Keeping it focused on concepts makes sense.",
-                createdAt:
-                  new Date(
-                    now - 5 * 60 * 60 * 1000
-                  ).toISOString(),
-                likes: 6,
-                liked: false,
-                userVote: 0
-              },
-              {
-                id: "reply-course-2",
-                parentId:
-                  "reply-course-1",
-                author:
-                  "AUC Atlas Admin",
-                body:
-                  "Great. The final forum could also let students follow course tags for updates.",
-                createdAt:
-                  new Date(
-                    now - 4 * 60 * 60 * 1000
-                  ).toISOString(),
-                likes: 3,
-                liked: false,
-                userVote: 0
-              }
-            ]
-          },
-          {
-            id: "demo-transport",
-            category:
-              "Housing & Transportation",
-            tag: "New Cairo",
-            title:
-              "Ideas for making daily commutes easier",
-            body:
-              "What transportation tips, safe carpool practices, or scheduling habits have made commuting to campus more manageable?",
-            author: "Demo Student",
-            createdAt:
-              new Date(
-                now - 25 * 60 * 60 * 1000
-              ).toISOString(),
-            likes: 7,
-            liked: false,
-            views: 47,
-            pinned: false,
-            solved: false,
-            replies: []
-          }
-        ];
-      }
-
-      function loadPosts() {
+      function sendToLogin() {
         try {
-          var saved = JSON.parse(
-            localStorage.getItem(
-              STORAGE_KEY
-            ) || "null"
+          localStorage.setItem(
+            "auc-atlas-login-redirect",
+            window.location.pathname +
+              window.location.search
           );
-
-          if (Array.isArray(saved)) {
-            return saved;
-          }
         } catch (error) {}
 
-        var seeded = createSeedPosts();
-
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify(seeded)
-        );
-
-        return seeded;
+        window.location.href = "/login";
       }
 
-      function savePosts() {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify(state.posts)
+      function requireForumUser() {
+        if (user.uid) {
+          return true;
+        }
+
+        showToast(
+          "Sign in with your AUC account to continue."
         );
+
+        window.setTimeout(
+          sendToLogin,
+          500
+        );
+
+        return false;
+      }
+
+      async function readForumResponse(
+        response
+      ) {
+        var data = await response
+          .json()
+          .catch(function () {
+            return {};
+          });
+
+        if (!response.ok) {
+          var error = new Error(
+            data.error ||
+              "Could not update the forum."
+          );
+
+          error.status = response.status;
+          throw error;
+        }
+
+        return data;
+      }
+
+      async function forumRequest(
+        action,
+        payload
+      ) {
+        if (!requireForumUser()) {
+          return null;
+        }
+
+        try {
+          var response = await fetch(
+            "/api/forum",
+            {
+              method: "POST",
+              credentials: "same-origin",
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+              body: JSON.stringify(
+                Object.assign(
+                  { action: action },
+                  payload || {}
+                )
+              )
+            }
+          );
+
+          return await readForumResponse(
+            response
+          );
+        } catch (error) {
+          if (error.status === 401) {
+            sendToLogin();
+            return null;
+          }
+
+          showToast(
+            error.message ||
+              "Could not update the forum."
+          );
+
+          return null;
+        }
+      }
+
+      async function loadPosts(
+        countView
+      ) {
+        var parameters =
+          new URLSearchParams();
+
+        parameters.set("data", "1");
+
+        if (countView) {
+          var currentParameters =
+            new URLSearchParams(
+              window.location.search
+            );
+
+          var viewedPostId =
+            currentParameters.get("post");
+
+          if (viewedPostId) {
+            parameters.set(
+              "viewPost",
+              viewedPostId
+            );
+          }
+        }
+
+        var response = await fetch(
+          "/api/forum?" +
+            parameters.toString(),
+          {
+            credentials: "same-origin",
+            cache: "no-store"
+          }
+        );
+
+        var data =
+          await readForumResponse(
+            response
+          );
+
+        return Array.isArray(data.posts)
+          ? data.posts
+          : [];
+      }
+
+      async function refreshPosts() {
+        try {
+          state.posts =
+            await loadPosts(false);
+
+          renderFeed();
+
+          if (state.activePostId) {
+            var activePost = findPost(
+              state.activePostId
+            );
+
+            if (activePost) {
+              renderDetail(activePost);
+            }
+          }
+        } catch (error) {
+          showToast(
+            error.message ||
+              "Could not refresh discussions."
+          );
+        }
       }
 
       function escapeHtml(value) {
@@ -2035,50 +2805,28 @@ function renderForumPage(actor) {
         );
       }
 
-      function toggleLike(
+      async function toggleLike(
         postId,
         direction
       ) {
-        var post =
-          findPost(postId);
-
-        if (!post) {
+        if (!findPost(postId)) {
           return;
         }
 
-        var requestedVote =
-          direction === -1 ? -1 : 1;
-        var currentVote =
-          Number(post.userVote || 0);
+        var result =
+          await forumRequest(
+            "vote-post",
+            {
+              postId: postId,
+              direction: direction
+            }
+          );
 
-        if (
-          !currentVote &&
-          post.liked
-        ) {
-          currentVote = 1;
+        if (!result) {
+          return;
         }
 
-        var nextVote =
-          currentVote === requestedVote
-            ? 0
-            : requestedVote;
-
-        post.likes =
-          Number(post.likes || 0) +
-          nextVote -
-          currentVote;
-        post.userVote = nextVote;
-        post.liked = nextVote === 1;
-
-        savePosts();
-        renderFeed();
-
-        if (
-          !discussionView.hidden &&
-          state.activePostId === postId
-        ) {
-          renderDetail(post);
-        }
+        await refreshPosts();
       }
 
       function findReply(
@@ -2094,47 +2842,32 @@ function renderForumPage(actor) {
         );
       }
 
-      function voteReply(
+      async function voteReply(
         post,
         replyId,
         direction
       ) {
-        var reply =
-          findReply(
-            post,
-            replyId
-          );
-
-        if (!reply) {
+        if (
+          !findReply(post, replyId)
+        ) {
           return;
         }
 
-        var requestedVote =
-          direction === -1 ? -1 : 1;
-        var currentVote =
-          Number(reply.userVote || 0);
+        var result =
+          await forumRequest(
+            "vote-reply",
+            {
+              postId: post.id,
+              replyId: replyId,
+              direction: direction
+            }
+          );
 
-        if (
-          !currentVote &&
-          reply.liked
-        ) {
-          currentVote = 1;
+        if (!result) {
+          return;
         }
 
-        var nextVote =
-          currentVote === requestedVote
-            ? 0
-            : requestedVote;
-
-        reply.likes =
-          Number(reply.likes || 0) +
-          nextVote -
-          currentVote;
-        reply.userVote = nextVote;
-        reply.liked = nextVote === 1;
-
-        savePosts();
-        renderDetail(post);
+        await refreshPosts();
       }
 
       function getReplyChildren(
@@ -2452,17 +3185,21 @@ function renderForumPage(actor) {
               escapeHtml(post.id),
             '">▼</button>',
 
-            '<button class="secondary-button" type="button" data-toggle-solved="',
-              escapeHtml(post.id),
-            '">',
-              post.solved
-                ? 'Remove Solved Status'
-                : 'Mark as Solved',
-            '</button>',
+            post.canManage
+              ? [
+                  '<button class="secondary-button" type="button" data-toggle-solved="',
+                    escapeHtml(post.id),
+                  '">',
+                    post.solved
+                      ? 'Remove Solved Status'
+                      : 'Mark as Solved',
+                  '</button>',
 
-            '<button class="secondary-button danger-button" type="button" data-delete-post="',
-              escapeHtml(post.id),
-            '">Delete Demo Post</button>',
+                  '<button class="secondary-button danger-button" type="button" data-delete-post="',
+                    escapeHtml(post.id),
+                  '">Delete Post</button>'
+                ].join("")
+              : '',
           '</div>',
 
           '<section class="reply-section">',
@@ -2500,7 +3237,7 @@ function renderForumPage(actor) {
           .getElementById("reply-form")
           .addEventListener(
             "submit",
-            function (event) {
+            async function (event) {
               event.preventDefault();
 
               var replyBody =
@@ -2515,29 +3252,24 @@ function renderForumPage(actor) {
                 return;
               }
 
-              post.replies.push({
-                id:
-                  "reply-" +
-                  Date.now().toString(36),
-                parentId: "",
-                author:
-                  admin.displayName ||
-                  "AUC Atlas Admin",
-                body: replyBody,
-                createdAt:
-                  new Date()
-                    .toISOString(),
-                likes: 0,
-                liked: false,
-                userVote: 0
-              });
+              var result =
+                await forumRequest(
+                  "create-reply",
+                  {
+                    postId: post.id,
+                    parentId: "",
+                    body: replyBody
+                  }
+                );
 
-              savePosts();
-              renderFeed();
-              renderDetail(post);
+              if (!result) {
+                return;
+              }
+
+              await refreshPosts();
 
               showToast(
-                "Demo comment posted."
+                "Comment posted."
               );
             }
           );
@@ -2572,7 +3304,9 @@ function renderForumPage(actor) {
         }
       );
 
-      function handlePostAction(event) {
+      async function handlePostAction(
+        event
+      ) {
         var activePost =
           findPost(
             state.activePostId
@@ -2716,33 +3450,30 @@ function renderForumPage(actor) {
             return;
           }
 
-          activePost.replies.push({
-            id:
-              "reply-" +
-              Date.now().toString(36),
-            parentId: parentReplyId,
-            author:
-              admin.displayName ||
-              "AUC Atlas Admin",
-            body: nestedReplyBody,
-            createdAt:
-              new Date().toISOString(),
-            likes: 0,
-            liked: false,
-            userVote: 0
-          });
+          var nestedResult =
+            await forumRequest(
+              "create-reply",
+              {
+                postId: activePost.id,
+                parentId:
+                  parentReplyId,
+                body: nestedReplyBody
+              }
+            );
+
+          if (!nestedResult) {
+            return;
+          }
 
           state.openReplyBranches[
             parentReplyId
           ] = true;
           state.replyingToId = "";
 
-          savePosts();
-          renderFeed();
-          renderDetail(activePost);
+          await refreshPosts();
 
           showToast(
-            "Nested reply posted."
+            "Reply posted."
           );
 
           return;
@@ -2831,25 +3562,24 @@ function renderForumPage(actor) {
           );
 
         if (solvedButton) {
-          var solvedPost =
-            findPost(
-              solvedButton.dataset
-                .toggleSolved
+          var solvedResult =
+            await forumRequest(
+              "toggle-solved",
+              {
+                postId:
+                  solvedButton.dataset
+                    .toggleSolved
+              }
             );
 
-          if (!solvedPost) {
+          if (!solvedResult) {
             return;
           }
 
-          solvedPost.solved =
-            !solvedPost.solved;
-
-          savePosts();
-          renderFeed();
-          renderDetail(solvedPost);
+          await refreshPosts();
 
           showToast(
-            solvedPost.solved
+            solvedResult.solved
               ? "Discussion marked as solved."
               : "Solved status removed."
           );
@@ -2865,24 +3595,25 @@ function renderForumPage(actor) {
         if (deleteButton) {
           if (
             !window.confirm(
-              "Delete this demo post from this browser?"
+              "Permanently delete this post and all of its replies?"
             )
           ) {
             return;
           }
 
-          state.posts =
-            state.posts.filter(
-              function (post) {
-                return (
-                  post.id !==
+          var deleteResult =
+            await forumRequest(
+              "delete-post",
+              {
+                postId:
                   deleteButton.dataset
                     .deletePost
-                );
               }
             );
 
-          savePosts();
+          if (!deleteResult) {
+            return;
+          }
 
           window.location.href =
             "/forum";
@@ -2928,7 +3659,7 @@ function renderForumPage(actor) {
 
       composerForm.addEventListener(
         "submit",
-        function (event) {
+        async function (event) {
           event.preventDefault();
 
           var title =
@@ -2975,39 +3706,27 @@ function renderForumPage(actor) {
             return;
           }
 
-          var postId =
-            "post-" +
-            Date.now().toString(36);
+          var result =
+            await forumRequest(
+              "create-post",
+              {
+                category: category,
+                tag: tag,
+                title: title,
+                body: body,
+                anonymous: anonymous
+              }
+            );
 
-          state.posts.unshift({
-            id: postId,
-            category: category,
-            tag: tag,
-            title: title,
-            body: body,
-            author:
-              anonymous
-                ? "Anonymous"
-                : (
-                  admin.displayName ||
-                  "AUC Atlas Admin"
-                ),
-            createdAt:
-              new Date().toISOString(),
-            likes: 0,
-            liked: false,
-            userVote: 0,
-            views: 0,
-            pinned: false,
-            solved: false,
-            replies: []
-          });
-
-          savePosts();
+          if (!result) {
+            return;
+          }
 
           window.location.href =
             "/forum?post=" +
-            encodeURIComponent(postId);
+            encodeURIComponent(
+              result.postId
+            );
         }
       );
 
@@ -3026,6 +3745,11 @@ function renderForumPage(actor) {
           parameters.get("compose") ===
           "1"
         ) {
+          if (!user.uid) {
+            requireForumUser();
+            return;
+          }
+
           composerForm.reset();
           showForumView("compose");
 
@@ -3055,12 +3779,7 @@ function renderForumPage(actor) {
           if (requestedPost) {
             state.activePostId =
               requestedPostId;
-            requestedPost.views =
-              Number(
-                requestedPost.views || 0
-              ) + 1;
 
-            savePosts();
             showForumView(
               "discussion"
             );
@@ -3090,54 +3809,6 @@ function renderForumPage(actor) {
           "AUC Atlas Community";
       }
 
-      document
-        .getElementById("reset-demo")
-        .addEventListener(
-          "click",
-          function () {
-            if (
-              !window.confirm(
-                "Reset all forum demo posts and replies in this browser?"
-              )
-            ) {
-              return;
-            }
-
-            state.posts =
-              createSeedPosts();
-            state.category =
-              "All Discussions";
-            state.search = "";
-            state.sort = "latest";
-
-            searchInput.value = "";
-            sortInput.value = "latest";
-
-            savePosts();
-            renderFeed();
-
-            showToast(
-              "Demo data reset."
-            );
-          }
-        );
-
-      document
-        .getElementById(
-          "admin-name"
-        )
-        .textContent =
-          admin.displayName ||
-          "AUC Atlas Admin";
-
-      document
-        .getElementById(
-          "discussion-admin-name"
-        )
-        .textContent =
-          admin.displayName ||
-          "AUC Atlas Admin";
-
       postCategory.innerHTML =
         categories
           .map(function (category) {
@@ -3151,8 +3822,26 @@ function renderForumPage(actor) {
           })
           .join("");
 
-      state.posts = loadPosts();
-      renderCurrentPage();
+      postList.innerHTML =
+        '<div class="forum-empty">' +
+          '<h3>Loading discussions</h3>' +
+          '<p>Please wait while the community loads.</p>' +
+        '</div>';
+
+      loadPosts(true)
+        .then(function (posts) {
+          state.posts = posts;
+          renderCurrentPage();
+        })
+        .catch(function (error) {
+          state.posts = [];
+          renderCurrentPage();
+
+          showToast(
+            error.message ||
+              "Could not load discussions."
+          );
+        });
     })();
   </script>
 </body>
@@ -3168,41 +3857,189 @@ module.exports = async function handler(
     "no-store"
   );
 
-  res.setHeader(
-    "Content-Type",
-    "text/html; charset=utf-8"
-  );
+  const query = req.query || {};
 
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
-
-    return res
-      .status(405)
-      .send(
-        renderAccessPage(403)
-      );
-  }
+  const isDataRequest =
+    req.method === "GET" &&
+    String(query.data || "") === "1";
 
   try {
+    if (isDataRequest) {
+      const actor =
+        await getForumActor(
+          req,
+          false
+        );
+
+      await incrementForumView(
+        query.viewPost
+      );
+
+      const posts =
+        await getForumPosts(
+          actor,
+          query.viewPost
+        );
+
+      return res.status(200).json({
+        posts,
+        user: actor
+          ? {
+              uid: actor.uid,
+              displayName:
+                actor.displayName,
+              isAdmin: actor.isAdmin
+            }
+          : null
+      });
+    }
+
+    if (req.method === "GET") {
+      const actor =
+        await getForumActor(
+          req,
+          false
+        );
+
+      res.setHeader(
+        "Content-Type",
+        "text/html; charset=utf-8"
+      );
+
+      return res
+        .status(200)
+        .send(
+          renderForumPage(actor)
+        );
+    }
+
+    if (req.method !== "POST") {
+      res.setHeader(
+        "Allow",
+        "GET, POST"
+      );
+
+      return res.status(405).json({
+        error: "Method not allowed."
+      });
+    }
+
     const actor =
-      await ensureAdminUser(req);
-
-    return res
-      .status(200)
-      .send(
-        renderForumPage(actor)
+      await getForumActor(
+        req,
+        true
       );
+
+    const body = getForumBody(req);
+
+    const action =
+      cleanForumString(
+        body.action,
+        40
+      );
+
+    if (action === "create-post") {
+      const postId =
+        await createForumPost(
+          actor,
+          body
+        );
+
+      return res.status(201).json({
+        success: true,
+        postId
+      });
+    }
+
+    if (action === "create-reply") {
+      const replyId =
+        await createForumReply(
+          actor,
+          body
+        );
+
+      return res.status(201).json({
+        success: true,
+        replyId
+      });
+    }
+
+    if (action === "vote-post") {
+      const userVote =
+        await voteForumTarget(
+          actor,
+          body,
+          "post"
+        );
+
+      return res.status(200).json({
+        success: true,
+        userVote
+      });
+    }
+
+    if (action === "vote-reply") {
+      const userVote =
+        await voteForumTarget(
+          actor,
+          body,
+          "reply"
+        );
+
+      return res.status(200).json({
+        success: true,
+        userVote
+      });
+    }
+
+    if (
+      action === "toggle-solved"
+    ) {
+      const solved =
+        await toggleForumSolved(
+          actor,
+          body
+        );
+
+      return res.status(200).json({
+        success: true,
+        solved
+      });
+    }
+
+    if (action === "delete-post") {
+      await deleteForumPost(
+        actor,
+        body
+      );
+
+      return res.status(200).json({
+        success: true
+      });
+    }
+
+    throw createForumError(
+      "Forum action not found.",
+      404
+    );
   } catch (error) {
-    const statusCode =
-      error &&
-      error.statusCode === 401
-        ? 401
-        : 403;
+    if (error.retryAfterSeconds) {
+      res.setHeader(
+        "Retry-After",
+        String(
+          error.retryAfterSeconds
+        )
+      );
+    }
 
     return res
-      .status(statusCode)
-      .send(
-        renderAccessPage(statusCode)
-      );
+      .status(
+        error.statusCode || 500
+      )
+      .json({
+        error:
+          error.message ||
+          "Could not update the forum."
+      });
   }
 };
