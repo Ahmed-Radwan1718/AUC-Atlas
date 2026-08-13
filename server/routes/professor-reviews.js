@@ -15,7 +15,7 @@ const REVIEW_MUTATION_MAX_REQUESTS = 30;
 const REVIEW_MAX_PER_PROFESSOR = 5;
 const REVIEW_SUBMISSION_WINDOW_MS =
   60 * 60 * 1000;
-const REVIEW_MAX_SUBMISSIONS_PER_WINDOW = 5;
+const REVIEW_MAX_SUBMISSIONS_PER_WINDOW = 35;
 
 const allowedValues = {
   recommendation: ["Yes", "Depends", "No"],
