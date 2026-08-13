@@ -1486,7 +1486,6 @@ function renderForumPage(actor) {
     }
 
     .forum-toolbar input,
-    .forum-toolbar select,
     .form-field input,
     .form-field select,
     .form-field textarea,
@@ -1501,7 +1500,6 @@ function renderForumPage(actor) {
     }
 
     .forum-toolbar input,
-    .forum-toolbar select,
     .form-field input,
     .form-field select {
       min-height: 48px;
@@ -1509,7 +1507,6 @@ function renderForumPage(actor) {
     }
 
     .forum-toolbar input:focus,
-    .forum-toolbar select:focus,
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
@@ -1519,6 +1516,166 @@ function renderForumPage(actor) {
       box-shadow:
         0 0 0 4px
         rgba(192, 154, 92, 0.12);
+    }
+
+    .forum-sort-dropdown {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .forum-sort-trigger {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 16px;
+      border: 1px solid
+        rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition:
+        border-color 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
+    }
+
+    .forum-sort-trigger:hover {
+      border-color:
+        rgba(192, 154, 92, 0.42);
+      background: rgba(255, 255, 255, 0.98);
+    }
+
+    .forum-sort-trigger:focus-visible {
+      outline: none;
+      border-color:
+        rgba(192, 154, 92, 0.58);
+      box-shadow:
+        0 0 0 4px
+        rgba(192, 154, 92, 0.12);
+    }
+
+    .forum-sort-value {
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .forum-sort-chevron {
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid
+        currentColor;
+      border-bottom: 2px solid
+        currentColor;
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+      flex: 0 0 auto;
+    }
+
+    .forum-sort-dropdown.open
+    .forum-sort-chevron {
+      transform: rotate(225deg);
+    }
+
+    .forum-sort-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      z-index: 80;
+      width: max(100%, 220px);
+      max-width: calc(100vw - 32px);
+      max-height:
+        min(360px, calc(100vh - 180px));
+      padding: 10px 8px;
+      border: 1px solid
+        rgba(23, 23, 23, 0.12);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow:
+        0 18px 42px
+        rgba(42, 32, 20, 0.14);
+      overflow-y: auto;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        visibility 0.2s ease;
+    }
+
+    .forum-sort-dropdown.open
+    .forum-sort-menu {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .forum-sort-option {
+      position: relative;
+      width: 100%;
+      margin-bottom: 6px;
+      padding: 11px 14px 11px 24px;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.66);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+      text-align: left;
+      cursor: pointer;
+      display: block;
+    }
+
+    .forum-sort-option:last-child {
+      margin-bottom: 0;
+    }
+
+    .forum-sort-option::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 11px;
+      bottom: 11px;
+      width: 2px;
+      border-radius: 999px;
+      background:
+        rgba(192, 154, 92, 0.92);
+      opacity: 0;
+      transform: scaleY(0.35);
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .forum-sort-option:hover,
+    .forum-sort-option:focus-visible,
+    .forum-sort-option.active {
+      color: #171717;
+      background:
+        rgba(192, 154, 92, 0.12);
+      outline: none;
+    }
+
+    .forum-sort-option:hover::before,
+    .forum-sort-option:focus-visible::before,
+    .forum-sort-option.active::before {
+      opacity: 1;
+      transform: scaleY(1);
     }
 
     .feed-summary {
@@ -2260,20 +2417,118 @@ function renderForumPage(actor) {
               aria-label="Search discussions"
             >
 
-            <select
+            <input
               id="forum-sort"
-              aria-label="Sort discussions"
+              type="hidden"
+              value="popular"
             >
-              <option value="latest">
-                Latest
-              </option>
-              <option value="popular">
-                Popular
-              </option>
-              <option value="unanswered">
-                Unanswered
-              </option>
-            </select>
+
+            <div
+              class="forum-sort-dropdown"
+              id="forum-sort-dropdown"
+            >
+              <button
+                class="forum-sort-trigger"
+                id="forum-sort-trigger"
+                type="button"
+                aria-label="Sort discussions"
+                aria-haspopup="listbox"
+                aria-controls="forum-sort-menu"
+                aria-expanded="false"
+              >
+                <span
+                  class="forum-sort-value"
+                  id="forum-sort-value"
+                >
+                  Trending
+                </span>
+                <span
+                  class="forum-sort-chevron"
+                  aria-hidden="true"
+                ></span>
+              </button>
+
+              <div
+                class="forum-sort-menu"
+                id="forum-sort-menu"
+                role="listbox"
+                aria-label="Sort discussions"
+                aria-hidden="true"
+              >
+                <button
+                  class="forum-sort-option active"
+                  type="button"
+                  role="option"
+                  aria-selected="true"
+                  data-sort-value="popular"
+                >
+                  Trending
+                </button>
+                <button
+                  class="forum-sort-option"
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  data-sort-value="latest"
+                >
+                  Latest
+                </button>
+                <button
+                  class="forum-sort-option"
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  data-sort-value="oldest"
+                >
+                  Oldest
+                </button>
+                <button
+                  class="forum-sort-option"
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  data-sort-value="most-liked"
+                >
+                  Most Upvoted
+                </button>
+                <button
+                  class="forum-sort-option"
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  data-sort-value="most-commented"
+                >
+                  Most Commented
+                </button>
+                <button
+                  class="forum-sort-option"
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  data-sort-value="most-viewed"
+                >
+                  Most Viewed
+                </button>
+                <button
+                  class="forum-sort-option"
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  data-sort-value="unanswered"
+                >
+                  Unanswered
+                </button>
+                <button
+                  class="forum-sort-option"
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  data-sort-value="solved"
+                >
+                  Solved
+                </button>
+              </div>
+            </div>
           </div>
 
           <p
@@ -2554,10 +2809,29 @@ function renderForumPage(actor) {
         document.getElementById(
           "forum-search"
         );
-
       var sortInput =
         document.getElementById(
           "forum-sort"
+        );
+
+      var sortDropdown =
+        document.getElementById(
+          "forum-sort-dropdown"
+        );
+
+      var sortTrigger =
+        document.getElementById(
+          "forum-sort-trigger"
+        );
+
+      var sortValue =
+        document.getElementById(
+          "forum-sort-value"
+        );
+
+      var sortMenu =
+        document.getElementById(
+          "forum-sort-menu"
         );
 
       var feedView =
@@ -2924,20 +3198,79 @@ function renderForumPage(actor) {
             }
           );
 
+        var newestFirst =
+          function (a, b) {
+            return (
+              new Date(b.createdAt) -
+              new Date(a.createdAt)
+            );
+          };
+
         if (
           state.sort === "popular"
         ) {
           posts.sort(
             function (a, b) {
+              var scoreDifference =
+                (
+                  Number(b.likes || 0) +
+                  b.replies.length * 3 +
+                  Number(b.views || 0) / 10
+                ) -
+                (
+                  Number(a.likes || 0) +
+                  a.replies.length * 3 +
+                  Number(a.views || 0) / 10
+                );
+
               return (
-                b.likes +
-                b.replies.length * 3 +
-                b.views / 10
-              ) - (
-                a.likes +
-                a.replies.length * 3 +
-                a.views / 10
+                scoreDifference ||
+                newestFirst(a, b)
               );
+            }
+          );
+        } else if (
+          state.sort === "oldest"
+        ) {
+          posts.sort(
+            function (a, b) {
+              return (
+                new Date(a.createdAt) -
+                new Date(b.createdAt)
+              );
+            }
+          );
+        } else if (
+          state.sort === "most-liked"
+        ) {
+          posts.sort(
+            function (a, b) {
+              return (
+                Number(b.likes || 0) -
+                Number(a.likes || 0)
+              ) || newestFirst(a, b);
+            }
+          );
+        } else if (
+          state.sort === "most-commented"
+        ) {
+          posts.sort(
+            function (a, b) {
+              return (
+                b.replies.length -
+                a.replies.length
+              ) || newestFirst(a, b);
+            }
+          );
+        } else if (
+          state.sort === "most-viewed"
+        ) {
+          posts.sort(
+            function (a, b) {
+              return (
+                Number(b.views || 0) -
+                Number(a.views || 0)
+              ) || newestFirst(a, b);
             }
           );
         } else if (
@@ -2949,23 +3282,19 @@ function renderForumPage(actor) {
             }
           );
 
-          posts.sort(
-            function (a, b) {
-              return (
-                new Date(b.createdAt) -
-                new Date(a.createdAt)
-              );
+          posts.sort(newestFirst);
+        } else if (
+          state.sort === "solved"
+        ) {
+          posts = posts.filter(
+            function (post) {
+              return Boolean(post.solved);
             }
           );
+
+          posts.sort(newestFirst);
         } else {
-          posts.sort(
-            function (a, b) {
-              return (
-                new Date(b.createdAt) -
-                new Date(a.createdAt)
-              );
-            }
-          );
+          posts.sort(newestFirst);
         }
 
         return posts;
@@ -4062,15 +4391,177 @@ function renderForumPage(actor) {
         }
       );
 
-      sortInput.addEventListener(
-        "change",
-        function () {
-          state.sort =
-            sortInput.value;
-
-          renderFeed();
+      function syncForumSortDropdown() {
+        if (
+          !sortInput ||
+          !sortValue ||
+          !sortMenu
+        ) {
+          return;
         }
-      );
+
+        var selectedLabel =
+          "Trending";
+
+        sortMenu
+          .querySelectorAll(
+            "[data-sort-value]"
+          )
+          .forEach(function (option) {
+            var isActive =
+              option.dataset.sortValue ===
+              sortInput.value;
+
+            option.classList.toggle(
+              "active",
+              isActive
+            );
+
+            option.setAttribute(
+              "aria-selected",
+              String(isActive)
+            );
+
+            if (isActive) {
+              selectedLabel =
+                option.textContent.trim();
+            }
+          });
+
+        sortValue.textContent =
+          selectedLabel;
+      }
+
+      function closeForumSortDropdown() {
+        if (
+          !sortDropdown ||
+          !sortTrigger ||
+          !sortMenu
+        ) {
+          return;
+        }
+
+        sortDropdown.classList.remove(
+          "open"
+        );
+
+        sortTrigger.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+
+        sortMenu.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+      }
+
+      function initializeForumSortDropdown() {
+        if (
+          !sortInput ||
+          !sortDropdown ||
+          !sortTrigger ||
+          !sortMenu
+        ) {
+          return;
+        }
+
+        sortTrigger.addEventListener(
+          "click",
+          function () {
+            var shouldOpen =
+              !sortDropdown.classList
+                .contains("open");
+
+            sortDropdown.classList.toggle(
+              "open",
+              shouldOpen
+            );
+
+            sortTrigger.setAttribute(
+              "aria-expanded",
+              String(shouldOpen)
+            );
+
+            sortMenu.setAttribute(
+              "aria-hidden",
+              String(!shouldOpen)
+            );
+
+            if (shouldOpen) {
+              var activeOption =
+                sortMenu.querySelector(
+                  ".forum-sort-option.active"
+                );
+
+              if (activeOption) {
+                window.setTimeout(
+                  function () {
+                    activeOption.focus();
+                  },
+                  0
+                );
+              }
+            }
+          }
+        );
+
+        sortMenu.addEventListener(
+          "click",
+          function (event) {
+            var option =
+              event.target.closest(
+                "[data-sort-value]"
+              );
+
+            if (!option) {
+              return;
+            }
+
+            sortInput.value =
+              option.dataset.sortValue ||
+              "popular";
+
+            state.sort =
+              sortInput.value;
+
+            syncForumSortDropdown();
+            closeForumSortDropdown();
+            renderFeed();
+          }
+        );
+
+        document.addEventListener(
+          "click",
+          function (event) {
+            if (
+              !sortDropdown.contains(
+                event.target
+              )
+            ) {
+              closeForumSortDropdown();
+            }
+          }
+        );
+
+        document.addEventListener(
+          "keydown",
+          function (event) {
+            if (
+              event.key === "Escape" &&
+              sortDropdown.classList
+                .contains("open")
+            ) {
+              closeForumSortDropdown();
+              sortTrigger.focus();
+            }
+          }
+        );
+
+        syncForumSortDropdown();
+      }
+
+      initializeForumSortDropdown();
 
       composerForm.addEventListener(
         "submit",
@@ -4236,6 +4727,7 @@ function renderForumPage(actor) {
             : "popular";
         sortInput.value =
           state.sort;
+        syncForumSortDropdown();
 
         showForumView("feed");
         renderFeed();
