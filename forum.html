@@ -1295,23 +1295,30 @@
       position: absolute;
       top: 28px;
       left: 36px;
-      width: 34px;
+      width: auto;
       height: 34px;
       min-height: 34px;
       margin: 0;
-      padding: 0;
-      border-radius: 50%;
-      background: #eef1f2;
-      color: #171717;
-      font-size: 18px;
+      padding: 0 2px;
+      border-radius: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 12px;
+      font-weight: 800;
       letter-spacing: 0;
       text-transform: none;
-      justify-content: center;
+      justify-content: flex-start;
       z-index: 2;
     }
 
     #discussion-page .forum-back-link:hover {
-      background: rgba(192, 154, 92, 0.18);
+      background: transparent;
+      color: #171717;
+    }
+
+    #discussion-page .forum-back-link:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.55);
+      outline-offset: 4px;
     }
 
     .discussion-post-author {
@@ -1382,15 +1389,35 @@
 
     #discussion-page .like-button {
       min-height: 30px;
-      padding: 0 6px;
+      padding: 0 8px;
       border: 0;
       background: transparent;
       font-size: 11px;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      transition:
+        transform 0.08s ease,
+        background-color 0.12s ease,
+        color 0.12s ease;
     }
 
-    #discussion-page .like-button:hover,
+    #discussion-page .like-button:hover {
+      background: rgba(192, 154, 92, 0.08);
+    }
+
     #discussion-page .like-button.active {
-      background: rgba(192, 154, 92, 0.12);
+      background: rgba(192, 154, 92, 0.16);
+      color: rgba(126, 86, 26, 0.98);
+    }
+
+    #discussion-page .like-button:active {
+      transform: scale(0.9);
+    }
+
+    #discussion-page .like-button:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.55);
+      outline-offset: 2px;
     }
 
     .detail-stat {
@@ -2069,7 +2096,7 @@
             href="/forum"
             aria-label="Back to Community"
           >
-            <span aria-hidden="true">&larr;</span>
+            Back
           </a>
 
           <div id="detail-content"></div>
@@ -2976,33 +3003,140 @@
       function findPost(postId) {
         return state.posts.find(
           function (post) {
-            return post.id === postId;
+            return (
+              String(post.id) ===
+              String(postId)
+            );
           }
         );
+      }
+
+      function renderPostVoteState(post) {
+        if (
+          String(state.activePostId) ===
+          String(post.id)
+        ) {
+          renderDetail(post);
+          return;
+        }
+
+        renderFeed();
       }
 
       async function toggleLike(
         postId,
         direction
       ) {
-        if (!findPost(postId)) {
+        var post = findPost(postId);
+
+        if (
+          !post ||
+          !requireForumUser()
+        ) {
           return;
         }
+
+        var requestedVote =
+          Number(direction) === -1
+            ? -1
+            : 1;
+
+        var currentVote =
+          Number(post.userVote || 0);
+
+        if (
+          !currentVote &&
+          post.liked
+        ) {
+          currentVote = 1;
+        }
+
+        var nextVote =
+          currentVote === requestedVote
+            ? 0
+            : requestedVote;
+
+        post.userVote = nextVote;
+        post.liked = nextVote === 1;
+        post.likes =
+          Number(post.likes || 0) +
+          nextVote -
+          currentVote;
+
+        renderPostVoteState(post);
+
+        if (!state.postVoteQueues) {
+          state.postVoteQueues =
+            Object.create(null);
+        }
+
+        var voteKey =
+          String(postId);
+
+        var previousRequest =
+          state.postVoteQueues[voteKey] ||
+          Promise.resolve();
+
+        var voteRequest =
+          previousRequest
+            .catch(function () {
+              return null;
+            })
+            .then(function () {
+              return forumRequest(
+                "vote-post",
+                {
+                  postId: postId,
+                  direction:
+                    requestedVote
+                }
+              );
+            });
+
+        state.postVoteQueues[voteKey] =
+          voteRequest;
 
         var result =
-          await forumRequest(
-            "vote-post",
-            {
-              postId: postId,
-              direction: direction
-            }
-          );
+          await voteRequest;
 
-        if (!result) {
+        if (
+          state.postVoteQueues[voteKey] !==
+          voteRequest
+        ) {
           return;
         }
 
-        await refreshPosts();
+        delete state.postVoteQueues[
+          voteKey
+        ];
+
+        if (!result) {
+          await refreshPosts();
+          return;
+        }
+
+        var confirmedVote =
+          Number(
+            result.userVote || 0
+          );
+
+        if (
+          confirmedVote !==
+          Number(post.userVote || 0)
+        ) {
+          post.likes =
+            Number(post.likes || 0) +
+            confirmedVote -
+            Number(post.userVote || 0);
+
+          post.userVote =
+            confirmedVote;
+
+          post.liked =
+            confirmedVote === 1;
+
+          renderPostVoteState(post);
+        }
       }
 
       function findReply(
