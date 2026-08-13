@@ -1270,6 +1270,329 @@
         flex-direction: column;
       }
     }
+
+    #discussion-page {
+      min-height: 100vh;
+      padding: 104px 0 72px;
+      background: #fff;
+    }
+
+    #discussion-page .discussion-shell {
+      width: min(760px, 100%);
+    }
+
+    #discussion-page .discussion-main {
+      position: relative;
+      min-width: 0;
+      padding: 28px 36px 56px;
+      border: 0;
+      border-radius: 0;
+      background: #fff;
+      box-shadow: none;
+    }
+
+    #discussion-page .forum-back-link {
+      position: absolute;
+      top: 28px;
+      left: 36px;
+      width: 34px;
+      height: 34px;
+      min-height: 34px;
+      margin: 0;
+      padding: 0;
+      border-radius: 50%;
+      background: #eef1f2;
+      color: #171717;
+      font-size: 18px;
+      letter-spacing: 0;
+      text-transform: none;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    #discussion-page .forum-back-link:hover {
+      background: rgba(192, 154, 92, 0.18);
+    }
+
+    .discussion-post-author {
+      min-height: 36px;
+      padding-left: 48px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .discussion-post-author .post-avatar {
+      width: 34px;
+      height: 34px;
+      font-size: 9px;
+    }
+
+    .discussion-post-author-copy {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .discussion-post-author-line {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .discussion-post-author-line strong {
+      color: #171717;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    .discussion-post-author-line span,
+    .discussion-post-context {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .discussion-post-context {
+      color: #8d641f;
+      font-weight: 700;
+    }
+
+    #discussion-page .detail-heading {
+      margin: 12px 0 14px;
+      font-size: clamp(24px, 4vw, 32px);
+      line-height: 1.16;
+      text-transform: none;
+    }
+
+    #discussion-page .detail-copy {
+      margin: 0 0 16px;
+      color: rgba(23, 23, 23, 0.82);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    #discussion-page .detail-actions {
+      min-height: 36px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.1);
+      gap: 4px;
+    }
+
+    #discussion-page .like-button {
+      min-height: 30px;
+      padding: 0 6px;
+      border: 0;
+      background: transparent;
+      font-size: 11px;
+    }
+
+    #discussion-page .like-button:hover,
+    #discussion-page .like-button.active {
+      background: rgba(192, 154, 92, 0.12);
+    }
+
+    .detail-stat {
+      margin-left: 8px;
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    #discussion-page .reply-section {
+      margin-top: 0;
+      padding-top: 20px;
+      border-top: 0;
+    }
+
+    #discussion-page .reply-form {
+      margin: 0 0 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.1);
+      gap: 8px;
+    }
+
+    #discussion-page .reply-form textarea {
+      min-height: 82px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #faf9f6;
+      font-size: 13px;
+    }
+
+    #discussion-page .reply-form .form-actions {
+      margin-top: 0;
+    }
+
+    #discussion-page .reply-form .primary-button {
+      min-height: 38px;
+      padding: 0 16px;
+    }
+
+    #discussion-page .reply-section-heading {
+      margin-bottom: 6px;
+    }
+
+    #discussion-page .reply-section-heading h3 {
+      font-size: 15px;
+    }
+
+    #discussion-page .reply-list {
+      display: block;
+    }
+
+    #discussion-page .reply-list .forum-empty {
+      padding: 26px 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      text-align: left;
+    }
+
+    #discussion-page .reply-list .forum-empty h3 {
+      font-size: 14px;
+    }
+
+    #discussion-page .reply-list .forum-empty p {
+      margin-top: 5px;
+      font-size: 12px;
+    }
+
+    #discussion-page .reply-card {
+      position: relative;
+      padding: 14px 0 14px 42px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    #discussion-page .reply-card + .reply-card {
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    #discussion-page .reply-card::before {
+      content: "";
+      position: absolute;
+      top: 46px;
+      bottom: -14px;
+      left: 15px;
+      width: 1px;
+      background: rgba(23, 23, 23, 0.12);
+    }
+
+    #discussion-page .reply-card:last-child::before,
+    #discussion-page .reply-card.is-collapsed::before {
+      display: none;
+    }
+
+    .reply-avatar {
+      position: absolute;
+      top: 14px;
+      left: 0;
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(192, 154, 92, 0.22);
+      border-radius: 50%;
+      background: rgba(192, 154, 92, 0.13);
+      color: #8d641f;
+      font-size: 8px;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+    }
+
+    #discussion-page .reply-card-header {
+      min-height: 30px;
+      margin-bottom: 4px;
+      gap: 5px;
+    }
+
+    #discussion-page .reply-card-header strong {
+      font-size: 12px;
+    }
+
+    #discussion-page .reply-card-header time {
+      font-size: 10px;
+    }
+
+    #discussion-page .reply-collapse-button {
+      width: 20px;
+      height: 20px;
+      margin-left: auto;
+      border-radius: 50%;
+      background: transparent;
+    }
+
+    #discussion-page .reply-card-body {
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    #discussion-page .reply-card-actions {
+      margin-top: 5px;
+      gap: 2px;
+    }
+
+    #discussion-page .reply-action-button,
+    #discussion-page .reply-children-toggle {
+      min-height: 28px;
+      padding: 0 6px;
+      font-size: 10px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    #discussion-page .reply-children-toggle {
+      margin-top: 2px;
+    }
+
+    #discussion-page .reply-children {
+      margin-top: 0;
+      margin-left: 14px;
+      padding-left: 18px;
+      border-left-color: rgba(23, 23, 23, 0.12);
+      gap: 0;
+    }
+
+    #discussion-page .reply-card.is-collapsed {
+      padding: 8px 0;
+      border-left: 0;
+      background: transparent;
+    }
+
+    #discussion-page .nested-reply-form {
+      border-radius: 12px;
+      background: #faf9f6;
+    }
+
+    @media (max-width: 760px) {
+      #discussion-page {
+        padding-top: 88px;
+      }
+
+      #discussion-page .discussion-main {
+        padding: 20px 18px 44px;
+      }
+
+      #discussion-page .forum-back-link {
+        top: 20px;
+        left: 18px;
+      }
+
+      .discussion-post-author {
+        padding-left: 44px;
+      }
+
+      #discussion-page .detail-heading {
+        font-size: 24px;
+      }
+
+      #discussion-page .reply-card {
+        padding-left: 38px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1605,63 +1928,20 @@
     hidden
   >
     <div class="discussion-shell">
-      <a
-        class="forum-back-link"
-        href="/forum"
+      <section
+        class="discussion-main"
+        aria-label="Discussion"
       >
-        &larr; Back to Community
-      </a>
-
-      <div class="discussion-layout">
-        <aside class="discussion-categories">
-          <section class="forum-panel is-sticky">
-            <h2>Categories</h2>
-            <div
-              class="category-list"
-              id="discussion-category-list"
-            ></div>
-          </section>
-        </aside>
-
-        <section
-          class="discussion-main"
-          aria-label="Discussion"
+        <a
+          class="forum-back-link"
+          href="/forum"
+          aria-label="Back to Community"
         >
-          <div id="detail-content"></div>
-        </section>
+          <span aria-hidden="true">&larr;</span>
+        </a>
 
-        <aside class="discussion-sidebar">
-          <section class="forum-panel">
-            <div class="side-section">
-              <p class="panel-kicker">
-                AUC Atlas Community
-              </p>
-              <h3>About this discussion</h3>
-              <p class="side-copy">
-                Read the full post, join the
-                conversation, and reply directly
-                to other comments.
-              </p>
-            </div>
-
-            <div class="side-section">
-              <h3>Community rules</h3>
-              <ol class="rule-list">
-                <li>
-                  Be respectful and helpful.
-                </li>
-                <li>
-                  Protect private information.
-                </li>
-                <li>
-                  No cheating, scams,
-                  harassment, or spam.
-                </li>
-              </ol>
-            </div>
-          </section>
-        </aside>
-      </div>
+        <div id="detail-content"></div>
+      </section>
     </div>
   </main>
 
@@ -2599,6 +2879,22 @@
 
         var replyId =
           String(reply.id || "");
+        var replyAuthor =
+          String(
+            reply.author ||
+              "AUC student"
+          ).trim();
+        var replyInitials =
+          replyAuthor
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(function (part) {
+              return part.charAt(0);
+            })
+            .join("")
+            .toUpperCase() ||
+          "AUC";
         var collapsed =
           Boolean(
             state.collapsedReplyIds[
@@ -2713,23 +3009,24 @@
 
         return [
           '<article class="reply-card">',
+            '<span class="reply-avatar" aria-hidden="true">',
+              escapeHtml(replyInitials),
+            '</span>',
+
             '<header class="reply-card-header">',
-              '<button class="reply-collapse-button" type="button" data-collapse-reply="',
-                escapeHtml(replyId),
-                '" aria-label="Collapse comment">−</button>',
               '<strong>',
-                escapeHtml(
-                  reply.author ||
-                  "AUC student"
-                ),
+                escapeHtml(replyAuthor),
               '</strong>',
-              '<time>',
+              '<time>· ',
                 escapeHtml(
                   formatRelative(
                     reply.createdAt
                   )
                 ),
               '</time>',
+              '<button class="reply-collapse-button" type="button" data-collapse-reply="',
+                escapeHtml(replyId),
+                '" aria-label="Collapse comment">−</button>',
             '</header>',
 
             '<p class="reply-card-body">',
@@ -2818,6 +3115,51 @@
       function renderDetail(post) {
         var userVote =
           Number(post.userVote || 0);
+        var anonymous =
+          post.anonymous === true;
+        var author =
+          anonymous
+            ? "Anonymous"
+            : String(
+                post.author ||
+                  "AUC student"
+              ).trim();
+        var authorPhotoURL =
+          anonymous
+            ? ""
+            : String(
+                post.authorPhotoURL ||
+                  ""
+              ).trim();
+        var authorInitials =
+          author
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(function (part) {
+              return part.charAt(0);
+            })
+            .join("")
+            .toUpperCase() ||
+          "AUC";
+        var avatarMarkup =
+          authorPhotoURL
+            ? [
+                '<span class="post-avatar" aria-hidden="true">',
+                  '<img loading="lazy" decoding="async" src="',
+                    escapeHtml(authorPhotoURL),
+                  '" alt="">',
+                '</span>'
+              ].join("")
+            : [
+                '<span class="post-avatar" aria-hidden="true">',
+                  escapeHtml(
+                    anonymous
+                      ? "AN"
+                      : authorInitials
+                  ),
+                '</span>'
+              ].join("");
 
         if (
           !userVote &&
@@ -2827,83 +3169,80 @@
         }
 
         detailContent.innerHTML = [
-          '<div class="post-badges">',
-            '<span class="post-badge is-gold">',
-              escapeHtml(post.category),
-            '</span>',
-            post.tag
-              ? '<span class="post-badge">' +
-                escapeHtml(post.tag) +
-                '</span>'
-              : '',
-            post.pinned
-              ? '<span class="post-badge">Pinned</span>'
-              : '',
-            post.solved
-              ? '<span class="post-badge">Solved</span>'
-              : '',
-          '</div>',
+          '<article class="discussion-post">',
+            '<header class="discussion-post-author">',
+              avatarMarkup,
+              '<div class="discussion-post-author-copy">',
+                '<div class="discussion-post-author-line">',
+                  '<strong>',
+                    escapeHtml(author),
+                  '</strong>',
+                  '<span>· ',
+                    escapeHtml(
+                      formatRelative(
+                        post.createdAt
+                      )
+                    ),
+                  '</span>',
+                '</div>',
+                '<div class="discussion-post-context">',
+                  escapeHtml(post.category),
+                  post.tag
+                    ? ' · ' +
+                      escapeHtml(post.tag)
+                    : '',
+                  post.pinned
+                    ? ' · Pinned'
+                    : '',
+                  post.solved
+                    ? ' · Solved'
+                    : '',
+                '</div>',
+              '</div>',
+            '</header>',
 
-          '<h2 class="detail-heading" id="detail-title">',
-            escapeHtml(post.title),
-          '</h2>',
+            '<h2 class="detail-heading" id="detail-title">',
+              escapeHtml(post.title),
+            '</h2>',
 
-          '<div class="post-meta">',
-            '<span class="post-author">Posted by ',
-              escapeHtml(post.author),
-            '</span>',
-            '<span class="post-time">',
-              escapeHtml(
-                formatRelative(
-                  post.createdAt
-                )
-              ),
-            '</span>',
-            '<span class="post-time">',
-              post.views,
-              ' views',
-            '</span>',
-          '</div>',
+            '<p class="detail-copy">',
+              escapeHtml(post.body),
+            '</p>',
 
-          '<p class="detail-copy">',
-            escapeHtml(post.body),
-          '</p>',
+            '<div class="detail-actions">',
+              '<button class="like-button',
+                userVote === 1
+                  ? ' active'
+                  : '',
+                '" type="button" data-like-post="',
+                escapeHtml(post.id),
+              '">▲ ',
+                Number(post.likes || 0),
+              '</button>',
 
-          '<div class="detail-actions">',
-            '<button class="like-button',
-              userVote === 1
-                ? ' active'
-                : '',
-              '" type="button" data-like-post="',
-              escapeHtml(post.id),
-            '">▲ ',
-              Number(post.likes || 0),
-            '</button>',
+              '<button class="like-button',
+                userVote === -1
+                  ? ' active'
+                  : '',
+                '" type="button" data-downvote-post="',
+                escapeHtml(post.id),
+              '">▼</button>',
 
-            '<button class="like-button',
-              userVote === -1
-                ? ' active'
-                : '',
-              '" type="button" data-downvote-post="',
-              escapeHtml(post.id),
-            '">▼</button>',
-          '</div>',
-
-          '<section class="reply-section">',
-            '<div class="reply-section-heading">',
-              '<h3>',
+              '<span class="detail-stat">',
                 post.replies.length,
                 post.replies.length === 1
-                  ? ' Comment'
-                  : ' Comments',
-              '</h3>',
-              '<span class="post-stat">Nested replies are collapsed by default</span>',
-            '</div>',
+                  ? ' comment'
+                  : ' comments',
+              '</span>',
 
-            '<div class="reply-list">',
-              renderReplyTree(post),
+              '<span class="detail-stat">',
+                Number(post.views || 0),
+                ' views',
+              '</span>',
             '</div>',
+          '</article>',
 
+          '<section class="reply-section">',
             '<form class="reply-form" id="reply-form">',
               '<label for="reply-body">',
                 'Comment on this post',
@@ -2917,6 +3256,19 @@
                 '</button>',
               '</div>',
             '</form>',
+
+            '<div class="reply-section-heading">',
+              '<h3>',
+                post.replies.length,
+                post.replies.length === 1
+                  ? ' Comment'
+                  : ' Comments',
+              '</h3>',
+            '</div>',
+
+            '<div class="reply-list">',
+              renderReplyTree(post),
+            '</div>',
           '</section>'
         ].join("");
 
