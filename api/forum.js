@@ -660,61 +660,89 @@ function renderForumPage(actor) {
       margin-top: 12px;
     }
 
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 2500;
-      padding: 24px;
-      background: rgba(23, 23, 23, 0.38);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      display: grid;
-      place-items: center;
-      overflow-y: auto;
+    .forum-page-view[hidden] {
+      display: none !important;
     }
 
-    .modal-card {
-      width: min(720px, 100%);
-      max-height: calc(100dvh - 48px);
-      overflow-y: auto;
-      padding: 28px;
+    .forum-page-inner,
+    .discussion-shell {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .forum-back-link {
+      min-height: 42px;
+      margin-bottom: 16px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .forum-back-link:hover {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
+
+    .forum-page-card,
+    .discussion-main {
       border: 1px solid
         rgba(23, 23, 23, 0.1);
-      border-radius: 28px;
-      background: rgba(255, 253, 248, 0.98);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.78);
       box-shadow:
-        0 34px 100px
-        rgba(23, 23, 23, 0.24);
+        0 24px 70px
+        rgba(42, 32, 20, 0.1);
     }
 
-    .modal-card.is-wide {
-      width: min(820px, 100%);
+    .forum-page-card {
+      padding: 30px;
     }
 
-    .modal-header {
-      margin-bottom: 22px;
+    .forum-page-header {
+      margin-bottom: 24px;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 20px;
     }
 
-    .modal-header h2 {
-      font-size: clamp(26px, 4vw, 38px);
-      line-height: 1.08;
+    .forum-page-header h1 {
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.06;
       text-transform: uppercase;
     }
 
-    .modal-close {
-      flex: 0 0 auto;
-      width: 42px;
-      height: 42px;
-      border: 1px solid
-        rgba(23, 23, 23, 0.1);
-      border-radius: 50%;
-      background: rgba(247, 244, 238, 0.82);
-      color: #171717;
-      font-size: 20px;
+    .discussion-layout {
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1fr)
+        286px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .discussion-main {
+      min-width: 0;
+      padding: 28px;
+    }
+
+    .discussion-sidebar {
+      position: sticky;
+      top: 112px;
+    }
+
+    .discussion-sidebar .forum-panel {
+      box-shadow:
+        0 22px 60px
+        rgba(42, 32, 20, 0.09);
     }
 
     .form-grid {
@@ -1047,16 +1075,18 @@ function renderForumPage(actor) {
         grid-column: auto;
       }
 
-      .modal {
-        padding: 10px;
-        align-items: end;
+      .discussion-layout {
+        grid-template-columns: 1fr;
       }
 
-      .modal-card {
-        max-height: calc(100dvh - 20px);
+      .discussion-sidebar {
+        position: static;
+      }
+
+      .forum-page-card,
+      .discussion-main {
         padding: 22px;
-        border-radius:
-          24px 24px 18px 18px;
+        border-radius: 22px;
       }
     }
 
@@ -1075,7 +1105,10 @@ function renderForumPage(actor) {
 <body>
   <div id="site-header-root"></div>
 
-  <main class="forum-page">
+  <main
+    class="forum-page"
+    id="forum-feed-view"
+  >
     <div class="forum-inner">
       <section class="forum-hero">
         <div>
@@ -1092,13 +1125,12 @@ function renderForumPage(actor) {
             with the AUC community.
           </p>
 
-          <button
+          <a
             class="primary-button"
-            id="open-composer"
-            type="button"
+            href="/forum?compose=1"
           >
             Create Post
-          </button>
+          </a>
         </div>
       </section>
 
@@ -1228,156 +1260,185 @@ function renderForumPage(actor) {
     </div>
   </main>
 
-  <div
-    class="modal"
-    id="composer-modal"
+  <main
+    class="forum-page forum-page-view"
+    id="composer-page"
     hidden
   >
-    <section
-      class="modal-card"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="composer-title"
-    >
-      <header class="modal-header">
-        <div>
-          <p class="panel-kicker">
-            New discussion
+    <div class="forum-page-inner">
+      <a
+        class="forum-back-link"
+        href="/forum"
+      >
+        &larr; Back to Community
+      </a>
+
+      <section
+        class="forum-page-card"
+        aria-labelledby="composer-title"
+      >
+        <header class="forum-page-header">
+          <div>
+            <p class="panel-kicker">
+              New discussion
+            </p>
+            <h1 id="composer-title">
+              Create a post
+            </h1>
+          </div>
+        </header>
+
+        <form id="composer-form">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="post-category">
+                Category
+              </label>
+              <select
+                id="post-category"
+                required
+              ></select>
+            </div>
+
+            <div class="form-field">
+              <label for="post-tag">
+                Optional tag
+              </label>
+              <input
+                id="post-tag"
+                maxlength="28"
+                placeholder="Example: CSCE 1101"
+              >
+            </div>
+
+            <div class="form-field is-full">
+              <label for="post-title">
+                Title
+              </label>
+              <input
+                id="post-title"
+                maxlength="120"
+                required
+                placeholder="What would you like to discuss?"
+              >
+            </div>
+
+            <div class="form-field is-full">
+              <label for="post-body">
+                Post
+              </label>
+              <textarea
+                id="post-body"
+                maxlength="4000"
+                required
+                placeholder="Share enough context for other students to respond."
+              ></textarea>
+            </div>
+
+            <label class="checkbox-row is-full">
+              <input
+                id="post-anonymous"
+                type="checkbox"
+              >
+              Post anonymously in the
+              community preview
+            </label>
+          </div>
+
+          <p class="form-note">
+            This demo stores content in your
+            browser only. Anonymous posts still
+            remain attributable to administrators
+            in a future production moderation
+            system.
           </p>
-          <h2 id="composer-title">
-            Create a post
-          </h2>
-        </div>
 
-        <button
-          class="modal-close"
-          type="button"
-          data-close-modal
-          aria-label="Close"
-        >
-          &times;
-        </button>
-      </header>
-
-      <form id="composer-form">
-        <div class="form-grid">
-          <div class="form-field">
-            <label for="post-category">
-              Category
-            </label>
-            <select
-              id="post-category"
-              required
-            ></select>
-          </div>
-
-          <div class="form-field">
-            <label for="post-tag">
-              Optional tag
-            </label>
-            <input
-              id="post-tag"
-              maxlength="28"
-              placeholder="Example: CSCE 1101"
+          <div class="form-actions">
+            <a
+              class="secondary-button"
+              href="/forum"
             >
-          </div>
+              Cancel
+            </a>
 
-          <div class="form-field is-full">
-            <label for="post-title">
-              Title
-            </label>
-            <input
-              id="post-title"
-              maxlength="120"
-              required
-              placeholder="What would you like to discuss?"
+            <button
+              class="primary-button"
+              type="submit"
             >
+              Publish Demo Post
+            </button>
           </div>
+        </form>
+      </section>
+    </div>
+  </main>
 
-          <div class="form-field is-full">
-            <label for="post-body">
-              Post
-            </label>
-            <textarea
-              id="post-body"
-              maxlength="4000"
-              required
-              placeholder="Share enough context for other students to respond."
-            ></textarea>
-          </div>
-
-          <label class="checkbox-row is-full">
-            <input
-              id="post-anonymous"
-              type="checkbox"
-            >
-            Post anonymously in the
-            community preview
-          </label>
-        </div>
-
-        <p class="form-note">
-          This demo stores content in your
-          browser only. Anonymous posts still
-          remain attributable to administrators
-          in a future production moderation
-          system.
-        </p>
-
-        <div class="form-actions">
-          <button
-            class="secondary-button"
-            type="button"
-            data-close-modal
-          >
-            Cancel
-          </button>
-
-          <button
-            class="primary-button"
-            type="submit"
-          >
-            Publish Demo Post
-          </button>
-        </div>
-      </form>
-    </section>
-  </div>
-
-  <div
-    class="modal"
-    id="detail-modal"
+  <main
+    class="forum-page forum-page-view"
+    id="discussion-page"
     hidden
   >
-    <section
-      class="modal-card is-wide"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="detail-title"
-    >
-      <header class="modal-header">
-        <div>
-          <p class="panel-kicker">
-            Discussion
-          </p>
-          <span class="detail-author-badge">
-            Admin preview
-          </span>
-        </div>
+    <div class="discussion-shell">
+      <a
+        class="forum-back-link"
+        href="/forum"
+      >
+        &larr; Back to Community
+      </a>
 
-        <button
-          class="modal-close"
-          type="button"
-          data-close-modal
-          aria-label="Close"
+      <div class="discussion-layout">
+        <section
+          class="discussion-main"
+          aria-label="Discussion"
         >
-          &times;
-        </button>
-      </header>
+          <div id="detail-content"></div>
+        </section>
 
-      <div id="detail-content"></div>
-    </section>
-  </div>
+        <aside class="discussion-sidebar">
+          <section class="forum-panel">
+            <div class="side-section">
+              <p class="panel-kicker">
+                AUC Atlas Community
+              </p>
+              <h3>About this discussion</h3>
+              <p class="side-copy">
+                Read the full post, join the
+                conversation, and reply directly
+                to other comments.
+              </p>
+            </div>
+
+            <div class="side-section">
+              <h3>Community rules</h3>
+              <ol class="rule-list">
+                <li>
+                  Be respectful and helpful.
+                </li>
+                <li>
+                  Protect private information.
+                </li>
+                <li>
+                  No cheating, scams,
+                  harassment, or spam.
+                </li>
+              </ol>
+            </div>
+
+            <div class="side-section">
+              <p class="panel-kicker">
+                Previewing as
+              </p>
+              <h3 id="discussion-admin-name"></h3>
+              <p class="side-copy">
+                This browser-only demo remains
+                restricted to administrators.
+              </p>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
 
   <div
     class="toast"
@@ -1448,14 +1509,19 @@ function renderForumPage(actor) {
           "forum-sort"
         );
 
-      var composerModal =
+      var feedView =
         document.getElementById(
-          "composer-modal"
+          "forum-feed-view"
         );
 
-      var detailModal =
+      var composerView =
         document.getElementById(
-          "detail-modal"
+          "composer-page"
+        );
+
+      var discussionView =
+        document.getElementById(
+          "discussion-page"
         );
 
       var composerForm =
@@ -1719,21 +1785,17 @@ function renderForumPage(actor) {
           );
       }
 
-      function openModal(modal) {
-        modal.hidden = false;
+      function showForumView(
+        viewName
+      ) {
+        feedView.hidden =
+          viewName !== "feed";
+        composerView.hidden =
+          viewName !== "compose";
+        discussionView.hidden =
+          viewName !== "discussion";
 
-        document.body.classList.add(
-          "modal-open"
-        );
-      }
-
-      function closeModals() {
-        composerModal.hidden = true;
-        detailModal.hidden = true;
-
-        document.body.classList.remove(
-          "modal-open"
-        );
+        window.scrollTo(0, 0);
       }
 
       function getFilteredPosts() {
@@ -2084,7 +2146,7 @@ function renderForumPage(actor) {
         renderFeed();
 
         if (
-          !detailModal.hidden &&
+          !discussionView.hidden &&
           state.activePostId === postId
         ) {
           renderDetail(post);
@@ -2554,20 +2616,13 @@ function renderForumPage(actor) {
       }
 
       function openPost(postId) {
-        var post =
-          findPost(postId);
-
-        if (!post) {
+        if (!findPost(postId)) {
           return;
         }
 
-        state.activePostId = postId;
-        post.views += 1;
-
-        savePosts();
-        renderFeed();
-        renderDetail(post);
-        openModal(detailModal);
+        window.location.href =
+          "/forum?post=" +
+          encodeURIComponent(postId);
       }
 
       categoryList.addEventListener(
@@ -2898,12 +2953,11 @@ function renderForumPage(actor) {
             );
 
           savePosts();
-          closeModals();
-          renderFeed();
 
-          showToast(
-            "Demo post deleted."
-          );
+          window.location.href =
+            "/forum";
+
+          return;
         }
       }
 
@@ -2941,29 +2995,6 @@ function renderForumPage(actor) {
           renderFeed();
         }
       );
-
-      document
-        .getElementById(
-          "open-composer"
-        )
-        .addEventListener(
-          "click",
-          function () {
-            composerForm.reset();
-            openModal(composerModal);
-
-            window.setTimeout(
-              function () {
-                document
-                  .getElementById(
-                    "post-title"
-                  )
-                  .focus();
-              },
-              40
-            );
-          }
-        );
 
       composerForm.addEventListener(
         "submit",
@@ -3014,10 +3045,12 @@ function renderForumPage(actor) {
             return;
           }
 
+          var postId =
+            "post-" +
+            Date.now().toString(36);
+
           state.posts.unshift({
-            id:
-              "post-" +
-              Date.now().toString(36),
+            id: postId,
             category: category,
             tag: tag,
             title: title,
@@ -3033,60 +3066,99 @@ function renderForumPage(actor) {
               new Date().toISOString(),
             likes: 0,
             liked: false,
+            userVote: 0,
             views: 0,
             pinned: false,
             solved: false,
             replies: []
           });
 
-          state.category =
-            "All Discussions";
-          state.search = "";
-          searchInput.value = "";
-
           savePosts();
-          closeModals();
-          renderFeed();
 
-          showToast(
-            "Demo post published in this browser."
-          );
+          window.location.href =
+            "/forum?post=" +
+            encodeURIComponent(postId);
         }
       );
 
-      document
-        .querySelectorAll(
-          "[data-close-modal]"
-        )
-        .forEach(function (button) {
-          button.addEventListener(
-            "click",
-            closeModals
+      function renderCurrentPage() {
+        var parameters =
+          new URLSearchParams(
+            window.location.search
           );
-        });
+        var requestedPostId =
+          String(
+            parameters.get("post") ||
+            ""
+          );
 
-      [
-        composerModal,
-        detailModal
-      ].forEach(function (modal) {
-        modal.addEventListener(
-          "click",
-          function (event) {
-            if (event.target === modal) {
-              closeModals();
-            }
-          }
-        );
-      });
+        if (
+          parameters.get("compose") ===
+          "1"
+        ) {
+          composerForm.reset();
+          showForumView("compose");
 
-      document.addEventListener(
-        "keydown",
-        function (event) {
-          if (event.key === "Escape") {
-            closeModals();
-          }
+          document.title =
+            "Create Post | AUC Atlas";
+
+          window.setTimeout(
+            function () {
+              document
+                .getElementById(
+                  "post-title"
+                )
+                .focus();
+            },
+            40
+          );
+
+          return;
         }
-      );
+
+        if (requestedPostId) {
+          var requestedPost =
+            findPost(
+              requestedPostId
+            );
+
+          if (requestedPost) {
+            state.activePostId =
+              requestedPostId;
+            requestedPost.views =
+              Number(
+                requestedPost.views || 0
+              ) + 1;
+
+            savePosts();
+            showForumView(
+              "discussion"
+            );
+            renderDetail(
+              requestedPost
+            );
+
+            document.title =
+              requestedPost.title +
+              " | AUC Atlas";
+
+            return;
+          }
+
+          window.history.replaceState(
+            {},
+            "",
+            "/forum"
+          );
+        }
+
+        state.activePostId = "";
+        showForumView("feed");
+        renderFeed();
+
+        document.title =
+          "AUC Atlas Community";
+      }
 
       document
         .getElementById("reset-demo")
@@ -3128,6 +3200,14 @@ function renderForumPage(actor) {
           admin.displayName ||
           "AUC Atlas Admin";
 
+      document
+        .getElementById(
+          "discussion-admin-name"
+        )
+        .textContent =
+          admin.displayName ||
+          "AUC Atlas Admin";
+
       postCategory.innerHTML =
         categories
           .map(function (category) {
@@ -3142,7 +3222,7 @@ function renderForumPage(actor) {
           .join("");
 
       state.posts = loadPosts();
-      renderFeed();
+      renderCurrentPage();
     })();
   </script>
 </body>
