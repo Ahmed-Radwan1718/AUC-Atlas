@@ -63,8 +63,12 @@ async function moderateForumContent(parts) {
   ).trim();
 
   if (!apiKey) {
+    console.error(
+      "Forum moderation configuration error: OPENAI_API_KEY is unavailable in this deployment."
+    );
+
     throw createForumError(
-      "Forum moderation is temporarily unavailable.",
+      "Forum moderation is missing its API key on this deployment.",
       503
     );
   }
@@ -117,8 +121,15 @@ async function moderateForumContent(parts) {
       }
     );
   } catch (error) {
+    console.error(
+      "Forum moderation network error:",
+      error && error.name
+        ? error.name
+        : "unknown-error"
+    );
+
     throw createForumError(
-      "Forum moderation is temporarily unavailable.",
+      "Forum moderation could not reach OpenAI.",
       503
     );
   } finally {
@@ -130,23 +141,48 @@ async function moderateForumContent(parts) {
   try {
     data = await response.json();
   } catch (error) {
+    console.error(
+      "Forum moderation returned invalid JSON:",
+      response.status
+    );
+
     throw createForumError(
-      "Forum moderation is temporarily unavailable.",
+      "OpenAI moderation returned an invalid response.",
       503
     );
   }
 
   if (!response.ok) {
+    const apiError =
+      data && data.error
+        ? data.error
+        : {};
+
     console.error(
       "Forum moderation request failed:",
       response.status,
-      data && data.error
-        ? data.error.type || "api-error"
-        : "api-error"
+      apiError.type || "api-error",
+      apiError.code || "no-code"
     );
 
+    let publicMessage =
+      "OpenAI moderation returned HTTP " +
+      response.status +
+      ".";
+
+    if (response.status === 401) {
+      publicMessage =
+        "OpenAI rejected the moderation API key.";
+    } else if (response.status === 403) {
+      publicMessage =
+        "The OpenAI API key does not have moderation permission.";
+    } else if (response.status === 429) {
+      publicMessage =
+        "The OpenAI moderation rate limit was reached.";
+    }
+
     throw createForumError(
-      "Forum moderation is temporarily unavailable.",
+      publicMessage,
       503
     );
   }
@@ -161,8 +197,12 @@ async function moderateForumContent(parts) {
     !result ||
     typeof result.flagged !== "boolean"
   ) {
+    console.error(
+      "Forum moderation response did not contain results[0].flagged."
+    );
+
     throw createForumError(
-      "Forum moderation is temporarily unavailable.",
+      "OpenAI moderation returned an incomplete response.",
       503
     );
   }
