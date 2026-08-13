@@ -458,8 +458,13 @@ function renderForumPage(actor) {
     }
 
     .post-card {
-      padding: 22px;
+      padding: 0;
       border-radius: 24px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns:
+        54px
+        minmax(0, 1fr);
       transition:
         transform 0.2s ease,
         border-color 0.2s ease,
@@ -470,6 +475,52 @@ function renderForumPage(actor) {
       border-color: rgba(192, 154, 92, 0.32);
       background: rgba(255, 255, 255, 0.9);
       transform: translateY(-2px);
+    }
+
+    .post-vote-rail {
+      padding: 16px 8px;
+      border-right: 1px solid
+        rgba(23, 23, 23, 0.08);
+      background: rgba(247, 244, 238, 0.72);
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .vote-arrow {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.42);
+      font-size: 17px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+    }
+
+    .vote-arrow:hover,
+    .vote-arrow.active-up {
+      background: rgba(192, 154, 92, 0.14);
+      color: rgba(151, 103, 32, 0.98);
+    }
+
+    .vote-arrow.active-down {
+      background: rgba(173, 37, 37, 0.09);
+      color: #ad2525;
+    }
+
+    .vote-score {
+      color: #171717;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .post-card-content {
+      min-width: 0;
+      padding: 18px 20px;
     }
 
     .post-card-top,
@@ -491,7 +542,7 @@ function renderForumPage(actor) {
 
     .post-title-button {
       width: 100%;
-      margin: 15px 0 9px;
+      margin: 12px 0 8px;
       border: 0;
       background: transparent;
       color: #171717;
@@ -506,7 +557,7 @@ function renderForumPage(actor) {
     }
 
     .post-preview {
-      margin-bottom: 18px;
+      margin-bottom: 14px;
       color: rgba(23, 23, 23, 0.64);
       font-size: 14px;
       line-height: 1.65;
@@ -519,7 +570,8 @@ function renderForumPage(actor) {
       font-weight: 700;
     }
 
-    .like-button {
+    .like-button,
+    .post-comment-button {
       min-height: 36px;
       padding: 0 12px;
       border: 1px solid
@@ -535,6 +587,12 @@ function renderForumPage(actor) {
       border-color: rgba(192, 154, 92, 0.32);
       background: rgba(192, 154, 92, 0.14);
       color: rgba(126, 86, 26, 0.98);
+    }
+
+    .post-comment-button:hover {
+      border-color: rgba(192, 154, 92, 0.3);
+      background: rgba(192, 154, 92, 0.11);
+      color: #171717;
     }
 
     .forum-empty {
@@ -747,8 +805,16 @@ function renderForumPage(actor) {
         rgba(23, 23, 23, 0.1);
     }
 
-    .reply-section h3 {
+    .reply-section-heading {
       margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .reply-section-heading h3 {
+      margin: 0;
       font-size: 18px;
     }
 
@@ -758,19 +824,39 @@ function renderForumPage(actor) {
     }
 
     .reply-card {
-      padding: 16px;
-      border: 1px solid
-        rgba(23, 23, 23, 0.08);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.72);
+      position: relative;
+      padding: 14px 14px 14px 18px;
+      border-left: 2px solid
+        rgba(192, 154, 92, 0.28);
+      border-radius: 0 16px 16px 0;
+      background: rgba(255, 255, 255, 0.56);
     }
 
-    .reply-card header {
+    .reply-card.is-collapsed {
+      padding: 8px 12px;
+      border-left-color:
+        rgba(23, 23, 23, 0.16);
+    }
+
+    .reply-card-header {
       margin-bottom: 8px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .reply-collapse-button {
+      width: 24px;
+      height: 24px;
+      border: 0;
+      border-radius: 7px;
+      background: rgba(247, 244, 238, 0.88);
+      color: rgba(23, 23, 23, 0.52);
+      font-size: 12px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
     }
 
     .reply-card strong {
@@ -782,11 +868,79 @@ function renderForumPage(actor) {
       font-size: 10px;
     }
 
-    .reply-card p {
+    .reply-card-body {
       color: rgba(23, 23, 23, 0.68);
       font-size: 13px;
       line-height: 1.65;
       white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .reply-card-actions {
+      margin-top: 9px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .reply-action-button,
+    .reply-children-toggle {
+      min-height: 32px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.52);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .reply-action-button:hover,
+    .reply-action-button.active,
+    .reply-children-toggle:hover {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
+
+    .reply-children-toggle {
+      margin-top: 8px;
+      color: rgba(126, 86, 26, 0.96);
+    }
+
+    .reply-children {
+      margin-top: 10px;
+      margin-left: 10px;
+      padding-left: 10px;
+      border-left: 1px solid
+        rgba(23, 23, 23, 0.1);
+      display: grid;
+      gap: 8px;
+    }
+
+    .nested-reply-form {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(247, 244, 238, 0.72);
+      display: grid;
+      gap: 8px;
+    }
+
+    .nested-reply-form textarea {
+      width: 100%;
+      min-height: 86px;
+      padding: 12px;
+      border: 1px solid
+        rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      line-height: 1.55;
+      resize: vertical;
+      outline: none;
     }
 
     .reply-form {
@@ -1261,7 +1415,10 @@ function renderForumPage(actor) {
         category: "All Discussions",
         search: "",
         sort: "latest",
-        activePostId: ""
+        activePostId: "",
+        collapsedReplyIds: {},
+        openReplyBranches: {},
+        replyingToId: ""
       };
 
       var toastTimer = 0;
@@ -1405,16 +1562,22 @@ function renderForumPage(actor) {
             replies: [
               {
                 id: "reply-course-1",
+                parentId: "",
                 author: "Demo Student",
                 body:
                   "A weekly session before the lab would be useful. Keeping it focused on concepts makes sense.",
                 createdAt:
                   new Date(
                     now - 5 * 60 * 60 * 1000
-                  ).toISOString()
+                  ).toISOString(),
+                likes: 6,
+                liked: false,
+                userVote: 0
               },
               {
                 id: "reply-course-2",
+                parentId:
+                  "reply-course-1",
                 author:
                   "AUC Atlas Admin",
                 body:
@@ -1422,7 +1585,10 @@ function renderForumPage(actor) {
                 createdAt:
                   new Date(
                     now - 4 * 60 * 60 * 1000
-                  ).toISOString()
+                  ).toISOString(),
+                likes: 3,
+                liked: false,
+                userVote: 0
               }
             ]
           },
@@ -1695,51 +1861,70 @@ function renderForumPage(actor) {
 
       function renderPostCard(post) {
         var preview =
-          post.body.length > 190
+          post.body.length > 240
             ? post.body.slice(
                 0,
-                187
+                237
               ) + "..."
             : post.body;
+        var userVote =
+          Number(post.userVote || 0);
+
+        if (
+          !userVote &&
+          post.liked
+        ) {
+          userVote = 1;
+        }
 
         return [
           '<article class="post-card">',
-            '<div class="post-card-top">',
-              '<div class="post-badges">',
-                '<span class="post-badge is-gold">',
-                  escapeHtml(
-                    post.category
-                  ),
-                '</span>',
-                post.tag
-                  ? '<span class="post-badge">' +
-                    escapeHtml(
-                      post.tag
-                    ) +
-                    '</span>'
+            '<div class="post-vote-rail">',
+              '<button class="vote-arrow',
+                userVote === 1
+                  ? ' active-up'
                   : '',
-                post.pinned
-                  ? '<span class="post-badge">Pinned</span>'
+                '" type="button" data-like-post="',
+                escapeHtml(post.id),
+                '" aria-label="Upvote post">▲</button>',
+              '<span class="vote-score">',
+                Number(post.likes || 0),
+              '</span>',
+              '<button class="vote-arrow',
+                userVote === -1
+                  ? ' active-down'
                   : '',
-                post.solved
-                  ? '<span class="post-badge">Solved</span>'
-                  : '',
-              '</div>',
+                '" type="button" data-downvote-post="',
+                escapeHtml(post.id),
+                '" aria-label="Downvote post">▼</button>',
             '</div>',
 
-            '<button class="post-title-button" type="button" data-open-post="',
-              escapeHtml(post.id),
-            '">',
-              escapeHtml(post.title),
-            '</button>',
+            '<div class="post-card-content">',
+              '<div class="post-card-top">',
+                '<div class="post-badges">',
+                  '<span class="post-badge is-gold">',
+                    escapeHtml(
+                      post.category
+                    ),
+                  '</span>',
+                  post.tag
+                    ? '<span class="post-badge">' +
+                      escapeHtml(
+                        post.tag
+                      ) +
+                      '</span>'
+                    : '',
+                  post.pinned
+                    ? '<span class="post-badge">Pinned</span>'
+                    : '',
+                  post.solved
+                    ? '<span class="post-badge">Solved</span>'
+                    : '',
+                '</div>',
+              '</div>',
 
-            '<p class="post-preview">',
-              escapeHtml(preview),
-            '</p>',
-
-            '<footer class="post-card-footer">',
               '<div class="post-meta">',
-                '<span class="post-author">',
+                '<span class="post-author">Posted by ',
                   escapeHtml(post.author),
                 '</span>',
                 '<span class="post-time">',
@@ -1751,27 +1936,33 @@ function renderForumPage(actor) {
                 '</span>',
               '</div>',
 
-              '<div class="post-actions">',
-                '<span class="post-stat">',
-                  post.replies.length,
-                  ' replies',
-                '</span>',
-                '<span class="post-stat">',
-                  post.views,
-                  ' views',
-                '</span>',
-                '<button class="like-button',
-                  post.liked
-                    ? ' active'
-                    : '',
-                  '" type="button" data-like-post="',
-                  escapeHtml(post.id),
-                '">',
-                  'Helpful · ',
-                  post.likes,
-                '</button>',
-              '</div>',
-            '</footer>',
+              '<button class="post-title-button" type="button" data-open-post="',
+                escapeHtml(post.id),
+              '">',
+                escapeHtml(post.title),
+              '</button>',
+
+              '<p class="post-preview">',
+                escapeHtml(preview),
+              '</p>',
+
+              '<footer class="post-card-footer">',
+                '<div class="post-actions">',
+                  '<button class="post-comment-button" type="button" data-open-post="',
+                    escapeHtml(post.id),
+                  '">',
+                    post.replies.length,
+                    post.replies.length === 1
+                      ? ' Comment'
+                      : ' Comments',
+                  '</button>',
+                  '<span class="post-stat">',
+                    post.views,
+                    ' views',
+                  '</span>',
+                '</div>',
+              '</footer>',
+            '</div>',
           '</article>'
         ].join("");
       }
@@ -1854,7 +2045,10 @@ function renderForumPage(actor) {
         );
       }
 
-      function toggleLike(postId) {
+      function toggleLike(
+        postId,
+        direction
+      ) {
         var post =
           findPost(postId);
 
@@ -1862,13 +2056,29 @@ function renderForumPage(actor) {
           return;
         }
 
-        post.liked = !post.liked;
+        var requestedVote =
+          direction === -1 ? -1 : 1;
+        var currentVote =
+          Number(post.userVote || 0);
 
-        post.likes = Math.max(
-          0,
-          post.likes +
-            (post.liked ? 1 : -1)
-        );
+        if (
+          !currentVote &&
+          post.liked
+        ) {
+          currentVote = 1;
+        }
+
+        var nextVote =
+          currentVote === requestedVote
+            ? 0
+            : requestedVote;
+
+        post.likes =
+          Number(post.likes || 0) +
+          nextVote -
+          currentVote;
+        post.userVote = nextVote;
+        post.liked = nextVote === 1;
 
         savePosts();
         renderFeed();
@@ -1881,42 +2091,314 @@ function renderForumPage(actor) {
         }
       }
 
-      function renderDetail(post) {
-        var replies =
-          post.replies.length
-            ? post.replies
-                .map(function (reply) {
-                  return [
-                    '<article class="reply-card">',
-                      '<header>',
-                        '<strong>',
-                          escapeHtml(
-                            reply.author
-                          ),
-                        '</strong>',
-                        '<time>',
-                          escapeHtml(
-                            formatRelative(
-                              reply.createdAt
-                            )
-                          ),
-                        '</time>',
-                      '</header>',
-                      '<p>',
-                        escapeHtml(
-                          reply.body
-                        ),
-                      '</p>',
-                    '</article>'
-                  ].join("");
-                })
-                .join("")
-            : (
-              '<div class="forum-empty">' +
-                '<h3>No replies yet</h3>' +
-                '<p>Start the conversation with a helpful response.</p>' +
-              '</div>'
+      function findReply(
+        post,
+        replyId
+      ) {
+        return post.replies.find(
+          function (reply) {
+            return (
+              reply.id === replyId
             );
+          }
+        );
+      }
+
+      function voteReply(
+        post,
+        replyId,
+        direction
+      ) {
+        var reply =
+          findReply(
+            post,
+            replyId
+          );
+
+        if (!reply) {
+          return;
+        }
+
+        var requestedVote =
+          direction === -1 ? -1 : 1;
+        var currentVote =
+          Number(reply.userVote || 0);
+
+        if (
+          !currentVote &&
+          reply.liked
+        ) {
+          currentVote = 1;
+        }
+
+        var nextVote =
+          currentVote === requestedVote
+            ? 0
+            : requestedVote;
+
+        reply.likes =
+          Number(reply.likes || 0) +
+          nextVote -
+          currentVote;
+        reply.userVote = nextVote;
+        reply.liked = nextVote === 1;
+
+        savePosts();
+        renderDetail(post);
+      }
+
+      function getReplyChildren(
+        post,
+        parentId
+      ) {
+        return post.replies.filter(
+          function (reply) {
+            return (
+              String(
+                reply.parentId || ""
+              ) === parentId
+            );
+          }
+        );
+      }
+
+      function renderReplyNode(
+        post,
+        reply,
+        depth
+      ) {
+        if (depth > 8) {
+          return "";
+        }
+
+        var replyId =
+          String(reply.id || "");
+        var collapsed =
+          Boolean(
+            state.collapsedReplyIds[
+              replyId
+            ]
+          );
+        var children =
+          getReplyChildren(
+            post,
+            replyId
+          );
+        var branchOpen =
+          Boolean(
+            state.openReplyBranches[
+              replyId
+            ]
+          );
+        var userVote =
+          Number(reply.userVote || 0);
+
+        if (
+          !userVote &&
+          reply.liked
+        ) {
+          userVote = 1;
+        }
+
+        if (collapsed) {
+          return [
+            '<article class="reply-card is-collapsed">',
+              '<button class="reply-action-button" type="button" data-collapse-reply="',
+                escapeHtml(replyId),
+              '">',
+                '+ ',
+                escapeHtml(
+                  reply.author ||
+                  "AUC student"
+                ),
+                ' · ',
+                children.length,
+                children.length === 1
+                  ? ' child hidden'
+                  : ' children hidden',
+              '</button>',
+            '</article>'
+          ].join("");
+        }
+
+        var childMarkup = "";
+
+        if (children.length) {
+          childMarkup = [
+            '<button class="reply-children-toggle" type="button" data-toggle-reply-branch="',
+              escapeHtml(replyId),
+            '" aria-expanded="',
+              branchOpen
+                ? 'true'
+                : 'false',
+            '">',
+              branchOpen
+                ? 'Hide '
+                : 'Show ',
+              children.length,
+              children.length === 1
+                ? ' reply'
+                : ' replies',
+            '</button>',
+            branchOpen
+              ? [
+                  '<div class="reply-children">',
+                    children
+                      .map(
+                        function (
+                          childReply
+                        ) {
+                          return renderReplyNode(
+                            post,
+                            childReply,
+                            depth + 1
+                          );
+                        }
+                      )
+                      .join(""),
+                  '</div>'
+                ].join("")
+              : ''
+          ].join("");
+        }
+
+        var nestedReplyForm =
+          state.replyingToId ===
+            replyId
+            ? [
+                '<div class="nested-reply-form">',
+                  '<textarea maxlength="2000" data-nested-reply-body="',
+                    escapeHtml(replyId),
+                  '" placeholder="Reply to ',
+                    escapeHtml(
+                      reply.author ||
+                      "this comment"
+                    ),
+                  '"></textarea>',
+                  '<div class="post-actions">',
+                    '<button class="primary-button" type="button" data-submit-nested-reply="',
+                      escapeHtml(replyId),
+                    '">Post Reply</button>',
+                    '<button class="secondary-button" type="button" data-cancel-nested-reply>Cancel</button>',
+                  '</div>',
+                '</div>'
+              ].join("")
+            : "";
+
+        return [
+          '<article class="reply-card">',
+            '<header class="reply-card-header">',
+              '<button class="reply-collapse-button" type="button" data-collapse-reply="',
+                escapeHtml(replyId),
+                '" aria-label="Collapse comment">−</button>',
+              '<strong>',
+                escapeHtml(
+                  reply.author ||
+                  "AUC student"
+                ),
+              '</strong>',
+              '<time>',
+                escapeHtml(
+                  formatRelative(
+                    reply.createdAt
+                  )
+                ),
+              '</time>',
+            '</header>',
+
+            '<p class="reply-card-body">',
+              escapeHtml(reply.body),
+            '</p>',
+
+            '<div class="reply-card-actions">',
+              '<button class="reply-action-button',
+                userVote === 1
+                  ? ' active'
+                  : '',
+                '" type="button" data-like-reply="',
+                escapeHtml(replyId),
+              '">▲ ',
+                Number(reply.likes || 0),
+              '</button>',
+
+              '<button class="reply-action-button',
+                userVote === -1
+                  ? ' active'
+                  : '',
+                '" type="button" data-downvote-reply="',
+                escapeHtml(replyId),
+              '">▼</button>',
+
+              '<button class="reply-action-button" type="button" data-reply-to="',
+                escapeHtml(replyId),
+              '">Reply</button>',
+            '</div>',
+
+            nestedReplyForm,
+            childMarkup,
+          '</article>'
+        ].join("");
+      }
+
+      function renderReplyTree(post) {
+        if (!post.replies.length) {
+          return (
+            '<div class="forum-empty">' +
+              '<h3>No comments yet</h3>' +
+              '<p>Start the conversation with a helpful response.</p>' +
+            '</div>'
+          );
+        }
+
+        var knownReplyIds =
+          new Set(
+            post.replies.map(
+              function (reply) {
+                return String(
+                  reply.id || ""
+                );
+              }
+            )
+          );
+
+        var rootReplies =
+          post.replies.filter(
+            function (reply) {
+              var parentId =
+                String(
+                  reply.parentId || ""
+                );
+
+              return (
+                !parentId ||
+                !knownReplyIds.has(
+                  parentId
+                )
+              );
+            }
+          );
+
+        return rootReplies
+          .map(function (reply) {
+            return renderReplyNode(
+              post,
+              reply,
+              0
+            );
+          })
+          .join("");
+      }
+
+      function renderDetail(post) {
+        var userVote =
+          Number(post.userVote || 0);
+
+        if (
+          !userVote &&
+          post.liked
+        ) {
+          userVote = 1;
+        }
 
         detailContent.innerHTML = [
           '<div class="post-badges">',
@@ -1941,7 +2423,7 @@ function renderForumPage(actor) {
           '</h2>',
 
           '<div class="post-meta">',
-            '<span class="post-author">',
+            '<span class="post-author">Posted by ',
               escapeHtml(post.author),
             '</span>',
             '<span class="post-time">',
@@ -1963,15 +2445,22 @@ function renderForumPage(actor) {
 
           '<div class="detail-actions">',
             '<button class="like-button',
-              post.liked
+              userVote === 1
                 ? ' active'
                 : '',
               '" type="button" data-like-post="',
               escapeHtml(post.id),
-            '">',
-              'Helpful · ',
-              post.likes,
+            '">▲ ',
+              Number(post.likes || 0),
             '</button>',
+
+            '<button class="like-button',
+              userVote === -1
+                ? ' active'
+                : '',
+              '" type="button" data-downvote-post="',
+              escapeHtml(post.id),
+            '">▼</button>',
 
             '<button class="secondary-button" type="button" data-toggle-solved="',
               escapeHtml(post.id),
@@ -1983,33 +2472,34 @@ function renderForumPage(actor) {
 
             '<button class="secondary-button danger-button" type="button" data-delete-post="',
               escapeHtml(post.id),
-            '">',
-              'Delete Demo Post',
-            '</button>',
+            '">Delete Demo Post</button>',
           '</div>',
 
           '<section class="reply-section">',
-            '<h3>',
-              post.replies.length,
-              post.replies.length === 1
-                ? ' Reply'
-                : ' Replies',
-            '</h3>',
+            '<div class="reply-section-heading">',
+              '<h3>',
+                post.replies.length,
+                post.replies.length === 1
+                  ? ' Comment'
+                  : ' Comments',
+              '</h3>',
+              '<span class="post-stat">Nested replies are collapsed by default</span>',
+            '</div>',
 
             '<div class="reply-list">',
-              replies,
+              renderReplyTree(post),
             '</div>',
 
             '<form class="reply-form" id="reply-form">',
               '<label for="reply-body">',
-                'Add a reply',
+                'Comment on this post',
               '</label>',
 
-              '<textarea id="reply-body" maxlength="2000" required placeholder="Write a constructive response."></textarea>',
+              '<textarea id="reply-body" maxlength="2000" required placeholder="Join the discussion."></textarea>',
 
               '<div class="form-actions">',
                 '<button class="primary-button" type="submit">',
-                  'Post Reply',
+                  'Post Comment',
                 '</button>',
               '</div>',
             '</form>',
@@ -2039,13 +2529,17 @@ function renderForumPage(actor) {
                 id:
                   "reply-" +
                   Date.now().toString(36),
+                parentId: "",
                 author:
                   admin.displayName ||
                   "AUC Atlas Admin",
                 body: replyBody,
                 createdAt:
                   new Date()
-                    .toISOString()
+                    .toISOString(),
+                likes: 0,
+                liked: false,
+                userVote: 0
               });
 
               savePosts();
@@ -2053,7 +2547,7 @@ function renderForumPage(actor) {
               renderDetail(post);
 
               showToast(
-                "Demo reply posted."
+                "Demo comment posted."
               );
             }
           );
@@ -2096,6 +2590,217 @@ function renderForumPage(actor) {
       );
 
       function handlePostAction(event) {
+        var activePost =
+          findPost(
+            state.activePostId
+          );
+
+        var collapseReplyButton =
+          event.target.closest(
+            "[data-collapse-reply]"
+          );
+
+        if (
+          collapseReplyButton &&
+          activePost
+        ) {
+          var collapseReplyId =
+            collapseReplyButton.dataset
+              .collapseReply;
+
+          state.collapsedReplyIds[
+            collapseReplyId
+          ] =
+            !state.collapsedReplyIds[
+              collapseReplyId
+            ];
+
+          renderDetail(activePost);
+          return;
+        }
+
+        var branchButton =
+          event.target.closest(
+            "[data-toggle-reply-branch]"
+          );
+
+        if (
+          branchButton &&
+          activePost
+        ) {
+          var branchReplyId =
+            branchButton.dataset
+              .toggleReplyBranch;
+
+          state.openReplyBranches[
+            branchReplyId
+          ] =
+            !state.openReplyBranches[
+              branchReplyId
+            ];
+
+          renderDetail(activePost);
+          return;
+        }
+
+        var replyToButton =
+          event.target.closest(
+            "[data-reply-to]"
+          );
+
+        if (
+          replyToButton &&
+          activePost
+        ) {
+          state.replyingToId =
+            replyToButton.dataset.replyTo;
+
+          renderDetail(activePost);
+
+          var nestedTextarea =
+            Array.from(
+              detailContent.querySelectorAll(
+                "[data-nested-reply-body]"
+              )
+            ).find(
+              function (textarea) {
+                return (
+                  textarea.dataset
+                    .nestedReplyBody ===
+                  state.replyingToId
+                );
+              }
+            );
+
+          if (nestedTextarea) {
+            nestedTextarea.focus();
+          }
+
+          return;
+        }
+
+        var cancelNestedReply =
+          event.target.closest(
+            "[data-cancel-nested-reply]"
+          );
+
+        if (
+          cancelNestedReply &&
+          activePost
+        ) {
+          state.replyingToId = "";
+          renderDetail(activePost);
+          return;
+        }
+
+        var submitNestedReply =
+          event.target.closest(
+            "[data-submit-nested-reply]"
+          );
+
+        if (
+          submitNestedReply &&
+          activePost
+        ) {
+          var parentReplyId =
+            submitNestedReply.dataset
+              .submitNestedReply;
+
+          var replyTextarea =
+            Array.from(
+              detailContent.querySelectorAll(
+                "[data-nested-reply-body]"
+              )
+            ).find(
+              function (textarea) {
+                return (
+                  textarea.dataset
+                    .nestedReplyBody ===
+                  parentReplyId
+                );
+              }
+            );
+
+          var nestedReplyBody =
+            replyTextarea
+              ? replyTextarea.value.trim()
+              : "";
+
+          if (!nestedReplyBody) {
+            if (replyTextarea) {
+              replyTextarea.focus();
+            }
+            return;
+          }
+
+          activePost.replies.push({
+            id:
+              "reply-" +
+              Date.now().toString(36),
+            parentId: parentReplyId,
+            author:
+              admin.displayName ||
+              "AUC Atlas Admin",
+            body: nestedReplyBody,
+            createdAt:
+              new Date().toISOString(),
+            likes: 0,
+            liked: false,
+            userVote: 0
+          });
+
+          state.openReplyBranches[
+            parentReplyId
+          ] = true;
+          state.replyingToId = "";
+
+          savePosts();
+          renderFeed();
+          renderDetail(activePost);
+
+          showToast(
+            "Nested reply posted."
+          );
+
+          return;
+        }
+
+        var likeReplyButton =
+          event.target.closest(
+            "[data-like-reply]"
+          );
+
+        if (
+          likeReplyButton &&
+          activePost
+        ) {
+          voteReply(
+            activePost,
+            likeReplyButton.dataset
+              .likeReply,
+            1
+          );
+          return;
+        }
+
+        var downvoteReplyButton =
+          event.target.closest(
+            "[data-downvote-reply]"
+          );
+
+        if (
+          downvoteReplyButton &&
+          activePost
+        ) {
+          voteReply(
+            activePost,
+            downvoteReplyButton.dataset
+              .downvoteReply,
+            -1
+          );
+          return;
+        }
+
         var openButton =
           event.target.closest(
             "[data-open-post]"
@@ -2115,7 +2820,22 @@ function renderForumPage(actor) {
 
         if (likeButton) {
           toggleLike(
-            likeButton.dataset.likePost
+            likeButton.dataset.likePost,
+            1
+          );
+          return;
+        }
+
+        var downvoteButton =
+          event.target.closest(
+            "[data-downvote-post]"
+          );
+
+        if (downvoteButton) {
+          toggleLike(
+            downvoteButton.dataset
+              .downvotePost,
+            -1
           );
           return;
         }
