@@ -1567,6 +1567,127 @@
       background: #faf9f6;
     }
 
+    .discussion-loading {
+      padding: 4px 0 18px;
+      animation:
+        discussionContentEnter
+        0.28s
+        ease-out
+        both;
+    }
+
+    .discussion-loading-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .discussion-loading-avatar,
+    .discussion-loading-line {
+      position: relative;
+      overflow: hidden;
+      background: rgba(192, 154, 92, 0.14);
+    }
+
+    .discussion-loading-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+
+    .discussion-loading-copy {
+      width: min(260px, 60%);
+      display: grid;
+      gap: 7px;
+    }
+
+    .discussion-loading-line {
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .discussion-loading-line.is-short {
+      width: 42%;
+    }
+
+    .discussion-loading-line.is-title {
+      width: min(520px, 82%);
+      height: 24px;
+      margin-top: 22px;
+    }
+
+    .discussion-loading-line.is-body {
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    .discussion-loading-line.is-body-short {
+      width: 68%;
+      margin-top: 8px;
+    }
+
+    .discussion-loading-avatar::after,
+    .discussion-loading-line::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.72),
+          transparent
+        );
+      transform: translateX(-100%);
+      animation:
+        discussionLoadingShimmer
+        1.05s
+        ease-in-out
+        infinite;
+    }
+
+    #detail-content > .discussion-post,
+    #detail-content > .reply-section {
+      animation:
+        discussionContentEnter
+        0.32s
+        ease-out
+        both;
+    }
+
+    #detail-content > .reply-section {
+      animation-delay: 0.04s;
+    }
+
+    @keyframes discussionLoadingShimmer {
+      to {
+        transform: translateX(100%);
+      }
+    }
+
+    @keyframes discussionContentEnter {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .discussion-loading,
+      .discussion-loading-avatar::after,
+      .discussion-loading-line::after,
+      #detail-content > .discussion-post,
+      #detail-content > .reply-section {
+        animation: none !important;
+      }
+    }
+
     @media (max-width: 760px) {
       #discussion-page {
         padding-top: 88px;
@@ -2260,23 +2381,58 @@
 
       async function refreshPosts() {
         try {
-          state.posts =
+          var refreshedPosts =
             await loadPosts(false);
 
           if (state.activePostId) {
-            var activePost = findPost(
-              state.activePostId
-            );
+            var refreshedPost =
+              refreshedPosts.find(
+                function (post) {
+                  return (
+                    String(post.id) ===
+                    String(
+                      state.activePostId
+                    )
+                  );
+                }
+              );
 
-            renderCategories();
+            if (refreshedPost) {
+              var replaced = false;
 
-            if (activePost) {
-              renderDetail(activePost);
+              state.posts =
+                state.posts.map(
+                  function (post) {
+                    if (
+                      String(post.id) ===
+                      String(
+                        refreshedPost.id
+                      )
+                    ) {
+                      replaced = true;
+                      return refreshedPost;
+                    }
+
+                    return post;
+                  }
+                );
+
+              if (!replaced) {
+                state.posts.push(
+                  refreshedPost
+                );
+              }
+
+              renderCategories();
+              renderDetail(
+                refreshedPost
+              );
             }
 
             return;
           }
 
+          state.posts = refreshedPosts;
           renderFeed();
         } catch (error) {
           showToast(
@@ -3351,14 +3507,115 @@
           );
       }
 
-      function openPost(postId) {
-        if (!findPost(postId)) {
+      function renderPostLoading() {
+        detailContent.innerHTML = [
+          '<div class="discussion-loading" role="status" aria-live="polite" aria-label="Opening discussion">',
+            '<div class="discussion-loading-header">',
+              '<span class="discussion-loading-avatar"></span>',
+              '<div class="discussion-loading-copy">',
+                '<span class="discussion-loading-line"></span>',
+                '<span class="discussion-loading-line is-short"></span>',
+              '</div>',
+            '</div>',
+            '<div class="discussion-loading-line is-title"></div>',
+            '<div class="discussion-loading-line is-body"></div>',
+            '<div class="discussion-loading-line is-body-short"></div>',
+          '</div>'
+        ].join("");
+      }
+
+      async function openPost(postId) {
+        var previewPost =
+          findPost(postId);
+
+        if (!previewPost) {
           return;
         }
 
-        window.location.href =
+        state.activePostId =
+          String(postId);
+        state.category =
+          previewPost.category;
+
+        window.history.pushState(
+          {
+            forumPost:
+              state.activePostId
+          },
+          "",
           "/forum?post=" +
-          encodeURIComponent(postId);
+            encodeURIComponent(
+              state.activePostId
+            )
+        );
+
+        renderCategories();
+        showForumView("discussion");
+        renderPostLoading();
+
+        document.title =
+          previewPost.title +
+          " | AUC Atlas";
+
+        try {
+          var detailedPosts =
+            await loadPosts(true);
+          var detailedPost =
+            detailedPosts.find(
+              function (post) {
+                return (
+                  String(post.id) ===
+                  String(postId)
+                );
+              }
+            );
+
+          if (
+            state.activePostId !==
+              String(postId)
+          ) {
+            return;
+          }
+
+          if (!detailedPost) {
+            throw new Error(
+              "Discussion not found."
+            );
+          }
+
+          state.posts =
+            state.posts.map(
+              function (post) {
+                return (
+                  String(post.id) ===
+                  String(postId)
+                )
+                  ? detailedPost
+                  : post;
+              }
+            );
+
+          renderCategories();
+          renderDetail(detailedPost);
+        } catch (error) {
+          if (
+            state.activePostId !==
+              String(postId)
+          ) {
+            return;
+          }
+
+          detailContent.innerHTML =
+            '<div class="forum-empty">' +
+              '<h3>Could not open discussion</h3>' +
+              '<p>Please try again.</p>' +
+            '</div>';
+
+          showToast(
+            error.message ||
+              "Could not open discussion."
+          );
+        }
       }
 
       function navigateToCategory(
@@ -4183,11 +4440,29 @@
           })
           .join("");
 
-      postList.innerHTML =
-        '<div class="forum-empty">' +
-          '<h3>Loading discussions</h3>' +
-          '<p>Please wait while the community loads.</p>' +
-        '</div>';
+      var initialParameters =
+        new URLSearchParams(
+          window.location.search
+        );
+      var initialPostId =
+        String(
+          initialParameters.get(
+            "post"
+          ) || ""
+        );
+
+      if (initialPostId) {
+        state.activePostId =
+          initialPostId;
+        showForumView("discussion");
+        renderPostLoading();
+      } else {
+        postList.innerHTML =
+          '<div class="forum-empty">' +
+            '<h3>Loading discussions</h3>' +
+            '<p>Please wait while the community loads.</p>' +
+          '</div>';
+      }
 
       loadPosts(true)
         .then(function (posts) {
