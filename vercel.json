@@ -7,12 +7,8 @@
   },
   "rewrites": [
     {
-      "source": "/forum",
-      "destination": "/api/forum"
-    },
-    {
       "source": "/forum/:category",
-      "destination": "/api/forum"
+      "destination": "/forum.html"
     }
   ],
   "git": {
