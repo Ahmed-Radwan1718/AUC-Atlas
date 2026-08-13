@@ -474,10 +474,15 @@ async function getForumPosts(
   }
 
   const results = await Promise.all([
-    db.collection("forumPosts")
-      .orderBy("createdAt", "desc")
-      .limit(75)
-      .get(),
+    requestedPostId
+      ? Promise.resolve(null)
+      : db.collection("forumPosts")
+          .orderBy(
+            "createdAt",
+            "desc"
+          )
+          .limit(75)
+          .get(),
     getForumVoteMap(actor),
     requestedPostId
       ? db.collection("forumPosts")
@@ -490,20 +495,14 @@ async function getForumPosts(
   const voteMap = results[1];
   const requestedPostDoc = results[2];
   const postDocs =
-    postSnapshot.docs.slice();
-
-  if (
-    requestedPostDoc &&
-    requestedPostDoc.exists &&
-    !postDocs.some(function (postDoc) {
-      return (
-        postDoc.id ===
-        requestedPostDoc.id
-      );
-    })
-  ) {
-    postDocs.push(requestedPostDoc);
-  }
+    requestedPostId
+      ? (
+          requestedPostDoc &&
+          requestedPostDoc.exists
+            ? [requestedPostDoc]
+            : []
+        )
+      : postSnapshot.docs.slice();
 
   const authorProfiles = new Map();
   const authorUids = Array.from(
@@ -1205,15 +1204,18 @@ module.exports = async function handler(
 
   try {
     if (isDataRequest) {
+      const requestResults =
+        await Promise.all([
+          getForumActor(
+            req,
+            false
+          ),
+          incrementForumView(
+            query.viewPost
+          )
+        ]);
       const actor =
-        await getForumActor(
-          req,
-          false
-        );
-
-      await incrementForumView(
-        query.viewPost
-      );
+        requestResults[0];
 
       const requestedPostId =
         query.viewPost ||
