@@ -165,6 +165,14 @@ async function moderateForumContent(parts) {
       apiError.code || "no-code"
     );
 
+    if (response.status === 429) {
+      console.warn(
+        "Forum moderation skipped because OpenAI returned 429:",
+        apiError.code || "no-code"
+      );
+      return;
+    }
+
     let publicMessage =
       "OpenAI moderation returned HTTP " +
       response.status +
@@ -176,9 +184,6 @@ async function moderateForumContent(parts) {
     } else if (response.status === 403) {
       publicMessage =
         "The OpenAI API key does not have moderation permission.";
-    } else if (response.status === 429) {
-      publicMessage =
-        "The OpenAI moderation rate limit was reached.";
     }
 
     throw createForumError(
