@@ -4093,22 +4093,6 @@ function renderForumPage(actor) {
               '" type="button" data-downvote-post="',
               escapeHtml(post.id),
             '">▼</button>',
-
-            post.canManage
-              ? [
-                  '<button class="secondary-button" type="button" data-toggle-solved="',
-                    escapeHtml(post.id),
-                  '">',
-                    post.solved
-                      ? 'Remove Solved Status'
-                      : 'Mark as Solved',
-                  '</button>',
-
-                  '<button class="secondary-button danger-button" type="button" data-delete-post="',
-                    escapeHtml(post.id),
-                  '">Delete Post</button>'
-                ].join("")
-              : '',
           '</div>',
 
           '<section class="reply-section">',
