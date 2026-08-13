@@ -512,11 +512,93 @@ async function getForumPosts(
     postDocs.push(requestedPostDoc);
   }
 
+  const authorProfiles = new Map();
+  const authorUids = Array.from(
+    new Set(
+      postDocs
+        .map(function (postDoc) {
+          const postData =
+            postDoc.data() || {};
+          const isAnonymous =
+            postData.anonymous === true ||
+            cleanForumString(
+              postData.authorName,
+              80
+            ).toLowerCase() ===
+              "anonymous";
+
+          return isAnonymous
+            ? ""
+            : cleanForumString(
+                postData.authorUid,
+                160
+              );
+        })
+        .filter(Boolean)
+    )
+  );
+
+  if (authorUids.length) {
+    const authorDocs =
+      await db.getAll(
+        ...authorUids.map(
+          function (authorUid) {
+            return db.collection("users")
+              .doc(authorUid);
+          }
+        )
+      );
+
+    authorDocs.forEach(
+      function (authorDoc) {
+        if (!authorDoc.exists) {
+          return;
+        }
+
+        const authorData =
+          authorDoc.data() || {};
+
+        authorProfiles.set(
+          authorDoc.id,
+          {
+            displayName:
+              cleanForumString(
+                authorData.fullName ||
+                  authorData.displayName,
+                80
+              ),
+            photoURL:
+              cleanForumString(
+                authorData.photoURL,
+                2000
+              )
+          }
+        );
+      }
+    );
+  }
+
   return Promise.all(
     postDocs.map(
       async function (postDoc) {
         const postData =
           postDoc.data() || {};
+        const isAnonymous =
+          postData.anonymous === true ||
+          cleanForumString(
+            postData.authorName,
+            80
+          ).toLowerCase() ===
+            "anonymous";
+        const authorProfile =
+          isAnonymous
+            ? null
+            : authorProfiles.get(
+                cleanForumString(
+                  postData.authorUid,
+                  160
+                )
+              ) || null;
 
         const replySnapshot =
           await postDoc.ref
@@ -617,11 +699,29 @@ async function getForumPosts(
             4000
           ),
           author:
-            cleanForumString(
-              postData.authorName ||
-                "AUC student",
-              80
-            ),
+            isAnonymous
+              ? "Anonymous"
+              : cleanForumString(
+                  (
+                    authorProfile &&
+                    authorProfile.displayName
+                  ) ||
+                    postData.authorName ||
+                    "AUC student",
+                  80
+                ),
+          authorPhotoURL:
+            isAnonymous
+              ? ""
+              : cleanForumString(
+                  (
+                    authorProfile &&
+                    authorProfile.photoURL
+                  ) ||
+                    "",
+                  2000
+                ),
+          anonymous: isAnonymous,
           createdAt:
             getStoredDate(
               postData.createdAt,
@@ -1477,6 +1577,7 @@ function renderForumPage(actor) {
     }
 
     .post-card-meta {
+      min-width: 0;
       display: flex;
       align-items: center;
       gap: 7px;
@@ -1501,6 +1602,14 @@ function renderForumPage(actor) {
       flex: 0 0 auto;
       display: grid;
       place-items: center;
+      overflow: hidden;
+    }
+
+    .post-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .post-card-community,
@@ -1510,8 +1619,12 @@ function renderForumPage(actor) {
     }
 
     .post-card-community {
+      max-width: min(180px, 32vw);
       color: #171717;
       font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .post-card-time {
@@ -2851,6 +2964,53 @@ function renderForumPage(actor) {
           Number(post.likes || 0);
         var commentCount =
           post.replies.length;
+        var anonymous =
+          post.anonymous === true;
+        var author =
+          anonymous
+            ? "Anonymous"
+            : String(
+                post.author ||
+                  "AUC student"
+              ).trim();
+        var authorPhotoURL =
+          anonymous
+            ? ""
+            : String(
+                post.authorPhotoURL ||
+                  ""
+              ).trim();
+        var authorInitials =
+          author
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(function (part) {
+              return part.charAt(0);
+            })
+            .join("")
+            .toUpperCase() ||
+          "AUC";
+        var avatarMarkup =
+          authorPhotoURL
+            ? [
+                '<span class="post-avatar" aria-hidden="true">',
+                  '<img src="',
+                    escapeHtml(
+                      authorPhotoURL
+                    ),
+                  '" alt="">',
+                '</span>'
+              ].join("")
+            : [
+                '<span class="post-avatar" aria-hidden="true">',
+                  escapeHtml(
+                    anonymous
+                      ? "AN"
+                      : authorInitials
+                  ),
+                '</span>'
+              ].join("");
 
         return [
           '<article class="post-card">',
@@ -2864,8 +3024,12 @@ function renderForumPage(actor) {
               ),
             '">',
               '<div class="post-card-meta">',
-                '<span class="post-avatar" aria-hidden="true">AUC</span>',
+                avatarMarkup,
                 '<span class="post-card-community">',
+                  escapeHtml(author),
+                '</span>',
+                '<span class="post-card-time" aria-hidden="true">·</span>',
+                '<span class="post-card-time">',
                   escapeHtml(post.category),
                 '</span>',
                 '<span class="post-card-time" aria-hidden="true">·</span>',
