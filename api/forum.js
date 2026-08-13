@@ -1909,7 +1909,11 @@ function renderForumPage(actor) {
 
         return [
           '<article class="post-card">',
-            '<a class="post-card-link" href="/forum?post=',
+            '<a class="post-card-link" data-open-post="',
+              escapeHtml(
+                String(post.id)
+              ),
+            '" href="/forum?post=',
               encodeURIComponent(
                 String(post.id)
               ),
@@ -2786,6 +2790,8 @@ function renderForumPage(actor) {
           );
 
         if (openButton) {
+          event.preventDefault();
+
           openPost(
             openButton.dataset.openPost
           );
