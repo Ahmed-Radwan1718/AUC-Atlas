@@ -3485,6 +3485,8 @@ function renderForumPage(actor) {
                   : '',
                 '" href="',
                 escapeHtml(categoryUrl),
+                '" data-category="',
+                escapeHtml(category),
                 '"',
                 category === state.category
                   ? ' aria-current="page"'
@@ -4179,22 +4181,113 @@ function renderForumPage(actor) {
           encodeURIComponent(postId);
       }
 
-      categoryList.addEventListener(
-        "click",
-        function (event) {
-          var button =
-            event.target.closest(
-              "[data-category]"
-            );
+      function navigateToCategory(
+        category,
+        categoryUrl
+      ) {
+        var selectedCategory =
+          category === "Trending" ||
+          categories.includes(category)
+            ? category
+            : "Trending";
 
-          if (!button) {
-            return;
-          }
+        var selectedUrl =
+          selectedCategory === "Trending"
+            ? "/forum"
+            : categoryUrl ||
+              "/forum/" +
+                getCategorySlug(
+                  selectedCategory
+                );
 
-          state.category =
-            button.dataset.category;
+        state.activePostId = "";
+        state.category =
+          selectedCategory;
+        state.search = "";
+        searchInput.value = "";
+        state.sort =
+          selectedCategory === "Trending"
+            ? "popular"
+            : "latest";
+        sortInput.value =
+          state.sort;
 
-          renderFeed();
+        syncForumSortDropdown();
+        closeForumSortDropdown();
+
+        var currentUrl =
+          window.location.pathname +
+          window.location.search;
+
+        if (currentUrl !== selectedUrl) {
+          window.history.pushState(
+            {
+              forumCategory:
+                selectedCategory
+            },
+            "",
+            selectedUrl
+          );
+        }
+
+        renderFeed();
+        showForumView("feed");
+
+        document.title =
+          selectedCategory === "Trending"
+            ? "Trending Discussions | AUC Atlas"
+            : selectedCategory +
+              " | AUC Atlas Community";
+      }
+
+      function handleCategoryNavigation(
+        event
+      ) {
+        if (
+          event.defaultPrevented ||
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) {
+          return;
+        }
+
+        var link =
+          event.target.closest(
+            "[data-category]"
+          );
+
+        if (!link) {
+          return;
+        }
+
+        event.preventDefault();
+
+        navigateToCategory(
+          link.dataset.category,
+          link.getAttribute("href")
+        );
+      }
+
+      [
+        categoryList,
+        discussionCategoryList
+      ].forEach(function (list) {
+        if (list) {
+          list.addEventListener(
+            "click",
+            handleCategoryNavigation
+          );
+        }
+      });
+
+      window.addEventListener(
+        "popstate",
+        function () {
+          closeForumSortDropdown();
+          renderCurrentPage();
         }
       );
 
