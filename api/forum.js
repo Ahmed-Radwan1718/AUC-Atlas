@@ -454,77 +454,115 @@ function renderForumPage(actor) {
 
     .post-list {
       display: grid;
-      gap: 12px;
+      gap: 0;
+      border-bottom: 1px solid
+        rgba(23, 23, 23, 0.12);
     }
 
     .post-card {
       padding: 0;
-      border-radius: 24px;
+      border: 0;
+      border-top: 1px solid
+        rgba(23, 23, 23, 0.12);
+      border-radius: 0;
+      background: #fff;
+      box-shadow: none;
       overflow: hidden;
-      display: grid;
-      grid-template-columns:
-        54px
-        minmax(0, 1fr);
-      transition:
-        transform 0.2s ease,
-        border-color 0.2s ease,
-        background 0.2s ease;
+      transition: background 0.18s ease;
     }
 
     .post-card:hover {
-      border-color: rgba(192, 154, 92, 0.32);
-      background: rgba(255, 255, 255, 0.9);
-      transform: translateY(-2px);
+      border-color:
+        rgba(23, 23, 23, 0.12);
+      background: rgba(192, 154, 92, 0.05);
+      transform: none;
     }
 
-    .post-vote-rail {
-      padding: 16px 8px;
-      border-right: 1px solid
-        rgba(23, 23, 23, 0.08);
-      background: rgba(247, 244, 238, 0.72);
+    .post-card-link {
+      min-width: 0;
+      padding: 22px 0 20px;
+      color: inherit;
+      text-decoration: none;
+      display: block;
+    }
+
+    .post-card-link:focus-visible {
+      outline: 2px solid
+        rgba(192, 154, 92, 0.82);
+      outline-offset: -2px;
+    }
+
+    .post-card-meta {
       display: flex;
       align-items: center;
-      flex-direction: column;
-      gap: 6px;
+      gap: 7px;
     }
 
-    .vote-arrow {
-      width: 34px;
-      height: 34px;
-      border: 0;
-      border-radius: 10px;
-      background: transparent;
-      color: rgba(23, 23, 23, 0.42);
-      font-size: 17px;
-      font-weight: 900;
+    .post-avatar {
+      width: 24px;
+      height: 24px;
+      border: 1px solid
+        rgba(192, 154, 92, 0.22);
+      border-radius: 50%;
+      background:
+        linear-gradient(
+          135deg,
+          #fff,
+          rgba(192, 154, 92, 0.16)
+        );
+      color: rgba(192, 154, 92, 0.98);
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      flex: 0 0 auto;
       display: grid;
       place-items: center;
     }
 
-    .vote-arrow:hover,
-    .vote-arrow.active-up {
-      background: rgba(192, 154, 92, 0.14);
-      color: rgba(151, 103, 32, 0.98);
+    .post-card-community,
+    .post-card-time {
+      font-size: 11px;
+      line-height: 1;
     }
 
-    .vote-arrow.active-down {
-      background: rgba(173, 37, 37, 0.09);
-      color: #ad2525;
-    }
-
-    .vote-score {
+    .post-card-community {
       color: #171717;
-      font-size: 12px;
-      font-weight: 900;
+      font-weight: 700;
     }
 
-    .post-card-content {
-      min-width: 0;
-      padding: 18px 20px;
+    .post-card-time {
+      color: rgba(23, 23, 23, 0.52);
+      font-weight: 500;
     }
 
-    .post-card-top,
-    .post-card-footer,
+    .post-card-title {
+      margin: 10px 0 7px;
+      color: #171717;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .post-preview {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.78);
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .post-card-counts {
+      margin-top: 10px;
+      color: rgba(23, 23, 23, 0.52);
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
     .post-meta,
     .post-badges,
     .post-actions,
@@ -535,34 +573,6 @@ function renderForumPage(actor) {
       flex-wrap: wrap;
     }
 
-    .post-card-top,
-    .post-card-footer {
-      justify-content: space-between;
-    }
-
-    .post-title-button {
-      width: 100%;
-      margin: 12px 0 8px;
-      border: 0;
-      background: transparent;
-      color: #171717;
-      font-size: 21px;
-      font-weight: 700;
-      line-height: 1.18;
-      text-align: left;
-    }
-
-    .post-title-button:hover {
-      color: rgba(126, 86, 26, 0.96);
-    }
-
-    .post-preview {
-      margin-bottom: 14px;
-      color: rgba(23, 23, 23, 0.64);
-      font-size: 14px;
-      line-height: 1.65;
-    }
-
     .post-author,
     .post-time {
       color: rgba(23, 23, 23, 0.5);
@@ -570,8 +580,7 @@ function renderForumPage(actor) {
       font-weight: 700;
     }
 
-    .like-button,
-    .post-comment-button {
+    .like-button {
       min-height: 36px;
       padding: 0 12px;
       border: 1px solid
@@ -587,12 +596,6 @@ function renderForumPage(actor) {
       border-color: rgba(192, 154, 92, 0.32);
       background: rgba(192, 154, 92, 0.14);
       color: rgba(126, 86, 26, 0.98);
-    }
-
-    .post-comment-button:hover {
-      border-color: rgba(192, 154, 92, 0.3);
-      background: rgba(192, 154, 92, 0.11);
-      color: #171717;
     }
 
     .forum-empty {
@@ -1923,73 +1926,26 @@ function renderForumPage(actor) {
 
       function renderPostCard(post) {
         var preview =
-          post.body.length > 240
-            ? post.body.slice(
-                0,
-                237
-              ) + "..."
-            : post.body;
-        var userVote =
-          Number(post.userVote || 0);
-
-        if (
-          !userVote &&
-          post.liked
-        ) {
-          userVote = 1;
-        }
+          String(post.body || "").trim();
+        var voteCount =
+          Number(post.likes || 0);
+        var commentCount =
+          post.replies.length;
 
         return [
           '<article class="post-card">',
-            '<div class="post-vote-rail">',
-              '<button class="vote-arrow',
-                userVote === 1
-                  ? ' active-up'
-                  : '',
-                '" type="button" data-like-post="',
-                escapeHtml(post.id),
-                '" aria-label="Upvote post">▲</button>',
-              '<span class="vote-score">',
-                Number(post.likes || 0),
-              '</span>',
-              '<button class="vote-arrow',
-                userVote === -1
-                  ? ' active-down'
-                  : '',
-                '" type="button" data-downvote-post="',
-                escapeHtml(post.id),
-                '" aria-label="Downvote post">▼</button>',
-            '</div>',
-
-            '<div class="post-card-content">',
-              '<div class="post-card-top">',
-                '<div class="post-badges">',
-                  '<span class="post-badge is-gold">',
-                    escapeHtml(
-                      post.category
-                    ),
-                  '</span>',
-                  post.tag
-                    ? '<span class="post-badge">' +
-                      escapeHtml(
-                        post.tag
-                      ) +
-                      '</span>'
-                    : '',
-                  post.pinned
-                    ? '<span class="post-badge">Pinned</span>'
-                    : '',
-                  post.solved
-                    ? '<span class="post-badge">Solved</span>'
-                    : '',
-                '</div>',
-              '</div>',
-
-              '<div class="post-meta">',
-                '<span class="post-author">Posted by ',
-                  escapeHtml(post.author),
+            '<a class="post-card-link" href="/forum?post=',
+              encodeURIComponent(
+                String(post.id)
+              ),
+            '">',
+              '<div class="post-card-meta">',
+                '<span class="post-avatar" aria-hidden="true">AUC</span>',
+                '<span class="post-card-community">',
+                  escapeHtml(post.category),
                 '</span>',
-                '<span class="post-time">',
+                '<span class="post-card-time" aria-hidden="true">·</span>',
+                '<span class="post-card-time">',
                   escapeHtml(
                     formatRelative(
                       post.createdAt
@@ -1998,33 +1954,26 @@ function renderForumPage(actor) {
                 '</span>',
               '</div>',
 
-              '<button class="post-title-button" type="button" data-open-post="',
-                escapeHtml(post.id),
-              '">',
+              '<h2 class="post-card-title">',
                 escapeHtml(post.title),
-              '</button>',
+              '</h2>',
 
               '<p class="post-preview">',
                 escapeHtml(preview),
               '</p>',
 
-              '<footer class="post-card-footer">',
-                '<div class="post-actions">',
-                  '<button class="post-comment-button" type="button" data-open-post="',
-                    escapeHtml(post.id),
-                  '">',
-                    post.replies.length,
-                    post.replies.length === 1
-                      ? ' Comment'
-                      : ' Comments',
-                  '</button>',
-                  '<span class="post-stat">',
-                    post.views,
-                    ' views',
-                  '</span>',
-                '</div>',
-              '</footer>',
-            '</div>',
+              '<p class="post-card-counts">',
+                voteCount,
+                voteCount === 1
+                  ? ' vote'
+                  : ' votes',
+                ' · ',
+                commentCount,
+                commentCount === 1
+                  ? ' comment'
+                  : ' comments',
+              '</p>',
+            '</a>',
           '</article>'
         ].join("");
       }
