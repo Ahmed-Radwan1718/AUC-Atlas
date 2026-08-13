@@ -2865,7 +2865,7 @@ function renderForumPage(actor) {
           String(
             window.location.pathname ||
               ""
-          ).replace(/\/+$/, "");
+          ).replace(/\\/+$/, "");
         var prefix = "/forum/";
 
         if (!path.startsWith(prefix)) {
