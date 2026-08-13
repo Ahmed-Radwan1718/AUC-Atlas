@@ -1966,7 +1966,7 @@
 
       var state = {
         posts: [],
-        category: "Trending",
+        category: "Home",
         search: "",
         sort: "popular",
         activePostId: "",
@@ -2406,7 +2406,7 @@
             function (post) {
               var matchesCategory =
                 state.category ===
-                  "Trending" ||
+                  "Home" ||
                 post.category ===
                   state.category;
 
@@ -2539,14 +2539,14 @@
 
       function renderCategories() {
         var allCategories = [
-          "Trending"
+          "Home"
         ].concat(categories);
 
         var categoryMarkup =
           allCategories
             .map(function (category) {
               var count =
-                category === "Trending"
+                category === "Home"
                   ? state.posts.length
                   : state.posts.filter(
                       function (post) {
@@ -2558,7 +2558,7 @@
                     ).length;
 
               var categoryUrl =
-                category === "Trending"
+                category === "Home"
                   ? "/forum"
                   : "/forum/" +
                     getCategorySlug(
@@ -3329,13 +3329,13 @@
         categoryUrl
       ) {
         var selectedCategory =
-          category === "Trending" ||
+          category === "Home" ||
           categories.includes(category)
             ? category
-            : "Trending";
+            : "Home";
 
         var selectedUrl =
-          selectedCategory === "Trending"
+          selectedCategory === "Home"
             ? "/forum"
             : categoryUrl ||
               "/forum/" +
@@ -3349,7 +3349,7 @@
         state.search = "";
         searchInput.value = "";
         state.sort =
-          selectedCategory === "Trending"
+          selectedCategory === "Home"
             ? "popular"
             : "latest";
         sortInput.value =
@@ -3377,8 +3377,8 @@
         showForumView("feed");
 
         document.title =
-          selectedCategory === "Trending"
-            ? "Trending Discussions | AUC Atlas"
+          selectedCategory === "Home"
+            ? "Community Forum | AUC Atlas"
             : selectedCategory +
               " | AUC Atlas Community";
       }
@@ -4114,7 +4114,7 @@
         state.activePostId = "";
         state.category =
           requestedCategory ||
-          "Trending";
+          "Home";
         state.sort =
           requestedCategory
             ? "latest"
@@ -4130,7 +4130,7 @@
           requestedCategory
             ? requestedCategory +
               " | AUC Atlas Community"
-            : "Trending Discussions | AUC Atlas";
+            : "Community Forum | AUC Atlas";
       }
 
       postCategory.innerHTML =
