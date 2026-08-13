@@ -600,15 +600,22 @@ async function getForumPosts(
                 )
               ) || null;
 
+        const shouldLoadReplies =
+          Boolean(requestedPostId) &&
+          postDoc.id ===
+            requestedPostId;
+
         const replySnapshot =
-          await postDoc.ref
-            .collection("replies")
-            .orderBy(
-              "createdAt",
-              "asc"
-            )
-            .limit(300)
-            .get();
+          shouldLoadReplies
+            ? await postDoc.ref
+                .collection("replies")
+                .orderBy(
+                  "createdAt",
+                  "asc"
+                )
+                .limit(300)
+                .get()
+            : null;
 
         const canManage = Boolean(
           actor &&
@@ -623,52 +630,54 @@ async function getForumPosts(
         );
 
         const replies =
-          replySnapshot.docs.map(
-            function (replyDoc) {
-              const replyData =
-                replyDoc.data() || {};
+          replySnapshot
+            ? replySnapshot.docs.map(
+                function (replyDoc) {
+                  const replyData =
+                    replyDoc.data() || {};
 
-              const replyVote =
-                voteMap.get(
-                  getVoteKey(
-                    "reply",
-                    postDoc.id,
-                    replyDoc.id
-                  )
-                ) || 0;
+                  const replyVote =
+                    voteMap.get(
+                      getVoteKey(
+                        "reply",
+                        postDoc.id,
+                        replyDoc.id
+                      )
+                    ) || 0;
 
-              return {
-                id: replyDoc.id,
-                parentId:
-                  cleanForumString(
-                    replyData.parentId,
-                    160
-                  ),
-                author:
-                  cleanForumString(
-                    replyData.authorName ||
-                      "AUC student",
-                    80
-                  ),
-                body:
-                  cleanForumString(
-                    replyData.body,
-                    2000
-                  ),
-                createdAt:
-                  getStoredDate(
-                    replyData.createdAt,
-                    replyData.createdAtIso
-                  ),
-                likes: Number(
-                  replyData.score || 0
-                ),
-                liked:
-                  replyVote === 1,
-                userVote: replyVote
-              };
-            }
-          );
+                  return {
+                    id: replyDoc.id,
+                    parentId:
+                      cleanForumString(
+                        replyData.parentId,
+                        160
+                      ),
+                    author:
+                      cleanForumString(
+                        replyData.authorName ||
+                          "AUC student",
+                        80
+                      ),
+                    body:
+                      cleanForumString(
+                        replyData.body,
+                        2000
+                      ),
+                    createdAt:
+                      getStoredDate(
+                        replyData.createdAt,
+                        replyData.createdAtIso
+                      ),
+                    likes: Number(
+                      replyData.score || 0
+                    ),
+                    liked:
+                      replyVote === 1,
+                    userVote: replyVote
+                  };
+                }
+              )
+            : [];
 
         const postVote =
           voteMap.get(
@@ -734,6 +743,12 @@ async function getForumPosts(
           userVote: postVote,
           views: Number(
             postData.viewCount || 0
+          ),
+          replyCount: Math.max(
+            Number(
+              postData.replyCount || 0
+            ),
+            replies.length
           ),
           pinned:
             Boolean(postData.pinned),
@@ -1213,10 +1228,17 @@ function renderForumPage(actor) {
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: #f7f4ee;
       color: #171717;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     body.modal-open {
@@ -1248,6 +1270,37 @@ function renderForumPage(actor) {
           rgba(247, 244, 238, 0) 380px
         ),
         #f7f4ee;
+      animation:
+        forumPageEnter
+        0.42s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+    }
+
+    @keyframes forumPageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .forum-page,
+      .post-card,
+      .forum-sort-menu,
+      .forum-sort-chevron {
+        animation: none !important;
+        transition-duration: 0.01ms !important;
+      }
     }
 
     .forum-inner {
@@ -1455,12 +1508,21 @@ function renderForumPage(actor) {
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      transition:
+        transform 0.22s
+          cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 0.2s ease,
+        color 0.2s ease;
     }
 
     .category-button:hover,
     .category-button.active {
       background: rgba(192, 154, 92, 0.12);
       color: #171717;
+    }
+
+    .category-button:hover {
+      transform: translateX(3px);
     }
 
     .category-count {
@@ -1691,6 +1753,7 @@ function renderForumPage(actor) {
     .post-list {
       display: grid;
       gap: 14px;
+      contain: layout style;
     }
 
     .post-card {
@@ -1700,14 +1763,58 @@ function renderForumPage(actor) {
       border-radius: 22px;
       background: rgba(255, 255, 255, 0.82);
       box-shadow:
-        0 12px 34px
-        rgba(42, 32, 20, 0.07);
+        0 8px 22px
+        rgba(42, 32, 20, 0.055);
       overflow: hidden;
+      content-visibility: auto;
+      contain: layout paint style;
+      contain-intrinsic-size: auto 132px;
+      animation:
+        forumCardEnter
+        0.34s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
       transition:
-        transform 0.18s ease,
-        background 0.18s ease,
-        border-color 0.18s ease,
-        box-shadow 0.18s ease;
+        transform 0.24s
+          cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .post-card:nth-child(2) {
+      animation-delay: 0.025s;
+    }
+
+    .post-card:nth-child(3) {
+      animation-delay: 0.05s;
+    }
+
+    .post-card:nth-child(4) {
+      animation-delay: 0.075s;
+    }
+
+    .post-card:nth-child(5) {
+      animation-delay: 0.1s;
+    }
+
+    .post-card:nth-child(6) {
+      animation-delay: 0.125s;
+    }
+
+    .post-card:nth-child(n + 7) {
+      animation: none;
+    }
+
+    @keyframes forumCardEnter {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .post-card:hover {
@@ -1715,9 +1822,9 @@ function renderForumPage(actor) {
         rgba(192, 154, 92, 0.3);
       background: rgba(255, 255, 255, 0.96);
       box-shadow:
-        0 16px 40px
-        rgba(42, 32, 20, 0.1);
-      transform: translateY(-2px);
+        0 11px 28px
+        rgba(42, 32, 20, 0.075);
+      transform: translateY(-3px);
     }
 
     .post-card-link {
@@ -2978,21 +3085,34 @@ function renderForumPage(actor) {
 
         parameters.set("data", "1");
 
+        var requestedPostId = "";
+
         if (countView) {
           var currentParameters =
             new URLSearchParams(
               window.location.search
             );
 
-          var viewedPostId =
-            currentParameters.get("post");
-
-          if (viewedPostId) {
-            parameters.set(
-              "viewPost",
-              viewedPostId
+          requestedPostId =
+            String(
+              currentParameters.get(
+                "post"
+              ) || ""
             );
-          }
+        } else {
+          requestedPostId =
+            String(
+              state.activePostId || ""
+            );
+        }
+
+        if (requestedPostId) {
+          parameters.set(
+            countView
+              ? "viewPost"
+              : "post",
+            requestedPostId
+          );
         }
 
         var response = await fetch(
@@ -3019,17 +3139,21 @@ function renderForumPage(actor) {
           state.posts =
             await loadPosts(false);
 
-          renderFeed();
-
           if (state.activePostId) {
             var activePost = findPost(
               state.activePostId
             );
 
+            renderCategories();
+
             if (activePost) {
               renderDetail(activePost);
             }
+
+            return;
           }
+
+          renderFeed();
         } catch (error) {
           showToast(
             error.message ||
@@ -3163,6 +3287,29 @@ function renderForumPage(actor) {
         );
       }
 
+      function getPostReplyCount(
+        post
+      ) {
+        var storedCount =
+          Number(
+            post &&
+            post.replyCount
+          );
+
+        var loadedCount =
+          post &&
+          Array.isArray(post.replies)
+            ? post.replies.length
+            : 0;
+
+        return Math.max(
+          Number.isFinite(storedCount)
+            ? storedCount
+            : 0,
+          loadedCount
+        );
+      }
+
       function getFilteredPosts() {
         var search =
           state.search.toLowerCase();
@@ -3214,12 +3361,12 @@ function renderForumPage(actor) {
               var scoreDifference =
                 (
                   Number(b.likes || 0) +
-                  b.replies.length * 3 +
+                  getPostReplyCount(b) * 3 +
                   Number(b.views || 0) / 10
                 ) -
                 (
                   Number(a.likes || 0) +
-                  a.replies.length * 3 +
+                  getPostReplyCount(a) * 3 +
                   Number(a.views || 0) / 10
                 );
 
@@ -3257,8 +3404,8 @@ function renderForumPage(actor) {
           posts.sort(
             function (a, b) {
               return (
-                b.replies.length -
-                a.replies.length
+                getPostReplyCount(b) -
+                getPostReplyCount(a)
               ) || newestFirst(a, b);
             }
           );
@@ -3278,7 +3425,10 @@ function renderForumPage(actor) {
         ) {
           posts = posts.filter(
             function (post) {
-              return !post.replies.length;
+              return (
+                getPostReplyCount(post) ===
+                0
+              );
             }
           );
 
@@ -3368,7 +3518,7 @@ function renderForumPage(actor) {
         var voteCount =
           Number(post.likes || 0);
         var commentCount =
-          post.replies.length;
+          getPostReplyCount(post);
         var anonymous =
           post.anonymous === true;
         var author =
@@ -3400,7 +3550,7 @@ function renderForumPage(actor) {
           authorPhotoURL
             ? [
                 '<span class="post-avatar" aria-hidden="true">',
-                  '<img src="',
+                  '<img loading="lazy" decoding="async" src="',
                     escapeHtml(
                       authorPhotoURL
                     ),
@@ -3477,11 +3627,11 @@ function renderForumPage(actor) {
             .slice()
             .sort(function (a, b) {
               return (
-                b.likes +
-                b.replies.length * 3
+                Number(b.likes || 0) +
+                getPostReplyCount(b) * 3
               ) - (
-                a.likes +
-                a.replies.length * 3
+                Number(a.likes || 0) +
+                getPostReplyCount(a) * 3
               );
             })
             .slice(0, 3);
@@ -3499,9 +3649,9 @@ function renderForumPage(actor) {
                     ),
                   '</strong>',
                   '<p>',
-                    post.replies.length,
+                    getPostReplyCount(post),
                     ' replies · ',
-                    post.likes,
+                    Number(post.likes || 0),
                     ' helpful',
                   '</p>',
                 '</button>'
@@ -4387,7 +4537,15 @@ function renderForumPage(actor) {
           state.search =
             searchInput.value.trim();
 
-          renderFeed();
+          window.clearTimeout(
+            searchInput.renderTimer
+          );
+
+          searchInput.renderTimer =
+            window.setTimeout(
+              renderFeed,
+              110
+            );
         }
       );
 
@@ -4805,10 +4963,15 @@ module.exports = async function handler(
         query.viewPost
       );
 
+      const requestedPostId =
+        query.viewPost ||
+        query.post ||
+        "";
+
       const posts =
         await getForumPosts(
           actor,
-          query.viewPost
+          requestedPostId
         );
 
       return res.status(200).json({
