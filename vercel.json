@@ -5,6 +5,12 @@
       "includeFiles": "{*.html,data/*.js,home-search.js,site-header.js,site-footer.js}"
     }
   },
+  "rewrites": [
+    {
+      "source": "/forum",
+      "destination": "/api/forum"
+    }
+  ],
   "git": {
     "deploymentEnabled": true
   },
