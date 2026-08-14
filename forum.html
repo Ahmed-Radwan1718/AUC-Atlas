@@ -335,8 +335,63 @@
       display: grid;
       grid-template-columns:
         minmax(0, 1fr)
-        180px;
+        180px
+        auto;
+      align-items: center;
       gap: 10px;
+    }
+
+    .forum-create-button {
+      min-width: 132px;
+      min-height: 48px;
+      padding: 0 16px;
+      border: 1px solid #171717;
+      border-radius: 18px;
+      background: #171717;
+      box-shadow:
+        0 10px 24px
+        rgba(23, 23, 23, 0.14);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition:
+        transform 0.16s ease,
+        background-color 0.16s ease,
+        box-shadow 0.16s ease;
+    }
+
+    .forum-create-button::before {
+      content: "+";
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #c09a5c;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .forum-create-button:hover {
+      background: #2b2b2b;
+      box-shadow:
+        0 14px 30px
+        rgba(23, 23, 23, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .forum-create-button:focus-visible {
+      outline: 2px solid
+        rgba(192, 154, 92, 0.72);
+      outline-offset: 3px;
     }
 
     .forum-toolbar input,
@@ -1765,13 +1820,6 @@
             discuss campus life, and connect
             with the AUC community.
           </p>
-
-          <a
-            class="primary-button"
-            href="/forum?compose=1"
-          >
-            Create Post
-          </a>
         </div>
       </section>
 
@@ -1910,6 +1958,13 @@
                 </button>
               </div>
             </div>
+
+            <a
+              class="forum-create-button"
+              href="/forum?compose=1"
+            >
+              New post
+            </a>
           </div>
 
           <p
