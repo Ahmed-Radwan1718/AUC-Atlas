@@ -1177,6 +1177,20 @@
       overflow: hidden;
     }
 
+    body.support-donation-open .site-header,
+    body.support-donation-open main,
+    body.support-donation-open .site-footer {
+      filter: blur(12px);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    body.support-donation-open main,
+    body.support-donation-open .site-footer {
+      transform: scale(1.015);
+      transform-origin: center;
+    }
+
     .support-donation-modal[hidden] {
       display: none;
       opacity: 0;
