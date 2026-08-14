@@ -96,6 +96,10 @@
         border-top: 1px solid rgba(23, 23, 23, 0.08);
       }
 
+      .site-footer-bottom p + p {
+        margin-top: 10px;
+      }
+
       @media (max-width: 760px) {
         .site-footer-grid {
           grid-template-columns: 1fr;
