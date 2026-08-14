@@ -746,6 +746,80 @@ async function getForumPosts(
                 .get()
             : null;
 
+        const replyAuthorUids =
+          replySnapshot
+            ? Array.from(
+                new Set(
+                  replySnapshot.docs
+                    .map(function (
+                      replyDoc
+                    ) {
+                      const replyData =
+                        replyDoc.data() ||
+                        {};
+
+                      return cleanForumString(
+                        replyData.authorUid,
+                        160
+                      );
+                    })
+                    .filter(Boolean)
+                )
+              )
+            : [];
+
+        const missingReplyAuthorUids =
+          replyAuthorUids.filter(
+            function (authorUid) {
+              return !authorProfiles.has(
+                authorUid
+              );
+            }
+          );
+
+        if (
+          missingReplyAuthorUids.length
+        ) {
+          const replyAuthorDocs =
+            await db.getAll(
+              ...missingReplyAuthorUids.map(
+                function (authorUid) {
+                  return db
+                    .collection("users")
+                    .doc(authorUid);
+                }
+              )
+            );
+
+          replyAuthorDocs.forEach(
+            function (authorDoc) {
+              if (!authorDoc.exists) {
+                return;
+              }
+
+              const authorData =
+                authorDoc.data() || {};
+
+              authorProfiles.set(
+                authorDoc.id,
+                {
+                  displayName:
+                    cleanForumString(
+                      authorData.fullName ||
+                        authorData.displayName,
+                      80
+                    ),
+                  photoURL:
+                    cleanForumString(
+                      authorData.photoURL,
+                      2000
+                    )
+                }
+              );
+            }
+          );
+        }
+
         const canManage = Boolean(
           actor &&
           (
@@ -764,6 +838,13 @@ async function getForumPosts(
                 function (replyDoc) {
                   const replyData =
                     replyDoc.data() || {};
+                  const replyAuthorProfile =
+                    authorProfiles.get(
+                      cleanForumString(
+                        replyData.authorUid,
+                        160
+                      )
+                    ) || null;
 
                   const replyVote =
                     voteMap.get(
@@ -783,9 +864,22 @@ async function getForumPosts(
                       ),
                     author:
                       cleanForumString(
-                        replyData.authorName ||
+                        (
+                          replyAuthorProfile &&
+                          replyAuthorProfile.displayName
+                        ) ||
+                          replyData.authorName ||
                           "AUC student",
                         80
+                      ),
+                    authorPhotoURL:
+                      cleanForumString(
+                        (
+                          replyAuthorProfile &&
+                          replyAuthorProfile.photoURL
+                        ) ||
+                          "",
+                        2000
                       ),
                     body:
                       cleanForumString(
