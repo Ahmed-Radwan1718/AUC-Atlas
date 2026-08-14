@@ -1677,6 +1677,52 @@
       outline-offset: 2px;
     }
 
+    #discussion-page button[data-like-post],
+    #discussion-page button[data-like-reply] {
+      color: #397252;
+    }
+
+    #discussion-page button[data-like-post]:hover,
+    #discussion-page button[data-like-reply]:hover {
+      background: rgba(57, 114, 82, 0.1);
+      color: #285b3e;
+    }
+
+    #discussion-page button[data-like-post].active,
+    #discussion-page button[data-like-reply].active {
+      background: rgba(57, 114, 82, 0.16);
+      color: #285b3e;
+    }
+
+    #discussion-page button[data-downvote-post],
+    #discussion-page button[data-downvote-reply] {
+      color: #aa5449;
+    }
+
+    #discussion-page button[data-downvote-post]:hover,
+    #discussion-page button[data-downvote-reply]:hover {
+      background: rgba(170, 84, 73, 0.1);
+      color: #8f3f37;
+    }
+
+    #discussion-page button[data-downvote-post].active,
+    #discussion-page button[data-downvote-reply].active {
+      background: rgba(170, 84, 73, 0.16);
+      color: #8f3f37;
+    }
+
+    #discussion-page button[data-like-post]:focus-visible,
+    #discussion-page button[data-like-reply]:focus-visible {
+      outline: 2px solid rgba(57, 114, 82, 0.45);
+      outline-offset: 2px;
+    }
+
+    #discussion-page button[data-downvote-post]:focus-visible,
+    #discussion-page button[data-downvote-reply]:focus-visible {
+      outline: 2px solid rgba(170, 84, 73, 0.45);
+      outline-offset: 2px;
+    }
+
     .detail-stat {
       margin-left: 8px;
       color: rgba(23, 23, 23, 0.5);
