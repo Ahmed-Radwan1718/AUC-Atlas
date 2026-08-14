@@ -3533,7 +3533,7 @@
             userVote === 1
           );
           upvoteButton.textContent =
-            Number(reply.likes || 0);
+            Number(reply.upvotes || 0);
         }
 
         if (downvoteButton) {
@@ -3541,7 +3541,8 @@
             "active",
             userVote === -1
           );
-          downvoteButton.textContent = "";
+          downvoteButton.textContent =
+            Number(reply.downvotes || 0);
         }
       }
 
@@ -3581,10 +3582,39 @@
 
         reply.userVote = nextVote;
         reply.liked = nextVote === 1;
+        reply.upvotes =
+          Math.max(
+            0,
+            Number(reply.upvotes || 0) +
+            (
+              nextVote === 1
+                ? 1
+                : 0
+            ) -
+            (
+              currentVote === 1
+                ? 1
+                : 0
+            )
+          );
+        reply.downvotes =
+          Math.max(
+            0,
+            Number(reply.downvotes || 0) +
+            (
+              nextVote === -1
+                ? 1
+                : 0
+            ) -
+            (
+              currentVote === -1
+                ? 1
+                : 0
+            )
+          );
         reply.likes =
-          Number(reply.likes || 0) +
-          nextVote -
-          currentVote;
+          reply.upvotes -
+          reply.downvotes;
 
         renderReplyVoteState(reply);
 
@@ -3636,13 +3666,42 @@
         ];
 
         if (!result) {
-          reply.likes =
-            Number(reply.likes || 0) +
-            currentVote -
-            nextVote;
+          reply.upvotes =
+            Math.max(
+              0,
+              Number(reply.upvotes || 0) +
+              (
+                currentVote === 1
+                  ? 1
+                  : 0
+              ) -
+              (
+                nextVote === 1
+                  ? 1
+                  : 0
+              )
+            );
+          reply.downvotes =
+            Math.max(
+              0,
+              Number(reply.downvotes || 0) +
+              (
+                currentVote === -1
+                  ? 1
+                  : 0
+              ) -
+              (
+                nextVote === -1
+                  ? 1
+                  : 0
+              )
+            );
           reply.userVote = currentVote;
           reply.liked =
             currentVote === 1;
+          reply.likes =
+            reply.upvotes -
+            reply.downvotes;
 
           renderReplyVoteState(reply);
           return;
@@ -3659,14 +3718,43 @@
           confirmedVote !==
           displayedVote
         ) {
-          reply.likes =
-            Number(reply.likes || 0) +
-            confirmedVote -
-            displayedVote;
+          reply.upvotes =
+            Math.max(
+              0,
+              Number(reply.upvotes || 0) +
+              (
+                confirmedVote === 1
+                  ? 1
+                  : 0
+              ) -
+              (
+                displayedVote === 1
+                  ? 1
+                  : 0
+              )
+            );
+          reply.downvotes =
+            Math.max(
+              0,
+              Number(reply.downvotes || 0) +
+              (
+                confirmedVote === -1
+                  ? 1
+                  : 0
+              ) -
+              (
+                displayedVote === -1
+                  ? 1
+                  : 0
+              )
+            );
           reply.userVote =
             confirmedVote;
           reply.liked =
             confirmedVote === 1;
+          reply.likes =
+            reply.upvotes -
+            reply.downvotes;
 
           renderReplyVoteState(reply);
         }
@@ -3875,7 +3963,7 @@
                 '" type="button" data-like-reply="',
                 escapeHtml(replyId),
                 '" aria-label="Upvote comment">',
-                Number(reply.likes || 0),
+                Number(reply.upvotes || 0),
               '</button>',
 
               '<button class="reply-action-button',
@@ -3884,7 +3972,9 @@
                   : '',
                 '" type="button" data-downvote-reply="',
                 escapeHtml(replyId),
-                '" aria-label="Downvote comment"></button>',
+                '" aria-label="Downvote comment">',
+                Number(reply.downvotes || 0),
+              '</button>',
 
               '<button class="reply-action-button" type="button" data-reply-to="',
                 escapeHtml(replyId),
