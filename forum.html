@@ -3058,10 +3058,42 @@
 
         post.userVote = nextVote;
         post.liked = nextVote === 1;
+
+        post.upvotes =
+          Math.max(
+            0,
+            Number(post.upvotes || 0) +
+            (
+              nextVote === 1
+                ? 1
+                : 0
+            ) -
+            (
+              currentVote === 1
+                ? 1
+                : 0
+            )
+          );
+
+        post.downvotes =
+          Math.max(
+            0,
+            Number(post.downvotes || 0) +
+            (
+              nextVote === -1
+                ? 1
+                : 0
+            ) -
+            (
+              currentVote === -1
+                ? 1
+                : 0
+            )
+          );
+
         post.likes =
-          Number(post.likes || 0) +
-          nextVote -
-          currentVote;
+          post.upvotes -
+          post.downvotes;
 
         renderPostVoteState(post);
 
@@ -3124,18 +3156,7 @@
           confirmedVote !==
           Number(post.userVote || 0)
         ) {
-          post.likes =
-            Number(post.likes || 0) +
-            confirmedVote -
-            Number(post.userVote || 0);
-
-          post.userVote =
-            confirmedVote;
-
-          post.liked =
-            confirmedVote === 1;
-
-          renderPostVoteState(post);
+          await refreshPosts();
         }
       }
 
@@ -3544,7 +3565,7 @@
                 '" type="button" data-like-post="',
                 escapeHtml(post.id),
               '">▲ ',
-                Number(post.likes || 0),
+                Number(post.upvotes || 0),
               '</button>',
 
               '<button class="like-button',
@@ -3553,7 +3574,9 @@
                   : '',
                 '" type="button" data-downvote-post="',
                 escapeHtml(post.id),
-              '">▼</button>',
+              '">▼ ',
+                Number(post.downvotes || 0),
+              '</button>',
 
               '<span class="detail-stat">',
                 post.replies.length,
