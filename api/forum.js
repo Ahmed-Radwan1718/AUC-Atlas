@@ -824,10 +824,6 @@ async function getForumPosts(
               postData.category,
               80
             ),
-          tag: cleanForumString(
-            postData.tag,
-            28
-          ),
           title: cleanForumString(
             postData.title,
             120
@@ -930,10 +926,6 @@ async function createForumPost(
       body.body,
       4000
     );
-  const tag = cleanForumString(
-    body.tag,
-    28
-  );
   const anonymous =
     body.anonymous === true;
 
@@ -957,9 +949,6 @@ async function createForumPost(
 
   await moderateForumContent([
     "Forum post title:\n" + title,
-    tag
-      ? "Forum post tag:\n" + tag
-      : "",
     "Forum post body:\n" + postBody
   ]);
 
@@ -972,7 +961,6 @@ async function createForumPost(
 
   await postRef.set({
     category,
-    tag,
     title,
     body: postBody,
     authorUid: actor.uid,
