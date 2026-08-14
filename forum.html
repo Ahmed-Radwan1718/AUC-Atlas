@@ -1173,6 +1173,39 @@
       color: #171717;
     }
 
+    button[data-like-post],
+    button[data-downvote-post],
+    button[data-like-reply],
+    button[data-downvote-reply] {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    button[data-like-post]::before,
+    button[data-downvote-post]::before,
+    button[data-like-reply]::before,
+    button[data-downvote-reply]::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      flex: 0 0 6px;
+      border: solid currentColor;
+      border-width: 0 1.5px 1.5px 0;
+      border-radius: 1px;
+    }
+
+    button[data-like-post]::before,
+    button[data-like-reply]::before {
+      transform: rotate(-135deg);
+    }
+
+    button[data-downvote-post]::before,
+    button[data-downvote-reply]::before {
+      transform: rotate(45deg);
+    }
+
     .reply-children-toggle {
       margin-top: 8px;
       color: rgba(126, 86, 26, 0.96);
@@ -3221,7 +3254,6 @@
             userVote === 1
           );
           upvoteButton.textContent =
-            "▲ " +
             Number(post.upvotes || 0);
         }
 
@@ -3231,7 +3263,6 @@
             userVote === -1
           );
           downvoteButton.textContent =
-            "▼ " +
             Number(post.downvotes || 0);
         }
       }
@@ -3501,7 +3532,6 @@
             userVote === 1
           );
           upvoteButton.textContent =
-            "▲ " +
             Number(reply.likes || 0);
         }
 
@@ -3510,7 +3540,7 @@
             "active",
             userVote === -1
           );
-          downvoteButton.textContent = "▼";
+          downvoteButton.textContent = "";
         }
       }
 
@@ -3843,7 +3873,7 @@
                   : '',
                 '" type="button" data-like-reply="',
                 escapeHtml(replyId),
-              '">▲ ',
+                '" aria-label="Upvote comment">',
                 Number(reply.likes || 0),
               '</button>',
 
@@ -3853,7 +3883,7 @@
                   : '',
                 '" type="button" data-downvote-reply="',
                 escapeHtml(replyId),
-              '">▼</button>',
+                '" aria-label="Downvote comment"></button>',
 
               '<button class="reply-action-button" type="button" data-reply-to="',
                 escapeHtml(replyId),
@@ -4015,7 +4045,7 @@
                   : '',
                 '" type="button" data-like-post="',
                 escapeHtml(post.id),
-              '">▲ ',
+                '" aria-label="Upvote post">',
                 Number(post.upvotes || 0),
               '</button>',
 
@@ -4025,7 +4055,7 @@
                   : '',
                 '" type="button" data-downvote-post="',
                 escapeHtml(post.id),
-              '">▼ ',
+                '" aria-label="Downvote post">',
                 Number(post.downvotes || 0),
               '</button>',
 
