@@ -156,6 +156,7 @@
         </div>
 
         <div class="site-footer-bottom">
+          <p>AUC Atlas can make mistakes. Please double-check all information with official AUC sources. AUC Atlas is not liable for any decisions, actions, or outcomes based on information provided on this website.</p>
           <p>&copy; 2026 AUC Atlas. All rights reserved.</p>
         </div>
       </div>
