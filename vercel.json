@@ -5,7 +5,18 @@
       "includeFiles": "{*.html,data/*.js,home-search.js,site-header.js,site-footer.js}"
     }
   },
+  "redirects": [
+    {
+      "source": "/auc-benefits",
+      "destination": "/student-perks",
+      "permanent": true
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/student-perks",
+      "destination": "/auc-benefits.html"
+    },
     {
       "source": "/forum/:category",
       "destination": "/forum.html"
