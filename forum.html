@@ -1220,6 +1220,87 @@
         rgba(23, 23, 23, 0.1);
       display: grid;
       gap: 8px;
+      transform-origin: top center;
+    }
+
+    .reply-children.is-opening {
+      animation:
+        forumReplyBranchOpen
+        0.22s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+    }
+
+    .reply-children.is-closing {
+      pointer-events: none;
+      animation:
+        forumReplyBranchClose
+        0.18s
+        ease-in
+        both;
+    }
+
+    button[data-like-post],
+    button[data-downvote-post],
+    button[data-like-reply],
+    button[data-downvote-reply] {
+      transition:
+        transform 0.16s ease,
+        background-color 0.16s ease,
+        color 0.16s ease;
+    }
+
+    button.vote-feedback {
+      animation:
+        forumVoteFeedback
+        0.24s
+        cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes forumReplyBranchOpen {
+      from {
+        opacity: 0;
+        transform:
+          translateY(-7px)
+          scaleY(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform:
+          translateY(0)
+          scaleY(1);
+      }
+    }
+
+    @keyframes forumReplyBranchClose {
+      from {
+        opacity: 1;
+        transform:
+          translateY(0)
+          scaleY(1);
+      }
+
+      to {
+        opacity: 0;
+        transform:
+          translateY(-5px)
+          scaleY(0.97);
+      }
+    }
+
+    @keyframes forumVoteFeedback {
+      0% {
+        transform: scale(1);
+      }
+
+      45% {
+        transform: scale(1.14);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
 
     .nested-reply-form {
@@ -1303,6 +1384,9 @@
 
     @media (prefers-reduced-motion: reduce) {
       .nested-reply-form,
+      .reply-children.is-opening,
+      .reply-children.is-closing,
+      button.vote-feedback,
       .primary-button.is-loading::before {
         animation: none !important;
       }
@@ -3213,6 +3297,31 @@
         );
       }
 
+      function animateVoteButton(button) {
+        if (!button) {
+          return;
+        }
+
+        button.classList.remove(
+          "vote-feedback"
+        );
+
+        void button.offsetWidth;
+
+        button.classList.add(
+          "vote-feedback"
+        );
+
+        window.setTimeout(
+          function () {
+            button.classList.remove(
+              "vote-feedback"
+            );
+          },
+          260
+        );
+      }
+
       function renderPostVoteState(post) {
         if (
           String(state.activePostId) !==
@@ -4558,15 +4667,128 @@
           var branchReplyId =
             branchButton.dataset
               .toggleReplyBranch;
-
-          state.openReplyBranches[
-            branchReplyId
-          ] =
+          var branchOpen =
             !state.openReplyBranches[
               branchReplyId
             ];
+          var branchChildren =
+            getReplyChildren(
+              activePost,
+              branchReplyId
+            );
 
-          renderDetail(activePost);
+          state.openReplyBranches[
+            branchReplyId
+          ] = branchOpen;
+
+          branchButton.setAttribute(
+            "aria-expanded",
+            branchOpen
+              ? "true"
+              : "false"
+          );
+
+          branchButton.textContent =
+            (
+              branchOpen
+                ? "Hide "
+                : "Show "
+            ) +
+            branchChildren.length +
+            (
+              branchChildren.length === 1
+                ? " reply"
+                : " replies"
+            );
+
+          var existingBranch =
+            branchButton.nextElementSibling;
+          var branchDepth = 0;
+          var ancestorCard =
+            branchButton.closest(
+              ".reply-card"
+            );
+
+          while (
+            ancestorCard &&
+            ancestorCard.parentElement
+          ) {
+            var parentCard =
+              ancestorCard.parentElement
+                .closest(".reply-card");
+
+            if (!parentCard) {
+              break;
+            }
+
+            branchDepth += 1;
+            ancestorCard = parentCard;
+          }
+
+          if (branchOpen) {
+            if (
+              existingBranch &&
+              existingBranch.classList
+                .contains(
+                  "reply-children"
+                )
+            ) {
+              existingBranch.remove();
+            }
+
+            branchButton.insertAdjacentHTML(
+              "afterend",
+              [
+                '<div class="reply-children is-opening">',
+                  branchChildren
+                    .map(function (
+                      childReply
+                    ) {
+                      return renderReplyNode(
+                        activePost,
+                        childReply,
+                        branchDepth + 1
+                      );
+                    })
+                    .join(""),
+                '</div>'
+              ].join("")
+            );
+          } else if (
+            existingBranch &&
+            existingBranch.classList
+              .contains(
+                "reply-children"
+              )
+          ) {
+            var branchToRemove =
+              existingBranch;
+            var reduceMotion =
+              window.matchMedia &&
+              window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+              ).matches;
+
+            if (reduceMotion) {
+              branchToRemove.remove();
+            } else {
+              branchToRemove.classList.add(
+                "is-closing"
+              );
+
+              window.setTimeout(
+                function () {
+                  if (
+                    branchToRemove.parentNode
+                  ) {
+                    branchToRemove.remove();
+                  }
+                },
+                180
+              );
+            }
+          }
+
           return;
         }
 
@@ -4799,6 +5021,10 @@
           likeReplyButton &&
           activePost
         ) {
+          animateVoteButton(
+            likeReplyButton
+          );
+
           voteReply(
             activePost,
             likeReplyButton.dataset
@@ -4817,6 +5043,10 @@
           downvoteReplyButton &&
           activePost
         ) {
+          animateVoteButton(
+            downvoteReplyButton
+          );
+
           voteReply(
             activePost,
             downvoteReplyButton.dataset
@@ -4846,6 +5076,10 @@
           );
 
         if (likeButton) {
+          animateVoteButton(
+            likeButton
+          );
+
           toggleLike(
             likeButton.dataset.likePost,
             1
@@ -4859,6 +5093,10 @@
           );
 
         if (downvoteButton) {
+          animateVoteButton(
+            downvoteButton
+          );
+
           toggleLike(
             downvoteButton.dataset
               .downvotePost,
