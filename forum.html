@@ -971,12 +971,27 @@
     }
 
     .form-field {
+      min-width: 0;
       display: grid;
       gap: 8px;
     }
 
     .form-field.is-full {
       grid-column: 1 / -1;
+    }
+
+    .form-field .forum-sort-trigger {
+      min-height: 48px;
+      border-radius: 18px;
+      background: rgba(247, 244, 238, 0.72);
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .form-field .forum-sort-menu {
+      left: 0;
+      right: auto;
+      width: 100%;
     }
 
     .form-field label,
@@ -2045,17 +2060,53 @@
 
         <form id="composer-form">
           <div class="form-grid">
-            <div class="form-field is-full">
-              <label for="post-category">
+            <div class="form-field">
+              <label for="post-category-trigger">
                 Category
               </label>
-              <select
+
+              <input
                 id="post-category"
-                required
-              ></select>
+                type="hidden"
+                value="Academics &amp; Courses"
+              >
+
+              <div
+                class="forum-sort-dropdown"
+                id="post-category-dropdown"
+              >
+                <button
+                  class="forum-sort-trigger"
+                  id="post-category-trigger"
+                  type="button"
+                  aria-label="Choose a category"
+                  aria-haspopup="listbox"
+                  aria-controls="post-category-menu"
+                  aria-expanded="false"
+                >
+                  <span
+                    class="forum-sort-value"
+                    id="post-category-value"
+                  >
+                    Academics &amp; Courses
+                  </span>
+                  <span
+                    class="forum-sort-chevron"
+                    aria-hidden="true"
+                  ></span>
+                </button>
+
+                <div
+                  class="forum-sort-menu"
+                  id="post-category-menu"
+                  role="listbox"
+                  aria-label="Post category"
+                  aria-hidden="true"
+                ></div>
+              </div>
             </div>
 
-            <div class="form-field is-full">
+            <div class="form-field">
               <label for="post-title">
                 Title
               </label>
@@ -2278,6 +2329,26 @@
       var postCategory =
         document.getElementById(
           "post-category"
+        );
+
+      var postCategoryDropdown =
+        document.getElementById(
+          "post-category-dropdown"
+        );
+
+      var postCategoryTrigger =
+        document.getElementById(
+          "post-category-trigger"
+        );
+
+      var postCategoryValue =
+        document.getElementById(
+          "post-category-value"
+        );
+
+      var postCategoryMenu =
+        document.getElementById(
+          "post-category-menu"
         );
 
       var detailContent =
@@ -4447,6 +4518,176 @@
 
       initializeForumSortDropdown();
 
+      function syncPostCategoryDropdown() {
+        if (
+          !postCategory ||
+          !postCategoryValue ||
+          !postCategoryMenu
+        ) {
+          return;
+        }
+
+        var selectedLabel =
+          categories[0] ||
+          "Choose a category";
+
+        postCategoryMenu
+          .querySelectorAll(
+            "[data-category-value]"
+          )
+          .forEach(function (option) {
+            var isActive =
+              option.dataset.categoryValue ===
+              postCategory.value;
+
+            option.classList.toggle(
+              "active",
+              isActive
+            );
+
+            option.setAttribute(
+              "aria-selected",
+              String(isActive)
+            );
+
+            if (isActive) {
+              selectedLabel =
+                option.textContent.trim();
+            }
+          });
+
+        postCategoryValue.textContent =
+          selectedLabel;
+      }
+
+      function closePostCategoryDropdown() {
+        if (
+          !postCategoryDropdown ||
+          !postCategoryTrigger ||
+          !postCategoryMenu
+        ) {
+          return;
+        }
+
+        postCategoryDropdown.classList.remove(
+          "open"
+        );
+
+        postCategoryTrigger.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+
+        postCategoryMenu.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+      }
+
+      function initializePostCategoryDropdown() {
+        if (
+          !postCategory ||
+          !postCategoryDropdown ||
+          !postCategoryTrigger ||
+          !postCategoryMenu
+        ) {
+          return;
+        }
+
+        postCategoryTrigger.addEventListener(
+          "click",
+          function () {
+            var shouldOpen =
+              !postCategoryDropdown.classList
+                .contains("open");
+
+            postCategoryDropdown.classList.toggle(
+              "open",
+              shouldOpen
+            );
+
+            postCategoryTrigger.setAttribute(
+              "aria-expanded",
+              String(shouldOpen)
+            );
+
+            postCategoryMenu.setAttribute(
+              "aria-hidden",
+              String(!shouldOpen)
+            );
+
+            if (shouldOpen) {
+              closeForumSortDropdown();
+
+              var activeOption =
+                postCategoryMenu.querySelector(
+                  ".forum-sort-option.active"
+                );
+
+              if (activeOption) {
+                window.setTimeout(
+                  function () {
+                    activeOption.focus();
+                  },
+                  0
+                );
+              }
+            }
+          }
+        );
+
+        postCategoryMenu.addEventListener(
+          "click",
+          function (event) {
+            var option =
+              event.target.closest(
+                "[data-category-value]"
+              );
+
+            if (!option) {
+              return;
+            }
+
+            postCategory.value =
+              option.dataset.categoryValue ||
+              "";
+
+            syncPostCategoryDropdown();
+            closePostCategoryDropdown();
+            postCategoryTrigger.focus();
+          }
+        );
+
+        document.addEventListener(
+          "click",
+          function (event) {
+            if (
+              !postCategoryDropdown.contains(
+                event.target
+              )
+            ) {
+              closePostCategoryDropdown();
+            }
+          }
+        );
+
+        document.addEventListener(
+          "keydown",
+          function (event) {
+            if (
+              event.key === "Escape" &&
+              postCategoryDropdown.classList
+                .contains("open")
+            ) {
+              closePostCategoryDropdown();
+              postCategoryTrigger.focus();
+            }
+          }
+        );
+
+        syncPostCategoryDropdown();
+      }
+
       composerForm.addEventListener(
         "submit",
         async function (event) {
@@ -4534,6 +4775,7 @@
           }
 
           composerForm.reset();
+          syncPostCategoryDropdown();
           showForumView("compose");
 
           document.title =
@@ -4614,18 +4856,37 @@
             : "Community Forum | AUC Atlas";
       }
 
-      postCategory.innerHTML =
+      postCategory.value =
+        categories[0] || "";
+
+      postCategory.defaultValue =
+        postCategory.value;
+
+      postCategoryMenu.innerHTML =
         categories
-          .map(function (category) {
-            return (
-              '<option value="' +
-              escapeHtml(category) +
-              '">' +
-              escapeHtml(category) +
-              '</option>'
-            );
+          .map(function (
+            category,
+            index
+          ) {
+            return [
+              '<button class="forum-sort-option',
+                index === 0
+                  ? ' active'
+                  : '',
+                '" type="button" role="option" aria-selected="',
+                index === 0
+                  ? 'true'
+                  : 'false',
+                '" data-category-value="',
+                escapeHtml(category),
+              '">',
+                escapeHtml(category),
+              '</button>'
+            ].join("");
           })
           .join("");
+
+      initializePostCategoryDropdown();
 
       var initialParameters =
         new URLSearchParams(
