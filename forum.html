@@ -3118,14 +3118,59 @@
 
       function renderPostVoteState(post) {
         if (
-          String(state.activePostId) ===
+          String(state.activePostId) !==
           String(post.id)
         ) {
-          renderDetail(post);
+          renderFeed();
           return;
         }
 
-        renderFeed();
+        var upvoteButton =
+          Array.from(
+            detailContent.querySelectorAll(
+              "[data-like-post]"
+            )
+          ).find(function (button) {
+            return (
+              button.dataset.likePost ===
+              String(post.id)
+            );
+          });
+
+        var downvoteButton =
+          Array.from(
+            detailContent.querySelectorAll(
+              "[data-downvote-post]"
+            )
+          ).find(function (button) {
+            return (
+              button.dataset.downvotePost ===
+              String(post.id)
+            );
+          });
+
+        var userVote =
+          Number(post.userVote || 0);
+
+        if (upvoteButton) {
+          upvoteButton.classList.toggle(
+            "active",
+            userVote === 1
+          );
+          upvoteButton.textContent =
+            "▲ " +
+            Number(post.upvotes || 0);
+        }
+
+        if (downvoteButton) {
+          downvoteButton.classList.toggle(
+            "active",
+            userVote === -1
+          );
+          downvoteButton.textContent =
+            "▼ " +
+            Number(post.downvotes || 0);
+        }
       }
 
       async function toggleLike(
@@ -3248,7 +3293,45 @@
         ];
 
         if (!result) {
-          await refreshPosts();
+          post.upvotes =
+            Math.max(
+              0,
+              Number(post.upvotes || 0) +
+              (
+                currentVote === 1
+                  ? 1
+                  : 0
+              ) -
+              (
+                nextVote === 1
+                  ? 1
+                  : 0
+              )
+            );
+
+          post.downvotes =
+            Math.max(
+              0,
+              Number(post.downvotes || 0) +
+              (
+                currentVote === -1
+                  ? 1
+                  : 0
+              ) -
+              (
+                nextVote === -1
+                  ? 1
+                  : 0
+              )
+            );
+
+          post.userVote = currentVote;
+          post.liked = currentVote === 1;
+          post.likes =
+            post.upvotes -
+            post.downvotes;
+
+          renderPostVoteState(post);
           return;
         }
 
@@ -3256,12 +3339,53 @@
           Number(
             result.userVote || 0
           );
+        var displayedVote =
+          Number(post.userVote || 0);
 
         if (
           confirmedVote !==
-          Number(post.userVote || 0)
+          displayedVote
         ) {
-          await refreshPosts();
+          post.upvotes =
+            Math.max(
+              0,
+              Number(post.upvotes || 0) +
+              (
+                confirmedVote === 1
+                  ? 1
+                  : 0
+              ) -
+              (
+                displayedVote === 1
+                  ? 1
+                  : 0
+              )
+            );
+
+          post.downvotes =
+            Math.max(
+              0,
+              Number(post.downvotes || 0) +
+              (
+                confirmedVote === -1
+                  ? 1
+                  : 0
+              ) -
+              (
+                displayedVote === -1
+                  ? 1
+                  : 0
+              )
+            );
+
+          post.userVote = confirmedVote;
+          post.liked =
+            confirmedVote === 1;
+          post.likes =
+            post.upvotes -
+            post.downvotes;
+
+          renderPostVoteState(post);
         }
       }
 
@@ -3278,32 +3402,180 @@
         );
       }
 
+      function renderReplyVoteState(
+        reply
+      ) {
+        var upvoteButton =
+          Array.from(
+            detailContent.querySelectorAll(
+              "[data-like-reply]"
+            )
+          ).find(function (button) {
+            return (
+              button.dataset.likeReply ===
+              String(reply.id)
+            );
+          });
+
+        var downvoteButton =
+          Array.from(
+            detailContent.querySelectorAll(
+              "[data-downvote-reply]"
+            )
+          ).find(function (button) {
+            return (
+              button.dataset.downvoteReply ===
+              String(reply.id)
+            );
+          });
+
+        var userVote =
+          Number(reply.userVote || 0);
+
+        if (upvoteButton) {
+          upvoteButton.classList.toggle(
+            "active",
+            userVote === 1
+          );
+          upvoteButton.textContent =
+            "▲ " +
+            Number(reply.likes || 0);
+        }
+
+        if (downvoteButton) {
+          downvoteButton.classList.toggle(
+            "active",
+            userVote === -1
+          );
+          downvoteButton.textContent = "▼";
+        }
+      }
+
       async function voteReply(
         post,
         replyId,
         direction
       ) {
+        var reply =
+          findReply(post, replyId);
+
         if (
-          !findReply(post, replyId)
+          !reply ||
+          !requireForumUser()
         ) {
           return;
         }
 
-        var result =
-          await forumRequest(
-            "vote-reply",
-            {
-              postId: post.id,
-              replyId: replyId,
-              direction: direction
-            }
-          );
+        var requestedVote =
+          Number(direction) === -1
+            ? -1
+            : 1;
+        var currentVote =
+          Number(reply.userVote || 0);
 
-        if (!result) {
+        if (
+          !currentVote &&
+          reply.liked
+        ) {
+          currentVote = 1;
+        }
+
+        var nextVote =
+          currentVote === requestedVote
+            ? 0
+            : requestedVote;
+
+        reply.userVote = nextVote;
+        reply.liked = nextVote === 1;
+        reply.likes =
+          Number(reply.likes || 0) +
+          nextVote -
+          currentVote;
+
+        renderReplyVoteState(reply);
+
+        if (!state.replyVoteQueues) {
+          state.replyVoteQueues =
+            Object.create(null);
+        }
+
+        var voteKey =
+          String(post.id) +
+          ":" +
+          String(replyId);
+        var previousRequest =
+          state.replyVoteQueues[voteKey] ||
+          Promise.resolve();
+
+        var voteRequest =
+          previousRequest
+            .catch(function () {
+              return null;
+            })
+            .then(function () {
+              return forumRequest(
+                "vote-reply",
+                {
+                  postId: post.id,
+                  replyId: replyId,
+                  direction:
+                    requestedVote
+                }
+              );
+            });
+
+        state.replyVoteQueues[voteKey] =
+          voteRequest;
+
+        var result =
+          await voteRequest;
+
+        if (
+          state.replyVoteQueues[voteKey] !==
+          voteRequest
+        ) {
           return;
         }
 
-        await refreshPosts();
+        delete state.replyVoteQueues[
+          voteKey
+        ];
+
+        if (!result) {
+          reply.likes =
+            Number(reply.likes || 0) +
+            currentVote -
+            nextVote;
+          reply.userVote = currentVote;
+          reply.liked =
+            currentVote === 1;
+
+          renderReplyVoteState(reply);
+          return;
+        }
+
+        var confirmedVote =
+          Number(
+            result.userVote || 0
+          );
+        var displayedVote =
+          Number(reply.userVote || 0);
+
+        if (
+          confirmedVote !==
+          displayedVote
+        ) {
+          reply.likes =
+            Number(reply.likes || 0) +
+            confirmedVote -
+            displayedVote;
+          reply.userVote =
+            confirmedVote;
+          reply.liked =
+            confirmedVote === 1;
+
+          renderReplyVoteState(reply);
+        }
       }
 
       function getReplyChildren(
@@ -4066,10 +4338,58 @@
           replyToButton &&
           activePost
         ) {
+          var existingNestedForm =
+            detailContent.querySelector(
+              ".nested-reply-form"
+            );
+
+          if (existingNestedForm) {
+            existingNestedForm.remove();
+          }
+
           state.replyingToId =
             replyToButton.dataset.replyTo;
 
-          renderDetail(activePost);
+          var reply =
+            findReply(
+              activePost,
+              state.replyingToId
+            );
+          var replyActions =
+            replyToButton.closest(
+              ".reply-card-actions"
+            );
+
+          if (
+            reply &&
+            replyActions
+          ) {
+            replyActions.insertAdjacentHTML(
+              "afterend",
+              [
+                '<div class="nested-reply-form">',
+                  '<textarea maxlength="2000" data-nested-reply-body="',
+                    escapeHtml(
+                      state.replyingToId
+                    ),
+                  '" placeholder="Reply to ',
+                    escapeHtml(
+                      reply.author ||
+                      "this comment"
+                    ),
+                  '"></textarea>',
+                  '<div class="post-actions">',
+                    '<button class="primary-button" type="button" data-submit-nested-reply="',
+                      escapeHtml(
+                        state.replyingToId
+                      ),
+                    '">Post Reply</button>',
+                    '<button class="secondary-button" type="button" data-cancel-nested-reply>Cancel</button>',
+                  '</div>',
+                '</div>'
+              ].join("")
+            );
+          }
 
           var nestedTextarea =
             Array.from(
@@ -4103,7 +4423,16 @@
           activePost
         ) {
           state.replyingToId = "";
-          renderDetail(activePost);
+
+          var nestedReplyForm =
+            cancelNestedReply.closest(
+              ".nested-reply-form"
+            );
+
+          if (nestedReplyForm) {
+            nestedReplyForm.remove();
+          }
+
           return;
         }
 
