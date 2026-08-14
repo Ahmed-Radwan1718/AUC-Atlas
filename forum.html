@@ -1575,27 +1575,13 @@
       border-top: 1px solid rgba(23, 23, 23, 0.08);
     }
 
-    #discussion-page .reply-card::before {
-      content: "";
-      position: absolute;
-      top: 46px;
-      bottom: -14px;
-      left: 15px;
-      width: 1px;
-      background: rgba(23, 23, 23, 0.12);
-    }
-
-    #discussion-page .reply-card:last-child::before,
-    #discussion-page .reply-card.is-collapsed::before {
-      display: none;
-    }
-
     .reply-avatar {
       position: absolute;
       top: 14px;
       left: 0;
       width: 30px;
       height: 30px;
+      overflow: hidden;
       border: 1px solid rgba(192, 154, 92, 0.22);
       border-radius: 50%;
       background: rgba(192, 154, 92, 0.13);
@@ -1604,6 +1590,13 @@
       font-weight: 800;
       display: grid;
       place-items: center;
+    }
+
+    .reply-avatar img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
     }
 
     #discussion-page .reply-card-header {
@@ -1618,14 +1611,6 @@
 
     #discussion-page .reply-card-header time {
       font-size: 10px;
-    }
-
-    #discussion-page .reply-collapse-button {
-      width: 20px;
-      height: 20px;
-      margin-left: auto;
-      border-radius: 50%;
-      background: transparent;
     }
 
     #discussion-page .reply-card-body {
@@ -3363,6 +3348,26 @@
             .join("")
             .toUpperCase() ||
           "AUC";
+        var replyPhotoURL =
+          String(
+            reply.authorPhotoURL || ""
+          ).trim();
+        var replyAvatarMarkup =
+          replyPhotoURL
+            ? [
+                '<span class="reply-avatar" aria-hidden="true">',
+                  '<img loading="lazy" decoding="async" src="',
+                    escapeHtml(
+                      replyPhotoURL
+                    ),
+                  '" alt="">',
+                '</span>'
+              ].join("")
+            : [
+                '<span class="reply-avatar" aria-hidden="true">',
+                  escapeHtml(replyInitials),
+                '</span>'
+              ].join("");
         var collapsed =
           Boolean(
             state.collapsedReplyIds[
@@ -3477,9 +3482,7 @@
 
         return [
           '<article class="reply-card">',
-            '<span class="reply-avatar" aria-hidden="true">',
-              escapeHtml(replyInitials),
-            '</span>',
+            replyAvatarMarkup,
 
             '<header class="reply-card-header">',
               '<strong>',
@@ -3492,9 +3495,6 @@
                   )
                 ),
               '</time>',
-              '<button class="reply-collapse-button" type="button" data-collapse-reply="',
-                escapeHtml(replyId),
-                '" aria-label="Collapse comment">−</button>',
             '</header>',
 
             '<p class="reply-card-body">',
