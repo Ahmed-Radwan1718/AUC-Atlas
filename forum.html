@@ -2045,7 +2045,7 @@
 
         <form id="composer-form">
           <div class="form-grid">
-            <div class="form-field">
+            <div class="form-field is-full">
               <label for="post-category">
                 Category
               </label>
@@ -2053,17 +2053,6 @@
                 id="post-category"
                 required
               ></select>
-            </div>
-
-            <div class="form-field">
-              <label for="post-tag">
-                Optional tag
-              </label>
-              <input
-                id="post-tag"
-                maxlength="28"
-                placeholder="Example: CSCE 1101"
-              >
             </div>
 
             <div class="form-field is-full">
@@ -2689,7 +2678,6 @@
                 post.title,
                 post.body,
                 post.category,
-                post.tag,
                 post.author
               ]
                 .join(" ")
@@ -3590,10 +3578,6 @@
                 '</div>',
                 '<div class="discussion-post-context">',
                   escapeHtml(post.category),
-                  post.tag
-                    ? ' · ' +
-                      escapeHtml(post.tag)
-                    : '',
                   post.pinned
                     ? ' · Pinned'
                     : '',
@@ -4487,14 +4471,6 @@
           var category =
             postCategory.value;
 
-          var tag =
-            document
-              .getElementById(
-                "post-tag"
-              )
-              .value
-              .trim();
-
           var anonymous =
             document
               .getElementById(
@@ -4517,7 +4493,6 @@
               "create-post",
               {
                 category: category,
-                tag: tag,
                 title: title,
                 body: body,
                 anonymous: anonymous
