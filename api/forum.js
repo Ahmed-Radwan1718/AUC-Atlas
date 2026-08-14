@@ -458,6 +458,137 @@ async function getForumVoteMap(actor) {
   return voteMap;
 }
 
+function hasStoredForumVoteCounts(data) {
+  return Boolean(
+    data &&
+    Object.prototype.hasOwnProperty.call(
+      data,
+      "upvoteCount"
+    ) &&
+    Object.prototype.hasOwnProperty.call(
+      data,
+      "downvoteCount"
+    ) &&
+    Number.isFinite(
+      Number(data.upvoteCount)
+    ) &&
+    Number.isFinite(
+      Number(data.downvoteCount)
+    )
+  );
+}
+
+async function getForumPostVoteCountMap(
+  db,
+  postDocs
+) {
+  const countMap = new Map();
+  const missingPostIds = [];
+
+  postDocs.forEach(function (postDoc) {
+    const data = postDoc.data() || {};
+
+    if (hasStoredForumVoteCounts(data)) {
+      countMap.set(
+        postDoc.id,
+        {
+          upvotes: Math.max(
+            0,
+            Math.floor(
+              Number(data.upvoteCount)
+            )
+          ),
+          downvotes: Math.max(
+            0,
+            Math.floor(
+              Number(data.downvoteCount)
+            )
+          )
+        }
+      );
+      return;
+    }
+
+    countMap.set(
+      postDoc.id,
+      {
+        upvotes: 0,
+        downvotes: 0
+      }
+    );
+
+    missingPostIds.push(postDoc.id);
+  });
+
+  const voteQueries = [];
+
+  for (
+    let index = 0;
+    index < missingPostIds.length;
+    index += 10
+  ) {
+    voteQueries.push(
+      db.collection("forumVotes")
+        .where(
+          "postId",
+          "in",
+          missingPostIds.slice(
+            index,
+            index + 10
+          )
+        )
+        .get()
+    );
+  }
+
+  const voteSnapshots =
+    await Promise.all(voteQueries);
+
+  voteSnapshots.forEach(
+    function (snapshot) {
+      snapshot.forEach(function (voteDoc) {
+        const data = voteDoc.data() || {};
+
+        if (
+          cleanForumString(
+            data.targetType,
+            20
+          ) !== "post" ||
+          cleanForumString(
+            data.replyId,
+            160
+          )
+        ) {
+          return;
+        }
+
+        const counts =
+          countMap.get(
+            cleanForumString(
+              data.postId,
+              160
+            )
+          );
+
+        if (!counts) {
+          return;
+        }
+
+        const value =
+          Number(data.value || 0);
+
+        if (value === 1) {
+          counts.upvotes += 1;
+        } else if (value === -1) {
+          counts.downvotes += 1;
+        }
+      });
+    }
+  );
+
+  return countMap;
+}
+
 async function getForumPosts(
   actor,
   requestedPostIdValue
@@ -503,6 +634,12 @@ async function getForumPosts(
             : []
         )
       : postSnapshot.docs.slice();
+
+  const postVoteCountMap =
+    await getForumPostVoteCountMap(
+      db,
+      postDocs
+    );
 
   const authorProfiles = new Map();
   const authorUids = Array.from(
@@ -731,6 +868,20 @@ async function getForumPosts(
           likes: Number(
             postData.score || 0
           ),
+          upvotes: Number(
+            (
+              postVoteCountMap.get(
+                postDoc.id
+              ) || {}
+            ).upvotes || 0
+          ),
+          downvotes: Number(
+            (
+              postVoteCountMap.get(
+                postDoc.id
+              ) || {}
+            ).downvotes || 0
+          ),
           liked: postVote === 1,
           userVote: postVote,
           views: Number(
@@ -834,6 +985,8 @@ async function createForumPost(
         .serverTimestamp(),
     createdAtIso,
     score: 0,
+    upvoteCount: 0,
+    downvoteCount: 0,
     replyCount: 0,
     viewCount: 0,
     pinned: false,
@@ -1009,7 +1162,10 @@ async function voteForumTarget(
         );
       }
 
-      const currentVote =
+      const targetData =
+        targetDoc.data() || {};
+
+      const storedVote =
         voteDoc.exists
           ? Number(
               (
@@ -1017,6 +1173,83 @@ async function voteForumTarget(
               ).value || 0
             )
           : 0;
+
+      const currentVote =
+        storedVote === 1 ||
+        storedVote === -1
+          ? storedVote
+          : 0;
+
+      let currentUpvoteCount = 0;
+      let currentDownvoteCount = 0;
+
+      if (targetType === "post") {
+        if (
+          hasStoredForumVoteCounts(
+            targetData
+          )
+        ) {
+          currentUpvoteCount =
+            Math.max(
+              0,
+              Math.floor(
+                Number(
+                  targetData.upvoteCount
+                )
+              )
+            );
+
+          currentDownvoteCount =
+            Math.max(
+              0,
+              Math.floor(
+                Number(
+                  targetData.downvoteCount
+                )
+              )
+            );
+        } else {
+          const existingVotes =
+            await transaction.get(
+              db.collection("forumVotes")
+                .where(
+                  "postId",
+                  "==",
+                  postId
+                )
+            );
+
+          existingVotes.forEach(
+            function (existingVoteDoc) {
+              const data =
+                existingVoteDoc.data() ||
+                {};
+
+              if (
+                cleanForumString(
+                  data.targetType,
+                  20
+                ) !== "post" ||
+                cleanForumString(
+                  data.replyId,
+                  160
+                )
+              ) {
+                return;
+              }
+
+              const value =
+                Number(data.value || 0);
+
+              if (value === 1) {
+                currentUpvoteCount += 1;
+              } else if (value === -1) {
+                currentDownvoteCount += 1;
+              }
+            }
+          );
+        }
+      }
 
       const nextVote =
         currentVote ===
@@ -1026,6 +1259,38 @@ async function voteForumTarget(
 
       const difference =
         nextVote - currentVote;
+
+      const nextUpvoteCount =
+        Math.max(
+          0,
+          currentUpvoteCount +
+          (
+            nextVote === 1
+              ? 1
+              : 0
+          ) -
+          (
+            currentVote === 1
+              ? 1
+              : 0
+          )
+        );
+
+      const nextDownvoteCount =
+        Math.max(
+          0,
+          currentDownvoteCount +
+          (
+            nextVote === -1
+              ? 1
+              : 0
+          ) -
+          (
+            currentVote === -1
+              ? 1
+              : 0
+          )
+        );
 
       if (nextVote) {
         transaction.set(
@@ -1046,14 +1311,24 @@ async function voteForumTarget(
         transaction.delete(voteRef);
       }
 
+      const targetUpdate = {
+        score:
+          admin.firestore
+            .FieldValue
+            .increment(difference)
+      };
+
+      if (targetType === "post") {
+        targetUpdate.upvoteCount =
+          nextUpvoteCount;
+
+        targetUpdate.downvoteCount =
+          nextDownvoteCount;
+      }
+
       transaction.update(
         targetRef,
-        {
-          score:
-            admin.firestore
-              .FieldValue
-              .increment(difference)
-        }
+        targetUpdate
       );
 
       return nextVote;
