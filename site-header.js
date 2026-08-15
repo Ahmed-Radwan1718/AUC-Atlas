@@ -378,6 +378,22 @@
     }
 
     function applyLanguage(languageCode, attemptCount) {
+      const supportedLanguageCodes = [
+        "en",
+        "ar",
+        "fr",
+        "de",
+        "es"
+      ];
+
+      if (
+        supportedLanguageCodes.indexOf(
+          languageCode
+        ) === -1
+      ) {
+        return;
+      }
+
       if (languageCode === "en") {
         clearGoogleTranslateCookie();
         window.location.reload();
@@ -387,17 +403,34 @@
       setGoogleTranslateCookie(languageCode);
       loadGoogleTranslateScript();
 
-      const translateCombo = document.querySelector(".goog-te-combo");
+      const translateCombo =
+        document.querySelector(
+          ".goog-te-combo"
+        );
+      const languageOptionAvailable =
+        translateCombo &&
+        Array.from(
+          translateCombo.options
+        ).some(function (option) {
+          return option.value === languageCode;
+        });
 
-      if (translateCombo) {
+      if (languageOptionAvailable) {
         translateCombo.value = languageCode;
-        translateCombo.dispatchEvent(new Event("change"));
+        translateCombo.dispatchEvent(
+          new Event("change", {
+            bubbles: true
+          })
+        );
         return;
       }
 
-      if (attemptCount < 12) {
+      if (attemptCount < 20) {
         window.setTimeout(function () {
-          applyLanguage(languageCode, attemptCount + 1);
+          applyLanguage(
+            languageCode,
+            attemptCount + 1
+          );
         }, 500);
         return;
       }
