@@ -169,11 +169,11 @@
         width: 48px;
         height: 48px;
         padding: 0;
-        border: 1px solid rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(23, 23, 23, 0.1);
         border-radius: 999px;
-        background: rgba(24, 25, 24, 0.86);
-        color: white;
-        box-shadow: 0 18px 38px rgba(0, 0, 0, 0.34);
+        background: rgba(255, 255, 255, 0.86);
+        color: #171717;
+        box-shadow: none;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -184,8 +184,8 @@
 
       .tcs-language-toggle:hover {
         transform: translateY(-1px);
-        border-color: rgba(255, 255, 255, 0.28);
-        background: rgba(24, 25, 24, 0.96);
+        border-color: rgba(192, 154, 92, 0.3);
+        background: rgba(255, 255, 255, 0.98);
       }
 
       .tcs-language-toggle img {
@@ -193,7 +193,7 @@
         height: 26px;
         display: block;
         object-fit: contain;
-        filter: invert(1);
+        filter: none;
       }
 
       .tcs-language-panel {
