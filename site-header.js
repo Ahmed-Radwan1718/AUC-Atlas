@@ -202,10 +202,10 @@
         right: 0;
         min-width: 142px;
         padding: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.13);
+        border: 1px solid rgba(23, 23, 23, 0.1);
         border-radius: 16px;
-        background: rgba(24, 25, 24, 0.94);
-        box-shadow: 0 18px 38px rgba(0, 0, 0, 0.34);
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 18px 38px rgba(42, 32, 20, 0.14);
         backdrop-filter: blur(16px);
         display: grid;
         gap: 6px;
@@ -222,7 +222,7 @@
         border: 0;
         border-radius: 12px;
         background: transparent;
-        color: rgba(255, 255, 255, 0.78);
+        color: rgba(23, 23, 23, 0.7);
         font: inherit;
         font-size: 12px;
         font-weight: 700;
@@ -254,8 +254,8 @@
       }
 
       .tcs-language-option:hover {
-        background: rgba(255, 255, 255, 0.09);
-        color: white;
+        background: rgba(192, 154, 92, 0.12);
+        color: #171717;
       }
 
       #google_translate_element {
