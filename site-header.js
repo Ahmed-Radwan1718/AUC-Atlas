@@ -318,6 +318,109 @@
       gap: 8px;
     }
 
+    .site-language-control {
+      position: relative;
+      min-width: 118px;
+      display: flex;
+      align-items: center;
+    }
+
+    .site-language-control-mobile {
+      display: none;
+    }
+
+    .site-language-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .site-language-icon {
+      position: absolute;
+      left: 11px;
+      z-index: 1;
+      font-size: 14px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .site-language-control::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      width: 6px;
+      height: 6px;
+      border-right: 1.5px solid rgba(23, 23, 23, 0.58);
+      border-bottom: 1.5px solid rgba(23, 23, 23, 0.58);
+      transform: translateY(-2px) rotate(45deg);
+      pointer-events: none;
+    }
+
+    .site-language-select {
+      width: 100%;
+      height: 36px;
+      padding: 0 28px 0 31px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      appearance: none;
+      -webkit-appearance: none;
+      background: rgba(192, 154, 92, 0.1);
+      color: #171717;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      outline: none;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .site-language-select:hover {
+      background: rgba(192, 154, 92, 0.16);
+      border-color: rgba(192, 154, 92, 0.3);
+    }
+
+    .site-language-select:focus-visible {
+      border-color: rgba(192, 154, 92, 0.62);
+      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.18);
+    }
+
+    .site-translation-engine {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      clip-path: inset(50%);
+      pointer-events: none;
+    }
+
+    body > .skiptranslate,
+    .goog-te-banner-frame.skiptranslate,
+    .VIpgJd-ZVi9od-ORHb-OEVmcd {
+      display: none !important;
+    }
+
+    body {
+      top: 0 !important;
+    }
+
+    #goog-gt-tt,
+    .goog-te-balloon-frame {
+      display: none !important;
+    }
+
     .site-notification-button,
     .site-notification-button:visited {
       position: relative;
@@ -663,6 +766,33 @@
         display: flex;
       }
 
+      .site-language-control-desktop {
+        display: none;
+      }
+
+      .site-language-control-mobile {
+        width: 100%;
+        min-width: 0;
+        margin-top: 4px;
+        display: flex;
+      }
+
+      .site-language-control-mobile .site-language-select {
+        height: 48px;
+        padding-left: 40px;
+        border-radius: 16px;
+        background: rgba(192, 154, 92, 0.1);
+        font-size: 13px;
+      }
+
+      .site-language-control-mobile .site-language-icon {
+        left: 15px;
+      }
+
+      .site-language-control-mobile::after {
+        right: 17px;
+      }
+
       .site-header-gpa {
         display: none;
       }
@@ -751,6 +881,18 @@
   </nav>
 
   <div class="site-header-actions">
+    <div class="site-language-control site-language-control-desktop notranslate" translate="no">
+      <label class="site-language-label" for="site-language-select-desktop">Language</label>
+      <span class="site-language-icon" aria-hidden="true">🌐</span>
+      <select class="site-language-select" id="site-language-select-desktop" aria-label="Select language">
+        <option value="en">English</option>
+        <option value="fr" lang="fr">Français</option>
+        <option value="es" lang="es">Español</option>
+        <option value="ar" lang="ar" dir="rtl">العربية</option>
+        <option value="de" lang="de">Deutsch</option>
+      </select>
+    </div>
+
     <a class="site-notification-button" id="site-notification-button" href="notifications.html" aria-label="Notifications">
       <img src="bell.png" alt="">
       <span class="site-notification-badge" id="site-notification-badge" hidden>0</span>
@@ -797,12 +939,26 @@
   </button>
 </header>
 
+<div id="google_translate_element" class="site-translation-engine" aria-hidden="true"></div>
+
 <div class="nav-menu-overlay" aria-hidden="true">
   <div class="nav-menu-panel nav-menu-main active">
     <div class="nav-menu-links">
       <a href="professors.html" class="nav-menu-link">Professors</a>
       <a href="courses.html" class="nav-menu-link">Courses</a>
       <a href="gpa-calculator.html" class="nav-menu-link">GPA Calculator</a>
+
+      <div class="site-language-control site-language-control-mobile notranslate" translate="no">
+        <label class="site-language-label" for="site-language-select-mobile">Language</label>
+        <span class="site-language-icon" aria-hidden="true">🌐</span>
+        <select class="site-language-select" id="site-language-select-mobile" aria-label="Select language">
+          <option value="en">English</option>
+          <option value="fr" lang="fr">Français</option>
+          <option value="es" lang="es">Español</option>
+          <option value="ar" lang="ar" dir="rtl">العربية</option>
+          <option value="de" lang="de">Deutsch</option>
+        </select>
+      </div>
     </div>
   </div>
 </div>
@@ -821,6 +977,133 @@
   const degreeLink = document.getElementById("floating-degree-link");
   const reviewsLink = document.getElementById("floating-reviews-link");
   const logoutButton = document.getElementById("floating-logout-button");
+  const languageSelects = document.querySelectorAll(".site-language-select");
+  const languageStorageKey = "auc-atlas-language";
+  const supportedLanguages = ["en", "fr", "es", "ar", "de"];
+
+  function getTranslationCookieLanguage() {
+    const match = document.cookie.match(
+      /(?:^|;\s*)googtrans=\/en\/([a-z]{2})(?:;|$)/i
+    );
+    const language = match ? match[1].toLowerCase() : "";
+
+    return supportedLanguages.indexOf(language) !== -1
+      ? language
+      : "";
+  }
+
+  function getSelectedLanguage() {
+    try {
+      const savedLanguage = localStorage.getItem(languageStorageKey);
+
+      if (supportedLanguages.indexOf(savedLanguage) !== -1) {
+        return savedLanguage;
+      }
+    } catch (error) {}
+
+    return getTranslationCookieLanguage() || "en";
+  }
+
+  function syncLanguageControls(language) {
+    languageSelects.forEach(function (select) {
+      select.value = language;
+    });
+
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+  }
+
+  function saveSelectedLanguage(language) {
+    try {
+      localStorage.setItem(languageStorageKey, language);
+    } catch (error) {}
+  }
+
+  function clearTranslationCookies() {
+    const expiredCookie =
+      "googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    const hostname = window.location.hostname;
+
+    document.cookie = expiredCookie;
+
+    if (
+      hostname &&
+      hostname !== "localhost" &&
+      hostname.indexOf(".") !== -1
+    ) {
+      document.cookie = expiredCookie + ";domain=" + hostname;
+      document.cookie = expiredCookie + ";domain=." + hostname;
+    }
+  }
+
+  function applySelectedLanguage(language) {
+    if (supportedLanguages.indexOf(language) === -1) {
+      return;
+    }
+
+    saveSelectedLanguage(language);
+    syncLanguageControls(language);
+    clearTranslationCookies();
+
+    if (language !== "en") {
+      document.cookie =
+        "googtrans=/en/" +
+        language +
+        ";path=/;SameSite=Lax";
+    }
+
+    window.location.reload();
+  }
+
+  function loadTranslationEngine(language) {
+    if (
+      language === "en" ||
+      document.querySelector("script[data-auc-translation-engine]")
+    ) {
+      return;
+    }
+
+    window.googleTranslateElementInit = function () {
+      if (
+        !window.google ||
+        !window.google.translate ||
+        typeof window.google.translate.TranslateElement !== "function"
+      ) {
+        return;
+      }
+
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: "en",
+          includedLanguages: "en,fr,es,ar,de",
+          autoDisplay: false
+        },
+        "google_translate_element"
+      );
+    };
+
+    const translationScript = document.createElement("script");
+    translationScript.src =
+      "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    translationScript.async = true;
+    translationScript.setAttribute(
+      "data-auc-translation-engine",
+      ""
+    );
+    document.head.appendChild(translationScript);
+  }
+
+  const selectedLanguage = getSelectedLanguage();
+
+  syncLanguageControls(selectedLanguage);
+
+  languageSelects.forEach(function (select) {
+    select.addEventListener("change", function () {
+      applySelectedLanguage(select.value);
+    });
+  });
+
+  loadTranslationEngine(selectedLanguage);
 
   function closeNavMenu() {
     document.body.classList.remove("nav-menu-open");
