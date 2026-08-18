@@ -185,7 +185,7 @@
 
         <div class="site-footer-bottom">
           <p class="site-footer-copyright">&copy; 2026 AUC Atlas. All rights reserved.</p>
-          <p class="site-footer-disclaimer">AUC Atlas can make mistakes & is not liable for any decisions or outcomes based on information provided on this website.</p>
+          <p class="site-footer-disclaimer">AUC Atlas can make mistakes. Double-check important info.</p>
         </div>
       </div>
     `;
