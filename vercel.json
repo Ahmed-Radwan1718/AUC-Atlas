@@ -12,7 +12,7 @@
     }
   ],
   "git": {
-    "deploymentEnabled": true
+    "deploymentEnabled": false
   },
   "headers": [
     {
