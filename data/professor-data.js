@@ -1062,7 +1062,6 @@
       transform: translate(-50%, -50%);
       transform-origin: center center;
       animation: none;
-      will-change: transform, opacity, border-radius;
     }
 
     .review-modal-header {
@@ -1774,12 +1773,10 @@
       margin-top: 0;
       overflow: hidden;
       opacity: 1;
-      transform: translateY(0);
       transition:
         height 0.28s ease,
         opacity 0.22s ease,
         transform 0.22s ease;
-      will-change: height, opacity, transform;
     }
 
     .professor-review-insights-more-toggle {
