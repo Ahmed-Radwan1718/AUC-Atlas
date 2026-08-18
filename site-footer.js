@@ -94,10 +94,24 @@
         margin-top: 34px;
         padding-top: 18px;
         border-top: 1px solid rgba(23, 23, 23, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
       }
 
-      .site-footer-bottom p + p {
-        margin-top: 10px;
+      .site-footer-bottom p {
+        margin: 0;
+      }
+
+      .site-footer-copyright {
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+
+      .site-footer-disclaimer {
+        flex: 1 1 auto;
+        text-align: right;
       }
 
       @media (max-width: 760px) {
@@ -115,6 +129,16 @@
           min-height: 44px;
           display: flex;
           align-items: center;
+        }
+
+        .site-footer-bottom {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .site-footer-disclaimer {
+          text-align: left;
         }
       }
     `;
@@ -160,8 +184,8 @@
         </div>
 
         <div class="site-footer-bottom">
-          <p>AUC Atlas can make mistakes. Please double-check all information with official AUC sources. AUC Atlas is not liable for any decisions, actions, or outcomes based on information provided on this website.</p>
-          <p>&copy; 2026 AUC Atlas. All rights reserved.</p>
+          <p class="site-footer-copyright">&copy; 2026 AUC Atlas. All rights reserved.</p>
+          <p class="site-footer-disclaimer">AUC Atlas can make mistakes. Please double-check all information with official AUC sources. AUC Atlas is not liable for any decisions, actions, or outcomes based on information provided on this website.</p>
         </div>
       </div>
     `;
