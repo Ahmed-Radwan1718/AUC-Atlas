@@ -1779,7 +1779,7 @@
         </div>
 
         <p>
-          Check the newest professor reviews, student-uploaded course materials, and professor profiles added to the platform.
+          Check the newest professor reviews, student-uploaded course materials, and professors with the highest student ratings.
         </p>
       </div>
 
@@ -1817,15 +1817,15 @@
         <article class="home-latest-card">
           <div class="home-latest-card-head">
             <div>
-              <span>New profiles</span>
-              <h3>Recently added</h3>
+              <span>Student ratings</span>
+              <h3>Top reviewed professors</h3>
             </div>
 
             <a href="professors.html">View all →</a>
           </div>
 
           <div class="home-latest-list" id="home-latest-professors">
-            <p class="home-latest-status">Loading professor profiles...</p>
+            <p class="home-latest-status">Loading top-reviewed professors...</p>
           </div>
         </article>
       </div>
@@ -2109,7 +2109,7 @@
         }).format(date);
       }
 
-      function renderLatestProfessors() {
+      function renderTopReviewedProfessors(summaries) {
         if (!latestProfessorsRoot) {
           return;
         }
@@ -2117,39 +2117,118 @@
         const professors = Array.isArray(window.aucAtlasProfessors)
           ? window.aucAtlasProfessors
           : [];
-        const latestProfessors = professors.filter(function (professor) {
-          return (
-            professor &&
-            professor.id &&
-            professor.name &&
-            professor.image !== "user.png"
-          );
-        }).slice(0, 3);
+        const professorsById = new Map();
 
-        if (!latestProfessors.length) {
+        professors.forEach(function (professor) {
+          if (professor && professor.id) {
+            professorsById.set(
+              String(professor.id),
+              professor
+            );
+          }
+        });
+
+        const topProfessors = (
+          Array.isArray(summaries)
+            ? summaries
+            : []
+        )
+          .map(function (summary) {
+            const professorId = String(
+              summary && summary.professorId || ""
+            );
+            const professor =
+              professorsById.get(professorId);
+            const averageRating = Number(
+              summary && summary.averageRating
+            );
+            const reviewCount = Math.max(
+              0,
+              Math.round(
+                Number(
+                  summary && summary.reviewCount
+                ) || 0
+              )
+            );
+
+            if (
+              !professor ||
+              !professor.name ||
+              !Number.isFinite(averageRating) ||
+              averageRating <= 0 ||
+              reviewCount <= 0
+            ) {
+              return null;
+            }
+
+            return {
+              professor,
+              averageRating: Math.min(
+                5,
+                averageRating
+              ),
+              reviewCount
+            };
+          })
+          .filter(Boolean)
+          .sort(function (a, b) {
+            if (
+              b.averageRating !==
+              a.averageRating
+            ) {
+              return (
+                b.averageRating -
+                a.averageRating
+              );
+            }
+
+            return (
+              b.reviewCount -
+              a.reviewCount
+            );
+          })
+          .slice(0, 3);
+
+        if (!topProfessors.length) {
           latestProfessorsRoot.innerHTML = `
             <p class="home-latest-status">
-              New professor profiles will appear here.
+              Top-reviewed professors will appear here once ratings are available.
             </p>
           `;
           return;
         }
 
-        latestProfessorsRoot.innerHTML = latestProfessors.map(function (professor) {
+        latestProfessorsRoot.innerHTML = topProfessors.map(function (item) {
+          const professor = item.professor;
           const department =
             professor.displayDepartment ||
             professor.department ||
             "AUC";
+          const reviewLabel =
+            item.reviewCount === 1
+              ? "review"
+              : "reviews";
+          const ratingLabel =
+            item.averageRating.toFixed(1) +
+            " out of 5 from " +
+            item.reviewCount +
+            " " +
+            reviewLabel;
 
           return `
             <a
               class="home-latest-item home-latest-person"
               href="professors.html?id=${encodeURIComponent(professor.id)}"
             >
-              <img src="${escapeHomeText(professor.image)}" alt="">
+              <img src="${escapeHomeText(professor.image || "user.png")}" alt="">
               <span class="home-latest-person-copy">
                 <strong>${escapeHomeText(professor.name)}</strong>
-                <small>${escapeHomeText(department)}</small>
+                <small aria-label="${escapeHomeText(department + ". " + ratingLabel)}">
+                  ${escapeHomeText(department)} ·
+                  <span class="home-latest-stars" aria-hidden="true">★</span>
+                  ${escapeHomeText(item.averageRating.toFixed(1))} ·
+                  ${escapeHomeText(item.reviewCount + " " + reviewLabel)}
+                </small>
               </span>
               <span class="home-latest-arrow" aria-hidden="true">→</span>
             </a>
@@ -2278,7 +2357,6 @@
 
       setHomeCount(courseCount, courses.length);
       setHomeCount(professorCount, professors.length);
-      renderLatestProfessors();
 
       Promise.resolve(
         window.aucAtlasWeeklyVisitsPromise
@@ -2342,6 +2420,9 @@
           setHomeCount(reviewCount, data.reviewCount);
           renderLatestReviews(data.latestReviews);
           renderLatestMaterials(data.latestMaterials);
+          renderTopReviewedProfessors(
+            data.topReviewedProfessors
+          );
         })
         .catch(function () {
           if (reviewCount) {
@@ -2350,6 +2431,7 @@
 
           renderLatestReviews([]);
           renderLatestMaterials([]);
+          renderTopReviewedProfessors([]);
         });
     })();
   </script>
