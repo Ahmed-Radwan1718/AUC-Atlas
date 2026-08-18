@@ -80,6 +80,91 @@ async function getLatestReviews(limit) {
   return reviews;
 }
 
+async function getTopReviewedProfessors(limit) {
+  const safeLimit = Math.max(
+    1,
+    Math.min(
+      24,
+      Math.floor(Number(limit) || 12)
+    )
+  );
+  const snapshot = await admin.firestore()
+    .collection("professorReviews")
+    .select(
+      "professorId",
+      "professorName",
+      "rating"
+    )
+    .get();
+  const totals = new Map();
+
+  snapshot.forEach(function (doc) {
+    const data = doc.data() || {};
+    const professorId = cleanString(
+      data.professorId,
+      80
+    );
+    const professorName = cleanString(
+      data.professorName,
+      120
+    );
+    const rating = Number(data.rating || 0);
+
+    if (
+      !professorId ||
+      !Number.isFinite(rating) ||
+      rating < 1 ||
+      rating > 5
+    ) {
+      return;
+    }
+
+    const summary = totals.get(professorId) || {
+      professorId,
+      professorName,
+      reviewCount: 0,
+      ratingTotal: 0
+    };
+
+    if (!summary.professorName && professorName) {
+      summary.professorName = professorName;
+    }
+
+    summary.reviewCount += 1;
+    summary.ratingTotal += rating;
+    totals.set(professorId, summary);
+  });
+
+  return Array.from(totals.values())
+    .map(function (summary) {
+      return {
+        professorId: summary.professorId,
+        professorName: summary.professorName,
+        reviewCount: summary.reviewCount,
+        averageRating: Math.round(
+          (
+            summary.ratingTotal /
+            summary.reviewCount
+          ) * 100
+        ) / 100
+      };
+    })
+    .sort(function (a, b) {
+      if (b.averageRating !== a.averageRating) {
+        return b.averageRating - a.averageRating;
+      }
+
+      if (b.reviewCount !== a.reviewCount) {
+        return b.reviewCount - a.reviewCount;
+      }
+
+      return a.professorName.localeCompare(
+        b.professorName
+      );
+    })
+    .slice(0, safeLimit);
+}
+
 async function getLatestMaterials(limit) {
   const safeLimit = Math.max(
     1,
@@ -146,7 +231,8 @@ module.exports = async function handler(req, res) {
       reviewCountSnapshot,
       materialCountSnapshot,
       latestReviews,
-      latestMaterials
+      latestMaterials,
+      topReviewedProfessors
     ] = await Promise.all([
       db.collection("professorReviews")
         .count()
@@ -156,7 +242,8 @@ module.exports = async function handler(req, res) {
         .count()
         .get(),
       getLatestReviews(3),
-      getLatestMaterials(3)
+      getLatestMaterials(3),
+      getTopReviewedProfessors(12)
     ]);
 
     res.setHeader(
@@ -172,7 +259,8 @@ module.exports = async function handler(req, res) {
         materialCountSnapshot.data().count || 0
       ),
       latestReviews,
-      latestMaterials
+      latestMaterials,
+      topReviewedProfessors
     });
   } catch (error) {
     return res.status(500).json({
