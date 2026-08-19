@@ -702,7 +702,8 @@ function validateMaterialUploadAuthorizationData(
 
   if (
     authorizationData.consumedAt ||
-    authorizationData.cancelledAt
+    authorizationData.cancelledAt ||
+    authorizationData.cleanupStartedAt
   ) {
     throw createMaterialError(
       "This upload authorization has already been used.",
