@@ -5,6 +5,12 @@
       "includeFiles": "{*.html,data/*.js,home-search.js,site-header.js,site-footer.js}"
     }
   },
+  "crons": [
+    {
+      "path": "/api/cleanup-material-uploads",
+      "schedule": "0 3 * * *"
+    }
+  ],
   "rewrites": [
     {
       "source": "/forum/:category",
