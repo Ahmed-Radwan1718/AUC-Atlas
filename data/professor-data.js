@@ -4764,7 +4764,20 @@
       professorVisibleLimit = professorPageSize;
     }
 
-    const matchingProfessors = professors.filter(professorMatches);
+    const matchingProfessors = professors
+      .filter(professorMatches)
+      .sort(function (firstProfessor, secondProfessor) {
+        const reviewDifference =
+          Number(secondProfessor.reviewCount || 0) -
+          Number(firstProfessor.reviewCount || 0);
+
+        if (reviewDifference !== 0) {
+          return reviewDifference;
+        }
+
+        return firstProfessor.name.localeCompare(secondProfessor.name);
+      });
+
     const visibleProfessors = matchingProfessors.slice(
       0,
       professorVisibleLimit
