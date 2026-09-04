@@ -2204,31 +2204,49 @@
           const stars =
             "★".repeat(rating) +
             "☆".repeat(5 - rating);
+          const professorId = String(
+            review.professorId || ""
+          );
+          const professor = professors.find(function (item) {
+            return (
+              item &&
+              String(item.id || "") === professorId
+            );
+          });
           const professorName =
             review.professorName ||
+            (professor && professor.name) ||
             "AUC professor";
-          const professorHref = review.professorId
+          const professorImage =
+            professor && professor.image
+              ? professor.image
+              : "user.png";
+          const professorHref = professorId
             ? "professors.html?id=" +
-              encodeURIComponent(review.professorId)
+              encodeURIComponent(professorId)
             : "professors.html";
 
           return `
-            <a class="home-latest-item" href="${professorHref}">
-              <span class="home-latest-item-top">
-                <span class="home-latest-type">Review</span>
-                <small>${escapeHomeText(formatHomeDate(review.createdAt))}</small>
-              </span>
+            <a class="home-latest-item home-latest-person" href="${professorHref}">
+              <img src="${escapeHomeText(professorImage)}" alt="">
 
-              <strong>${escapeHomeText(professorName)}</strong>
+              <span class="home-latest-person-copy">
+                <span class="home-latest-item-top">
+                  <span class="home-latest-type">Review</span>
+                  <small>${escapeHomeText(formatHomeDate(review.createdAt))}</small>
+                </span>
 
-              <span class="home-latest-item-bottom">
-                <small>
-                  ${escapeHomeText(review.courseCode || "Course not listed")}
-                </small>
-                <span
-                  class="home-latest-stars"
-                  aria-label="${rating} out of 5 stars"
-                >${stars}</span>
+                <strong>${escapeHomeText(professorName)}</strong>
+
+                <span class="home-latest-item-bottom">
+                  <small>
+                    ${escapeHomeText(review.courseCode || "Course not listed")}
+                  </small>
+                  <span
+                    class="home-latest-stars"
+                    aria-label="${rating} out of 5 stars"
+                  >${stars}</span>
+                </span>
               </span>
             </a>
           `;
