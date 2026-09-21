@@ -11,12 +11,20 @@
       "schedule": "0 3 * * *"
     }
   ],
-  "rewrites": [
-    {
-      "source": "/forum/:category",
-      "destination": "/forum.html"
-    }
-  ],
+"rewrites": [
+  {
+    "source": "/professors/:slug",
+    "destination": "/professors.html"
+  },
+  {
+    "source": "/courses/:slug",
+    "destination": "/courses.html"
+  },
+  {
+    "source": "/forum/:category",
+    "destination": "/forum.html"
+  }
+],
   "git": {
     "deploymentEnabled": false
   },
