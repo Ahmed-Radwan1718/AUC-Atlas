@@ -2568,17 +2568,36 @@
       .replace(/^-+|-+$/g, "");
   }
 
-  function getProfessorId(professor) {
-    return normalizeProfessorId(professor.id || professor.name);
+function getProfessorId(professor) {
+  return normalizeProfessorId(professor.id || professor.name);
+}
+
+function getCurrentProfessorId() {
+  const legacyProfessorId = new URLSearchParams(
+    window.location.search
+  ).get("id");
+
+  if (legacyProfessorId) {
+    return normalizeProfessorId(legacyProfessorId);
   }
 
-  function getCurrentProfessorId() {
-    return normalizeProfessorId(new URLSearchParams(window.location.search).get("id"));
+  const pathMatch = window.location.pathname.match(
+    /^\/professors\/([^/]+)\/?$/i
+  );
+
+  if (!pathMatch) {
+    return "";
   }
 
-  function getProfessorUrl(professor) {
-    return "professors.html?id=" + encodeURIComponent(getProfessorId(professor));
-  }
+  return normalizeProfessorId(pathMatch[1]);
+}
+
+function getProfessorUrl(professor) {
+  return (
+    "/professors/" +
+    encodeURIComponent(getProfessorId(professor))
+  );
+}
 
   function getCheckedValues(group) {
     return Array.from(document.querySelectorAll('[data-filter-group="' + group + '"]:checked')).map(function (input) {
