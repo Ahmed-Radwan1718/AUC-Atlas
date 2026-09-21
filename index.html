@@ -2157,7 +2157,7 @@
           return `
             <a
               class="home-latest-item home-latest-person"
-              href="professors.html?id=${encodeURIComponent(professor.id)}"
+              href="/professors/${encodeURIComponent(professor.id)}"
             >
               <img src="${escapeHomeText(professor.image || "user.png")}" alt="">
               <span class="home-latest-person-copy">
@@ -2221,10 +2221,10 @@
             professor && professor.image
               ? professor.image
               : "user.png";
-          const professorHref = professorId
-            ? "professors.html?id=" +
-              encodeURIComponent(professorId)
-            : "professors.html";
+const professorHref = professorId
+  ? "/professors/" +
+    encodeURIComponent(professorId)
+  : "/professors";
 
           return `
             <a class="home-latest-item home-latest-person" href="${professorHref}">
@@ -2275,11 +2275,19 @@
           const courseCode =
             material.courseCode ||
             "AUC course";
-          const materialHref = material.courseCode
-            ? "courses.html?course=" +
-              encodeURIComponent(material.courseCode) +
-              "#course-materials-access"
-            : "courses.html";
+const materialCourseSlug = String(
+  material.courseCode || ""
+)
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-+|-+$/g, "");
+
+const materialHref = materialCourseSlug
+  ? "/courses/" +
+    encodeURIComponent(materialCourseSlug) +
+    "#course-materials-access"
+  : "/courses";
 
           return `
             <a class="home-latest-item" href="${materialHref}">
