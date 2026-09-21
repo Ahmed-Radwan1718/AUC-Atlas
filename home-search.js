@@ -21,12 +21,40 @@
     materials: []
   };
 
-  function normalize(value) {
-    return String(value || "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, " ")
-      .trim();
-  }
+function normalize(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function getProfessorProfileUrl(professorId) {
+  const slug = String(professorId || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug
+    ? "/professors/" + encodeURIComponent(slug)
+    : "/professors";
+}
+
+function getCourseProfileUrl(courseCode, hash) {
+  const slug = String(courseCode || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug
+    ? (
+        "/courses/" +
+        encodeURIComponent(slug) +
+        (hash || "")
+      )
+    : "/courses";
+}
 
   function getSearchTerms(query) {
     return normalize(query).split(/\s+/).filter(Boolean);
@@ -181,9 +209,7 @@
         professorId,
         department,
         meta: "",
-        href:
-          "professors.html?id=" +
-          encodeURIComponent(professorId),
+href: getProfessorProfileUrl(professorId),
         score
       };
 
@@ -219,7 +245,7 @@
         type: "Course",
         title: course.code + " — " + course.title,
         meta: course.department + " · " + course.level,
-        href: "courses.html?course=" + encodeURIComponent(course.code),
+        href: getCourseProfileUrl(course.code),
         score
       };
     }).filter(function (result) {
@@ -243,9 +269,10 @@
         type: "Material",
         title: material.title || "Course material",
         meta: metaParts.join(" · "),
-        href: "courses.html?course=" +
-          encodeURIComponent(material.courseCode || "") +
-          "#course-materials-access",
+href: getCourseProfileUrl(
+  material.courseCode,
+  "#course-materials-access"
+),
         score: Number(material.score || 0)
       };
     });
