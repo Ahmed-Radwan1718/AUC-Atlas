@@ -4715,11 +4715,11 @@
   function renderPopularCourseCards(root, popularCourses) {
     root.innerHTML = popularCourses.map(function (course) {
       return `
-        <a
-          class="course-feature-card"
-          href="courses.html?course=${encodeURIComponent(course.code)}"
-          aria-label="Open ${escapeMaterialText(course.code)} course page"
-        >
+<a
+  class="course-feature-card"
+  href="${getCourseUrl(course.code)}"
+  aria-label="Open ${escapeMaterialText(course.code)} course page"
+>
           <span class="course-feature-code">${escapeMaterialText(course.code)}</span>
           <h3>${escapeMaterialText(course.title)}</h3>
 
@@ -4864,11 +4864,12 @@
       const courseLabel = [courseCode, courseTitle]
         .filter(Boolean)
         .join(" — ");
-      const href = courseCode
-        ? "courses.html?course=" +
-          encodeURIComponent(courseCode) +
-          "#course-materials-access"
-        : "courses.html";
+const href = courseCode
+  ? getCourseUrl(
+      courseCode,
+      "#course-materials-access"
+    )
+  : "/courses";
       const fileName = String(
         material.fileName ||
         material.title ||
@@ -5248,11 +5249,11 @@
 
     grid.innerHTML = visibleCourses.map(function (course) {
       return `
-        <a
-          class="course-card"
-          href="courses.html?course=${encodeURIComponent(course.code)}"
-          aria-label="Open ${escapeMaterialText(course.code)} course page"
-        >
+<a
+  class="course-card"
+  href="${getCourseUrl(course.code)}"
+  aria-label="Open ${escapeMaterialText(course.code)} course page"
+>
           <span class="course-code">
             ${escapeMaterialText(course.code)}
           </span>
@@ -5333,14 +5334,81 @@
     setTimeout(animateCourseSearchPlaceholder, 250);
   }
 
-  function normalizeCourseCode(value) {
-    return String(value || "").replace(/\s+/g, " ").trim().toUpperCase();
+function normalizeCourseCode(value) {
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
+}
+
+function getCourseSlug(value) {
+  return normalizeCourseCode(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getCourseUrl(courseCode, hash) {
+  const slug = getCourseSlug(courseCode);
+
+  if (!slug) {
+    return "/courses";
   }
 
-  function getSelectedCourseCode() {
-    const params = new URLSearchParams(window.location.search);
-    return normalizeCourseCode(params.get("course"));
+  return (
+    "/courses/" +
+    encodeURIComponent(slug) +
+    (hash || "")
+  );
+}
+
+function getProfessorProfileUrl(professorId) {
+  const normalizedId = String(professorId || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalizedId
+    ? "/professors/" + encodeURIComponent(normalizedId)
+    : "/professors";
+}
+
+function getSelectedCourseCode() {
+  const params = new URLSearchParams(
+    window.location.search
+  );
+
+  const legacyCourseCode = params.get("course");
+
+  if (legacyCourseCode) {
+    return normalizeCourseCode(legacyCourseCode);
   }
+
+  const pathMatch = window.location.pathname.match(
+    /^\/courses\/([^/]+)\/?$/i
+  );
+
+  if (!pathMatch) {
+    return "";
+  }
+
+  const pathSlug = String(pathMatch[1] || "")
+    .trim()
+    .toLowerCase();
+
+  const selectedCourse = courses.find(function (course) {
+    return getCourseSlug(course.code) === pathSlug;
+  });
+
+  if (selectedCourse) {
+    return normalizeCourseCode(selectedCourse.code);
+  }
+
+  return normalizeCourseCode(
+    pathSlug.replace(/-/g, " ")
+  );
+}
 
   function setCourseDetailText(id, value) {
     const element = document.getElementById(id);
@@ -5402,13 +5470,16 @@
       return;
     }
 
-    list.innerHTML = professors.map(function (professor) {
-      return `
-        <a class="course-professor-link" href="professors.html?id=${encodeURIComponent(professor.id)}">
-          <strong>${escapeMaterialText(professor.name)}</strong>
-        </a>
-      `;
-    }).join("");
+list.innerHTML = professors.map(function (professor) {
+  return `
+    <a
+      class="course-professor-link"
+      href="${getProfessorProfileUrl(professor.id)}"
+    >
+      <strong>${escapeMaterialText(professor.name)}</strong>
+    </a>
+  `;
+}).join("");
   }
 
   async function loadCourseProfessors(course) {
