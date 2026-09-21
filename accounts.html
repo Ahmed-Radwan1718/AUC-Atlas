@@ -4074,11 +4074,17 @@
       }) || null;
     }
 
-    function getAccountReviewProfessorUrl(professorId) {
-      return professorId
-        ? "professors.html?id=" + encodeURIComponent(professorId)
-        : "";
-    }
+function getAccountReviewProfessorUrl(professorId) {
+  const slug = String(professorId || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug
+    ? "/professors/" + encodeURIComponent(slug)
+    : "";
+}
 
     function renderAccountReviewStars(rating) {
       const safeRating = Math.max(0, Math.min(5, Math.round(Number(rating || 0))));
