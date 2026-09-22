@@ -14,11 +14,11 @@
 "rewrites": [
   {
     "source": "/professors/:slug",
-    "destination": "/professors.html"
+    "destination": "/professors"
   },
   {
     "source": "/courses/:slug",
-    "destination": "/courses.html"
+    "destination": "/courses"
   },
   {
     "source": "/forum/:category",
