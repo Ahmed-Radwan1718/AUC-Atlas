@@ -8,6 +8,9 @@ const {
   verifyAdminAuthenticator,
   requireFreshAdminAccess
 } = require("../server/_lib/adminHelpers");
+const {
+  deleteCloudinaryMaterial
+} = require("../server/_lib/cloudinaryCourseMaterials");
 
 function cleanString(value, maxLength) {
   return String(value || "").trim().replace(/\s+/g, " ").slice(0, maxLength);
@@ -143,6 +146,7 @@ function serializeMaterial(doc) {
     title: data.title || data.fileName || "Course material",
     fileName: data.fileName || "",
     fileId: data.fileId || "",
+    storageKey: data.storageKey || "",
     status: data.status || "pending",
     uploaderUid: data.uploaderUid || "",
     uploaderDisplayName: data.uploaderDisplayName || "AUC student",
@@ -204,105 +208,6 @@ function serializeAudit(doc) {
     actorEmail: data.actorEmail || "",
     createdAt: getTimestampIso(data.createdAt || data.createdAtIso)
   };
-}
-
-function getImageKitAuthorizationHeader() {
-  const privateKey = cleanString(process.env.IMAGEKIT_PRIVATE_KEY, 500);
-
-  return privateKey
-    ? "Basic " + Buffer.from(privateKey + ":").toString("base64")
-    : "";
-}
-
-function getImageKitDescriptionParts(file) {
-  return String(file && file.description ? file.description : "")
-    .split(" | ")
-    .map(function (part) {
-      return cleanString(part, 500);
-    });
-}
-
-async function getImageKitMaterials() {
-  const authorization = getImageKitAuthorizationHeader();
-
-  if (!authorization) {
-    return [];
-  }
-
-  const query = new URLSearchParams({
-    tags: "auc-atlas-material",
-    type: "file",
-    limit: "1000",
-    sort: "DESC_CREATED"
-  });
-  const response = await fetch(
-    "https://api.imagekit.io/v1/files?" + query.toString(),
-    {
-      headers: {
-        Accept: "application/json",
-        Authorization: authorization
-      }
-    }
-  );
-
-  if (!response.ok) {
-    return [];
-  }
-
-  const files = await response.json().catch(function () {
-    return [];
-  });
-
-  if (!Array.isArray(files)) {
-    return [];
-  }
-
-  return files.map(function (file) {
-    const parts = getImageKitDescriptionParts(file);
-    const fileId = cleanString(file && file.fileId, 160);
-    const fileName = cleanString(parts[8] || (file && file.name), 240);
-
-    return {
-      id: "imagekit:" + fileId,
-      source: "imagekit",
-      courseCode: parts[1] || "",
-      courseTitle: "",
-      professor: parts[2] || "",
-      semester: parts[3] || "",
-      materialType: parts[4] || "Material",
-      title: parts[0] || fileName || "Course material",
-      fileName,
-      fileId,
-      status: "pending",
-      uploaderUid: parts[7] || "",
-      uploaderDisplayName: parts[5] || "AUC student",
-      createdAt: cleanString(file && file.createdAt, 80)
-    };
-  });
-}
-
-async function deleteImageKitFile(fileId) {
-  const authorization = getImageKitAuthorizationHeader();
-  const safeFileId = cleanString(fileId, 160);
-
-  if (!authorization || !safeFileId) {
-    return;
-  }
-
-  const response = await fetch(
-    "https://api.imagekit.io/v1/files/" + encodeURIComponent(safeFileId),
-    {
-      method: "DELETE",
-      headers: {
-        Accept: "application/json",
-        Authorization: authorization
-      }
-    }
-  );
-
-  if (!response.ok && response.status !== 404) {
-    throw createAdminError("Could not delete the stored ImageKit file.", 502);
-  }
 }
 
 async function writeAuditLog(actor, details) {
@@ -484,7 +389,6 @@ async function getDashboardData(actor) {
     db.collection("adminAuditLogs").orderBy("createdAt", "desc").limit(10).get(),
     db.collection("siteSettings").doc("donationCounter").get(),
     db.collection("siteNotifications").orderBy("createdAtIso", "desc").limit(25).get(),
-    getImageKitMaterials(),
     listAllUsers(actor)
   ]);
 
@@ -494,26 +398,21 @@ async function getDashboardData(actor) {
   const auditSnapshot = results[3];
   const donationDoc = results[4];
   const notificationsSnapshot = results[5];
-  const imageKitMaterials = results[6];
-  const users = results[7];
+  const users = results[6];
   const reviews = [];
   const firestoreMaterials = [];
   const reports = [];
   const audits = [];
   const notifications = [];
-  const knownImageKitFileIds = new Set();
 
   reviewsSnapshot.forEach(function (doc) {
     reviews.push(serializeReview(doc));
   });
 
   materialsSnapshot.forEach(function (doc) {
-    const material = serializeMaterial(doc);
-    firestoreMaterials.push(material);
-
-    if (material.fileId) {
-      knownImageKitFileIds.add(material.fileId);
-    }
+    firestoreMaterials.push(
+      serializeMaterial(doc)
+    );
   });
 
   reportsSnapshot.forEach(function (doc) {
@@ -531,12 +430,7 @@ async function getDashboardData(actor) {
   const materials = firestoreMaterials
     .filter(function (material) {
       return material.status !== "rejected";
-    })
-    .concat(
-      imageKitMaterials.filter(function (material) {
-        return material.fileId && !knownImageKitFileIds.has(material.fileId);
-      })
-    );
+    });
 
   reviews.sort(function (a, b) {
     return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
@@ -842,26 +736,11 @@ async function handleApproveMaterial(actor, body) {
 }
 
 async function handleDeleteMaterial(actor, body) {
-  const source = body.source === "imagekit" ? "imagekit" : "firestore";
   const materialId = cleanString(body.materialId, 180);
   const reason = cleanMultiline(body.reason, 500);
 
   if (!materialId) {
     throw createAdminError("Course material not found.", 400);
-  }
-
-  if (source === "imagekit") {
-    const fileId = cleanString(body.fileId || materialId.replace(/^imagekit:/, ""), 160);
-    await deleteImageKitFile(fileId);
-    await writeAuditLog(actor, {
-      action: "delete_material",
-      targetType: "course_material",
-      targetId: fileId,
-      targetLabel: cleanString(body.title || body.fileName || "ImageKit material", 240),
-      reason
-    });
-
-    return { success: true };
   }
 
   const materialRef = admin.firestore().collection("courseMaterials").doc(materialId);
@@ -872,7 +751,9 @@ async function handleDeleteMaterial(actor, body) {
   }
 
   const materialData = materialDoc.data() || {};
-  await deleteImageKitFile(materialData.fileId).catch(function () {});
+  await deleteCloudinaryMaterial(
+    materialData.storageKey
+  ).catch(function () {});
 
   const deletedAtIso = new Date().toISOString();
   await materialRef.set({
