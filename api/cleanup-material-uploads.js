@@ -79,98 +79,6 @@ function hasValidCronAuthorization(req) {
   );
 }
 
-function getStorageConfig() {
-  const url = cleanString(
-    process.env.COURSE_MATERIAL_STORAGE_URL,
-    1000
-  ).replace(/\/+$/, "");
-  const secret = cleanString(
-    process.env.COURSE_MATERIAL_STORAGE_SECRET,
-    500
-  ).toLowerCase();
-
-  let parsedUrl = null;
-
-  try {
-    parsedUrl = new URL(url);
-  } catch (error) {
-    parsedUrl = null;
-  }
-
-  if (
-    !parsedUrl ||
-    parsedUrl.protocol !== "https:" ||
-    parsedUrl.username ||
-    parsedUrl.password ||
-    !/^[a-f0-9]{64}$/.test(secret)
-  ) {
-    throw new Error(
-      "Course-material storage is not configured."
-    );
-  }
-
-  return {
-    url: parsedUrl.origin,
-    secret
-  };
-}
-
-function createStorageSignature(secret, parts) {
-  return crypto
-    .createHmac("sha256", secret)
-    .update(parts.join("\n"))
-    .digest("hex");
-}
-
-async function deleteStorageMaterial(storageKey) {
-  const safeStorageKey = cleanString(
-    storageKey,
-    80
-  );
-
-  if (!/^[a-f0-9]{36}$/i.test(safeStorageKey)) {
-    return;
-  }
-
-  const config = getStorageConfig();
-  const expires =
-    Math.floor(Date.now() / 1000) + 5 * 60;
-  const query = new URLSearchParams({
-    key: safeStorageKey,
-    expires: String(expires)
-  });
-
-  query.set(
-    "signature",
-    createStorageSignature(
-      config.secret,
-      [
-        "delete",
-        safeStorageKey,
-        String(expires)
-      ]
-    )
-  );
-
-  const response = await fetch(
-    config.url +
-      "/file?" +
-      query.toString(),
-    {
-      method: "DELETE",
-      headers: {
-        Accept: "application/json"
-      }
-    }
-  );
-
-  if (!response.ok && response.status !== 404) {
-    throw new Error(
-      "Storage cleanup request failed."
-    );
-  }
-}
-
 function clearActiveAuthorization(
   transaction,
   limitRef
@@ -270,8 +178,7 @@ async function claimAuthorizationCleanup(
         authorizationId,
         uploaderUid,
         storageKey: cleanString(
-          data.storageKey ||
-            authorizationId,
+          data.storageKey,
           80
         )
       };
@@ -340,7 +247,7 @@ async function cleanupAuthorizationDocument(
     return cleanup.status;
   }
 
-  await deleteStorageMaterial(
+  await deleteCloudinaryMaterial(
     cleanup.storageKey
   );
 
