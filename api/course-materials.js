@@ -1,4 +1,3 @@
-const crypto = require("crypto");
 const admin = require("../server/_lib/firebaseAdmin");
 
 const { getSiteSessionUser } = require("../server/_lib/securityHelpers");
@@ -8,10 +7,16 @@ const {
 const {
   MATERIAL_MAX_FILE_BYTES,
   cleanMaterialFileName,
+  getMaterialFileExtension,
   normalizeMaterialMimeType,
   isAllowedMaterialMimeType,
   doesMaterialMimeMatchFileName
 } = require("../server/_lib/courseMaterialUploadPolicy");
+const {
+  getCloudinaryMaterial,
+  deleteCloudinaryMaterial,
+  isCloudinaryMaterialPublicId
+} = require("../server/_lib/cloudinaryCourseMaterials");
 
 const MATERIAL_RANDOM_READ_WINDOW_MS =
   10 * 60 * 1000;
@@ -138,157 +143,6 @@ async function getUploaderProfile(decodedUser, userRecord) {
   };
 }
 
-function slugifyMaterialValue(value) {
-  return String(value || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "unknown";
-}
-
-function getImageKitDescriptionParts(file) {
-  return String(file && file.description ? file.description : "")
-    .split(" | ")
-    .map(function (part) {
-      return cleanString(part, 240);
-    });
-}
-
-function getImageKitMaterialType(file, descriptionParts) {
-  const descriptionType = cleanMaterialType(descriptionParts[4]);
-
-  if (descriptionType) {
-    return descriptionType;
-  }
-
-  const tags = Array.isArray(file && file.tags) ? file.tags : [];
-  const typeTag = tags.find(function (tag) {
-    return String(tag || "").indexOf("material-type-") === 0;
-  });
-
-  if (!typeTag) {
-    return "Material";
-  }
-
-  const normalizedType = String(typeTag)
-    .replace(/^material-type-/, "")
-    .replace(/-/g, " ");
-
-  return cleanMaterialType(normalizedType) || "Material";
-}
-
-async function getImageKitCourseMaterials(courseCode) {
-  const privateKey = String(
-    process.env.IMAGEKIT_PRIVATE_KEY || ""
-  ).trim();
-
-  if (!privateKey) {
-    return [];
-  }
-
-  const courseTag = "course-" + slugifyMaterialValue(courseCode);
-  const query = new URLSearchParams({
-    tags: courseTag,
-    type: "file",
-    limit: "1000",
-    sort: "DESC_CREATED"
-  });
-
-  const response = await fetch(
-    "https://api.imagekit.io/v1/files?" + query.toString(),
-    {
-      headers: {
-        Accept: "application/json",
-        Authorization:
-          "Basic " +
-          Buffer.from(privateKey + ":").toString("base64")
-      }
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Could not load ImageKit course materials.");
-  }
-
-  const files = await response.json();
-
-  if (!Array.isArray(files)) {
-    return [];
-  }
-
-  return files.map(function (file) {
-    const descriptionParts = getImageKitDescriptionParts(file);
-    const imageKitFileName = cleanString(
-      file && file.name,
-      240
-    );
-    const legacyFileName = imageKitFileName.replace(
-      /_[a-z0-9]{6,}(\.[^.]+)$/i,
-      "$1"
-    );
-    const fileName = cleanString(
-      descriptionParts[8] ||
-      legacyFileName ||
-      imageKitFileName,
-      240
-    );
-    const fileId = cleanString(file && file.fileId, 160);
-    const isAnonymous =
-      cleanBoolean(descriptionParts[9]) ||
-      (
-        Array.isArray(file && file.tags) &&
-        file.tags.includes("anonymous-upload")
-      );
-    const titleFromName = fileName
-      .replace(/\.[^.]+$/, "")
-      .replace(/[-_]+/g, " ")
-      .trim();
-
-    return {
-      id: "imagekit-" + fileId,
-      courseCode,
-      courseTitle: "",
-      professor:
-        descriptionParts[2] || "Professor not listed",
-      semester:
-        descriptionParts[3] || "Semester not listed",
-      materialType: getImageKitMaterialType(
-        file,
-        descriptionParts
-      ),
-      title:
-        descriptionParts[0] ||
-        titleFromName ||
-        "Course material",
-      fileName,
-      fileUrl: "",
-      downloadUrl: fileId
-        ? "/api/course-material-download?imageKitFileId=" +
-          encodeURIComponent(fileId)
-        : "",
-      filePath: "",
-      fileId: "",
-      size: Number((file && file.size) || 0),
-      fileType: cleanString(
-        file && (file.mime || file.fileType),
-        80
-      ),
-      status: "pending",
-      isAnonymous,
-      uploaderUid: isAnonymous
-        ? ""
-        : (descriptionParts[7] || ""),
-      uploaderDisplayName: isAnonymous
-        ? "Anonymous student"
-        : (descriptionParts[5] || "AUC student"),
-      uploaderPhotoURL: isAnonymous
-        ? ""
-        : cleanUrl(descriptionParts[6]),
-      createdAt: cleanString(file && file.createdAt, 80)
-    };
-  });
-}
-
 async function getCourseMaterials(courseCode) {
   const snapshot = await admin.firestore()
     .collection("courseMaterials")
@@ -386,291 +240,76 @@ async function getRandomCourseMaterials(limit) {
   return groupedMaterials.slice(0, safeLimit);
 }
 
-function getStorageConfig() {
-  const url = cleanString(
-    process.env.COURSE_MATERIAL_STORAGE_URL,
-    1000
-  ).replace(/\/+$/, "");
-  const secret = cleanString(
-    process.env.COURSE_MATERIAL_STORAGE_SECRET,
-    500
-  ).toLowerCase();
-
-  let parsedUrl = null;
-
-  try {
-    parsedUrl = new URL(url);
-  } catch (error) {
-    parsedUrl = null;
-  }
+async function verifyCloudinaryMaterialUpload(data) {
+  const publicId = cleanString(
+    data.publicId,
+    80
+  );
+  const assetId = cleanString(
+    data.assetId,
+    160
+  );
+  const expectedFileName =
+    cleanMaterialFileName(data.fileName);
+  const expectedFileSize =
+    Number(data.fileSize);
+  const expectedFileType =
+    normalizeMaterialMimeType(data.fileType);
+  const expectedExtension =
+    getMaterialFileExtension(expectedFileName);
 
   if (
-    !parsedUrl ||
-    parsedUrl.protocol !== "https:" ||
-    parsedUrl.username ||
-    parsedUrl.password ||
-    !/^[a-f0-9]{64}$/.test(secret)
+    !isCloudinaryMaterialPublicId(publicId) ||
+    !/^[A-Za-z0-9_-]{16,160}$/.test(assetId)
   ) {
     throw createMaterialError(
-      "Course-material storage is not configured.",
-      500
+      "Could not verify the uploaded course material.",
+      400
+    );
+  }
+
+  const file =
+    await getCloudinaryMaterial(publicId);
+
+  if (
+    file.publicId !== publicId ||
+    file.assetId !== assetId ||
+    file.resourceType !== "raw" ||
+    file.deliveryType !== "authenticated" ||
+    file.format !== expectedExtension ||
+    file.size !== expectedFileSize ||
+    file.size <= 0 ||
+    file.size > MATERIAL_MAX_FILE_BYTES ||
+    !isAllowedMaterialMimeType(
+      expectedFileType
+    ) ||
+    !doesMaterialMimeMatchFileName(
+      expectedFileName,
+      expectedFileType
+    )
+  ) {
+    await deleteCloudinaryMaterial(
+      publicId
+    ).catch(function () {});
+
+    throw createMaterialError(
+      "The uploaded file type or size is not allowed.",
+      400
     );
   }
 
   return {
-    url: parsedUrl.origin,
-    secret
+    storageKey: publicId,
+    fileId: assetId,
+    cloudinaryPublicId: publicId,
+    cloudinaryAssetId: assetId,
+    cloudinaryFormat: file.format,
+    fileName: expectedFileName,
+    fileUrl: "",
+    filePath: "",
+    size: file.size,
+    fileType: expectedFileType
   };
-}
-
-function createStorageSignature(secret, parts) {
-  return crypto
-    .createHmac("sha256", secret)
-    .update(parts.join("\n"))
-    .digest("hex");
-}
-
-function buildStorageSignedRequestUrl(
-  config,
-  pathname,
-  action,
-  storageKey
-) {
-  const expires =
-    Math.floor(Date.now() / 1000) + 5 * 60;
-
-  const query = new URLSearchParams({
-    key: storageKey,
-    expires: String(expires)
-  });
-
-  query.set(
-    "signature",
-    createStorageSignature(
-      config.secret,
-      [
-        action,
-        storageKey,
-        String(expires)
-      ]
-    )
-  );
-
-  return (
-    config.url +
-    pathname +
-    "?" +
-    query.toString()
-  );
-}
-
-async function getStorageFileDetails(storageKey) {
-  const safeStorageKey = cleanString(
-    storageKey,
-    80
-  );
-
-  if (!/^[a-f0-9]{36}$/i.test(safeStorageKey)) {
-    throw createMaterialError(
-      "Could not verify the uploaded course material.",
-      400
-    );
-  }
-
-  const config = getStorageConfig();
-
-  const response = await fetch(
-    buildStorageSignedRequestUrl(
-      config,
-      "/metadata",
-      "metadata",
-      safeStorageKey
-    ),
-    {
-      headers: {
-        Accept: "application/json"
-      }
-    }
-  );
-
-  if (response.status === 404) {
-    throw createMaterialError(
-      "Could not verify the uploaded course material.",
-      400
-    );
-  }
-
-  if (!response.ok) {
-    throw createMaterialError(
-      "Could not verify the stored course material.",
-      502
-    );
-  }
-
-  const file = await response
-    .json()
-    .catch(function () {
-      return {};
-    });
-
-  return {
-    storageKey: cleanString(
-      file.storageKey,
-      80
-    ),
-    fileName: cleanMaterialFileName(
-      file.fileName
-    ),
-    size: Math.max(
-      0,
-      Number(file.size) || 0
-    ),
-    fileType: normalizeMaterialMimeType(
-      file.type
-    )
-  };
-}
-
-async function deleteStorageMaterial(storageKey) {
-  const safeStorageKey = cleanString(
-    storageKey,
-    80
-  );
-
-  if (!/^[a-f0-9]{36}$/i.test(safeStorageKey)) {
-    return;
-  }
-
-  const config = getStorageConfig();
-
-  const response = await fetch(
-    buildStorageSignedRequestUrl(
-      config,
-      "/file",
-      "delete",
-      safeStorageKey
-    ),
-    {
-      method: "DELETE",
-      headers: {
-        Accept: "application/json"
-      }
-    }
-  );
-
-  if (!response.ok && response.status !== 404) {
-    throw createMaterialError(
-      "Could not delete the stored course material.",
-      502
-    );
-  }
-}
-
-function getImageKitAuthorizationHeader() {
-  const privateKey = cleanString(
-    process.env.IMAGEKIT_PRIVATE_KEY,
-    500
-  );
-
-  return privateKey
-    ? "Basic " + Buffer.from(privateKey + ":").toString("base64")
-    : "";
-}
-
-function normalizeImageKitPath(value) {
-  let normalizedPath = String(value || "").trim();
-
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      const decodedPath = decodeURIComponent(normalizedPath);
-
-      if (decodedPath === normalizedPath) {
-        break;
-      }
-
-      normalizedPath = decodedPath;
-    } catch (error) {
-      break;
-    }
-  }
-
-  normalizedPath = normalizedPath.replace(/\\/g, "/");
-
-  if (normalizedPath.charAt(0) !== "/") {
-    normalizedPath = "/" + normalizedPath;
-  }
-
-  return normalizedPath.replace(/\/{2,}/g, "/");
-}
-
-function getExpectedImageKitMaterialFolder(data) {
-  return (
-    "/auc-atlas/materials/" +
-    slugifyMaterialValue(data.courseCode) +
-    "/" +
-    slugifyMaterialValue(data.professor) +
-    "/" +
-    slugifyMaterialValue(data.semester) +
-    "/"
-  );
-}
-
-async function getImageKitFileDetails(fileId) {
-  const authorization = getImageKitAuthorizationHeader();
-  const safeFileId = cleanString(fileId, 160);
-
-  if (
-    !authorization ||
-    !/^[A-Za-z0-9_-]{6,160}$/.test(safeFileId)
-  ) {
-    throw createMaterialError(
-      "Could not verify the uploaded course material.",
-      400
-    );
-  }
-
-  const response = await fetch(
-    "https://api.imagekit.io/v1/files/" +
-      encodeURIComponent(safeFileId) +
-      "/details",
-    {
-      headers: {
-        Accept: "application/json",
-        Authorization: authorization
-      }
-    }
-  );
-
-  if (response.status === 404) {
-    throw createMaterialError(
-      "Could not verify the uploaded course material.",
-      400
-    );
-  }
-
-  if (!response.ok) {
-    throw createMaterialError(
-      "Could not verify the stored ImageKit file.",
-      502
-    );
-  }
-
-  const file = await response.json().catch(function () {
-    return {};
-  });
-
-  if (
-    !file ||
-    file.type !== "file" ||
-    cleanString(file.fileId, 160) !== safeFileId
-  ) {
-    throw createMaterialError(
-      "Could not verify the uploaded course material.",
-      400
-    );
-  }
-
-  return file;
 }
 
 function validateMaterialUploadAuthorizationData(
@@ -812,116 +451,6 @@ async function verifyStorageMaterialUpload(data) {
     size: actualSize,
     fileType: actualMimeType
   };
-}
-
-function cleanImageKitDescriptionPart(value, maxLength) {
-  return cleanString(value, maxLength)
-    .replace(/\s*\|\s*/g, " ");
-}
-
-function buildImageKitMaterialDescription(data) {
-  return [
-    cleanImageKitDescriptionPart(data.title, 160),
-    cleanImageKitDescriptionPart(data.courseCode, 40),
-    cleanImageKitDescriptionPart(data.professor, 120),
-    cleanImageKitDescriptionPart(data.semester, 80),
-    cleanImageKitDescriptionPart(data.materialType, 80),
-    cleanImageKitDescriptionPart(data.uploaderDisplayName, 80),
-    cleanImageKitDescriptionPart(data.uploaderPhotoURL, 500),
-    cleanImageKitDescriptionPart(data.uploaderUid, 160),
-    cleanImageKitDescriptionPart(data.fileName, 240),
-    cleanImageKitDescriptionPart(
-      String(cleanBoolean(data.isAnonymous)),
-      10
-    )
-  ].join(" | ");
-}
-
-function buildImageKitMaterialTags(data) {
-  return [
-    "auc-atlas-material",
-    "status-" + slugifyMaterialValue(data.status || "approved"),
-    data.courseCode
-      ? "course-" + slugifyMaterialValue(data.courseCode)
-      : "",
-    data.professor
-      ? "professor-" + slugifyMaterialValue(data.professor)
-      : "",
-    data.semester
-      ? "semester-" + slugifyMaterialValue(data.semester)
-      : "",
-    data.materialType
-      ? "material-type-" + slugifyMaterialValue(data.materialType)
-      : "",
-    data.uploaderUid
-      ? "uploader-" + slugifyMaterialValue(data.uploaderUid)
-      : "",
-    cleanBoolean(data.isAnonymous)
-      ? "anonymous-upload"
-      : ""
-  ].filter(Boolean);
-}
-
-async function updateImageKitMaterial(fileId, data) {
-  const authorization = getImageKitAuthorizationHeader();
-  const safeFileId = cleanString(fileId, 160);
-
-  if (!authorization || !safeFileId) {
-    return;
-  }
-
-  const response = await fetch(
-    "https://api.imagekit.io/v1/files/" +
-      encodeURIComponent(safeFileId) +
-      "/details",
-    {
-      method: "PATCH",
-      headers: {
-        Accept: "application/json",
-        Authorization: authorization,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        description: buildImageKitMaterialDescription(data),
-        tags: buildImageKitMaterialTags(data)
-      })
-    }
-  );
-
-  if (!response.ok) {
-    throw createMaterialError(
-      "Could not update the stored course material.",
-      502
-    );
-  }
-}
-
-async function deleteImageKitMaterial(fileId) {
-  const authorization = getImageKitAuthorizationHeader();
-  const safeFileId = cleanString(fileId, 160);
-
-  if (!authorization || !safeFileId) {
-    return;
-  }
-
-  const response = await fetch(
-    "https://api.imagekit.io/v1/files/" +
-      encodeURIComponent(safeFileId),
-    {
-      method: "DELETE",
-      headers: {
-        Accept: "application/json",
-        Authorization: authorization
-      }
-    }
-  );
-
-  if (!response.ok && response.status !== 404) {
-    throw createMaterialError(
-      "Could not delete the stored course material.",
-      502
-    );
-  }
 }
 
 async function getUserMaterials(uploaderUid) {
@@ -1111,16 +640,6 @@ module.exports = async function handler(req, res) {
         currentStatus === "rejected"
           ? "rejected"
           : "approved";
-      const updatedData = Object.assign(
-        {},
-        ownedMaterial.data,
-        {
-          title,
-          materialType,
-          status: nextStatus,
-          updatedAtIso
-        }
-      );
       const firestoreUpdate = {
         title,
         materialType,
@@ -1132,22 +651,6 @@ module.exports = async function handler(req, res) {
       await ownedMaterial.ref.update(
         firestoreUpdate
       );
-
-      if (
-        !cleanString(
-          ownedMaterial.data.storageKey,
-          80
-        )
-      ) {
-        try {
-          await updateImageKitMaterial(
-            ownedMaterial.data.fileId,
-            updatedData
-          );
-        } catch (error) {
-          // The Firestore record remains the source used by the site.
-        }
-      }
 
       return res.status(200).json({
         success: true,
@@ -1164,20 +667,9 @@ module.exports = async function handler(req, res) {
       const deletedAtIso = new Date().toISOString();
 
       try {
-        const storageKey = cleanString(
-          ownedMaterial.data.storageKey,
-          80
+        await deleteCloudinaryMaterial(
+          ownedMaterial.data.storageKey
         );
-
-        if (storageKey) {
-          await deleteStorageMaterial(
-            storageKey
-          );
-        } else {
-          await deleteImageKitMaterial(
-            ownedMaterial.data.fileId
-          );
-        }
       } catch (error) {
         // The rejected Firestore record prevents the file from returning.
       }
@@ -1202,9 +694,13 @@ module.exports = async function handler(req, res) {
       body.uploadAuthorizationId,
       80
     );
-    const submittedStorageKey = cleanString(
-      body.storageKey,
+    const submittedPublicId = cleanString(
+      body.cloudinaryPublicId,
       80
+    );
+    const submittedAssetId = cleanString(
+      body.cloudinaryAssetId,
+      160
     );
     const requestedUploadGroupId = cleanString(
       body.uploadGroupId,
@@ -1213,7 +709,8 @@ module.exports = async function handler(req, res) {
 
     if (
       !uploadAuthorizationId ||
-      !submittedStorageKey
+      !submittedPublicId ||
+      !submittedAssetId
     ) {
       throw createMaterialError(
         "Could not save this course material.",
@@ -1279,8 +776,13 @@ module.exports = async function handler(req, res) {
       !materialType ||
       !title ||
       !fileName ||
-      !/^[a-f0-9]{36}$/i.test(storageKey) ||
-      submittedStorageKey !== storageKey ||
+      !isCloudinaryMaterialPublicId(
+        storageKey
+      ) ||
+      submittedPublicId !== storageKey ||
+      !/^[A-Za-z0-9_-]{16,160}$/.test(
+        submittedAssetId
+      ) ||
       !Number.isSafeInteger(fileSize) ||
       fileSize <= 0 ||
       fileSize > MATERIAL_MAX_FILE_BYTES ||
@@ -1297,10 +799,12 @@ module.exports = async function handler(req, res) {
     }
 
     const verifiedFile =
-      await verifyStorageMaterialUpload({
-        storageKey,
+      await verifyCloudinaryMaterialUpload({
+        publicId: storageKey,
+        assetId: submittedAssetId,
         fileName,
-        fileSize
+        fileSize,
+        fileType
       });
     const createdAtIso = new Date().toISOString();
     const materialData = {
@@ -1317,6 +821,13 @@ module.exports = async function handler(req, res) {
       filePath: "",
       fileId: verifiedFile.fileId,
       storageKey: verifiedFile.storageKey,
+      storageProvider: "cloudinary",
+      cloudinaryPublicId:
+        verifiedFile.cloudinaryPublicId,
+      cloudinaryAssetId:
+        verifiedFile.cloudinaryAssetId,
+      cloudinaryFormat:
+        verifiedFile.cloudinaryFormat,
       size: verifiedFile.size,
       fileType: verifiedFile.fileType,
       status: "approved",
@@ -1329,7 +840,7 @@ module.exports = async function handler(req, res) {
     const db = admin.firestore();
     const materialRef = db
       .collection("courseMaterials")
-      .doc("storage-" + verifiedFile.storageKey);
+      .doc("cloudinary-" + verifiedFile.fileId);
     const uploadLimitRef = db
       .collection("materialUploadLimits")
       .doc(decodedUser.uid);
@@ -1383,6 +894,10 @@ module.exports = async function handler(req, res) {
         registeredFileId: verifiedFile.fileId,
         registeredStorageKey:
           verifiedFile.storageKey,
+        registeredCloudinaryAssetId:
+          verifiedFile.cloudinaryAssetId,
+        registeredCloudinaryPublicId:
+          verifiedFile.cloudinaryPublicId,
         registeredMaterialId: materialRef.id
       });
 
