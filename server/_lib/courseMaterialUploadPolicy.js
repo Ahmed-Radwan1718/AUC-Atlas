@@ -111,34 +111,6 @@ function doesMaterialMimeMatchFileName(fileName, mimeType) {
   );
 }
 
-function buildImageKitUploadChecks(fileSize) {
-  const safeFileSize = Number(fileSize);
-
-  if (
-    !Number.isSafeInteger(safeFileSize) ||
-    safeFileSize <= 0 ||
-    safeFileSize > MATERIAL_MAX_FILE_BYTES
-  ) {
-    return "";
-  }
-
-  const allowedMimeTypes = MATERIAL_ALLOWED_MIME_TYPES
-    .map(function (mimeType) {
-      return JSON.stringify(mimeType);
-    })
-    .join(", ");
-
-  return (
-    '"file.size" = ' +
-    safeFileSize +
-    ' AND "file.size" <= ' +
-    MATERIAL_MAX_FILE_BYTES +
-    ' AND "file.mime" IN [' +
-    allowedMimeTypes +
-    "]"
-  );
-}
-
 module.exports = {
   MATERIAL_MAX_FILE_BYTES,
   MATERIAL_USER_QUOTA_BYTES,
@@ -149,6 +121,5 @@ module.exports = {
   normalizeMaterialMimeType,
   isAllowedMaterialFileName,
   isAllowedMaterialMimeType,
-  doesMaterialMimeMatchFileName,
-  buildImageKitUploadChecks
+  doesMaterialMimeMatchFileName
 };
