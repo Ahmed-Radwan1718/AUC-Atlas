@@ -2,6 +2,11 @@ const crypto = require("crypto");
 const admin = require(
   "../server/_lib/firebaseAdmin"
 );
+const {
+  deleteCloudinaryMaterial
+} = require(
+  "../server/_lib/cloudinaryCourseMaterials"
+);
 
 const CLEANUP_GRACE_MS =
   15 * 60 * 1000;
