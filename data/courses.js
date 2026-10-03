@@ -7702,20 +7702,53 @@ list.innerHTML = professors.map(function (professor) {
   function uploadMaterialFile(
     uploadUrl,
     file,
-    fileType,
+    authorization,
     onProgress
   ) {
     return new Promise(function (resolve, reject) {
       const request = new XMLHttpRequest();
+      const formData = new FormData();
+      const uploadParameters =
+        authorization &&
+        authorization.uploadParameters &&
+        typeof authorization.uploadParameters ===
+          "object"
+          ? authorization.uploadParameters
+          : {};
+
+      formData.append("file", file);
+
+      Object.keys(uploadParameters).forEach(
+        function (key) {
+          formData.append(
+            key,
+            String(uploadParameters[key])
+          );
+        }
+      );
+
+      formData.append(
+        "api_key",
+        String(
+          authorization &&
+          authorization.apiKey
+            ? authorization.apiKey
+            : ""
+        )
+      );
+      formData.append(
+        "signature",
+        String(
+          authorization &&
+          authorization.signature
+            ? authorization.signature
+            : ""
+        )
+      );
 
       request.open(
         "POST",
         uploadUrl
-      );
-
-      request.setRequestHeader(
-        "Content-Type",
-        fileType
       );
 
       request.upload.addEventListener(
@@ -7755,8 +7788,12 @@ list.innerHTML = professors.map(function (professor) {
 
           reject(
             new Error(
-              responseData.error ||
-                "The storage server rejected the upload."
+              (
+                responseData.error &&
+                responseData.error.message
+              ) ||
+                responseData.error ||
+                "Cloudinary rejected the upload."
             )
           );
         }
@@ -7767,7 +7804,7 @@ list.innerHTML = professors.map(function (professor) {
         function () {
           reject(
             new Error(
-              "The upload connection failed."
+              "The Cloudinary upload connection failed."
             )
           );
         }
@@ -7784,7 +7821,7 @@ list.innerHTML = professors.map(function (professor) {
         }
       );
 
-      request.send(file);
+      request.send(formData);
     });
   }
 
@@ -7995,7 +8032,7 @@ list.innerHTML = professors.map(function (professor) {
             }
 
             const authResponse = await fetch(
-              "/api/imagekit-auth",
+              "/api/cloudinary-auth",
               {
                 method: "POST",
                 credentials: "same-origin",
@@ -8043,13 +8080,9 @@ list.innerHTML = professors.map(function (professor) {
               String(
                 auth.uploadUrl || ""
               ).trim();
-            const storageKey =
+            const cloudinaryPublicId =
               String(
-                auth.storageKey || ""
-              ).trim();
-            const fileType =
-              String(
-                auth.fileType || ""
+                auth.cloudinaryPublicId || ""
               ).trim();
 
             activeAuthorizationId =
@@ -8059,16 +8092,20 @@ list.innerHTML = professors.map(function (professor) {
 
             if (
               !activeAuthorizationId ||
-              !/^[a-f0-9]{36}$/i.test(
-                storageKey
+              !/^auc-atlas\/materials\/[a-f0-9]{36}\.(?:pdf|docx?|pptx?|xlsx?|jpe?g|png)$/i.test(
+                cloudinaryPublicId
               ) ||
-              !uploadUrl.startsWith(
-                "https://storage.aucatlas.com/upload?"
+              !/^https:\/\/api\.cloudinary\.com\/v1_1\/[^/]+\/raw\/authenticated$/.test(
+                uploadUrl
               ) ||
-              !fileType
+              !auth.apiKey ||
+              !auth.signature ||
+              !auth.uploadParameters ||
+              auth.uploadParameters.public_id !==
+                cloudinaryPublicId
             ) {
               throw new Error(
-                "The secure upload authorization is incomplete."
+                "The secure Cloudinary upload authorization is incomplete."
               );
             }
 
@@ -8076,7 +8113,7 @@ list.innerHTML = professors.map(function (professor) {
               await uploadMaterialFile(
                 uploadUrl,
                 file,
-                fileType,
+                auth,
                 function (
                   fileProgress
                 ) {
@@ -8100,6 +8137,26 @@ list.innerHTML = professors.map(function (professor) {
                   );
                 }
               );
+            const cloudinaryAssetId =
+              String(
+                uploadedFile.asset_id || ""
+              ).trim();
+
+            if (
+              uploadedFile.public_id !==
+                cloudinaryPublicId ||
+              uploadedFile.resource_type !== "raw" ||
+              uploadedFile.type !== "authenticated" ||
+              Number(uploadedFile.bytes) !==
+                file.size ||
+              !/^[A-Za-z0-9_-]{16,160}$/.test(
+                cloudinaryAssetId
+              )
+            ) {
+              throw new Error(
+                "Cloudinary returned an unexpected upload result."
+              );
+            }
 
             const saveResponse =
               await fetch(
@@ -8117,9 +8174,10 @@ list.innerHTML = professors.map(function (professor) {
                       activeAuthorizationId,
                     uploadGroupId:
                       uploadGroupId,
-                    storageKey:
-                      uploadedFile.storageKey ||
-                      storageKey
+                    cloudinaryPublicId:
+                      cloudinaryPublicId,
+                    cloudinaryAssetId:
+                      cloudinaryAssetId
                   })
                 }
               );
@@ -8207,7 +8265,7 @@ list.innerHTML = professors.map(function (professor) {
         } catch (error) {
           if (activeAuthorizationId) {
             await fetch(
-              "/api/imagekit-auth",
+              "/api/cloudinary-auth",
               {
                 method: "POST",
                 credentials:
