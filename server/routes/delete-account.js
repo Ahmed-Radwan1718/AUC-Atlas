@@ -11,6 +11,9 @@ const {
   consumeSecurityRateLimit,
   clearSecurityRateLimit
 } = require("../_lib/securityRateLimits");
+const {
+  deleteCloudinaryMaterial
+} = require("../_lib/cloudinaryCourseMaterials");
 
 const DELETE_ACCOUNT_ATTEMPT_WINDOW_MS =
   15 * 60 * 1000;
@@ -36,50 +39,6 @@ function getRequestBody(req) {
   }
 
   return req.body || {};
-}
-
-function getImageKitAuthorizationHeader() {
-  const privateKey = cleanString(
-    process.env.IMAGEKIT_PRIVATE_KEY,
-    500
-  );
-
-  return privateKey
-    ? "Basic " +
-        Buffer.from(privateKey + ":").toString("base64")
-    : "";
-}
-
-async function deleteImageKitFile(fileId) {
-  const authorization =
-    getImageKitAuthorizationHeader();
-  const safeFileId = cleanString(fileId, 160);
-
-  if (
-    !authorization ||
-    !/^[A-Za-z0-9_-]{6,160}$/.test(safeFileId)
-  ) {
-    return;
-  }
-
-  const response = await fetch(
-    "https://api.imagekit.io/v1/files/" +
-      encodeURIComponent(safeFileId),
-    {
-      method: "DELETE",
-      headers: {
-        Accept: "application/json",
-        Authorization: authorization
-      }
-    }
-  );
-
-  if (!response.ok && response.status !== 404) {
-    throw createDeleteAccountError(
-      "Could not delete an uploaded course file.",
-      502
-    );
-  }
 }
 
 function getCloudinaryConfig() {
@@ -251,8 +210,8 @@ async function deleteUserMaterials(db, uid) {
       snapshot.docs.map(function (doc) {
         const data = doc.data() || {};
 
-        return deleteImageKitFile(
-          data.fileId
+        return deleteCloudinaryMaterial(
+          data.storageKey
         ).catch(function () {});
       })
     );
