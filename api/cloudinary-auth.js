@@ -11,9 +11,12 @@ const {
   MATERIAL_UPLOAD_AUTH_TTL_SECONDS,
   cleanMaterialFileName,
   getMaterialFileExtension,
-  isAllowedMaterialFileName,
-  buildImageKitUploadChecks
+  isAllowedMaterialFileName
 } = require("../server/_lib/courseMaterialUploadPolicy");
+const {
+  createCloudinaryUploadAuthorization,
+  deleteCloudinaryMaterial
+} = require("../server/_lib/cloudinaryCourseMaterials");
 
 const MATERIAL_UPLOAD_AUTHORIZATION_WINDOW_MS =
   60 * 60 * 1000;
@@ -39,13 +42,13 @@ const MATERIAL_TYPE_LOOKUP = MATERIAL_TYPE_CHOICES.reduce(
   {}
 );
 
-function createImageKitAuthError(message, statusCode) {
+function createMaterialUploadError(message, statusCode) {
   const error = new Error(message);
   error.statusCode = statusCode;
   return error;
 }
 
-function createImageKitRateLimitError(retryAfterSeconds) {
+function createMaterialUploadRateLimitError(retryAfterSeconds) {
   const safeRetryAfterSeconds = Math.max(
     1,
     Math.ceil(Number(retryAfterSeconds) || 1)
@@ -54,7 +57,7 @@ function createImageKitRateLimitError(retryAfterSeconds) {
     1,
     Math.ceil(safeRetryAfterSeconds / 60)
   );
-  const error = createImageKitAuthError(
+  const error = createMaterialUploadError(
     "Too many course-material uploads. Try again in " +
       retryAfterMinutes +
       (retryAfterMinutes === 1 ? " minute." : " minutes."),
@@ -121,43 +124,6 @@ function getRequestBody(req) {
   return req.body || {};
 }
 
-function getStorageConfig() {
-  const url = cleanString(
-    process.env.COURSE_MATERIAL_STORAGE_URL,
-    1000
-  ).replace(/\/+$/, "");
-  const secret = cleanString(
-    process.env.COURSE_MATERIAL_STORAGE_SECRET,
-    500
-  ).toLowerCase();
-
-  let parsedUrl = null;
-
-  try {
-    parsedUrl = new URL(url);
-  } catch (error) {
-    parsedUrl = null;
-  }
-
-  if (
-    !parsedUrl ||
-    parsedUrl.protocol !== "https:" ||
-    parsedUrl.username ||
-    parsedUrl.password ||
-    !/^[a-f0-9]{64}$/.test(secret)
-  ) {
-    throw createImageKitAuthError(
-      "Course-material storage is not configured.",
-      500
-    );
-  }
-
-  return {
-    url: parsedUrl.origin,
-    secret
-  };
-}
-
 function getMaterialMimeType(fileName) {
   const mimeTypes = {
     pdf: "application/pdf",
@@ -181,96 +147,6 @@ function getMaterialMimeType(fileName) {
   );
 }
 
-function createStorageSignature(secret, parts) {
-  return crypto
-    .createHmac("sha256", secret)
-    .update(parts.join("\n"))
-    .digest("hex");
-}
-
-function buildStorageUploadUrl(config, data) {
-  const query = new URLSearchParams({
-    key: data.storageKey,
-    filename: data.fileName,
-    size: String(data.fileSize),
-    type: data.fileType,
-    expires: String(data.expiresAt),
-    nonce: data.nonce
-  });
-
-  query.set(
-    "signature",
-    createStorageSignature(
-      config.secret,
-      [
-        "upload",
-        data.storageKey,
-        data.fileName,
-        String(data.fileSize),
-        data.fileType,
-        String(data.expiresAt),
-        data.nonce
-      ]
-    )
-  );
-
-  return (
-    config.url +
-    "/upload?" +
-    query.toString()
-  );
-}
-
-async function deleteStorageMaterial(storageKey) {
-  const safeStorageKey = cleanString(
-    storageKey,
-    80
-  );
-
-  if (!/^[a-f0-9]{36}$/i.test(safeStorageKey)) {
-    return;
-  }
-
-  const config = getStorageConfig();
-  const expires =
-    Math.floor(Date.now() / 1000) + 5 * 60;
-  const query = new URLSearchParams({
-    key: safeStorageKey,
-    expires: String(expires)
-  });
-
-  query.set(
-    "signature",
-    createStorageSignature(
-      config.secret,
-      [
-        "delete",
-        safeStorageKey,
-        String(expires)
-      ]
-    )
-  );
-
-  const response = await fetch(
-    config.url +
-      "/file?" +
-      query.toString(),
-    {
-      method: "DELETE",
-      headers: {
-        Accept: "application/json"
-      }
-    }
-  );
-
-  if (!response.ok && response.status !== 404) {
-    throw createImageKitAuthError(
-      "Could not clean up the abandoned upload.",
-      502
-    );
-  }
-}
-
 async function ensureVerifiedAucUser(req) {
   const decodedUser = await getSiteSessionUser(req, {
     checkRevoked: true
@@ -286,7 +162,7 @@ async function ensureVerifiedAucUser(req) {
     !userRecord.emailVerified ||
     !email.endsWith("@aucegypt.edu")
   ) {
-    throw createImageKitAuthError(
+    throw createMaterialUploadError(
       "Please verify your AUC email address before uploading materials.",
       403
     );
@@ -387,7 +263,7 @@ async function reserveMaterialUploadAuthorization(data) {
       ) &&
       activeAuthorizationCleanupAtMs > nowMs
     ) {
-      throw createImageKitRateLimitError(
+      throw createMaterialUploadRateLimitError(
         Math.ceil(
           (activeAuthorizationCleanupAtMs - nowMs) /
             1000
@@ -399,7 +275,7 @@ async function reserveMaterialUploadAuthorization(data) {
       data.currentStoredBytes + data.fileSize >
       MATERIAL_USER_QUOTA_BYTES
     ) {
-      throw createImageKitAuthError(
+      throw createMaterialUploadError(
         "Your course-material storage quota has been reached.",
         413
       );
@@ -644,7 +520,7 @@ async function cleanupExpiredMaterialUploadAuthorization(
     return;
   }
 
-  await deleteStorageMaterial(
+  await deleteCloudinaryMaterial(
     cleanup.storageKey
   );
 
@@ -712,7 +588,7 @@ async function cancelMaterialUploadAuthorization(
   });
 
   if (storageKey) {
-    await deleteStorageMaterial(
+    await deleteCloudinaryMaterial(
       storageKey
     ).catch(function () {});
   }
@@ -752,7 +628,6 @@ module.exports = async function handler(req, res) {
         "Too many course-material upload requests. Please try again later."
     });
 
-    const config = getStorageConfig();
     const courseCode = cleanString(
       body.courseCode,
       40
@@ -788,7 +663,7 @@ module.exports = async function handler(req, res) {
       fileSize <= 0 ||
       fileSize > MATERIAL_MAX_FILE_BYTES
     ) {
-      throw createImageKitAuthError(
+      throw createMaterialUploadError(
         "Choose a supported course-material file up to 25MB.",
         400
       );
@@ -800,8 +675,6 @@ module.exports = async function handler(req, res) {
 
     const authorizationId =
       crypto.randomBytes(18).toString("hex");
-    const nonce =
-      crypto.randomBytes(18).toString("hex");
     const issuedAt =
       Math.floor(Date.now() / 1000);
     const expiresAt =
@@ -810,6 +683,11 @@ module.exports = async function handler(req, res) {
     const currentStoredBytes =
       await getStoredBytesForUploader(
         uploader.uid
+      );
+    const cloudinaryUpload =
+      createCloudinaryUploadAuthorization(
+        authorizationId,
+        fileName
       );
 
     await reserveMaterialUploadAuthorization({
@@ -827,27 +705,22 @@ module.exports = async function handler(req, res) {
       fileName,
       fileSize,
       fileType,
-      storageKey: authorizationId,
+      storageKey: cloudinaryUpload.publicId,
       expiresAtMs,
       currentStoredBytes
     });
 
-    const uploadUrl = buildStorageUploadUrl(
-      config,
-      {
-        storageKey: authorizationId,
-        fileName,
-        fileSize,
-        fileType,
-        expiresAt,
-        nonce
-      }
-    );
-
     return res.status(200).json({
       authorizationId,
-      storageKey: authorizationId,
-      uploadUrl,
+      storageKey: cloudinaryUpload.publicId,
+      cloudinaryPublicId:
+        cloudinaryUpload.publicId,
+      uploadUrl: cloudinaryUpload.uploadUrl,
+      apiKey: cloudinaryUpload.apiKey,
+      signature: cloudinaryUpload.signature,
+      timestamp: cloudinaryUpload.timestamp,
+      uploadParameters:
+        cloudinaryUpload.uploadParameters,
       fileType,
       expiresAt: new Date(expiresAtMs).toISOString(),
       limits: {
