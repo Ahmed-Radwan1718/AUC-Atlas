@@ -1,23 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>AUC Atlas | Professors, Courses & Student Materials</title>
-
-  <meta property="og:image" content="https://aucatlas.com/logo.svg">
-  <meta property="og:image:secure_url" content="https://aucatlas.com/logo.svg">
-  <meta property="og:image:type" content="image/svg+xml">
-  <meta property="og:image:width" content="512">
-  <meta property="og:image:height" content="512">
-  <meta property="og:image:alt" content="AUC Atlas logo">
-
-  <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
-  <link rel="apple-touch-icon" sizes="180x180" href="/logo.svg">
-
-  <style>
-    * {
+/* Homepage styles migrated from index.html. */
+* {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -1661,843 +1643,724 @@
         padding-bottom: 80px;
       }
     }
-  </style>
-</head>
 
-<body>
-  <div id="site-header-root"></div>
-  <script src="site-header.js"></script>
+/* Shared header styles migrated from site-header.js. */
+:where(
+      button,
+      [role="button"],
+      input[type="button"],
+      input[type="submit"],
+      input[type="reset"]
+    ) {
+      -webkit-tap-highlight-color: transparent;
+      transition:
+        color 0.2s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+    }
 
-  <main class="home-page">
+    :where(
+      button,
+      [role="button"],
+      input[type="button"],
+      input[type="submit"],
+      input[type="reset"]
+    ):not([class*="backdrop"]):not(:disabled):not([aria-disabled="true"]):active {
+      transform: translateY(1px) scale(0.98);
+    }
 
-    <section class="home-hero">
-      <div>
-        <p class="home-kicker">Built for AUC students</p>
-        <h1>Know before you enroll.</h1>
-        <p class="home-hero-copy">
-          Search professors, courses, and student-uploaded material in one place.
-        </p>
+    @media (prefers-reduced-motion: reduce) {
+      :where(
+        button,
+        [role="button"],
+        input[type="button"],
+        input[type="submit"],
+        input[type="reset"]
+      ) {
+        transition-duration: 0.01ms !important;
+      }
+    }
 
-        <form class="atlas-search" id="atlas-search-form" role="search" autocomplete="off" novalidate>
-          <input
-            id="atlas-search-input"
-            name="q"
-            type="search"
-            placeholder="Search a professor, course, or material"
-            aria-label="Search AUC Atlas"
-            aria-controls="atlas-search-results"
-            aria-expanded="false"
-            aria-autocomplete="list"
-            autocomplete="off"
-            spellcheck="false"
-          >
-          <button type="submit">Search</button>
+    .site-header {
+      position: fixed;
+      top: 22px;
+      left: 50%;
+      z-index: 90;
+      width: min(1120px, calc(100% - 48px));
+      min-height: 62px;
+      padding: 0 14px 0 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.12);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: minmax(160px, 1fr) auto minmax(160px, 1fr);
+      align-items: center;
+      gap: 24px;
+    }
 
-          <div
-            class="atlas-search-results"
-            id="atlas-search-results"
-            aria-label="Search results"
-            hidden
-          >
-            <div id="atlas-search-results-list"></div>
-            <p
-              class="atlas-search-status"
-              id="atlas-search-status"
-              aria-live="polite"
-              hidden
-            ></p>
-          </div>
-        </form>
-      </div>
+    .site-header-logo,
+    .site-header-logo:visited {
+      position: relative;
+      justify-self: start;
+      min-width: 88px;
+      min-height: 34px;
+      padding: 6px 0;
+      box-sizing: border-box;
+      color: #171717;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 4px;
+      overflow: hidden;
+      isolation: isolate;
+    }
 
-      <aside class="home-feature-card">
-        <span>Quick access</span>
-        <h2>Start with what you need.</h2>
-        <p>
-          Jump directly to the main AUC Atlas tools instead of searching through the site.
-        </p>
+    .site-header-logo::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 32px;
+      height: 32px;
+      background: url("/logo.svg") center / contain no-repeat;
+      opacity: 0;
+      filter: drop-shadow(0 10px 18px rgba(42, 32, 20, 0.18));
+      transform: translate(-50%, -50%) scale(0.18) rotate(-28deg);
+      transition: opacity 0.28s ease, transform 0.42s cubic-bezier(0.2, 0.9, 0.2, 1.2);
+    }
 
-        <div class="home-quick-links">
-          <a class="home-quick-link" href="professors.html">
-            <strong>Browse professors</strong>
-            <span aria-hidden="true">→</span>
-          </a>
+    .site-header-logo-auc,
+    .site-header-logo-atlas {
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+      transform-origin: center;
+      transition: opacity 0.24s ease, filter 0.24s ease, transform 0.36s cubic-bezier(0.2, 0.9, 0.2, 1);
+    }
 
-          <a class="home-quick-link" href="courses.html">
-            <strong>Explore courses</strong>
-            <span aria-hidden="true">→</span>
-          </a>
+    .site-header-logo-auc {
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 14px;
+    }
 
-          <a class="home-quick-link" href="gpa-calculator.html">
-            <strong>Calculate your GPA</strong>
-            <span aria-hidden="true">→</span>
-          </a>
-        </div>
-      </aside>
-    </section>
+    .site-header-logo-atlas {
+      color: #171717;
+      font-size: 22px;
+    }
 
-    <section class="home-stats-section" aria-labelledby="home-stats-title">
-      <div class="home-section-head">
-        <div>
-          <p class="home-kicker">AUC Atlas by the numbers</p>
-          <h2 id="home-stats-title">Built from student knowledge.</h2>
-        </div>
+    .site-header-logo:hover .site-header-logo-auc,
+    .site-header-logo:focus-visible .site-header-logo-auc {
+      opacity: 0;
+      filter: blur(6px);
+      transform: translateX(22px) scale(0.15) rotate(24deg);
+    }
 
-        <p>
-          Live counts from the professors, courses, reviews, and visits during the current week.
-        </p>
-      </div>
+    .site-header-logo:hover .site-header-logo-atlas,
+    .site-header-logo:focus-visible .site-header-logo-atlas {
+      opacity: 0;
+      filter: blur(6px);
+      transform: translateX(-20px) scale(0.15) rotate(-20deg);
+    }
 
-      <div class="home-stats-grid">
-        <article class="home-stat">
-          <strong id="home-professor-count">0</strong>
-          <span>Professors listed</span>
-        </article>
+    .site-header-logo:hover::after,
+    .site-header-logo:focus-visible::after {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
 
-        <article class="home-stat">
-          <strong id="home-course-count">0</strong>
-          <span>Courses available</span>
-        </article>
+    .site-header-nav {
+      grid-column: 2;
+      justify-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 34px;
+    }
 
-        <article class="home-stat">
-          <strong id="home-review-count">—</strong>
-          <span>Student reviews</span>
-        </article>
+    .site-header-nav > a,
+    .site-header-nav > a:visited {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: color 0.2s ease, opacity 0.2s ease;
+    }
 
-        <article class="home-stat">
-          <strong id="home-weekly-visit-count">—</strong>
-          <span>Visits this week</span>
-        </article>
-      </div>
-    </section>
+    .site-header-nav > a:hover {
+      color: #171717;
+    }
 
-    <section class="home-content-section" aria-labelledby="home-latest-title">
-      <div class="home-section-head">
-        <div>
-          <p class="home-kicker">Latest on AUC Atlas</p>
-          <h2 id="home-latest-title">See what students added recently.</h2>
-        </div>
+    .site-header-actions {
+      grid-column: 3;
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
-        <p>
-          Check the newest professor reviews, student-uploaded course materials, and professors with the highest student ratings.
-        </p>
-      </div>
+    .site-notification-button,
+    .site-notification-button:visited {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      color: #171717;
+      text-decoration: none;
+      display: grid;
+      place-items: center;
+      transition:
+        background 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    }
 
-      <div class="home-latest-grid">
-        <article class="home-latest-card">
-          <div class="home-latest-card-head">
-            <div>
-              <span>Student feedback</span>
-              <h3>Recent reviews</h3>
-            </div>
+    .site-notification-button:hover {
+      background: rgba(192, 154, 92, 0.12);
+      transform: translateY(-1px);
+    }
 
-            <a href="professors.html">View all →</a>
-          </div>
+    .site-notification-button:focus-visible {
+      outline: 3px solid rgba(192, 154, 92, 0.32);
+      outline-offset: 2px;
+    }
 
-          <div class="home-latest-list" id="home-latest-reviews">
-            <p class="home-latest-status">Loading recent reviews...</p>
-          </div>
-        </article>
+    .site-notification-button img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      display: block;
+    }
 
-        <article class="home-latest-card">
-          <div class="home-latest-card-head">
-            <div>
-              <span>Course resources</span>
-              <h3>New materials</h3>
-            </div>
+    .site-notification-badge {
+      position: absolute;
+      top: -2px;
+      right: -3px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border: 2px solid #ffffff;
+      border-radius: 999px;
+      background: #ad2525;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 14px;
+      text-align: center;
+    }
 
-            <a href="courses.html">View all →</a>
-          </div>
+    .floating-account-widget {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
 
-          <div class="home-latest-list" id="home-latest-materials">
-            <p class="home-latest-status">Loading new materials...</p>
-          </div>
-        </article>
+    .floating-account-button {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
 
-        <article class="home-latest-card">
-          <div class="home-latest-card-head">
-            <div>
-              <span>Student ratings</span>
-              <h3>Top reviewed professors</h3>
-            </div>
+    .floating-account-button img {
+      width: 24px;
+      height: 24px;
+      display: block;
+      object-fit: contain;
+    }
 
-            <a href="professors.html">View all →</a>
-          </div>
+    .floating-account-button img.has-profile-photo {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      object-fit: cover;
+      background: rgba(192, 154, 92, 0.14);
+    }
 
-          <div class="home-latest-list" id="home-latest-professors">
-            <p class="home-latest-status">Loading top-reviewed professors...</p>
-          </div>
-        </article>
-      </div>
-    </section>
+    .floating-account-button:hover {
+      opacity: 0.72;
+      transform: translateY(-1px);
+    }
 
-    <section class="home-content-section" aria-labelledby="home-request-title">
-      <div class="home-request-layout">
-        <div class="home-request-copy">
-          <p class="home-kicker">Missing something?</p>
-          <h2 id="home-request-title">Help us fill the gaps.</h2>
-          <p>
-            Request a missing professor, course, or study resource, or report information that needs to be corrected.
-          </p>
-        </div>
+    .floating-account-menu {
+      position: absolute;
+      top: 52px;
+      right: 0;
+      min-width: 238px;
+      padding: 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.16);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: grid;
+      gap: 4px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px) scale(0.98);
+      transform-origin: top right;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    }
 
-        <div class="home-request-grid">
-          <a
-            class="home-request-card"
-            href="https://wa.me/201010206091"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span>Professor request</span>
-            <strong>Request a professor</strong>
-            <p>Tell us which AUC professor is missing from the directory.</p>
-            <span aria-hidden="true">→</span>
-          </a>
+    .floating-account-menu.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
 
-          <a
-            class="home-request-card"
-            href="https://wa.me/201010206091"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span>Course request</span>
-            <strong>Request a course</strong>
-            <p>Submit a course code or title that should be searchable.</p>
-            <span aria-hidden="true">→</span>
-          </a>
+    .floating-account-menu[hidden],
+    .floating-account-menu-link[hidden] {
+      display: none;
+    }
 
-          <a
-            class="home-request-card"
-            href="https://wa.me/201010206091"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span>Material request</span>
-            <strong>Request course material</strong>
-            <p>Let students know which notes, exams, or resources are needed.</p>
-            <span aria-hidden="true">→</span>
-          </a>
+    .floating-account-menu-link,
+    .floating-account-menu-link:visited {
+      width: 100%;
+      min-height: 38px;
+      padding: 0 13px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.68);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: left;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+    }
 
-          <a
-            class="home-request-card"
-            href="https://wa.me/201010206091"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span>Correction</span>
-            <strong>Report incorrect information</strong>
-            <p>Flag outdated, missing, or inaccurate information on the site.</p>
-            <span aria-hidden="true">→</span>
-          </a>
-        </div>
-      </div>
-    </section>
-  </main>
+    .floating-account-menu-link:hover {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
 
-  <div class="support-donation-modal" id="support-donation-modal" hidden>
-    <button
-      class="support-donation-backdrop"
-      type="button"
-      id="support-donation-backdrop"
-      aria-label="Close donation window"
-    ></button>
+    .floating-account-menu-link img,
+    .floating-account-menu-icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+      object-fit: contain;
+      opacity: 0.68;
+      transition: opacity 0.2s ease;
+    }
 
-    <div
-      class="support-donation-card"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="support-donation-title"
-    >
-      <button
-        class="support-donation-close"
-        type="button"
-        id="support-donation-close"
-        aria-label="Close donation window"
-      >×</button>
+    .floating-account-menu-icon {
+      flex: 0 0 16px;
+      color: inherit;
+      background: currentColor;
+    }
 
-      <div class="support-donation-heading">
-        <div class="support-donation-title-group">
-          <p class="support-donation-kicker">Support AUC Atlas</p>
-          <h2 id="support-donation-title">Scan to donate</h2>
-        </div>
+    .floating-account-menu-link:hover img,
+    .floating-account-menu-link:hover .floating-account-menu-icon {
+      opacity: 1;
+    }
 
-        <p class="support-donation-copy">
-          Open Telda on your phone and scan this QR code to help cover the monthly running costs.
-        </p>
-      </div>
+    .floating-degree-icon {
+      position: relative;
+      background: transparent;
+    }
 
-      <div class="support-barcode">
-        <img src="telda-payment-barcode.png" alt="Telda donation QR code">
-        <span>Scan with Telda</span>
-      </div>
-    </div>
-  </div>
+    .floating-degree-icon::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-left: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      border-radius: 0 0 0 3px;
+    }
 
-  <script src="data/courses.js"></script>
-  <script src="data/professor-data.js"></script>
-  <script src="home-search.js"></script>
+    .floating-degree-icon::after {
+      content: "";
+      position: absolute;
+      left: 5px;
+      bottom: 4px;
+      width: 3px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 5px -3px 0 currentColor, 10px -7px 0 currentColor;
+    }
 
-  <script>
-    (function () {
-      const professorCount = document.getElementById("home-professor-count");
-      const courseCount = document.getElementById("home-course-count");
-      const reviewCount = document.getElementById("home-review-count");
-      const weeklyVisitCount = document.getElementById("home-weekly-visit-count");
-      const latestReviewsRoot = document.getElementById("home-latest-reviews");
-      const latestMaterialsRoot = document.getElementById("home-latest-materials");
-      const latestProfessorsRoot = document.getElementById("home-latest-professors");
+    .floating-reviews-icon {
+      -webkit-mask: url("/support-icon.png") center / contain no-repeat;
+      mask: url("/support-icon.png") center / contain no-repeat;
+    }
 
-      function escapeHomeText(value) {
-        return String(value || "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
+    .floating-account-logout {
+      color: #c73636;
+    }
+
+    .floating-logout-icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+      background: currentColor;
+      opacity: 0.95;
+      transition: opacity 0.2s ease;
+      -webkit-mask: url("/logout-icon.png") center / contain no-repeat;
+      mask: url("/logout-icon.png") center / contain no-repeat;
+    }
+
+    .floating-account-logout:hover {
+      color: #a91515;
+    }
+
+    .floating-account-logout:hover .floating-logout-icon {
+      opacity: 1;
+    }
+
+    .hamburger-toggle {
+      display: none;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      flex-direction: column;
+    }
+
+    .hamburger-toggle span {
+      width: 18px;
+      height: 2px;
+      border-radius: 999px;
+      background: #171717;
+      display: block;
+    }
+
+    .nav-menu-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1001;
+      padding: 82px 14px 14px;
+      background: rgba(23, 23, 23, 0.18);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    body.nav-menu-open .nav-menu-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .nav-menu-panel {
+      padding: 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.16);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: none;
+    }
+
+    .nav-menu-panel.active {
+      display: block;
+    }
+
+    .nav-menu-links {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-menu-link,
+    .nav-menu-link:visited,
+    .nav-menu-button {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.68);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: left;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .nav-menu-link:hover,
+    .nav-menu-button:hover {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
+
+    @media (max-width: 900px) {
+      body.nav-menu-open {
+        overflow: hidden;
       }
 
-      function formatHomeCount(value) {
-        const number = Math.max(
-          0,
-          Math.round(Number(value) || 0)
-        );
-
-        return number.toLocaleString("en-US");
+      .site-header {
+        top: 14px;
+        left: 14px;
+        right: 14px;
+        z-index: 1002;
+        width: auto;
+        height: 54px;
+        min-height: 54px;
+        padding: 0 10px;
+        transform: none;
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr) 92px;
+        align-items: center;
+        gap: 0;
       }
 
-      function prefersReducedHomeMotion() {
-        return window.matchMedia(
-          "(prefers-reduced-motion: reduce)"
-        ).matches;
+      .site-header-nav {
+        display: none;
       }
 
-      function setHomeCount(element, value) {
-        if (!element) {
-          return;
-        }
-
-        const currentValue = Math.max(
-          0,
-          Number(
-            String(element.textContent || "")
-              .replace(/,/g, "")
-          ) || 0
-        );
-        const nextValue = Math.max(
-          0,
-          Math.round(Number(value) || 0)
-        );
-
-        if (
-          prefersReducedHomeMotion() ||
-          currentValue === nextValue
-        ) {
-          element.textContent =
-            formatHomeCount(nextValue);
-          return;
-        }
-
-        if (element.homeCountAnimationFrame) {
-          cancelAnimationFrame(
-            element.homeCountAnimationFrame
-          );
-        }
-
-        const startTime = performance.now();
-        const duration = 520;
-
-        function updateFrame(now) {
-          const progress = Math.min(
-            (now - startTime) / duration,
-            1
-          );
-          const easedProgress =
-            1 - Math.pow(1 - progress, 3);
-          const displayedValue =
-            currentValue +
-            (nextValue - currentValue) *
-              easedProgress;
-
-          element.textContent = formatHomeCount(
-            displayedValue
-          );
-
-          if (progress < 1) {
-            element.homeCountAnimationFrame =
-              requestAnimationFrame(updateFrame);
-          } else {
-            element.textContent =
-              formatHomeCount(nextValue);
-          }
-        }
-
-        element.homeCountAnimationFrame =
-          requestAnimationFrame(updateFrame);
+      .site-header-logo,
+      .site-header-logo:visited {
+        grid-column: 2;
+        justify-self: center;
+        min-width: 88px;
+        display: inline-flex;
+        overflow: hidden;
+        text-align: center;
       }
 
-      function formatHomeDate(value) {
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-          return "Recently";
-        }
-
-        return new Intl.DateTimeFormat("en-US", {
-          month: "short",
-          day: "numeric"
-        }).format(date);
+      .site-header-actions {
+        grid-column: 3;
+        justify-self: end;
+        gap: 2px;
+        display: flex;
       }
 
-      function renderTopReviewedProfessors(summaries) {
-        if (!latestProfessorsRoot) {
-          return;
-        }
-
-        const professors = Array.isArray(window.aucAtlasProfessors)
-          ? window.aucAtlasProfessors
-          : [];
-        const professorsById = new Map();
-
-        professors.forEach(function (professor) {
-          if (professor && professor.id) {
-            professorsById.set(
-              String(professor.id),
-              professor
-            );
-          }
-        });
-
-        const topProfessors = (
-          Array.isArray(summaries)
-            ? summaries
-            : []
-        )
-          .map(function (summary) {
-            const professorId = String(
-              summary && summary.professorId || ""
-            );
-            const professor =
-              professorsById.get(professorId);
-            const averageRating = Number(
-              summary && summary.averageRating
-            );
-            const reviewCount = Math.max(
-              0,
-              Math.round(
-                Number(
-                  summary && summary.reviewCount
-                ) || 0
-              )
-            );
-
-            if (
-              !professor ||
-              !professor.name ||
-              !Number.isFinite(averageRating) ||
-              averageRating <= 0 ||
-              reviewCount <= 0
-            ) {
-              return null;
-            }
-
-            return {
-              professor,
-              averageRating: Math.min(
-                5,
-                averageRating
-              ),
-              reviewCount
-            };
-          })
-          .filter(Boolean)
-          .sort(function (a, b) {
-            if (
-              b.averageRating !==
-              a.averageRating
-            ) {
-              return (
-                b.averageRating -
-                a.averageRating
-              );
-            }
-
-            return (
-              b.reviewCount -
-              a.reviewCount
-            );
-          })
-          .slice(0, 3);
-
-        if (!topProfessors.length) {
-          latestProfessorsRoot.innerHTML = `
-            <p class="home-latest-status">
-              Top-reviewed professors will appear here once ratings are available.
-            </p>
-          `;
-          return;
-        }
-
-        latestProfessorsRoot.innerHTML = topProfessors.map(function (item) {
-          const professor = item.professor;
-          const department =
-            professor.displayDepartment ||
-            professor.department ||
-            "AUC";
-          const reviewLabel =
-            item.reviewCount === 1
-              ? "review"
-              : "reviews";
-          const ratingLabel =
-            item.averageRating.toFixed(1) +
-            " out of 5 from " +
-            item.reviewCount +
-            " " +
-            reviewLabel;
-
-          return `
-            <a
-              class="home-latest-item home-latest-person"
-              href="/professors/${encodeURIComponent(professor.id)}"
-            >
-              <img src="${escapeHomeText(professor.image || "user.png")}" alt="">
-              <span class="home-latest-person-copy">
-                <strong>${escapeHomeText(professor.name)}</strong>
-                <small aria-label="${escapeHomeText(department + ". " + ratingLabel)}">
-                  ${escapeHomeText(department)} ·
-                  <span class="home-latest-stars" aria-hidden="true">★</span>
-                  ${escapeHomeText(item.averageRating.toFixed(1))} ·
-                  ${escapeHomeText(item.reviewCount + " " + reviewLabel)}
-                </small>
-              </span>
-              <span class="home-latest-arrow" aria-hidden="true">→</span>
-            </a>
-          `;
-        }).join("");
+      .site-header-gpa {
+        display: none;
       }
 
-      function renderLatestReviews(reviews) {
-        if (!latestReviewsRoot) {
-          return;
-        }
-
-        const safeReviews = Array.isArray(reviews)
-          ? reviews.slice(0, 3)
-          : [];
-
-        if (!safeReviews.length) {
-          latestReviewsRoot.innerHTML = `
-            <p class="home-latest-status">
-              The newest professor reviews will appear here.
-            </p>
-          `;
-          return;
-        }
-
-        latestReviewsRoot.innerHTML = safeReviews.map(function (review) {
-          const rating = Math.max(
-            0,
-            Math.min(
-              5,
-              Math.round(Number(review.rating) || 0)
-            )
-          );
-          const stars =
-            "★".repeat(rating) +
-            "☆".repeat(5 - rating);
-          const professorId = String(
-            review.professorId || ""
-          );
-          const professor = professors.find(function (item) {
-            return (
-              item &&
-              String(item.id || "") === professorId
-            );
-          });
-          const professorName =
-            review.professorName ||
-            (professor && professor.name) ||
-            "AUC professor";
-          const professorImage =
-            professor && professor.image
-              ? professor.image
-              : "user.png";
-const professorHref = professorId
-  ? "/professors/" +
-    encodeURIComponent(professorId)
-  : "/professors";
-
-          return `
-            <a class="home-latest-item home-latest-person" href="${professorHref}">
-              <img src="${escapeHomeText(professorImage)}" alt="">
-
-              <span class="home-latest-person-copy">
-                <span class="home-latest-item-top">
-                  <span class="home-latest-type">Review</span>
-                  <small>${escapeHomeText(formatHomeDate(review.createdAt))}</small>
-                </span>
-
-                <strong>${escapeHomeText(professorName)}</strong>
-
-                <span class="home-latest-item-bottom">
-                  <small>
-                    ${escapeHomeText(review.courseCode || "Course not listed")}
-                  </small>
-                  <span
-                    class="home-latest-stars"
-                    aria-label="${rating} out of 5 stars"
-                  >${stars}</span>
-                </span>
-              </span>
-            </a>
-          `;
-        }).join("");
+      .site-header-user,
+      .site-header-user:visited,
+      .floating-account-button {
+        width: 44px;
+        height: 44px;
       }
 
-      function renderLatestMaterials(materials) {
-        if (!latestMaterialsRoot) {
-          return;
-        }
-
-        const safeMaterials = Array.isArray(materials)
-          ? materials.slice(0, 3)
-          : [];
-
-        if (!safeMaterials.length) {
-          latestMaterialsRoot.innerHTML = `
-            <p class="home-latest-status">
-              New approved course materials will appear here.
-            </p>
-          `;
-          return;
-        }
-
-        latestMaterialsRoot.innerHTML = safeMaterials.map(function (material) {
-          const courseCode =
-            material.courseCode ||
-            "AUC course";
-const materialCourseSlug = String(
-  material.courseCode || ""
-)
-  .trim()
-  .toLowerCase()
-  .replace(/[^a-z0-9]+/g, "-")
-  .replace(/^-+|-+$/g, "");
-
-const materialHref = materialCourseSlug
-  ? "/courses/" +
-    encodeURIComponent(materialCourseSlug) +
-    "#course-materials-access"
-  : "/courses";
-
-          return `
-            <a class="home-latest-item" href="${materialHref}">
-              <span class="home-latest-item-top">
-                <span class="home-latest-type">
-                  ${escapeHomeText(material.materialType || "Material")}
-                </span>
-                <small>
-                  ${escapeHomeText(formatHomeDate(material.createdAt))}
-                </small>
-              </span>
-
-              <strong>
-                ${escapeHomeText(material.title || "Course material")}
-              </strong>
-
-              <span class="home-latest-item-bottom">
-                <small>${escapeHomeText(courseCode)}</small>
-                <span class="home-latest-arrow" aria-hidden="true">→</span>
-              </span>
-            </a>
-          `;
-        }).join("");
+      .floating-account-menu {
+        right: -4px;
+        max-width: calc(100vw - 28px);
+        max-height: calc(100dvh - 90px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
       }
 
-      const courses = Array.isArray(window.aucAtlasCourses)
-        ? window.aucAtlasCourses
-        : [];
-      const professors = Array.isArray(window.aucAtlasProfessors)
-        ? window.aucAtlasProfessors
-        : [];
-
-      setHomeCount(courseCount, courses.length);
-      setHomeCount(professorCount, professors.length);
-
-      Promise.resolve(
-        window.aucAtlasWeeklyVisitsPromise
-      )
-        .then(function (count) {
-          const numericCount = Number(count);
-
-          if (
-            count !== null &&
-            count !== undefined &&
-            Number.isFinite(numericCount)
-          ) {
-            return numericCount;
-          }
-
-          return fetch("/api/weekly-visitors", {
-            method: "GET",
-            credentials: "same-origin",
-            cache: "no-store",
-            headers: {
-              Accept: "application/json"
-            }
-          })
-            .then(function (response) {
-              if (!response.ok) {
-                throw new Error(
-                  "Could not load weekly visits."
-                );
-              }
-
-              return response.json();
-            })
-            .then(function (data) {
-              return data.weeklyVisits;
-            });
-        })
-        .then(function (count) {
-          setHomeCount(weeklyVisitCount, count);
-        })
-        .catch(function () {
-          if (weeklyVisitCount) {
-            weeklyVisitCount.textContent = "—";
-          }
-        });
-
-      fetch("/api/homepage-overview", {
-        method: "GET",
-        credentials: "same-origin",
-        headers: {
-          Accept: "application/json"
-        }
-      })
-        .then(function (response) {
-          if (!response.ok) {
-            throw new Error("Could not load homepage activity.");
-          }
-
-          return response.json();
-        })
-        .then(function (data) {
-          setHomeCount(reviewCount, data.reviewCount);
-          renderLatestReviews(data.latestReviews);
-          renderLatestMaterials(data.latestMaterials);
-          renderTopReviewedProfessors(
-            data.topReviewedProfessors
-          );
-        })
-        .catch(function () {
-          if (reviewCount) {
-            reviewCount.textContent = "—";
-          }
-
-          renderLatestReviews([]);
-          renderLatestMaterials([]);
-          renderTopReviewedProfessors([]);
-        });
-    })();
-  </script>
-
-  <script>
-    (function () {
-      const openButton = document.getElementById("support-donate-open");
-      const modal = document.getElementById("support-donation-modal");
-      const backdrop = document.getElementById("support-donation-backdrop");
-      const closeButton = document.getElementById("support-donation-close");
-      const monthlyGoalCopy = document.getElementById("support-monthly-goal-copy");
-      const monthlyGoal = document.getElementById("support-monthly-goal");
-      const progressFill = document.getElementById("support-progress-fill");
-      const progressText = document.getElementById("support-progress-text");
-
-      function formatDonationAmount(value, currency) {
-        const amount = Number(value || 0);
-        const formatted = Number.isInteger(amount)
-          ? amount.toLocaleString("en-US")
-          : amount.toLocaleString("en-US", {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 2
-            });
-
-        return currency === "EGP" ? "EGP " + formatted : "$" + formatted;
+      .floating-account-menu-link {
+        min-height: 44px;
       }
 
-      function updateDonationCounter(data) {
-        const currentAmount = Math.max(0, Number(data.currentAmount || 0));
-        const goalAmount = Math.max(0, Number(data.goalAmount || 100));
-        const currency = data.currency === "EGP" ? "EGP" : "USD";
-        const percentage = goalAmount > 0
-          ? Math.min(100, Math.max(0, currentAmount / goalAmount * 100))
-          : 0;
-
-        if (monthlyGoalCopy) {
-          monthlyGoalCopy.textContent = formatDonationAmount(goalAmount, currency) + "/month";
-        }
-
-        if (monthlyGoal) {
-          monthlyGoal.textContent = formatDonationAmount(goalAmount, currency);
-        }
-
-        if (progressFill) {
-          progressFill.style.width = percentage + "%";
-        }
-
-        if (progressText) {
-          progressText.textContent =
-            formatDonationAmount(currentAmount, currency) +
-            " of " +
-            formatDonationAmount(goalAmount, currency);
-        }
+      .hamburger-toggle {
+        grid-column: 1;
+        grid-row: 1;
+        display: flex;
+        justify-self: start;
+        width: 44px;
+        height: 44px;
       }
 
-      fetch("/api/donation-counter", {
-        method: "GET",
-        credentials: "same-origin",
-        headers: {
-          Accept: "application/json"
+      .nav-menu-overlay {
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .nav-menu-panel {
+        max-height: calc(100dvh - 96px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+
+      .auth-section {
+        min-height: calc(100dvh - 88px);
+      }
+
+      .auth-password-input-wrap input {
+        padding-right: 62px;
+      }
+
+      .auth-password-visibility-toggle {
+        right: 4px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .auth-two-factor-panel {
+        padding: 12px;
+        overflow-y: auto;
+        align-items: flex-start;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .auth-two-factor-card {
+        max-height: calc(100dvh - 24px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+    }
+
+/* Shared footer styles migrated from site-footer.js. */
+.site-footer {
+        padding: 46px 0 24px;
+        border-top: 1px solid rgba(23, 23, 23, 0.08);
+        background: rgba(255, 255, 255, 0.58);
+        color: #171717;
+      }
+
+      .site-footer-inner {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .site-footer-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) repeat(3, minmax(140px, 0.65fr));
+        gap: 34px;
+      }
+
+      .site-footer-logo {
+        margin-bottom: 10px;
+        color: #171717;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 4px;
+      }
+
+      .site-footer-logo-auc {
+        color: rgba(192, 154, 92, 0.84);
+        font-size: 14px;
+      }
+
+      .site-footer-logo-atlas {
+        color: #171717;
+        font-size: 22px;
+      }
+
+      .site-footer-brand p,
+      .site-footer-bottom p {
+        color: rgba(23, 23, 23, 0.62);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .site-footer-column h3 {
+        margin-bottom: 13px;
+        color: rgba(192, 154, 92, 0.9);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .site-footer-links {
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }
+
+      .site-footer-links a,
+      .site-footer-links a:visited {
+        color: rgba(23, 23, 23, 0.64);
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .site-footer-links a:hover {
+        color: #171717;
+      }
+
+      .site-footer-bottom {
+        margin-top: 34px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(23, 23, 23, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+      }
+
+      .site-footer-bottom p {
+        margin: 0;
+      }
+
+      .site-footer-copyright {
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+
+      .site-footer-disclaimer {
+        flex: 1 1 auto;
+        text-align: right;
+      }
+
+      @media (max-width: 760px) {
+        .site-footer-grid {
+          grid-template-columns: 1fr;
+          gap: 26px;
         }
-      })
-        .then(function (response) {
-          if (!response.ok) {
-            throw new Error("Could not load donation counter.");
-          }
 
-          return response.json();
-        })
-        .then(updateDonationCounter)
-        .catch(function () {});
-
-      if (!openButton || !modal || !backdrop || !closeButton) {
-        return;
-      }
-
-      function openDonationModal() {
-        modal.hidden = false;
-        document.body.classList.add("support-donation-open");
-
-        window.setTimeout(function () {
-          closeButton.focus();
-        }, 0);
-      }
-
-      function closeDonationModal() {
-        modal.hidden = true;
-        document.body.classList.remove("support-donation-open");
-        openButton.focus();
-      }
-
-      openButton.addEventListener("click", openDonationModal);
-      backdrop.addEventListener("click", closeDonationModal);
-      closeButton.addEventListener("click", closeDonationModal);
-
-      document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape" && !modal.hidden) {
-          closeDonationModal();
+        .site-footer-links {
+          gap: 2px;
         }
-      });
-    })();
-  </script>
-</body>
-</html>
+
+        .site-footer-links a,
+        .site-footer-links a:visited {
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+        }
+
+        .site-footer-bottom {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .site-footer-disclaimer {
+          text-align: left;
+        }
+      }
