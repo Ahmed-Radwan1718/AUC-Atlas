@@ -18,7 +18,7 @@ const {
 const SETUP_EXPIRES_MS =
   10 * 60 * 1000;
 const RECENT_SETUP_AUTH_MAX_AGE_MS =
-  10 * 60 * 1000;
+  90 * 60 * 1000;
 
 function cleanCode(value) {
   return String(value || "")
