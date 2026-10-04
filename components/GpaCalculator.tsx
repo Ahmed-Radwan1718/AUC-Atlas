@@ -340,26 +340,26 @@ export function GpaCalculator() {
       const row = document.createElement("div");
       row.className = "gpa-row";
 
-      row.innerHTML = \`
-        <input class="course-name" type="text" placeholder="Course name" value="\${courseName}">
-        <input class="course-credits" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Credits" value="\${credits}" aria-label="Credits">
+      row.innerHTML = `
+        <input class="course-name" type="text" placeholder="Course name" value="${courseName}">
+        <input class="course-credits" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Credits" value="${credits}" aria-label="Credits">
         <div class="grade-dropdown">
-          <input class="course-grade" type="hidden" value="\${grade}">
+          <input class="course-grade" type="hidden" value="${grade}">
           <button class="grade-toggle" type="button" aria-label="Grade">
-            <span class="grade-toggle-label">\${getGradeLabel(grade)}</span>
+            <span class="grade-toggle-label">${getGradeLabel(grade)}</span>
             <span class="grade-chevron"></span>
           </button>
           <div class="grade-menu" hidden>
-            \${grades
+            ${grades
               .map(
                 (item) =>
-                  \`<button class="grade-option" type="button" data-grade-value="\${item[0]}">\${item[1]}</button>\`
+                  `<button class="grade-option" type="button" data-grade-value="${item[0]}">${item[1]}</button>`
               )
               .join("")}
           </div>
         </div>
         <button class="remove-course" type="button" aria-label="Remove course" title="Remove course">&times;</button>
-      \`;
+      `;
 
       const creditsInput = row.querySelector<HTMLInputElement>(".course-credits");
       const courseNameInput = row.querySelector<HTMLInputElement>(".course-name");
@@ -438,7 +438,7 @@ export function GpaCalculator() {
       const title = semesterName || "Semester " + semesterNumber;
 
       semester.className = "gpa-semester";
-      semester.innerHTML = \`
+      semester.innerHTML = `
         <div class="gpa-semester-header">
           <input class="semester-name" type="text" value="" aria-label="Semester name">
           <div class="semester-actions">
@@ -458,7 +458,7 @@ export function GpaCalculator() {
         <div class="semester-course-footer">
           <button class="gpa-action semester-add-course" type="button" aria-label="Add course" title="Add course">+</button>
         </div>
-      \`;
+      `;
 
       const semesterNameInput =
         semester.querySelector<HTMLInputElement>(".semester-name");
