@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
         source: "/index.html",
         destination: "/",
         permanent: true
+      },
+      {
+        source: "/gpa-calculator.html",
+        destination: "/gpa-calculator",
+        permanent: true
       }
     ];
   }
