@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Log In - AUC Atlas</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .auth-page {
+      min-height: 100vh;
+      padding-top: 104px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+    }
+
+    .auth-section {
+      min-height: calc(100vh - 104px);
+      padding: 92px 44px 104px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-section-inner {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .auth-section-header {
+      margin-bottom: 34px;
+      text-align: left;
+    }
+
+    .auth-section-title {
+      max-width: 620px;
+      margin-bottom: 22px;
+      color: #171717;
+      font-size: clamp(30px, 3.2vw, 46px);
+      font-weight: 600;
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .auth-section-intro {
+      max-width: 560px;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    .auth-panel {
+      padding: 30px;
+      border-radius: 26px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.12);
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .auth-login-options {
+      display: grid;
+      gap: 12px;
+    }
+
+    .auth-field {
+      display: grid;
+      gap: 10px;
+    }
+
+    .auth-field label {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .auth-field input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      outline: none;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .auth-field input:focus {
+      background: white;
+      border-color: rgba(192, 154, 92, 0.84);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
+    }
+
+    .auth-password-input-wrap {
+      position: relative;
+    }
+
+    .auth-password-input-wrap input {
+      padding-right: 54px;
+    }
+
+    .auth-password-visibility-toggle {
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #6f6f6f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transform: translateY(-50%);
+      transition: opacity 0.2s ease;
+    }
+
+    .auth-password-visibility-toggle:hover {
+      opacity: 0.72;
+    }
+
+    .auth-password-visibility-toggle svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+      opacity: 1;
+      display: block;
+    }
+
+    .auth-password-visibility-toggle .auth-password-eye-slash {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+    }
+
+    .auth-password-visibility-toggle.password-hidden .auth-password-eye-slash {
+      opacity: 1;
+    }
+
+    .auth-password-visibility-toggle.password-visible .auth-password-eye-slash {
+      opacity: 0;
+    }
+
+    .auth-button {
+      width: 100%;
+      min-height: 52px;
+      margin-top: 4px;
+      border: 1px solid rgba(192, 154, 92, 0.84);
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.84);
+      color: white;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .auth-button:hover {
+      background: rgba(171, 132, 70, 0.92);
+      border-color: rgba(171, 132, 70, 0.92);
+      opacity: 1;
+    }
+
+    .auth-button:active {
+      transform: translateY(1px);
+    }
+
+    .auth-google-button {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #171717;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .auth-google-button:hover {
+      background: white;
+      border-color: rgba(192, 154, 92, 0.38);
+      box-shadow: 0 10px 26px rgba(42, 32, 20, 0.1);
+    }
+
+    .auth-google-button:active {
+      transform: translateY(1px);
+    }
+
+    .auth-google-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .auth-google-icon {
+      width: 24px;
+      height: 24px;
+      display: block;
+      object-fit: contain;
+      flex: 0 0 24px;
+    }
+
+    .auth-passwordless-button {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.58);
+      color: #171717;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    .auth-passwordless-button:hover {
+      background: white;
+      border-color: rgba(192, 154, 92, 0.38);
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: rgba(23, 23, 23, 0.12);
+    }
+
+    .auth-message {
+      min-height: 22px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .auth-message.error {
+      color: #9d3b3b;
+    }
+
+    .auth-panel-footer {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(23, 23, 23, 0.09);
+      color: rgba(23, 23, 23, 0.58);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .auth-panel-footer + .auth-panel-footer {
+      margin-top: 0;
+      padding-top: 12px;
+      border-top: 0;
+    }
+
+    .auth-panel-footer a,
+    .auth-panel-footer a:visited {
+      color: rgba(192, 154, 92, 0.95);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: none;
+      text-decoration: none;
+    }
+
+    .auth-panel-footer a:hover {
+      opacity: 0.76;
+    }
+
+    .auth-two-factor-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 3300;
+      padding: 24px;
+      background: rgba(23, 23, 23, 0.38);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-two-factor-panel[hidden] {
+      display: none;
+    }
+
+    .auth-two-factor-card {
+      width: min(500px, 100%);
+      padding: 30px;
+      border-radius: 26px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 28px 70px rgba(42, 32, 20, 0.22);
+    }
+
+    .auth-two-factor-header {
+      margin-bottom: 24px;
+    }
+
+    .auth-two-factor-eyebrow {
+      margin-bottom: 14px;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .auth-two-factor-header h2 {
+      margin-bottom: 12px;
+      color: #171717;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .auth-two-factor-header p {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .auth-two-factor-code-inputs {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .auth-field .auth-two-factor-code-input {
+      width: 100%;
+      min-height: 58px;
+      padding: 0;
+      border-radius: 16px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .auth-field .auth-two-factor-code-input:focus {
+      border-color: rgba(192, 154, 92, 0.84);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
+    }
+
+    .auth-two-factor-actions {
+      display: grid;
+      gap: 12px;
+    }
+
+    .auth-two-factor-link-button {
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.58);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .auth-two-factor-link-button:hover {
+      opacity: 0.72;
+    }
+
+    .auth-two-factor-link-button span {
+      color: rgba(192, 154, 92, 0.95);
+    }
+
+    .auth-two-factor-link-button:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    @media (max-width: 900px) {
+      .auth-page {
+        padding-top: 88px;
+      }
+
+      .auth-section {
+        min-height: calc(100vh - 88px);
+        padding: 54px 20px 72px;
+      }
+
+      .auth-section-title {
+        margin-left: 0;
+        margin-right: 0;
+        font-size: 34px;
+      }
+
+      .auth-section-intro {
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .auth-panel {
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      .auth-panel-footer {
+        justify-content: center;
+        text-align: center;
+      }
+
+      .auth-two-factor-card {
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      .auth-two-factor-header h2 {
+        font-size: 24px;
+      }
+
+      .auth-two-factor-code-inputs {
+        gap: 7px;
+      }
+
+      .auth-field .auth-two-factor-code-input {
+        min-height: 50px;
+        border-radius: 14px;
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="site-header-root"></div>
+  <script src="site-header.js"></script>
+
+  <main class="auth-page">
+    <section class="auth-section">
+      <div class="auth-section-inner">
+        <div class="auth-section-header">
+          <h1 class="auth-section-title">Log In</h1>
+          <p class="auth-section-intro">
+            Log in to manage your AUC Atlas profile, saved professors, course materials, and student reviews.
+          </p>
+        </div>
+
+        <div class="auth-panel">
+          <form class="auth-form" id="login-form">
+            <button class="auth-google-button" type="button" id="google-login-button">
+              <img class="auth-google-icon" src="google-logo.png" alt="" aria-hidden="true">
+              <span>Continue with Google</span>
+            </button>
+
+            <div class="auth-divider"><span>or continue with email</span></div>
+
+            <div class="auth-field">
+              <label for="login-email">Email Address</label>
+              <input type="email" id="login-email" autocomplete="email">
+            </div>
+
+            <div class="auth-field auth-password-field">
+              <label for="login-password">Password</label>
+
+              <div class="auth-password-input-wrap">
+                <input type="password" id="login-password" autocomplete="current-password">
+
+                <button class="auth-password-visibility-toggle password-hidden" type="button" data-target="login-password" aria-label="Show password">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 5C6 5 2.1 9.6 1 12c1.1 2.4 5 7 11 7s9.9-4.6 11-7c-1.1-2.4-5-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"/>
+                    <path class="auth-password-eye-slash" d="M4 20L20 4"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="auth-login-options">
+              <button class="auth-button" type="submit" id="login-submit">
+                Log In
+              </button>
+
+              <div class="auth-divider"><span>or</span></div>
+
+              <button class="auth-passwordless-button" type="button" id="login-passwordless-button">
+                Email Me a Sign-In Code
+              </button>
+            </div>
+
+            <p class="auth-message" id="login-message" aria-live="polite"></p>
+          </form>
+
+          <div class="auth-panel-footer">
+            <span>Forgot your password?</span>
+            <a href="forgot-password.html">Reset Password</a>
+          </div>
+
+          <div class="auth-panel-footer">
+            <span>Do not have an account?</span>
+            <a href="signup.html">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="auth-two-factor-panel" id="login-two-factor-panel" hidden>
+    <div class="auth-two-factor-card">
+      <div class="auth-two-factor-header">
+        <p class="auth-two-factor-eyebrow">Two-Factor Authentication</p>
+        <h2>Enter Authenticator Code</h2>
+        <p>Open your authenticator app and enter the 6-digit code for AUC Atlas.</p>
+      </div>
+
+      <form class="auth-form" id="login-two-factor-form">
+        <div class="auth-field">
+          <label>Authenticator Code</label>
+
+          <div class="auth-two-factor-code-inputs" aria-label="Authenticator code">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" data-login-two-factor-input aria-label="Digit 1">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-two-factor-input aria-label="Digit 2">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-two-factor-input aria-label="Digit 3">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-two-factor-input aria-label="Digit 4">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-two-factor-input aria-label="Digit 5">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-two-factor-input aria-label="Digit 6">
+          </div>
+        </div>
+
+        <div class="auth-two-factor-actions">
+          <button class="auth-button" type="submit" id="login-two-factor-submit">
+            Verify Code
+          </button>
+
+          <button class="auth-two-factor-link-button" type="button" id="login-two-factor-email-recovery">
+            Lost access to your authenticator app?<br>
+            <span>Receive a code by email</span>
+          </button>
+        </div>
+
+        <p class="auth-message" id="login-two-factor-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="auth-two-factor-panel" id="login-authenticator-recovery-panel" hidden>
+    <div class="auth-two-factor-card">
+      <div class="auth-two-factor-header">
+        <p class="auth-two-factor-eyebrow">Email Recovery</p>
+        <h2>Enter Email Code</h2>
+        <p id="login-authenticator-recovery-description">
+          Enter the 6-digit code sent to your AUC email address.
+        </p>
+      </div>
+
+      <form class="auth-form" id="login-authenticator-recovery-form">
+        <div class="auth-field">
+          <label>Email Recovery Code</label>
+
+          <div class="auth-two-factor-code-inputs" aria-label="Email recovery code">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 1">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 2">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 3">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 4">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 5">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-authenticator-recovery-input aria-label="Digit 6">
+          </div>
+        </div>
+
+        <div class="auth-two-factor-actions">
+          <button class="auth-button" type="submit" id="login-authenticator-recovery-submit">
+            Verify Code
+          </button>
+
+          <button class="auth-two-factor-link-button" type="button" id="login-authenticator-recovery-resend">
+            Send a new code
+          </button>
+
+          <button class="auth-two-factor-link-button" type="button" id="login-authenticator-recovery-back">
+            Back to authenticator app
+          </button>
+        </div>
+
+        <p class="auth-message" id="login-authenticator-recovery-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="auth-two-factor-panel" id="login-email-code-panel" hidden>
+    <div class="auth-two-factor-card">
+      <div class="auth-two-factor-header">
+        <p class="auth-two-factor-eyebrow">Email Sign-In</p>
+        <h2>Enter Email Code</h2>
+        <p id="login-email-code-description">
+          Enter the 6-digit code sent to your AUC email address.
+        </p>
+      </div>
+
+      <form class="auth-form" id="login-email-code-form">
+        <div class="auth-field">
+          <label>Email Sign-In Code</label>
+
+          <div class="auth-two-factor-code-inputs" aria-label="Email sign-in code">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" data-login-email-code-input aria-label="Digit 1">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-email-code-input aria-label="Digit 2">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-email-code-input aria-label="Digit 3">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-email-code-input aria-label="Digit 4">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-email-code-input aria-label="Digit 5">
+            <input class="auth-two-factor-code-input" type="text" inputmode="numeric" maxlength="1" data-login-email-code-input aria-label="Digit 6">
+          </div>
+        </div>
+
+        <div class="auth-two-factor-actions">
+          <button class="auth-button" type="submit" id="login-email-code-submit">
+            Verify Code
+          </button>
+
+          <button class="auth-two-factor-link-button" type="button" id="login-email-code-resend">
+            Send a new code
+          </button>
+
+          <button class="auth-two-factor-link-button" type="button" id="login-email-code-cancel">
+            Cancel sign in
+          </button>
+        </div>
+
+        <p class="auth-message" id="login-email-code-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById("login-form");
+    const loginButton = document.getElementById("login-submit");
+    const loginMessage = document.getElementById("login-message");
+    const passwordVisibilityToggles = document.querySelectorAll(".auth-password-visibility-toggle");
+    const passwordlessLoginButton = document.getElementById("login-passwordless-button");
+    const twoFactorPanel = document.getElementById("login-two-factor-panel");
+    const twoFactorForm = document.getElementById("login-two-factor-form");
+    const twoFactorCodeInputs = Array.from(document.querySelectorAll("[data-login-two-factor-input]"));
+    const twoFactorSubmit = document.getElementById("login-two-factor-submit");
+    const twoFactorRecoveryButton = document.getElementById("login-two-factor-email-recovery");
+    const twoFactorMessage = document.getElementById("login-two-factor-message");
+
+    let awaitingAuthenticatorCode = false;
+
+    function showMessage(message, type) {
+      loginMessage.textContent = message;
+      loginMessage.className = "auth-message";
+
+      if (type) {
+        loginMessage.classList.add(type);
+      }
+    }
+
+    function showTwoFactorMessage(message, type) {
+      twoFactorMessage.textContent = message;
+      twoFactorMessage.className = "auth-message";
+
+      if (type) {
+        twoFactorMessage.classList.add(type);
+      }
+    }
+
+    function clearLocalSignedInState() {
+      try {
+        localStorage.removeItem("auc-atlas-signed-in");
+        localStorage.removeItem("aucAtlasSignedIn");
+      } catch (error) {}
+
+      window.aucAtlasCurrentUser = null;
+    }
+
+    function markLocalSignedIn(user) {
+      try {
+        localStorage.setItem("auc-atlas-signed-in", "1");
+        localStorage.setItem("aucAtlasSignedIn", "true");
+      } catch (error) {}
+
+      window.aucAtlasCurrentUser = user || null;
+    }
+
+    function getLoginRedirectTarget() {
+      const savedRedirect = localStorage.getItem("auc-atlas-login-redirect");
+
+      if (savedRedirect) {
+        localStorage.removeItem("auc-atlas-login-redirect");
+        return savedRedirect;
+      }
+
+      return "accounts.html";
+    }
+
+    function finishLogin(user) {
+      markLocalSignedIn(user);
+
+      if (twoFactorPanel && !twoFactorPanel.hidden) {
+        showTwoFactorMessage("Logged in successfully.", "success");
+      } else {
+        showMessage("Logged in successfully.", "success");
+      }
+
+      setTimeout(function () {
+        window.location.href = getLoginRedirectTarget();
+      }, 700);
+    }
+
+    window.handleAucAtlasGoogleLoginResult =
+      async function (data) {
+        const result =
+          data || {};
+
+        if (result.requiresTwoFactor) {
+          if (result.method === "email") {
+            if (
+              typeof window.startLoginEmailTwoFactor !==
+              "function"
+            ) {
+              throw new Error(
+                "Email verification could not be opened."
+              );
+            }
+
+            awaitingAuthenticatorCode =
+              true;
+
+            try {
+              await window
+                .startLoginEmailTwoFactor();
+            } catch (error) {
+              awaitingAuthenticatorCode =
+                false;
+
+              throw error;
+            }
+
+            return;
+          }
+
+          openTwoFactorPanel({
+            emailRecoveryAvailable:
+              Boolean(
+                result.emailRecoveryAvailable
+              )
+          });
+
+          return;
+        }
+
+        finishLogin(
+          result.user || null
+        );
+      };
+
+    function clearTwoFactorCodeInputs() {
+      twoFactorCodeInputs.forEach(function (input) {
+        input.value = "";
+      });
+    }
+
+    function getTwoFactorCodeValue() {
+      return twoFactorCodeInputs.map(function (input) {
+        return input.value.trim();
+      }).join("");
+    }
+
+    function focusFirstTwoFactorCodeInput() {
+      if (twoFactorCodeInputs[0]) {
+        twoFactorCodeInputs[0].focus();
+      }
+    }
+
+    function openTwoFactorPanel(options) {
+      const settings = options || {};
+
+      clearLocalSignedInState();
+      awaitingAuthenticatorCode = true;
+      clearTwoFactorCodeInputs();
+      showMessage("", "");
+      showTwoFactorMessage("", "");
+
+      twoFactorRecoveryButton.hidden =
+        !Boolean(settings.emailRecoveryAvailable);
+
+      twoFactorPanel.hidden = false;
+      twoFactorSubmit.disabled = false;
+      twoFactorSubmit.textContent = "Verify Code";
+
+      setTimeout(function () {
+        focusFirstTwoFactorCodeInput();
+      }, 50);
+    }
+
+    function closeTwoFactorPanel(message) {
+      awaitingAuthenticatorCode = false;
+      twoFactorPanel.hidden = true;
+      clearTwoFactorCodeInputs();
+      showTwoFactorMessage("", "");
+
+      twoFactorSubmit.disabled = false;
+      twoFactorSubmit.textContent = "Verify Code";
+      loginButton.disabled = false;
+      loginButton.textContent = "Log In";
+
+      if (message) {
+        showMessage(message, "error");
+      }
+    }
+
+    async function verifyAuthenticatorLogin() {
+      const code = getTwoFactorCodeValue();
+
+      if (!/^\d{6}$/.test(code)) {
+        showTwoFactorMessage("Please enter your 6-digit authenticator code.", "error");
+        focusFirstTwoFactorCodeInput();
+        return;
+      }
+
+      twoFactorSubmit.disabled = true;
+      twoFactorSubmit.textContent = "Verifying...";
+      showTwoFactorMessage("", "");
+
+      try {
+        const response = await fetch("/api/verify-login-authenticator", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            code: code
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Invalid authenticator code.");
+        }
+
+        awaitingAuthenticatorCode = false;
+        finishLogin(data.user || null);
+      } catch (error) {
+        showTwoFactorMessage(error.message || "The authenticator code is incorrect.", "error");
+        clearTwoFactorCodeInputs();
+        focusFirstTwoFactorCodeInput();
+      } finally {
+        if (awaitingAuthenticatorCode) {
+          twoFactorSubmit.disabled = false;
+          twoFactorSubmit.textContent = "Verify Code";
+        }
+      }
+    }
+
+    passwordVisibilityToggles.forEach(function (toggleButton) {
+      const targetId = toggleButton.getAttribute("data-target");
+      const targetInput = document.getElementById(targetId);
+
+      toggleButton.addEventListener("click", function () {
+        if (!targetInput) {
+          return;
+        }
+
+        if (targetInput.type === "password") {
+          targetInput.type = "text";
+          toggleButton.classList.remove("password-hidden");
+          toggleButton.classList.add("password-visible");
+          toggleButton.setAttribute("aria-label", "Hide password");
+        } else {
+          targetInput.type = "password";
+          toggleButton.classList.add("password-hidden");
+          toggleButton.classList.remove("password-visible");
+          toggleButton.setAttribute("aria-label", "Show password");
+        }
+      });
+    });
+
+    twoFactorCodeInputs.forEach(function (input, index) {
+      input.addEventListener("input", function () {
+        input.value = input.value.replace(/\D/g, "").slice(0, 1);
+
+        if (input.value && twoFactorCodeInputs[index + 1]) {
+          twoFactorCodeInputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener("keydown", function (event) {
+        if (event.key === "Backspace" && !input.value && twoFactorCodeInputs[index - 1]) {
+          twoFactorCodeInputs[index - 1].focus();
+        }
+      });
+
+      input.addEventListener("paste", function (event) {
+        const pastedCode = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+
+        if (!pastedCode) {
+          return;
+        }
+
+        event.preventDefault();
+
+        twoFactorCodeInputs.forEach(function (codeInput, codeIndex) {
+          codeInput.value = pastedCode.charAt(codeIndex) || "";
+        });
+
+        const focusIndex = Math.min(pastedCode.length, twoFactorCodeInputs.length) - 1;
+
+        if (twoFactorCodeInputs[focusIndex]) {
+          twoFactorCodeInputs[focusIndex].focus();
+        }
+      });
+    });
+
+    loginForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+
+      loginButton.disabled = true;
+      loginButton.textContent = "Logging In...";
+      showMessage("", "");
+
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password
+          })
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Incorrect email or password.");
+        }
+
+        if (data.requiresTwoFactor) {
+          if (data.method === "email") {
+            if (typeof window.startLoginEmailTwoFactor !== "function") {
+              throw new Error("Email verification could not be opened.");
+            }
+
+            awaitingAuthenticatorCode = true;
+            await window.startLoginEmailTwoFactor();
+            return;
+          }
+
+          openTwoFactorPanel({
+            emailRecoveryAvailable: Boolean(data.emailRecoveryAvailable)
+          });
+          return;
+        }
+
+        finishLogin(data.user || null);
+      } catch (error) {
+        clearLocalSignedInState();
+        showMessage(error.message || "Something went wrong. Please try again.", "error");
+      } finally {
+        if (!awaitingAuthenticatorCode) {
+          loginButton.disabled = false;
+          loginButton.textContent = "Log In";
+        }
+      }
+    });
+
+    twoFactorForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      await verifyAuthenticatorLogin();
+    });
+
+  </script>
+  <script src="login-code.js"></script>
+  <script src="login-authenticator-recovery.js"></script>
+
+  <script type="module">
+    import {
+      getApps,
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+
+    import {
+      GoogleAuthProvider,
+      getAuth,
+      inMemoryPersistence,
+      setPersistence,
+      signInWithPopup,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    const googleLoginButton =
+      document.getElementById(
+        "google-login-button"
+      );
+
+    const googleLoginMessage =
+      document.getElementById(
+        "login-message"
+      );
+
+    const originalGoogleButtonContent =
+      googleLoginButton
+        ? googleLoginButton.innerHTML
+        : "";
+
+    let googleLoginAuth = null;
+
+    function showGoogleLoginMessage(
+      message,
+      type
+    ) {
+      if (!googleLoginMessage) {
+        return;
+      }
+
+      googleLoginMessage.textContent =
+        message;
+
+      googleLoginMessage.className =
+        "auth-message" +
+        (
+          type
+            ? " " + type
+            : ""
+        );
+    }
+
+    function getGoogleLoginError(
+      error
+    ) {
+      if (
+        error &&
+        error.code ===
+          "auth/popup-closed-by-user"
+      ) {
+        return "Google sign-in was closed before it finished.";
+      }
+
+      if (
+        error &&
+        error.code ===
+          "auth/popup-blocked"
+      ) {
+        return "Your browser blocked the Google popup. Please allow popups and try again.";
+      }
+
+      if (
+        error &&
+        error.code ===
+          "auth/account-exists-with-different-credential"
+      ) {
+        return "This Google account is not connected yet. Log in with your AUC email and connect Google from My Account.";
+      }
+
+      return (
+        error.message ||
+        "Could not log in with Google. Please try again."
+      );
+    }
+
+    async function getGoogleFirebaseConfig() {
+      const response = await fetch(
+        "/api/google-auth",
+        {
+          method: "GET",
+          credentials:
+            "same-origin",
+          headers: {
+            "Accept":
+              "application/json"
+          }
+        }
+      );
+
+      const data =
+        await response
+          .json()
+          .catch(function () {
+            return {};
+          });
+
+      if (
+        !response.ok ||
+        !data.firebase
+      ) {
+        throw new Error(
+          data.error ||
+          "Google sign-in is not configured."
+        );
+      }
+
+      return data.firebase;
+    }
+
+    async function startGoogleLogin() {
+      if (!googleLoginButton) {
+        return;
+      }
+
+      googleLoginButton.disabled =
+        true;
+
+      googleLoginButton.textContent =
+        "Opening Google...";
+
+      showGoogleLoginMessage(
+        "",
+        ""
+      );
+
+      try {
+        const firebase =
+          await getGoogleFirebaseConfig();
+
+        const appName =
+          "aucAtlasGoogleLogin";
+
+        const existingApp =
+          getApps().find(function (app) {
+            return app.name === appName;
+          });
+
+        const firebaseApp =
+          existingApp ||
+          initializeApp(
+            firebase,
+            appName
+          );
+
+        const auth =
+          getAuth(firebaseApp);
+
+        await setPersistence(
+          auth,
+          inMemoryPersistence
+        );
+
+        googleLoginAuth = auth;
+
+        const provider =
+          new GoogleAuthProvider();
+
+        provider.setCustomParameters({
+          prompt: "select_account"
+        });
+
+        const result =
+          await signInWithPopup(
+            auth,
+            provider
+          );
+
+        const idToken =
+          await result.user
+            .getIdToken(true);
+
+        const response = await fetch(
+          "/api/google-auth",
+          {
+            method: "POST",
+            credentials:
+              "same-origin",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              action: "login",
+              idToken
+            })
+          }
+        );
+
+        const data =
+          await response
+            .json()
+            .catch(function () {
+              return {};
+            });
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+          throw new Error(
+            data.error ||
+            "This Google account is not connected to an existing AUC Atlas account."
+          );
+        }
+
+        await signOut(auth)
+          .catch(function () {});
+
+        googleLoginAuth = null;
+
+        if (
+          typeof window
+            .handleAucAtlasGoogleLoginResult !==
+          "function"
+        ) {
+          throw new Error(
+            "Google login could not be completed."
+          );
+        }
+
+        await window
+          .handleAucAtlasGoogleLoginResult(
+            data
+          );
+      } catch (error) {
+        showGoogleLoginMessage(
+          getGoogleLoginError(error),
+          "error"
+        );
+      } finally {
+        if (googleLoginAuth) {
+          await signOut(
+            googleLoginAuth
+          ).catch(function () {});
+
+          googleLoginAuth = null;
+        }
+
+        googleLoginButton.disabled =
+          false;
+
+        googleLoginButton.innerHTML =
+          originalGoogleButtonContent;
+      }
+    }
+
+    if (googleLoginButton) {
+      googleLoginButton.addEventListener(
+        "click",
+        startGoogleLogin
+      );
+    }
+  </script>
+</body>
+</html>
