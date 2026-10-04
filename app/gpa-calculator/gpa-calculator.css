@@ -854,3 +854,8 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* The legacy GPA page did not render the shared footer. */
+body:has(.gpa-page) .site-footer {
+  display: none;
+}
