@@ -1,0 +1,5196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<base href="/">
+
+<title>Courses | AUC Atlas</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f4ee;
+      color: #171717;
+    }
+
+    .courses-page {
+      min-height: 100vh;
+      padding: 126px 0 86px;
+      background:
+        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
+        #f7f4ee;
+    }
+
+    .courses-inner {
+      width: min(1380px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .courses-header {
+      margin-bottom: 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 28px;
+      align-items: end;
+    }
+
+    .courses-kicker {
+      margin-bottom: 16px;
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .courses-header h1 {
+      max-width: 650px;
+      color: #171717;
+      font-size: clamp(34px, 4.8vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .courses-header p {
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .courses-browser {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .courses-filters {
+      position: sticky;
+      top: 120px;
+      padding: 14px;
+      border-radius: 26px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.1);
+      display: grid;
+      gap: 10px;
+    }
+
+    .courses-filters h2 {
+      padding: 10px 14px 6px;
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .course-filter-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .course-filter-pill input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .course-filter-pill span {
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .course-filter-pill:hover span,
+    .course-filter-pill:has(input:checked) span {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
+
+    .courses-search-box {
+      margin-bottom: 18px;
+    }
+
+    .courses-search-box input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.78);
+      color: #171717;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .courses-search-box input:focus {
+      border-color: rgba(192, 154, 92, 0.58);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .courses-result-count {
+      margin-bottom: 18px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .course-card,
+    .courses-empty {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+    }
+
+    .course-card {
+      min-height: 190px;
+      padding: 22px;
+      border-radius: 24px;
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 22px;
+      animation: courseCardIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+    }
+
+    .course-card:hover,
+    .course-card:focus-visible {
+      border-color: rgba(192, 154, 92, 0.32);
+      background: rgba(255, 255, 255, 0.9);
+      transform: translateY(-2px);
+    }
+
+    .course-card:focus-visible {
+      outline: 3px solid rgba(192, 154, 92, 0.35);
+      outline-offset: 3px;
+    }
+
+    .course-code {
+      margin-bottom: 14px;
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: block;
+    }
+
+    .course-card h2 {
+      color: #171717;
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.12;
+    }
+
+    .course-card-meta {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .course-card-meta span {
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      background: rgba(247, 244, 238, 0.74);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .courses-empty {
+      padding: 24px;
+      border-radius: 24px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 15px;
+      font-weight: 700;
+      animation: courseCardIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .courses-header {
+      max-width: 980px;
+      margin: 0 auto 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
+      gap: 28px;
+      align-items: center;
+      text-align: left;
+    }
+
+    .courses-header h1 {
+      max-width: 520px;
+      margin: 0;
+      font-size: clamp(30px, 3.2vw, 46px);
+      font-weight: 600;
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .courses-header p {
+      max-width: 430px;
+      margin: 0 0 0 auto;
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.6;
+      text-align: right;
+    }
+
+    .courses-browser {
+      max-width: 980px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .courses-results {
+      display: grid;
+      gap: 18px;
+    }
+
+    .courses-search-box {
+      margin-bottom: 0;
+    }
+
+    .courses-search-box input {
+      min-height: 68px;
+      padding: 0 26px;
+      border-radius: 999px;
+      font-size: 18px;
+      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
+    }
+
+    .courses-search-box input::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      margin-left: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      background:
+        linear-gradient(45deg, transparent 43%, rgba(23, 23, 23, 0.9) 44%, rgba(23, 23, 23, 0.9) 56%, transparent 57%),
+        linear-gradient(-45deg, transparent 43%, rgba(23, 23, 23, 0.9) 44%, rgba(23, 23, 23, 0.9) 56%, transparent 57%);
+    }
+
+    .courses-search-box input::-webkit-search-cancel-button:hover {
+      background:
+        linear-gradient(45deg, transparent 43%, #171717 44%, #171717 56%, transparent 57%),
+        linear-gradient(-45deg, transparent 43%, #171717 44%, #171717 56%, transparent 57%);
+    }
+
+    .course-query-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .course-query-chip {
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .course-query-strip .course-query-chip {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.64);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: none;
+      display: inline-flex;
+      align-items: center;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .course-discovery {
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.7fr);
+      gap: 0;
+      align-items: stretch;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 28px 80px rgba(42, 32, 20, 0.1);
+    }
+
+    .course-discovery-panel {
+      padding: 26px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .course-discovery-panel:first-child {
+      border-right: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .course-discovery-panel h2 {
+      margin-bottom: 8px;
+      color: #171717;
+      font-size: 22px;
+      line-height: 1.15;
+    }
+
+    .course-discovery-panel p {
+      max-width: 560px;
+      margin-bottom: 18px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .course-filter-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .course-filter-pill span {
+      min-height: 48px;
+      padding: 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 16px;
+      background: rgba(247, 244, 238, 0.72);
+      color: rgba(23, 23, 23, 0.72);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .course-filter-pill span::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      margin-right: 10px;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.62);
+      flex: 0 0 auto;
+    }
+
+    .course-chip-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .course-chip-grid .course-query-chip {
+      min-height: 54px;
+      padding: 0 14px 0 16px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 16px;
+      background: rgba(247, 244, 238, 0.72);
+      color: rgba(23, 23, 23, 0.78);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .course-chip-grid .course-query-chip::after {
+      content: "Find";
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: rgba(23, 23, 23, 0.52);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .course-query-strip .course-query-chip:hover,
+    .course-filter-pill:hover span,
+    .course-filter-pill:has(input:checked) span,
+    .course-chip-grid .course-query-chip:hover {
+      border-color: rgba(192, 154, 92, 0.34);
+      background: rgba(192, 154, 92, 0.14);
+      color: #171717;
+      transform: translateY(-1px);
+    }
+
+    .courses-result-count {
+      margin-bottom: 0;
+    }
+
+    .courses-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .course-card {
+      min-height: 0;
+      padding: 16px 18px;
+      border-radius: 18px;
+      border-left: 4px solid rgba(192, 154, 92, 0.7);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 16px 45px rgba(42, 32, 20, 0.08);
+    }
+
+    .course-code {
+      margin-bottom: 6px;
+    }
+
+    .course-card h2 {
+      font-size: 18px;
+    }
+
+    .course-card-meta {
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 980px) {
+      .course-discovery-panel:first-child {
+        border-right: 0;
+        border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .course-discovery-panel {
+        padding: 20px;
+      }
+
+      .course-filter-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .course-detail-view {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .course-back-link {
+      width: fit-content;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .course-back-link:hover {
+      color: #171717;
+    }
+
+    .course-profile-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 410px);
+      grid-template-areas:
+        "course upload"
+        "materials upload";
+      gap: 18px;
+      align-items: start;
+    }
+
+    .course-profile-card {
+      grid-area: course;
+    }
+
+    .course-materials-loading,
+    .course-material-summary {
+      grid-area: materials;
+    }
+
+    .material-upload-panel {
+      grid-area: upload;
+    }
+
+    .course-profile-card,
+    .course-material-summary,
+    .material-upload-panel {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 20px 54px rgba(42, 32, 20, 0.1);
+    }
+
+    .course-profile-card {
+      overflow: hidden;
+    }
+
+    .course-detail-hero {
+      padding: 30px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: transparent;
+    }
+
+    .course-detail-kicker {
+      margin-bottom: 12px;
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .course-detail-hero h1 {
+      max-width: 760px;
+      color: #171717;
+      font-size: clamp(30px, 3.2vw, 46px);
+      font-weight: 600;
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .course-detail-description {
+      max-width: 760px;
+      margin-top: 16px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.65;
+    }
+
+    .course-detail-grid {
+      padding: 24px 30px 4px;
+      display: grid;
+      gap: 0;
+    }
+
+    .course-detail-stat {
+      min-height: 58px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      align-items: center;
+      gap: 18px;
+    }
+
+    .course-detail-stat:last-child {
+      border-bottom: 0;
+    }
+
+    .course-detail-stat span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .course-detail-stat strong {
+      color: #171717;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    .course-detail-professors {
+      align-items: start;
+    }
+
+    .course-professor-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .course-professor-list p {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    .course-professor-link {
+      min-height: auto;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #171717;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .course-professor-link strong {
+      color: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    .course-professor-link span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .course-professor-link:hover {
+      color: rgba(154, 112, 48, 0.96);
+      opacity: 0.78;
+    }
+
+    .course-action-stack {
+      display: contents;
+    }
+
+    .course-action-stack[hidden] {
+      display: none;
+    }
+
+    .course-materials-loading {
+      min-height: 420px;
+      padding: 32px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 20px 54px rgba(42, 32, 20, 0.1);
+      color: rgba(23, 23, 23, 0.58);
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .course-materials-loading[hidden] {
+      display: none;
+    }
+
+    .course-materials-loading-spinner {
+      width: 46px;
+      height: 46px;
+      border: 4px solid rgba(23, 23, 23, 0.1);
+      border-top-color: rgba(192, 154, 92, 0.92);
+      border-radius: 999px;
+      animation: courseMaterialsLoadingSpin 0.8s linear infinite;
+    }
+
+    .course-materials-loading p {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .course-action-stack.is-loading > .course-material-summary,
+    .course-action-stack.is-loading > .material-upload-panel {
+      display: none;
+    }
+
+    .course-action-stack:not(.is-loading) > .course-material-summary,
+    .course-action-stack:not(.is-loading) > .material-upload-panel {
+      animation: courseMaterialsReady 0.28s ease both;
+    }
+
+    .course-action-stack.is-locked > .course-material-summary,
+    .course-action-stack.is-locked > .material-upload-panel {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .course-action-stack.is-locked > .course-material-summary {
+      min-height: 310px;
+    }
+
+    .course-action-stack.is-locked > .material-upload-panel {
+      min-height: 520px;
+    }
+
+    .course-action-stack.is-locked
+      > .course-material-summary
+      > :not(.course-material-access-lock),
+    .course-action-stack.is-locked
+      > .material-upload-panel
+      > :not(.course-material-access-lock) {
+      filter: blur(7px);
+      opacity: 0.42;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .course-material-access-lock {
+      display: none;
+    }
+
+    .course-action-stack.is-locked .course-material-access-lock {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      padding: 24px;
+      background: rgba(247, 244, 238, 0.46);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      display: grid;
+      place-items: center;
+    }
+
+    .course-material-access-lock-card {
+      width: min(100%, 320px);
+      padding: 22px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 22px 60px rgba(42, 32, 20, 0.14);
+      text-align: center;
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+    }
+
+    .course-material-access-lock-card strong {
+      color: #171717;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .course-action-stack .course-material-access-lock-card p {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    .course-material-access-lock-card a {
+      min-height: 42px;
+      margin-top: 4px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes courseMaterialsLoadingSpin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes courseMaterialsReady {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .course-material-summary {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(230px, 280px);
+      column-gap: 24px;
+      row-gap: 16px;
+      align-items: start;
+    }
+
+    .course-material-downloads > div:first-child {
+      grid-column: 1;
+      min-width: 0;
+    }
+
+    .course-material-downloads > p {
+      grid-column: 1;
+      max-width: 560px;
+    }
+
+    .course-material-downloads > .course-material-library-toolbar {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: end;
+      justify-self: end;
+    }
+
+    .course-material-downloads > .course-materials-list {
+      grid-column: 1 / -1;
+    }
+
+    .course-material-summary span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .course-material-summary h2 {
+      margin-top: 4px;
+      color: #171717;
+      font-size: 24px;
+      line-height: 1.12;
+    }
+
+    .course-material-summary p {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    @media (max-width: 720px) {
+      .course-material-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .course-material-downloads > div:first-child,
+      .course-material-downloads > p,
+      .course-material-downloads > .course-material-library-toolbar,
+      .course-material-downloads > .course-materials-list {
+        grid-column: 1;
+        grid-row: auto;
+        justify-self: stretch;
+      }
+    }
+
+    .course-material-summary-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .course-material-summary-list span {
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      background: rgba(247, 244, 238, 0.74);
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+    }
+
+    .material-upload-panel {
+      margin: 0;
+      padding: 22px;
+      background: rgba(255, 255, 255, 0.78);
+      display: grid;
+      align-content: start;
+      gap: 16px;
+    }
+
+    .material-upload-panel-header {
+      display: grid;
+      gap: 4px;
+    }
+
+    .material-upload-panel-header span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .material-upload-panel h2 {
+      color: #171717;
+      font-size: 24px;
+      line-height: 1.12;
+    }
+
+    .material-upload-panel p {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .material-upload-form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .material-upload-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .material-upload-field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .material-upload-field > span {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .material-anonymous-option {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 16px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 18px;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.9),
+          rgba(247, 244, 238, 0.8)
+        );
+      box-shadow: 0 10px 26px rgba(42, 32, 20, 0.05);
+      cursor: pointer;
+      transition:
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease,
+        transform 0.22s ease;
+    }
+
+    .material-anonymous-option:hover {
+      border-color: rgba(192, 154, 92, 0.34);
+      box-shadow: 0 14px 32px rgba(42, 32, 20, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .material-anonymous-option:has(input:checked) {
+      border-color: rgba(192, 154, 92, 0.5);
+      background:
+        linear-gradient(
+          135deg,
+          rgba(192, 154, 92, 0.16),
+          rgba(255, 255, 255, 0.92)
+        );
+      box-shadow:
+        0 0 0 3px rgba(192, 154, 92, 0.08),
+        0 14px 34px rgba(42, 32, 20, 0.09);
+    }
+
+    .material-anonymous-option input {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      margin: 0;
+      flex: 0 0 46px;
+      appearance: none;
+      -webkit-appearance: none;
+      border: 1px solid rgba(23, 23, 23, 0.13);
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.12);
+      box-shadow: inset 0 1px 3px rgba(23, 23, 23, 0.12);
+      cursor: pointer;
+      outline: none;
+      transition:
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
+    }
+
+    .material-anonymous-option input::before {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 7px rgba(23, 23, 23, 0.22);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .material-anonymous-option input:checked {
+      border-color: rgba(154, 112, 48, 0.8);
+      background: #c09a5c;
+      box-shadow:
+        inset 0 1px 3px rgba(90, 58, 15, 0.18),
+        0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .material-anonymous-option input:checked::before {
+      transform: translateX(20px);
+    }
+
+    .material-anonymous-option input:focus-visible {
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.2);
+    }
+
+    .material-anonymous-option > span {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .material-anonymous-option > span::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      flex: 0 0 22px;
+      background: url("anonymous.png") center / contain no-repeat;
+    }
+
+    .material-anonymous-option strong {
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .material-upload-field input,
+    .material-upload-field select,
+    .material-choice-button,
+    .material-file-control {
+      min-height: 48px;
+      width: 100%;
+      padding: 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.76);
+      color: #171717;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      outline: none;
+      transition:
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease,
+        transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .material-upload-field input:not([type="file"]):hover,
+    .material-choice-button:hover {
+      border-color: rgba(192, 154, 92, 0.3);
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .material-upload-field input:not([type="file"]):focus,
+    .material-upload-field select:focus,
+    .material-choice-button:focus-visible,
+    .material-file-input:focus-visible + .material-file-control {
+      border-color: rgba(192, 154, 92, 0.58);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .material-native-select,
+    .material-upload-field .material-file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      min-height: 1px;
+      padding: 0;
+      border: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .material-choice {
+      position: relative;
+    }
+
+    .material-choice-button {
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .material-choice-button:active {
+      transform: scale(0.985);
+    }
+
+    .material-choice-button::after {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition:
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      flex: 0 0 auto;
+    }
+
+    .material-choice.open .material-choice-button {
+      border-color: rgba(192, 154, 92, 0.58);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.1);
+    }
+
+    .material-choice.open .material-choice-button::after {
+      transform: rotate(225deg);
+    }
+
+    .material-choice-menu {
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 8px);
+      right: 0;
+      left: 0;
+      max-height: min(260px, 52vh);
+      overflow: auto;
+      padding: 6px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 18px 45px rgba(42, 32, 20, 0.14);
+      display: grid;
+      gap: 4px;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px) scale(0.985);
+      transform-origin: top center;
+      transition:
+        opacity 0.18s ease,
+        transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0.18s ease;
+    }
+
+    .material-choice.open .material-choice-menu {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .material-choice-search-wrap {
+      position: sticky;
+      top: -6px;
+      z-index: 3;
+      margin: -6px -6px 6px;
+      padding: 10px 8px 12px;
+      background: #ffffff;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .material-choice-search {
+      min-height: 42px;
+      width: 100%;
+      padding: 0 12px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 12px;
+      background: #fffdf8;
+      color: #171717;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      outline: none;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .material-choice-search:focus {
+      border-color: rgba(192, 154, 92, 0.58);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.12);
+    }
+
+    .material-choice-option {
+      min-height: 38px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.68);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        transform 0.14s ease;
+    }
+
+    .material-choice-option:hover,
+    .material-choice-option[aria-selected="true"] {
+      background: rgba(192, 154, 92, 0.14);
+      color: #171717;
+    }
+
+    .material-choice-option:active {
+      transform: scale(0.985);
+    }
+
+    .material-file-field {
+      cursor: pointer;
+    }
+
+    .material-file-field.has-files {
+      cursor: default;
+    }
+
+    .material-file-field.has-files .material-file-control {
+      display: none;
+    }
+
+    .material-file-control {
+      min-height: 108px;
+      padding: 18px;
+      border-style: dashed;
+      background: rgba(255, 255, 255, 0.54);
+      color: #171717;
+      letter-spacing: 0;
+      text-transform: none;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition:
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease,
+        transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .material-file-field:hover .material-file-control {
+      border-color: rgba(192, 154, 92, 0.46);
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 10px 24px rgba(42, 32, 20, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .material-file-field:active .material-file-control {
+      transform: translateY(0) scale(0.992);
+    }
+
+    .material-file-icon {
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
+      border-radius: 15px;
+      background: rgba(192, 154, 92, 0.14);
+      color: rgba(154, 112, 48, 0.96);
+      display: grid;
+      place-items: center;
+    }
+
+    .material-file-icon img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .material-file-copy {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .material-file-copy strong {
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .material-file-copy small {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .material-file-selection {
+      display: grid;
+      gap: 8px;
+    }
+
+    .material-file-selection[hidden] {
+      display: none;
+    }
+
+    .material-file-selection-head {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .material-file-add-button {
+      min-height: 36px;
+      padding: 0 12px 0 9px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      color: rgba(23, 23, 23, 0.7);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .material-file-add-button:hover,
+    .material-file-add-button:focus-visible {
+      outline: none;
+      border-color: rgba(192, 154, 92, 0.42);
+      background: rgba(192, 154, 92, 0.13);
+      color: #171717;
+      transform: translateY(-1px);
+    }
+
+    .material-file-add-button:disabled {
+      cursor: wait;
+      opacity: 0.48;
+      transform: none;
+    }
+
+    .material-file-add-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.16);
+      color: rgba(145, 101, 35, 0.96);
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .material-file-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .material-file-item {
+      min-height: 44px;
+      padding: 9px 12px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.68);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .material-file-item strong {
+      min-width: 0;
+      color: rgba(23, 23, 23, 0.76);
+      font-size: 12px;
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .material-file-item-status {
+      min-width: 54px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .material-file-size {
+      color: rgba(23, 23, 23, 0.42);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .material-file-upload-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(23, 23, 23, 0.12);
+      border-top-color: rgba(145, 101, 35, 0.96);
+      border-radius: 999px;
+      display: none;
+      animation: materialUploadSpin 0.72s linear infinite;
+    }
+
+    .material-file-selection.is-uploading .material-file-size {
+      display: none;
+    }
+
+    .material-file-selection.is-uploading .material-file-upload-spinner {
+      display: block;
+    }
+
+    .material-upload-button {
+      min-height: 52px;
+      width: fit-content;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(23, 23, 23, 0.12);
+      transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .material-upload-button:hover,
+    .material-upload-button:focus-visible {
+      background: #262626;
+      box-shadow: 0 12px 28px rgba(23, 23, 23, 0.17);
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .material-upload-button:active {
+      transform: translateY(0) scale(0.97);
+      box-shadow: 0 5px 14px rgba(23, 23, 23, 0.12);
+    }
+
+    .material-upload-button:disabled {
+      cursor: wait;
+      opacity: 0.58;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .material-upload-progress {
+      width: 100%;
+      display: grid;
+      gap: 8px;
+    }
+
+    .material-upload-progress[hidden] {
+      display: none;
+    }
+
+    .material-upload-progress-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .material-upload-progress-head strong {
+      color: #171717;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .material-upload-progress-track {
+      width: 100%;
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.1);
+    }
+
+    .material-upload-progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: #c09a5c;
+      display: block;
+      transition: width 0.18s ease;
+    }
+
+    .material-upload-status {
+      min-height: 0;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.6;
+    }
+
+    .material-upload-status:empty {
+      display: none;
+    }
+
+    .material-upload-status.error {
+      color: #9f2f2f;
+    }
+
+    .material-upload-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2400;
+      background: rgba(247, 244, 238, 0.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: grid;
+      place-items: center;
+    }
+
+    .material-upload-overlay[hidden] {
+      display: none;
+    }
+
+    .material-upload-spinner {
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      border: 6px solid rgba(23, 23, 23, 0.12);
+      border-top-color: #171717;
+      animation: materialUploadSpin 0.82s linear infinite;
+    }
+
+    .course-material-downloads {
+      align-content: start;
+    }
+
+    .course-materials-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .course-material-card {
+      padding: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 18px 44px rgba(42, 32, 20, 0.08);
+      display: grid;
+      align-content: start;
+      gap: 16px;
+    }
+
+    .course-material-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .course-material-author {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .course-material-avatar,
+    .course-material-avatar-fallback {
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #171717;
+      color: #fffdf8;
+      display: grid;
+      place-items: center;
+      object-fit: cover;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .course-material-author-copy {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .course-material-author-copy strong {
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .course-material-upload-date {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .course-material-title {
+      margin: 0;
+      color: #171717;
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .course-material-file-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .course-material-more {
+      display: grid;
+      gap: 16px;
+    }
+
+    .course-material-more-toggle {
+      order: 2;
+      width: fit-content;
+      padding: 2px 0;
+      border: 0;
+      background: transparent;
+      color: #171717;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.4;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+
+    .course-material-more-toggle::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.2s ease;
+    }
+
+    .course-material-more[open]
+      .course-material-more-toggle::after {
+      transform: rotate(225deg) translate(-1px, -1px);
+    }
+
+    .course-material-more-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .course-material-more-toggle:hover,
+    .course-material-more-toggle:focus-visible {
+      color: rgba(145, 101, 35, 0.96);
+      outline: none;
+    }
+
+    .course-material-more-open {
+      display: none;
+    }
+
+    .course-material-more[open]
+      .course-material-more-closed {
+      display: none;
+    }
+
+    .course-material-more[open]
+      .course-material-more-open {
+      display: inline;
+    }
+
+    .course-material-more-content {
+      order: 1;
+      display: grid;
+      gap: 16px;
+    }
+
+    .course-material-extra-file {
+      display: grid;
+      gap: 12px;
+    }
+
+    .course-material-preview-tile {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 18px;
+      background: rgba(247, 244, 238, 0.62);
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      display: grid;
+      grid-template-columns: 62px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    button.course-material-preview-tile {
+      cursor: pointer;
+    }
+
+    .course-material-preview-tile:not(.is-disabled):hover,
+    .course-material-preview-tile:not(.is-disabled):focus-visible {
+      border-color: rgba(192, 154, 92, 0.42);
+      background: rgba(255, 255, 255, 0.94);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-material-file-icon {
+      width: 62px;
+      height: 76px;
+      padding: 8px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 12px;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.98),
+          rgba(237, 231, 220, 0.96)
+        );
+      color: rgba(145, 101, 35, 0.96);
+      display: grid;
+      place-items: end center;
+      box-shadow: 0 10px 24px rgba(42, 32, 20, 0.08);
+    }
+
+    .course-material-file-icon strong {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .course-material-file-icon-image {
+      width: 62px;
+      height: 76px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .course-material-file-copy {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .course-material-file-copy strong {
+      overflow: hidden;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-material-file-copy small {
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .course-material-preview-hint {
+      color: rgba(145, 101, 35, 0.96);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .course-material-preview-tile.is-disabled
+      .course-material-preview-hint {
+      color: rgba(23, 23, 23, 0.42);
+    }
+
+    .course-material-footer {
+      padding-top: 16px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .course-material-context {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .course-material-context span {
+      color: rgba(23, 23, 23, 0.52);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      line-height: 1.6;
+      text-transform: uppercase;
+    }
+
+    .course-material-context span:not(:last-child)::after {
+      content: "•";
+      margin: 0 10px;
+      color: rgba(192, 154, 92, 0.72);
+    }
+
+    .course-material-actions {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .course-material-report-button {
+      padding: 6px 0;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.46);
+      font: inherit;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    .course-material-report-button:hover,
+    .course-material-report-button:focus-visible {
+      color: #9f2f2f;
+      outline: none;
+    }
+
+    .course-material-report-button:disabled {
+      color: rgba(23, 23, 23, 0.38);
+      cursor: default;
+      opacity: 0.72;
+    }
+
+    .course-material-download-button {
+      min-height: 38px;
+      padding: 0 12px 0 15px;
+      border: 1px solid rgba(192, 154, 92, 0.28);
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.08);
+      color: #171717;
+      font: inherit;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 18px rgba(42, 32, 20, 0.05);
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .course-material-download-button::after {
+      content: "";
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background:
+        rgba(192, 154, 92, 0.16)
+        url("download.png")
+        center / 15px 15px
+        no-repeat;
+      display: block;
+    }
+
+    .course-material-download-button:hover,
+    .course-material-download-button:focus-visible {
+      border-color: rgba(192, 154, 92, 0.52);
+      background: rgba(192, 154, 92, 0.14);
+      color: #171717;
+      box-shadow: 0 10px 24px rgba(42, 32, 20, 0.09);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .course-material-library-toolbar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .course-material-filter-list {
+      position: relative;
+      width: auto;
+      flex: 0 0 auto;
+      align-self: flex-end;
+    }
+
+    .course-material-filter-list .material-choice-button {
+      position: relative;
+      width: 44px;
+      min-height: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.04);
+      color: rgba(23, 23, 23, 0.78);
+      font: inherit;
+      font-size: 0;
+      letter-spacing: 0;
+      text-transform: none;
+      box-shadow: none;
+      display: grid;
+      place-items: center;
+    }
+
+    .course-material-filter-list .material-choice-button::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 18px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow:
+        0 -6px 0 currentColor,
+        0 6px 0 currentColor;
+      transform: translate(-50%, -50%);
+    }
+
+    .course-material-filter-list .material-choice-button::after {
+      content: none;
+    }
+
+    .course-material-filter-list .material-choice-button:hover,
+    .course-material-filter-list .material-choice-button:focus-visible,
+    .course-material-filter-list.open .material-choice-button {
+      border-color: rgba(192, 154, 92, 0.42);
+      background: rgba(255, 255, 255, 0.94);
+      color: #171717;
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.1);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-material-filter-list .material-choice-button:active {
+      transform: translateY(0) scale(0.94);
+    }
+
+    .course-material-filter-list .material-choice-menu {
+      right: 0;
+      left: auto;
+      width: min(280px, calc(100vw - 48px));
+      max-height: min(320px, 52vh);
+      display: grid;
+      gap: 4px;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-7px) scale(0.96);
+      transform-origin: top right;
+      transition:
+        opacity 0.18s ease,
+        transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0.18s ease;
+    }
+
+    .course-material-filter-list.open .material-choice-menu {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .course-material-filter-list .material-choice-option {
+      min-height: 38px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .course-material-filter-list .material-choice-option[aria-selected="true"] {
+      background: rgba(192, 154, 92, 0.14);
+      color: #171717;
+    }
+
+    .course-material-filter-list .material-choice-option:active {
+      transform: scale(0.97);
+    }
+
+    .course-materials-list {
+      gap: 9px;
+      opacity: 1;
+      transform: translateY(0);
+      transition:
+        opacity 0.14s ease,
+        transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .course-materials-list.is-changing {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+
+    .course-material-row,
+    .course-material-group {
+      animation:
+        courseMaterialItemIn
+        0.34s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+    }
+
+    .course-material-row:nth-child(2),
+    .course-material-group:nth-child(2) {
+      animation-delay: 0.025s;
+    }
+
+    .course-material-row:nth-child(3),
+    .course-material-group:nth-child(3) {
+      animation-delay: 0.05s;
+    }
+
+    .course-material-row:nth-child(4),
+    .course-material-group:nth-child(4) {
+      animation-delay: 0.075s;
+    }
+
+    .course-material-row:nth-child(5),
+    .course-material-group:nth-child(5) {
+      animation-delay: 0.1s;
+    }
+
+    .course-material-row:nth-child(6),
+    .course-material-group:nth-child(6) {
+      animation-delay: 0.125s;
+    }
+
+    @keyframes courseMaterialItemIn {
+      from {
+        opacity: 0;
+        transform: translateY(9px) scale(0.992);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .course-material-group.is-animating {
+      overflow: hidden;
+    }
+
+    .course-material-action-menu[open]
+      .course-material-action-menu-panel {
+      animation:
+        courseMaterialMenuIn
+        0.2s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+      transform-origin: top right;
+    }
+
+    @keyframes courseMaterialMenuIn {
+      from {
+        opacity: 0;
+        transform: translateY(-5px) scale(0.94);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .course-material-group-summary,
+    .course-material-row-main,
+    .course-material-compact-download,
+    .course-material-action-menu > summary,
+    .course-material-show-more {
+      transition:
+        transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .course-material-group-summary:active,
+    button.course-material-row-main:active,
+    .course-material-compact-download:active,
+    .course-material-action-menu > summary:active,
+    .course-material-show-more:active {
+      transform: scale(0.975);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-material-filter,
+      .course-material-sort-choice .material-choice-button,
+      .course-material-sort-choice .material-choice-menu,
+      .course-material-sort-choice .material-choice-option,
+      .course-materials-list,
+      .course-material-row,
+      .course-material-group,
+      .course-material-action-menu-panel,
+      .course-material-group-summary,
+      .course-material-row-main,
+      .course-material-compact-download,
+      .course-material-action-menu > summary,
+      .course-material-show-more {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    .course-material-row,
+    .course-material-group {
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 8px 22px rgba(42, 32, 20, 0.045);
+    }
+
+    .course-material-row {
+      padding: 7px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .course-material-row-main {
+      min-width: 0;
+      min-height: 66px;
+      padding: 7px;
+      border: 0;
+      border-radius: 11px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 11px;
+    }
+
+    button.course-material-row-main {
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button.course-material-row-main:hover,
+    button.course-material-row-main:focus-visible {
+      background: rgba(192, 154, 92, 0.075);
+      outline: none;
+    }
+
+    .course-material-row-main.is-disabled {
+      cursor: default;
+    }
+
+    .course-material-row .course-material-file-icon-image,
+    .course-material-child-row .course-material-file-icon-image,
+    .course-material-group-summary .course-material-file-icon-image {
+      width: 40px;
+      height: 48px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .course-material-row .course-material-file-icon,
+    .course-material-child-row .course-material-file-icon,
+    .course-material-group-summary .course-material-file-icon {
+      width: 40px;
+      height: 48px;
+      padding: 5px;
+      border-radius: 9px;
+      box-shadow: none;
+    }
+
+    .course-material-row .course-material-file-icon strong,
+    .course-material-child-row .course-material-file-icon strong,
+    .course-material-group-summary .course-material-file-icon strong {
+      font-size: 8px;
+    }
+
+    .course-material-row-copy,
+    .course-material-group-copy {
+      min-width: 0;
+      display: grid;
+      gap: 3px;
+    }
+
+    .course-material-row-title-line {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .course-material-row-title-line strong {
+      min-width: 0;
+      overflow: hidden;
+      color: #171717;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+      line-height: 1.3;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .course-material-row-title-line em {
+      padding: 3px 6px;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.12);
+      color: rgba(145, 101, 35, 0.96);
+      font-size: 7px;
+      font-style: normal;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .course-material-row-file-name {
+      overflow: hidden;
+      color: rgba(23, 23, 23, 0.68);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .course-material-row-copy small,
+    .course-material-group-copy small {
+      overflow: hidden;
+      color: rgba(23, 23, 23, 0.46);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.4;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .course-material-preview-label {
+      color: rgba(145, 101, 35, 0.9);
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .course-material-compact-download {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      border: 1px solid rgba(192, 154, 92, 0.25);
+      border-radius: 999px;
+      background:
+        rgba(192, 154, 92, 0.08)
+        url("download.png")
+        center / 17px 17px
+        no-repeat;
+      display: block;
+      transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .course-material-compact-download:hover,
+    .course-material-compact-download:focus-visible {
+      border-color: rgba(192, 154, 92, 0.52);
+      background-color: rgba(192, 154, 92, 0.15);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-material-action-menu {
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .course-material-action-menu > summary {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 0;
+      line-height: 1;
+      cursor: pointer;
+      list-style: none;
+      display: grid;
+      place-items: center;
+      user-select: none;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .course-material-action-menu > summary::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow:
+        0 -7px 0 currentColor,
+        0 7px 0 currentColor;
+      transform: translate(-50%, -50%);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .course-material-action-menu > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .course-material-action-menu > summary:hover,
+    .course-material-action-menu > summary:focus-visible,
+    .course-material-action-menu[open] > summary {
+      border-color: rgba(192, 154, 92, 0.32);
+      background: rgba(192, 154, 92, 0.08);
+      color: #171717;
+      outline: none;
+      box-shadow: 0 8px 22px rgba(42, 32, 20, 0.08);
+    }
+
+    .course-material-action-menu[open] > summary::before {
+      transform: translate(-50%, -50%) rotate(90deg);
+    }
+
+    .course-material-action-menu-panel {
+      position: absolute;
+      z-index: 40;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 118px;
+      padding: 6px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 18px 44px rgba(42, 32, 20, 0.16);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transform-origin: top right;
+    }
+
+    .course-material-action-menu[open] .course-material-action-menu-panel {
+      animation:
+        courseMaterialMenuIn
+        0.24s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+    }
+
+    .course-material-action-menu-panel .course-material-report-button {
+      width: 100%;
+      min-height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      color: #9f2f2f;
+      font: inherit;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-align: center;
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.16s ease;
+    }
+
+    .course-material-action-menu-panel .course-material-report-button:hover,
+    .course-material-action-menu-panel .course-material-report-button:focus-visible {
+      background: rgba(159, 47, 47, 0.08);
+      color: #7f2424;
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-material-action-menu-panel .course-material-report-button:active {
+      transform: scale(0.97);
+    }
+
+    .course-material-group {
+      overflow: visible;
+    }
+
+    .course-material-group-summary {
+      min-height: 78px;
+      padding: 11px 13px;
+      list-style: none;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr) auto 14px;
+      align-items: center;
+      gap: 11px;
+      transition: background 0.2s ease;
+    }
+
+    .course-material-group-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .course-material-group-summary:hover,
+    .course-material-group-summary:focus-visible {
+      background: rgba(192, 154, 92, 0.06);
+      outline: none;
+    }
+
+    .course-material-file-count {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .course-material-group-chevron {
+      width: 7px;
+      height: 7px;
+      border-right: 1.5px solid #171717;
+      border-bottom: 1.5px solid #171717;
+      transform: rotate(45deg) translate(-1px, -1px);
+      transition: transform 0.2s ease;
+    }
+
+    .course-material-group[open] .course-material-group-chevron {
+      transform: rotate(225deg) translate(-1px, -1px);
+    }
+
+    .course-material-group-files {
+      padding: 7px;
+      border-top: 1px solid rgba(23, 23, 23, 0.07);
+      background: rgba(247, 244, 238, 0.45);
+      display: grid;
+      gap: 6px;
+    }
+
+    .course-material-child-row {
+      padding: 5px;
+      border: 1px solid rgba(23, 23, 23, 0.065);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.72);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .course-material-child-row .course-material-row-main {
+      min-height: 58px;
+    }
+
+    .course-material-show-more {
+      min-height: 40px;
+      width: fit-content;
+      margin: 5px auto 0;
+      padding: 0 16px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.66);
+      color: #171717;
+      font: inherit;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .course-material-show-more:hover,
+    .course-material-show-more:focus-visible {
+      border-color: rgba(192, 154, 92, 0.44);
+      background: rgba(192, 154, 92, 0.1);
+      outline: none;
+    }
+
+    @media (max-width: 640px) {
+      .course-material-library-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .course-material-sort-wrap {
+        justify-content: space-between;
+      }
+
+      .course-material-sort {
+        flex: 1;
+      }
+
+      .course-material-row-main {
+        grid-template-columns: 36px minmax(0, 1fr);
+      }
+
+      .course-material-preview-label {
+        display: none;
+      }
+
+      .course-material-row .course-material-file-icon-image,
+      .course-material-child-row .course-material-file-icon-image,
+      .course-material-group-summary .course-material-file-icon-image,
+      .course-material-row .course-material-file-icon,
+      .course-material-child-row .course-material-file-icon,
+      .course-material-group-summary .course-material-file-icon {
+        width: 36px;
+        height: 42px;
+      }
+
+      .course-material-group-summary {
+        grid-template-columns: 36px minmax(0, 1fr) auto 12px;
+      }
+
+      .course-material-row-copy small,
+      .course-material-group-copy small {
+        white-space: normal;
+      }
+
+      .course-material-file-count {
+        font-size: 7px;
+      }
+    }
+
+    body.material-preview-open,
+    body.content-report-open {
+      overflow: hidden;
+    }
+
+    .course-material-preview-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .course-material-preview-modal[hidden],
+    .course-report-modal[hidden],
+    .quick-material-upload-modal[hidden] {
+      display: none;
+      opacity: 0;
+    }
+
+    .course-material-preview-modal,
+    .course-report-modal,
+    .quick-material-upload-modal {
+      opacity: 1;
+      transition:
+        opacity 0.24s ease,
+        display 0.24s;
+      transition-behavior: allow-discrete;
+      will-change: opacity;
+    }
+
+    @starting-style {
+      .course-material-preview-modal:not([hidden]),
+      .course-report-modal:not([hidden]),
+      .quick-material-upload-modal:not([hidden]) {
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-material-preview-modal,
+      .course-report-modal,
+      .quick-material-upload-modal {
+        transition: none;
+      }
+    }
+
+    .course-material-preview-backdrop {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: rgba(23, 23, 23, 0.66);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor: pointer;
+    }
+
+    .course-material-preview-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(1100px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 26px;
+      background: #f7f4ee;
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.34);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+
+    .course-material-preview-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .course-material-preview-header-copy {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .course-material-preview-header h2 {
+      overflow: hidden;
+      color: #171717;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-material-preview-header p {
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .course-material-preview-close {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.86);
+      color: #171717;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .course-material-preview-viewer {
+      position: relative;
+      min-height: min(68vh, 720px);
+      overflow: auto;
+      background: #e9e5de;
+      display: grid;
+      place-items: center;
+    }
+
+    .course-material-preview-frame,
+    .course-material-preview-image {
+      width: 100%;
+      height: min(68vh, 720px);
+      border: 0;
+      background: #ffffff;
+      display: block;
+    }
+
+    .course-material-preview-image {
+      padding: 20px;
+      object-fit: contain;
+      background: #171717;
+    }
+
+    .course-material-preview-frame[hidden],
+    .course-material-preview-image[hidden],
+    .course-material-preview-loading[hidden],
+    .course-material-preview-fallback[hidden] {
+      display: none;
+    }
+
+    .course-material-preview-loading,
+    .course-material-preview-fallback {
+      max-width: 480px;
+      padding: 28px;
+      color: rgba(23, 23, 23, 0.66);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .course-material-preview-loading {
+      display: grid;
+      place-items: center;
+      gap: 14px;
+    }
+
+    .course-material-preview-loading::before {
+      content: "";
+      width: 38px;
+      height: 38px;
+      border: 4px solid rgba(23, 23, 23, 0.12);
+      border-top-color: #171717;
+      border-radius: 999px;
+      animation: materialUploadSpin 0.8s linear infinite;
+    }
+
+    .course-material-preview-footer {
+      padding: 14px 20px;
+      border-top: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .course-material-preview-download {
+      min-height: 42px;
+      padding: 0 12px 0 16px;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .course-material-preview-download::after {
+      content: "";
+      width: 22px;
+      height: 22px;
+      flex: 0 0 22px;
+      background: url("download.png") center / 15px 15px no-repeat;
+    }
+
+    .course-report-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3100;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .course-report-modal[hidden] {
+      display: none;
+    }
+
+    .course-report-backdrop {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: rgba(247, 244, 238, 0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor: pointer;
+      animation:
+        courseReportBackdropIn
+        0.24s
+        ease
+        both;
+    }
+
+    .course-report-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(500px, 100%);
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 34px 90px rgba(42, 32, 20, 0.2);
+      animation:
+        courseReportDialogIn
+        0.3s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+    }
+
+    .course-report-header {
+      padding: 24px 24px 14px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .course-report-header-copy {
+      min-width: 0;
+      display: grid;
+      gap: 7px;
+    }
+
+    .course-report-kicker {
+      margin: 0;
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .course-report-header h2 {
+      margin: 0;
+      color: #171717;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.1;
+    }
+
+    .course-report-header-copy > p:last-child {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    .course-report-close {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: rgba(23, 23, 23, 0.82);
+      font: inherit;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .course-report-close:hover,
+    .course-report-close:focus-visible {
+      background: #171717;
+      color: #ffffff;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.14);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-report-form {
+      padding: 0 24px 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .course-report-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .course-report-field > span {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .course-report-field textarea {
+      width: 100%;
+      min-height: 132px;
+      padding: 13px 14px;
+      resize: vertical;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.58);
+      color: #171717;
+      font: inherit;
+      font-size: 14px;
+      line-height: 1.55;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .course-report-field textarea:focus {
+      border-color: rgba(192, 154, 92, 0.56);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .course-report-status {
+      min-height: 0;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .course-report-status:empty {
+      display: none;
+    }
+
+    .course-report-status.error {
+      color: #9f2f2f;
+    }
+
+    .course-report-actions {
+      padding-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .course-report-cancel,
+    .course-report-submit {
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .course-report-cancel {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.58);
+      color: rgba(23, 23, 23, 0.68);
+    }
+
+    .course-report-cancel:hover,
+    .course-report-cancel:focus-visible {
+      background: #ffffff;
+      color: #171717;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.08);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-report-submit {
+      border: 0;
+      background: #171717;
+      color: #ffffff;
+    }
+
+    .course-report-submit:hover:not(:disabled),
+    .course-report-submit:focus-visible:not(:disabled) {
+      background: #242424;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.14);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-report-submit:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    @keyframes courseReportBackdropIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes courseReportDialogIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-report-backdrop,
+      .course-report-dialog {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .course-report-modal {
+        padding: 14px;
+      }
+
+      .course-report-dialog {
+        border-radius: 22px;
+      }
+
+      .course-report-header {
+        padding: 20px 18px 16px;
+      }
+
+      .course-report-form {
+        padding: 0 18px 18px;
+      }
+
+      .course-report-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .course-report-cancel,
+      .course-report-submit {
+        width: 100%;
+      }
+    }
+
+    .course-material-status {
+      margin: 0;
+      padding: 22px;
+      border: 1px dashed rgba(23, 23, 23, 0.16);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.54);
+      color: rgba(23, 23, 23, 0.68);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .course-material-preview-tile {
+        grid-template-columns: 52px minmax(0, 1fr);
+      }
+
+      .course-material-file-icon {
+        width: 52px;
+        height: 66px;
+      }
+
+      .course-material-preview-hint {
+        grid-column: 1 / -1;
+      }
+
+      .course-material-preview-modal {
+        height: 100dvh;
+        padding: 10px;
+      }
+
+      .course-material-preview-dialog {
+        height: calc(100dvh - 20px);
+        max-height: calc(100dvh - 20px);
+        border-radius: 20px;
+      }
+
+      .course-material-preview-header {
+        padding: 14px;
+        gap: 10px;
+      }
+
+      .course-material-preview-header h2 {
+        font-size: 15px;
+      }
+
+      .course-material-preview-close {
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
+      }
+
+      .course-material-preview-viewer {
+        min-height: 0;
+        height: 100%;
+      }
+
+      .course-material-preview-frame,
+      .course-material-preview-image {
+        min-height: 0;
+        height: 100%;
+      }
+
+      .course-material-preview-footer {
+        padding: 12px 14px max(12px, env(safe-area-inset-bottom));
+      }
+
+      .course-material-preview-download {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+      }
+    }
+
+    @keyframes materialUploadSpin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .course-profile-layout {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "course"
+          "materials"
+          "upload";
+      }
+
+      .course-detail-stat {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+    }
+
+    .courses-list-view[hidden],
+    .courses-result-count[hidden],
+    .courses-grid[hidden],
+    .course-discovery[hidden],
+    .course-detail-view[hidden] {
+      display: none;
+    }
+
+    @keyframes courseCardIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-card,
+      .courses-empty {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .courses-header {
+        grid-template-columns: 1fr;
+        text-align: left;
+      }
+
+      .courses-header h1,
+      .courses-header p {
+        margin-left: 0;
+        text-align: left;
+      }
+
+      .course-discovery {
+        grid-template-columns: 1fr;
+      }
+
+      .course-card {
+        grid-template-columns: 1fr;
+      }
+
+      .course-card-meta {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .courses-page {
+        padding-top: 96px;
+      }
+
+      .courses-search-box input {
+        min-height: 60px;
+        border-radius: 24px;
+        font-size: 16px;
+      }
+
+      .course-query-strip {
+        justify-content: flex-start;
+      }
+
+      .course-discovery-panel,
+      .course-card {
+        border-radius: 22px;
+      }
+    }
+
+    .courses-inner {
+      width: min(1680px, calc(100% - 32px));
+    }
+
+    .courses-header {
+      max-width: none;
+      margin: 0 0 34px;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 28px;
+      align-items: end;
+    }
+
+    .courses-header h1 {
+      max-width: 640px;
+      margin: 0;
+      color: #171717;
+      font-size: clamp(26px, 3vw, 40px);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .courses-header p {
+      max-width: 420px;
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.7;
+      text-align: left;
+    }
+
+    .courses-browser {
+      max-width: none;
+      margin: 0;
+    }
+
+    .courses-results {
+      position: relative;
+      isolation: isolate;
+      gap: 46px;
+    }
+
+    .courses-results::before {
+      content: "";
+      position: absolute;
+      inset: -24px -16px -40px;
+      z-index: 40;
+      border-radius: 28px;
+      background: rgba(247, 244, 238, 0.58);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.24s ease;
+    }
+
+    .courses-results.is-search-active::before {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .courses-search-box {
+      position: relative;
+      z-index: 60;
+      width: min(100%, 560px);
+      margin: 0 auto;
+    }
+
+    .courses-search-box input {
+      position: relative;
+      z-index: 2;
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-size: 15px;
+      box-shadow: 0 18px 50px rgba(42, 32, 20, 0.08);
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .courses-search-box input:focus {
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow:
+        0 0 0 4px rgba(192, 154, 92, 0.12),
+        0 18px 50px rgba(42, 32, 20, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .courses-home-content {
+      margin-top: 14px;
+      display: grid;
+      gap: 80px;
+      transition:
+        opacity 0.24s ease,
+        filter 0.24s ease,
+        transform 0.24s ease;
+    }
+
+    .courses-results.is-search-active .courses-home-content {
+      opacity: 0.28;
+      filter: blur(4px);
+      transform: scale(0.995);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .courses-home-content[hidden] {
+      display: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .courses-results::before,
+      .courses-home-content {
+        transition: none;
+      }
+    }
+
+    .course-home-section {
+      padding-top: 34px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .course-section-heading {
+      max-width: 720px;
+      margin-bottom: 24px;
+    }
+
+    .course-section-kicker {
+      margin-bottom: 16px;
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .course-section-heading h2 {
+      margin-bottom: 10px;
+      color: #171717;
+      font-size: clamp(26px, 3vw, 40px);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .course-section-heading p:not(.course-section-kicker) {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .course-department-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .course-department-button {
+      min-height: 88px;
+      padding: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 18px 48px rgba(42, 32, 20, 0.07);
+      color: #171717;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 9px;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .course-department-button span {
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .course-department-button strong {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .course-department-button:hover,
+    .course-department-button:focus-visible {
+      outline: none;
+      border-color: rgba(192, 154, 92, 0.36);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 24px 60px rgba(42, 32, 20, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .course-popular-heading {
+      max-width: none;
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1fr)
+        minmax(280px, 420px);
+      gap: 36px;
+      align-items: end;
+    }
+
+    .course-popular-heading h2 {
+      margin-bottom: 0;
+    }
+
+    .course-popular-heading > p {
+      max-width: 420px;
+      justify-self: end;
+    }
+
+    .course-popular-grid {
+      counter-reset: popular-course;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: 0 26px 76px rgba(42, 32, 20, 0.1);
+    }
+
+    .course-feature-card {
+      counter-increment: popular-course;
+      min-width: 0;
+      min-height: 132px;
+      padding: 22px 24px;
+      color: inherit;
+      text-decoration: none;
+      display: grid;
+      grid-template-columns:
+        44px
+        minmax(0, 1fr);
+      grid-template-rows: auto auto auto;
+      column-gap: 18px;
+      row-gap: 7px;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.38);
+      animation: courseCardIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .course-feature-card::before {
+      content: counter(popular-course, decimal-leading-zero);
+      grid-column: 1;
+      grid-row: 1 / 4;
+      align-self: center;
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .course-feature-card:nth-child(odd) {
+      border-right: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .course-feature-card:nth-child(n + 3) {
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .course-feature-code {
+      grid-column: 2;
+      grid-row: 1;
+      color: rgba(172, 128, 59, 0.96);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .course-feature-card h3 {
+      grid-column: 2;
+      grid-row: 2;
+      margin: 0;
+      overflow: hidden;
+      color: #171717;
+      font-size: 20px;
+      font-weight: 750;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-feature-meta {
+      grid-column: 2;
+      grid-row: 3;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .course-feature-meta span {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: normal;
+      line-height: 1.45;
+      text-transform: none;
+    }
+
+    .course-feature-meta span + span::before {
+      content: "•";
+      margin: 0 8px;
+      color: rgba(192, 154, 92, 0.72);
+    }
+
+    .course-feature-card:hover,
+    .course-feature-card:focus-visible {
+      outline: none;
+      background: rgba(192, 154, 92, 0.11);
+      box-shadow: inset 0 0 0 1px rgba(192, 154, 92, 0.2);
+    }
+
+    .course-recent-card {
+      position: relative;
+      min-height: 196px;
+      padding: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 18px 48px rgba(42, 32, 20, 0.075);
+      color: inherit;
+      text-decoration: none;
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr);
+      grid-template-rows: auto auto minmax(36px, 1fr);
+      column-gap: 16px;
+      row-gap: 15px;
+      animation: courseCardIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition:
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease,
+        transform 0.22s ease;
+    }
+
+    .course-recent-icon-shell {
+      grid-column: 1;
+      grid-row: 1;
+      width: 54px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+    }
+
+    .course-recent-file-icon-image,
+    .course-recent-file-icon-fallback {
+      width: 38px;
+      height: 46px;
+    }
+
+    .course-recent-file-icon-image {
+      object-fit: contain;
+      display: block;
+    }
+
+    .course-recent-file-icon-fallback {
+      box-sizing: border-box;
+      padding: 5px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 9px;
+      background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.98),
+        rgba(237, 231, 220, 0.96)
+      );
+      color: rgba(145, 101, 35, 0.96);
+      display: grid;
+      place-items: end center;
+    }
+
+    .course-recent-file-icon-fallback strong {
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .course-recent-card-copy {
+      grid-column: 2;
+      grid-row: 1;
+      min-width: 0;
+      display: grid;
+      align-content: center;
+      gap: 5px;
+    }
+
+    .course-recent-type {
+      color: rgba(172, 128, 59, 0.96);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .course-recent-card h3 {
+      margin: 0;
+      overflow: hidden;
+      color: #171717;
+      font-size: 20px;
+      font-weight: 750;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-recent-card p {
+      margin: 0;
+      overflow: hidden;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.45;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-recent-meta {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .course-recent-meta span {
+      padding: 6px 9px;
+      border: 1px solid rgba(23, 23, 23, 0.07);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.82);
+      color: rgba(23, 23, 23, 0.55);
+      font-size: 8px;
+      font-weight: 850;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+    }
+
+    .course-recent-footer {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      width: 100%;
+      padding-top: 13px;
+      border-top: 1px solid rgba(23, 23, 23, 0.07);
+      align-self: end;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .course-recent-uploader {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(23, 23, 23, 0.52);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .course-recent-uploader-avatar {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      flex: 0 0 24px;
+      overflow: hidden;
+      border: 1px solid rgba(192, 154, 92, 0.22);
+      border-radius: 50%;
+      background: rgba(192, 154, 92, 0.1);
+      color: #a67c39;
+      font-size: 10px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      text-transform: uppercase;
+    }
+
+    .course-recent-uploader-avatar img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      object-fit: cover;
+      display: block;
+    }
+
+    .course-recent-uploader-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-recent-card small {
+      flex: 0 0 auto;
+      margin-left: auto;
+      color: rgba(23, 23, 23, 0.45);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.4;
+      text-align: right;
+    }
+
+    .course-recent-card:hover,
+    .course-recent-card:focus-visible {
+      outline: none;
+      border-color: rgba(192, 154, 92, 0.34);
+      background: rgba(255, 255, 255, 0.97);
+      box-shadow: 0 24px 60px rgba(42, 32, 20, 0.12);
+      transform: translateY(-3px);
+    }
+
+    .course-recent-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .course-recent-status {
+      grid-column: 1 / -1;
+      padding: 28px;
+      border: 1px dashed rgba(23, 23, 23, 0.16);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.54);
+      text-align: center;
+    }
+
+    .course-recent-status strong {
+      display: block;
+      color: #171717;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .course-recent-status p {
+      margin-top: 7px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .course-recent-status a {
+      margin-top: 14px;
+      color: rgba(154, 112, 48, 0.96);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+    }
+
+    .course-contribute {
+      padding-top: 34px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .course-contribute-copy {
+      max-width: 720px;
+    }
+
+    .course-contribute-copy h2 {
+      margin-bottom: 10px;
+      color: #171717;
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .course-contribute-copy p:not(.course-section-kicker) {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .course-upload-start {
+      min-height: 50px;
+      padding: 0 20px;
+      border: 0;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .course-upload-start:hover,
+    .course-upload-start:focus-visible {
+      outline: none;
+      background: rgba(154, 112, 48, 0.96);
+      box-shadow: 0 14px 34px rgba(42, 32, 20, 0.16);
+      transform: translateY(-2px);
+    }
+
+    body.quick-material-upload-open {
+      overflow: hidden;
+    }
+
+    .quick-material-upload-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 2600;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .quick-material-upload-modal[hidden] {
+      display: none;
+    }
+
+    .quick-material-upload-backdrop {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: rgba(23, 23, 23, 0.32);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      cursor: default;
+    }
+
+    .quick-material-upload-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(760px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior-x: none;
+      padding: 28px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 28px;
+      background: #f7f4ee;
+      box-shadow: 0 38px 110px rgba(23, 23, 23, 0.24);
+      animation: quickMaterialUploadIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .quick-material-upload-header {
+      padding-right: 54px;
+    }
+
+    .quick-material-upload-kicker {
+      margin-bottom: 9px;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .quick-material-upload-header h2 {
+      color: #171717;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .quick-material-upload-copy {
+      max-width: 620px;
+      margin-top: 12px;
+      color: rgba(23, 23, 23, 0.6);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .quick-material-upload-close {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      color: rgba(23, 23, 23, 0.56);
+      font: inherit;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .quick-material-upload-close:hover,
+    .quick-material-upload-close:focus-visible {
+      outline: none;
+      background: #171717;
+      color: #ffffff;
+      transform: rotate(4deg);
+    }
+
+    .quick-material-upload-dialog .material-upload-form {
+      margin-top: 24px;
+    }
+
+    .quick-material-upload-dialog .material-upload-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .quick-material-course-field {
+      grid-column: 1 / -1;
+    }
+
+    .quick-material-upload-dialog .material-choice-menu {
+      z-index: 60;
+    }
+
+    .quick-material-upload-dialog .material-upload-button {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .material-upload-status.success {
+      color: #2f8f5b;
+    }
+
+    @keyframes quickMaterialUploadIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .quick-material-upload-modal {
+        height: 100dvh;
+        padding: 12px;
+        align-items: end;
+      }
+
+      .quick-material-upload-dialog {
+        max-height: calc(100dvh - 24px);
+        padding: 22px 18px max(22px, env(safe-area-inset-bottom));
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 24px;
+      }
+
+      .quick-material-upload-close {
+        top: 14px;
+        right: 14px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .quick-material-upload-header {
+        padding-right: 52px;
+      }
+
+      .quick-material-upload-dialog .material-upload-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-material-course-field {
+        grid-column: auto;
+      }
+
+      .quick-material-upload-dialog .material-choice-menu {
+        position: static;
+        z-index: auto;
+        width: 100%;
+        max-height: min(240px, 38dvh);
+        margin-top: 8px;
+        box-shadow: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .quick-material-upload-dialog {
+        animation: none;
+      }
+    }
+
+    .courses-search-dropdown {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      left: 0;
+      z-index: 80;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 30px 80px rgba(42, 32, 20, 0.18);
+      transform-origin: top center;
+      animation: courseSearchDropdownIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .courses-search-dropdown[hidden] {
+      display: none;
+    }
+
+    @keyframes courseSearchDropdownIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .courses-result-count {
+      margin: 0;
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .courses-grid {
+      display: block;
+      max-height: min(520px, 62vh);
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .courses-grid .course-card {
+      min-height: 76px;
+      padding: 14px 16px;
+      border: 0;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      color: inherit;
+      text-decoration: none;
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      animation: none;
+      transition:
+        background 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .courses-grid .course-card:last-child {
+      border-bottom: 0;
+    }
+
+    .courses-grid .course-card:hover,
+    .courses-grid .course-card:focus-visible {
+      outline: none;
+      background: rgba(192, 154, 92, 0.12);
+      transform: translateX(2px);
+    }
+
+    .courses-grid .course-code {
+      margin: 0;
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+
+    .course-search-copy {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .course-search-copy strong {
+      overflow: hidden;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-search-copy small {
+      overflow: hidden;
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.4;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .course-search-arrow {
+      color: rgba(192, 154, 92, 0.96);
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .courses-empty {
+      margin: 0;
+      padding: 24px 18px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
+      text-align: center;
+      animation: none;
+    }
+
+    @media (max-width: 640px) {
+      .courses-search-dropdown {
+        max-width: 100%;
+        border-radius: 20px;
+      }
+
+      .courses-grid {
+        max-height: min(440px, 52dvh);
+      }
+
+      .courses-grid .course-card {
+        grid-template-columns: 70px minmax(0, 1fr) 20px;
+        gap: 10px;
+        padding: 13px 14px;
+      }
+
+      .course-search-copy strong {
+        font-size: 13px;
+      }
+
+      .course-search-copy small {
+        font-size: 9px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .courses-search-dropdown {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 1240px) {
+      .course-department-grid,
+      .courses-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .course-recent-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .courses-header {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .courses-header p {
+        max-width: 620px;
+      }
+
+      .course-popular-heading {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .course-popular-heading > p {
+        max-width: 620px;
+        justify-self: start;
+      }
+
+      .course-department-grid,
+      .courses-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .course-contribute {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .course-upload-start {
+        width: fit-content;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .courses-home-content {
+        gap: 58px;
+      }
+
+      .course-department-grid,
+      .course-recent-grid,
+      .courses-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .course-popular-grid {
+        grid-template-columns: 1fr;
+        border-radius: 22px;
+      }
+
+      .course-feature-card {
+        min-height: 112px;
+        padding: 18px;
+        grid-template-columns:
+          36px
+          minmax(0, 1fr);
+        column-gap: 14px;
+      }
+
+      .course-feature-card:nth-child(odd) {
+        border-right: 0;
+      }
+
+      .course-feature-card:nth-child(n + 2) {
+        border-top: 1px solid rgba(23, 23, 23, 0.08);
+      }
+
+      .course-recent-card,
+      .course-card {
+        border-radius: 22px;
+      }
+
+      .course-upload-start {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-feature-card,
+      .course-recent-card {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="site-header-root"></div>
+  <script src="site-header.js"></script>
+
+  <main class="courses-page">
+    <div class="courses-inner">
+      <div class="courses-list-view" id="courses-list-view">
+        <section class="courses-header">
+          <h1>Find your course material.</h1>
+
+          <p>
+            Search by course code, title, subject, department, or level.
+          </p>
+        </section>
+
+        <section class="courses-browser" aria-label="Course search and discovery">
+          <section class="courses-results">
+            <div class="courses-search-box">
+              <input
+                id="course-search-input"
+                type="search"
+                placeholder="Search courses..."
+                aria-label="Search courses"
+                aria-controls="course-search-dropdown"
+                aria-expanded="false"
+                autocomplete="off"
+              >
+
+              <div
+                class="courses-search-dropdown"
+                id="course-search-dropdown"
+                hidden
+              >
+                <div class="courses-result-count" id="courses-result-count">
+                  0 matches
+                </div>
+
+                <section
+                  class="courses-grid"
+                  id="courses-grid"
+                  aria-label="Course search results"
+                ></section>
+              </div>
+            </div>
+
+            <div class="courses-home-content" id="courses-home-content">
+              <section class="course-home-section" aria-labelledby="popular-courses-title">
+                <div class="course-section-heading course-popular-heading">
+                  <div>
+                    <p class="course-section-kicker">Start here</p>
+                    <h2 id="popular-courses-title">Popular courses</h2>
+                  </div>
+
+                  <p>
+                    Quick access to the foundational courses students search for most across AUC.
+                  </p>
+                </div>
+
+                <div
+                  class="course-popular-grid"
+                  id="course-popular-grid"
+                  aria-label="Popular courses"
+                ></div>
+              </section>
+
+              <section class="course-home-section" aria-labelledby="recent-materials-title">
+                <div class="course-section-heading">
+                  <p class="course-section-kicker">Across AUC Atlas</p>
+                  <h2 id="recent-materials-title">Explore course materials</h2>
+                  <p>
+                    Discover a rotating selection of notes, review sheets, slides, and practice files shared by students.
+                  </p>
+                </div>
+
+                <div
+                  class="course-recent-grid"
+                  id="course-recent-materials"
+                  aria-live="polite"
+                >
+                  <div class="course-recent-status">
+                    <strong>Loading course materials...</strong>
+                  </div>
+                </div>
+              </section>
+
+              <section class="course-contribute" aria-labelledby="course-contribute-title">
+                <div class="course-contribute-copy">
+                  <p class="course-section-kicker">Help another student</p>
+                  <h2 id="course-contribute-title">Have useful course material?</h2>
+                  <p>
+                    Choose the course and upload lecture notes, review sheets, assignments, slides, or practice material without leaving this page.
+                  </p>
+                </div>
+
+                <button
+                  class="course-upload-start"
+                  id="course-upload-start"
+                  type="button"
+                  aria-haspopup="dialog"
+                  aria-controls="quick-material-upload-modal"
+                  aria-expanded="false"
+                >
+                  Upload course material
+                </button>
+              </section>
+            </div>
+          </section>
+        </section>
+      </div>
+
+      <section class="course-detail-view" id="course-detail-view" aria-label="Course details" hidden>
+        <a class="course-back-link" href="courses.html">Back to courses</a>
+
+        <div class="course-profile-layout">
+          <article class="course-profile-card">
+            <section class="course-detail-hero">
+              <p class="course-detail-kicker" id="course-detail-code">Course</p>
+              <h1 id="course-detail-title">Course title</h1>
+              <p class="course-detail-description" id="course-detail-description">
+                Course description coming soon.
+              </p>
+            </section>
+
+            <section class="course-detail-grid" aria-label="Course facts">
+              <div class="course-detail-stat">
+                <span>Subject</span>
+                <strong id="course-detail-subject">Subject</strong>
+              </div>
+
+              <div class="course-detail-stat">
+                <span>Level</span>
+                <strong id="course-detail-level">Level</strong>
+              </div>
+
+              <div class="course-detail-stat">
+                <span>Code</span>
+                <strong id="course-detail-full-code">Code</strong>
+              </div>
+
+              <div
+                class="course-detail-stat"
+                id="course-detail-prerequisite-row"
+                hidden
+              >
+                <span>Prerequisite</span>
+                <strong id="course-detail-prerequisite">Prerequisite</strong>
+              </div>
+
+              <div class="course-detail-stat course-detail-professors">
+                <span>Professors</span>
+                <div class="course-professor-list" id="course-professor-list">
+                  <p>No professors listed for this course yet.</p>
+                </div>
+              </div>
+            </section>
+          </article>
+
+          <aside class="course-action-stack is-loading" id="course-materials-access" aria-busy="true">
+            <div class="course-materials-loading" id="course-materials-loading" role="status" aria-live="polite">
+              <div class="course-materials-loading-spinner" aria-hidden="true"></div>
+              <p>Loading course materials</p>
+            </div>
+
+            <section class="course-material-summary course-material-downloads" aria-label="Course materials">
+              <div>
+                <span>Materials library</span>
+                <h2>Course files</h2>
+              </div>
+
+              <div class="course-material-library-toolbar">
+                <div
+                  class="material-choice course-material-filter-list course-material-filter-choice"
+                  id="course-material-filter"
+                >
+                  <button
+                    class="material-choice-button"
+                    type="button"
+                    data-material-filter-button
+                    data-material-filter-value="all"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                  >
+                    All materials
+                  </button>
+
+                  <div
+                    class="material-choice-menu"
+                    data-material-filter-menu
+                    role="listbox"
+                    aria-label="Filter course materials"
+                  >
+                    <button class="material-choice-option" type="button" data-material-filter-option="all" aria-selected="true">All materials</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="notes" aria-selected="false">Notes</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="slides" aria-selected="false">Slides</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="syllabus" aria-selected="false">Syllabus</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="past-exam" aria-selected="false">Past exam</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="practice-sheet" aria-selected="false">Practice sheet</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="lab-file" aria-selected="false">Lab file</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="past-assignment" aria-selected="false">Past assignments</button>
+                    <button class="material-choice-option" type="button" data-material-filter-option="review-sheet" aria-selected="false">Review sheet</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="course-materials-list" id="course-materials-list" aria-label="Downloadable course files">
+                <p class="course-material-status">Loading course files...</p>
+              </div>
+
+              <div class="course-material-access-lock" aria-hidden="true">
+                <div class="course-material-access-lock-card">
+                  <strong>Log in to view content</strong>
+                  <p>Sign in with a verified AUC email to view, preview, and download course files.</p>
+                  <a href="login.html">Log in</a>
+                </div>
+              </div>
+            </section>
+
+            <section class="material-upload-panel" aria-label="Upload course material">
+              <div class="material-upload-panel-header">
+                <span>Contribute material</span>
+                <h2>Upload material</h2>
+              </div>
+
+              <p>Share a useful file and tie it to the professor and semester you took this course with.</p>
+
+              <form class="material-upload-form" id="material-upload-form">
+                <div class="material-upload-grid">
+                  <label class="material-upload-field">
+                    <span>Professor</span>
+                    <select class="material-native-select" id="material-professor" required>
+                      <option value="">Choose professor</option>
+                    </select>
+                  </label>
+
+                  <label class="material-upload-field">
+                    <span>Material type</span>
+                    <select class="material-native-select" id="material-type" required>
+                      <option value="">Choose material type</option>
+                      <option value="Notes">Notes</option>
+                      <option value="Slides">Slides</option>
+                      <option value="Syllabus">Syllabus</option>
+                      <option value="Past exam">Past exam</option>
+                      <option value="Practice sheet">Practice sheet</option>
+                      <option value="Lab file">Lab file</option>
+                      <option value="Past assignment">Past assignments</option>
+                      <option value="Review sheet">Review sheet</option>
+                    </select>
+                  </label>
+
+                  <label class="material-upload-field">
+                    <span>Semester</span>
+                    <select class="material-native-select" id="material-semester" required>
+                      <option value="">Choose semester</option>
+                      <option value="Fall 2026">Fall 2026</option>
+                      <option value="Summer 2026">Summer 2026</option>
+                      <option value="Spring 2026">Spring 2026</option>
+                      <option value="Winter 2026">Winter 2026</option>
+                      <option value="Fall 2025">Fall 2025</option>
+                      <option value="Summer 2025">Summer 2025</option>
+                      <option value="Spring 2025">Spring 2025</option>
+                      <option value="Winter 2025">Winter 2025</option>
+                      <option value="Fall 2024">Fall 2024</option>
+                      <option value="Summer 2024">Summer 2024</option>
+                      <option value="Spring 2024">Spring 2024</option>
+                      <option value="Winter 2024">Winter 2024</option>
+                      <option value="Fall 2023">Fall 2023</option>
+                      <option value="Summer 2023">Summer 2023</option>
+                      <option value="Spring 2023">Spring 2023</option>
+                      <option value="Winter 2023">Winter 2023</option>
+                      <option value="Fall 2022">Fall 2022</option>
+                      <option value="Summer 2022">Summer 2022</option>
+                      <option value="Spring 2022">Spring 2022</option>
+                      <option value="Winter 2022">Winter 2022</option>
+                      <option value="Fall 2021">Fall 2021</option>
+                      <option value="Summer 2021">Summer 2021</option>
+                      <option value="Spring 2021">Spring 2021</option>
+                      <option value="Winter 2021">Winter 2021</option>
+                      <option value="Fall 2020">Fall 2020</option>
+                      <option value="Summer 2020">Summer 2020</option>
+                      <option value="Spring 2020">Spring 2020</option>
+                      <option value="Winter 2020">Winter 2020</option>
+                      <option value="Fall 2019">Fall 2019</option>
+                      <option value="Summer 2019">Summer 2019</option>
+                      <option value="Spring 2019">Spring 2019</option>
+                      <option value="Winter 2019">Winter 2019</option>
+                      <option value="Fall 2018">Fall 2018</option>
+                      <option value="Summer 2018">Summer 2018</option>
+                      <option value="Spring 2018">Spring 2018</option>
+                      <option value="Winter 2018">Winter 2018</option>
+                    </select>
+                  </label>
+                </div>
+
+                <label class="material-upload-field">
+                  <span>Material title</span>
+                  <input id="material-title" type="text" placeholder="Midterm notes, lab sheet, final review..." required>
+                </label>
+
+                <label class="material-upload-field material-file-field">
+                  <span>Files</span>
+                  <input class="material-file-input" id="material-file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png" multiple required>
+
+                  <span class="material-file-control">
+                    <span class="material-file-icon" aria-hidden="true">
+                      <img src="upload.png" alt="">
+                    </span>
+
+                    <span class="material-file-copy">
+                      <strong>Choose one or more files</strong>
+                      <small>PDF, Word, PowerPoint, Excel, JPG or PNG · 25 MB per file</small>
+                    </span>
+                  </span>
+                </label>
+
+                <div class="material-file-selection" id="material-file-selection" hidden aria-live="polite"></div>
+
+                <label class="material-anonymous-option">
+                  <input
+                    id="material-anonymous"
+                    data-material-role="anonymous"
+                    type="checkbox"
+                    value="true"
+                  >
+
+                  <span>
+                    <strong>Upload anonymously</strong>
+                  </span>
+                </label>
+
+                <button class="material-upload-button" id="material-upload-button" type="submit">Upload material</button>
+
+                <div class="material-upload-progress" id="material-upload-progress" hidden>
+                  <div class="material-upload-progress-head">
+                    <span id="material-upload-progress-label">Uploading files</span>
+                    <strong id="material-upload-progress-value">0%</strong>
+                  </div>
+
+                  <div
+                    class="material-upload-progress-track"
+                    id="material-upload-progress-track"
+                    role="progressbar"
+                    aria-label="Material upload progress"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                  >
+                    <span class="material-upload-progress-fill" id="material-upload-progress-fill"></span>
+                  </div>
+                </div>
+
+                <p class="material-upload-status" id="material-upload-status" aria-live="polite"></p>
+
+                <div class="material-upload-overlay" id="material-upload-overlay" hidden aria-label="Uploading material" role="status">
+                  <div class="material-upload-spinner"></div>
+                </div>
+              </form>
+
+              <div class="course-material-access-lock" aria-hidden="true">
+                <div class="course-material-access-lock-card">
+                  <strong>Log in to view content</strong>
+                  <p>Sign in with a verified AUC email to access the material upload form.</p>
+                  <a href="login.html">Log in</a>
+                </div>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div
+    class="quick-material-upload-modal"
+    id="quick-material-upload-modal"
+    hidden
+  >
+    <button
+      class="quick-material-upload-backdrop"
+      type="button"
+      aria-label="Close upload form"
+      data-close-quick-material-upload
+    ></button>
+
+    <section
+      class="quick-material-upload-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="quick-material-upload-title"
+    >
+      <button
+        class="quick-material-upload-close"
+        id="quick-material-upload-close"
+        type="button"
+        aria-label="Close upload form"
+        data-close-quick-material-upload
+      >×</button>
+
+      <header class="quick-material-upload-header">
+        <p class="quick-material-upload-kicker">Share course material</p>
+        <h2 id="quick-material-upload-title">Quick upload</h2>
+        <p class="quick-material-upload-copy">
+          Choose the course, professor, semester, and material type, then upload one or more files.
+        </p>
+      </header>
+
+      <form
+        class="material-upload-form"
+        id="quick-material-upload-form"
+      >
+        <div class="material-upload-grid">
+          <label class="material-upload-field quick-material-course-field">
+            <span>Course</span>
+            <select
+              class="material-native-select"
+              id="quick-material-course"
+              data-material-role="course"
+              data-material-search-placeholder="Search courses"
+              required
+            >
+              <option value="">Choose course</option>
+            </select>
+          </label>
+
+          <label class="material-upload-field">
+            <span>Professor</span>
+            <select
+              class="material-native-select"
+              id="quick-material-professor"
+              data-material-role="professor"
+              data-material-search-placeholder="Search professors"
+              required
+            >
+              <option value="">Choose professor</option>
+            </select>
+          </label>
+
+          <label class="material-upload-field">
+            <span>Material type</span>
+            <select
+              class="material-native-select"
+              id="quick-material-type"
+              data-material-role="type"
+              required
+            >
+              <option value="">Choose material type</option>
+              <option value="Notes">Notes</option>
+              <option value="Slides">Slides</option>
+              <option value="Syllabus">Syllabus</option>
+              <option value="Past exam">Past exam</option>
+              <option value="Practice sheet">Practice sheet</option>
+              <option value="Lab file">Lab file</option>
+              <option value="Past assignments">Past assignments</option>
+              <option value="Review sheet">Review sheet</option>
+            </select>
+          </label>
+
+          <label class="material-upload-field">
+            <span>Semester</span>
+            <select
+              class="material-native-select"
+              id="quick-material-semester"
+              data-material-role="semester"
+              required
+            >
+              <option value="">Choose semester</option>
+              <option value="Fall 2026">Fall 2026</option>
+              <option value="Summer 2026">Summer 2026</option>
+              <option value="Spring 2026">Spring 2026</option>
+              <option value="Winter 2026">Winter 2026</option>
+              <option value="Fall 2025">Fall 2025</option>
+              <option value="Summer 2025">Summer 2025</option>
+              <option value="Spring 2025">Spring 2025</option>
+              <option value="Winter 2025">Winter 2025</option>
+              <option value="Fall 2024">Fall 2024</option>
+              <option value="Summer 2024">Summer 2024</option>
+              <option value="Spring 2024">Spring 2024</option>
+              <option value="Winter 2024">Winter 2024</option>
+              <option value="Fall 2023">Fall 2023</option>
+              <option value="Summer 2023">Summer 2023</option>
+              <option value="Spring 2023">Spring 2023</option>
+              <option value="Winter 2023">Winter 2023</option>
+              <option value="Fall 2022">Fall 2022</option>
+              <option value="Summer 2022">Summer 2022</option>
+              <option value="Spring 2022">Spring 2022</option>
+              <option value="Winter 2022">Winter 2022</option>
+              <option value="Fall 2021">Fall 2021</option>
+              <option value="Summer 2021">Summer 2021</option>
+              <option value="Spring 2021">Spring 2021</option>
+              <option value="Winter 2021">Winter 2021</option>
+              <option value="Fall 2020">Fall 2020</option>
+              <option value="Summer 2020">Summer 2020</option>
+              <option value="Spring 2020">Spring 2020</option>
+              <option value="Winter 2020">Winter 2020</option>
+              <option value="Fall 2019">Fall 2019</option>
+              <option value="Summer 2019">Summer 2019</option>
+              <option value="Spring 2019">Spring 2019</option>
+              <option value="Winter 2019">Winter 2019</option>
+              <option value="Fall 2018">Fall 2018</option>
+              <option value="Summer 2018">Summer 2018</option>
+              <option value="Spring 2018">Spring 2018</option>
+              <option value="Winter 2018">Winter 2018</option>
+            </select>
+          </label>
+
+          <label class="material-upload-field">
+            <span>Material title</span>
+            <input
+              id="quick-material-title"
+              data-material-role="title"
+              type="text"
+              placeholder="Midterm notes, lab sheet, final review..."
+              required
+            >
+          </label>
+        </div>
+
+        <label class="material-upload-field material-file-field">
+          <span>Files</span>
+          <input
+            class="material-file-input"
+            id="quick-material-file"
+            data-material-role="file"
+            type="file"
+            accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png"
+            multiple
+            required
+          >
+
+          <span class="material-file-control">
+            <span class="material-file-icon" aria-hidden="true">
+              <img src="upload.png" alt="">
+            </span>
+
+            <span class="material-file-copy">
+              <strong>Choose one or more files</strong>
+              <small>PDF, Word, PowerPoint, Excel, JPG or PNG · 25 MB per file</small>
+            </span>
+          </span>
+        </label>
+
+        <div
+          class="material-file-selection"
+          id="quick-material-file-selection"
+          data-material-role="file-selection"
+          hidden
+          aria-live="polite"
+        ></div>
+
+        <label class="material-anonymous-option">
+          <input
+            id="quick-material-anonymous"
+            data-material-role="anonymous"
+            type="checkbox"
+            value="true"
+          >
+
+          <span>
+            <strong>Upload anonymously</strong>
+          </span>
+        </label>
+
+        <button
+          class="material-upload-button"
+          id="quick-material-upload-button"
+          data-material-role="submit"
+          type="submit"
+        >
+          Upload material
+        </button>
+
+        <div
+          class="material-upload-progress"
+          id="quick-material-upload-progress"
+          data-material-role="progress"
+          hidden
+        >
+          <div class="material-upload-progress-head">
+            <span
+              id="quick-material-upload-progress-label"
+              data-material-role="progress-label"
+            >Uploading files</span>
+
+            <strong
+              id="quick-material-upload-progress-value"
+              data-material-role="progress-value"
+            >0%</strong>
+          </div>
+
+          <div
+            class="material-upload-progress-track"
+            id="quick-material-upload-progress-track"
+            data-material-role="progress-track"
+            role="progressbar"
+            aria-label="Material upload progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+            <span
+              class="material-upload-progress-fill"
+              id="quick-material-upload-progress-fill"
+              data-material-role="progress-fill"
+            ></span>
+          </div>
+        </div>
+
+        <p
+          class="material-upload-status"
+          id="quick-material-upload-status"
+          data-material-role="status"
+          aria-live="polite"
+        ></p>
+      </form>
+    </section>
+  </div>
+
+  <div
+    class="course-material-preview-modal"
+    id="course-material-preview-modal"
+    hidden
+  >
+    <button
+      class="course-material-preview-backdrop"
+      type="button"
+      aria-label="Close file preview"
+      data-close-material-preview
+    ></button>
+
+    <section
+      class="course-material-preview-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="course-material-preview-title"
+    >
+      <header class="course-material-preview-header">
+        <div class="course-material-preview-header-copy">
+          <h2 id="course-material-preview-title">File preview</h2>
+          <p id="course-material-preview-meta">Preparing preview</p>
+        </div>
+
+        <button
+          class="course-material-preview-close"
+          id="course-material-preview-close"
+          type="button"
+          aria-label="Close file preview"
+          data-close-material-preview
+        >×</button>
+      </header>
+
+      <div class="course-material-preview-viewer">
+        <div
+          class="course-material-preview-loading"
+          id="course-material-preview-loading"
+        >
+          Preparing a secure preview...
+        </div>
+
+        <iframe
+          class="course-material-preview-frame"
+          id="course-material-preview-frame"
+          title="Course material preview"
+          hidden
+        ></iframe>
+
+        <img
+          class="course-material-preview-image"
+          id="course-material-preview-image"
+          alt="Course material preview"
+          hidden
+        >
+
+        <div
+          class="course-material-preview-fallback"
+          id="course-material-preview-fallback"
+          hidden
+        ></div>
+      </div>
+
+      <footer class="course-material-preview-footer">
+        <a
+          class="course-material-preview-download"
+          id="course-material-preview-download"
+          href="#"
+          target="_blank"
+          rel="noopener"
+        >Download original</a>
+      </footer>
+    </section>
+  </div>
+
+  <div
+    class="course-report-modal"
+    id="course-report-modal"
+    hidden
+  >
+    <button
+      class="course-report-backdrop"
+      type="button"
+      aria-label="Close report panel"
+      data-close-course-report
+    ></button>
+
+    <section
+      class="course-report-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="course-report-title"
+    >
+      <header class="course-report-header">
+        <div class="course-report-header-copy">
+          <p class="course-report-kicker">Content moderation</p>
+          <h2 id="course-report-title">Report material</h2>
+          <p id="course-report-copy">
+            Tell us what is wrong with this course material. Our moderators will review your report.
+          </p>
+        </div>
+
+        <button
+          class="course-report-close"
+          type="button"
+          aria-label="Close report panel"
+          data-close-course-report
+        >×</button>
+      </header>
+
+      <form
+        class="course-report-form"
+        id="course-report-form"
+      >
+        <label class="course-report-field">
+          <span>Reason for report</span>
+          <textarea
+            id="course-report-reason"
+            name="reason"
+            maxlength="1000"
+            placeholder="Describe the issue with this material..."
+            required
+          ></textarea>
+        </label>
+
+        <p
+          class="course-report-status"
+          id="course-report-status"
+          aria-live="polite"
+        ></p>
+
+        <div class="course-report-actions">
+          <button
+            class="course-report-cancel"
+            type="button"
+            data-close-course-report
+          >Cancel</button>
+
+          <button
+            class="course-report-submit"
+            id="course-report-submit"
+            type="submit"
+          >Submit report</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="data/professor-data.js"></script>
+  <script src="data/courses.js"></script>
+</body>
+</html>
