@@ -11,6 +11,25 @@
     const styles = document.createElement("style");
     styles.id = "account-authenticator-redesign-styles";
     styles.textContent = `
+      html:has(#authenticator-modal:not([hidden])),
+      body:has(#authenticator-modal:not([hidden])) {
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
+      body:has(#authenticator-modal:not([hidden])) .site-header,
+      body:has(#authenticator-modal:not([hidden])) .account-page {
+        filter: blur(12px);
+        pointer-events: none;
+        user-select: none;
+      }
+
+      #authenticator-modal .account-authenticator-modal-backdrop {
+        background: rgba(12, 12, 12, 0.68);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+      }
+
       #authenticator-modal .account-authenticator-modal-card {
         width: min(calc(100vw - 48px), 470px);
         padding: 30px;
