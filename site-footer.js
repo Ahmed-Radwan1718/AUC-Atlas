@@ -81,11 +81,78 @@
       });
   }
 
+  function applyProfessorCardStarColors() {
+    document
+      .querySelectorAll(
+        ".professor-card .professor-meta > span:last-child"
+      )
+      .forEach(function (rating) {
+        if (rating.dataset.starColorReady === "true") {
+          return;
+        }
+
+        const match = rating.textContent
+          .trim()
+          .match(/^([★]+)([☆]*)(?:\s+(.+))?$/);
+
+        if (!match) {
+          return;
+        }
+
+        rating.textContent = "";
+
+        const filledStars = document.createElement("span");
+        filledStars.textContent = match[1];
+        filledStars.style.color = "#C09A5C";
+        rating.appendChild(filledStars);
+
+        if (match[2]) {
+          const emptyStars = document.createElement("span");
+          emptyStars.textContent = match[2];
+          rating.appendChild(emptyStars);
+        }
+
+        if (match[3]) {
+          rating.appendChild(
+            document.createTextNode(" " + match[3])
+          );
+        }
+
+        rating.dataset.starColorReady = "true";
+      });
+  }
+
+  function setupProfessorCardStarColors() {
+    const grid = document.getElementById("professors-grid");
+
+    if (!grid) {
+      return;
+    }
+
+    applyProfessorCardStarColors();
+
+    if (grid.dataset.starColorObserverReady === "true") {
+      return;
+    }
+
+    const observer = new MutationObserver(function () {
+      applyProfessorCardStarColors();
+    });
+
+    observer.observe(grid, {
+      childList: true,
+      subtree: true
+    });
+
+    grid.dataset.starColorObserverReady = "true";
+  }
+
   function renderSiteFooter() {
     const currentPath = window.location.pathname.replace(/\/+$/, "");
     const currentPage = (currentPath.split("/").pop() || "index").replace(/\.html$/i, "");
 
     applyProfessorPhotoUpdates();
+    setupProfessorCardStarColors();
 
     if (
       currentPage === "accounts" &&
