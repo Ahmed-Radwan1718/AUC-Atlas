@@ -35,7 +35,13 @@
     "ahmed-abou-auf": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559682/e1c29d85-e7e2-4ddc-996f-d70c33f1b344.png",
     "ahmed-elbanbi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559715/41b2bf66-d3cc-4c88-8ccd-24702e9c26fd.png",
     "ahmed-elbayoumi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559741/3f07c828-e4c9-4586-b5bb-fdc480382356.png",
-    "alessandro-topa": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559770/90a70470-6bf5-4541-a256-181a5df5ee44.png"
+    "alessandro-topa": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559770/90a70470-6bf5-4541-a256-181a5df5ee44.png",
+    "ali-awni": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559838/fb694392-e272-4cdd-af30-552ad7258b52.png",
+    "peter-barsoum": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559873/68946122-1c17-4d17-96fb-2c0be49d4965.png",
+    "ali-hadi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559896/66dd6d53-22d8-4aff-a491-6e172f8030b0.png",
+    "amal-esawi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559924/dd8ed207-dc83-4f99-b380-64c7f1f2a675.png",
+    "amina-el-bindary": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559948/3cb36bbb-5312-4de4-be75-12f29c101c32.png",
+    "amr-abdel-kawi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559971/dd1480b9-8d7f-4998-a253-021fd4d46ef8.png"
   };
 
   function normalizeProfessorId(value) {
