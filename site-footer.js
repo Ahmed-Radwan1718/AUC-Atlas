@@ -12,6 +12,15 @@
     const currentPath = window.location.pathname.replace(/\/+$/, "");
     const currentPage = (currentPath.split("/").pop() || "index").replace(/\.html$/i, "");
 
+    if (
+      currentPage === "accounts" &&
+      !document.querySelector('script[src="account-authenticator-ui.js"]')
+    ) {
+      const authenticatorUiScript = document.createElement("script");
+      authenticatorUiScript.src = "account-authenticator-ui.js";
+      document.head.appendChild(authenticatorUiScript);
+    }
+
     if (footerHiddenPages.has(currentPage) || document.querySelector(".site-footer")) {
       return;
     }
