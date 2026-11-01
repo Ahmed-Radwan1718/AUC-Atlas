@@ -14,7 +14,18 @@
     "mohamed-badran": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558103/a5d14d05-15ac-4370-a206-e1527fc036c7.png",
     "wafik-lotfallah": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558143/29c1c873-da78-4247-8e61-18180bb4c9d2.png",
     "addison-ellis": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558195/4926dd5e-3c19-4dfd-80e1-e0375b4af172.png",
-    "ahmed-abdellatif": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558230/a0626c92-db85-4274-bdb8-7c263e8491db.png"
+    "ahmed-abdellatif": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558230/a0626c92-db85-4274-bdb8-7c263e8491db.png",
+    "ehab-elsawy": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558368/01e94527-d618-436d-90f6-420de93463db.png",
+    "yasmine-motawy": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558421/729f5565-10b9-40ae-8cce-b45ba9a9fbf6.png",
+    "hassan-azazy": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558561/3012e7d4-c723-4d2a-a4ae-1177eaf0b101.png",
+    "mustafa-arafa": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558739/800ea61f-86a8-4493-b325-7f7f11c9f16b.png",
+    "walid-fouad": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558858/ed0d7552-8282-4edd-8bfe-8b2f8e15553e.png",
+    "aya-musmar": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558918/eb3dcd89-953f-4966-9c64-4d7f788b3a8e.png",
+    "chelsea-green": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558956/e5255a7f-2193-4ff5-9fc4-d495bea0a2b9.png",
+    "catarina-belo": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559003/daf84a9b-e38e-4675-b3a3-44e2ce981443.png",
+    "christopher-barker": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559032/0fb6712a-f9c0-4bac-9735-a60da144feaf.png",
+    "daoud-siniora": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559074/5234bcd4-e7a2-4162-b6f2-a102a710fa65.png",
+    "dina-ebeid": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559131/69eb4f13-b22d-4ed6-8de8-4a7934f81be5.png"
   };
 
   function normalizeProfessorId(value) {
