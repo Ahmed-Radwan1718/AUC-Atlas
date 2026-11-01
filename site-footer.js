@@ -41,7 +41,33 @@
     "ali-hadi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559896/66dd6d53-22d8-4aff-a491-6e172f8030b0.png",
     "amal-esawi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559924/dd8ed207-dc83-4f99-b380-64c7f1f2a675.png",
     "amina-el-bindary": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559948/3cb36bbb-5312-4de4-be75-12f29c101c32.png",
-    "amr-abdel-kawi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559971/dd1480b9-8d7f-4998-a253-021fd4d46ef8.png"
+    "amr-abdel-kawi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559971/dd1480b9-8d7f-4998-a253-021fd4d46ef8.png",
+    "abdelaziz-ezzelarab": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560451/7477f95d-0999-46f9-9de2-1ef634b04d99.png",
+    "adam-talib": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560521/19723afa-0308-433b-8d8a-41d00b33575e.png",
+    "amr-adly": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560549/2356b1d7-2e81-4e97-8b96-e217726e2217.png",
+    "amr-el-kadi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560587/48421bd4-b7ea-45b0-9636-e62d3e20225a.png",
+    "angie-zaher": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560641/6e8f7b4c-57bc-4e0d-b07a-256b255278eb.png",
+    "anwar-abd-elnaser": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560660/647dcd80-ec7b-44bf-aa60-c93258dbdad5.png",
+    "ariane-schneck": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560679/fb7c6512-3bfa-46d5-adfe-0f067af8efb5.png",
+    "arthur-bos": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560712/04f002e5-ecf0-4052-b81b-81edf4c58b3a.png",
+    "asma-amleh": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560741/2034677c-5a7f-410b-a37f-1c9ef84dee00.png",
+    "atta-gebril": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560767/178c7ce2-e208-44f8-95b2-1b36b8b7f8d7.png",
+    "bernard-o-kane": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560796/465356fd-4c1f-408b-bdb9-95cf14443e16.png",
+    "dalal-abo-el-seoud": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560854/b6006bbe-b4ca-46af-8f4d-eb70404e44f1.png",
+    "david-rafferty": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560887/f1eb633e-cd5d-46a4-9ac3-8b7453b3c041.png",
+    "dina-bassiouni": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560935/dc60a45a-9a8a-487d-82a3-2e0b0c0fdd4e.png",
+    "euan-metz": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560986/f912336a-beac-489d-87d5-594405c19c17.png",
+    "fikry-boutros": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561009/52298476-3ef7-4987-b336-3baa28cac9c4.png",
+    "firas-al-atraqchi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561040/cdb5ff06-1cc5-4868-9bd9-7b147aa78959.png",
+    "ghada-barsoum": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561086/66ebf876-1f10-4476-b998-827b78062951.png",
+    "ghalia-el-srakbi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561121/a1cf2adc-28a8-4d72-8cfb-48ba86026972.png",
+    "h-rizzo": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561165/c605ba76-bb09-4485-80ff-3284e20b8e8f.png",
+    "gretchen-mccullough": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561203/351300ac-1825-4d3f-a694-9516259428bd.png",
+    "gurusewak-khalsa": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561324/7b12c06e-b3fc-4359-b9db-6bdb77083634.png"
+  };
+
+  const professorNameUpdates = {
+    "h-rizzo": "Helen Rizzo"
   };
 
   function normalizeProfessorId(value) {
@@ -77,6 +103,56 @@
 
         if (updatedPhoto && image.src !== updatedPhoto) {
           image.src = updatedPhoto;
+        }
+      });
+  }
+
+  function applyProfessorNameUpdates() {
+    document
+      .querySelectorAll(
+        ".professor-card-image img, .professor-profile-image img"
+      )
+      .forEach(function (image) {
+        const professorId = normalizeProfessorId(image.alt);
+        const updatedName = professorNameUpdates[professorId];
+
+        if (!updatedName) {
+          return;
+        }
+
+        const card = image.closest(".professor-card");
+        const profileCard = image.closest(".professor-profile-card");
+        const heading = card ? card.querySelector("h2") : null;
+        const pageHeading = document.querySelector(
+          ".professors-header.professor-profile-heading h1"
+        );
+        const professorNameInput = document.querySelector(
+          'input[name="professorName"]'
+        );
+
+        image.alt = updatedName;
+
+        if (heading) {
+          heading.textContent = updatedName;
+        }
+
+        if (card) {
+          card.setAttribute(
+            "aria-label",
+            "Open " + updatedName + " profile"
+          );
+        }
+
+        if (profileCard) {
+          if (pageHeading) {
+            pageHeading.textContent = updatedName;
+          }
+
+          if (professorNameInput) {
+            professorNameInput.value = updatedName;
+          }
+
+          document.title = updatedName + " | AUC Atlas";
         }
       });
   }
@@ -122,21 +198,27 @@
       });
   }
 
-  function setupProfessorCardStarColors() {
+  function applyProfessorOverrides() {
+    applyProfessorPhotoUpdates();
+    applyProfessorNameUpdates();
+    applyProfessorCardStarColors();
+  }
+
+  function setupProfessorOverrides() {
     const grid = document.getElementById("professors-grid");
 
     if (!grid) {
       return;
     }
 
-    applyProfessorCardStarColors();
+    applyProfessorOverrides();
 
-    if (grid.dataset.starColorObserverReady === "true") {
+    if (grid.dataset.professorOverridesReady === "true") {
       return;
     }
 
     const observer = new MutationObserver(function () {
-      applyProfessorCardStarColors();
+      applyProfessorOverrides();
     });
 
     observer.observe(grid, {
@@ -144,15 +226,15 @@
       subtree: true
     });
 
-    grid.dataset.starColorObserverReady = "true";
+    grid.dataset.professorOverridesReady = "true";
   }
 
   function renderSiteFooter() {
     const currentPath = window.location.pathname.replace(/\/+$/, "");
     const currentPage = (currentPath.split("/").pop() || "index").replace(/\.html$/i, "");
 
-    applyProfessorPhotoUpdates();
-    setupProfessorCardStarColors();
+    applyProfessorOverrides();
+    setupProfessorOverrides();
 
     if (
       currentPage === "accounts" &&
