@@ -28,7 +28,14 @@
     "dina-ebeid": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559131/69eb4f13-b22d-4ed6-8de8-4a7934f81be5.png",
     "dina-amin": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559201/4afc6619-9e14-4e3d-bc0f-3b1814ba704a.png",
     "elizabeth-rauh": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559438/2089b265-f586-492d-a767-e718dee11eec.png",
-    "ahmed-tolba": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559365/4c9ab1b4-ffb8-45d3-b154-d884fde9dfeb.png"
+    "ahmed-tolba": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559365/4c9ab1b4-ffb8-45d3-b154-d884fde9dfeb.png",
+    "ahmad-khan": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559557/6f67da04-20ff-47a7-9f6e-b23fc0c55c48.png",
+    "ahmad-saqfalhait": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559589/fa1c7f10-a4ca-4c18-ae16-530dffaf6977.png",
+    "ahmed-abdel-meguid": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559643/f8656d6d-ca3b-4997-a3c2-a107d30ceec5.png",
+    "ahmed-abou-auf": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559682/e1c29d85-e7e2-4ddc-996f-d70c33f1b344.png",
+    "ahmed-elbanbi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559715/41b2bf66-d3cc-4c88-8ccd-24702e9c26fd.png",
+    "ahmed-elbayoumi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559741/3f07c828-e4c9-4586-b5bb-fdc480382356.png",
+    "alessandro-topa": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559770/90a70470-6bf5-4541-a256-181a5df5ee44.png"
   };
 
   function normalizeProfessorId(value) {
