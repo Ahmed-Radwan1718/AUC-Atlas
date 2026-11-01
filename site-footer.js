@@ -8,9 +8,57 @@
     "reset-password"
   ]);
 
+  const professorPhotoUpdates = {
+    "kate-ellis": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793557977/5af39b66-7df3-4d17-8dc4-070332864bed.png",
+    "nageh-allam": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558061/c0f7ea2d-853f-4973-8dbe-5040bc8e917a.png",
+    "mohamed-badran": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558103/a5d14d05-15ac-4370-a206-e1527fc036c7.png",
+    "wafik-lotfallah": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558143/29c1c873-da78-4247-8e61-18180bb4c9d2.png",
+    "addison-ellis": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558195/4926dd5e-3c19-4dfd-80e1-e0375b4af172.png",
+    "ahmed-abdellatif": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558230/a0626c92-db85-4274-bdb8-7c263e8491db.png"
+  };
+
+  function normalizeProfessorId(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function applyProfessorPhotoUpdates() {
+    if (Array.isArray(window.aucAtlasProfessors)) {
+      window.aucAtlasProfessors.forEach(function (professor) {
+        const professorId = normalizeProfessorId(
+          professor && (professor.id || professor.name)
+        );
+        const updatedPhoto = professorPhotoUpdates[professorId];
+
+        if (updatedPhoto) {
+          professor.image = updatedPhoto;
+        }
+      });
+    }
+
+    document
+      .querySelectorAll(
+        ".professor-card-image img, .professor-profile-image img"
+      )
+      .forEach(function (image) {
+        const professorId = normalizeProfessorId(image.alt);
+        const updatedPhoto = professorPhotoUpdates[professorId];
+
+        if (updatedPhoto && image.src !== updatedPhoto) {
+          image.src = updatedPhoto;
+        }
+      });
+  }
+
   function renderSiteFooter() {
     const currentPath = window.location.pathname.replace(/\/+$/, "");
     const currentPage = (currentPath.split("/").pop() || "index").replace(/\.html$/i, "");
+
+    applyProfessorPhotoUpdates();
 
     if (
       currentPage === "accounts" &&
