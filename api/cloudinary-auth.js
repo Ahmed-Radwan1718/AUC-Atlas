@@ -3,9 +3,6 @@ const admin = require("../server/_lib/firebaseAdmin");
 
 const { getSiteSessionUser } = require("../server/_lib/securityHelpers");
 const {
-  consumeSecurityRateLimit
-} = require("../server/_lib/securityRateLimits");
-const {
   MATERIAL_MAX_FILE_BYTES,
   MATERIAL_USER_QUOTA_BYTES,
   MATERIAL_UPLOAD_AUTH_TTL_SECONDS,
@@ -17,12 +14,6 @@ const {
   createCloudinaryUploadAuthorization,
   deleteCloudinaryMaterial
 } = require("../server/_lib/cloudinaryCourseMaterials");
-
-const MATERIAL_UPLOAD_AUTHORIZATION_WINDOW_MS =
-  60 * 60 * 1000;
-const MATERIAL_UPLOAD_MAX_AUTHORIZATIONS = 20;
-const MATERIAL_UPLOAD_REGISTRATION_GRACE_MS =
-  5 * 60 * 1000;
 
 const MATERIAL_TYPE_CHOICES = [
   "Notes",
@@ -48,26 +39,6 @@ function createMaterialUploadError(message, statusCode) {
   return error;
 }
 
-function createMaterialUploadRateLimitError(retryAfterSeconds) {
-  const safeRetryAfterSeconds = Math.max(
-    1,
-    Math.ceil(Number(retryAfterSeconds) || 1)
-  );
-  const retryAfterMinutes = Math.max(
-    1,
-    Math.ceil(safeRetryAfterSeconds / 60)
-  );
-  const error = createMaterialUploadError(
-    "Too many course-material uploads. Try again in " +
-      retryAfterMinutes +
-      (retryAfterMinutes === 1 ? " minute." : " minutes."),
-    429
-  );
-
-  error.retryAfterSeconds = safeRetryAfterSeconds;
-  return error;
-}
-
 function cleanString(value, maxLength) {
   return String(value || "")
     .trim()
@@ -87,29 +58,6 @@ function cleanMaterialType(value) {
   return MATERIAL_TYPE_LOOKUP[
     cleanString(value, 80).toLowerCase()
   ] || "";
-}
-
-function cleanDescriptionPart(value, maxLength) {
-  return cleanString(value, maxLength)
-    .replace(/\s*\|\s*/g, " ");
-}
-
-function slugifyMaterialValue(value) {
-  return String(value || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "unknown";
-}
-
-function getTimestampMillis(value) {
-  if (!value) return 0;
-  if (typeof value.toDate === "function") return value.toDate().getTime();
-  if (typeof value.seconds === "number") return value.seconds * 1000;
-  if (typeof value._seconds === "number") return value._seconds * 1000;
-
-  const parsedDate = new Date(value);
-  return Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
 }
 
 function getRequestBody(req) {
@@ -200,9 +148,7 @@ async function ensureVerifiedAucUser(req) {
   };
 }
 
-async function getStoredBytesForUploader(
-  uploaderUid
-) {
+async function getStoredBytesForUploader(uploaderUid) {
   const snapshot = await admin
     .firestore()
     .collection("courseMaterials")
@@ -232,302 +178,50 @@ async function getStoredBytesForUploader(
 }
 
 async function reserveMaterialUploadAuthorization(data) {
-  const db = admin.firestore();
-  const limitRef = db
-    .collection("materialUploadLimits")
-    .doc(data.uploaderUid);
-  const authorizationRef = db
+  if (
+    data.currentStoredBytes + data.fileSize >
+    MATERIAL_USER_QUOTA_BYTES
+  ) {
+    throw createMaterialUploadError(
+      "Your course-material storage quota has been reached.",
+      413
+    );
+  }
+
+  const nowMs = Date.now();
+  const authorizationRef = admin
+    .firestore()
     .collection("materialUploadAuthorizations")
     .doc(data.authorizationId);
-  const nowMs = Date.now();
 
-  await db.runTransaction(async function (transaction) {
-    const limitDoc = await transaction.get(limitRef);
-    const limitData = limitDoc.exists
-      ? limitDoc.data() || {}
-      : {};
-    const activeAuthorizationExpiresAtMs =
-      getTimestampMillis(
-        limitData.activeAuthorizationExpiresAt
-      );
-    const activeAuthorizationCleanupAtMs =
-      activeAuthorizationExpiresAtMs
-        ? activeAuthorizationExpiresAtMs +
-          MATERIAL_UPLOAD_REGISTRATION_GRACE_MS
-        : 0;
-
-    if (
-      cleanString(
-        limitData.activeAuthorizationId,
-        80
-      ) &&
-      activeAuthorizationCleanupAtMs > nowMs
-    ) {
-      throw createMaterialUploadRateLimitError(
-        Math.ceil(
-          (activeAuthorizationCleanupAtMs - nowMs) /
-            1000
-        )
-      );
-    }
-
-    if (
-      data.currentStoredBytes + data.fileSize >
-      MATERIAL_USER_QUOTA_BYTES
-    ) {
-      throw createMaterialUploadError(
-        "Your course-material storage quota has been reached.",
-        413
-      );
-    }
-
-    transaction.set(
-      limitRef,
-      {
-        uploaderUid: data.uploaderUid,
-        activeAuthorizationId:
-          data.authorizationId,
-        activeAuthorizationExpiresAt:
-          admin.firestore.Timestamp.fromDate(
-            new Date(data.expiresAtMs)
-          ),
-        updatedAt:
-          admin.firestore.FieldValue.serverTimestamp()
-      },
-      { merge: true }
-    );
-
-    transaction.set(authorizationRef, {
-      authorizationId: data.authorizationId,
-      uploaderUid: data.uploaderUid,
-      courseCode: data.courseCode,
-      courseTitle: data.courseTitle,
-      professor: data.professor,
-      semester: data.semester,
-      materialType: data.materialType,
-      title: data.title,
-      fileName: data.fileName,
-      uploadFileName: data.fileName,
-      fileSize: data.fileSize,
-      fileType: data.fileType,
-      storageKey: data.storageKey,
-      folder: "",
-      isAnonymous: cleanBoolean(data.isAnonymous),
-      uploaderDisplayName: data.uploaderDisplayName,
-      uploaderPhotoURL: data.uploaderPhotoURL,
-      createdAt:
-        admin.firestore.FieldValue.serverTimestamp(),
-      createdAtIso: new Date(nowMs).toISOString(),
-      expiresAt:
-        admin.firestore.Timestamp.fromDate(
-          new Date(data.expiresAtMs)
-        ),
-      consumedAt: null,
-      cancelledAt: null
-    });
+  await authorizationRef.set({
+    authorizationId: data.authorizationId,
+    uploaderUid: data.uploaderUid,
+    courseCode: data.courseCode,
+    courseTitle: data.courseTitle,
+    professor: data.professor,
+    semester: data.semester,
+    materialType: data.materialType,
+    title: data.title,
+    fileName: data.fileName,
+    uploadFileName: data.fileName,
+    fileSize: data.fileSize,
+    fileType: data.fileType,
+    storageKey: data.storageKey,
+    folder: "",
+    isAnonymous: cleanBoolean(data.isAnonymous),
+    uploaderDisplayName: data.uploaderDisplayName,
+    uploaderPhotoURL: data.uploaderPhotoURL,
+    createdAt:
+      admin.firestore.FieldValue.serverTimestamp(),
+    createdAtIso: new Date(nowMs).toISOString(),
+    expiresAt:
+      admin.firestore.Timestamp.fromDate(
+        new Date(data.expiresAtMs)
+      ),
+    consumedAt: null,
+    cancelledAt: null
   });
-}
-
-async function claimExpiredMaterialUploadAuthorization(
-  uploaderUid
-) {
-  const safeUploaderUid = cleanString(
-    uploaderUid,
-    160
-  );
-
-  if (!safeUploaderUid) {
-    return null;
-  }
-
-  const db = admin.firestore();
-  const limitRef = db
-    .collection("materialUploadLimits")
-    .doc(safeUploaderUid);
-  const nowMs = Date.now();
-
-  return await db.runTransaction(
-    async function (transaction) {
-      const limitDoc =
-        await transaction.get(limitRef);
-      const limitData = limitDoc.exists
-        ? limitDoc.data() || {}
-        : {};
-      const authorizationId = cleanString(
-        limitData.activeAuthorizationId,
-        80
-      );
-      const expiresAtMs = getTimestampMillis(
-        limitData.activeAuthorizationExpiresAt
-      );
-      const cleanupAtMs = expiresAtMs
-        ? expiresAtMs +
-          MATERIAL_UPLOAD_REGISTRATION_GRACE_MS
-        : 0;
-
-      if (
-        !/^[a-f0-9]{36}$/i.test(
-          authorizationId
-        ) ||
-        !cleanupAtMs ||
-        cleanupAtMs > nowMs
-      ) {
-        return null;
-      }
-
-      const authorizationRef = db
-        .collection(
-          "materialUploadAuthorizations"
-        )
-        .doc(authorizationId);
-      const authorizationDoc =
-        await transaction.get(authorizationRef);
-
-      if (!authorizationDoc.exists) {
-        transaction.set(
-          limitRef,
-          {
-            activeAuthorizationId: "",
-            activeAuthorizationExpiresAt: null,
-            updatedAt:
-              admin.firestore.FieldValue
-                .serverTimestamp()
-          },
-          { merge: true }
-        );
-
-        return null;
-      }
-
-      const authorizationData =
-        authorizationDoc.data() || {};
-
-      if (
-        cleanString(
-          authorizationData.uploaderUid,
-          160
-        ) !== safeUploaderUid
-      ) {
-        transaction.set(
-          limitRef,
-          {
-            activeAuthorizationId: "",
-            activeAuthorizationExpiresAt: null,
-            updatedAt:
-              admin.firestore.FieldValue
-                .serverTimestamp()
-          },
-          { merge: true }
-        );
-
-        return null;
-      }
-
-      if (authorizationData.consumedAt) {
-        transaction.delete(authorizationRef);
-        transaction.set(
-          limitRef,
-          {
-            activeAuthorizationId: "",
-            activeAuthorizationExpiresAt: null,
-            updatedAt:
-              admin.firestore.FieldValue
-                .serverTimestamp()
-          },
-          { merge: true }
-        );
-
-        return null;
-      }
-
-      transaction.set(
-        authorizationRef,
-        {
-          cleanupStartedAt:
-            admin.firestore.FieldValue
-              .serverTimestamp()
-        },
-        { merge: true }
-      );
-
-      return {
-        authorizationId,
-        storageKey: cleanString(
-          authorizationData.storageKey ||
-            authorizationId,
-          80
-        )
-      };
-    }
-  );
-}
-
-async function finalizeExpiredMaterialUploadAuthorization(
-  uploaderUid,
-  authorizationId
-) {
-  const db = admin.firestore();
-  const authorizationRef = db
-    .collection("materialUploadAuthorizations")
-    .doc(authorizationId);
-  const limitRef = db
-    .collection("materialUploadLimits")
-    .doc(uploaderUid);
-
-  await db.runTransaction(async function (transaction) {
-    const authorizationDoc =
-      await transaction.get(authorizationRef);
-    const limitDoc =
-      await transaction.get(limitRef);
-    const limitData = limitDoc.exists
-      ? limitDoc.data() || {}
-      : {};
-
-    if (authorizationDoc.exists) {
-      transaction.delete(authorizationRef);
-    }
-
-    if (
-      cleanString(
-        limitData.activeAuthorizationId,
-        80
-      ) === authorizationId
-    ) {
-      transaction.set(
-        limitRef,
-        {
-          activeAuthorizationId: "",
-          activeAuthorizationExpiresAt: null,
-          updatedAt:
-            admin.firestore.FieldValue
-              .serverTimestamp()
-        },
-        { merge: true }
-      );
-    }
-  });
-}
-
-async function cleanupExpiredMaterialUploadAuthorization(
-  uploaderUid
-) {
-  const cleanup =
-    await claimExpiredMaterialUploadAuthorization(
-      uploaderUid
-    );
-
-  if (!cleanup) {
-    return;
-  }
-
-  await deleteCloudinaryMaterial(
-    cleanup.storageKey
-  );
-
-  await finalizeExpiredMaterialUploadAuthorization(
-    uploaderUid,
-    cleanup.authorizationId
-  );
 }
 
 async function cancelMaterialUploadAuthorization(
@@ -580,8 +274,7 @@ async function cancelMaterialUploadAuthorization(
       authorizationRef,
       {
         cancelledAt:
-          admin.firestore.FieldValue
-            .serverTimestamp()
+          admin.firestore.FieldValue.serverTimestamp()
       },
       { merge: true }
     );
@@ -615,18 +308,6 @@ module.exports = async function handler(req, res) {
 
       return res.status(200).json({ success: true });
     }
-
-    await consumeSecurityRateLimit({
-      scope:
-        "material-upload-authorization-user",
-      identifier: uploader.uid,
-      maxAttempts:
-        MATERIAL_UPLOAD_MAX_AUTHORIZATIONS,
-      windowMs:
-        MATERIAL_UPLOAD_AUTHORIZATION_WINDOW_MS,
-      message:
-        "Too many course-material upload requests. Please try again later."
-    });
 
     const courseCode = cleanString(
       body.courseCode,
@@ -668,10 +349,6 @@ module.exports = async function handler(req, res) {
         400
       );
     }
-
-    await cleanupExpiredMaterialUploadAuthorization(
-      uploader.uid
-    );
 
     const authorizationId =
       crypto.randomBytes(18).toString("hex");
@@ -730,13 +407,6 @@ module.exports = async function handler(req, res) {
     });
   } catch (error) {
     res.setHeader("Cache-Control", "no-store");
-
-    if (error.retryAfterSeconds) {
-      res.setHeader(
-        "Retry-After",
-        String(error.retryAfterSeconds)
-      );
-    }
 
     return res.status(error.statusCode || 500).json({
       error: error.message || "Could not prepare upload."
