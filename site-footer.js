@@ -63,7 +63,8 @@
     "ghalia-el-srakbi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561121/a1cf2adc-28a8-4d72-8cfb-48ba86026972.png",
     "h-rizzo": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561165/c605ba76-bb09-4485-80ff-3284e20b8e8f.png",
     "gretchen-mccullough": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561203/351300ac-1825-4d3f-a694-9516259428bd.png",
-    "gurusewak-khalsa": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561324/7b12c06e-b3fc-4359-b9db-6bdb77083634.png"
+    "gurusewak-khalsa": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561324/7b12c06e-b3fc-4359-b9db-6bdb77083634.png",
+    "mohamed-basuony": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561388/97651435-e8c9-418b-b21e-29d27a55f021.png"
   };
 
   const professorNameUpdates = {
