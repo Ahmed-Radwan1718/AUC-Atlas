@@ -25,7 +25,10 @@
     "catarina-belo": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559003/daf84a9b-e38e-4675-b3a3-44e2ce981443.png",
     "christopher-barker": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559032/0fb6712a-f9c0-4bac-9735-a60da144feaf.png",
     "daoud-siniora": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559074/5234bcd4-e7a2-4162-b6f2-a102a710fa65.png",
-    "dina-ebeid": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559131/69eb4f13-b22d-4ed6-8de8-4a7934f81be5.png"
+    "dina-ebeid": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559131/69eb4f13-b22d-4ed6-8de8-4a7934f81be5.png",
+    "dina-amin": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559201/4afc6619-9e14-4e3d-bc0f-3b1814ba704a.png",
+    "elizabeth-rauh": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559438/2089b265-f586-492d-a767-e718dee11eec.png",
+    "ahmed-tolba": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559365/4c9ab1b4-ffb8-45d3-b154-d884fde9dfeb.png"
   };
 
   function normalizeProfessorId(value) {
