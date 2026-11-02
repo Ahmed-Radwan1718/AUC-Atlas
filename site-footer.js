@@ -8,65 +8,6 @@
     "reset-password"
   ]);
 
-  const professorPhotoUpdates = {
-    "kate-ellis": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793557977/5af39b66-7df3-4d17-8dc4-070332864bed.png",
-    "nageh-allam": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558061/c0f7ea2d-853f-4973-8dbe-5040bc8e917a.png",
-    "mohamed-badran": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558103/a5d14d05-15ac-4370-a206-e1527fc036c7.png",
-    "wafik-lotfallah": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558143/29c1c873-da78-4247-8e61-18180bb4c9d2.png",
-    "addison-ellis": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558195/4926dd5e-3c19-4dfd-80e1-e0375b4af172.png",
-    "ahmed-abdellatif": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558230/a0626c92-db85-4274-bdb8-7c263e8491db.png",
-    "ehab-elsawy": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558368/01e94527-d618-436d-90f6-420de93463db.png",
-    "yasmine-motawy": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558421/729f5565-10b9-40ae-8cce-b45ba9a9fbf6.png",
-    "hassan-azazy": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558561/3012e7d4-c723-4d2a-a4ae-1177eaf0b101.png",
-    "mustafa-arafa": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558739/800ea61f-86a8-4493-b325-7f7f11c9f16b.png",
-    "walid-fouad": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558858/ed0d7552-8282-4edd-8bfe-8b2f8e15553e.png",
-    "aya-musmar": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558918/eb3dcd89-953f-4966-9c64-4d7f788b3a8e.png",
-    "chelsea-green": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558956/e5255a7f-2193-4ff5-9fc4-d495bea0a2b9.png",
-    "catarina-belo": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559003/daf84a9b-e38e-4675-b3a3-44e2ce981443.png",
-    "christopher-barker": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559032/0fb6712a-f9c0-4bac-9735-a60da144feaf.png",
-    "daoud-siniora": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559074/5234bcd4-e7a2-4162-b6f2-a102a710fa65.png",
-    "dina-ebeid": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559131/69eb4f13-b22d-4ed6-8de8-4a7934f81be5.png",
-    "dina-amin": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559201/4afc6619-9e14-4e3d-bc0f-3b1814ba704a.png",
-    "elizabeth-rauh": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559438/2089b265-f586-492d-a767-e718dee11eec.png",
-    "ahmed-tolba": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559365/4c9ab1b4-ffb8-45d3-b154-d884fde9dfeb.png",
-    "ahmad-khan": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559557/6f67da04-20ff-47a7-9f6e-b23fc0c55c48.png",
-    "ahmad-saqfalhait": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559589/fa1c7f10-a4ca-4c18-ae16-530dffaf6977.png",
-    "ahmed-abdel-meguid": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559643/f8656d6d-ca3b-4997-a3c2-a107d30ceec5.png",
-    "ahmed-abou-auf": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559682/e1c29d85-e7e2-4ddc-996f-d70c33f1b344.png",
-    "ahmed-elbanbi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559715/41b2bf66-d3cc-4c88-8ccd-24702e9c26fd.png",
-    "ahmed-elbayoumi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559741/3f07c828-e4c9-4586-b5bb-fdc480382356.png",
-    "alessandro-topa": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559770/90a70470-6bf5-4541-a256-181a5df5ee44.png",
-    "ali-awni": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559838/fb694392-e272-4cdd-af30-552ad7258b52.png",
-    "peter-barsoum": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559873/68946122-1c17-4d17-96fb-2c0be49d4965.png",
-    "ali-hadi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559896/66dd6d53-22d8-4aff-a491-6e172f8030b0.png",
-    "amal-esawi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559924/dd8ed207-dc83-4f99-b380-64c7f1f2a675.png",
-    "amina-el-bindary": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559948/3cb36bbb-5312-4de4-be75-12f29c101c32.png",
-    "amr-abdel-kawi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559971/dd1480b9-8d7f-4998-a253-021fd4d46ef8.png",
-    "abdelaziz-ezzelarab": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560451/7477f95d-0999-46f9-9de2-1ef634b04d99.png",
-    "adam-talib": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560521/19723afa-0308-433b-8d8a-41d00b33575e.png",
-    "amr-adly": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560549/2356b1d7-2e81-4e97-8b96-e217726e2217.png",
-    "amr-el-kadi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560587/48421bd4-b7ea-45b0-9636-e62d3e20225a.png",
-    "angie-zaher": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560641/6e8f7b4c-57bc-4e0d-b07a-256b255278eb.png",
-    "anwar-abd-elnaser": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560660/647dcd80-ec7b-44bf-aa60-c93258dbdad5.png",
-    "ariane-schneck": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560679/fb7c6512-3bfa-46d5-adfe-0f067af8efb5.png",
-    "arthur-bos": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560712/04f002e5-ecf0-4052-b81b-81edf4c58b3a.png",
-    "asma-amleh": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560741/2034677c-5a7f-410b-a37f-1c9ef84dee00.png",
-    "atta-gebril": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560767/178c7ce2-e208-44f8-95b2-1b36b8b7f8d7.png",
-    "bernard-o-kane": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560796/465356fd-4c1f-408b-bdb9-95cf14443e16.png",
-    "dalal-abo-el-seoud": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560854/b6006bbe-b4ca-46af-8f4d-eb70404e44f1.png",
-    "david-rafferty": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560887/f1eb633e-cd5d-46a4-9ac3-8b7453b3c041.png",
-    "dina-bassiouni": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560935/dc60a45a-9a8a-487d-82a3-2e0b0c0fdd4e.png",
-    "euan-metz": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560986/f912336a-beac-489d-87d5-594405c19c17.png",
-    "fikry-boutros": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561009/52298476-3ef7-4987-b336-3baa28cac9c4.png",
-    "firas-al-atraqchi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561040/cdb5ff06-1cc5-4868-9bd9-7b147aa78959.png",
-    "ghada-barsoum": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561086/66ebf876-1f10-4476-b998-827b78062951.png",
-    "ghalia-el-srakbi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561121/a1cf2adc-28a8-4d72-8cfb-48ba86026972.png",
-    "h-rizzo": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561165/c605ba76-bb09-4485-80ff-3284e20b8e8f.png",
-    "gretchen-mccullough": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561203/351300ac-1825-4d3f-a694-9516259428bd.png",
-    "gurusewak-khalsa": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561324/7b12c06e-b3fc-4359-b9db-6bdb77083634.png",
-    "mohamed-basuony": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561388/97651435-e8c9-418b-b21e-29d27a55f021.png"
-  };
-
   const professorNameUpdates = {
     "h-rizzo": "Helen Rizzo"
   };
@@ -78,34 +19,6 @@
       .replace(/&/g, "and")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
-  }
-
-  function applyProfessorPhotoUpdates() {
-    if (Array.isArray(window.aucAtlasProfessors)) {
-      window.aucAtlasProfessors.forEach(function (professor) {
-        const professorId = normalizeProfessorId(
-          professor && (professor.id || professor.name)
-        );
-        const updatedPhoto = professorPhotoUpdates[professorId];
-
-        if (updatedPhoto) {
-          professor.image = updatedPhoto;
-        }
-      });
-    }
-
-    document
-      .querySelectorAll(
-        ".professor-card-image img, .professor-profile-image img"
-      )
-      .forEach(function (image) {
-        const professorId = normalizeProfessorId(image.alt);
-        const updatedPhoto = professorPhotoUpdates[professorId];
-
-        if (updatedPhoto && image.src !== updatedPhoto) {
-          image.src = updatedPhoto;
-        }
-      });
   }
 
   function applyProfessorNameUpdates() {
@@ -200,7 +113,6 @@
   }
 
   function applyProfessorOverrides() {
-    applyProfessorPhotoUpdates();
     applyProfessorNameUpdates();
     applyProfessorCardStarColors();
   }
