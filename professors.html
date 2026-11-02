@@ -427,7 +427,7 @@
 
         <article class="professor-card">
           <div class="professor-card-image">
-            <img src="https://res.cloudinary.com/hpsuzs6q/image/upload/v1785344851/Gretchen_McCullough_ktotfl.png" alt="Gretchen McCullough">
+            <img src="https://res.cloudinary.com/dhtamisqn/image/upload/v1793648756/dlnhr6egw8r9vtxy81ca.png" alt="Gretchen McCullough">
           </div>
           <div class="professor-card-body">
             <h2>Gretchen McCullough</h2>
@@ -471,5 +471,25 @@
 
   <script src="data/courses.js"></script>
   <script src="data/professor-data.js"></script>
+  <script>
+    (function () {
+      const professorPhotoOverrides = {
+        "gretchen-mccullough": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793648756/dlnhr6egw8r9vtxy81ca.png",
+        "kate-ellis": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793648828/yywrnyebmy41tpn6efed.png"
+      };
+
+      if (!Array.isArray(window.aucAtlasProfessors)) {
+        return;
+      }
+
+      window.aucAtlasProfessors.forEach(function (professor) {
+        const replacementPhoto = professorPhotoOverrides[professor.id];
+
+        if (replacementPhoto) {
+          professor.image = replacementPhoto;
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
