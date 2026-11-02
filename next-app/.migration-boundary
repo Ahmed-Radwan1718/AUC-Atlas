@@ -1,0 +1,4 @@
+AUC Atlas Next.js migration workspace.
+
+During the migration, do not modify any file outside /next-app.
+Existing site files are read-only references until final cutover.
