@@ -459,7 +459,7 @@
       }
 
       window.location.href =
-        "accounts.html";
+        "index.html";
     } catch (error) {
       showEmailCodeMessage(
         error.message ||
@@ -623,3 +623,16 @@
     }
   );
 })();
+
+if (typeof getLoginRedirectTarget === "function") {
+  getLoginRedirectTarget = function () {
+    const savedRedirect = localStorage.getItem("auc-atlas-login-redirect");
+
+    if (savedRedirect) {
+      localStorage.removeItem("auc-atlas-login-redirect");
+      return savedRedirect;
+    }
+
+    return "index.html";
+  };
+}
