@@ -1,0 +1,52 @@
+name: One-shot professor image update
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update-professor-images-temp.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-professor-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update professor image URLs
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('data/professor-data.js')
+          text = path.read_text(encoding='utf-8')
+
+          updates = {
+              'ahmed-abdellatif': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793716894/q9m5fsngtegh7ut0ypeq.png',
+              'ahmed-abdel-meguid': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793716911/ticrvzydbtj7dvpdmkr8.png',
+          }
+
+          for professor_id, new_url in updates.items():
+              pattern = rf'(\{{ id: "{re.escape(professor_id)}"[^\n]*?image: ")[^"]+(" \}})'
+              text, count = re.subn(pattern, rf'\g<1>{new_url}\2', text)
+              if count != 1:
+                  raise SystemExit(f'Expected exactly 1 match for {professor_id}, found {count}')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit update and remove one-shot workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/update-professor-images-temp.yml
+          git add data/professor-data.js
+          git commit -m "Update Ahmed professor photos"
+          git push
