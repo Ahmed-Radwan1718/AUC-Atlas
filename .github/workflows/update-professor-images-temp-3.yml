@@ -1,0 +1,51 @@
+name: One-shot professor image update 3
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update-professor-images-temp-3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-professor-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update professor image URLs
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('data/professor-data.js')
+          text = path.read_text(encoding='utf-8')
+
+          updates = {
+              'Ahmed Tolba': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793717666/ce8175d2-f34b-4b2a-969c-7d73b20f62ab.png',
+              'Alessandro Topa': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793559770/90a70470-6bf5-4541-a256-181a5df5ee44.png',
+              'Ali Awni': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793717787/768a20de-7410-40cf-98ec-6daeebf447cf.png',
+              'Ali Hadi': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793717875/39f59e45-48c6-47a7-9ddc-332251e3de5d.png',
+          }
+
+          for name, url in updates.items():
+              pattern = re.compile(r'(\{[^\n]*name: "' + re.escape(name) + r'"[^\n]*?image: ")[^"]*("[^\n]*\})')
+              text, count = pattern.subn(r'\1' + url + r'\2', text)
+              if count != 1:
+                  raise SystemExit(f'Expected exactly one match for {name}, found {count}')
+
+          path.write_text(text, encoding='utf-8')
+
+      - name: Commit update and remove one-shot workflow
+        run: |
+          git config user.name "Ahmed-Radwan1718"
+          git config user.email "ahmedradwan21@gmail.com"
+          git rm .github/workflows/update-professor-images-temp-3.yml
+          git add data/professor-data.js
+          git commit -m "Update four professor photos"
+          git push
