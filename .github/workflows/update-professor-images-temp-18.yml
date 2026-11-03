@@ -1,0 +1,76 @@
+name: One-shot professor image update 18
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update-professor-images-temp-18.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-professor-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update exact professor records
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          path = Path('data/professor-data.js')
+          lines = path.read_text(encoding='utf-8').splitlines(keepends=True)
+          updates = {
+            "karim-seddik": {
+              "image": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732650/000f244d-89e6-42d1-a706-955c97577a0c.png"
+            },
+            "karim-banawan": {
+              "image": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732675/de1b5766-fc3b-406c-8a83-1c4c6457dad1.png"
+            },
+            "joseph-massad": {
+              "image": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732788/f9ea9a19-69a2-4935-bff3-50d77b811608.png",
+              "email": "joseph.massad@aucegypt.edu"
+            },
+            "kathleen-saville": {
+              "image": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732860/fc30a3d3-89b5-4493-9b0c-6e795e0b5455.png"
+            },
+            "khaled-dahawy": {
+              "image": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732962/860ff953-b580-4384-b6ad-457efb036d89.png"
+            },
+            "khaled-samaha": {
+              "image": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793733022/829b75f8-de51-471d-b8d7-796a38bfb784.png"
+            },
+            "laila-elserty": {
+              "image": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793733106/61c92489-2acf-4113-82e3-413591dbf55e.png"
+            }
+          }
+          for professor_id, fields in updates.items():
+              marker = f'id: "{professor_id}"'
+              matches = [i for i, line in enumerate(lines) if marker in line]
+              if len(matches) != 1:
+                  raise SystemExit(f'Expected one match for {professor_id}, found {len(matches)}')
+              i = matches[0]
+              line = lines[i]
+              for field, value in fields.items():
+                  pattern = rf'(?<![A-Za-z]){re.escape(field)}: "[^"]*"'
+                  line, count = re.subn(pattern, lambda m: f'{field}: "{value}"', line)
+                  if count != 1:
+                      raise SystemExit(f'{professor_id} field {field}: {count} matches')
+              lines[i] = line
+          path.write_text(''.join(lines), encoding='utf-8')
+          PY
+          node --check data/professor-data.js
+
+      - name: Commit update and remove one-shot workflow
+        run: |
+          rm .github/workflows/update-professor-images-temp-18.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/professor-data.js .github/workflows/update-professor-images-temp-18.yml
+          git commit -m 'Update seven professor photos and Joseph Massad email'
+          git push
