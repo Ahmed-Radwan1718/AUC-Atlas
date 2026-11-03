@@ -1,0 +1,76 @@
+name: One-shot professor image update 9
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update-professor-images-temp-9.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-professor-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update professor image URLs
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('data/professor-data.js')
+          text = path.read_text(encoding='utf-8')
+
+          updates = {
+              'Firas Al-Atraqchi': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793719329/3eb68694-e023-41f7-9648-80521146e456.png',
+              'Ghada Barsoum': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793719364/2d786b47-7bdf-422c-96ec-7bee45496464.png',
+              'Ghalia El Srakbi': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793719462/dfbb6b56-3027-4366-b1ee-aceab7923efb.png',
+              'Gurusewak Khalsa': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793719534/de2e371d-fcd8-4a03-a966-c5c49a8cc6a6.png',
+              'Hanan Kholoussy': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793719674/e0d43298-f40c-43d3-a1ae-35c02dbaebf3.png',
+          }
+
+          for professor_name, new_url in updates.items():
+              marker = f'name: "{professor_name}"'
+              matches = [line for line in text.splitlines() if marker in line]
+              if len(matches) != 1:
+                  raise SystemExit(f'Expected exactly one match for {professor_name}, found {len(matches)}')
+              old_line = matches[0]
+              before, sep, rest = old_line.partition('image: "')
+              if not sep:
+                  raise SystemExit(f'No image field found for {professor_name}')
+              _, sep2, after = rest.partition('"')
+              if not sep2:
+                  raise SystemExit(f'Malformed image field for {professor_name}')
+              new_line = before + 'image: "' + new_url + '"' + after
+              text = text.replace(old_line, new_line, 1)
+
+          # The site's record for Helen Rizzo is currently stored as H. Rizzo / id h-rizzo.
+          marker = 'id: "h-rizzo"'
+          matches = [line for line in text.splitlines() if marker in line]
+          if len(matches) != 1:
+              raise SystemExit(f'Expected exactly one match for Helen Rizzo (h-rizzo), found {len(matches)}')
+          old_line = matches[0]
+          before, sep, rest = old_line.partition('image: "')
+          if not sep:
+              raise SystemExit('No image field found for Helen Rizzo')
+          _, sep2, after = rest.partition('"')
+          if not sep2:
+              raise SystemExit('Malformed image field for Helen Rizzo')
+          new_line = before + 'image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561165/c605ba76-bb09-4485-80ff-3284e20b8e8f.png"' + after
+          text = text.replace(old_line, new_line, 1)
+
+          path.write_text(text, encoding='utf-8')
+
+      - name: Commit update and remove one-shot workflow
+        shell: bash
+        run: |
+          rm .github/workflows/update-professor-images-temp-9.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/professor-data.js .github/workflows/update-professor-images-temp-9.yml
+          git commit -m "Update professor photos"
+          git push
