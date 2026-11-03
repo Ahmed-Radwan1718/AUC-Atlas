@@ -12,6 +12,22 @@
     "h-rizzo": "Helen Rizzo"
   };
 
+  const professorImageUpdates = {
+    "richard-fincham": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703209/o3xsb11xwahokdyghseq.jpg",
+    "ehab-elsawy": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703166/ymrpykrdnjxianfocuur.png",
+    "arthur-bos": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703165/wieyufbwn0w8uexw3sel.png",
+    "tamer-shoeib": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703164/tltp5hnirzesjr6ihhbb.png",
+    "hassan-azazy": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703163/syclzbuuroxxejwd99oh.png",
+    "suher-zada": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703162/kd2i9rsegyzh230ht9ig.png",
+    "hani-henry": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703159/ouithn8if6ccl9gffzfa.jpg",
+    "eslam-badr": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793702504/sztnt1mkiieumbmihhv1.png",
+    "aya-musmar": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793649917/lwzsdfu2qokguxldi0om.png",
+    "amr-abdelkawi": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793649651/kyz1qvybc8dvryoq9bwb.png",
+    "elizabeth-rauh": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793649353/b4jmn5aslmihjz0xjty3.png",
+    "ahmad-khan": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793649232/tzb5lmbtaprwcggkwgvg.png",
+    "gretchen-mccullough": "https://res.cloudinary.com/dhtamisqn/image/upload/v1793648756/dlnhr6egw8r9vtxy81ca.png"
+  };
+
   function normalizeProfessorId(value) {
     return String(value || "")
       .trim()
@@ -71,6 +87,23 @@
       });
   }
 
+  function applyProfessorImageUpdates() {
+    document
+      .querySelectorAll(
+        ".professor-card-image img, .professor-profile-image img"
+      )
+      .forEach(function (image) {
+        const professorId = normalizeProfessorId(image.alt);
+        const updatedImage = professorImageUpdates[professorId];
+
+        if (!updatedImage || image.src === updatedImage) {
+          return;
+        }
+
+        image.src = updatedImage;
+      });
+  }
+
   function applyProfessorCardStarColors() {
     document
       .querySelectorAll(
@@ -114,6 +147,7 @@
 
   function applyProfessorOverrides() {
     applyProfessorNameUpdates();
+    applyProfessorImageUpdates();
     applyProfessorCardStarColors();
   }
 
