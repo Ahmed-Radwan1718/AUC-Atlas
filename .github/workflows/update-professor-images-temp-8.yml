@@ -1,0 +1,56 @@
+name: One-shot professor image update 8
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-professor-images:
+    if: github.event.head_commit.message == 'Add one-shot workflow for six professor photos'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update professor image URLs
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('data/professor-data.js')
+          text = path.read_text(encoding='utf-8')
+
+          updates = {
+              'christopher-barker': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793718809/c6c22323-e054-47bc-9dda-f61924c62104.png',
+              'daoud-siniora': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793718848/72f62805-f9c9-43d9-9b06-40e3117f26ad.png',
+              'david-rafferty': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793560887/f1eb633e-cd5d-46a4-9ac3-8b7453b3c041.png',
+              'dina-amin': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793559201/4afc6619-9e14-4e3d-bc0f-3b1814ba704a.png',
+              'dina-ebeid': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793719084/8f7af358-84fa-43ce-95ae-51a59c52ce4f.png',
+              'euan-metz': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793560986/f912336a-beac-489d-87d5-594405c19c17.png',
+          }
+
+          for professor_id, new_url in updates.items():
+              pattern = rf'(\{{ id: "{re.escape(professor_id)}"[^\n]*?image: ")[^"]+(" \}})'
+              text, count = re.subn(pattern, rf'\g<1>{new_url}\2', text)
+              if count != 1:
+                  raise SystemExit(f'Expected exactly 1 match for {professor_id}, found {count}')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit update and remove one-shot workflow
+        shell: bash
+        run: |
+          rm .github/workflows/update-professor-images-temp-8.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/professor-data.js .github/workflows/update-professor-images-temp-8.yml
+          git commit -m "Update six professor photos"
+          git push
