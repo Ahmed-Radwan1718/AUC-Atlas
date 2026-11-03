@@ -1,0 +1,55 @@
+name: One-shot professor image update 6
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update-professor-images-temp-6.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-professor-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update professor image URLs
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('data/professor-data.js')
+          text = path.read_text(encoding='utf-8')
+
+          updates = {
+              'Anwar Abd ElNaser': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793718314/cf697f63-aee6-4721-a6a6-81f4f52191be.png',
+              'Ariane Schneck': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793718405/d5443166-7029-4cfa-8c26-7c1cc6278d39.png',
+              'Asma Amleh': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793718501/2884052d-05b8-456b-a081-f21d07962dd4.png',
+              'Atta Gebril': 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793718600/6406d3e5-96c4-4615-8568-4144b4d8e772.png',
+              "Bernard O'Kane": 'https://res.cloudinary.com/dhtamisqn/image/upload/v1793560796/465356fd-4c1f-408b-bdb9-95cf14443e16.png',
+          }
+
+          for professor_name, new_url in updates.items():
+              pattern = rf'(\{{ id: "[^"]+", name: "{re.escape(professor_name)}"[^\n]*?image: ")[^"]+(" \}})'
+              text, count = re.subn(pattern, rf'\g<1>{new_url}\2', text)
+              if count != 1:
+                  raise SystemExit(f'Expected exactly 1 match for {professor_name}, found {count}')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit update and remove one-shot workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/update-professor-images-temp-6.yml
+          git add data/professor-data.js
+          git commit -m "Update five professor photos"
+          git push
