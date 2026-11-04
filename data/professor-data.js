@@ -695,6 +695,7 @@
     }
 
     .professor-card {
+      min-height: 350px;
       color: inherit;
       text-decoration: none;
       cursor: pointer;
