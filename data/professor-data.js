@@ -4675,7 +4675,6 @@ function getProfessorUrl(professor) {
 
     return (
       "★".repeat(filledStars) +
-      "☆".repeat(5 - filledStars) +
       " " +
       averageRating.toFixed(1)
     );
