@@ -4792,6 +4792,17 @@ function getProfessorUrl(professor) {
     const matchingProfessors = professors
       .filter(professorMatches)
       .sort(function (firstProfessor, secondProfessor) {
+        const firstHasPhoto = Boolean(
+          firstProfessor.image && firstProfessor.image !== "user.png"
+        );
+        const secondHasPhoto = Boolean(
+          secondProfessor.image && secondProfessor.image !== "user.png"
+        );
+
+        if (firstHasPhoto !== secondHasPhoto) {
+          return secondHasPhoto - firstHasPhoto;
+        }
+
         const reviewDifference =
           Number(secondProfessor.reviewCount || 0) -
           Number(firstProfessor.reviewCount || 0);
