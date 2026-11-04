@@ -4821,7 +4821,6 @@ function getProfessorUrl(professor) {
           </div>
           <div class="professor-card-body">
             <h2>${escapeHtml(professor.name)}</h2>
-            <p class="professor-bio">${escapeHtml(professor.bio || "Bio coming soon.")}</p>
             <div class="professor-meta">
               <span>${escapeHtml(professor.displayDepartment || professor.department)}</span>
               <span>${escapeHtml((professor.reviewCount || 0) + " " + ((professor.reviewCount || 0) === 1 ? "Review" : "Reviews"))}</span>
