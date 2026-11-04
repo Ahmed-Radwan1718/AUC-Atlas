@@ -680,6 +680,11 @@
         transform 0.2s ease;
     }
 
+    .professors-search-box input[type="search"]::-webkit-search-cancel-button {
+      filter: brightness(0);
+      cursor: pointer;
+    }
+
     .professors-search-box input:focus {
       border-color: rgba(192, 154, 92, 0.58);
       background: rgba(255, 255, 255, 0.96);
