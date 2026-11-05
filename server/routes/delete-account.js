@@ -12,8 +12,9 @@ const {
   clearSecurityRateLimit
 } = require("../_lib/securityRateLimits");
 const {
-  deleteCloudinaryMaterial
-} = require("../_lib/cloudinaryCourseMaterials");
+  deleteStoredCourseMaterial,
+  deletePendingCourseMaterial
+} = require("../_lib/courseMaterialStorage");
 
 const DELETE_ACCOUNT_ATTEMPT_WINDOW_MS =
   15 * 60 * 1000;
@@ -210,8 +211,8 @@ async function deleteUserMaterials(db, uid) {
       snapshot.docs.map(function (doc) {
         const data = doc.data() || {};
 
-        return deleteCloudinaryMaterial(
-          data.storageKey
+        return deleteStoredCourseMaterial(
+          data
         ).catch(function () {});
       })
     );
@@ -418,6 +419,20 @@ module.exports = async function handler(req, res) {
           "==",
           decodedUser.uid
         )
+    );
+
+    const pendingMaterialsSnapshot = await db
+      .collection("materialUploadAuthorizations")
+      .where("uploaderUid", "==", decodedUser.uid)
+      .get();
+
+    await Promise.all(
+      pendingMaterialsSnapshot.docs.map(async function (doc) {
+        const authorization = doc.data() || {};
+        if (!authorization.consumedAt) {
+          await deletePendingCourseMaterial(authorization).catch(function () {});
+        }
+      })
     );
 
     await deleteQueryDocuments(

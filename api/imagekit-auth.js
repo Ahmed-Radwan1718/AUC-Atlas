@@ -1,0 +1,412 @@
+const crypto = require("crypto");
+const admin = require("../server/_lib/firebaseAdmin");
+
+const { getSiteSessionUser } = require("../server/_lib/securityHelpers");
+const {
+  MATERIAL_MAX_FILE_BYTES,
+  MATERIAL_USER_QUOTA_BYTES,
+  MATERIAL_UPLOAD_AUTH_TTL_SECONDS,
+  cleanMaterialFileName,
+  getMaterialFileExtension,
+  isAllowedMaterialFileName
+} = require("../server/_lib/courseMaterialUploadPolicy");
+const { createImageKitUploadAuthorization } = require("../server/_lib/imageKitCourseMaterials");
+const { deletePendingCourseMaterial } = require("../server/_lib/courseMaterialStorage");
+
+const MATERIAL_TYPE_CHOICES = [
+  "Notes",
+  "Slides",
+  "Syllabus",
+  "Past exam",
+  "Practice sheet",
+  "Lab file",
+  "Past assignments",
+  "Review sheet"
+];
+const MATERIAL_TYPE_LOOKUP = MATERIAL_TYPE_CHOICES.reduce(
+  function (lookup, materialType) {
+    lookup[materialType.toLowerCase()] = materialType;
+    return lookup;
+  },
+  {}
+);
+
+function createMaterialUploadError(message, statusCode) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+}
+
+function cleanString(value, maxLength) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, maxLength);
+}
+
+function cleanBoolean(value) {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  return cleanString(value, 10).toLowerCase() === "true";
+}
+
+function cleanMaterialType(value) {
+  return MATERIAL_TYPE_LOOKUP[
+    cleanString(value, 80).toLowerCase()
+  ] || "";
+}
+
+function getRequestBody(req) {
+  if (typeof req.body === "string") {
+    try {
+      return JSON.parse(req.body || "{}");
+    } catch (error) {
+      return {};
+    }
+  }
+
+  return req.body || {};
+}
+
+function getMaterialMimeType(fileName) {
+  const mimeTypes = {
+    pdf: "application/pdf",
+    doc: "application/msword",
+    docx:
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ppt: "application/vnd.ms-powerpoint",
+    pptx:
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    xls: "application/vnd.ms-excel",
+    xlsx:
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png"
+  };
+
+  return (
+    mimeTypes[getMaterialFileExtension(fileName)] ||
+    ""
+  );
+}
+
+async function ensureVerifiedAucUser(req) {
+  const decodedUser = await getSiteSessionUser(req, {
+    checkRevoked: true
+  });
+  const userRecord = await admin.auth().getUser(decodedUser.uid);
+  const email = String(
+    userRecord.email ||
+    decodedUser.email ||
+    ""
+  ).trim().toLowerCase();
+
+  if (
+    !userRecord.emailVerified ||
+    !email.endsWith("@aucegypt.edu")
+  ) {
+    throw createMaterialUploadError(
+      "Please verify your AUC email address before uploading materials.",
+      403
+    );
+  }
+
+  const userDoc = await admin
+    .firestore()
+    .collection("users")
+    .doc(decodedUser.uid)
+    .get();
+  const userData = userDoc.exists
+    ? userDoc.data() || {}
+    : {};
+  const displayName = String(
+    userData.fullName ||
+    userRecord.displayName ||
+    email.split("@")[0] ||
+    "AUC student"
+  )
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, 80);
+  const photoURL = String(
+    userData.photoURL ||
+    userRecord.photoURL ||
+    ""
+  )
+    .trim()
+    .slice(0, 500);
+
+  return {
+    uid: decodedUser.uid,
+    displayName: displayName || "AUC student",
+    photoURL
+  };
+}
+
+async function getStoredBytesForUploader(uploaderUid) {
+  const snapshot = await admin
+    .firestore()
+    .collection("courseMaterials")
+    .where("uploaderUid", "==", uploaderUid)
+    .get();
+
+  let totalBytes = 0;
+
+  snapshot.forEach(function (doc) {
+    const data = doc.data() || {};
+    const status = cleanString(
+      data.status,
+      40
+    ).toLowerCase();
+
+    if (status === "rejected") {
+      return;
+    }
+
+    totalBytes += Math.max(
+      0,
+      Number(data.size) || 0
+    );
+  });
+
+  return totalBytes;
+}
+
+async function reserveMaterialUploadAuthorization(data) {
+  if (
+    data.currentStoredBytes + data.fileSize >
+    MATERIAL_USER_QUOTA_BYTES
+  ) {
+    throw createMaterialUploadError(
+      "Your course-material storage quota has been reached.",
+      413
+    );
+  }
+
+  const nowMs = Date.now();
+  const authorizationRef = admin
+    .firestore()
+    .collection("materialUploadAuthorizations")
+    .doc(data.authorizationId);
+
+  await authorizationRef.set({
+    authorizationId: data.authorizationId,
+    uploaderUid: data.uploaderUid,
+    courseCode: data.courseCode,
+    courseTitle: data.courseTitle,
+    professor: data.professor,
+    semester: data.semester,
+    materialType: data.materialType,
+    title: data.title,
+    fileName: data.fileName,
+    uploadFileName: data.fileName,
+    fileSize: data.fileSize,
+    fileType: data.fileType,
+    storageKey: data.storageKey,
+    storageProvider: "imagekit",
+    folder: "/auc-atlas/materials",
+    isAnonymous: cleanBoolean(data.isAnonymous),
+    uploaderDisplayName: data.uploaderDisplayName,
+    uploaderPhotoURL: data.uploaderPhotoURL,
+    createdAt:
+      admin.firestore.FieldValue.serverTimestamp(),
+    createdAtIso: new Date(nowMs).toISOString(),
+    expiresAt:
+      admin.firestore.Timestamp.fromDate(
+        new Date(data.expiresAtMs)
+      ),
+    consumedAt: null,
+    cancelledAt: null
+  });
+}
+
+async function cancelMaterialUploadAuthorization(
+  uploaderUid,
+  authorizationId
+) {
+  const safeAuthorizationId = cleanString(
+    authorizationId,
+    80
+  );
+
+  if (!/^[a-f0-9]{36}$/i.test(safeAuthorizationId)) {
+    return;
+  }
+
+  const db = admin.firestore();
+  const authorizationRef = db
+    .collection("materialUploadAuthorizations")
+    .doc(safeAuthorizationId);
+  let pendingAuthorization = null;
+
+  await db.runTransaction(async function (transaction) {
+    const authorizationDoc =
+      await transaction.get(authorizationRef);
+
+    if (!authorizationDoc.exists) {
+      return;
+    }
+
+    const authorizationData =
+      authorizationDoc.data() || {};
+
+    if (
+      cleanString(
+        authorizationData.uploaderUid,
+        160
+      ) !== cleanString(uploaderUid, 160) ||
+      authorizationData.consumedAt
+    ) {
+      return;
+    }
+
+    pendingAuthorization = {
+      storageKey: cleanString(authorizationData.storageKey, 100),
+      storageProvider: authorizationData.storageProvider || "cloudinary"
+    };
+
+    transaction.set(
+      authorizationRef,
+      {
+        cancelledAt:
+          admin.firestore.FieldValue.serverTimestamp()
+      },
+      { merge: true }
+    );
+  });
+
+  if (pendingAuthorization && pendingAuthorization.storageKey) {
+    await deletePendingCourseMaterial(pendingAuthorization)
+      .catch(function () {});
+  }
+}
+
+module.exports = async function handler(req, res) {
+  try {
+    if (req.method !== "POST") {
+      res.setHeader("Allow", "POST");
+      return res.status(405).json({ error: "Method not allowed" });
+    }
+
+    const uploader = await ensureVerifiedAucUser(req);
+    const body = getRequestBody(req);
+    const action = cleanString(body.action, 40).toLowerCase();
+
+    res.setHeader("Cache-Control", "no-store");
+
+    if (action === "cancel") {
+      await cancelMaterialUploadAuthorization(
+        uploader.uid,
+        body.authorizationId
+      );
+
+      return res.status(200).json({ success: true });
+    }
+
+    const courseCode = cleanString(
+      body.courseCode,
+      40
+    ).toUpperCase();
+    const courseTitle = cleanString(
+      body.courseTitle,
+      160
+    );
+    const professor = cleanString(body.professor, 120);
+    const semester = cleanString(body.semester, 80);
+    const materialType = cleanMaterialType(
+      body.materialType ||
+      body.type ||
+      body.category
+    );
+    const isAnonymous = cleanBoolean(
+      body.isAnonymous
+    );
+    const title = cleanString(body.title, 160);
+    const fileName = cleanMaterialFileName(body.fileName);
+    const fileSize = Number(body.fileSize);
+    const fileType = getMaterialMimeType(fileName);
+
+    if (
+      !courseCode ||
+      !professor ||
+      !semester ||
+      !materialType ||
+      !title ||
+      !isAllowedMaterialFileName(fileName) ||
+      !fileType ||
+      !Number.isSafeInteger(fileSize) ||
+      fileSize <= 0 ||
+      fileSize > MATERIAL_MAX_FILE_BYTES
+    ) {
+      throw createMaterialUploadError(
+        "Choose a supported course-material file up to 25MB.",
+        400
+      );
+    }
+
+    const authorizationId =
+      crypto.randomBytes(18).toString("hex");
+    const issuedAt =
+      Math.floor(Date.now() / 1000);
+    const expiresAt =
+      issuedAt + MATERIAL_UPLOAD_AUTH_TTL_SECONDS;
+    const expiresAtMs = expiresAt * 1000;
+    const currentStoredBytes =
+      await getStoredBytesForUploader(
+        uploader.uid
+      );
+    const imageKitUpload =
+      createImageKitUploadAuthorization(
+        authorizationId,
+        fileName,
+        MATERIAL_UPLOAD_AUTH_TTL_SECONDS
+      );
+
+    await reserveMaterialUploadAuthorization({
+      authorizationId,
+      uploaderUid: uploader.uid,
+      uploaderDisplayName: uploader.displayName,
+      uploaderPhotoURL: uploader.photoURL,
+      courseCode,
+      courseTitle,
+      professor,
+      semester,
+      materialType,
+      isAnonymous,
+      title,
+      fileName,
+      fileSize,
+      fileType,
+      storageKey: imageKitUpload.filePath,
+      expiresAtMs,
+      currentStoredBytes
+    });
+
+    return res.status(200).json({
+      authorizationId,
+      storageKey: imageKitUpload.filePath,
+      imagekitFilePath: imageKitUpload.filePath,
+      uploadUrl: imageKitUpload.uploadUrl,
+      publicKey: imageKitUpload.publicKey,
+      token: imageKitUpload.token,
+      expire: imageKitUpload.expire,
+      signature: imageKitUpload.signature,
+      uploadParameters: imageKitUpload.uploadParameters,
+      fileType,
+      expiresAt: new Date(expiresAtMs).toISOString(),
+      limits: {
+        maxFileBytes: MATERIAL_MAX_FILE_BYTES,
+        userQuotaBytes: MATERIAL_USER_QUOTA_BYTES
+      }
+    });
+  } catch (error) {
+    res.setHeader("Cache-Control", "no-store");
+
+    return res.status(error.statusCode || 500).json({
+      error: error.message || "Could not prepare upload."
+    });
+  }
+};

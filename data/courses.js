@@ -7726,13 +7726,16 @@ list.innerHTML = professors.map(function (professor) {
     );
 
     formData.append(
-      "api_key",
-      String(
-        authorization &&
-        authorization.apiKey
-          ? authorization.apiKey
-          : ""
-      )
+      "publicKey",
+      String(authorization && authorization.publicKey || "")
+    );
+    formData.append(
+      "token",
+      String(authorization && authorization.token || "")
+    );
+    formData.append(
+      "expire",
+      String(authorization && authorization.expire || "")
     );
     formData.append(
       "signature",
@@ -7755,7 +7758,7 @@ list.innerHTML = professors.map(function (professor) {
       );
     } catch (error) {
       throw new Error(
-        "The Cloudinary upload connection failed."
+        "The ImageKit upload connection failed. Check your network and try again."
       );
     }
 
@@ -7773,7 +7776,7 @@ list.innerHTML = professors.map(function (professor) {
           cloudinaryData.error.message
         ) ||
           cloudinaryData.error ||
-          "Cloudinary rejected the upload."
+          "ImageKit rejected the upload."
       );
     }
 
@@ -7991,7 +7994,7 @@ list.innerHTML = professors.map(function (professor) {
             }
 
             const authResponse = await fetch(
-              "/api/cloudinary-auth",
+              "/api/imagekit-auth",
               {
                 method: "POST",
                 credentials: "same-origin",
@@ -8036,35 +8039,36 @@ list.innerHTML = professors.map(function (professor) {
             }
 
             const uploadUrl =
-              String(
-                auth.uploadUrl || ""
-              ).trim();
-            const cloudinaryPublicId =
-              String(
-                auth.cloudinaryPublicId || ""
-              ).trim();
+              String(auth.uploadUrl || "").trim();
+            const imagekitFilePath =
+              String(auth.imagekitFilePath || "").trim();
 
             activeAuthorizationId =
-              String(
-                auth.authorizationId || ""
-              ).trim();
+              String(auth.authorizationId || "").trim();
 
             if (
               !activeAuthorizationId ||
-              !/^auc-atlas\/materials\/[a-f0-9]{36}\.(?:pdf|docx?|pptx?|xlsx?|jpe?g|png)$/i.test(
-                cloudinaryPublicId
+              !/^\/auc-atlas\/materials\/[a-f0-9]{36}\.(?:pdf|docx?|pptx?|xlsx?|jpe?g|png)$/i.test(
+                imagekitFilePath
               ) ||
-              !/^https:\/\/api\.cloudinary\.com\/v1_1\/[^/]+\/raw\/authenticated$/.test(
-                uploadUrl
-              ) ||
-              !auth.apiKey ||
+              uploadUrl !==
+                "https://upload.imagekit.io/api/v1/files/upload" ||
+              !auth.publicKey ||
               !auth.signature ||
+              !auth.token ||
+              !Number.isSafeInteger(Number(auth.expire)) ||
+              Number(auth.expire) <= Date.now() / 1000 ||
               !auth.uploadParameters ||
-              auth.uploadParameters.public_id !==
-                cloudinaryPublicId
+              auth.uploadParameters.fileName !==
+                imagekitFilePath.split("/").pop() ||
+              auth.uploadParameters.folder !==
+                "/auc-atlas/materials" ||
+              auth.uploadParameters.isPrivateFile !== "true" ||
+              auth.uploadParameters.useUniqueFileName !== "false" ||
+              auth.uploadParameters.overwriteFile !== "false"
             ) {
               throw new Error(
-                "The secure Cloudinary upload authorization is incomplete."
+                "The secure ImageKit upload authorization is incomplete."
               );
             }
 
@@ -8096,24 +8100,16 @@ list.innerHTML = professors.map(function (professor) {
                   );
                 }
               );
-            const cloudinaryAssetId =
-              String(
-                uploadedFile.asset_id || ""
-              ).trim();
+            const imagekitFileId =
+              String(uploadedFile.fileId || "").trim();
 
             if (
-              uploadedFile.public_id !==
-                cloudinaryPublicId ||
-              uploadedFile.resource_type !== "raw" ||
-              uploadedFile.type !== "authenticated" ||
-              Number(uploadedFile.bytes) !==
-                file.size ||
-              !/^[A-Za-z0-9_-]{16,160}$/.test(
-                cloudinaryAssetId
-              )
+              !/^[a-f0-9]{24}$/i.test(imagekitFileId) ||
+              uploadedFile.filePath !== imagekitFilePath ||
+              Number(uploadedFile.size) !== file.size
             ) {
               throw new Error(
-                "Cloudinary returned an unexpected upload result."
+                "ImageKit returned an unexpected upload result."
               );
             }
 
@@ -8133,10 +8129,10 @@ list.innerHTML = professors.map(function (professor) {
                       activeAuthorizationId,
                     uploadGroupId:
                       uploadGroupId,
-                    cloudinaryPublicId:
-                      cloudinaryPublicId,
-                    cloudinaryAssetId:
-                      cloudinaryAssetId
+                    imagekitFilePath:
+                      imagekitFilePath,
+                    imagekitFileId:
+                      imagekitFileId
                   })
                 }
               );
@@ -8224,7 +8220,7 @@ list.innerHTML = professors.map(function (professor) {
         } catch (error) {
           if (activeAuthorizationId) {
             await fetch(
-              "/api/cloudinary-auth",
+              "/api/imagekit-auth",
               {
                 method: "POST",
                 credentials:

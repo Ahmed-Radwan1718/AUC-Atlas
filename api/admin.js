@@ -9,8 +9,8 @@ const {
   requireFreshAdminAccess
 } = require("../server/_lib/adminHelpers");
 const {
-  deleteCloudinaryMaterial
-} = require("../server/_lib/cloudinaryCourseMaterials");
+  deleteStoredCourseMaterial
+} = require("../server/_lib/courseMaterialStorage");
 
 function cleanString(value, maxLength) {
   return String(value || "").trim().replace(/\s+/g, " ").slice(0, maxLength);
@@ -751,8 +751,8 @@ async function handleDeleteMaterial(actor, body) {
   }
 
   const materialData = materialDoc.data() || {};
-  await deleteCloudinaryMaterial(
-    materialData.storageKey
+  await deleteStoredCourseMaterial(
+    materialData
   ).catch(function () {});
 
   const deletedAtIso = new Date().toISOString();

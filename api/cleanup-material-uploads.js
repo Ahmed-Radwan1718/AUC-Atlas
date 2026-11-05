@@ -3,10 +3,8 @@ const admin = require(
   "../server/_lib/firebaseAdmin"
 );
 const {
-  deleteCloudinaryMaterial
-} = require(
-  "../server/_lib/cloudinaryCourseMaterials"
-);
+  deletePendingCourseMaterial
+} = require("../server/_lib/courseMaterialStorage");
 
 const CLEANUP_GRACE_MS =
   15 * 60 * 1000;
@@ -179,8 +177,9 @@ async function claimAuthorizationCleanup(
         uploaderUid,
         storageKey: cleanString(
           data.storageKey,
-          80
-        )
+          100
+        ),
+        storageProvider: data.storageProvider || "cloudinary"
       };
     }
   );
@@ -247,9 +246,7 @@ async function cleanupAuthorizationDocument(
     return cleanup.status;
   }
 
-  await deleteCloudinaryMaterial(
-    cleanup.storageKey
-  );
+  await deletePendingCourseMaterial(cleanup);
 
   await finalizeAuthorizationCleanup(
     cleanup

@@ -13,10 +13,14 @@ const {
   doesMaterialMimeMatchFileName
 } = require("../server/_lib/courseMaterialUploadPolicy");
 const {
-  getCloudinaryMaterial,
-  deleteCloudinaryMaterial,
-  isCloudinaryMaterialPublicId
-} = require("../server/_lib/cloudinaryCourseMaterials");
+  getImageKitMaterial,
+  deleteImageKitMaterial,
+  isImageKitMaterialPath,
+  isImageKitFileId
+} = require("../server/_lib/imageKitCourseMaterials");
+const {
+  deleteStoredCourseMaterial
+} = require("../server/_lib/courseMaterialStorage");
 
 const MATERIAL_RANDOM_READ_WINDOW_MS =
   10 * 60 * 1000;
@@ -240,73 +244,49 @@ async function getRandomCourseMaterials(limit) {
   return groupedMaterials.slice(0, safeLimit);
 }
 
-async function verifyCloudinaryMaterialUpload(data) {
-  const publicId = cleanString(
-    data.publicId,
-    80
-  );
-  const assetId = cleanString(
-    data.assetId,
-    160
-  );
-  const expectedFileName =
-    cleanMaterialFileName(data.fileName);
-  const expectedFileSize =
-    Number(data.fileSize);
-  const expectedFileType =
-    normalizeMaterialMimeType(data.fileType);
-  const expectedExtension =
-    getMaterialFileExtension(expectedFileName);
+async function verifyImageKitMaterialUpload(data) {
+  const fileId = cleanString(data.fileId, 160);
+  const expectedPath = cleanString(data.filePath, 100);
+  const expectedFileName = cleanMaterialFileName(data.fileName);
+  const expectedFileSize = Number(data.fileSize);
+  const expectedFileType = normalizeMaterialMimeType(data.fileType);
 
-  if (
-    !isCloudinaryMaterialPublicId(publicId) ||
-    !/^[A-Za-z0-9_-]{16,160}$/.test(assetId)
-  ) {
-    throw createMaterialError(
-      "Could not verify the uploaded course material.",
-      400
-    );
+  if (!isImageKitFileId(fileId) || !isImageKitMaterialPath(expectedPath)) {
+    throw createMaterialError("Could not verify the uploaded course material.", 400);
   }
 
-  const file =
-    await getCloudinaryMaterial(publicId);
+  const file = await getImageKitMaterial(fileId);
+  const samePath = file.filePath === expectedPath;
+  const providerMime = normalizeMaterialMimeType(file.mime);
+  const providerMimeAcceptable =
+    !providerMime ||
+    providerMime === "application/octet-stream" ||
+    doesMaterialMimeMatchFileName(expectedFileName, providerMime);
 
   if (
-    file.publicId !== publicId ||
-    file.assetId !== assetId ||
-    file.resourceType !== "raw" ||
-    file.deliveryType !== "authenticated" ||
-    file.format !== expectedExtension ||
+    !samePath ||
+    file.name !== expectedPath.split("/").pop() ||
+    !file.isPrivateFile ||
     file.size !== expectedFileSize ||
     file.size <= 0 ||
     file.size > MATERIAL_MAX_FILE_BYTES ||
-    !isAllowedMaterialMimeType(
-      expectedFileType
-    ) ||
-    !doesMaterialMimeMatchFileName(
-      expectedFileName,
-      expectedFileType
-    )
+    !isAllowedMaterialMimeType(expectedFileType) ||
+    !doesMaterialMimeMatchFileName(expectedFileName, expectedFileType) ||
+    !providerMimeAcceptable
   ) {
-    await deleteCloudinaryMaterial(
-      publicId
-    ).catch(function () {});
-
-    throw createMaterialError(
-      "The uploaded file type or size is not allowed.",
-      400
-    );
+    // Never delete an unrelated provider file supplied by the browser.
+    if (samePath) {
+      await deleteImageKitMaterial(fileId, expectedPath).catch(function () {});
+    }
+    throw createMaterialError("The uploaded file type, privacy setting, or size is not allowed.", 400);
   }
 
   return {
-    storageKey: publicId,
-    fileId: assetId,
-    cloudinaryPublicId: publicId,
-    cloudinaryAssetId: assetId,
-    cloudinaryFormat: file.format,
+    storageKey: expectedPath,
+    fileId,
+    imagekitFileId: fileId,
+    imagekitFilePath: expectedPath,
     fileName: expectedFileName,
-    fileUrl: "",
-    filePath: "",
     size: file.size,
     fileType: expectedFileType
   };
@@ -398,58 +378,6 @@ async function getMaterialUploadAuthorization(
       safeAuthorizationId,
       uploaderUid
     )
-  };
-}
-
-async function verifyStorageMaterialUpload(data) {
-  const safeStorageKey = cleanString(
-    data.storageKey,
-    80
-  );
-  const file = await getStorageFileDetails(
-    safeStorageKey
-  );
-
-  const verifiedFileName =
-    cleanMaterialFileName(file.fileName);
-  const actualSize = Math.max(
-    0,
-    Number(file.size) || 0
-  );
-  const actualMimeType =
-    normalizeMaterialMimeType(file.fileType);
-
-  if (
-    file.storageKey !== safeStorageKey ||
-    verifiedFileName !==
-      cleanMaterialFileName(data.fileName) ||
-    actualSize !== Number(data.fileSize) ||
-    actualSize <= 0 ||
-    actualSize > MATERIAL_MAX_FILE_BYTES ||
-    !isAllowedMaterialMimeType(actualMimeType) ||
-    !doesMaterialMimeMatchFileName(
-      verifiedFileName,
-      actualMimeType
-    )
-  ) {
-    await deleteStorageMaterial(
-      safeStorageKey
-    ).catch(function () {});
-
-    throw createMaterialError(
-      "The uploaded file type or size is not allowed.",
-      400
-    );
-  }
-
-  return {
-    storageKey: safeStorageKey,
-    fileId: safeStorageKey,
-    fileName: verifiedFileName,
-    fileUrl: "",
-    filePath: "",
-    size: actualSize,
-    fileType: actualMimeType
   };
 }
 
@@ -667,8 +595,8 @@ module.exports = async function handler(req, res) {
       const deletedAtIso = new Date().toISOString();
 
       try {
-        await deleteCloudinaryMaterial(
-          ownedMaterial.data.storageKey
+        await deleteStoredCourseMaterial(
+          ownedMaterial.data
         );
       } catch (error) {
         // The rejected Firestore record prevents the file from returning.
@@ -694,12 +622,12 @@ module.exports = async function handler(req, res) {
       body.uploadAuthorizationId,
       80
     );
-    const submittedPublicId = cleanString(
-      body.cloudinaryPublicId,
-      80
+    const submittedFilePath = cleanString(
+      body.imagekitFilePath,
+      100
     );
-    const submittedAssetId = cleanString(
-      body.cloudinaryAssetId,
+    const submittedFileId = cleanString(
+      body.imagekitFileId,
       160
     );
     const requestedUploadGroupId = cleanString(
@@ -709,8 +637,8 @@ module.exports = async function handler(req, res) {
 
     if (
       !uploadAuthorizationId ||
-      !submittedPublicId ||
-      !submittedAssetId
+      !submittedFilePath ||
+      !submittedFileId
     ) {
       throw createMaterialError(
         "Could not save this course material.",
@@ -776,13 +704,10 @@ module.exports = async function handler(req, res) {
       !materialType ||
       !title ||
       !fileName ||
-      !isCloudinaryMaterialPublicId(
-        storageKey
-      ) ||
-      submittedPublicId !== storageKey ||
-      !/^[A-Za-z0-9_-]{16,160}$/.test(
-        submittedAssetId
-      ) ||
+      authorizationData.storageProvider !== "imagekit" ||
+      !isImageKitMaterialPath(storageKey) ||
+      submittedFilePath !== storageKey ||
+      !isImageKitFileId(submittedFileId) ||
       !Number.isSafeInteger(fileSize) ||
       fileSize <= 0 ||
       fileSize > MATERIAL_MAX_FILE_BYTES ||
@@ -799,9 +724,9 @@ module.exports = async function handler(req, res) {
     }
 
     const verifiedFile =
-      await verifyCloudinaryMaterialUpload({
-        publicId: storageKey,
-        assetId: submittedAssetId,
+      await verifyImageKitMaterialUpload({
+        filePath: storageKey,
+        fileId: submittedFileId,
         fileName,
         fileSize,
         fileType
@@ -821,13 +746,9 @@ module.exports = async function handler(req, res) {
       filePath: "",
       fileId: verifiedFile.fileId,
       storageKey: verifiedFile.storageKey,
-      storageProvider: "cloudinary",
-      cloudinaryPublicId:
-        verifiedFile.cloudinaryPublicId,
-      cloudinaryAssetId:
-        verifiedFile.cloudinaryAssetId,
-      cloudinaryFormat:
-        verifiedFile.cloudinaryFormat,
+      storageProvider: "imagekit",
+      imagekitFileId: verifiedFile.imagekitFileId,
+      imagekitFilePath: verifiedFile.imagekitFilePath,
       size: verifiedFile.size,
       fileType: verifiedFile.fileType,
       status: "approved",
@@ -840,7 +761,7 @@ module.exports = async function handler(req, res) {
     const db = admin.firestore();
     const materialRef = db
       .collection("courseMaterials")
-      .doc("cloudinary-" + verifiedFile.fileId);
+      .doc("imagekit-" + verifiedFile.fileId);
     const uploadLimitRef = db
       .collection("materialUploadLimits")
       .doc(decodedUser.uid);
@@ -894,10 +815,10 @@ module.exports = async function handler(req, res) {
         registeredFileId: verifiedFile.fileId,
         registeredStorageKey:
           verifiedFile.storageKey,
-        registeredCloudinaryAssetId:
-          verifiedFile.cloudinaryAssetId,
-        registeredCloudinaryPublicId:
-          verifiedFile.cloudinaryPublicId,
+        registeredImageKitFileId:
+          verifiedFile.imagekitFileId,
+        registeredImageKitFilePath:
+          verifiedFile.imagekitFilePath,
         registeredMaterialId: materialRef.id
       });
 

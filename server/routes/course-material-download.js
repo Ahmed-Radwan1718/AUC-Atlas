@@ -9,6 +9,12 @@ const {
   buildCloudinaryAssetDownloadUrl,
   isCloudinaryMaterialPublicId
 } = require("../_lib/cloudinaryCourseMaterials");
+const {
+  getImageKitMaterial,
+  buildSignedImageKitMaterialUrl,
+  isImageKitMaterialPath,
+  isImageKitFileId
+} = require("../_lib/imageKitCourseMaterials");
 
 const MATERIAL_DOWNLOAD_WINDOW_MS =
   60 * 60 * 1000;
@@ -116,41 +122,48 @@ module.exports = async function handler(req, res) {
         ? "inline"
         : "attachment";
 
-    if (
-      !canDownload ||
-      material.storageProvider !== "cloudinary" ||
-      !isCloudinaryMaterialPublicId(storageKey) ||
-      !/^[A-Za-z0-9_-]{16,160}$/.test(fileId)
-    ) {
-      throw createDownloadError(
-        "Course material file not found.",
-        404
-      );
+    if (!canDownload) {
+      throw createDownloadError("Course material file not found.", 404);
     }
 
-    const cloudinaryFile =
-      await getCloudinaryMaterial(
-        storageKey
-      );
+    let signedUrl;
 
-    if (cloudinaryFile.assetId !== fileId) {
-      throw createDownloadError(
-        "Course material file not found.",
-        404
-      );
-    }
+    if (material.storageProvider === "imagekit") {
+      if (!isImageKitMaterialPath(storageKey) || !isImageKitFileId(fileId)) {
+        throw createDownloadError("Course material file not found.", 404);
+      }
 
-    downloadFileName = cleanString(
-      material.fileName ||
-      "course-material",
-      240
-    ).replace(/[\r\n]/g, " ");
+      const imagekitFile = await getImageKitMaterial(fileId);
 
-    const signedUrl =
-      buildCloudinaryAssetDownloadUrl(
+      if (imagekitFile.filePath !== storageKey || !imagekitFile.isPrivateFile) {
+        throw createDownloadError("Course material file not found.", 404);
+      }
+
+      signedUrl = buildSignedImageKitMaterialUrl(imagekitFile.filePath);
+    } else if (material.storageProvider === "cloudinary") {
+      if (!isCloudinaryMaterialPublicId(storageKey) ||
+          !/^[A-Za-z0-9_-]{16,160}$/.test(fileId)) {
+        throw createDownloadError("Course material file not found.", 404);
+      }
+
+      const cloudinaryFile = await getCloudinaryMaterial(storageKey);
+
+      if (cloudinaryFile.assetId !== fileId) {
+        throw createDownloadError("Course material file not found.", 404);
+      }
+
+      signedUrl = buildCloudinaryAssetDownloadUrl(
         cloudinaryFile.assetId,
         dispositionType
       );
+    } else {
+      throw createDownloadError("Course material file not found.", 404);
+    }
+
+    downloadFileName = cleanString(
+      material.fileName || "course-material",
+      240
+    ).replace(/[\r\n]/g, " ");
 
     const rangeHeader = String(
       req.headers && req.headers.range
