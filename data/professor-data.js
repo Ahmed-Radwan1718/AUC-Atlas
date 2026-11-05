@@ -4631,6 +4631,7 @@ function getProfessorUrl(professor) {
   let professorVisibleLimit = professorPageSize;
   let professorFilterAnimationTimer = 0;
   let professorReviewSummariesLoaded = false;
+  let professorReviewSummariesFailed = false;
   let professorReviewSummariesPromise = null;
 
   function getProfessorCardImageUrl(imageURL) {
@@ -4678,6 +4679,19 @@ function getProfessorUrl(professor) {
       " " +
       averageRating.toFixed(1)
     );
+  }
+
+  function getProfessorListingPriority(professor) {
+    const hasPhoto = Boolean(
+      professor.image &&
+      String(professor.image).trim() !== "user.png"
+    );
+    const hasReviews = Number(professor.reviewCount || 0) > 0;
+
+    if (hasPhoto && hasReviews) return 0;
+    if (hasPhoto) return 1;
+    if (hasReviews) return 2;
+    return 3;
   }
 
   function loadProfessorReviewSummaries() {
@@ -4748,7 +4762,9 @@ function getProfessorUrl(professor) {
         renderProfessors(false, false);
       })
       .catch(function () {
-        professorReviewSummariesPromise = null;
+        professorReviewSummariesFailed = true;
+        professorReviewSummariesLoaded = true;
+        renderProfessors(false, false);
       });
 
     return professorReviewSummariesPromise;
@@ -4785,6 +4801,14 @@ function getProfessorUrl(professor) {
 
     document.title = "Professors | AUC Atlas";
 
+    // Wait for review summaries before showing the first directory.
+    // Otherwise the cards appear with zero reviews, then reshuffle.
+    if (!professorReviewSummariesLoaded) {
+      grid.innerHTML =
+        '<p class="professors-empty" role="status" aria-live="polite">Loading professors and reviews...</p>';
+      return;
+    }
+
     if (resetVisibleLimit) {
       professorVisibleLimit = professorPageSize;
     }
@@ -4792,15 +4816,12 @@ function getProfessorUrl(professor) {
     const matchingProfessors = professors
       .filter(professorMatches)
       .sort(function (firstProfessor, secondProfessor) {
-        const firstHasPhoto = Boolean(
-          firstProfessor.image && firstProfessor.image !== "user.png"
-        );
-        const secondHasPhoto = Boolean(
-          secondProfessor.image && secondProfessor.image !== "user.png"
-        );
+        const priorityDifference =
+          getProfessorListingPriority(firstProfessor) -
+          getProfessorListingPriority(secondProfessor);
 
-        if (firstHasPhoto !== secondHasPhoto) {
-          return secondHasPhoto - firstHasPhoto;
+        if (priorityDifference !== 0) {
+          return priorityDifference;
         }
 
         const reviewDifference =
@@ -4821,6 +4842,13 @@ function getProfessorUrl(professor) {
 
     grid.innerHTML = visibleProfessors.map(function (professor, index) {
       const shouldLoadImmediately = index < 8;
+      const reviewCount = Number(professor.reviewCount || 0);
+      const reviewLabel = professorReviewSummariesFailed
+        ? "Reviews unavailable"
+        : reviewCount + " " + (reviewCount === 1 ? "Review" : "Reviews");
+      const ratingLabel = professorReviewSummariesFailed
+        ? "Ratings unavailable"
+        : professor.averageStars || "No Stars Yet";
 
       return `
         <a class="professor-card" href="${escapeHtml(getProfessorUrl(professor))}" aria-label="Open ${escapeHtml(professor.name)} profile">
@@ -4839,8 +4867,8 @@ function getProfessorUrl(professor) {
             <h2>${escapeHtml(professor.name)}</h2>
             <div class="professor-meta">
               <span>${escapeHtml(professor.displayDepartment || professor.department)}</span>
-              <span>${escapeHtml((professor.reviewCount || 0) + " " + ((professor.reviewCount || 0) === 1 ? "Review" : "Reviews"))}</span>
-              <span>${escapeHtml(professor.averageStars || "No Stars Yet")}</span>
+              <span>${escapeHtml(reviewLabel)}</span>
+              <span>${escapeHtml(ratingLabel)}</span>
             </div>
           </div>
         </a>
