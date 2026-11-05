@@ -8199,7 +8199,7 @@ list.innerHTML = professors.map(function (professor) {
 
           setMaterialUploadStatus(
             files.length === 1
-              ? "File uploaded successfully and added to the course materials library."
+              ? "File upload successful!"
               : files.length +
                   " files uploaded successfully and added to the course materials library.",
             "success",
