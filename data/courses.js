@@ -7699,130 +7699,89 @@ list.innerHTML = professors.map(function (professor) {
     }
   }
 
-  function uploadMaterialFile(
+  async function uploadMaterialFile(
     uploadUrl,
     file,
     authorization,
     onProgress
   ) {
-    return new Promise(function (resolve, reject) {
-      const request = new XMLHttpRequest();
-      const formData = new FormData();
-      const uploadParameters =
+    const formData = new FormData();
+    const uploadParameters =
+      authorization &&
+      authorization.uploadParameters &&
+      typeof authorization.uploadParameters ===
+        "object"
+        ? authorization.uploadParameters
+        : {};
+
+    formData.append("file", file);
+
+    Object.keys(uploadParameters).forEach(
+      function (key) {
+        formData.append(
+          key,
+          String(uploadParameters[key])
+        );
+      }
+    );
+
+    formData.append(
+      "api_key",
+      String(
         authorization &&
-        authorization.uploadParameters &&
-        typeof authorization.uploadParameters ===
-          "object"
-          ? authorization.uploadParameters
-          : {};
+        authorization.apiKey
+          ? authorization.apiKey
+          : ""
+      )
+    );
+    formData.append(
+      "signature",
+      String(
+        authorization &&
+        authorization.signature
+          ? authorization.signature
+          : ""
+      )
+    );
 
-      formData.append("file", file);
-
-      Object.keys(uploadParameters).forEach(
-        function (key) {
-          formData.append(
-            key,
-            String(uploadParameters[key])
-          );
+    let cloudinaryResponse;
+    try {
+      cloudinaryResponse = await fetch(
+        uploadUrl,
+        {
+          method: "POST",
+          body: formData
         }
       );
-
-      formData.append(
-        "api_key",
-        String(
-          authorization &&
-          authorization.apiKey
-            ? authorization.apiKey
-            : ""
-        )
+    } catch (error) {
+      throw new Error(
+        "The Cloudinary upload connection failed."
       );
-      formData.append(
-        "signature",
-        String(
-          authorization &&
-          authorization.signature
-            ? authorization.signature
-            : ""
-        )
+    }
+
+    const cloudinaryData =
+      await cloudinaryResponse
+        .json()
+        .catch(function () {
+          return {};
+        });
+
+    if (!cloudinaryResponse.ok) {
+      throw new Error(
+        (
+          cloudinaryData.error &&
+          cloudinaryData.error.message
+        ) ||
+          cloudinaryData.error ||
+          "Cloudinary rejected the upload."
       );
+    }
 
-      request.open(
-        "POST",
-        uploadUrl
-      );
+    if (typeof onProgress === "function") {
+      onProgress(1);
+    }
 
-      request.upload.addEventListener(
-        "progress",
-        function (event) {
-          if (
-            event.lengthComputable &&
-            typeof onProgress === "function"
-          ) {
-            onProgress(
-              event.loaded / event.total
-            );
-          }
-        }
-      );
-
-      request.addEventListener(
-        "load",
-        function () {
-          let responseData = {};
-
-          try {
-            responseData = JSON.parse(
-              request.responseText || "{}"
-            );
-          } catch (error) {
-            responseData = {};
-          }
-
-          if (
-            request.status >= 200 &&
-            request.status < 300
-          ) {
-            resolve(responseData);
-            return;
-          }
-
-          reject(
-            new Error(
-              (
-                responseData.error &&
-                responseData.error.message
-              ) ||
-                responseData.error ||
-                "Cloudinary rejected the upload."
-            )
-          );
-        }
-      );
-
-      request.addEventListener(
-        "error",
-        function () {
-          reject(
-            new Error(
-              "The Cloudinary upload connection failed."
-            )
-          );
-        }
-      );
-
-      request.addEventListener(
-        "abort",
-        function () {
-          reject(
-            new Error(
-              "The upload was cancelled."
-            )
-          );
-        }
-      );
-
-      request.send(formData);
-    });
+    return cloudinaryData;
   }
 
   function setupMaterialUploadForm(
