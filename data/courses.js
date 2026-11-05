@@ -7670,7 +7670,7 @@ list.innerHTML = professors.map(function (professor) {
 
     setMaterialFileUploadState(
       form,
-      Boolean(isVisible && safePercent < 100)
+      Boolean(isVisible && label !== "Upload complete")
     );
 
     if (progress) {
@@ -7699,7 +7699,7 @@ list.innerHTML = professors.map(function (professor) {
     }
   }
 
-  async function uploadMaterialFile(
+  function uploadMaterialFile(
     uploadUrl,
     file,
     authorization,
@@ -7747,44 +7747,93 @@ list.innerHTML = professors.map(function (professor) {
       )
     );
 
-    let cloudinaryResponse;
-    try {
-      cloudinaryResponse = await fetch(
-        uploadUrl,
-        {
-          method: "POST",
-          body: formData
+    return new Promise(function (resolve, reject) {
+      const request = new XMLHttpRequest();
+
+      request.upload.addEventListener(
+        "progress",
+        function (event) {
+          if (
+            event.lengthComputable &&
+            event.total > 0 &&
+            typeof onProgress === "function"
+          ) {
+            onProgress(
+              Math.max(
+                0,
+                Math.min(1, event.loaded / event.total)
+              )
+            );
+          }
         }
       );
-    } catch (error) {
-      throw new Error(
-        "The ImageKit upload connection failed. Check your network and try again."
+
+      request.addEventListener(
+        "load",
+        function () {
+          let imageKitResponse = {};
+
+          try {
+            imageKitResponse = JSON.parse(
+              request.responseText || "{}"
+            );
+          } catch (error) {
+            imageKitResponse = {};
+          }
+
+          if (request.status >= 200 && request.status < 300) {
+            if (typeof onProgress === "function") {
+              onProgress(1);
+            }
+
+            resolve(imageKitResponse);
+            return;
+          }
+
+          reject(
+            new Error(
+              (
+                imageKitResponse.error &&
+                imageKitResponse.error.message
+              ) ||
+                imageKitResponse.message ||
+                imageKitResponse.error ||
+                "ImageKit rejected the upload."
+            )
+          );
+        }
       );
-    }
 
-    const cloudinaryData =
-      await cloudinaryResponse
-        .json()
-        .catch(function () {
-          return {};
-        });
-
-    if (!cloudinaryResponse.ok) {
-      throw new Error(
-        (
-          cloudinaryData.error &&
-          cloudinaryData.error.message
-        ) ||
-          cloudinaryData.error ||
-          "ImageKit rejected the upload."
+      request.addEventListener(
+        "error",
+        function () {
+          reject(
+            new Error(
+              "The ImageKit upload connection failed. Check your network and try again."
+            )
+          );
+        }
       );
-    }
 
-    if (typeof onProgress === "function") {
-      onProgress(1);
-    }
+      request.addEventListener(
+        "abort",
+        function () {
+          reject(new Error("The upload was cancelled."));
+        }
+      );
 
-    return cloudinaryData;
+      request.addEventListener(
+        "timeout",
+        function () {
+          reject(new Error("The ImageKit upload timed out. Try again."));
+        }
+      );
+
+      // Avoid manually setting Content-Type: the browser must supply
+      // the multipart boundary for ImageKit's upload endpoint.
+      request.open("POST", uploadUrl);
+      request.send(formData);
+    });
   }
 
   function setupMaterialUploadForm(
@@ -8112,6 +8161,19 @@ list.innerHTML = professors.map(function (professor) {
                 "ImageKit returned an unexpected upload result."
               );
             }
+
+            // Transfer progress can reach 100% before the file is
+            // registered; keep the form busy during server verification.
+            setMaterialUploadProgress(
+              totalBytes > 0
+                ? ((completedBytes + file.size) / totalBytes) * 100
+                : 100,
+              files.length > 1
+                ? "Saving file " + (index + 1) + " of " + files.length
+                : "Saving uploaded file",
+              true,
+              form
+            );
 
             const saveResponse =
               await fetch(
