@@ -5537,9 +5537,20 @@ list.innerHTML = professors.map(function (professor) {
   function syncMaterialChoiceButton(choice, select) {
     const button = choice.querySelector(".material-choice-button");
     const selectedOption = select.options[select.selectedIndex];
+    const professorSearch = choice.querySelector(
+      ".material-professor-search-input"
+    );
 
     if (button && selectedOption) {
       button.textContent = selectedOption.textContent;
+    }
+
+    if (professorSearch) {
+      professorSearch.value = select.value && selectedOption
+        ? selectedOption.textContent
+        : "";
+      professorSearch.setAttribute("aria-expanded", "false");
+      choice.classList.remove("open");
     }
 
     choice.querySelectorAll(".material-choice-option").forEach(function (optionButton) {
@@ -5557,6 +5568,188 @@ list.innerHTML = professors.map(function (professor) {
     });
   }
 
+  function setupMaterialProfessorSearch(select) {
+    const choice = document.createElement("div");
+    const input = document.createElement("input");
+    const menu = document.createElement("div");
+    const empty = document.createElement("p");
+    const options = [];
+
+    choice.className = "material-choice material-professor-search-choice";
+
+    input.type = "search";
+    input.className = "material-professor-search-input";
+    input.placeholder = "Search professors...";
+    input.setAttribute("aria-label", "Search professors");
+    input.setAttribute("aria-autocomplete", "list");
+    input.setAttribute("aria-controls", select.id + "-search-results");
+    input.setAttribute("aria-expanded", "false");
+    input.setAttribute("autocomplete", "off");
+    input.setAttribute("autocorrect", "off");
+    input.setAttribute("autocapitalize", "none");
+    input.setAttribute("spellcheck", "false");
+
+    menu.className = "material-choice-menu";
+    menu.id = select.id + "-search-results";
+    menu.setAttribute("role", "listbox");
+    menu.setAttribute("aria-label", "Matching professors");
+
+    empty.className = "material-professor-search-empty";
+    empty.textContent = "No matching professors.";
+    empty.hidden = true;
+
+    function closeResults(restoreSelection) {
+      choice.classList.remove("open");
+      input.setAttribute("aria-expanded", "false");
+
+      if (restoreSelection && !select.value) {
+        input.value = "";
+      }
+    }
+
+    function selectProfessor(option) {
+      select.value = option.value;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      closeResults(false);
+      input.focus();
+    }
+
+    Array.from(select.options).forEach(function (option) {
+      if (!option.value) return;
+
+      const optionButton = document.createElement("button");
+      optionButton.type = "button";
+      optionButton.className = "material-choice-option";
+      optionButton.dataset.value = option.value;
+      optionButton.textContent = option.textContent;
+      optionButton.setAttribute("role", "option");
+      optionButton.setAttribute("aria-selected", "false");
+      optionButton.hidden = true;
+      optionButton.addEventListener("click", function () {
+        selectProfessor(option);
+      });
+
+      options.push(optionButton);
+      menu.appendChild(optionButton);
+    });
+
+    menu.appendChild(empty);
+
+    function renderMatches() {
+      const terms = input.value
+        .toLowerCase()
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+      let matchCount = 0;
+
+      options.forEach(function (option) {
+        const name = option.textContent.toLowerCase();
+        const matches = terms.length > 0 &&
+          terms.every(function (term) {
+            return name.includes(term);
+          });
+        option.hidden = !matches;
+        if (matches) matchCount += 1;
+      });
+
+      empty.hidden = !terms.length || matchCount > 0;
+
+      if (!terms.length) {
+        closeResults(false);
+        return;
+      }
+
+      closeMaterialChoiceMenus(choice);
+      choice.classList.add("open");
+      input.setAttribute("aria-expanded", "true");
+    }
+
+    input.addEventListener("input", function () {
+      if (input.value !== select.value) {
+        select.value = "";
+      }
+      renderMatches();
+    });
+
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        // Typing a search must not accidentally submit the upload form.
+        event.preventDefault();
+        if (choice.classList.contains("open")) {
+          const firstMatch = options.find(function (option) {
+            return !option.hidden;
+          });
+          if (firstMatch) firstMatch.click();
+        }
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        closeResults(true);
+      } else if (
+        event.key === "ArrowDown" &&
+        choice.classList.contains("open")
+      ) {
+        const firstMatch = options.find(function (option) {
+          return !option.hidden;
+        });
+        if (firstMatch) {
+          event.preventDefault();
+          firstMatch.focus();
+        }
+      }
+    });
+
+    menu.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeResults(true);
+        input.focus();
+        return;
+      }
+
+      if (event.key !== "ArrowUp" && event.key !== "ArrowDown") {
+        return;
+      }
+
+      const visibleOptions = options.filter(function (option) {
+        return !option.hidden;
+      });
+      const activeIndex = visibleOptions.indexOf(document.activeElement);
+      const nextIndex = activeIndex + (event.key === "ArrowDown" ? 1 : -1);
+
+      event.preventDefault();
+
+      if (nextIndex < 0) {
+        input.focus();
+      } else if (nextIndex < visibleOptions.length) {
+        visibleOptions[nextIndex].focus();
+      }
+    });
+
+    choice.addEventListener("focusout", function () {
+      window.setTimeout(function () {
+        if (!choice.contains(document.activeElement)) {
+          closeResults(true);
+        }
+      }, 0);
+    });
+
+    document.addEventListener("click", function (event) {
+      if (!choice.contains(event.target)) {
+        closeResults(true);
+      }
+    });
+
+    select.addEventListener("change", function () {
+      syncMaterialChoiceButton(choice, select);
+    });
+
+    choice.appendChild(input);
+    choice.appendChild(menu);
+    select.insertAdjacentElement("afterend", choice);
+    syncMaterialChoiceButton(choice, select);
+  }
+
   function setupMaterialChoiceMenus(form) {
     form.querySelectorAll("select.material-native-select").forEach(function (select) {
       if (select.dataset.choiceReady === "true") {
@@ -5564,6 +5757,14 @@ list.innerHTML = professors.map(function (professor) {
       }
 
       select.dataset.choiceReady = "true";
+
+      if (
+        select.id === "material-professor" ||
+        select.dataset.materialRole === "professor"
+      ) {
+        setupMaterialProfessorSearch(select);
+        return;
+      }
 
       const choice = document.createElement("div");
       const button = document.createElement("button");

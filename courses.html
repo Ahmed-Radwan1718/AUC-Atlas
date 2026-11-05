@@ -1225,6 +1225,22 @@
       transform: translateY(0) scale(1);
     }
 
+    .material-professor-search-choice:not(.open) .material-choice-menu {
+      display: none;
+    }
+
+    .material-professor-search-choice .material-professor-search-input {
+      width: 100%;
+    }
+
+    .material-professor-search-empty {
+      margin: 0;
+      padding: 12px;
+      color: rgba(23, 23, 23, 0.6);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
     .material-choice-search-wrap {
       position: sticky;
       top: -6px;
@@ -4649,8 +4665,6 @@
                 <span>Contribute material</span>
                 <h2>Upload material</h2>
               </div>
-
-              <p>Share a useful file and tie it to the professor and semester you took this course with.</p>
 
               <form class="material-upload-form" id="material-upload-form">
                 <div class="material-upload-grid">
