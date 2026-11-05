@@ -47,24 +47,6 @@ function getTimestampIso(value) {
   return millis ? new Date(millis).toISOString() : "";
 }
 
-function cleanAmount(value, fallbackValue) {
-  const amount = Number(value);
-  return Number.isFinite(amount) && amount >= 0
-    ? Math.round(amount * 100) / 100
-    : fallbackValue;
-}
-
-function getDonationData(data) {
-  const source = data || {};
-
-  return {
-    currentAmount: cleanAmount(source.currentAmount, 0),
-    goalAmount: cleanAmount(source.goalAmount, 100),
-    currency: source.currency === "EGP" ? "EGP" : "USD",
-    updatedAt: getTimestampIso(source.updatedAt || source.updatedAtIso)
-  };
-}
-
 function cleanNotificationType(value) {
   const type = cleanString(value, 20).toLowerCase();
 
@@ -387,7 +369,6 @@ async function getDashboardData(actor) {
     db.collection("courseMaterials").limit(25).get(),
     db.collection("contentReports").where("status", "==", "open").limit(25).get(),
     db.collection("adminAuditLogs").orderBy("createdAt", "desc").limit(10).get(),
-    db.collection("siteSettings").doc("donationCounter").get(),
     db.collection("siteNotifications").orderBy("createdAtIso", "desc").limit(25).get(),
     listAllUsers(actor)
   ]);
@@ -396,9 +377,8 @@ async function getDashboardData(actor) {
   const materialsSnapshot = results[1];
   const reportsSnapshot = results[2];
   const auditSnapshot = results[3];
-  const donationDoc = results[4];
-  const notificationsSnapshot = results[5];
-  const users = results[6];
+  const notificationsSnapshot = results[4];
+  const users = results[5];
   const reviews = [];
   const firestoreMaterials = [];
   const reports = [];
@@ -464,10 +444,7 @@ async function getDashboardData(actor) {
     reviews: reviews.slice(0, 250),
     materials: materials.slice(0, 250),
     notifications,
-    auditLogs: audits,
-    donation: getDonationData(
-      donationDoc.exists ? donationDoc.data() || {} : {}
-    )
+    auditLogs: audits
   };
 }
 
@@ -1086,44 +1063,6 @@ async function handleDeleteNotification(actor, body) {
   };
 }
 
-async function handleUpdateDonation(actor, body) {
-  const currentAmount = cleanAmount(body.currentAmount, -1);
-  const goalAmount = cleanAmount(body.goalAmount, -1);
-  const currency = body.currency === "EGP" ? "EGP" : "USD";
-
-  if (currentAmount < 0 || goalAmount <= 0) {
-    throw createAdminError("Enter valid donation and goal amounts.", 400);
-  }
-
-  const updatedAtIso = new Date().toISOString();
-  const counterData = {
-    currentAmount,
-    goalAmount,
-    currency,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    updatedAtIso,
-    updatedByUid: actor.uid
-  };
-
-  await admin.firestore()
-    .collection("siteSettings")
-    .doc("donationCounter")
-    .set(counterData, { merge: true });
-
-  await writeAuditLog(actor, {
-    action: "update_donation_counter",
-    targetType: "site_setting",
-    targetId: "donationCounter",
-    targetLabel: currency + " " + currentAmount + " / " + goalAmount,
-    reason: cleanMultiline(body.reason, 500)
-  });
-
-  return {
-    success: true,
-    donation: getDonationData(counterData)
-  };
-}
-
 module.exports = async function handler(req, res) {
   try {
     res.setHeader(
@@ -1279,14 +1218,6 @@ module.exports = async function handler(req, res) {
     ) {
       result =
         await handleDeleteNotification(
-          actor,
-          body
-        );
-    } else if (
-      action === "updateDonation"
-    ) {
-      result =
-        await handleUpdateDonation(
           actor,
           body
         );

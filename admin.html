@@ -601,8 +601,7 @@
     }
 
     .admin-form-card,
-    .admin-user-result,
-    .admin-donation-preview {
+    .admin-user-result {
       padding: 22px;
       border: 1px solid rgba(23, 23, 23, 0.09);
       border-radius: 22px;
@@ -726,47 +725,6 @@
       flex-wrap: wrap;
     }
 
-    .admin-donation-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
-      gap: 18px;
-      align-items: start;
-    }
-
-    .admin-donation-preview {
-      display: grid;
-      gap: 14px;
-    }
-
-    .admin-donation-preview span {
-      color: rgba(23, 23, 23, 0.5);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .admin-donation-preview strong {
-      font-size: 40px;
-      line-height: 1;
-    }
-
-    .admin-progress {
-      height: 11px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: rgba(192, 154, 92, 0.14);
-    }
-
-    .admin-progress-fill {
-      width: 0;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #8f6b36, #c09a5c, #e2c48c);
-      display: block;
-      transition: width 0.3s ease;
-    }
-
     .admin-empty {
       padding: 30px 18px;
       border: 1px dashed rgba(23, 23, 23, 0.14);
@@ -805,7 +763,7 @@
 
       .admin-sidebar {
         position: static;
-        grid-template-columns: repeat(6, minmax(130px, 1fr));
+        grid-template-columns: repeat(5, minmax(130px, 1fr));
         overflow-x: auto;
       }
 
@@ -813,9 +771,6 @@
         text-align: center;
       }
 
-      .admin-donation-layout {
-        grid-template-columns: 1fr;
-      }
     }
 
     .admin-page {
@@ -1296,8 +1251,7 @@
     }
 
     .admin-form-card,
-    .admin-user-result,
-    .admin-donation-preview {
+    .admin-user-result {
       padding: 24px;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 24px;
@@ -1365,8 +1319,7 @@
       background: rgba(247, 244, 238, 0.74);
     }
 
-    .admin-user-detail span,
-    .admin-donation-preview span {
+    .admin-user-detail span {
       color: rgba(192, 154, 92, 0.92);
       font-size: 10px;
       font-weight: 700;
@@ -1378,17 +1331,6 @@
       font-size: 14px;
       font-weight: 600;
       line-height: 1.45;
-    }
-
-    .admin-donation-preview strong {
-      color: #171717;
-      font-size: 38px;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .admin-progress {
-      background: rgba(192, 154, 92, 0.14);
     }
 
     .admin-empty {
@@ -1574,7 +1516,7 @@
 
       .admin-sidebar {
         position: static;
-        grid-template-columns: repeat(6, minmax(140px, 1fr));
+        grid-template-columns: repeat(5, minmax(140px, 1fr));
         overflow-x: auto;
       }
 
@@ -1582,9 +1524,6 @@
         text-align: center;
       }
 
-      .admin-donation-layout {
-        grid-template-columns: 1fr;
-      }
     }
 
     @media (max-width: 720px) {
@@ -1630,7 +1569,6 @@
 
       .admin-form-card,
       .admin-user-result,
-      .admin-donation-preview,
       .admin-state-card {
         padding: 20px;
         border-radius: 22px;
@@ -1726,7 +1664,7 @@
           </div>
 
           <div class="admin-header-copy">
-            Review registered users, moderate reviews and uploads, and update the public donation goal.
+            Review registered users, moderate reviews and uploads.
           </div>
         </header>
 
@@ -1756,7 +1694,6 @@
             <button class="admin-nav-button" type="button" data-admin-panel="reviews">Reviews</button>
             <button class="admin-nav-button" type="button" data-admin-panel="materials">Uploads</button>
             <button class="admin-nav-button" type="button" data-admin-panel="notifications">Notifications</button>
-            <button class="admin-nav-button" type="button" data-admin-panel="donation">Donation</button>
           </aside>
 
           <section>
@@ -1845,55 +1782,6 @@
               <div class="admin-list admin-notification-list" id="admin-notification-list"></div>
             </article>
 
-            <article class="admin-panel" id="admin-panel-donation">
-              <div class="admin-panel-heading">
-                <div>
-                  <h2>Donation counter</h2>
-                  <p>Change the amount donated so far, the monthly goal, and the displayed currency.</p>
-                </div>
-              </div>
-
-              <div class="admin-donation-layout">
-                <div class="admin-form-card">
-                  <form class="admin-form" id="admin-donation-form">
-                    <div class="admin-form-grid">
-                      <div class="admin-field">
-                        <label for="admin-donation-current">Donated so far</label>
-                        <input id="admin-donation-current" type="number" min="0" step="0.01" required>
-                      </div>
-                      <div class="admin-field">
-                        <label for="admin-donation-goal">Monthly goal</label>
-                        <input id="admin-donation-goal" type="number" min="0.01" step="0.01" required>
-                      </div>
-                      <div class="admin-field full">
-                        <label for="admin-donation-currency">Currency</label>
-                        <select id="admin-donation-currency">
-                          <option value="USD">USD</option>
-                          <option value="EGP">EGP</option>
-                        </select>
-                      </div>
-                      <div class="admin-field full">
-                        <label for="admin-donation-reason">Internal note</label>
-                        <textarea id="admin-donation-reason" maxlength="500" placeholder="Optional reason for this adjustment"></textarea>
-                      </div>
-                    </div>
-                    <div>
-                      <button class="admin-button primary" id="admin-donation-submit" type="submit">Update counter</button>
-                    </div>
-                    <p class="admin-message" id="admin-donation-message" aria-live="polite"></p>
-                  </form>
-                </div>
-
-                <aside class="admin-donation-preview">
-                  <span>Public counter preview</span>
-                  <strong id="admin-donation-preview-amount">$0</strong>
-                  <div class="admin-progress" aria-hidden="true">
-                    <span class="admin-progress-fill" id="admin-donation-preview-fill"></span>
-                  </div>
-                  <p class="admin-item-copy" id="admin-donation-preview-copy">$0 of $100</p>
-                </aside>
-              </div>
-            </article>
           </section>
         </div>
       </div>

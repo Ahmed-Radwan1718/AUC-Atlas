@@ -222,46 +222,6 @@
     document.getElementById(
       "admin-notification-list"
     );
-  const donationForm =
-    document.getElementById(
-      "admin-donation-form"
-    );
-  const donationCurrentInput =
-    document.getElementById(
-      "admin-donation-current"
-    );
-  const donationGoalInput =
-    document.getElementById(
-      "admin-donation-goal"
-    );
-  const donationCurrencyInput =
-    document.getElementById(
-      "admin-donation-currency"
-    );
-  const donationReasonInput =
-    document.getElementById(
-      "admin-donation-reason"
-    );
-  const donationSubmit =
-    document.getElementById(
-      "admin-donation-submit"
-    );
-  const donationMessage =
-    document.getElementById(
-      "admin-donation-message"
-    );
-  const donationPreviewAmount =
-    document.getElementById(
-      "admin-donation-preview-amount"
-    );
-  const donationPreviewFill =
-    document.getElementById(
-      "admin-donation-preview-fill"
-    );
-  const donationPreviewCopy =
-    document.getElementById(
-      "admin-donation-preview-copy"
-    );
   const toast =
     document.getElementById(
       "admin-toast"
@@ -300,18 +260,6 @@
       hour: "numeric",
       minute: "2-digit"
     });
-  }
-
-  function formatAmount(value, currency) {
-    const amount = Number(value || 0);
-    const formatted = Number.isInteger(amount)
-      ? amount.toLocaleString("en-US")
-      : amount.toLocaleString("en-US", {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2
-        });
-
-    return currency === "EGP" ? "EGP " + formatted : "$" + formatted;
   }
 
   function showToast(message) {
@@ -1322,31 +1270,6 @@
       ).join("");
   }
 
-  function renderDonation() {
-    const donation = state.dashboard.donation || {
-      currentAmount: 0,
-      goalAmount: 100,
-      currency: "USD"
-    };
-    donationCurrentInput.value = donation.currentAmount;
-    donationGoalInput.value = donation.goalAmount;
-    donationCurrencyInput.value = donation.currency === "EGP" ? "EGP" : "USD";
-    updateDonationPreview();
-  }
-
-  function updateDonationPreview() {
-    const currentAmount = Math.max(0, Number(donationCurrentInput.value || 0));
-    const goalAmount = Math.max(0, Number(donationGoalInput.value || 0));
-    const currency = donationCurrencyInput.value === "EGP" ? "EGP" : "USD";
-    const percentage = goalAmount > 0
-      ? Math.min(100, Math.max(0, currentAmount / goalAmount * 100))
-      : 0;
-
-    donationPreviewAmount.textContent = formatAmount(currentAmount, currency);
-    donationPreviewCopy.textContent = formatAmount(currentAmount, currency) + " of " + formatAmount(goalAmount, currency);
-    donationPreviewFill.style.width = percentage + "%";
-  }
-
   function renderUsers() {
     const users = Array.isArray(
       state.dashboard.users
@@ -1436,7 +1359,6 @@
     renderReviews();
     renderMaterials();
     renderNotifications();
-    renderDonation();
     switchPanel(state.activePanel);
   }
 
@@ -1512,9 +1434,6 @@
   reviewSearch.addEventListener("input", renderReviews);
   materialSearch.addEventListener("input", renderMaterials);
   userSearch.addEventListener("input", renderUsers);
-  donationCurrentInput.addEventListener("input", updateDonationPreview);
-  donationGoalInput.addEventListener("input", updateDonationPreview);
-  donationCurrencyInput.addEventListener("change", updateDonationPreview);
 
   reportList.addEventListener("click", function (event) {
     const openButton = event.target.closest(
@@ -1810,29 +1729,6 @@
         error.message ||
           "Could not delete the notification."
       );
-    });
-  });
-
-  donationForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-    setMessage(donationMessage, "", "");
-
-    runBusy(donationSubmit, async function () {
-      const data = await postAction({
-        action: "updateDonation",
-        currentAmount: Number(donationCurrentInput.value),
-        goalAmount: Number(donationGoalInput.value),
-        currency: donationCurrencyInput.value,
-        reason: donationReasonInput.value
-      });
-
-      state.dashboard.donation = data.donation;
-      donationReasonInput.value = "";
-      renderDonation();
-      setMessage(donationMessage, "Donation counter updated.", "success");
-      await loadDashboard({ message: "Donation counter updated." });
-    }).catch(function (error) {
-      setMessage(donationMessage, error.message || "Could not update the donation counter.", "error");
     });
   });
 
