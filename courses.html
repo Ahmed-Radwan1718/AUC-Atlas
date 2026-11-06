@@ -717,6 +717,16 @@
       display: none;
     }
 
+    /* Reserve the upload panel's position while course materials load. */
+    .course-materials-loading.course-upload-loading {
+      grid-area: upload;
+      min-height: 650px;
+    }
+
+    .course-action-stack:not(.is-loading) > .course-upload-loading {
+      display: none;
+    }
+
     .course-materials-loading-spinner {
       width: 46px;
       height: 46px;
@@ -4770,6 +4780,11 @@
             <div class="course-materials-loading" id="course-materials-loading" role="status" aria-live="polite">
               <div class="course-materials-loading-spinner" aria-hidden="true"></div>
               <p>Loading course materials</p>
+            </div>
+
+            <div class="course-materials-loading course-upload-loading" role="status" aria-live="polite">
+              <div class="course-materials-loading-spinner" aria-hidden="true"></div>
+              <p>Preparing upload form</p>
             </div>
 
             <section class="course-material-summary course-material-downloads" aria-label="Course materials">
