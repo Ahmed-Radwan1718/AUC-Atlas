@@ -5569,13 +5569,15 @@ list.innerHTML = professors.map(function (professor) {
     const menu = document.createElement("div");
     const empty = document.createElement("p");
     const options = [];
+    const isSemester = select.id === "material-semester" ||
+      select.dataset.materialRole === "semester";
 
     choice.className = "material-choice material-professor-search-choice";
 
     input.type = "search";
     input.className = "material-professor-search-input";
-    input.placeholder = "Search professors...";
-    input.setAttribute("aria-label", "Search professors");
+    input.placeholder = isSemester ? "Search semesters..." : "Search professors...";
+    input.setAttribute("aria-label", isSemester ? "Search semesters" : "Search professors");
     input.setAttribute("aria-autocomplete", "list");
     input.setAttribute("aria-controls", select.id + "-search-results");
     input.setAttribute("aria-expanded", "false");
@@ -5587,10 +5589,10 @@ list.innerHTML = professors.map(function (professor) {
     menu.className = "material-choice-menu";
     menu.id = select.id + "-search-results";
     menu.setAttribute("role", "listbox");
-    menu.setAttribute("aria-label", "Matching professors");
+    menu.setAttribute("aria-label", isSemester ? "Matching semesters" : "Matching professors");
 
     empty.className = "material-professor-search-empty";
-    empty.textContent = "No matching professors.";
+    empty.textContent = isSemester ? "No matching semesters." : "No matching professors.";
     empty.hidden = true;
 
     function closeResults(restoreSelection) {
@@ -5602,7 +5604,7 @@ list.innerHTML = professors.map(function (professor) {
       }
     }
 
-    function selectProfessor(option) {
+    function selectMatchingOption(option) {
       select.value = option.value;
       select.dispatchEvent(new Event("change", { bubbles: true }));
       closeResults(false);
@@ -5621,7 +5623,7 @@ list.innerHTML = professors.map(function (professor) {
       optionButton.setAttribute("aria-selected", "false");
       optionButton.hidden = true;
       optionButton.addEventListener("click", function () {
-        selectProfessor(option);
+        selectMatchingOption(option);
       });
 
       options.push(optionButton);
@@ -5640,17 +5642,17 @@ list.innerHTML = professors.map(function (professor) {
 
       options.forEach(function (option) {
         const name = option.textContent.toLowerCase();
-        const matches = terms.length > 0 &&
-          terms.every(function (term) {
+        const matches = (isSemester && !terms.length) ||
+          (terms.length > 0 && terms.every(function (term) {
             return name.includes(term);
-          });
+          }));
         option.hidden = !matches;
         if (matches) matchCount += 1;
       });
 
       empty.hidden = !terms.length || matchCount > 0;
 
-      if (!terms.length) {
+      if (!terms.length && !isSemester) {
         closeResults(false);
         return;
       }
@@ -5659,6 +5661,10 @@ list.innerHTML = professors.map(function (professor) {
       choice.classList.add("open");
       input.setAttribute("aria-expanded", "true");
     }
+
+    input.addEventListener("focus", function () {
+      if (isSemester) renderMatches();
+    });
 
     input.addEventListener("input", function () {
       if (input.value !== select.value) {
@@ -5755,7 +5761,9 @@ list.innerHTML = professors.map(function (professor) {
 
       if (
         select.id === "material-professor" ||
-        select.dataset.materialRole === "professor"
+        select.dataset.materialRole === "professor" ||
+        select.id === "material-semester" ||
+        select.dataset.materialRole === "semester"
       ) {
         setupMaterialProfessorSearch(select);
         return;
