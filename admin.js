@@ -206,16 +206,9 @@
     document.getElementById("admin-user-prev");
   const userNext =
     document.getElementById("admin-user-next");
-  const userDrawer =
-    document.getElementById("admin-user-drawer");
-  const userDrawerPanel =
-    userDrawer.querySelector(".admin-user-drawer-panel");
-  const userDetailContent =
-    document.getElementById("admin-user-detail-content");
   const userPageSize = Number.MAX_SAFE_INTEGER;
   let userPage = 1;
   let selectedUserUid = "";
-  let userDetailTrigger = null;
   const toast =
     document.getElementById(
       "admin-toast"
@@ -515,9 +508,6 @@
   }
 
   function switchPanel(panelName) {
-    if (panelName !== "users" && !userDrawer.hidden) {
-      closeUserDrawer(false);
-    }
     state.activePanel = panelName;
 
     navButtons.forEach(function (button) {
@@ -1164,20 +1154,19 @@
     }).join("");
   }
 
-  function closeUserDrawer(restoreFocus) {
-    const shouldRestore = restoreFocus !== false;
-    userDrawer.hidden = true;
-    selectedUserUid = "";
+  function toggleUserDetails(uid) {
+    selectedUserUid = selectedUserUid === uid ? "" : uid;
+    renderUsers();
 
-    if (
-      shouldRestore &&
-      userDetailTrigger &&
-      document.contains(userDetailTrigger)
-    ) {
-      userDetailTrigger.focus();
+    // Re-rendering replaces the clicked button; restore keyboard focus.
+    const matchingButton = Array.from(
+      userList.querySelectorAll("[data-user-open-uid]")
+    ).find(function (button) {
+      return button.dataset.userOpenUid === uid;
+    });
+    if (matchingButton) {
+      matchingButton.focus({ preventScroll: true });
     }
-
-    userDetailTrigger = null;
   }
 
   function renderUserDetails(user) {
@@ -1205,8 +1194,8 @@
           '</div>'
         ].join("");
 
-    userDetailContent.innerHTML = [
-      '<div class="admin-user-drawer-identity">',
+    return [
+      '<div class="admin-user-inline-identity">',
         '<strong>', escapeHtml(user.displayName || user.email || user.uid || "User"), '</strong>',
         '<p>', escapeHtml(user.email || "Email unavailable"), '</p>',
         '<span class="admin-user-status', statusClass, '">', status, '</span>',
@@ -1224,25 +1213,6 @@
       '</dl>',
       moderation
     ].join("");
-  }
-
-  function openUserDrawer(uid, trigger) {
-    const users = Array.isArray(state.dashboard && state.dashboard.users)
-      ? state.dashboard.users
-      : [];
-    const user = users.find(function (entry) {
-      return String(entry.uid) === uid;
-    });
-
-    if (!user) {
-      return;
-    }
-
-    selectedUserUid = uid;
-    userDetailTrigger = trigger;
-    renderUserDetails(user);
-    userDrawer.hidden = false;
-    userDrawerPanel.focus();
   }
 
   function renderUsers() {
@@ -1266,6 +1236,12 @@
         users.length.toLocaleString("en-US") + " registered accounts"
       : users.length.toLocaleString("en-US") + " registered accounts";
 
+    if (selectedUserUid && !filtered.some(function (user) {
+      return String(user.uid) === selectedUserUid;
+    })) {
+      selectedUserUid = "";
+    }
+
     if (!filtered.length) {
       userList.innerHTML = '<div class="admin-empty">' +
         (search
@@ -1288,13 +1264,18 @@
             '<th scope="col">Action</th>',
           '</tr></thead>',
           '<tbody>',
-            displayed.map(function (user) {
+            displayed.map(function (user, index) {
               const uid = escapeHtml(user.uid);
               const name = escapeHtml(user.displayName || user.email || user.uid || "Unnamed user");
               const status = user.disabled ? "Banned" : "Active";
+              const expanded = String(user.uid) === selectedUserUid;
+              const detailsId = "admin-user-details-" + (start + index);
               return [
-                '<tr>',
-                  '<td><button class="admin-user-open" type="button" data-user-open-uid="', uid, '">',
+                '<tr class="admin-user-row', expanded ? ' is-expanded' : '',
+                  '" data-user-row-uid="', uid, '">',
+                  '<td><button class="admin-user-open" type="button" data-user-open-uid="', uid,
+                    '" aria-expanded="', expanded ? 'true' : 'false',
+                    '" aria-controls="', detailsId, '">',
                     '<strong>', name, '</strong>',
                     '<small>', escapeHtml(user.email || "Email unavailable"),
                     user.isAdmin ? ' · Administrator' : '', '</small>',
@@ -1302,8 +1283,23 @@
                   '<td><span class="admin-user-status', user.disabled ? ' is-banned' : '', '">', status, '</span></td>',
                   '<td>', user.emailVerified ? 'Yes' : 'No', '</td>',
                   '<td><button class="admin-user-more" type="button" data-user-open-uid="', uid,
-                    '" aria-label="View details for ', name, '" title="View user details">⋯</button></td>',
-                '</tr>'
+                    '" aria-expanded="', expanded ? 'true' : 'false',
+                    '" aria-controls="', detailsId,
+                    '" aria-label="', expanded ? 'Hide details for ' : 'View details for ',
+                    name, '" title="', expanded ? 'Hide user details' : 'View user details', '">',
+                    expanded ? '⌃' : '⋯', '</button></td>',
+                '</tr>',
+                expanded ? [
+                  '<tr class="admin-user-expanded-row"><td colspan="4">',
+                    '<section class="admin-user-inline-detail" id="', detailsId, '" aria-label="User details">',
+                      '<div class="admin-user-inline-header">',
+                        '<h3>User details</h3>',
+                        '<button class="admin-user-inline-close" type="button" data-close-user-detail>Hide details</button>',
+                      '</div>',
+                      renderUserDetails(user),
+                    '</section>',
+                  '</td></tr>'
+                ].join("") : ""
               ].join("");
             }).join(""),
           '</tbody>',
@@ -1319,17 +1315,7 @@
       userNext.disabled = userPage === pageCount;
     }
 
-    if (selectedUserUid && !userDrawer.hidden) {
-      const selected = users.find(function (user) {
-        return String(user.uid) === selectedUserUid;
-      });
 
-      if (selected) {
-        renderUserDetails(selected);
-      } else {
-        closeUserDrawer(false);
-      }
-    }
   }
 
   function renderDashboard() {
@@ -1427,44 +1413,6 @@
   userNext.addEventListener("click", function () {
     userPage += 1;
     renderUsers();
-  });
-
-  userDrawer.addEventListener("click", function (event) {
-    if (event.target.closest("[data-close-user-detail]")) {
-      closeUserDrawer();
-    }
-  });
-
-  userDrawer.addEventListener("keydown", function (event) {
-    if (userDrawer.hidden) return;
-
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeUserDrawer();
-      return;
-    }
-
-    if (event.key !== "Tab") return;
-
-    const focusable = Array.from(
-      userDrawerPanel.querySelectorAll("button:not(:disabled)")
-    );
-    if (!focusable.length) {
-      event.preventDefault();
-      return;
-    }
-
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-
-    if (event.shiftKey && (document.activeElement === first ||
-      document.activeElement === userDrawerPanel)) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
   });
 
   reportList.addEventListener("click", function (event) {
@@ -1623,9 +1571,27 @@
   });
 
   usersPanel.addEventListener("click", function (event) {
+    if (event.target.closest("[data-close-user-detail]")) {
+      const uid = selectedUserUid;
+      selectedUserUid = "";
+      renderUsers();
+      const trigger = Array.from(userList.querySelectorAll("[data-user-open-uid]"))
+        .find(function (button) {
+          return button.dataset.userOpenUid === uid;
+        });
+      if (trigger) trigger.focus({ preventScroll: true });
+      return;
+    }
+
     const openButton = event.target.closest("[data-user-open-uid]");
     if (openButton) {
-      openUserDrawer(openButton.dataset.userOpenUid, openButton);
+      toggleUserDetails(openButton.dataset.userOpenUid);
+      return;
+    }
+
+    const userRow = event.target.closest(".admin-user-row[data-user-row-uid]");
+    if (userRow) {
+      toggleUserDetails(userRow.dataset.userRowUid);
       return;
     }
 
