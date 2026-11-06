@@ -83,7 +83,6 @@
 
     .home-hero > div {
       width: 100%;
-      max-width: 720px;
     }
 
     .home-kicker {
@@ -98,7 +97,7 @@
 
     .home-hero h1 {
       max-width: 760px;
-      margin-bottom: 20px;
+      margin-bottom: 0;
       color: #171717;
       font-size: clamp(44px, 7vw, 82px);
       font-weight: 600;
@@ -108,7 +107,7 @@
 
     .home-hero-copy {
       max-width: 610px;
-      margin-bottom: 32px;
+      margin-bottom: 0;
       color: rgba(23, 23, 23, 0.66);
       font-size: 16px;
       font-weight: 400;
@@ -896,11 +895,16 @@
 
     <section class="home-hero">
       <div>
-        <p class="home-kicker">Built for AUC students</p>
-        <h1>Know before you enroll.</h1>
-        <p class="home-hero-copy">
-          Search professors, courses, and student-uploaded material in one place.
-        </p>
+        <div class="home-section-head">
+          <div>
+            <p class="home-kicker">Built for AUC students</p>
+            <h1>Know before you enroll.</h1>
+          </div>
+
+          <p class="home-hero-copy">
+            Search professors, courses, and student-uploaded material in one place.
+          </p>
+        </div>
 
         <form class="atlas-search" id="atlas-search-form" role="search" autocomplete="off" novalidate>
           <input
