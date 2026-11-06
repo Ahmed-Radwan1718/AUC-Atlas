@@ -212,7 +212,7 @@
     userDrawer.querySelector(".admin-user-drawer-panel");
   const userDetailContent =
     document.getElementById("admin-user-detail-content");
-  const userPageSize = 25;
+  const userPageSize = Number.MAX_SAFE_INTEGER;
   let userPage = 1;
   let selectedUserUid = "";
   let userDetailTrigger = null;
