@@ -28,38 +28,38 @@
     }
 
     .gpa-inner {
-      width: min(980px, calc(100% - 32px));
+      width: min(1200px, calc(100% - 32px));
       margin: 0 auto;
     }
 
     .gpa-header {
       width: 100%;
-      margin: 0 auto 24px;
+      margin: 0 auto 38px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
       gap: 28px;
-      align-items: center;
+      align-items: end;
       text-align: left;
     }
 
     .gpa-header h1 {
-      max-width: 520px;
+      max-width: 640px;
       margin: 0;
       color: #171717;
-      font-size: clamp(30px, 3.2vw, 46px);
-      font-weight: 600;
-      line-height: 1.05;
+      font-size: clamp(26px, 3vw, 40px);
+      font-weight: 700;
+      line-height: 1.08;
       text-transform: uppercase;
     }
 
     .gpa-header p {
-      max-width: 430px;
-      margin: 0 0 0 auto;
+      max-width: 420px;
+      margin: 0;
       color: rgba(23, 23, 23, 0.66);
-      font-size: 15px;
+      font-size: 17px;
       font-weight: 400;
-      line-height: 1.6;
-      text-align: right;
+      line-height: 1.7;
+      text-align: left;
     }
 
     .gpa-layout {
@@ -78,20 +78,20 @@
     }
 
     .gpa-loading {
-      min-height: 318px;
-      padding: 22px;
-      border: 1px solid rgba(23, 23, 23, 0.1);
-      border-radius: 28px;
-      background: rgba(255, 255, 255, 0.76);
-      box-shadow: 0 24px 70px rgba(42, 32, 20, 0.1);
-      color: rgba(23, 23, 23, 0.58);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      min-height: 130px;
+      padding: 24px 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: none;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: flex-start;
+      justify-content: flex-start;
       gap: 12px;
     }
 
@@ -756,7 +756,7 @@
       }
 
       .gpa-inner {
-        width: min(100% - 24px, 980px);
+        width: calc(100% - 24px);
       }
 
       .gpa-header {
@@ -1157,6 +1157,153 @@
         width: 100%;
       }
     }
+
+    /* Shared editorial hierarchy from the Courses and Professors pages. */
+    .gpa-layout {
+      gap: 34px;
+    }
+
+    .gpa-panel {
+      max-width: 1080px;
+    }
+
+    .gpa-section-heading {
+      margin-bottom: 22px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      align-items: end;
+      gap: 28px;
+    }
+
+    .gpa-section-heading h2 {
+      margin: 0;
+      color: #171717;
+      font-size: clamp(24px, 2.8vw, 32px);
+      font-weight: 700;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .gpa-section-heading p {
+      max-width: 420px;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.65;
+    }
+
+    .gpa-summary {
+      padding-top: 22px;
+      padding-bottom: 30px;
+      border-top: 1px solid rgba(23, 23, 23, 0.09);
+    }
+
+    .summary-label {
+      color: #b48a4f;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+    }
+
+    .summary-items {
+      gap: 24px;
+    }
+
+    .summary-item strong {
+      color: rgba(23, 23, 23, 0.55);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+    }
+
+    .gpa-semester {
+      padding: 10px 0 28px;
+    }
+
+    .gpa-semester-header {
+      margin-bottom: 22px;
+    }
+
+    .gpa-table-head {
+      border-bottom: 0;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .gpa-row {
+      padding: 7px 0;
+    }
+
+    .gpa-row input,
+    .grade-toggle {
+      min-height: 50px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.76);
+    }
+
+    .gpa-actions {
+      padding-top: 4px;
+    }
+
+    @media (max-width: 760px) {
+      .gpa-header,
+      .gpa-section-heading {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+      }
+
+      .gpa-header {
+        margin-bottom: 30px;
+      }
+
+      .gpa-header p,
+      .gpa-section-heading p {
+        max-width: 620px;
+        margin: 0;
+        text-align: left;
+      }
+
+      .gpa-summary {
+        padding-top: 20px;
+      }
+
+      .gpa-layout {
+        gap: 28px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .gpa-section-heading {
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      .gpa-section-heading h2 {
+        font-size: 26px;
+      }
+
+      .gpa-section-heading p {
+        font-size: 14px;
+      }
+
+      .gpa-header {
+        margin-bottom: 28px;
+      }
+
+      .gpa-summary {
+        padding-top: 18px;
+        padding-bottom: 24px;
+      }
+
+      .summary-items {
+        gap: 18px 14px;
+      }
+
+      .gpa-row {
+        padding: 8px 0;
+      }
+    }
   </style>
 </head>
 
@@ -1178,6 +1325,11 @@
 
       <section class="gpa-layout" aria-label="GPA calculator">
         <section class="gpa-panel">
+          <div class="gpa-section-heading">
+            <h2>Your semesters</h2>
+            <p>Organize your courses by term. Your GPA updates as you enter grades.</p>
+          </div>
+
           <div class="gpa-semesters" id="gpa-semesters">
             <div class="gpa-loading" role="status" aria-live="polite">
               <span class="gpa-loading-spinner" aria-hidden="true"></span>
