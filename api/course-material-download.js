@@ -110,11 +110,6 @@ module.exports = async function handler(req, res) {
     const source = await getMaterialDownloadSource(material);
     const disposition = inline ? "inline" : "attachment";
     const safeAsciiFilename = filename.replace(/[^\x20-\x7e]/g, "_").replace(/["\\]/g, "_");
-    res.setHeader(
-      "Content-Disposition",
-      disposition + '; filename="' + safeAsciiFilename + '"; filename*=UTF-8\'\'' + encodeURIComponent(filename)
-    );
-
     if (!inline) {
       const destination = new URL(source.url);
       if (source.provider === "imagekit") {
@@ -122,6 +117,11 @@ module.exports = async function handler(req, res) {
       }
       return res.redirect(302, destination.toString());
     }
+
+    res.setHeader(
+      "Content-Disposition",
+      disposition + '; filename="' + safeAsciiFilename + '"; filename*=UTF-8\'\'' + encodeURIComponent(filename)
+    );
 
     const upstream = await fetch(source.inlineUrl || source.url, {
       redirect: "follow",
