@@ -826,6 +826,15 @@
       align-items: start;
     }
 
+    .professors-grid.professor-profile-grid .professor-profile-main {
+      min-width: 0;
+      display: grid;
+      align-content: start;
+      gap: 18px;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
     .professors-grid.professor-profile-grid .professor-profile-card {
       width: 100%;
       margin: 0;
@@ -837,7 +846,7 @@
       width: 100%;
       margin: 0;
       grid-column: 2;
-      grid-row: 1 / span 2;
+      grid-row: 1;
     }
 
     .professors-grid.professor-profile-grid .professor-reviews-section {
@@ -2409,10 +2418,18 @@
         grid-template-columns: 1fr;
       }
 
-      .professors-grid.professor-profile-grid .professor-review-insights,
+      .professors-grid.professor-profile-grid .professor-profile-main {
+        display: contents;
+      }
+
+      .professors-grid.professor-profile-grid .professor-review-insights {
+        grid-column: 1;
+        grid-row: 2;
+      }
+
       .professors-grid.professor-profile-grid .professor-reviews-section {
-        grid-column: auto;
-        grid-row: auto;
+        grid-column: 1;
+        grid-row: 3;
       }
 
       .professor-profile-card {
@@ -3629,6 +3646,7 @@ function getProfessorUrl(professor) {
     }
 
     grid.innerHTML = `
+      <div class="professor-profile-main">
       <article class="professor-profile-card">
         <div class="professor-profile-image">
           <img src="${escapeHtml(professor.image || "user.png")}" alt="${escapeHtml(professor.name)}">
@@ -3860,20 +3878,6 @@ function getProfessorUrl(professor) {
         </div>
       </article>
 
-      <section class="professor-review-insights" aria-label="Review stats for ${escapeHtml(professor.name)}">
-        <div class="professor-review-insights-header">
-          <div>
-            <span>Review stats</span>
-            <h2>Class patterns</h2>
-          </div>
-          <p id="professor-review-stats-count">Based on review choices</p>
-        </div>
-
-        <div class="professor-review-stats" id="professor-review-stats">
-          <p class="professor-review-status">Loading review stats...</p>
-        </div>
-      </section>
-
       <section class="professor-reviews-section" aria-label="Student reviews for ${escapeHtml(professor.name)}">
         <div class="professor-reviews-header">
           <div>
@@ -3885,6 +3889,21 @@ function getProfessorUrl(professor) {
 
         <div class="professor-reviews-list" id="professor-reviews-list">
           <p class="professor-review-status">Loading reviews...</p>
+        </div>
+      </section>
+      </div>
+
+      <section class="professor-review-insights" aria-label="Review stats for ${escapeHtml(professor.name)}">
+        <div class="professor-review-insights-header">
+          <div>
+            <span>Review stats</span>
+            <h2>Class patterns</h2>
+          </div>
+          <p id="professor-review-stats-count">Based on review choices</p>
+        </div>
+
+        <div class="professor-review-stats" id="professor-review-stats">
+          <p class="professor-review-status">Loading review stats...</p>
         </div>
       </section>
     `;
