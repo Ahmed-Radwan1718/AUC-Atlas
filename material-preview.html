@@ -193,7 +193,9 @@
         }
 
         try {
-          const response = await fetch(fileUrl.href, {
+          const inlineUrl = new URL(fileUrl.href);
+          inlineUrl.searchParams.set("disposition", "inline");
+          const response = await fetch(inlineUrl.href, {
             credentials: "same-origin",
             cache: "no-store"
           });
