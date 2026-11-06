@@ -1830,24 +1830,27 @@
       cursor: pointer;
     }
 
-    .admin-user-table tbody tr.admin-user-row.is-expanded {
-      background: rgba(192, 154, 92, 0.055);
+    .admin-user-table tbody tr.admin-user-row.is-expanded,
+    .admin-user-table tbody tr.admin-user-row.is-expanded:hover {
+      background: transparent;
     }
 
     .admin-user-table tbody tr.admin-user-expanded-row,
     .admin-user-table tbody tr.admin-user-expanded-row:hover {
-      background: rgba(255, 255, 255, 0.52);
+      background: transparent;
     }
 
     .admin-user-table .admin-user-expanded-row > td {
       width: 100%;
-      padding: 0 16px 24px;
+      padding: 0 10px 26px;
       border-bottom: 1px solid rgba(23, 23, 23, 0.12);
+      background: transparent;
       text-align: left;
     }
 
     .admin-user-inline-detail {
-      padding: 18px 0 0;
+      padding: 22px 0 0;
+      background: transparent;
       animation: adminPanelIn 0.2s ease;
     }
 
@@ -1929,14 +1932,42 @@
     }
 
     .admin-user-inline-detail .admin-user-actions {
-      margin-top: 20px;
+      margin-top: 22px;
+      align-items: center;
+      gap: 24px;
     }
 
     .admin-user-inline-detail .admin-user-actions .admin-button {
-      min-height: 38px;
-      border-radius: 10px;
-      letter-spacing: 0.02em;
+      min-height: 0;
+      padding: 4px 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      color: rgba(23, 23, 23, 0.72);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
       text-transform: none;
+      transform: none;
+    }
+
+    .admin-user-inline-detail .admin-user-actions .admin-button.danger {
+      color: #ad2525;
+    }
+
+    .admin-user-inline-detail .admin-user-actions .admin-button:hover:not(:disabled) {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transform: none;
+    }
+
+    .admin-user-inline-detail .admin-user-actions .admin-button:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 5px;
     }
 
     .admin-user-inline-detail .admin-user-actions .admin-item-copy {
