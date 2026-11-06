@@ -6882,14 +6882,25 @@ list.innerHTML = professors.map(function (professor) {
                 aria-hidden="true"
               >
             `
-            : `
-              <span
-                class="course-material-file-icon"
-                aria-hidden="true"
-              >
-                <strong>${extensionLabel}</strong>
-              </span>
-            `;
+            : ["ppt", "pptx"].includes(
+                extension
+              )
+              ? `
+                <img
+                  class="course-material-file-icon-image"
+                  src="ppt.png"
+                  alt=""
+                  aria-hidden="true"
+                >
+              `
+              : `
+                <span
+                  class="course-material-file-icon"
+                  aria-hidden="true"
+                >
+                  <strong>${extensionLabel}</strong>
+                </span>
+              `;
 
       const previewDataAttributes = [
         'data-download-url="' +
@@ -7040,22 +7051,13 @@ list.innerHTML = professors.map(function (professor) {
     }
 
     function buildGroupMetadata(material) {
-      const uploadDate =
-        formatMaterialUploadDate(
-          material.createdAt
-        ).replace(
-          /^Uploaded\s+/,
-          ""
-        );
-
       return [
         material.professor ||
           "Professor not listed",
         material.semester ||
           "Semester not listed",
         material.uploaderDisplayName ||
-          "AUC student",
-        uploadDate
+          "AUC student"
       ]
         .map(function (value) {
           return escapeMaterialText(value);
