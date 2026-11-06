@@ -1981,12 +1981,12 @@
       }
     }
 
-    /* Uploaded content: flat list instead of nested cards. */
-    #admin-panel-materials .admin-list {
+    /* Uploaded content and professor reviews: flat lists instead of cards. */
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-list {
       gap: 0;
     }
 
-    #admin-panel-materials .admin-item {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-item {
       padding: 19px 4px 20px;
       border: 0;
       border-bottom: 1px solid rgba(23, 23, 23, 0.12);
@@ -1999,32 +1999,32 @@
       transform: none;
     }
 
-    #admin-panel-materials .admin-item:first-child {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-item:first-child {
       padding-top: 4px;
     }
 
-    #admin-panel-materials .admin-item:hover {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-item:hover {
       border-color: rgba(23, 23, 23, 0.12);
       background: transparent;
       box-shadow: none;
       transform: none;
     }
 
-    #admin-panel-materials .admin-item-main {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-item-main {
       gap: 8px;
     }
 
-    #admin-panel-materials .admin-item-title {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-item-title {
       font-size: 16px;
       font-weight: 700;
     }
 
-    #admin-panel-materials .admin-meta {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-meta {
       gap: 4px 8px;
       align-items: baseline;
     }
 
-    #admin-panel-materials .admin-meta span {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-meta span {
       padding: 0;
       border: 0;
       border-radius: 0;
@@ -2037,24 +2037,24 @@
       text-transform: none;
     }
 
-    #admin-panel-materials .admin-meta span + span::before {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-meta span + span::before {
       content: "·";
       margin-right: 8px;
       color: rgba(23, 23, 23, 0.3);
     }
 
-    #admin-panel-materials .admin-item-copy {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-item-copy {
       font-size: 12px;
       line-height: 1.5;
       color: rgba(23, 23, 23, 0.6);
     }
 
-    #admin-panel-materials .admin-item-actions {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-item-actions {
       padding-top: 2px;
       align-items: flex-start;
     }
 
-    #admin-panel-materials .admin-button.danger {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-button.danger {
       min-height: 34px;
       padding: 0 9px;
       border: 0;
@@ -2067,31 +2067,31 @@
       white-space: nowrap;
     }
 
-    #admin-panel-materials .admin-button.danger:hover,
-    #admin-panel-materials .admin-button.danger:focus-visible {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-button.danger:hover,
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-button.danger:focus-visible {
       border: 0;
       background: rgba(199, 54, 54, 0.07);
       color: #9c2020;
       transform: none;
     }
 
-    #admin-panel-materials .admin-button.danger:focus-visible {
+    :is(#admin-panel-materials, #admin-panel-reviews) .admin-button.danger:focus-visible {
       outline: 2px solid rgba(173, 37, 37, 0.44);
       outline-offset: 2px;
     }
 
     @media (max-width: 720px) {
-      #admin-panel-materials .admin-item {
+      :is(#admin-panel-materials, #admin-panel-reviews) .admin-item {
         grid-template-columns: minmax(0, 1fr);
         gap: 8px;
         padding: 18px 2px;
       }
 
-      #admin-panel-materials .admin-item-actions {
+      :is(#admin-panel-materials, #admin-panel-reviews) .admin-item-actions {
         justify-content: flex-start;
       }
 
-      #admin-panel-materials .admin-button.danger {
+      :is(#admin-panel-materials, #admin-panel-reviews) .admin-button.danger {
         padding-left: 0;
       }
     }
