@@ -7129,11 +7129,6 @@ list.innerHTML = professors.map(function (professor) {
     function buildMultiFileGroup(group) {
       const material = group.material;
       const files = group.files;
-      const firstFileView = getFileView(
-        files[0],
-        material,
-        files
-      );
       const title =
         escapeMaterialText(
           material.title ||
@@ -7185,7 +7180,11 @@ list.innerHTML = professors.map(function (professor) {
           <summary
             class="course-material-group-summary"
           >
-            ${firstFileView.fileIcon}
+            <span class="course-material-folder-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              </svg>
+            </span>
 
             <span class="course-material-group-copy">
               <span
