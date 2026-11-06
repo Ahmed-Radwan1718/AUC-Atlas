@@ -980,7 +980,7 @@
         </div>
 
         <p>
-          Check the newest professor reviews, student-uploaded course materials, and professors with the highest student ratings.
+          Check professors with the lowest and highest student ratings, alongside newly uploaded course materials.
         </p>
       </div>
 
@@ -988,14 +988,14 @@
         <article class="home-latest-card">
           <div class="home-latest-card-head">
             <div>
-              <h3>Recent reviews</h3>
+              <h3>Lowest rated professors</h3>
             </div>
 
             <a href="professors.html">View all →</a>
           </div>
 
-          <div class="home-latest-list" id="home-latest-reviews">
-            <p class="home-latest-status">Loading recent reviews...</p>
+          <div class="home-latest-list" id="home-lowest-professors">
+            <p class="home-latest-status">Loading lowest-rated professors...</p>
           </div>
         </article>
 
@@ -1041,7 +1041,7 @@
       const courseCount = document.getElementById("home-course-count");
       const reviewCount = document.getElementById("home-review-count");
       const weeklyVisitCount = document.getElementById("home-weekly-visit-count");
-      const latestReviewsRoot = document.getElementById("home-latest-reviews");
+      const lowestProfessorsRoot = document.getElementById("home-lowest-professors");
       const latestMaterialsRoot = document.getElementById("home-latest-materials");
       const latestProfessorsRoot = document.getElementById("home-latest-professors");
 
@@ -1146,8 +1146,8 @@
         }).format(date);
       }
 
-      function renderTopReviewedProfessors(summaries) {
-        if (!latestProfessorsRoot) {
+      function renderRatedProfessors(summaries, targetRoot, lowestFirst) {
+        if (!targetRoot) {
           return;
         }
 
@@ -1165,7 +1165,7 @@
           }
         });
 
-        const topProfessors = (
+        const rankedProfessors = (
           Array.isArray(summaries)
             ? summaries
             : []
@@ -1209,33 +1209,26 @@
           })
           .filter(Boolean)
           .sort(function (a, b) {
-            if (
-              b.averageRating !==
-              a.averageRating
-            ) {
-              return (
-                b.averageRating -
-                a.averageRating
-              );
+            if (a.averageRating !== b.averageRating) {
+              return lowestFirst
+                ? a.averageRating - b.averageRating
+                : b.averageRating - a.averageRating;
             }
 
-            return (
-              b.reviewCount -
-              a.reviewCount
-            );
+            return b.reviewCount - a.reviewCount;
           })
           .slice(0, 3);
 
-        if (!topProfessors.length) {
-          latestProfessorsRoot.innerHTML = `
+        if (!rankedProfessors.length) {
+          targetRoot.innerHTML = `
             <p class="home-latest-status">
-              Top-reviewed professors will appear here once ratings are available.
+              ${lowestFirst ? "Lowest-rated" : "Top-reviewed"} professors will appear here once ratings are available.
             </p>
           `;
           return;
         }
 
-        latestProfessorsRoot.innerHTML = topProfessors.map(function (item) {
+        targetRoot.innerHTML = rankedProfessors.map(function (item) {
           const professor = item.professor;
           const department =
             professor.displayDepartment ||
@@ -1268,84 +1261,6 @@
                 </small>
               </span>
               <span class="home-latest-arrow" aria-hidden="true">→</span>
-            </a>
-          `;
-        }).join("");
-      }
-
-      function renderLatestReviews(reviews) {
-        if (!latestReviewsRoot) {
-          return;
-        }
-
-        const safeReviews = Array.isArray(reviews)
-          ? reviews.slice(0, 3)
-          : [];
-
-        if (!safeReviews.length) {
-          latestReviewsRoot.innerHTML = `
-            <p class="home-latest-status">
-              The newest professor reviews will appear here.
-            </p>
-          `;
-          return;
-        }
-
-        latestReviewsRoot.innerHTML = safeReviews.map(function (review) {
-          const rating = Math.max(
-            0,
-            Math.min(
-              5,
-              Math.round(Number(review.rating) || 0)
-            )
-          );
-          const stars =
-            "★".repeat(rating) +
-            "☆".repeat(5 - rating);
-          const professorId = String(
-            review.professorId || ""
-          );
-          const professor = professors.find(function (item) {
-            return (
-              item &&
-              String(item.id || "") === professorId
-            );
-          });
-          const professorName =
-            review.professorName ||
-            (professor && professor.name) ||
-            "AUC professor";
-          const professorImage =
-            professor && professor.image
-              ? professor.image
-              : "user.png";
-const professorHref = professorId
-  ? "/professors/" +
-    encodeURIComponent(professorId)
-  : "/professors";
-
-          return `
-            <a class="home-latest-item home-latest-person" href="${professorHref}">
-              <img src="${escapeHomeText(professorImage)}" alt="">
-
-              <span class="home-latest-person-copy">
-                <span class="home-latest-item-top">
-                  <span class="home-latest-type" aria-hidden="true"></span>
-                  <small>${escapeHomeText(formatHomeDate(review.createdAt))}</small>
-                </span>
-
-                <strong>${escapeHomeText(professorName)}</strong>
-
-                <span class="home-latest-item-bottom">
-                  <small>
-                    ${escapeHomeText(review.courseCode || "Course not listed")}
-                  </small>
-                  <span
-                    class="home-latest-stars"
-                    aria-label="${rating} out of 5 stars"
-                  >${stars}</span>
-                </span>
-              </span>
             </a>
           `;
         }).join("");
@@ -1481,10 +1396,16 @@ const materialHref = materialCourseSlug
         })
         .then(function (data) {
           setHomeCount(reviewCount, data.reviewCount);
-          renderLatestReviews(data.latestReviews);
+          renderRatedProfessors(
+            data.lowestRatedProfessors,
+            lowestProfessorsRoot,
+            true
+          );
           renderLatestMaterials(data.latestMaterials);
-          renderTopReviewedProfessors(
-            data.topReviewedProfessors
+          renderRatedProfessors(
+            data.topReviewedProfessors,
+            latestProfessorsRoot,
+            false
           );
         })
         .catch(function () {
@@ -1492,9 +1413,9 @@ const materialHref = materialCourseSlug
             reviewCount.textContent = "—";
           }
 
-          renderLatestReviews([]);
+          renderRatedProfessors([], lowestProfessorsRoot, true);
           renderLatestMaterials([]);
-          renderTopReviewedProfessors([]);
+          renderRatedProfessors([], latestProfessorsRoot, false);
         });
     })();
   </script>
