@@ -80,14 +80,7 @@ async function getLatestReviews(limit) {
   return reviews;
 }
 
-async function getTopReviewedProfessors(limit) {
-  const safeLimit = Math.max(
-    1,
-    Math.min(
-      24,
-      Math.floor(Number(limit) || 12)
-    )
-  );
+async function getReviewedProfessorRankings() {
   const snapshot = await admin.firestore()
     .collection("professorReviews")
     .select(
@@ -161,8 +154,7 @@ async function getTopReviewedProfessors(limit) {
       return a.professorName.localeCompare(
         b.professorName
       );
-    })
-    .slice(0, safeLimit);
+    });
 }
 
 async function getLatestMaterials(limit) {
@@ -232,7 +224,7 @@ module.exports = async function handler(req, res) {
       materialCountSnapshot,
       latestReviews,
       latestMaterials,
-      topReviewedProfessors
+      reviewedProfessorRankings
     ] = await Promise.all([
       db.collection("professorReviews")
         .count()
@@ -243,7 +235,7 @@ module.exports = async function handler(req, res) {
         .get(),
       getLatestReviews(3),
       getLatestMaterials(3),
-      getTopReviewedProfessors(12)
+      getReviewedProfessorRankings()
     ]);
 
     res.setHeader(
@@ -260,7 +252,19 @@ module.exports = async function handler(req, res) {
       ),
       latestReviews,
       latestMaterials,
-      topReviewedProfessors
+      topReviewedProfessors: reviewedProfessorRankings.slice(0, 12),
+      lowestRatedProfessors: reviewedProfessorRankings
+        .slice()
+        .sort(function (a, b) {
+          if (a.averageRating !== b.averageRating) {
+            return a.averageRating - b.averageRating;
+          }
+          if (a.reviewCount !== b.reviewCount) {
+            return b.reviewCount - a.reviewCount;
+          }
+          return a.professorName.localeCompare(b.professorName);
+        })
+        .slice(0, 3)
     });
   } catch (error) {
     return res.status(500).json({
