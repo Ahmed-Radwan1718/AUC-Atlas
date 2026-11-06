@@ -3360,8 +3360,8 @@
     }
 
     .courses-header {
-      max-width: none;
-      margin: 0 0 24px;
+      max-width: 1000px;
+      margin: 0 auto 24px;
       grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
       gap: 28px;
       align-items: end;
@@ -3418,8 +3418,8 @@
     .courses-search-box {
       position: relative;
       z-index: 60;
-      width: 70%;
-      margin: 0;
+      width: min(70%, 700px);
+      margin: 0 0 0 max(0px, calc((100% - 1000px) / 2));
     }
 
     .courses-search-box input {
@@ -3481,6 +3481,11 @@
     .course-home-section {
       padding-top: 34px;
       border-top: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .course-home-section:first-child {
+      max-width: 1000px;
+      margin: 0 auto;
     }
 
     .course-section-heading {
