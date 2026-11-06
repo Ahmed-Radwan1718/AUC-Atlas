@@ -3896,7 +3896,6 @@ function getProfessorUrl(professor) {
       <section class="professor-review-insights" aria-label="Review stats for ${escapeHtml(professor.name)}">
         <div class="professor-review-insights-header">
           <div>
-            <span>Review stats</span>
             <h2>Class patterns</h2>
           </div>
           <p id="professor-review-stats-count">Based on review choices</p>
