@@ -4374,6 +4374,38 @@
       margin-inline: auto;
     }
 
+    .course-home-section[aria-labelledby="recent-materials-title"] .course-section-heading {
+      max-width: none;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .course-home-section[aria-labelledby="recent-materials-title"] .course-section-heading h2 {
+      margin-bottom: 0;
+    }
+
+    .course-home-section[aria-labelledby="recent-materials-title"] .course-section-heading p {
+      flex: 0 1 420px;
+      max-width: 420px;
+      margin: 0;
+      text-align: left;
+    }
+
+    @media (max-width: 900px) {
+      .course-home-section[aria-labelledby="recent-materials-title"] .course-section-heading {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .course-home-section[aria-labelledby="recent-materials-title"] .course-section-heading p {
+        flex-basis: auto;
+        max-width: 620px;
+      }
+    }
+
     /* Search and popular courses: compact, aligned layouts */
     .courses-header {
       width: min(1200px, 100%);
