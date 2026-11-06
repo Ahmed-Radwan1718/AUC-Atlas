@@ -5642,17 +5642,17 @@ list.innerHTML = professors.map(function (professor) {
 
       options.forEach(function (option) {
         const name = option.textContent.toLowerCase();
-        const matches = (isSemester && !terms.length) ||
-          (terms.length > 0 && terms.every(function (term) {
+        const matches = terms.length > 0 &&
+          terms.every(function (term) {
             return name.includes(term);
-          }));
+          });
         option.hidden = !matches;
         if (matches) matchCount += 1;
       });
 
       empty.hidden = !terms.length || matchCount > 0;
 
-      if (!terms.length && !isSemester) {
+      if (!terms.length) {
         closeResults(false);
         return;
       }
@@ -5661,10 +5661,6 @@ list.innerHTML = professors.map(function (professor) {
       choice.classList.add("open");
       input.setAttribute("aria-expanded", "true");
     }
-
-    input.addEventListener("focus", function () {
-      if (isSemester) renderMatches();
-    });
 
     input.addEventListener("input", function () {
       if (input.value !== select.value) {
