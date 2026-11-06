@@ -120,6 +120,23 @@
       box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.13);
     }
 
+    /* Keep browser-autofilled login fields white rather than blue. */
+    .auth-field input:-webkit-autofill,
+    .auth-field input:-webkit-autofill:hover,
+    .auth-field input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+      box-shadow: 0 0 0 1000px #ffffff inset;
+      -webkit-text-fill-color: #171717;
+      caret-color: #171717;
+    }
+
+    .auth-field input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 1000px #ffffff inset, 0 0 0 4px rgba(192, 154, 92, 0.13);
+      box-shadow: 0 0 0 1000px #ffffff inset, 0 0 0 4px rgba(192, 154, 92, 0.13);
+      -webkit-text-fill-color: #171717;
+      caret-color: #171717;
+    }
+
     .auth-password-input-wrap {
       position: relative;
     }
