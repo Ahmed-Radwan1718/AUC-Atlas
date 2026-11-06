@@ -4825,12 +4825,27 @@ function getProfessorUrl(professor) {
     document.title = "Professors | AUC Atlas";
 
     // Wait for review summaries before showing the first directory.
-    // Otherwise the cards appear with zero reviews, then reshuffle.
+    // Reserve the final grid layout instead of showing a small floating message.
     if (!professorReviewSummariesLoaded) {
-      grid.innerHTML =
-        '<p class="professors-empty" role="status" aria-live="polite">Loading professors and reviews...</p>';
+      grid.setAttribute("aria-busy", "true");
+      grid.setAttribute("aria-label", "Loading professors and reviews");
+      grid.innerHTML = Array.from({ length: 4 }, function () {
+        return [
+          '<div class="professor-loading-card" aria-hidden="true">',
+            '<div class="professor-loading-image"></div>',
+            '<div class="professor-loading-body">',
+              '<span class="professor-loading-line is-title"></span>',
+              '<span class="professor-loading-line is-detail"></span>',
+              '<span class="professor-loading-line is-short"></span>',
+            '</div>',
+          '</div>'
+        ].join("");
+      }).join("");
       return;
     }
+
+    grid.removeAttribute("aria-busy");
+    grid.setAttribute("aria-label", "Professor list");
 
     if (resetVisibleLimit) {
       professorVisibleLimit = professorPageSize;
