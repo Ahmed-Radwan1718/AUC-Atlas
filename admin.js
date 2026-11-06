@@ -194,6 +194,28 @@
     document.getElementById(
       "admin-user-list"
     );
+  const usersPanel =
+    document.getElementById("admin-panel-users");
+  const userCount =
+    document.getElementById("admin-user-count");
+  const userPagination =
+    document.getElementById("admin-user-pagination");
+  const userPageInfo =
+    document.getElementById("admin-user-page-info");
+  const userPrev =
+    document.getElementById("admin-user-prev");
+  const userNext =
+    document.getElementById("admin-user-next");
+  const userDrawer =
+    document.getElementById("admin-user-drawer");
+  const userDrawerPanel =
+    userDrawer.querySelector(".admin-user-drawer-panel");
+  const userDetailContent =
+    document.getElementById("admin-user-detail-content");
+  const userPageSize = 25;
+  let userPage = 1;
+  let selectedUserUid = "";
+  let userDetailTrigger = null;
   const toast =
     document.getElementById(
       "admin-toast"
@@ -493,6 +515,9 @@
   }
 
   function switchPanel(panelName) {
+    if (panelName !== "users" && !userDrawer.hidden) {
+      closeUserDrawer(false);
+    }
     state.activePanel = panelName;
 
     navButtons.forEach(function (button) {
@@ -1139,86 +1164,172 @@
     }).join("");
   }
 
-  function renderUsers() {
-    const users = Array.isArray(
-      state.dashboard.users
-    )
+  function closeUserDrawer(restoreFocus) {
+    const shouldRestore = restoreFocus !== false;
+    userDrawer.hidden = true;
+    selectedUserUid = "";
+
+    if (
+      shouldRestore &&
+      userDetailTrigger &&
+      document.contains(userDetailTrigger)
+    ) {
+      userDetailTrigger.focus();
+    }
+
+    userDetailTrigger = null;
+  }
+
+  function renderUserDetails(user) {
+    const status = user.disabled ? "Banned" : "Active";
+    const statusClass = user.disabled ? " is-banned" : "";
+    const details = [
+      ["Account status", status],
+      ["Email verified", user.emailVerified ? "Yes" : "No"],
+      ["Firebase UID", user.uid || "Unavailable"],
+      ["Major", user.major || "Not provided"],
+      ["AUC ID", user.aucId || "Not provided"],
+      ["Session records", user.activeSessionRecords == null ? "Not loaded" : user.activeSessionRecords],
+      ["Created", formatDate(user.createdAt)],
+      ["Last sign in", formatDate(user.lastSignInAt)],
+      ["Ban reason", user.banReason || "Not banned"]
+    ];
+
+    // Existing moderation permissions and confirmation flows are retained.
+    const moderation = user.isAdmin
+      ? '<p class="admin-item-copy">Administrator accounts are protected from moderation actions.</p>'
+      : [
+          '<div class="admin-user-actions">',
+            '<button class="admin-button ', user.disabled ? 'primary' : 'danger', '" type="button" data-user-ban-action="', user.disabled ? 'unban' : 'ban', '" data-user-uid="', escapeHtml(user.uid), '">', user.disabled ? 'Unban user' : 'Ban user', '</button>',
+            '<button class="admin-button" type="button" data-user-revoke-sessions="', escapeHtml(user.uid), '">Revoke all sessions</button>',
+          '</div>'
+        ].join("");
+
+    userDetailContent.innerHTML = [
+      '<div class="admin-user-drawer-identity">',
+        '<strong>', escapeHtml(user.displayName || user.email || user.uid || "User"), '</strong>',
+        '<p>', escapeHtml(user.email || "Email unavailable"), '</p>',
+        '<span class="admin-user-status', statusClass, '">', status, '</span>',
+        user.isAdmin ? ' <span class="admin-badge">Administrator</span>' : '',
+      '</div>',
+      '<dl class="admin-user-detail-rows">',
+        details.map(function (detail) {
+          return [
+            '<div class="admin-user-detail-line">',
+              '<dt>', escapeHtml(detail[0]), '</dt>',
+              '<dd>', escapeHtml(String(detail[1])), '</dd>',
+            '</div>'
+          ].join("");
+        }).join(""),
+      '</dl>',
+      moderation
+    ].join("");
+  }
+
+  function openUserDrawer(uid, trigger) {
+    const users = Array.isArray(state.dashboard && state.dashboard.users)
       ? state.dashboard.users
       : [];
-    const search = normalizeSearch(
-      userSearch.value
-    );
-    const filtered = users.filter(
-      function (user) {
-        return (
-          !search ||
-          normalizeSearch(
-            [
-              user.displayName,
-              user.email,
-              user.uid,
-              user.major,
-              user.aucId,
-              user.banReason
-            ].join(" ")
-          ).includes(search)
-        );
-      }
-    );
+    const user = users.find(function (entry) {
+      return String(entry.uid) === uid;
+    });
 
-    if (!filtered.length) {
-      userList.innerHTML =
-        '<div class="admin-empty">' +
-        (
-          search
-            ? "No registered users match this filter."
-            : "No registered Firebase users were found."
-        ) +
-        '</div>';
+    if (!user) {
       return;
     }
 
-    userList.innerHTML = filtered
-      .map(function (user) {
-        const statusBadge = user.disabled
-          ? '<span class="admin-badge is-danger">Banned</span>'
-          : '<span class="admin-badge is-success">Active</span>';
-        const adminBadge = user.isAdmin
-          ? '<span class="admin-badge">Administrator</span>'
-          : '';
-        const moderationButtons = user.isAdmin
-          ? '<p class="admin-item-copy">Administrator accounts are protected from moderation actions.</p>'
-          : [
-              '<div class="admin-user-actions">',
-                '<button class="admin-button ', user.disabled ? 'primary' : 'danger', '" type="button" data-user-ban-action="', user.disabled ? 'unban' : 'ban', '" data-user-uid="', escapeHtml(user.uid), '">', user.disabled ? 'Unban user' : 'Ban user', '</button>',
-                '<button class="admin-button" type="button" data-user-revoke-sessions="', escapeHtml(user.uid), '">Revoke all sessions</button>',
-              '</div>'
-            ].join("");
+    selectedUserUid = uid;
+    userDetailTrigger = trigger;
+    renderUserDetails(user);
+    userDrawer.hidden = false;
+    userDrawerPanel.focus();
+  }
 
-        return [
-          '<article class="admin-user-result">',
-            '<div class="admin-user-head">',
-              '<div>',
-                '<h3>', escapeHtml(user.displayName || user.email || user.uid), '</h3>',
-                '<p class="admin-item-copy">', escapeHtml(user.email || "Email unavailable"), '</p>',
-              '</div>',
-              '<div class="admin-meta">', statusBadge, adminBadge, '</div>',
-            '</div>',
-            '<div class="admin-user-details">',
-              '<div class="admin-user-detail"><span>Firebase UID</span><strong>', escapeHtml(user.uid), '</strong></div>',
-              '<div class="admin-user-detail"><span>Email verified</span><strong>', user.emailVerified ? 'Yes' : 'No', '</strong></div>',
-              '<div class="admin-user-detail"><span>Major</span><strong>', escapeHtml(user.major || "Not provided"), '</strong></div>',
-              '<div class="admin-user-detail"><span>AUC ID</span><strong>', escapeHtml(user.aucId || "Not provided"), '</strong></div>',
-              '<div class="admin-user-detail"><span>Session records</span><strong>', user.activeSessionRecords === null ? 'Not loaded' : escapeHtml(user.activeSessionRecords), '</strong></div>',
-              '<div class="admin-user-detail"><span>Created</span><strong>', escapeHtml(formatDate(user.createdAt)), '</strong></div>',
-              '<div class="admin-user-detail"><span>Last sign in</span><strong>', escapeHtml(formatDate(user.lastSignInAt)), '</strong></div>',
-              '<div class="admin-user-detail"><span>Ban reason</span><strong>', escapeHtml(user.banReason || "Not banned"), '</strong></div>',
-            '</div>',
-            moderationButtons,
-          '</article>'
-        ].join("");
-      })
-      .join("");
+  function renderUsers() {
+    const users = Array.isArray(state.dashboard.users)
+      ? state.dashboard.users
+      : [];
+    const search = normalizeSearch(userSearch.value);
+    const filtered = users.filter(function (user) {
+      return !search || normalizeSearch([
+        user.displayName,
+        user.email,
+        user.uid,
+        user.major,
+        user.aucId,
+        user.banReason
+      ].join(" ")).includes(search);
+    });
+
+    userCount.textContent = search
+      ? filtered.length.toLocaleString("en-US") + " of " +
+        users.length.toLocaleString("en-US") + " registered accounts"
+      : users.length.toLocaleString("en-US") + " registered accounts";
+
+    if (!filtered.length) {
+      userList.innerHTML = '<div class="admin-empty">' +
+        (search
+          ? "No registered users match this filter."
+          : "No registered Firebase users were found.") +
+        '</div>';
+      userPagination.hidden = true;
+    } else {
+      const pageCount = Math.ceil(filtered.length / userPageSize);
+      userPage = Math.max(1, Math.min(userPage, pageCount));
+      const start = (userPage - 1) * userPageSize;
+      const displayed = filtered.slice(start, start + userPageSize);
+
+      userList.innerHTML = [
+        '<table class="admin-user-table">',
+          '<thead><tr>',
+            '<th scope="col">User</th>',
+            '<th scope="col">Status</th>',
+            '<th scope="col">Verified</th>',
+            '<th scope="col">Action</th>',
+          '</tr></thead>',
+          '<tbody>',
+            displayed.map(function (user) {
+              const uid = escapeHtml(user.uid);
+              const name = escapeHtml(user.displayName || user.email || user.uid || "Unnamed user");
+              const status = user.disabled ? "Banned" : "Active";
+              return [
+                '<tr>',
+                  '<td><button class="admin-user-open" type="button" data-user-open-uid="', uid, '">',
+                    '<strong>', name, '</strong>',
+                    '<small>', escapeHtml(user.email || "Email unavailable"),
+                    user.isAdmin ? ' · Administrator' : '', '</small>',
+                  '</button></td>',
+                  '<td><span class="admin-user-status', user.disabled ? ' is-banned' : '', '">', status, '</span></td>',
+                  '<td>', user.emailVerified ? 'Yes' : 'No', '</td>',
+                  '<td><button class="admin-user-more" type="button" data-user-open-uid="', uid,
+                    '" aria-label="View details for ', name, '" title="View user details">⋯</button></td>',
+                '</tr>'
+              ].join("");
+            }).join(""),
+          '</tbody>',
+        '</table>'
+      ].join("");
+
+      userPagination.hidden = filtered.length <= userPageSize;
+      userPageInfo.textContent =
+        (start + 1).toLocaleString("en-US") + "–" +
+        Math.min(start + userPageSize, filtered.length).toLocaleString("en-US") +
+        " of " + filtered.length.toLocaleString("en-US") + " users";
+      userPrev.disabled = userPage === 1;
+      userNext.disabled = userPage === pageCount;
+    }
+
+    if (selectedUserUid && !userDrawer.hidden) {
+      const selected = users.find(function (user) {
+        return String(user.uid) === selectedUserUid;
+      });
+
+      if (selected) {
+        renderUserDetails(selected);
+      } else {
+        closeUserDrawer(false);
+      }
+    }
   }
 
   function renderDashboard() {
@@ -1301,7 +1412,60 @@
   reportSearch.addEventListener("input", renderReports);
   reviewSearch.addEventListener("input", renderReviews);
   materialSearch.addEventListener("input", renderMaterials);
-  userSearch.addEventListener("input", renderUsers);
+  userSearch.addEventListener("input", function () {
+    userPage = 1;
+    renderUsers();
+  });
+
+  userPrev.addEventListener("click", function () {
+    if (userPage > 1) {
+      userPage -= 1;
+      renderUsers();
+    }
+  });
+
+  userNext.addEventListener("click", function () {
+    userPage += 1;
+    renderUsers();
+  });
+
+  userDrawer.addEventListener("click", function (event) {
+    if (event.target.closest("[data-close-user-detail]")) {
+      closeUserDrawer();
+    }
+  });
+
+  userDrawer.addEventListener("keydown", function (event) {
+    if (userDrawer.hidden) return;
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeUserDrawer();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+
+    const focusable = Array.from(
+      userDrawerPanel.querySelectorAll("button:not(:disabled)")
+    );
+    if (!focusable.length) {
+      event.preventDefault();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && (document.activeElement === first ||
+      document.activeElement === userDrawerPanel)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
 
   reportList.addEventListener("click", function (event) {
     const openButton = event.target.closest(
@@ -1458,7 +1622,13 @@
     });
   });
 
-  userList.addEventListener("click", function (event) {
+  usersPanel.addEventListener("click", function (event) {
+    const openButton = event.target.closest("[data-user-open-uid]");
+    if (openButton) {
+      openUserDrawer(openButton.dataset.userOpenUid, openButton);
+      return;
+    }
+
     const banButton = event.target.closest("[data-user-ban-action]");
     const revokeButton = event.target.closest("[data-user-revoke-sessions]");
 
