@@ -5607,8 +5607,8 @@ list.innerHTML = professors.map(function (professor) {
     function selectMatchingOption(option) {
       select.value = option.value;
       select.dispatchEvent(new Event("change", { bubbles: true }));
-      closeResults(false);
       input.focus();
+      closeResults(false);
     }
 
     Array.from(select.options).forEach(function (option) {
