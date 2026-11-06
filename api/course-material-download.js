@@ -106,8 +106,19 @@ module.exports = async function handler(req, res) {
     const contentType = doesMaterialMimeMatchFileName(filename, mimeFromRecord)
       ? mimeFromRecord
       : (MIME_BY_EXTENSION[extension] || "application/octet-stream");
-    const inline = String(req.query.disposition || "").toLowerCase() === "inline";
+    const previewMode = String(req.query.disposition || "").toLowerCase();
+    const inline = previewMode === "inline";
     const source = await getMaterialDownloadSource(material);
+
+    // Office's hosted viewer needs a short-lived URL it can retrieve itself.
+    // This endpoint is authenticated; no permanent public file link is exposed.
+    if (previewMode === "office-url") {
+      if (!["ppt", "pptx", "doc", "docx", "xls", "xlsx"].includes(extension)) {
+        return res.status(400).json({ error: "Office preview is not supported for this file." });
+      }
+      return res.status(200).json({ url: source.inlineUrl || source.url });
+    }
+
     const disposition = inline ? "inline" : "attachment";
     const safeAsciiFilename = filename.replace(/[^\x20-\x7e]/g, "_").replace(/["\\]/g, "_");
     if (!inline) {
