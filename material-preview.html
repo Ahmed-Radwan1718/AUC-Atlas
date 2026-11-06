@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Course file preview | AUC Atlas</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f7f4ee; color: #171717; }
+    .preview-shell { max-width: 1240px; min-height: 100vh; margin: 0 auto; padding: 28px 22px 46px; }
+    .preview-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; padding-bottom: 22px; border-bottom: 1px solid rgba(23,23,23,.12); }
+    .preview-heading { min-width: 0; }
+    .preview-kicker { color: #a47a3d; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 7px 0 6px; overflow-wrap: anywhere; font-size: clamp(22px,3vw,34px); line-height: 1.15; }
+    .preview-note { color: #6d6a65; font-size: 13px; line-height: 1.5; }
+    .preview-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .preview-actions a { min-height: 42px; padding: 0 19px; border-radius: 999px; text-decoration: none; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; }
+    #preview-download { background: #171717; color: white; }
+    .preview-back { color: #171717; background: #fff; border: 1px solid rgba(23,23,23,.12); }
+    .preview-main { position: relative; min-height: 55vh; margin-top: 22px; overflow: hidden; border: 1px solid rgba(23,23,23,.1); border-radius: 22px; background: #fff; box-shadow: 0 12px 38px rgba(42,32,20,.07); }
+    #preview-status { padding: 70px 24px; text-align: center; color: #6d6a65; font-size: 15px; line-height: 1.65; }
+    #preview-status.error { color: #9f2f2f; }
+    #preview-frame { width: 100%; height: min(78vh, 900px); min-height: 540px; border: 0; display: block; }
+    #preview-image { max-width: 100%; max-height: 80vh; height: auto; margin: 0 auto; display: block; object-fit: contain; }
+    #preview-document { padding: 26px; width: 100%; max-height: 78vh; overflow: auto; }
+    #preview-document .docx-wrapper { padding: 0; }
+    #preview-document table { border-collapse: collapse; width: 100%; }
+    #preview-document td, #preview-document th { border: 1px solid #dedbd5; padding: 8px 10px; font-size: 12px; text-align: left; }
+    #preview-document tr:nth-child(even) { background: #f7f4ee; }
+    #preview-slides { padding: 18px; display: grid; justify-items: center; gap: 14px; background: #ece8e1; }
+    #preview-canvas { width: 100%; max-width: 1120px; height: auto; background: white; box-shadow: 0 8px 30px rgba(0,0,0,.13); }
+    .preview-slide-controls { display: flex; align-items: center; gap: 12px; }
+    .preview-slide-controls button { min-height: 38px; padding: 0 18px; border: 1px solid #d4cec4; border-radius: 999px; background: #fff; color: #171717; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .preview-slide-controls button:hover { background: #f7f4ee; }
+    [hidden] { display: none !important; }
+    @media (max-width: 640px) {
+      .preview-shell { padding: 18px 12px 30px; }
+      .preview-header { align-items: flex-start; }
+      .preview-main { border-radius: 14px; }
+      #preview-frame { min-height: 70vh; }
+      #preview-document { padding: 12px; }
+      #preview-slides { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="preview-shell">
+    <header class="preview-header">
+      <div class="preview-heading">
+        <span class="preview-kicker">Course file preview</span>
+        <h1 id="preview-title">Opening file…</h1>
+        <p class="preview-note" id="preview-meta">View your file before downloading it.</p>
+      </div>
+      <nav class="preview-actions" aria-label="Preview actions">
+        <a class="preview-back" href="courses.html">Courses</a>
+        <a id="preview-download" href="#" rel="noopener" hidden>Download original</a>
+      </nav>
+    </header>
+
+    <section class="preview-main" aria-label="File preview">
+      <div id="preview-status" role="status" aria-live="polite">Loading preview…</div>
+      <iframe id="preview-frame" title="PDF preview" hidden></iframe>
+      <img id="preview-image" alt="Course file preview" hidden>
+      <div id="preview-document" hidden></div>
+      <div id="preview-slides" hidden>
+        <canvas id="preview-canvas" width="1280" height="720" aria-label="Presentation slide"></canvas>
+        <div class="preview-slide-controls">
+          <button id="preview-prev" type="button">Previous slide</button>
+          <button id="preview-next" type="button">Next slide</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    (function () {
+      "use strict";
+      const params = new URLSearchParams(location.search);
+      const title = document.getElementById("preview-title");
+      const meta = document.getElementById("preview-meta");
+      const status = document.getElementById("preview-status");
+      const download = document.getElementById("preview-download");
+      const frame = document.getElementById("preview-frame");
+      const image = document.getElementById("preview-image");
+      const documentViewer = document.getElementById("preview-document");
+      const slides = document.getElementById("preview-slides");
+      const canvas = document.getElementById("preview-canvas");
+      const previous = document.getElementById("preview-prev");
+      const next = document.getElementById("preview-next");
+      let objectUrl = "";
+      let slideViewer = null;
+
+      function showStatus(message, isError) {
+        status.textContent = message;
+        status.classList.toggle("error", Boolean(isError));
+        status.hidden = false;
+      }
+
+      function loadScript(url, globalName) {
+        if (window[globalName]) return Promise.resolve(window[globalName]);
+        return new Promise(function (resolve, reject) {
+          const script = document.createElement("script");
+          script.src = url;
+          script.async = true;
+          script.onload = function () {
+            if (window[globalName]) resolve(window[globalName]);
+            else reject(new Error("Preview renderer could not initialize."));
+          };
+          script.onerror = function () {
+            reject(new Error("Preview renderer could not load. Please check your connection."));
+          };
+          document.head.appendChild(script);
+        });
+      }
+
+      async function loadPowerPoint(blob, fileName) {
+        await loadScript("https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js", "JSZip");
+        await loadScript("https://cdn.jsdelivr.net/npm/pptxviewjs@1.1.9/dist/PptxViewJS.min.js", "PptxViewJS");
+        if (!window.PptxViewJS.PPTXViewer) throw new Error("PowerPoint renderer is unavailable.");
+        slides.hidden = false;
+        slideViewer = new window.PptxViewJS.PPTXViewer({ canvas: canvas });
+        await slideViewer.loadFile(new File([blob], fileName, {
+          type: "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        }));
+        await slideViewer.render(canvas);
+        previous.onclick = async function () {
+          await slideViewer.previousSlide(canvas);
+        };
+        next.onclick = async function () {
+          await slideViewer.nextSlide(canvas);
+        };
+      }
+
+      async function loadWord(blob) {
+        await loadScript("https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js", "JSZip");
+        await loadScript("https://cdn.jsdelivr.net/npm/docx-preview@0.3.6/dist/docx-preview.min.js", "docx");
+        if (!window.docx.renderAsync) throw new Error("Word preview renderer is unavailable.");
+        documentViewer.hidden = false;
+        await window.docx.renderAsync(blob, documentViewer);
+      }
+
+      async function loadSpreadsheet(blob) {
+        await loadScript("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js", "XLSX");
+        const book = window.XLSX.read(await blob.arrayBuffer(), { type: "array" });
+        if (!book.SheetNames.length) throw new Error("The spreadsheet is empty.");
+        const sheet = book.Sheets[book.SheetNames[0]];
+        const rows = window.XLSX.utils.sheet_to_json(sheet, {
+          header: 1, defval: "", blankrows: false
+        });
+        const note = document.createElement("p");
+        note.className = "preview-note";
+        note.textContent = "Sheet: " + book.SheetNames[0];
+        const table = document.createElement("table");
+        rows.slice(0, 500).forEach(function (row) {
+          const tr = document.createElement("tr");
+          row.slice(0, 50).forEach(function (cell) {
+            const td = document.createElement("td");
+            td.textContent = String(cell == null ? "" : cell);
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+        });
+        documentViewer.replaceChildren(note, table);
+        documentViewer.hidden = false;
+      }
+
+      async function start() {
+        const fileName = String(params.get("name") || "Course material").slice(0, 220);
+        const extension = (String(params.get("type") || fileName.split(".").pop()).toLowerCase());
+        title.textContent = fileName;
+        document.title = fileName + " | AUC Atlas preview";
+        const requestedUrl = params.get("file");
+        let fileUrl;
+
+        try {
+          fileUrl = new URL(requestedUrl || "", location.origin);
+          if (fileUrl.origin !== location.origin ||
+              fileUrl.pathname !== "/api/course-material-download" ||
+              !fileUrl.searchParams.get("id")) {
+            throw new Error("This file's preview link is invalid.");
+          }
+        } catch (error) {
+          showStatus("This file's preview link is invalid.", true);
+          return;
+        }
+
+        download.href = fileUrl.href;
+        download.hidden = false;
+
+        if (["ppt", "doc", "xls"].includes(extension)) {
+          showStatus("This older Office file format cannot be previewed reliably in the browser. You can download the original instead.", true);
+          return;
+        }
+
+        try {
+          const response = await fetch(fileUrl.href, {
+            credentials: "same-origin",
+            cache: "no-store"
+          });
+          if (response.status === 401 || response.status === 403) {
+            throw new Error("Please sign in with your verified AUC account to view this file.");
+          }
+          if (!response.ok) throw new Error("The file could not be loaded for preview.");
+          const contentType = (response.headers.get("content-type") || "").toLowerCase();
+          if (contentType.includes("text/html")) {
+            throw new Error("The file could not be loaded. Please sign in and try again.");
+          }
+          const blob = await response.blob();
+          if (!blob.size) throw new Error("The file is empty.");
+          meta.textContent = "Previewing " + fileName + " · " + (blob.size / 1048576).toFixed(1) + " MB";
+
+          if (extension === "pdf") {
+            objectUrl = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+            frame.src = objectUrl;
+            frame.hidden = false;
+          } else if (["png", "jpg", "jpeg", "gif", "webp"].includes(extension)) {
+            objectUrl = URL.createObjectURL(blob);
+            image.src = objectUrl;
+            image.hidden = false;
+          } else if (extension === "pptx") {
+            await loadPowerPoint(blob, fileName);
+          } else if (extension === "docx") {
+            await loadWord(blob);
+          } else if (extension === "xlsx") {
+            await loadSpreadsheet(blob);
+          } else {
+            throw new Error("This format cannot be previewed in your browser. Download the original file instead.");
+          }
+          status.hidden = true;
+        } catch (error) {
+          frame.hidden = true;
+          image.hidden = true;
+          slides.hidden = true;
+          documentViewer.hidden = true;
+          showStatus(error.message || "Preview is unavailable. Please download the original file.", true);
+        }
+      }
+
+      window.addEventListener("pagehide", function () {
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+      });
+      start();
+    })();
+  </script>
+</body>
+</html>
