@@ -5918,20 +5918,10 @@ list.innerHTML = professors.map(function (professor) {
     const fileInput = form.querySelector(
       '[data-material-role="file"], #material-file'
     );
-    const fileField = fileInput
-      ? fileInput.closest(".material-file-field")
-      : null;
     const selectedFiles = Array.from(files || []);
 
     if (fileInput) {
       fileInput.materialSelectedFiles = selectedFiles;
-    }
-
-    if (fileField) {
-      fileField.classList.toggle(
-        "has-files",
-        Boolean(selectedFiles.length)
-      );
     }
 
     if (!selection) {
@@ -5948,32 +5938,23 @@ list.innerHTML = professors.map(function (professor) {
     }
 
     selection.innerHTML = `
-      <div class="material-file-selection-head">
-        <button
-          class="material-file-add-button"
-          type="button"
-          data-add-material-file
-        >
-          <span class="material-file-add-icon" aria-hidden="true">+</span>
-          <span>Add more files</span>
-        </button>
-      </div>
-
       <div class="material-file-list">
-        ${selectedFiles.map(function (file) {
+        ${selectedFiles.map(function (file, index) {
           return `
             <div class="material-file-item">
-              <strong>${escapeMaterialText(file.name)}</strong>
-
+              <span class="material-file-item-copy">
+                <strong>${escapeMaterialText(file.name)}</strong>
+                <span class="material-file-size">${formatMaterialFileSize(file.size)}</span>
+              </span>
               <span class="material-file-item-status">
-                <span class="material-file-size">
-                  ${formatMaterialFileSize(file.size)}
-                </span>
-
-                <span
-                  class="material-file-upload-spinner"
-                  aria-hidden="true"
-                ></span>
+                <span class="material-file-upload-spinner" aria-hidden="true"></span>
+                <button
+                  class="material-file-remove"
+                  type="button"
+                  data-remove-material-file="${index}"
+                  aria-label="Remove ${escapeMaterialText(file.name)}"
+                  title="Remove file"
+                >×</button>
               </span>
             </div>
           `;
@@ -5982,35 +5963,24 @@ list.innerHTML = professors.map(function (professor) {
     `;
   }
 
-  function setMaterialFileUploadState(
-    form,
-    isUploading
-  ) {
+  function setMaterialFileUploadState(form, isUploading) {
     const selection = form.querySelector(
       '[data-material-role="file-selection"], #material-file-selection'
     );
+    const fileInput = form.querySelector(
+      '[data-material-role="file"], #material-file'
+    );
+
+    if (fileInput) {
+      fileInput.disabled = isUploading;
+    }
 
     if (!selection) {
       return;
     }
 
-    selection.classList.toggle(
-      "is-uploading",
-      isUploading
-    );
-
-    selection.setAttribute(
-      "aria-busy",
-      isUploading ? "true" : "false"
-    );
-
-    const addButton = selection.querySelector(
-      "[data-add-material-file]"
-    );
-
-    if (addButton) {
-      addButton.disabled = isUploading;
-    }
+    selection.classList.toggle("is-uploading", isUploading);
+    selection.setAttribute("aria-busy", isUploading ? "true" : "false");
   }
 
   function setupMaterialFilePicker(form) {
@@ -6021,10 +5991,7 @@ list.innerHTML = professors.map(function (professor) {
       '[data-material-role="file-selection"], #material-file-selection'
     );
 
-    if (
-      !fileInput ||
-      fileInput.dataset.fileReady === "true"
-    ) {
+    if (!fileInput || fileInput.dataset.fileReady === "true") {
       return;
     }
 
@@ -6039,65 +6006,108 @@ list.innerHTML = professors.map(function (professor) {
       });
 
       fileInput.files = transfer.files;
+      setMaterialFileSelection(form, fileInput.files);
+    }
 
-      setMaterialFileSelection(
-        form,
-        fileInput.files
-      );
+    function addSelectedFiles(newFiles) {
+      const existingFiles = Array.isArray(fileInput.materialSelectedFiles)
+        ? fileInput.materialSelectedFiles
+        : [];
+      const seenFiles = new Set();
+      const mergedFiles = existingFiles.concat(newFiles).filter(function (file) {
+        const fileKey = [file.name, file.size, file.lastModified].join("::");
+        if (seenFiles.has(fileKey)) {
+          return false;
+        }
+        seenFiles.add(fileKey);
+        return true;
+      });
+
+      applySelectedFiles(mergedFiles);
     }
 
     fileInput.addEventListener("change", function () {
-      const existingFiles = Array.isArray(
-        fileInput.materialSelectedFiles
-      )
-        ? fileInput.materialSelectedFiles
-        : [];
-      const newlySelectedFiles = Array.from(
-        fileInput.files || []
-      );
-      const seenFiles = new Set();
-
-      const mergedFiles = existingFiles
-        .concat(newlySelectedFiles)
-        .filter(function (file) {
-          const fileKey = [
-            file.name,
-            file.size,
-            file.lastModified
-          ].join("::");
-
-          if (seenFiles.has(fileKey)) {
-            return false;
-          }
-
-          seenFiles.add(fileKey);
-          return true;
-        });
-
-      applySelectedFiles(mergedFiles);
+      addSelectedFiles(Array.from(fileInput.files || []));
     });
 
     if (selection) {
-      selection.addEventListener(
-        "click",
-        function (event) {
-          const addButton = event.target.closest(
-            "[data-add-material-file]"
-          );
-
-          if (
-            !addButton ||
-            addButton.disabled
-          ) {
-            return;
-          }
-
-          event.preventDefault();
-
-          fileInput.value = "";
-          fileInput.click();
+      selection.addEventListener("click", function (event) {
+        const removeButton = event.target.closest("[data-remove-material-file]");
+        if (!removeButton || fileInput.disabled) {
+          return;
         }
-      );
+
+        event.preventDefault();
+        const removeIndex = Number(removeButton.dataset.removeMaterialFile);
+        const currentFiles = fileInput.materialSelectedFiles || [];
+        if (!Number.isInteger(removeIndex) || removeIndex < 0 || removeIndex >= currentFiles.length) {
+          return;
+        }
+
+        applySelectedFiles(currentFiles.filter(function (file, index) {
+          return index !== removeIndex;
+        }));
+      });
+    }
+
+    const fileField = fileInput.closest(".material-file-field");
+    if (fileField) {
+      let dragDepth = 0;
+      function hasDraggedFiles(event) {
+        return Boolean(
+          event.dataTransfer &&
+          Array.from(event.dataTransfer.types || []).includes("Files")
+        );
+      }
+
+      fileField.addEventListener("dragenter", function (event) {
+        if (!hasDraggedFiles(event) || fileInput.disabled) return;
+        event.preventDefault();
+        dragDepth += 1;
+        fileField.classList.add("is-drag-over");
+      });
+
+      fileField.addEventListener("dragover", function (event) {
+        if (!hasDraggedFiles(event) || fileInput.disabled) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "copy";
+        fileField.classList.add("is-drag-over");
+      });
+
+      fileField.addEventListener("dragleave", function (event) {
+        if (!hasDraggedFiles(event)) return;
+        dragDepth = Math.max(0, dragDepth - 1);
+        if (dragDepth === 0) {
+          fileField.classList.remove("is-drag-over");
+        }
+      });
+
+      fileField.addEventListener("drop", function (event) {
+        if (!hasDraggedFiles(event)) return;
+        event.preventDefault();
+        dragDepth = 0;
+        fileField.classList.remove("is-drag-over");
+        if (fileInput.disabled) return;
+
+        const allowedExtensions = fileInput.accept.toLowerCase().split(",").map(function (ext) {
+          return ext.trim();
+        });
+        const incomingFiles = Array.from(event.dataTransfer.files || []);
+        const acceptedFiles = incomingFiles.filter(function (file) {
+          const ext = "." + file.name.split(".").pop().toLowerCase();
+          return allowedExtensions.includes(ext);
+        });
+        if (acceptedFiles.length) {
+          addSelectedFiles(acceptedFiles);
+        }
+        if (acceptedFiles.length !== incomingFiles.length) {
+          setMaterialUploadStatus(
+            "Only PDF, Word, PowerPoint, Excel, JPG and PNG files can be uploaded.",
+            "error",
+            form
+          );
+        }
+      });
     }
   }
 
