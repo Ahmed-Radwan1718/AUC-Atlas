@@ -4968,11 +4968,6 @@ const href = courseCode
             <p>${escapeMaterialText(courseLabel || "AUC course material")}</p>
           </div>
 
-          <div class="course-recent-meta">
-            <span>${escapeMaterialText(material.professor || "Professor not listed")}</span>
-            <span>${escapeMaterialText(material.semester || "Semester not listed")}</span>
-          </div>
-
           <div class="course-recent-footer">
             <span class="course-recent-uploader">
               <span class="course-recent-uploader-avatar" aria-hidden="true">
