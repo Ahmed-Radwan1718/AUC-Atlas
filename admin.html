@@ -1825,89 +1825,91 @@
       cursor: not-allowed;
     }
 
-    .admin-user-drawer {
-      position: fixed;
-      inset: 0;
-      z-index: 3000;
+    /* User details expand directly below the selected table row. */
+    .admin-user-table tbody tr.admin-user-row {
+      cursor: pointer;
     }
 
-    .admin-user-drawer-backdrop {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      border: 0;
-      background: rgba(23, 23, 23, 0.28);
-      cursor: default;
+    .admin-user-table tbody tr.admin-user-row.is-expanded {
+      background: rgba(192, 154, 92, 0.055);
     }
 
-    .admin-user-drawer-panel {
-      position: absolute;
-      inset: 0 0 0 auto;
-      width: min(460px, 100%);
-      padding: 28px 30px;
-      overflow-y: auto;
-      background: #faf8f4;
-      box-shadow: -18px 0 60px rgba(23, 23, 23, 0.13);
-      outline: none;
+    .admin-user-table tbody tr.admin-user-expanded-row,
+    .admin-user-table tbody tr.admin-user-expanded-row:hover {
+      background: rgba(255, 255, 255, 0.52);
     }
 
-    .admin-user-drawer-top {
+    .admin-user-table .admin-user-expanded-row > td {
+      padding: 0 16px 24px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.12);
+      text-align: left;
+    }
+
+    .admin-user-inline-detail {
+      padding: 18px 0 0;
+      animation: adminPanelIn 0.2s ease;
+    }
+
+    .admin-user-inline-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 28px;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
     }
 
-    .admin-user-drawer-top h3 {
-      font-size: 23px;
-      line-height: 1.2;
+    .admin-user-inline-header h3 {
+      font-size: 16px;
+      font-weight: 700;
     }
 
-    .admin-user-drawer-close {
-      width: 38px;
-      height: 38px;
-      flex: 0 0 38px;
-      border: 1px solid rgba(23, 23, 23, 0.12);
-      border-radius: 12px;
+    .admin-user-inline-close {
+      padding: 7px 10px;
+      border: 0;
+      border-radius: 8px;
       background: transparent;
-      font-size: 25px;
-      line-height: 1;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 12px;
+      font-weight: 700;
     }
 
-    .admin-user-drawer-close:hover {
+    .admin-user-inline-close:hover {
       background: rgba(23, 23, 23, 0.06);
+      color: #171717;
     }
 
-    .admin-user-drawer-identity {
-      margin-bottom: 22px;
+    .admin-user-inline-identity {
+      margin-bottom: 18px;
     }
 
-    .admin-user-drawer-identity strong {
+    .admin-user-inline-identity strong {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       overflow-wrap: anywhere;
-      font-size: 21px;
-      line-height: 1.25;
+      font-size: 17px;
     }
 
-    .admin-user-drawer-identity p {
-      margin-bottom: 12px;
+    .admin-user-inline-identity p {
+      margin-bottom: 10px;
       overflow-wrap: anywhere;
       color: rgba(23, 23, 23, 0.58);
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .admin-user-detail-rows {
       margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 26px;
       border-top: 1px solid rgba(23, 23, 23, 0.1);
     }
 
     .admin-user-detail-line {
+      min-width: 0;
       display: grid;
-      grid-template-columns: 130px minmax(0, 1fr);
+      grid-template-columns: 118px minmax(0, 1fr);
       gap: 12px;
-      padding: 14px 0;
+      padding: 13px 0;
       border-bottom: 1px solid rgba(23, 23, 23, 0.09);
     }
 
@@ -1917,6 +1919,7 @@
     }
 
     .admin-user-detail-line dd {
+      min-width: 0;
       margin: 0;
       overflow-wrap: anywhere;
       color: #171717;
@@ -1924,23 +1927,22 @@
       font-weight: 700;
     }
 
-    .admin-user-drawer .admin-user-actions {
-      margin-top: 26px;
+    .admin-user-inline-detail .admin-user-actions {
+      margin-top: 20px;
     }
 
-    .admin-user-drawer .admin-user-actions .admin-button {
-      min-height: 42px;
-      border-radius: 12px;
+    .admin-user-inline-detail .admin-user-actions .admin-button {
+      min-height: 38px;
+      border-radius: 10px;
       letter-spacing: 0.02em;
       text-transform: none;
     }
 
-    .admin-user-drawer .admin-user-actions .admin-item-copy {
+    .admin-user-inline-detail .admin-user-actions .admin-item-copy {
       font-size: 12px;
     }
 
     .admin-user-table button:focus-visible,
-    .admin-user-drawer button:focus-visible,
     .admin-user-pagination button:focus-visible {
       outline: 2px solid #c09a5c;
       outline-offset: 2px;
@@ -1969,8 +1971,12 @@
         gap: 14px;
       }
 
-      .admin-user-drawer-panel {
-        padding: 22px 18px;
+      .admin-user-detail-rows {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-user-table .admin-user-expanded-row > td {
+        padding: 0 12px 20px;
       }
     }
 
@@ -2231,16 +2237,6 @@
                 </div>
               </nav>
 
-              <div class="admin-user-drawer" id="admin-user-drawer" hidden>
-                <button type="button" class="admin-user-drawer-backdrop" data-close-user-detail aria-label="Close user details"></button>
-                <section class="admin-user-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="admin-user-detail-heading" tabindex="-1">
-                  <div class="admin-user-drawer-top">
-                    <h3 id="admin-user-detail-heading">User details</h3>
-                    <button class="admin-user-drawer-close" type="button" data-close-user-detail aria-label="Close user details">&times;</button>
-                  </div>
-                  <div id="admin-user-detail-content"></div>
-                </section>
-              </div>
             </article>
 
           </section>
