@@ -3708,7 +3708,7 @@
       text-decoration: none;
       display: grid;
       grid-template-columns: 54px minmax(0, 1fr);
-      grid-template-rows: auto auto minmax(36px, 1fr);
+      grid-template-rows: auto minmax(36px, 1fr);
       column-gap: 16px;
       row-gap: 15px;
       animation: courseCardIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -3801,29 +3801,9 @@
       white-space: nowrap;
     }
 
-    .course-recent-meta {
-      grid-column: 1 / -1;
-      grid-row: 2;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-    }
-
-    .course-recent-meta span {
-      padding: 6px 9px;
-      border: 1px solid rgba(23, 23, 23, 0.07);
-      border-radius: 999px;
-      background: rgba(247, 244, 238, 0.82);
-      color: rgba(23, 23, 23, 0.55);
-      font-size: 8px;
-      font-weight: 850;
-      letter-spacing: 0.055em;
-      text-transform: uppercase;
-    }
-
     .course-recent-footer {
       grid-column: 1 / -1;
-      grid-row: 3;
+      grid-row: 2;
       width: 100%;
       padding-top: 13px;
       border-top: 1px solid rgba(23, 23, 23, 0.07);
