@@ -6496,21 +6496,21 @@ list.innerHTML = professors.map(function (professor) {
         return;
       }
 
-      const previewUrl = appendMaterialQueryParameter(
-        downloadUrl,
-        "disposition",
-        "inline"
+      const previewUrl = new URL(
+        "material-preview.html",
+        document.baseURI
+      );
+      previewUrl.searchParams.set("file", downloadUrl);
+      previewUrl.searchParams.set(
+        "name",
+        button.dataset.fileName || "Course material"
+      );
+      previewUrl.searchParams.set(
+        "type",
+        button.dataset.fileExtension || ""
       );
 
-      const previewWindow = window.open(
-        previewUrl,
-        "_blank",
-        "noopener"
-      );
-
-      if (previewWindow) {
-        previewWindow.opener = null;
-      }
+      window.open(previewUrl.href, "_blank", "noopener");
     }
 
     frame.addEventListener("load", function () {
