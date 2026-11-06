@@ -862,6 +862,301 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* GPA planner: minimal summary, flat semesters and clear actions */
+    .gpa-layout {
+      gap: 24px;
+    }
+
+    .gpa-summary {
+      padding: 14px 0 26px;
+      border: 0;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+      grid-template-areas:
+        "label items"
+        "gpa items";
+      column-gap: 12px;
+    }
+
+    .summary-label {
+      align-self: end;
+    }
+
+    .summary-gpa {
+      margin-top: 8px;
+      font-size: clamp(40px, 4vw, 50px);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.035em;
+      line-height: 1;
+    }
+
+    .summary-items {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      align-self: stretch;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .summary-item {
+      min-height: 80px;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      align-content: center;
+      gap: 10px;
+    }
+
+    .summary-item + .summary-item {
+      border: 0;
+    }
+
+    .summary-item span {
+      font-size: 22px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    .gpa-semesters {
+      gap: 0;
+    }
+
+    .gpa-semester {
+      padding: 12px 0 26px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .gpa-semester + .gpa-semester {
+      padding-top: 28px;
+      border-top: 1px solid rgba(23, 23, 23, 0.12);
+    }
+
+    .gpa-semester-header {
+      margin-bottom: 18px;
+    }
+
+    .semester-name {
+      min-width: 0;
+      font-size: 21px;
+    }
+
+    .semester-actions {
+      gap: 18px;
+    }
+
+    .semester-course-count {
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .remove-semester,
+    .gpa-row > .remove-course {
+      color: rgba(23, 23, 23, 0.46);
+    }
+
+    .remove-semester:hover,
+    .gpa-row > .remove-course:hover {
+      color: #a65f4e;
+    }
+
+    .gpa-table-head {
+      margin-bottom: 8px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.09);
+    }
+
+    .gpa-row {
+      padding: 6px 0;
+      border-bottom: 0;
+    }
+
+    .gpa-row:first-child {
+      padding-top: 0;
+    }
+
+    .gpa-row:last-child {
+      padding-bottom: 0;
+    }
+
+    .gpa-row input,
+    .grade-toggle {
+      min-height: 48px;
+      padding: 0 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .gpa-row .course-credits {
+      padding: 0 8px;
+      text-align: center;
+    }
+
+    .semester-course-footer {
+      margin-top: 14px;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .gpa-action.semester-add-course {
+      min-height: 34px;
+      height: 34px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.63);
+      box-shadow: none;
+    }
+
+    .gpa-action.semester-add-course:hover {
+      border: 0;
+      background: rgba(192, 154, 92, 0.09);
+      color: #171717;
+    }
+
+    .gpa-actions {
+      margin-top: 4px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .gpa-actions > .gpa-action {
+      min-height: 44px;
+      border-radius: 12px;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      text-transform: none;
+    }
+
+    .gpa-actions > .gpa-action.primary {
+      border-color: #171717;
+      background: #171717;
+      color: #ffffff;
+    }
+
+    .gpa-actions > .gpa-action.primary:hover:not(:disabled) {
+      border-color: #303030;
+      background: #303030;
+    }
+
+    .gpa-actions > .gpa-action.secondary {
+      border: 1px solid rgba(23, 23, 23, 0.16);
+      background: transparent;
+    }
+
+    .gpa-actions > .gpa-action.secondary::before {
+      content: "+";
+      margin-right: 8px;
+      font-size: 17px;
+      font-weight: 400;
+      vertical-align: -1px;
+    }
+
+    .gpa-actions > .gpa-action.subtle {
+      padding-inline: 12px;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.58);
+    }
+
+    .gpa-actions > .gpa-action.subtle:hover {
+      border: 0;
+      background: rgba(23, 23, 23, 0.055);
+      color: #171717;
+    }
+
+    @media (max-width: 760px) {
+      .gpa-summary {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "label"
+          "gpa"
+          "items";
+      }
+
+      .summary-items {
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(23, 23, 23, 0.1);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .gpa-summary {
+        padding: 10px 0 20px;
+        border-radius: 0;
+      }
+
+      .summary-items {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 14px;
+      }
+
+      .summary-item {
+        min-height: 0;
+        padding: 0;
+        border: 0;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        align-content: start;
+      }
+
+      .summary-item + .summary-item {
+        border: 0;
+      }
+
+      .gpa-semester {
+        padding: 10px 0 24px;
+        border-radius: 0;
+      }
+
+      .gpa-semester + .gpa-semester {
+        padding-top: 24px;
+      }
+
+      .gpa-row {
+        padding: 8px 0;
+      }
+
+      .semester-actions {
+        gap: 8px;
+      }
+
+      .semester-course-count {
+        font-size: 11px;
+      }
+
+      .gpa-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .gpa-actions > .gpa-action.subtle {
+        width: fit-content;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .gpa-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .gpa-actions > .gpa-action.subtle {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 
@@ -891,9 +1186,9 @@
           </div>
 
           <div class="gpa-actions">
-            <button class="gpa-action primary" type="button" id="add-semester">Add Semester</button>
-            <button class="gpa-action" type="button" id="save-gpa-plan">Save GPA Plan</button>
-            <button class="gpa-action" type="button" id="reset-courses">Reset</button>
+            <button class="gpa-action primary" type="button" id="save-gpa-plan">Save GPA Plan</button>
+            <button class="gpa-action secondary" type="button" id="add-semester">Add Semester</button>
+            <button class="gpa-action subtle" type="button" id="reset-courses">Reset</button>
           </div>
 
           <p
@@ -1168,6 +1463,7 @@
         <div class="gpa-semester-header">
           <input class="semester-name" type="text" value="" aria-label="Semester name">
           <div class="semester-actions">
+            <span class="semester-course-count">3 courses</span>
             <button class="remove-course remove-semester" type="button" aria-label="Remove semester" title="Remove semester">&times;</button>
           </div>
         </div>
@@ -1390,6 +1686,15 @@
     }
 
     function calculateGpa() {
+      document.querySelectorAll(".gpa-semester").forEach(function (semester) {
+        const count = semester.querySelectorAll(".gpa-row:not(.is-removing)").length;
+        const courseCount = semester.querySelector(".semester-course-count");
+
+        if (courseCount) {
+          courseCount.textContent = count + (count === 1 ? " course" : " courses");
+        }
+      });
+
       let totalCredits = 0;
       let totalQualityPoints = 0;
 
