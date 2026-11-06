@@ -115,6 +115,7 @@
 
       async function loadPowerPoint(blob, fileName) {
         await loadScript("https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js", "JSZip");
+        await loadScript("https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js", "Chart");
         await loadScript("https://cdn.jsdelivr.net/npm/pptxviewjs@1.1.9/dist/PptxViewJS.min.js", "PptxViewJS");
         if (!window.PptxViewJS.PPTXViewer) throw new Error("PowerPoint renderer is unavailable.");
         slides.hidden = false;
