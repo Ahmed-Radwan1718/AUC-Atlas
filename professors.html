@@ -79,6 +79,61 @@
       align-items: stretch;
     }
 
+    /* Loading placeholders occupy the same grid as the real professor cards. */
+    .professor-loading-card {
+      min-width: 0;
+      min-height: 350px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.045);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.34);
+    }
+
+    .professor-loading-image {
+      width: 100%;
+      height: 190px;
+      background: rgba(23, 23, 23, 0.055);
+    }
+
+    .professor-loading-body {
+      display: grid;
+      gap: 14px;
+      padding: 23px 20px;
+    }
+
+    .professor-loading-line {
+      display: block;
+      height: 12px;
+      max-width: 100%;
+      border-radius: 6px;
+      background: rgba(23, 23, 23, 0.065);
+    }
+
+    .professor-loading-line.is-title {
+      width: 72%;
+      height: 20px;
+    }
+
+    .professor-loading-line.is-detail {
+      width: 54%;
+    }
+
+    .professor-loading-line.is-short {
+      width: 36%;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .professor-loading-image,
+      .professor-loading-line {
+        animation: professor-loading-pulse 1.7s ease-in-out infinite;
+      }
+
+      @keyframes professor-loading-pulse {
+        0%, 100% { opacity: 0.55; }
+        50% { opacity: 1; }
+      }
+    }
+
     .professor-card {
       min-height: 440px;
       overflow: hidden;
