@@ -6491,26 +6491,77 @@ list.innerHTML = professors.map(function (professor) {
 
     function openPreview(button) {
       const downloadUrl = button.dataset.downloadUrl || "";
+      const extension = String(button.dataset.fileExtension || "").toLowerCase();
+      let fileUrl;
 
-      if (!downloadUrl) {
+      try {
+        fileUrl = new URL(downloadUrl, window.location.origin);
+        if (
+          fileUrl.origin !== window.location.origin ||
+          fileUrl.pathname !== "/api/course-material-download" ||
+          !fileUrl.searchParams.get("id")
+        ) {
+          return;
+        }
+      } catch (error) {
         return;
       }
 
-      const previewUrl = new URL(
-        "material-preview.html",
-        document.baseURI
-      );
-      previewUrl.searchParams.set("file", downloadUrl);
-      previewUrl.searchParams.set(
-        "name",
-        button.dataset.fileName || "Course material"
-      );
-      previewUrl.searchParams.set(
-        "type",
-        button.dataset.fileExtension || ""
-      );
+      // PDFs and images already have accurate native browser viewers.
+      if (!["ppt", "pptx", "doc", "docx", "xls", "xlsx"].includes(extension)) {
+        fileUrl.searchParams.set("disposition", "inline");
+        window.open(fileUrl.href, "_blank", "noopener");
+        return;
+      }
 
-      window.open(previewUrl.href, "_blank", "noopener");
+      // Open synchronously from the click so popup blockers don't interfere.
+      const previewTab = window.open("about:blank", "_blank");
+      if (previewTab) {
+        previewTab.document.title = "Opening Office document";
+        previewTab.document.body.textContent =
+          "Opening in Microsoft Office viewer…";
+        previewTab.opener = null;
+      }
+
+      fileUrl.searchParams.set("disposition", "office-url");
+      fetch(fileUrl.href, {
+        credentials: "same-origin",
+        cache: "no-store"
+      })
+        .then(async function (response) {
+          if (!response.ok) {
+            throw new Error(
+              response.status === 401 || response.status === 403
+                ? "Sign in with a verified AUC account to preview this file."
+                : "The document could not be opened."
+            );
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          const signedUrl = new URL(String(data.url || ""));
+          if (signedUrl.protocol !== "https:") {
+            throw new Error("The document preview link is invalid.");
+          }
+
+          const officeUrl =
+            "https://view.officeapps.live.com/op/view.aspx?src=" +
+            encodeURIComponent(signedUrl.href);
+
+          if (previewTab && !previewTab.closed) {
+            previewTab.location.replace(officeUrl);
+          } else {
+            window.location.assign(officeUrl);
+          }
+        })
+        .catch(function (error) {
+          const message = error.message || "The document could not be opened.";
+          if (previewTab && !previewTab.closed) {
+            previewTab.document.body.textContent = message;
+          } else {
+            window.alert(message);
+          }
+        });
     }
 
     frame.addEventListener("load", function () {
