@@ -3361,7 +3361,7 @@
 
     .courses-header {
       max-width: none;
-      margin: 0 0 34px;
+      margin: 0 0 24px;
       grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
       gap: 28px;
       align-items: end;
@@ -3393,7 +3393,7 @@
     .courses-results {
       position: relative;
       isolation: isolate;
-      gap: 46px;
+      gap: 24px;
     }
 
     .courses-results::before {
@@ -3418,17 +3418,21 @@
     .courses-search-box {
       position: relative;
       z-index: 60;
-      width: min(100%, 560px);
-      margin: 0 auto;
+      width: 70%;
+      margin: 0;
     }
 
     .courses-search-box input {
       position: relative;
       z-index: 2;
       min-height: 52px;
-      padding: 0 18px;
+      padding: 0 18px 0 52px;
       border-radius: 999px;
       font-size: 15px;
+      background-image: url("zoom-lens.png");
+      background-repeat: no-repeat;
+      background-position: 19px center;
+      background-size: 20px 20px;
       box-shadow: 0 18px 50px rgba(42, 32, 20, 0.08);
       transition:
         border-color 0.2s ease,
@@ -3438,7 +3442,7 @@
     }
 
     .courses-search-box input:focus {
-      background: rgba(255, 255, 255, 0.96);
+      background-color: rgba(255, 255, 255, 0.96);
       box-shadow:
         0 0 0 4px rgba(192, 154, 92, 0.12),
         0 18px 50px rgba(42, 32, 20, 0.1);
@@ -3446,7 +3450,7 @@
     }
 
     .courses-home-content {
-      margin-top: 14px;
+      margin-top: 0;
       display: grid;
       gap: 80px;
       transition:
@@ -4360,6 +4364,10 @@
       .courses-header {
         grid-template-columns: 1fr;
         align-items: start;
+      }
+
+      .courses-search-box {
+        width: 100%;
       }
 
       .courses-header p {
