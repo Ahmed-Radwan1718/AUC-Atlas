@@ -5079,10 +5079,22 @@ const href = courseCode
           ? getCourseByCode(courseInput.value)
           : null;
       },
-      onSuccess: function () {
+      onSuccess: function (uploadedCourse) {
         const courseCode = getSelectedCourseCode();
         const currentCourse = courseCode ? getCourseByCode(courseCode) : null;
         if (currentCourse) {
+          // Keep the hidden course choice selected for another upload.
+          const courseSelect = getMaterialFormControl(
+            form,
+            "course",
+            "quick-material-course"
+          );
+          if (courseSelect) {
+            courseSelect.value = currentCourse.code;
+            courseSelect.dispatchEvent(
+              new Event("change", { bubbles: true })
+            );
+          }
           return loadCourseMaterials(currentCourse);
         }
         return loadRecentMaterials();
