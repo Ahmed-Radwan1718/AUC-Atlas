@@ -5080,6 +5080,11 @@ const href = courseCode
           : null;
       },
       onSuccess: function () {
+        const courseCode = getSelectedCourseCode();
+        const currentCourse = courseCode ? getCourseByCode(courseCode) : null;
+        if (currentCourse) {
+          return loadCourseMaterials(currentCourse);
+        }
         return loadRecentMaterials();
       }
     });
@@ -5091,6 +5096,23 @@ const href = courseCode
         document.activeElement instanceof HTMLElement
           ? document.activeElement
           : button;
+
+      const courseCode = getSelectedCourseCode();
+      const courseInput = getMaterialFormControl(
+        form,
+        "course",
+        "quick-material-course"
+      );
+      if (courseCode && courseInput) {
+        courseInput.value = courseCode;
+        courseInput.dispatchEvent(
+          new Event("change", { bubbles: true })
+        );
+      }
+      modal.classList.toggle(
+        "is-course-detail-upload",
+        Boolean(courseCode)
+      );
 
       modal.hidden = false;
       document.body.classList.add(
@@ -7649,7 +7671,6 @@ function getSelectedCourseCode() {
   }
 
   function setupCourseMaterialsAccess(course) {
-    setupMaterialUploadForm(course);
     setupCourseMaterialPreview();
     loadCourseMaterials(course);
   }
@@ -8626,6 +8647,8 @@ function getSelectedCourseCode() {
   }
 
   function setupCoursesPage() {
+    setupCourseUploadStart();
+
     const searchInput = document.getElementById(
       "course-search-input"
     );
@@ -8676,7 +8699,6 @@ function getSelectedCourseCode() {
 
     renderSubjectFilters();
     renderPopularCourses();
-    setupCourseUploadStart();
     loadRecentMaterials();
     animateCourseSearchPlaceholder();
     renderCourses();
