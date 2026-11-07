@@ -890,15 +890,18 @@
       box-shadow: 0 20px 54px rgba(42, 32, 20, 0.1);
       display: grid;
       grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
-      align-items: start;
+      align-items: stretch;
     }
 
     .professor-profile-image {
-      height: 360px;
+      position: relative;
+      min-height: 260px;
       background: rgba(23, 23, 23, 0.04);
     }
 
     .professor-profile-image img {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       display: block;
@@ -912,28 +915,21 @@
     }
 
     .professor-profile-body {
-      padding: 28px;
+      padding: 24px;
       display: grid;
       align-content: start;
-      gap: 16px;
+      gap: 14px;
     }
 
     .professor-profile-info {
       max-width: 660px;
       display: grid;
-      gap: 10px;
+      gap: 15px;
     }
 
     .professor-profile-info div {
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
       display: grid;
-      gap: 3px;
-    }
-
-    .professor-profile-info div:last-child {
-      padding-bottom: 0;
-      border-bottom: 0;
+      gap: 4px;
     }
 
     .professor-profile-info div > span:first-child {
@@ -947,9 +943,9 @@
     .professor-profile-value,
     .professor-profile-email {
       color: #171717;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 400;
-      line-height: 1.45;
+      line-height: 1.5;
       text-decoration: none;
     }
 
@@ -2431,7 +2427,8 @@
       }
 
       .professor-profile-image {
-        height: 300px;
+        min-height: 0;
+        height: 260px;
       }
 
       .professor-review-form {
