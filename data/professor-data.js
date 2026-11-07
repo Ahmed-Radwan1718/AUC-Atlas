@@ -1579,13 +1579,10 @@
     }
 
     .professor-review-stat-row {
-      padding: 13px 0;
       border-bottom: 1px solid rgba(23, 23, 23, 0.08);
-      display: grid;
-      gap: 8px;
     }
 
-    .professor-review-stat-row:first-child {
+    .professor-review-stat-row:first-child > summary {
       padding-top: 4px;
     }
 
@@ -1594,11 +1591,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 10px;
     }
 
     .professor-review-stat-label {
       min-width: 0;
+      flex: 1 1 auto;
       color: rgba(23, 23, 23, 0.58);
       font-size: 9px;
       font-weight: 800;
@@ -1662,68 +1660,64 @@
         forwards;
     }
 
-    .professor-review-stat-details {
-      display: grid;
-      gap: 8px;
-    }
-
+    /* The summary covers the full label and progress bar, making each stat row expandable. */
     .professor-review-stat-details-toggle {
-      width: fit-content;
-      padding: 0;
+      width: 100%;
+      padding: 13px 0;
       border: 0;
       background: transparent;
-      color: rgba(23, 23, 23, 0.58);
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      line-height: 1.3;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
+      display: grid;
+      gap: 8px;
       list-style: none;
-      transition: color 0.18s ease;
-    }
-
-    .professor-review-stat-details-toggle::after {
-      content: "";
-      width: 5px;
-      height: 5px;
-      border-right: 1.4px solid currentColor;
-      border-bottom: 1.4px solid currentColor;
-      transform: rotate(45deg) translateY(-2px);
-      transition: transform 0.22s ease;
-    }
-
-    .professor-review-stat-details[open] .professor-review-stat-details-toggle {
-      color: #171717;
-    }
-
-    .professor-review-stat-details[open] .professor-review-stat-details-toggle::after {
-      transform: rotate(225deg) translate(-1px, -1px);
+      cursor: pointer;
     }
 
     .professor-review-stat-details-toggle::-webkit-details-marker {
       display: none;
     }
 
-    .professor-review-stat-details-less {
-      display: none;
+    .professor-review-stat-details-toggle::marker {
+      content: "";
     }
 
-    .professor-review-stat-details[open] .professor-review-stat-details-more {
-      display: none;
+    .professor-review-stat-details-toggle:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 3px;
+      border-radius: 4px;
     }
 
-    .professor-review-stat-details[open] .professor-review-stat-details-less {
-      display: inline;
+    .professor-review-stat-details-toggle:hover .professor-review-stat-label,
+    .professor-review-stat-row[open] .professor-review-stat-label {
+      color: #171717;
+    }
+
+    .professor-review-stat-chevron {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 6px;
+      margin: 0 2px;
+      border-right: 1.5px solid rgba(23, 23, 23, 0.55);
+      border-bottom: 1.5px solid rgba(23, 23, 23, 0.55);
+      transform: rotate(45deg);
+      transition: transform 0.22s ease;
+    }
+
+    .professor-review-stat-row[open] .professor-review-stat-chevron {
+      transform: rotate(225deg);
     }
 
     .professor-review-stat-breakdown {
       display: grid;
       gap: 9px;
-      padding: 5px 0 1px;
+      padding: 0 0 13px;
+    }
+
+    .professor-review-stat-response-count {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1.4;
     }
 
     .professor-review-stat-total,
@@ -2942,16 +2936,12 @@ function getProfessorUrl(professor) {
       }).join("");
 
       return `
-        <details class="professor-review-stat-details">
-          <summary class="professor-review-stat-details-toggle">
-            <span class="professor-review-stat-details-more">More details</span>
-            <span class="professor-review-stat-details-less">Hide details</span>
-          </summary>
-
-          <div class="professor-review-stat-breakdown">
-            ${answerMarkup}
-          </div>
-        </details>
+        <div class="professor-review-stat-breakdown">
+          <p class="professor-review-stat-response-count">
+            ${row.total} ${row.total === 1 ? "response" : "responses"} to this question
+          </p>
+          ${answerMarkup}
+        </div>
       `;
     }
 
@@ -2960,37 +2950,41 @@ function getProfessorUrl(professor) {
       const delay = Math.min(index * 55, 275);
 
       return `
-        <div class="professor-review-stat-row">
-          <div class="professor-review-stat-head">
-            <span class="professor-review-stat-label">${escapeHtml(row.label)}</span>
+        <details class="professor-review-stat-row">
+          <summary class="professor-review-stat-details-toggle">
+            <div class="professor-review-stat-head">
+              <span class="professor-review-stat-label">${escapeHtml(row.label)}</span>
 
-            <div class="professor-review-stat-value">
-              <strong>${escapeHtml(displayValue)}</strong>
-              <span aria-hidden="true">·</span>
-              <span>${escapeHtml(row.topAnswer.percent + "%")}</span>
+              <div class="professor-review-stat-value">
+                <strong>${escapeHtml(displayValue)}</strong>
+                <span aria-hidden="true">·</span>
+                <span>${escapeHtml(row.topAnswer.percent + "%")}</span>
+              </div>
+              <span class="professor-review-stat-chevron" aria-hidden="true"></span>
             </div>
-          </div>
 
-          <div
-            class="professor-review-stat-track"
-            role="img"
-            aria-label="${escapeHtml(row.label + ": " + displayValue + ", selected by " + row.topAnswer.percent + "% of responses")}"
-          >
-            <span
-              class="professor-review-stat-fill"
-              style="--stat-width: ${escapeHtml(String(row.topAnswer.width))}%; --stat-delay: ${delay}ms;"
-            ></span>
-          </div>
+            <div
+              class="professor-review-stat-track"
+              role="img"
+              aria-label="${escapeHtml(row.label + ": " + displayValue + ", selected by " + row.topAnswer.percent + "% of responses")}"
+            >
+              <span
+                class="professor-review-stat-fill"
+                style="--stat-width: ${escapeHtml(String(row.topAnswer.width))}%; --stat-delay: ${delay}ms;"
+              ></span>
+            </div>
+          </summary>
 
           ${renderStatBreakdown(row)}
-        </div>
+        </details>
       `;
     }
 
     if (statsCount) {
       statsCount.textContent = safeReviews.length
-        ? "Based on student reviews"
-        : "No review choices yet";
+        ? "Based on " + safeReviews.length + " student " +
+          (safeReviews.length === 1 ? "review" : "reviews")
+        : "No student reviews yet";
     }
 
     if (!panel) {
@@ -3895,7 +3889,7 @@ function getProfessorUrl(professor) {
           <div>
             <h2>Class patterns</h2>
           </div>
-          <p id="professor-review-stats-count">Based on review choices</p>
+          <p id="professor-review-stats-count">Loading review count...</p>
         </div>
 
         <div class="professor-review-stats" id="professor-review-stats">
