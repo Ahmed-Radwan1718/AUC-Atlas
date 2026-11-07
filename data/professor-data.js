@@ -1788,14 +1788,14 @@
     }
 
     .professor-review-stat-answer-track {
-      height: 6px;
+      height: 4px;
     }
 
     .professor-review-stat-answer-fill {
       width: var(--stat-width, 0%);
       height: 100%;
       border-radius: inherit;
-      background: rgba(192, 154, 92, 0.82);
+      background: rgba(192, 154, 92, 0.58);
       display: block;
     }
 
