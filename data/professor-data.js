@@ -1714,6 +1714,12 @@
       display: grid;
       gap: 9px;
       padding: 2px 0 11px;
+      overflow: hidden;
+      opacity: 1;
+      transition:
+        height 0.28s ease,
+        opacity 0.22s ease,
+        transform 0.22s ease;
     }
 
     .professor-review-stat-total,
@@ -1842,6 +1848,11 @@
       .professor-review-stat-fill {
         animation: none;
         transform: scaleX(1);
+      }
+
+      .professor-review-stat-breakdown,
+      .professor-review-insights-hidden {
+        transition: none;
       }
     }
 
@@ -3018,7 +3029,7 @@ function getProfessorUrl(professor) {
     panel.innerHTML = visibleRows.map(renderStatRow).join("") + hiddenMarkup;
 
     panel
-      .querySelectorAll(".professor-review-insights-more")
+      .querySelectorAll(".professor-review-stat-row, .professor-review-insights-more")
       .forEach(setupProfessorReviewDetailAnimation);
   }
 
@@ -3026,7 +3037,7 @@ function getProfessorUrl(professor) {
     const summary = details.querySelector("summary");
     const content = details.classList.contains("professor-review-insights-more")
       ? details.querySelector(".professor-review-insights-hidden")
-      : details.querySelector(".professor-review-detail-panel");
+      : details.querySelector(".professor-review-stat-breakdown");
 
     if (!summary || !content || details.dataset.reviewAnimationReady === "true") {
       return;
@@ -3043,6 +3054,11 @@ function getProfessorUrl(professor) {
 
     summary.addEventListener("click", function (event) {
       event.preventDefault();
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        details.open = !details.open;
+        return;
+      }
 
       if (closeTimer) {
         window.clearTimeout(closeTimer);
