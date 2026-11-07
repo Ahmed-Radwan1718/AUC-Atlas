@@ -229,6 +229,38 @@
     return String(value || "").trim().toLowerCase();
   }
 
+  function normalizeProfessorKey(value) {
+    return normalizeSearch(value).replace(/\s+/g, " ");
+  }
+
+  // The public professor catalog is loaded before admin.js.
+  const professorById = new Map();
+  const professorByName = new Map();
+  (Array.isArray(window.aucAtlasProfessors) ? window.aucAtlasProfessors : [])
+    .forEach(function (professor) {
+      if (professor && professor.id) {
+        professorById.set(normalizeProfessorKey(professor.id), professor);
+      }
+      if (professor && professor.name) {
+        professorByName.set(normalizeProfessorKey(professor.name), professor);
+      }
+    });
+
+  function getReviewProfessorPhoto(review) {
+    const id = normalizeProfessorKey(review.professorId);
+    const name = normalizeProfessorKey(review.professorName);
+    const professor = (id && professorById.get(id)) || professorByName.get(name);
+    const photo = String((professor && professor.image) || "").trim();
+    return photo && photo !== "user.png" ? photo : "";
+  }
+
+  function getProfessorInitials(name) {
+    return String(name || "").trim().split(/\s+/).filter(Boolean)
+      .slice(0, 2).map(function (part) {
+        return part.charAt(0).toUpperCase();
+      }).join("") || "?";
+  }
+
   function formatDate(value) {
     if (!value) {
       return "Date unavailable";
@@ -1078,18 +1110,28 @@
     }
 
     reviewList.innerHTML = filtered.map(function (review) {
+      const professorName = review.professorName || "Professor review";
+      const professorPhoto = getReviewProfessorPhoto(review);
       return [
         '<article class="admin-item">',
-          '<div class="admin-item-main">',
-            '<div class="admin-item-title">', escapeHtml(review.professorName || "Professor review"), '</div>',
-            '<div class="admin-meta">',
-              '<span>', escapeHtml(review.courseCode || "Course not listed"), '</span>',
-              '<span>', escapeHtml(String(review.rating || 0)), ' / 5</span>',
-              '<span>', escapeHtml(review.semesterTaken || "Semester not listed"), '</span>',
-              '<span>', escapeHtml(formatDate(review.createdAt)), '</span>',
+          '<div class="admin-item-main admin-review-body">',
+            '<div class="admin-review-avatar" aria-hidden="true">',
+              '<span>', escapeHtml(getProfessorInitials(professorName)), '</span>',
+              professorPhoto
+                ? '<img src="' + escapeHtml(professorPhoto) + '" alt="" loading="lazy" decoding="async">'
+                : '',
             '</div>',
-            '<p class="admin-item-copy">', escapeHtml(review.studentNote || "No written comment."), '</p>',
-            '<p class="admin-item-copy"><strong>Author:</strong> ', escapeHtml(review.authorName || "AUC student"), ' · ', escapeHtml(review.authorUid || "UID unavailable"), '</p>',
+            '<div class="admin-review-copy">',
+              '<div class="admin-item-title">', escapeHtml(professorName), '</div>',
+              '<div class="admin-meta">',
+                '<span>', escapeHtml(review.courseCode || "Course not listed"), '</span>',
+                '<span>', escapeHtml(String(review.rating || 0)), ' / 5</span>',
+                '<span>', escapeHtml(review.semesterTaken || "Semester not listed"), '</span>',
+                '<span>', escapeHtml(formatDate(review.createdAt)), '</span>',
+              '</div>',
+              '<p class="admin-item-copy">', escapeHtml(review.studentNote || "No written comment."), '</p>',
+              '<p class="admin-item-copy"><strong>Author:</strong> ', escapeHtml(review.authorName || "AUC student"), ' · ', escapeHtml(review.authorUid || "UID unavailable"), '</p>',
+            '</div>',
           '</div>',
           '<div class="admin-item-actions">',
             '<button class="admin-button danger" type="button" data-delete-review="', escapeHtml(review.id), '">Delete review</button>',
@@ -1480,6 +1522,13 @@
       );
     });
   });
+
+  // Capture image failures so the initials underneath remain visible.
+  reviewList.addEventListener("error", function (event) {
+    if (event.target.matches(".admin-review-avatar img")) {
+      event.target.remove();
+    }
+  }, true);
 
   reviewList.addEventListener("click", function (event) {
     const button = event.target.closest("[data-delete-review]");

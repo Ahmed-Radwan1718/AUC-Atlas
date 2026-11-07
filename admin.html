@@ -2115,6 +2115,45 @@
         padding-left: 0;
       }
     }
+    /* Small professor portraits in the reviews list; other admin lists are unchanged. */
+    #admin-panel-reviews .admin-review-body {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    #admin-panel-reviews .admin-review-avatar {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      overflow: hidden;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #e7dfd3;
+      color: #5d5245;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      line-height: 1;
+    }
+
+    #admin-panel-reviews .admin-review-avatar img {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #admin-panel-reviews .admin-review-copy {
+      display: grid;
+      min-width: 0;
+      gap: 8px;
+    }
+
   </style>
 </head>
 
@@ -2367,6 +2406,7 @@
 
   <div class="admin-toast" id="admin-toast" role="status" hidden></div>
 
+  <script src="data/professor-data.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>
