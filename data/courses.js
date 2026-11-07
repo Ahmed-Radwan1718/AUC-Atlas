@@ -5128,11 +5128,6 @@ const href = courseCode
         form
       );
 
-      const courseInput = getMaterialFormControl(
-        form,
-        "course",
-        "quick-material-course"
-      );
       const courseChoice = courseInput
         ? courseInput.nextElementSibling
         : null;
@@ -5147,7 +5142,9 @@ const href = courseCode
           : null;
 
       window.setTimeout(function () {
-        if (courseChoiceButton) {
+        if (courseCode && closeButton) {
+          closeButton.focus();
+        } else if (courseChoiceButton) {
           courseChoiceButton.focus();
         } else if (closeButton) {
           closeButton.focus();
