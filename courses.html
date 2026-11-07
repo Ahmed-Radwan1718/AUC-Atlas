@@ -4743,6 +4743,10 @@
       display: none;
     }
 
+    .quick-material-upload-modal.is-course-detail-upload .material-upload-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
     @keyframes courseUploadDrawerIn {
       from { opacity: 0; transform: translateX(28px); }
       to { opacity: 1; transform: translateX(0); }
@@ -4996,9 +5000,9 @@
 
       <header class="quick-material-upload-header">
         <p class="quick-material-upload-kicker">Share course material</p>
-        <h2 id="quick-material-upload-title">Quick upload</h2>
+        <h2 id="quick-material-upload-title">Upload material</h2>
         <p class="quick-material-upload-copy">
-          Choose the course, professor, semester, and material type, then upload one or more files.
+          Share notes, slides, assignments, and other course resources with your classmates.
         </p>
       </header>
 
