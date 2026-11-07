@@ -906,6 +906,11 @@
       object-position: center 18%;
     }
 
+    /* Recenter Ahmed Moustafa in his full-size profile portrait only. */
+    .professor-profile-image--ahmed-moustafa img {
+      object-position: 75% 18%;
+    }
+
     .professor-profile-body {
       padding: 28px;
       display: grid;
@@ -3648,7 +3653,7 @@ function getProfessorUrl(professor) {
     grid.innerHTML = `
       <div class="professor-profile-main">
       <article class="professor-profile-card">
-        <div class="professor-profile-image">
+        <div class="professor-profile-image${getProfessorId(professor) === "ahmed-moustafa" ? " professor-profile-image--ahmed-moustafa" : ""}">
           <img src="${escapeHtml(professor.image || "user.png")}" alt="${escapeHtml(professor.name)}">
         </div>
         <div class="professor-profile-body">
