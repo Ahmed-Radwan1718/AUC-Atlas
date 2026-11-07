@@ -233,6 +233,67 @@ function isMonthlyVisitRequest(req) {
   return period === "month";
 }
 
+// November 2026 was switched from weekly to monthly tracking mid-month.
+// Carry the stored November 2 week total into November once, without
+// removing visits that have already been recorded by monthly tracking.
+const NOVEMBER_2026_CARRYOVER = Object.freeze({
+  monthStart: "2026-11-01",
+  weekStart: "2026-11-02"
+});
+
+async function carryOverLegacyWeeklyVisits(db, countRef, monthStart) {
+  if (monthStart !== NOVEMBER_2026_CARRYOVER.monthStart) {
+    return;
+  }
+
+  const legacyCountRef = db
+    .collection("weeklyUniqueVisitorCounts")
+    .doc(NOVEMBER_2026_CARRYOVER.weekStart);
+
+  // Transaction makes multiple GETs and simultaneous POSTs safe:
+  // the baseline is applied at most once to the monthly document.
+  await db.runTransaction(async function (transaction) {
+    const monthSnapshot = await transaction.get(countRef);
+    const monthData = monthSnapshot.exists
+      ? monthSnapshot.data() || {}
+      : {};
+
+    if (monthData.carryoverWeekStart === NOVEMBER_2026_CARRYOVER.weekStart) {
+      return;
+    }
+
+    const weekSnapshot = await transaction.get(legacyCountRef);
+    const weekData = weekSnapshot.exists
+      ? weekSnapshot.data() || {}
+      : {};
+    const weeklyCount = Math.max(
+      0,
+      Math.floor(Number(weekData.count) || 0)
+    );
+
+    // Do not mark the transfer complete if historical data is missing.
+    if (!weeklyCount) {
+      return;
+    }
+
+    const existingMonthlyCount = Math.max(
+      0,
+      Math.floor(Number(monthData.count) || 0)
+    );
+
+    transaction.set(
+      countRef,
+      {
+        count: existingMonthlyCount + weeklyCount,
+        carryoverWeekStart: NOVEMBER_2026_CARRYOVER.weekStart,
+        carriedWeeklyVisits: weeklyCount,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      },
+      { merge: true }
+    );
+  });
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "POST") {
     res.setHeader("Allow", "GET, POST");
@@ -254,6 +315,10 @@ module.exports = async function handler(req, res) {
           : "weeklyUniqueVisitorCounts"
       )
       .doc(periodStart);
+
+    if (isMonthly) {
+      await carryOverLegacyWeeklyVisits(db, countRef, periodStart);
+    }
 
     function visitResponse(count, counted) {
       const payload = isMonthly
@@ -309,6 +374,23 @@ module.exports = async function handler(req, res) {
       const countData = countSnapshot.exists
         ? countSnapshot.data() || {}
         : {};
+      const isCarriedMonth = (
+        isMonthly &&
+        periodStart === NOVEMBER_2026_CARRYOVER.monthStart &&
+        countData.carryoverWeekStart === NOVEMBER_2026_CARRYOVER.weekStart
+      );
+      const legacyVisitorRef = isCarriedMonth
+        ? db.collection("weeklyUniqueVisitorCounts")
+          .doc(NOVEMBER_2026_CARRYOVER.weekStart)
+          .collection("visitors")
+          .doc(getWeeklyVisitorHash(
+            visitorId,
+            NOVEMBER_2026_CARRYOVER.weekStart
+          ))
+        : null;
+      const legacyVisitorSnapshot = legacyVisitorRef
+        ? await transaction.get(legacyVisitorRef)
+        : null;
 
       visits = Math.max(0, Number(countData.count) || 0);
 
@@ -316,14 +398,24 @@ module.exports = async function handler(req, res) {
         return;
       }
 
-      visits += 1;
-      counted = true;
+      // Already included in the transferred weekly baseline: mark as
+      // seen this month, but do not count the same visitor again.
+      const wasIncludedInWeeklyBaseline = Boolean(
+        legacyVisitorSnapshot && legacyVisitorSnapshot.exists
+      );
       const periodKey = isMonthly ? "monthStart" : "weekStart";
 
       transaction.set(visitorRef, {
         [periodKey]: periodStart,
         firstSeenAt: admin.firestore.FieldValue.serverTimestamp()
       });
+
+      if (wasIncludedInWeeklyBaseline) {
+        return;
+      }
+
+      visits += 1;
+      counted = true;
 
       transaction.set(
         countRef,
