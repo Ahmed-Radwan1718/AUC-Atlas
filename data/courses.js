@@ -6654,11 +6654,6 @@ function getSelectedCourseCode() {
   }
 
   function renderCourseMaterials(materials) {
-    const count = document.getElementById("course-file-count");
-    if (count) {
-      const total = Array.isArray(materials) ? materials.length : 0;
-      count.textContent = total + (total === 1 ? " file" : " files");
-    }
     const list = document.getElementById(
       "course-materials-list"
     );
@@ -7602,8 +7597,6 @@ function getSelectedCourseCode() {
     if (list) {
       list.innerHTML = '<p class="course-material-status">Loading course files...</p>';
     }
-    const count = document.getElementById("course-file-count");
-    if (count) count.textContent = "Loading files...";
 
     try {
       const response = await fetch(
@@ -7640,8 +7633,6 @@ function getSelectedCourseCode() {
       if (loading) {
         loading.hidden = true;
       }
-      const count = document.getElementById("course-file-count");
-      if (count) count.textContent = "Sign in to view";
 
       if (list) {
         list.innerHTML =
@@ -7657,26 +7648,7 @@ function getSelectedCourseCode() {
     }
   }
 
-  function setupCourseUploadAccordion() {
-    const panel = document.getElementById("course-upload-panel");
-    const toggle = document.getElementById("course-upload-toggle");
-    const content = document.getElementById("course-upload-content");
-    if (!panel || !toggle || !content || toggle.dataset.ready === "true") {
-      return;
-    }
-    toggle.dataset.ready = "true";
-    content.inert = true;
-    toggle.addEventListener("click", function () {
-      const expanded = !panel.classList.contains("is-expanded");
-      panel.classList.toggle("is-expanded", expanded);
-      toggle.setAttribute("aria-expanded", String(expanded));
-      toggle.querySelector("span").textContent = expanded ? "Close form" : "Upload material";
-      content.inert = !expanded;
-    });
-  }
-
   function setupCourseMaterialsAccess(course) {
-    setupCourseUploadAccordion();
     setupMaterialUploadForm(course);
     setupCourseMaterialPreview();
     loadCourseMaterials(course);
