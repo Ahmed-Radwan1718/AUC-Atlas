@@ -5426,6 +5426,7 @@ function getSelectedCourseCode() {
     return {
       id: knownProfessor ? knownProfessor.id : professorId,
       name: knownProfessor ? knownProfessor.name : professorName,
+      image: knownProfessor ? knownProfessor.image : "",
       department: knownProfessor
         ? (knownProfessor.displayDepartment || knownProfessor.department || "AUC")
         : "AUC"
@@ -5440,6 +5441,8 @@ function getSelectedCourseCode() {
     }
 
     const professorRow = list.closest(".course-detail-professors");
+    const detailsGrid = document.getElementById("course-detail-grid");
+    const prerequisiteRow = document.getElementById("course-detail-prerequisite-row");
     const professorsById = new Map();
     const safeReviews = Array.isArray(reviews) ? reviews : [];
 
@@ -5456,25 +5459,37 @@ function getSelectedCourseCode() {
       return firstProfessor.name.localeCompare(secondProfessor.name);
     });
 
-    if (professorRow) {
-      professorRow.hidden = !professors.length;
-    }
+    if (professorRow) professorRow.hidden = !professors.length;
+    if (detailsGrid) detailsGrid.hidden =
+      !professors.length && (!prerequisiteRow || prerequisiteRow.hidden);
 
     if (!professors.length) {
       list.innerHTML = "";
       return;
     }
 
-list.innerHTML = professors.map(function (professor) {
-  return `
-    <a
-      class="course-professor-link"
-      href="${getProfessorProfileUrl(professor.id)}"
-    >
-      <strong>${escapeMaterialText(professor.name)}</strong>
-    </a>
-  `;
-}).join("");
+    if (list.dataset.avatarFallbackReady !== "true") {
+      list.addEventListener("error", function (event) {
+        if (event.target.matches(".course-professor-avatar img")) event.target.remove();
+      }, true);
+      list.dataset.avatarFallbackReady = "true";
+    }
+
+    list.innerHTML = professors.map(function (professor) {
+      const photo = String(professor.image || "").trim();
+      const initials = professor.name.split(/\s+/).slice(0, 2).map(function (part) {
+        return part.charAt(0).toUpperCase();
+      }).join("");
+      return `
+        <a class="course-professor-link" href="${getProfessorProfileUrl(professor.id)}">
+          <span class="course-professor-avatar" aria-hidden="true">
+            ${escapeMaterialText(initials)}
+            ${photo && photo !== "user.png" ? '<img src="' + escapeMaterialText(photo) + '" alt="" loading="lazy">' : ""}
+          </span>
+          <strong>${escapeMaterialText(professor.name)}</strong>
+        </a>
+      `;
+    }).join("");
   }
 
   async function loadCourseProfessors(course) {
@@ -7639,12 +7654,33 @@ list.innerHTML = professors.map(function (professor) {
     loadCourseMaterials(course);
   }
 
+  function renderCoursePrerequisites(value) {
+    const target = document.getElementById("course-detail-prerequisite");
+    if (!target) return;
+    const source = String(value || "");
+    const existing = new Set(courses.map(function (course) {
+      return normalizeCourseCode(course.code);
+    }));
+    let result = "", cursor = 0;
+    for (const match of source.matchAll(/\b[A-Z]{2,5}\s*\d{4}\b/gi)) {
+      result += escapeMaterialText(source.slice(cursor, match.index));
+      const code = normalizeCourseCode(match[0]);
+      result += existing.has(code)
+        ? '<a class="course-detail-prereq-link" href="' + getCourseUrl(code) +
+          '">' + escapeMaterialText(match[0]) + '</a>'
+        : escapeMaterialText(match[0]);
+      cursor = match.index + match[0].length;
+    }
+    target.innerHTML = result + escapeMaterialText(source.slice(cursor));
+  }
+
   function renderCourseDetail(courseCode) {
     const listView = document.getElementById("courses-list-view");
     const detailView = document.getElementById("course-detail-view");
     const prerequisiteRow = document.getElementById(
       "course-detail-prerequisite-row"
     );
+    const detailsGrid = document.getElementById("course-detail-grid");
 
     if (!courseCode || !detailView) {
       return false;
@@ -7668,13 +7704,10 @@ list.innerHTML = professors.map(function (professor) {
         "course-detail-description",
         "Go back to courses and choose a course from the search results."
       );
-      setCourseDetailText("course-detail-subject", "Unavailable");
       setCourseDetailText("course-detail-level", "Unavailable");
-      setCourseDetailText("course-detail-full-code", courseCode || "Unavailable");
 
-      if (prerequisiteRow) {
-        prerequisiteRow.hidden = true;
-      }
+      if (prerequisiteRow) prerequisiteRow.hidden = true;
+      if (detailsGrid) detailsGrid.hidden = true;
 
       renderCourseProfessors({ code: "" }, []);
       return true;
@@ -7688,17 +7721,11 @@ list.innerHTML = professors.map(function (professor) {
       selectedCourse.description ||
         "Course description coming soon."
     );
-    setCourseDetailText("course-detail-subject", selectedCourse.subject);
     setCourseDetailText("course-detail-level", selectedCourse.level);
-    setCourseDetailText("course-detail-full-code", selectedCourse.code);
-    setCourseDetailText(
-      "course-detail-prerequisite",
-      selectedCourse.prerequisite
-    );
+    renderCoursePrerequisites(selectedCourse.prerequisite);
 
-    if (prerequisiteRow) {
-      prerequisiteRow.hidden = !selectedCourse.prerequisite;
-    }
+    if (prerequisiteRow) prerequisiteRow.hidden = !selectedCourse.prerequisite;
+    if (detailsGrid) detailsGrid.hidden = !selectedCourse.prerequisite;
 
     recordCourseView(selectedCourse.code);
     loadCourseProfessors(selectedCourse);

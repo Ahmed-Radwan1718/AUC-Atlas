@@ -571,17 +571,15 @@
     }
 
     .course-detail-hero {
-      padding: 30px;
-      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      padding: 28px 30px 24px;
       background: transparent;
     }
 
     .course-detail-kicker {
-      margin-bottom: 12px;
-      color: rgba(192, 154, 92, 0.92);
+      color: rgba(192,154,92,0.92);
       font-size: 12px;
       font-weight: 800;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.1em;
       line-height: 1.4;
       text-transform: uppercase;
     }
@@ -589,9 +587,9 @@
     .course-detail-hero h1 {
       max-width: 760px;
       color: #171717;
-      font-size: clamp(30px, 3.2vw, 46px);
-      font-weight: 600;
-      line-height: 1.05;
+      font-size: clamp(29px, 3vw, 36px);
+      font-weight: 500;
+      line-height: 1.12;
       text-transform: uppercase;
     }
 
@@ -605,27 +603,20 @@
     }
 
     .course-detail-grid {
-      padding: 24px 30px 4px;
+      margin: 0 30px;
+      padding: 20px 0 26px;
+      border-top: 1px solid rgba(23,23,23,0.08);
       display: grid;
-      gap: 0;
+      gap: 20px;
     }
 
     .course-detail-stat {
-      min-height: 58px;
-      padding: 14px 0;
-      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
       display: grid;
-      grid-template-columns: 120px minmax(0, 1fr);
-      align-items: center;
-      gap: 18px;
-    }
-
-    .course-detail-stat:last-child {
-      border-bottom: 0;
+      gap: 8px;
     }
 
     .course-detail-stat span {
-      color: rgba(192, 154, 92, 0.92);
+      color: rgba(192,154,92,0.92);
       font-size: 10px;
       font-weight: 800;
       letter-spacing: 0.1em;
@@ -634,13 +625,62 @@
 
     .course-detail-stat strong {
       color: #171717;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 400;
-      line-height: 1.45;
+      line-height: 1.5;
     }
 
     .course-detail-professors {
       align-items: start;
+    }
+
+    .course-detail-heading-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-bottom: 12px;
+    }
+
+    .course-detail-level { color: rgba(23,23,23,0.6); font-size: 12px; font-weight: 600; }
+    .course-detail-heading-separator { color: rgba(23,23,23,0.35); }
+
+    .course-detail-grid[hidden],
+    .course-detail-stat[hidden] { display: none; }
+
+    .course-detail-prereq-link {
+      color: #171717;
+      text-decoration: underline;
+      text-decoration-color: rgba(192,154,92,0.72);
+      text-underline-offset: 3px;
+      transition: color 0.18s ease;
+    }
+    .course-detail-prereq-link:hover,
+    .course-detail-prereq-link:focus-visible { color: #9a7030; }
+
+    .course-professor-link .course-professor-avatar {
+      position: relative;
+      display: grid;
+      place-items: center;
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+      overflow: hidden;
+      border-radius: 50%;
+      background: #e5ddd0;
+      color: #5c5040;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: normal;
+      line-height: 1;
+      text-transform: none;
+    }
+    .course-professor-avatar img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .course-professor-list {
@@ -4785,29 +4825,18 @@
         <div class="course-profile-layout">
           <article class="course-profile-card">
             <section class="course-detail-hero">
-              <p class="course-detail-kicker" id="course-detail-code">Course</p>
+              <div class="course-detail-heading-meta">
+                <span class="course-detail-kicker" id="course-detail-code">Course</span>
+                <span class="course-detail-heading-separator" aria-hidden="true">·</span>
+                <span class="course-detail-level" id="course-detail-level">Level</span>
+              </div>
               <h1 id="course-detail-title">Course title</h1>
               <p class="course-detail-description" id="course-detail-description">
                 Course description coming soon.
               </p>
             </section>
 
-            <section class="course-detail-grid" aria-label="Course facts">
-              <div class="course-detail-stat">
-                <span>Subject</span>
-                <strong id="course-detail-subject">Subject</strong>
-              </div>
-
-              <div class="course-detail-stat">
-                <span>Level</span>
-                <strong id="course-detail-level">Level</strong>
-              </div>
-
-              <div class="course-detail-stat">
-                <span>Code</span>
-                <strong id="course-detail-full-code">Code</strong>
-              </div>
-
+            <section class="course-detail-grid" id="course-detail-grid" aria-label="Course facts" hidden>
               <div
                 class="course-detail-stat"
                 id="course-detail-prerequisite-row"
@@ -4817,11 +4846,9 @@
                 <strong id="course-detail-prerequisite">Prerequisite</strong>
               </div>
 
-              <div class="course-detail-stat course-detail-professors">
+              <div class="course-detail-stat course-detail-professors" hidden>
                 <span>Professors</span>
-                <div class="course-professor-list" id="course-professor-list">
-                  <p>No professors listed for this course yet.</p>
-                </div>
+                <div class="course-professor-list" id="course-professor-list"></div>
               </div>
             </section>
           </article>
