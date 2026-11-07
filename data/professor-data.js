@@ -3627,10 +3627,6 @@ function getProfessorUrl(professor) {
         <div>
           <h1>${escapeHtml(professor.name)}</h1>
         </div>
-
-        <p>
-          Check contact details and leave a course-specific review.
-        </p>
       `;
     }
 
