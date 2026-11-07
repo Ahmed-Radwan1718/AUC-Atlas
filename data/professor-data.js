@@ -1586,7 +1586,7 @@
       min-width: 0;
     }
 
-    .professor-review-stat-row:first-child > summary {
+    .professor-review-stat-row:first-child > .professor-review-stat-details-toggle {
       padding-top: 4px;
     }
 
@@ -1670,18 +1670,12 @@
       padding: 8px 0;
       border: 0;
       background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
       display: grid;
       gap: 8px;
-      list-style: none;
       cursor: pointer;
-    }
-
-    .professor-review-stat-details-toggle::-webkit-details-marker {
-      display: none;
-    }
-
-    .professor-review-stat-details-toggle::marker {
-      content: "";
     }
 
     .professor-review-stat-details-toggle:focus-visible {
@@ -1691,7 +1685,7 @@
     }
 
     .professor-review-stat-details-toggle:hover .professor-review-stat-label,
-    .professor-review-stat-row[open] .professor-review-stat-label {
+    .professor-review-stat-row.open .professor-review-stat-label {
       color: #171717;
     }
 
@@ -1706,20 +1700,27 @@
       transition: transform 0.22s ease;
     }
 
-    .professor-review-stat-row[open] .professor-review-stat-chevron {
+    .professor-review-stat-row.open .professor-review-stat-chevron {
       transform: rotate(225deg);
     }
 
     .professor-review-stat-breakdown {
       display: grid;
       gap: 9px;
-      padding: 2px 0 11px;
+      max-height: 0;
+      padding: 0;
       overflow: hidden;
-      opacity: 1;
+      opacity: 0;
       transition:
-        height 0.28s ease,
-        opacity 0.22s ease,
-        transform 0.22s ease;
+        max-height 0.42s ease,
+        opacity 0.28s ease,
+        padding 0.42s ease;
+    }
+
+    .professor-review-stat-row.open .professor-review-stat-breakdown {
+      max-height: var(--stat-expanded-height, 520px);
+      opacity: 1;
+      padding: 2px 0 11px;
     }
 
     .professor-review-stat-total,
@@ -2948,11 +2949,7 @@ function getProfessorUrl(professor) {
         `;
       }).join("");
 
-      return `
-        <div class="professor-review-stat-breakdown">
-          ${answerMarkup}
-        </div>
-      `;
+      return answerMarkup;
     }
 
     function renderStatRow(row, index) {
@@ -2960,8 +2957,9 @@ function getProfessorUrl(professor) {
       const delay = Math.min(index * 55, 275);
 
       return `
-        <details class="professor-review-stat-row">
-          <summary class="professor-review-stat-details-toggle">
+        <div class="professor-review-stat-row">
+          <button class="professor-review-stat-details-toggle" type="button"
+                  aria-expanded="false" aria-controls="professor-review-stat-breakdown-${index}">
             <div class="professor-review-stat-head">
               <span class="professor-review-stat-label">${escapeHtml(row.label)}</span>
 
@@ -2983,10 +2981,12 @@ function getProfessorUrl(professor) {
                 style="--stat-width: ${escapeHtml(String(row.topAnswer.width))}%; --stat-delay: ${delay}ms;"
               ></span>
             </div>
-          </summary>
+          </button>
 
-          ${renderStatBreakdown(row)}
-        </details>
+          <div id="professor-review-stat-breakdown-${index}" class="professor-review-stat-breakdown" aria-hidden="true">
+            ${renderStatBreakdown(row)}
+          </div>
+        </div>
       `;
     }
 
@@ -3029,15 +3029,39 @@ function getProfessorUrl(professor) {
     panel.innerHTML = visibleRows.map(renderStatRow).join("") + hiddenMarkup;
 
     panel
-      .querySelectorAll(".professor-review-stat-row, .professor-review-insights-more")
+      .querySelectorAll(".professor-review-stat-row")
+      .forEach(setupProfessorReviewStatAnimation);
+
+    panel
+      .querySelectorAll(".professor-review-insights-more")
       .forEach(setupProfessorReviewDetailAnimation);
+  }
+
+  // Match the Department filter: toggling a class drives a max-height/opacity transition.
+  function setupProfessorReviewStatAnimation(row) {
+    const button = row.querySelector(".professor-review-stat-details-toggle");
+    const breakdown = row.querySelector(".professor-review-stat-breakdown");
+
+    if (!button || !breakdown) {
+      return;
+    }
+
+    button.addEventListener("click", function () {
+      // Size the transition to this row, rather than keeping a long empty delay.
+      breakdown.style.setProperty(
+        "--stat-expanded-height",
+        (breakdown.scrollHeight + 16) + "px"
+      );
+
+      const open = row.classList.toggle("open");
+      button.setAttribute("aria-expanded", String(open));
+      breakdown.setAttribute("aria-hidden", String(!open));
+    });
   }
 
   function setupProfessorReviewDetailAnimation(details) {
     const summary = details.querySelector("summary");
-    const content = details.classList.contains("professor-review-insights-more")
-      ? details.querySelector(".professor-review-insights-hidden")
-      : details.querySelector(".professor-review-stat-breakdown");
+    const content = details.querySelector(".professor-review-insights-hidden");
 
     if (!summary || !content || details.dataset.reviewAnimationReady === "true") {
       return;
