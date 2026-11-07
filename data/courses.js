@@ -5079,7 +5079,24 @@ const href = courseCode
           ? getCourseByCode(courseInput.value)
           : null;
       },
-      onSuccess: function () {
+      onSuccess: function (uploadedCourse) {
+        const courseCode = getSelectedCourseCode();
+        const currentCourse = courseCode ? getCourseByCode(courseCode) : null;
+        if (currentCourse) {
+          // Keep the hidden course choice selected for another upload.
+          const courseSelect = getMaterialFormControl(
+            form,
+            "course",
+            "quick-material-course"
+          );
+          if (courseSelect) {
+            courseSelect.value = currentCourse.code;
+            courseSelect.dispatchEvent(
+              new Event("change", { bubbles: true })
+            );
+          }
+          return loadCourseMaterials(currentCourse);
+        }
         return loadRecentMaterials();
       }
     });
@@ -5091,6 +5108,23 @@ const href = courseCode
         document.activeElement instanceof HTMLElement
           ? document.activeElement
           : button;
+
+      const courseCode = getSelectedCourseCode();
+      const courseInput = getMaterialFormControl(
+        form,
+        "course",
+        "quick-material-course"
+      );
+      if (courseCode && courseInput) {
+        courseInput.value = courseCode;
+        courseInput.dispatchEvent(
+          new Event("change", { bubbles: true })
+        );
+      }
+      modal.classList.toggle(
+        "is-course-detail-upload",
+        Boolean(courseCode)
+      );
 
       modal.hidden = false;
       document.body.classList.add(
@@ -5106,11 +5140,6 @@ const href = courseCode
         form
       );
 
-      const courseInput = getMaterialFormControl(
-        form,
-        "course",
-        "quick-material-course"
-      );
       const courseChoice = courseInput
         ? courseInput.nextElementSibling
         : null;
@@ -5125,7 +5154,9 @@ const href = courseCode
           : null;
 
       window.setTimeout(function () {
-        if (courseChoiceButton) {
+        if (courseCode && closeButton) {
+          closeButton.focus();
+        } else if (courseChoiceButton) {
           courseChoiceButton.focus();
         } else if (closeButton) {
           closeButton.focus();
@@ -7649,7 +7680,6 @@ function getSelectedCourseCode() {
   }
 
   function setupCourseMaterialsAccess(course) {
-    setupMaterialUploadForm(course);
     setupCourseMaterialPreview();
     loadCourseMaterials(course);
   }
@@ -8626,6 +8656,8 @@ function getSelectedCourseCode() {
   }
 
   function setupCoursesPage() {
+    setupCourseUploadStart();
+
     const searchInput = document.getElementById(
       "course-search-input"
     );
@@ -8676,7 +8708,6 @@ function getSelectedCourseCode() {
 
     renderSubjectFilters();
     renderPopularCourses();
-    setupCourseUploadStart();
     loadRecentMaterials();
     animateCourseSearchPlaceholder();
     renderCourses();
