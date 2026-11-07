@@ -6,9 +6,9 @@
   document.head.appendChild(faviconLink);
 
   const isAdminPage = /\/admin(?:\.html)?\/?$/.test(window.location.pathname);
-  const weeklyVisitCacheKey =
-    "aucAtlasWeeklyVisitCache";
-  const weeklyVisitCacheDurationMs =
+  const monthlyVisitCacheKey =
+    "aucAtlasMonthlyVisitCache";
+  const monthlyVisitCacheDurationMs =
     30 * 60 * 1000;
 
   function clearLegacyUniqueVisitorId() {
@@ -29,45 +29,65 @@
     }
   }
 
-  function getCachedWeeklyVisitCount() {
+  function getCairoVisitorMonthKey() {
+    const dateParts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Africa/Cairo",
+      year: "numeric",
+      month: "2-digit"
+    }).formatToParts(new Date());
+    const calendarDate = {};
+
+    dateParts.forEach(function (part) {
+      if (part.type !== "literal") {
+        calendarDate[part.type] = Number(part.value);
+      }
+    });
+
+    return calendarDate.year + "-" +
+      String(calendarDate.month).padStart(2, "0");
+  }
+
+  function getCachedMonthlyVisitCount() {
     try {
       const cached = JSON.parse(
         window.sessionStorage.getItem(
-          weeklyVisitCacheKey
+          monthlyVisitCacheKey
         ) || "null"
       );
       const savedAt = Number(
         cached && cached.savedAt
       );
-      const weeklyVisits = Number(
-        cached && cached.weeklyVisits
+      const monthlyVisits = Number(
+        cached && cached.monthlyVisits
       );
 
       if (
         !cached ||
         !Number.isFinite(savedAt) ||
+        cached.monthKey !== getCairoVisitorMonthKey() ||
         Date.now() - savedAt >
-          weeklyVisitCacheDurationMs ||
-        !Number.isFinite(weeklyVisits)
+          monthlyVisitCacheDurationMs ||
+        !Number.isFinite(monthlyVisits)
       ) {
         return null;
       }
 
-      return Math.max(0, weeklyVisits);
+      return Math.max(0, monthlyVisits);
     } catch (error) {
       return null;
     }
   }
 
-  function cacheWeeklyVisitCount(
-    weeklyVisits
+  function cacheMonthlyVisitCount(
+    monthlyVisits
   ) {
     try {
       window.sessionStorage.setItem(
-        weeklyVisitCacheKey,
+        monthlyVisitCacheKey,
         JSON.stringify({
           savedAt: Date.now(),
-          weeklyVisits
+          monthKey: getCairoVisitorMonthKey(),
+          monthlyVisits
         })
       );
     } catch (error) {
@@ -75,7 +95,7 @@
     }
   }
 
-  function trackWeeklyVisit() {
+  function trackMonthlyVisit() {
     if (
       isAdminPage ||
       typeof window.fetch !== "function"
@@ -83,19 +103,19 @@
       return Promise.resolve(null);
     }
 
-    const cachedWeeklyVisits =
-      getCachedWeeklyVisitCount();
+    const cachedMonthlyVisits =
+      getCachedMonthlyVisitCount();
 
-    if (cachedWeeklyVisits !== null) {
-      window.aucAtlasWeeklyVisits =
-        cachedWeeklyVisits;
+    if (cachedMonthlyVisits !== null) {
+      window.aucAtlasMonthlyVisits =
+        cachedMonthlyVisits;
 
       return Promise.resolve(
-        cachedWeeklyVisits
+        cachedMonthlyVisits
       );
     }
 
-    return fetch("/api/weekly-visitors", {
+    return fetch("/api/monthly-visitors", {
       method: "POST",
       credentials: "same-origin",
       cache: "no-store",
@@ -106,25 +126,25 @@
       .then(function (response) {
         if (!response.ok) {
           throw new Error(
-            "Could not update weekly visits."
+            "Could not update monthly visits."
           );
         }
 
         return response.json();
       })
       .then(function (data) {
-        const weeklyVisits = Math.max(
+        const monthlyVisits = Math.max(
           0,
-          Number(data.weeklyVisits) || 0
+          Number(data.monthlyVisits) || 0
         );
 
-        window.aucAtlasWeeklyVisits =
-          weeklyVisits;
-        cacheWeeklyVisitCount(
-          weeklyVisits
+        window.aucAtlasMonthlyVisits =
+          monthlyVisits;
+        cacheMonthlyVisitCount(
+          monthlyVisits
         );
 
-        return weeklyVisits;
+        return monthlyVisits;
       })
       .catch(function () {
         return null;
@@ -133,8 +153,8 @@
 
   clearLegacyUniqueVisitorId();
 
-  window.aucAtlasWeeklyVisitsPromise =
-    trackWeeklyVisit();
+  window.aucAtlasMonthlyVisitsPromise =
+    trackMonthlyVisit();
 
   if (!isAdminPage && !document.querySelector('script[src="site-footer.js"]')) {
     const footerScript = document.createElement("script");

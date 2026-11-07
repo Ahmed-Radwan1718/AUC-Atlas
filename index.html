@@ -997,7 +997,7 @@
         </div>
 
         <p>
-          Live counts from the professors, courses, reviews, and visits during the current week.
+          Live counts from the professors, courses, reviews, and visits during the current month.
         </p>
       </div>
 
@@ -1018,8 +1018,8 @@
         </article>
 
         <article class="home-stat">
-          <strong id="home-weekly-visit-count">—</strong>
-          <span>Visits this week</span>
+          <strong id="home-monthly-visit-count">—</strong>
+          <span>Visits this month</span>
         </article>
       </div>
     </section>
@@ -1091,7 +1091,7 @@
       const professorCount = document.getElementById("home-professor-count");
       const courseCount = document.getElementById("home-course-count");
       const reviewCount = document.getElementById("home-review-count");
-      const weeklyVisitCount = document.getElementById("home-weekly-visit-count");
+      const monthlyVisitCount = document.getElementById("home-monthly-visit-count");
       const lowestProfessorsRoot = document.getElementById("home-lowest-professors");
       const latestMaterialsRoot = document.getElementById("home-latest-materials");
       const latestProfessorsRoot = document.getElementById("home-latest-professors");
@@ -1424,7 +1424,7 @@ const materialHref = materialCourseSlug
       setHomeCount(professorCount, professors.length);
 
       Promise.resolve(
-        window.aucAtlasWeeklyVisitsPromise
+        window.aucAtlasMonthlyVisitsPromise
       )
         .then(function (count) {
           const numericCount = Number(count);
@@ -1437,7 +1437,7 @@ const materialHref = materialCourseSlug
             return numericCount;
           }
 
-          return fetch("/api/weekly-visitors", {
+          return fetch("/api/monthly-visitors", {
             method: "GET",
             credentials: "same-origin",
             cache: "no-store",
@@ -1448,22 +1448,22 @@ const materialHref = materialCourseSlug
             .then(function (response) {
               if (!response.ok) {
                 throw new Error(
-                  "Could not load weekly visits."
+                  "Could not load monthly visits."
                 );
               }
 
               return response.json();
             })
             .then(function (data) {
-              return data.weeklyVisits;
+              return data.monthlyVisits;
             });
         })
         .then(function (count) {
-          setHomeCount(weeklyVisitCount, count);
+          setHomeCount(monthlyVisitCount, count);
         })
         .catch(function () {
-          if (weeklyVisitCount) {
-            weeklyVisitCount.textContent = "—";
+          if (monthlyVisitCount) {
+            monthlyVisitCount.textContent = "—";
           }
         });
 
