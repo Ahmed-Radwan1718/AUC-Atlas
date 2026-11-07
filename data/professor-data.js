@@ -3886,7 +3886,6 @@ function getProfessorUrl(professor) {
       <section class="professor-reviews-section" aria-label="Student reviews for ${escapeHtml(professor.name)}">
         <div class="professor-reviews-header">
           <div>
-            <span>Student reviews</span>
             <h2>What students said</h2>
           </div>
           <p id="professor-reviews-count">Loading reviews...</p>
