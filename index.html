@@ -1372,9 +1372,16 @@
         }
 
         latestMaterialsRoot.innerHTML = safeMaterials.map(function (material) {
-          const courseCode =
-            material.courseCode ||
-            "AUC course";
+          const courseEntry = (
+            Array.isArray(window.aucAtlasCourses) ? window.aucAtlasCourses : []
+          ).find(function (course) {
+            return String(course.code || "").trim().toUpperCase() ===
+              String(material.courseCode || "").trim().toUpperCase();
+          });
+          const courseName =
+            (courseEntry && courseEntry.title) ||
+            material.courseTitle ||
+            "Course name unavailable";
 const materialCourseSlug = String(
   material.courseCode || ""
 )
@@ -1395,14 +1402,9 @@ const materialHref = materialCourseSlug
                 ${getHomeMaterialIcon(material)}
               </span>
               <span class="home-latest-material-copy">
-                <span class="home-latest-item-top">
-                  <span class="home-latest-type">
-                    ${escapeHomeText(material.materialType || "Material")}
-                  </span>
-                </span>
                 <strong>${escapeHomeText(material.title || "Course material")}</strong>
                 <span class="home-latest-item-bottom">
-                  <small>${escapeHomeText(courseCode)}</small>
+                  <small>${escapeHomeText(courseName)}</small>
                 </span>
               </span>
               <span class="home-latest-arrow" aria-hidden="true">→</span>
