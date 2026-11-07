@@ -3056,7 +3056,14 @@ function getProfessorUrl(professor) {
       event.preventDefault();
 
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        if (closeTimer) {
+          window.clearTimeout(closeTimer);
+          closeTimer = null;
+        }
         details.open = !details.open;
+        content.style.height = "";
+        content.style.opacity = "";
+        content.style.transform = "";
         return;
       }
 
