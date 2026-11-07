@@ -1902,16 +1902,17 @@
 
     .professor-review-author {
       min-width: 0;
+      flex: 1 1 auto;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 9px;
     }
 
     .professor-review-avatar,
     .professor-review-avatar-fallback {
-      width: 44px;
-      height: 44px;
-      flex: 0 0 44px;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
       border-radius: 999px;
       overflow: hidden;
       background: #171717;
@@ -1919,21 +1920,27 @@
       display: grid;
       place-items: center;
       object-fit: cover;
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 800;
       letter-spacing: 0.04em;
     }
 
     .professor-review-author strong {
       display: block;
-      color: #171717;
-      font-size: 14px;
-      line-height: 1.2;
+      min-width: 0;
+      overflow: hidden;
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.3;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .professor-review-rating {
+      flex: 0 0 auto;
       color: #c09a5c;
-      font-size: 14px;
+      font-size: 20px;
       font-weight: 900;
       line-height: 1;
       white-space: nowrap;
@@ -1944,7 +1951,7 @@
     .professor-review-stars {
       display: inline-flex;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
     }
 
     .professor-review-star {
