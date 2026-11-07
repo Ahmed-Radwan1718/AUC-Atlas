@@ -1729,6 +1729,39 @@
       gap: 5px;
     }
 
+    /* Keep answers with no selections out of the initial breakdown. */
+    .professor-review-stat-answer.is-zero-answer {
+      display: none;
+    }
+
+    .professor-review-stat-breakdown.show-zero-options .professor-review-stat-answer.is-zero-answer {
+      display: grid;
+    }
+
+    .professor-review-stat-show-zeros {
+      justify-self: start;
+      margin-top: 2px;
+      padding: 4px 0;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.62);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .professor-review-stat-show-zeros:hover,
+    .professor-review-stat-show-zeros:focus-visible {
+      color: #171717;
+    }
+
+    .professor-review-stat-show-zeros:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+
     .professor-review-stat-answer-head {
       min-width: 0;
       display: flex;
@@ -2922,6 +2955,9 @@ function getProfessorUrl(professor) {
 
     function renderStatBreakdown(row) {
       const answers = Array.isArray(row.answers) ? row.answers : [];
+      const hasZeroOptions = answers.some(function (answer) {
+        return Number(answer.count || 0) === 0;
+      });
       const answerMarkup = answers.map(function (answer) {
         const answerValue = getCompactStatValue(answer.value);
         const answerPercent = Number(answer.percent || 0);
@@ -2929,7 +2965,7 @@ function getProfessorUrl(professor) {
         const answerMeta = answerPercent + "%";
 
         return `
-          <div class="professor-review-stat-answer">
+          <div class="professor-review-stat-answer${Number(answer.count || 0) === 0 ? " is-zero-answer" : ""}">
             <div class="professor-review-stat-answer-head">
               <span>${escapeHtml(answerValue)}</span>
               <span>${escapeHtml(answerMeta)}</span>
@@ -2949,7 +2985,9 @@ function getProfessorUrl(professor) {
         `;
       }).join("");
 
-      return answerMarkup;
+      return answerMarkup + (hasZeroOptions
+        ? '<button class="professor-review-stat-show-zeros" type="button" aria-expanded="false">Show all options</button>'
+        : "");
     }
 
     function renderStatRow(row, index) {
@@ -3046,17 +3084,31 @@ function getProfessorUrl(professor) {
       return;
     }
 
-    button.addEventListener("click", function () {
-      // Size the transition to this row, rather than keeping a long empty delay.
+    function updateExpandedHeight() {
+      // Recalculate after hiding/showing options so the existing CSS transition
+      // expands to the content rather than clipping it.
       breakdown.style.setProperty(
         "--stat-expanded-height",
         (breakdown.scrollHeight + 16) + "px"
       );
+    }
 
+    button.addEventListener("click", function () {
+      updateExpandedHeight();
       const open = row.classList.toggle("open");
       button.setAttribute("aria-expanded", String(open));
       breakdown.setAttribute("aria-hidden", String(!open));
     });
+
+    const showZeros = breakdown.querySelector(".professor-review-stat-show-zeros");
+    if (showZeros) {
+      showZeros.addEventListener("click", function () {
+        const showingAll = breakdown.classList.toggle("show-zero-options");
+        showZeros.textContent = showingAll ? "Hide zero-percent options" : "Show all options";
+        showZeros.setAttribute("aria-expanded", String(showingAll));
+        updateExpandedHeight();
+      });
+    }
   }
 
   function setupProfessorReviewDetailAnimation(details) {
