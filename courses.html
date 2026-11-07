@@ -3254,6 +3254,266 @@
       }
     }
 
+
+    /* Course profiles share the professor page's title, width, and card rhythm. */
+    .course-detail-view {
+      width: min(1380px, 100%);
+      gap: 16px;
+    }
+
+    .course-back-link {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+    }
+
+    .course-detail-page-heading {
+      display: grid;
+      gap: 10px;
+      padding: 0 2px 2px;
+    }
+
+    .course-detail-page-heading h1 {
+      color: #171717;
+      font-size: clamp(30px, 3.2vw, 46px);
+      font-weight: 600;
+      line-height: 1.05;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+    }
+
+    .course-detail-page-heading .course-detail-heading-meta {
+      margin-bottom: 0;
+    }
+
+    .course-profile-layout {
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 400px);
+      grid-template-areas:
+        "course upload"
+        "filesHeading upload"
+        "materials upload";
+      gap: 16px 18px;
+    }
+
+    .course-files-heading {
+      grid-area: filesHeading;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 2px 2px 0;
+    }
+
+    .course-files-heading h2 {
+      color: #171717;
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .course-files-heading p {
+      color: rgba(23, 23, 23, 0.52);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: right;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .course-detail-hero {
+      padding: 24px 28px 20px;
+    }
+
+    .course-detail-description {
+      margin-top: 0;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .course-detail-grid {
+      margin: 0 28px;
+      padding: 18px 0 24px;
+      gap: 18px;
+    }
+
+    .course-profile-card,
+    .course-material-summary,
+    .material-upload-panel {
+      border-radius: 22px;
+      box-shadow: 0 18px 44px rgba(42, 32, 20, 0.08);
+    }
+
+    .course-material-summary {
+      padding: 18px 20px;
+      grid-template-columns: minmax(0, 1fr);
+      column-gap: 0;
+      row-gap: 12px;
+    }
+
+    .course-material-downloads > div.course-material-library-toolbar {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+      justify-self: end;
+    }
+
+    .course-material-downloads > .course-materials-list {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .course-material-downloads .course-materials-list {
+      padding-top: 12px;
+    }
+
+    .material-upload-panel {
+      padding: 20px;
+      gap: 0;
+    }
+
+    .material-upload-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .material-upload-panel-header h2 {
+      font-size: 21px;
+      line-height: 1.2;
+    }
+
+    .material-upload-panel-header p {
+      margin-top: 5px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .material-upload-panel-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      flex: 0 0 auto;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .material-upload-panel-toggle:hover,
+    .material-upload-panel-toggle:focus-visible {
+      background: #34302b;
+    }
+
+    .material-upload-panel-toggle:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 3px;
+    }
+
+    .material-upload-panel-chevron {
+      width: 6px;
+      height: 6px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.28s ease;
+    }
+
+    .material-upload-panel.is-expanded .material-upload-panel-chevron {
+      transform: rotate(225deg) translateY(-1px);
+    }
+
+    .material-upload-panel-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      pointer-events: none;
+      transition: grid-template-rows 0.42s ease, opacity 0.28s ease;
+    }
+
+    .material-upload-panel.is-expanded .material-upload-panel-content {
+      grid-template-rows: 1fr;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .material-upload-panel-content-inner {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .material-upload-panel-content-inner > .material-upload-form {
+      padding-top: 0;
+      transition: padding-top 0.42s ease;
+    }
+
+    .material-upload-panel.is-expanded .material-upload-panel-content-inner > .material-upload-form {
+      padding-top: 20px;
+    }
+
+    .course-materials-loading.course-upload-loading {
+      min-height: 150px;
+    }
+
+    .course-action-stack.is-locked > .material-upload-panel {
+      min-height: 205px;
+    }
+
+    @media (max-width: 980px) {
+      .course-profile-layout {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+          "course"
+          "filesHeading"
+          "materials"
+          "upload";
+      }
+    }
+
+    @media (max-width: 640px) {
+      .course-detail-page-heading h1 {
+        font-size: clamp(28px, 7vw, 38px);
+      }
+
+      .course-detail-hero {
+        padding: 22px 20px 18px;
+      }
+
+      .course-detail-grid {
+        margin: 0 20px;
+      }
+
+      .material-upload-panel-header {
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .material-upload-panel-toggle {
+        min-height: 44px;
+      }
+
+      .course-material-downloads > div.course-material-library-toolbar {
+        justify-self: stretch;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .material-upload-panel-content,
+      .material-upload-panel-content-inner > .material-upload-form,
+      .material-upload-panel-chevron {
+        transition: none;
+      }
+    }
+
     .courses-list-view[hidden],
     .courses-result-count[hidden],
     .courses-grid[hidden],
@@ -4822,15 +5082,18 @@
       <section class="course-detail-view" id="course-detail-view" aria-label="Course details" hidden>
         <a class="course-back-link" href="courses.html">Back to courses</a>
 
+        <header class="course-detail-page-heading">
+          <h1 id="course-detail-title">Course title</h1>
+          <div class="course-detail-heading-meta">
+            <span class="course-detail-kicker" id="course-detail-code">Course</span>
+            <span class="course-detail-heading-separator" aria-hidden="true">·</span>
+            <span class="course-detail-level" id="course-detail-level">Level</span>
+          </div>
+        </header>
+
         <div class="course-profile-layout">
           <article class="course-profile-card">
             <section class="course-detail-hero">
-              <div class="course-detail-heading-meta">
-                <span class="course-detail-kicker" id="course-detail-code">Course</span>
-                <span class="course-detail-heading-separator" aria-hidden="true">·</span>
-                <span class="course-detail-level" id="course-detail-level">Level</span>
-              </div>
-              <h1 id="course-detail-title">Course title</h1>
               <p class="course-detail-description" id="course-detail-description">
                 Course description coming soon.
               </p>
@@ -4853,6 +5116,11 @@
             </section>
           </article>
 
+          <div class="course-files-heading">
+            <h2>Course files</h2>
+            <p id="course-file-count" aria-live="polite">Loading files...</p>
+          </div>
+
           <aside class="course-action-stack is-loading" id="course-materials-access" aria-busy="true">
             <div class="course-materials-loading" id="course-materials-loading" role="status" aria-live="polite">
               <div class="course-materials-loading-spinner" aria-hidden="true"></div>
@@ -4865,10 +5133,6 @@
             </div>
 
             <section class="course-material-summary course-material-downloads" aria-label="Course materials">
-              <div>
-                <h2>Course files</h2>
-              </div>
-
               <div class="course-material-library-toolbar">
                 <div
                   class="material-choice course-material-filter-list course-material-filter-choice"
@@ -4917,12 +5181,24 @@
               </div>
             </section>
 
-            <section class="material-upload-panel" aria-label="Upload course material">
+            <section class="material-upload-panel" id="course-upload-panel" aria-label="Upload course material">
               <div class="material-upload-panel-header">
-                <h2>Upload material</h2>
+                <div>
+                  <h2>Upload material</h2>
+                  <p>Share notes, slides, and course files.</p>
+                </div>
+                <button type="button" class="material-upload-panel-toggle"
+                        id="course-upload-toggle"
+                        aria-controls="course-upload-content"
+                        aria-expanded="false">
+                  <span>Upload material</span>
+                  <span class="material-upload-panel-chevron" aria-hidden="true"></span>
+                </button>
               </div>
 
-              <form class="material-upload-form" id="material-upload-form">
+              <div class="material-upload-panel-content" id="course-upload-content" inert>
+                <div class="material-upload-panel-content-inner">
+                  <form class="material-upload-form" id="material-upload-form">
                 <div class="material-upload-grid">
                   <label class="material-upload-field">
                     <span>Professor</span>
@@ -5052,7 +5328,9 @@
                 <div class="material-upload-overlay" id="material-upload-overlay" hidden aria-label="Uploading material" role="status">
                   <div class="material-upload-spinner"></div>
                 </div>
-              </form>
+                  </form>
+                </div>
+              </div>
 
               <div class="course-material-access-lock" aria-hidden="true">
                 <div class="course-material-access-lock-card">
