@@ -200,8 +200,7 @@ function getCourseProfileUrl(courseCode, hash) {
         professor.department,
         professor.displayDepartment,
         professor.filterDepartment,
-        professor.course,
-        professor.bio
+        professor.course
       ]);
       const result = {
         type: "Professor",
