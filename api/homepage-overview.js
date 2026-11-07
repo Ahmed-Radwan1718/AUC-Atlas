@@ -54,6 +54,8 @@ function serializeMaterial(doc) {
       80
     ),
     title: cleanString(data.title, 160),
+    fileName: cleanString(data.fileName, 240),
+    fileType: cleanString(data.fileType, 120),
     createdAt: createdAtMillis
       ? new Date(createdAtMillis).toISOString()
       : cleanString(data.createdAtIso, 80)

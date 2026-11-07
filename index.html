@@ -672,6 +672,57 @@
       white-space: nowrap;
     }
 
+
+    /* Compact file icons match the photo rows in the neighboring cards. */
+    .home-latest-material {
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .home-latest-material-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+    }
+
+    .home-latest-material-icon img {
+      display: block;
+      max-width: 38px;
+      max-height: 46px;
+      object-fit: contain;
+    }
+
+    .home-latest-material-icon-fallback {
+      width: 42px;
+      height: 46px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 9px;
+      background: rgba(192, 154, 92, 0.1);
+      color: #92672e;
+      font-size: 9px;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+    }
+
+    .home-latest-material-copy {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .home-latest-material-copy > strong {
+      overflow: hidden;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .home-roadmap-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1266,6 +1317,42 @@
         }).join("");
       }
 
+      function getHomeMaterialIcon(material) {
+        const fileName = String(material.fileName || material.title || "").trim().toLowerCase();
+        const extensionMatch = fileName.match(/\.([a-z0-9]{1,8})$/);
+        let extension = extensionMatch ? extensionMatch[1] : "";
+        const fileType = String(material.fileType || "").toLowerCase();
+
+        if (!extension) {
+          if (fileType.includes("pdf")) extension = "pdf";
+          else if (fileType.includes("word")) extension = "docx";
+          else if (fileType.includes("presentation") || fileType.includes("powerpoint")) extension = "pptx";
+          else if (fileType.includes("spreadsheet") || fileType.includes("excel")) extension = "xlsx";
+          else if (fileType.includes("jpeg")) extension = "jpg";
+          else if (fileType.includes("png")) extension = "png";
+        }
+
+        const icons = {
+          pdf: "pdf.png",
+          doc: "doc.png",
+          docx: "doc.png",
+          ppt: "ppt.png",
+          pptx: "ppt.png",
+          xls: "xls.png",
+          xlsx: "xls.png",
+          jpg: "jpg.png",
+          jpeg: "jpg.png",
+          png: "png.png"
+        };
+        const icon = icons[extension];
+
+        return icon
+          ? '<img src="' + icon + '" alt="">'
+          : '<span class="home-latest-material-icon-fallback">' +
+              escapeHomeText((extension || "FILE").slice(0, 5).toUpperCase()) +
+            '</span>';
+      }
+
       function renderLatestMaterials(materials) {
         if (!latestMaterialsRoot) {
           return;
@@ -1303,27 +1390,25 @@ const materialHref = materialCourseSlug
   : "/courses";
 
           return `
-            <a class="home-latest-item" href="${materialHref}">
-              <span class="home-latest-item-top">
-                <span class="home-latest-type">
-                  ${escapeHomeText(material.materialType || "Material")}
+            <a class="home-latest-item home-latest-material" href="${materialHref}">
+              <span class="home-latest-material-icon" aria-hidden="true">
+                ${getHomeMaterialIcon(material)}
+              </span>
+              <span class="home-latest-material-copy">
+                <span class="home-latest-item-top">
+                  <span class="home-latest-type">
+                    ${escapeHomeText(material.materialType || "Material")}
+                  </span>
+                  <small>${escapeHomeText(formatHomeDate(material.createdAt))}</small>
                 </span>
-                <small>
-                  ${escapeHomeText(formatHomeDate(material.createdAt))}
-                </small>
+                <strong>${escapeHomeText(material.title || "Course material")}</strong>
+                <span class="home-latest-item-bottom">
+                  <small>${escapeHomeText(courseCode)}</small>
+                </span>
               </span>
-
-              <strong>
-                ${escapeHomeText(material.title || "Course material")}
-              </strong>
-
-              <span class="home-latest-item-bottom">
-                <small>${escapeHomeText(courseCode)}</small>
-                <span class="home-latest-arrow" aria-hidden="true">→</span>
-              </span>
+              <span class="home-latest-arrow" aria-hidden="true">→</span>
             </a>
-          `;
-        }).join("");
+          `;        }).join("");
       }
 
       const courses = Array.isArray(window.aucAtlasCourses)
