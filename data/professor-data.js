@@ -1573,13 +1573,19 @@
       text-transform: uppercase;
     }
 
+    .professor-review-insights-header p {
+      font-size: 11px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
     .professor-review-stats {
       display: grid;
-      gap: 0;
+      gap: 10px;
     }
 
     .professor-review-stat-row {
-      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      min-width: 0;
     }
 
     .professor-review-stat-row:first-child > summary {
@@ -1598,11 +1604,11 @@
       min-width: 0;
       flex: 1 1 auto;
       color: rgba(23, 23, 23, 0.58);
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 800;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.01em;
       line-height: 1.3;
-      text-transform: uppercase;
+      text-transform: none;
     }
 
     .professor-review-stat-value {
@@ -1610,10 +1616,10 @@
       color: rgba(23, 23, 23, 0.42);
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.01em;
       line-height: 1.3;
       text-align: right;
-      text-transform: uppercase;
+      text-transform: none;
       white-space: nowrap;
       display: inline-flex;
       align-items: center;
@@ -1663,7 +1669,7 @@
     /* The summary covers the full label and progress bar, making each stat row expandable. */
     .professor-review-stat-details-toggle {
       width: 100%;
-      padding: 13px 0;
+      padding: 8px 0;
       border: 0;
       background: transparent;
       display: grid;
@@ -1709,7 +1715,7 @@
     .professor-review-stat-breakdown {
       display: grid;
       gap: 9px;
-      padding: 0 0 13px;
+      padding: 2px 0 11px;
     }
 
     .professor-review-stat-total,
@@ -1725,11 +1731,11 @@
       justify-content: space-between;
       gap: 12px;
       color: rgba(23, 23, 23, 0.48);
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 800;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.01em;
       line-height: 1.35;
-      text-transform: uppercase;
+      text-transform: none;
     }
 
     .professor-review-stat-answer-head span:first-child {
@@ -1774,7 +1780,7 @@
       order: 1;
       box-sizing: border-box;
       display: grid;
-      gap: 0;
+      gap: 10px;
       margin-top: 0;
       overflow: hidden;
       opacity: 1;
