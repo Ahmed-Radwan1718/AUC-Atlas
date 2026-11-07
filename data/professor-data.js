@@ -1574,8 +1574,10 @@
     }
 
     .professor-review-insights-header p {
-      font-size: 11px;
-      letter-spacing: 0;
+      color: rgba(23, 23, 23, 0.68);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
       text-transform: none;
     }
 
@@ -1603,21 +1605,21 @@
     .professor-review-stat-label {
       min-width: 0;
       flex: 1 1 auto;
-      color: rgba(23, 23, 23, 0.58);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.01em;
-      line-height: 1.3;
+      color: rgba(23, 23, 23, 0.74);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      line-height: 1.45;
       text-transform: none;
     }
 
     .professor-review-stat-value {
       min-width: 0;
-      color: rgba(23, 23, 23, 0.42);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      line-height: 1.3;
+      color: rgba(23, 23, 23, 0.60);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      line-height: 1.45;
       text-align: right;
       text-transform: none;
       white-space: nowrap;
@@ -1629,13 +1631,13 @@
 
     .professor-review-stat-value strong {
       color: #171717;
-      font-size: 10px;
-      font-weight: 800;
+      font-size: 12px;
+      font-weight: 700;
     }
 
     .professor-review-stat-value span:last-child {
-      color: rgba(192, 154, 92, 0.96);
-      font-weight: 900;
+      color: #a67e3e;
+      font-weight: 700;
     }
 
     .professor-review-stat-track,
@@ -1730,11 +1732,11 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      color: rgba(23, 23, 23, 0.48);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.01em;
-      line-height: 1.35;
+      color: rgba(23, 23, 23, 0.65);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      line-height: 1.45;
       text-transform: none;
     }
 
@@ -1798,10 +1800,10 @@
       border: 0;
       background: transparent;
       color: #171717;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: normal;
+      text-transform: none;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
