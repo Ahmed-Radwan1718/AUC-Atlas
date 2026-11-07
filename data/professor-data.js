@@ -1970,10 +1970,6 @@
     }
 
     .professor-review-context span {
-      padding: 8px 10px;
-      border: 1px solid rgba(23, 23, 23, 0.08);
-      border-radius: 999px;
-      background: rgba(247, 244, 238, 0.72);
       color: rgba(23, 23, 23, 0.62);
       font-size: 11px;
       font-weight: 800;
@@ -3572,6 +3568,7 @@ function getProfessorUrl(professor) {
 
           <div class="professor-review-context">
             <span>${escapeHtml(review.courseTaken || "Course not listed")}</span>
+            <span aria-hidden="true">·</span>
             <span>${escapeHtml(review.semesterTaken || "Semester not listed")}</span>
           </div>
 
