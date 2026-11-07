@@ -1882,7 +1882,6 @@
     }
 
     .professor-review-card {
-      min-height: 210px;
       padding: 16px;
       border: 1px solid rgba(23, 23, 23, 0.09);
       border-radius: 16px;
