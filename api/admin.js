@@ -315,11 +315,12 @@ async function listAllUsers(actor) {
 async function getDashboardData(actor) {
   const db = admin.firestore();
   const results = await Promise.all([
-    db.collection("professorReviews").limit(25).get(),
+    db.collection("professorReviews").get(),
     db.collection("courseMaterials").limit(25).get(),
     db.collection("contentReports").where("status", "==", "open").limit(25).get(),
     db.collection("adminAuditLogs").orderBy("createdAt", "desc").limit(10).get(),
-    listAllUsers(actor)
+    listAllUsers(actor),
+    db.collection("professorReviews").count().get()
   ]);
 
   const reviewsSnapshot = results[0];
@@ -327,6 +328,7 @@ async function getDashboardData(actor) {
   const reportsSnapshot = results[2];
   const auditSnapshot = results[3];
   const users = results[4];
+  const reviewCountSnapshot = results[5];
   const reviews = [];
   const firestoreMaterials = [];
   const reports = [];
@@ -376,7 +378,7 @@ async function getDashboardData(actor) {
     },
     stats: {
       users: users.length,
-      reviews: reviews.length,
+      reviews: Number(reviewCountSnapshot.data().count || 0),
       materials: materials.length,
       bannedUsers: users.filter(function (user) {
         return user.disabled;
@@ -384,7 +386,7 @@ async function getDashboardData(actor) {
     },
     users,
     reports: reports.slice(0, 250),
-    reviews: reviews.slice(0, 250),
+    reviews,
     materials: materials.slice(0, 250),
     auditLogs: audits
   };

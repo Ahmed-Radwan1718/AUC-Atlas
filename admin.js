@@ -174,6 +174,14 @@
     document.getElementById(
       "admin-material-list"
     );
+  const reviewPagination =
+    document.getElementById("admin-review-pagination");
+  const reviewPageInfo =
+    document.getElementById("admin-review-page-info");
+  const reviewPrev =
+    document.getElementById("admin-review-prev");
+  const reviewNext =
+    document.getElementById("admin-review-next");
   const reportSearch =
     document.getElementById(
       "admin-report-search"
@@ -207,7 +215,9 @@
   const userNext =
     document.getElementById("admin-user-next");
   const userPageSize = Number.MAX_SAFE_INTEGER;
+  const reviewPageSize = 25;
   let userPage = 1;
+  let reviewPage = 1;
   let selectedUserUid = "";
   const toast =
     document.getElementById(
@@ -1106,10 +1116,24 @@
 
     if (!filtered.length) {
       reviewList.innerHTML = '<div class="admin-empty">No matching professor reviews were found.</div>';
+      reviewPagination.hidden = true;
       return;
     }
 
-    reviewList.innerHTML = filtered.map(function (review) {
+    const pageCount = Math.ceil(filtered.length / reviewPageSize);
+    reviewPage = Math.max(1, Math.min(reviewPage, pageCount));
+    const start = (reviewPage - 1) * reviewPageSize;
+    const visibleReviews = filtered.slice(start, start + reviewPageSize);
+
+    reviewPagination.hidden = pageCount <= 1;
+    reviewPageInfo.textContent =
+      (start + 1).toLocaleString("en-US") + "–" +
+      Math.min(start + reviewPageSize, filtered.length).toLocaleString("en-US") +
+      " of " + filtered.length.toLocaleString("en-US") + " reviews";
+    reviewPrev.disabled = reviewPage === 1;
+    reviewNext.disabled = reviewPage === pageCount;
+
+    reviewList.innerHTML = visibleReviews.map(function (review) {
       const professorName = review.professorName || "Professor review";
       const professorPhoto = getReviewProfessorPhoto(review);
       return [
@@ -1431,7 +1455,26 @@
   });
 
   reportSearch.addEventListener("input", renderReports);
-  reviewSearch.addEventListener("input", renderReviews);
+  reviewSearch.addEventListener("input", function () {
+    reviewPage = 1;
+    renderReviews();
+  });
+
+  function changeReviewPage(nextPage) {
+    reviewPage = nextPage;
+    renderReviews();
+    reviewList.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+
+  reviewPrev.addEventListener("click", function () {
+    if (reviewPage > 1) {
+      changeReviewPage(reviewPage - 1);
+    }
+  });
+
+  reviewNext.addEventListener("click", function () {
+    changeReviewPage(reviewPage + 1);
+  });
   materialSearch.addEventListener("input", renderMaterials);
   userSearch.addEventListener("input", function () {
     userPage = 1;
@@ -1465,6 +1508,7 @@
 
       if (targetType === "review") {
         reviewSearch.value = targetId;
+        reviewPage = 1;
         renderReviews();
         switchPanel("reviews");
       } else {
