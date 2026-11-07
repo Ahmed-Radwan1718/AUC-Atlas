@@ -1712,14 +1712,6 @@
       padding: 0 0 13px;
     }
 
-    .professor-review-stat-response-count {
-      margin: 0;
-      color: rgba(23, 23, 23, 0.58);
-      font-size: 10px;
-      font-weight: 600;
-      line-height: 1.4;
-    }
-
     .professor-review-stat-total,
     .professor-review-stat-answer {
       display: grid;
@@ -2937,9 +2929,6 @@ function getProfessorUrl(professor) {
 
       return `
         <div class="professor-review-stat-breakdown">
-          <p class="professor-review-stat-response-count">
-            ${row.total} ${row.total === 1 ? "response" : "responses"} to this question
-          </p>
           ${answerMarkup}
         </div>
       `;
