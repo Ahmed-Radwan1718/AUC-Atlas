@@ -115,7 +115,7 @@
       );
     }
 
-    return fetch("/api/monthly-visitors", {
+    return fetch("/api/weekly-visitors?period=month", {
       method: "POST",
       credentials: "same-origin",
       cache: "no-store",

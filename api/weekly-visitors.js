@@ -200,148 +200,147 @@ async function getWeeklyVisitCount(countRef) {
   return Math.max(0, Number(countData.count) || 0);
 }
 
+function getCurrentMonthStart() {
+  const dateParts = new Intl.DateTimeFormat("en-US", {
+    timeZone: VISITOR_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit"
+  }).formatToParts(new Date());
+  const calendarDate = {};
+
+  dateParts.forEach(function (part) {
+    if (part.type !== "literal") {
+      calendarDate[part.type] = Number(part.value);
+    }
+  });
+
+  return calendarDate.year + "-" +
+    String(calendarDate.month).padStart(2, "0") + "-01";
+}
+
+function isMonthlyVisitRequest(req) {
+  let period = req && req.query && req.query.period;
+  if (Array.isArray(period)) {
+    period = period[0];
+  }
+  if (!period && req && req.url) {
+    try {
+      period = new URL(req.url, "https://localhost").searchParams.get("period");
+    } catch (error) {
+      period = "";
+    }
+  }
+  return period === "month";
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "POST") {
     res.setHeader("Allow", "GET, POST");
-
-    return res.status(405).json({
-      error: "Method not allowed"
-    });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   res.setHeader("Cache-Control", "private, no-store, max-age=0");
 
   try {
     const db = admin.firestore();
-    const weekStart = getCurrentWeekStart();
+    const isMonthly = isMonthlyVisitRequest(req);
+    const periodStart = isMonthly
+      ? getCurrentMonthStart()
+      : getCurrentWeekStart();
     const countRef = db
       .collection(
-        "weeklyUniqueVisitorCounts"
+        isMonthly
+          ? "monthlyUniqueVisitorCounts"
+          : "weeklyUniqueVisitorCounts"
       )
-      .doc(weekStart);
+      .doc(periodStart);
+
+    function visitResponse(count, counted) {
+      const payload = isMonthly
+        ? { monthlyVisits: count, monthStart: periodStart }
+        : { weeklyVisits: count, weekStart: periodStart };
+      if (typeof counted === "boolean") {
+        payload.counted = counted;
+      }
+      return res.status(200).json(payload);
+    }
 
     if (req.method === "GET") {
-      const weeklyVisits =
-        await getWeeklyVisitCount(countRef);
-
-      return res.status(200).json({
-        weeklyVisits,
-        weekStart
-      });
+      return visitResponse(await getWeeklyVisitCount(countRef));
     }
 
     if (isAutomatedVisitor(req)) {
-      return res.status(200).json({
-        weeklyVisits:
-          await getWeeklyVisitCount(countRef),
-        weekStart,
-        counted: false
-      });
+      return visitResponse(await getWeeklyVisitCount(countRef), false);
     }
 
-    const visitorId =
-      getOrCreateVisitorId(req, res);
+    const visitorId = getOrCreateVisitorId(req, res);
     const visitorRef = countRef
       .collection("visitors")
-      .doc(
-        getWeeklyVisitorHash(
-          visitorId,
-          weekStart
-        )
-      );
-    const existingVisitorSnapshot =
-      await visitorRef.get();
+      .doc(getWeeklyVisitorHash(visitorId, periodStart));
+    const existingVisitorSnapshot = await visitorRef.get();
 
     if (existingVisitorSnapshot.exists) {
-      return res.status(200).json({
-        weeklyVisits:
-          await getWeeklyVisitCount(countRef),
-        weekStart,
-        counted: false
-      });
+      return visitResponse(await getWeeklyVisitCount(countRef), false);
     }
 
     try {
       await consumeSecurityRateLimit({
-        scope:
-          "weekly-unique-visitors-ip",
+        scope: isMonthly
+          ? "monthly-unique-visitors-ip"
+          : "weekly-unique-visitors-ip",
         identifier: getRequestIp(req),
-        maxAttempts:
-          VISITOR_MAX_POSTS_PER_WINDOW,
-        windowMs:
-          VISITOR_RATE_LIMIT_WINDOW_MS,
-        message:
-          "Too many visitor-count requests from this connection."
+        maxAttempts: VISITOR_MAX_POSTS_PER_WINDOW,
+        windowMs: VISITOR_RATE_LIMIT_WINDOW_MS,
+        message: "Too many visitor-count requests from this connection."
       });
     } catch (error) {
       if (error.statusCode !== 429) {
         throw error;
       }
-
-      return res.status(200).json({
-        weeklyVisits:
-          await getWeeklyVisitCount(countRef),
-        weekStart,
-        counted: false
-      });
+      return visitResponse(await getWeeklyVisitCount(countRef), false);
     }
 
-    let weeklyVisits = 0;
+    let visits = 0;
     let counted = false;
 
-    await db.runTransaction(
-      async function (transaction) {
-        const visitorSnapshot =
-          await transaction.get(visitorRef);
-        const countSnapshot =
-          await transaction.get(countRef);
-        const countData =
-          countSnapshot.exists
-            ? countSnapshot.data() || {}
-            : {};
+    await db.runTransaction(async function (transaction) {
+      const visitorSnapshot = await transaction.get(visitorRef);
+      const countSnapshot = await transaction.get(countRef);
+      const countData = countSnapshot.exists
+        ? countSnapshot.data() || {}
+        : {};
 
-        weeklyVisits = Math.max(
-          0,
-          Number(countData.count) || 0
-        );
+      visits = Math.max(0, Number(countData.count) || 0);
 
-        if (visitorSnapshot.exists) {
-          return;
-        }
-
-        weeklyVisits += 1;
-        counted = true;
-
-        transaction.set(visitorRef, {
-          weekStart,
-          firstSeenAt:
-            admin.firestore.FieldValue.serverTimestamp()
-        });
-
-        transaction.set(
-          countRef,
-          {
-            count: weeklyVisits,
-            weekStart,
-            timeZone: VISITOR_TIME_ZONE,
-            updatedAt:
-              admin.firestore.FieldValue.serverTimestamp()
-          },
-          {
-            merge: true
-          }
-        );
+      if (visitorSnapshot.exists) {
+        return;
       }
-    );
 
-    return res.status(200).json({
-      weeklyVisits,
-      weekStart,
-      counted
+      visits += 1;
+      counted = true;
+      const periodKey = isMonthly ? "monthStart" : "weekStart";
+
+      transaction.set(visitorRef, {
+        [periodKey]: periodStart,
+        firstSeenAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      transaction.set(
+        countRef,
+        {
+          count: visits,
+          [periodKey]: periodStart,
+          timeZone: VISITOR_TIME_ZONE,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        },
+        { merge: true }
+      );
     });
+
+    return visitResponse(visits, counted);
   } catch (error) {
     return res.status(500).json({
-      error: "Could not process the weekly visit count."
+      error: "Could not process the visit count."
     });
   }
 };
