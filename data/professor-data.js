@@ -1876,9 +1876,9 @@
     }
 
     .professor-review-card-top {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      justify-content: space-between;
       gap: 14px;
     }
 
@@ -1914,12 +1914,14 @@
       color: rgba(23, 23, 23, 0.56);
       font-size: 12px;
       font-weight: 600;
-      line-height: 1.3;
+      line-height: 1;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     .professor-review-rating {
+      align-self: center;
+      transform: translateY(-2px);
       flex: 0 0 auto;
       color: #c09a5c;
       font-size: 20px;
@@ -2342,10 +2344,13 @@
 
     @media (max-width: 720px) {
       .professor-review-insights-header,
-      .professor-reviews-header,
-      .professor-review-card-top {
+      .professor-reviews-header {
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .professor-review-card-top {
+        align-items: center;
       }
 
       .professor-review-stat-labels {
