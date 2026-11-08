@@ -11,20 +11,32 @@
       "schedule": "0 3 * * *"
     }
   ],
-"rewrites": [
-  {
-    "source": "/professors/:slug",
-    "destination": "/professors"
-  },
-  {
-    "source": "/courses/:slug",
-    "destination": "/courses"
-  },
-  {
-    "source": "/forum/:category",
-    "destination": "/forum.html"
-  }
-],
+  "rewrites": [
+    {
+      "source": "/faq",
+      "destination": "https://auc-atlas-next-faq.vercel.app/faq"
+    },
+    {
+      "source": "/faq.html",
+      "destination": "https://auc-atlas-next-faq.vercel.app/faq"
+    },
+    {
+      "source": "/_next/:path*",
+      "destination": "https://auc-atlas-next-faq.vercel.app/_next/:path*"
+    },
+    {
+      "source": "/professors/:slug",
+      "destination": "/professors"
+    },
+    {
+      "source": "/courses/:slug",
+      "destination": "/courses"
+    },
+    {
+      "source": "/forum/:category",
+      "destination": "/forum.html"
+    }
+  ],
   "git": {
     "deploymentEnabled": true
   },
