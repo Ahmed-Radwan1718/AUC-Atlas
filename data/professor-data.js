@@ -1909,6 +1909,84 @@
       gap: 14px;
     }
 
+
+    /* Professor review loading follows the directory's quiet card skeletons. */
+    .professor-review-loading-card {
+      min-width: 0;
+      min-height: 195px;
+      padding: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.055);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.45);
+      display: grid;
+      align-content: start;
+      gap: 16px;
+    }
+
+    .professor-review-loading-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .professor-review-loading-avatar {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      border-radius: 50%;
+      background: rgba(23, 23, 23, 0.055);
+    }
+
+    .professor-review-loading-top .professor-review-loading-line {
+      flex: 1 1 auto;
+      max-width: 46%;
+    }
+
+    .professor-review-loading-rating {
+      flex: 0 0 62px;
+      width: 62px;
+      height: 12px;
+      margin-left: auto;
+    }
+
+    .professor-review-loading-detail {
+      display: grid;
+      gap: 11px;
+    }
+
+    .professor-review-loading-line,
+    .professor-review-count-loading {
+      display: block;
+      height: 11px;
+      border-radius: 6px;
+      background: rgba(23, 23, 23, 0.065);
+    }
+
+    .professor-review-loading-line.is-context { width: 52%; }
+    .professor-review-loading-line.is-note { width: 93%; }
+    .professor-review-loading-line.is-note-short { width: 67%; }
+
+    .professor-review-count-loading {
+      width: 86px;
+      height: 10px;
+      margin: 3px 0;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .professor-review-loading-avatar,
+      .professor-review-loading-line,
+      .professor-review-loading-rating,
+      .professor-review-count-loading {
+        animation: professor-review-loading-pulse 1.7s ease-in-out infinite;
+      }
+
+      @keyframes professor-review-loading-pulse {
+        0%, 100% { opacity: 0.55; }
+        50% { opacity: 1; }
+      }
+    }
+
     .professor-review-card {
       padding: 16px;
       border: 1px solid rgba(23, 23, 23, 0.09);
@@ -4094,6 +4172,26 @@ function getProfessorUrl(professor) {
     );
   }
 
+  function renderProfessorReviewLoadingCards() {
+    // Skeletons reserve the real review-card grid without implying a review count.
+    return Array.from({ length: 3 }, function () {
+      return [
+        '<article class="professor-review-loading-card" aria-hidden="true">',
+          '<div class="professor-review-loading-top">',
+            '<span class="professor-review-loading-avatar"></span>',
+            '<span class="professor-review-loading-line"></span>',
+            '<span class="professor-review-loading-rating professor-review-loading-line"></span>',
+          '</div>',
+          '<div class="professor-review-loading-detail">',
+            '<span class="professor-review-loading-line is-context"></span>',
+            '<span class="professor-review-loading-line is-note"></span>',
+            '<span class="professor-review-loading-line is-note-short"></span>',
+          '</div>',
+        '</article>'
+      ].join("");
+    }).join("");
+  }
+
   function renderProfessorReviews(reviews) {
     const list = document.getElementById("professor-reviews-list");
     const count = document.getElementById("professor-reviews-count");
@@ -4106,11 +4204,17 @@ function getProfessorUrl(professor) {
       return;
     }
 
+    list.removeAttribute("aria-busy");
+    list.removeAttribute("role");
+    list.removeAttribute("aria-label");
+
     setupProfessorReviewReports(
       list
     );
 
     if (count) {
+      count.classList.remove("is-loading");
+      count.removeAttribute("aria-label");
       count.textContent = safeReviews.length + " " + (safeReviews.length === 1 ? "review" : "reviews");
     }
 
@@ -4178,11 +4282,16 @@ function getProfessorUrl(professor) {
     const stats = document.getElementById("professor-review-stats");
 
     if (list) {
-      list.innerHTML = '<p class="professor-review-status">Loading reviews...</p>';
+      list.setAttribute("aria-busy", "true");
+      list.setAttribute("role", "status");
+      list.setAttribute("aria-label", "Loading student reviews");
+      list.innerHTML = renderProfessorReviewLoadingCards();
     }
 
     if (count) {
-      count.textContent = "Loading reviews...";
+      count.classList.add("is-loading");
+      count.setAttribute("aria-label", "Loading reviews");
+      count.innerHTML = '<span class="professor-review-count-loading" aria-hidden="true"></span>';
     }
 
     if (stats) {
@@ -4204,10 +4313,15 @@ function getProfessorUrl(professor) {
       renderProfessorReviews(data.reviews || []);
     } catch (error) {
       if (count) {
+        count.classList.remove("is-loading");
+        count.removeAttribute("aria-label");
         count.textContent = "Reviews unavailable";
       }
 
       if (list) {
+        list.removeAttribute("aria-busy");
+        list.removeAttribute("role");
+        list.removeAttribute("aria-label");
         list.innerHTML = '<p class="professor-review-status">Could not load reviews right now.</p>';
       }
 
@@ -4544,11 +4658,11 @@ function getProfessorUrl(professor) {
           <div>
             <h2>What students said</h2>
           </div>
-          <p id="professor-reviews-count">Loading reviews...</p>
+          <p id="professor-reviews-count" class="is-loading" aria-label="Loading reviews"><span class="professor-review-count-loading" aria-hidden="true"></span></p>
         </div>
 
-        <div class="professor-reviews-list" id="professor-reviews-list">
-          <p class="professor-review-status">Loading reviews...</p>
+        <div class="professor-reviews-list" id="professor-reviews-list" role="status" aria-busy="true" aria-label="Loading student reviews">
+          ${renderProfessorReviewLoadingCards()}
         </div>
       </section>
       </div>
