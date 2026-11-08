@@ -960,18 +960,18 @@
       gap: 4px;
     }
 
-    .professor-profile-info div > span:first-child {
-      color: rgba(192, 154, 92, 0.92);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
+    .professor-profile-info > div:not(.professor-profile-identity) > span:first-child {
+      color: #777;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
       text-transform: uppercase;
     }
 
     .professor-profile-value,
     .professor-profile-email {
-      color: #171717;
-      font-size: 15px;
+      color: #303030;
+      font-size: 12px;
       font-weight: 400;
       line-height: 1.5;
       text-decoration: none;
