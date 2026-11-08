@@ -4305,8 +4305,8 @@ function getProfessorUrl(professor) {
               </div>
 
               <div class="review-field">
-                <label for="review-semester">Semester taken</label>
-                <select id="review-semester" name="semesterTaken" required>
+                <label for="review-semester-search">Semester taken</label>
+                <select id="review-semester" name="semesterTaken" class="review-native-select" required>
                   <option value="" selected disabled>Choose semester</option>
                   <option>Fall 2026</option>
                   <option>Summer 2026</option>
@@ -4345,6 +4345,22 @@ function getProfessorUrl(professor) {
                   <option>Spring 2018</option>
                   <option>Winter 2018</option>
                 </select>
+                <div class="review-course-search-wrap">
+                  <input
+                    id="review-semester-search"
+                    class="review-course-search-input"
+                    type="search"
+                    placeholder="Search semesters (e.g. Fall 2026)"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-controls="review-semester-suggestions"
+                    aria-expanded="false"
+                  >
+                  <div id="review-semester-suggestions" class="review-course-suggestions" role="listbox" aria-label="Matching semesters" hidden></div>
+                </div>
               </div>
                 </div>
 
@@ -4619,17 +4635,17 @@ function getProfessorUrl(professor) {
     syncDependsField();
   }
 
-  function setupReviewCourseSearch(form) {
-    const select = form.querySelector("#review-course");
-    const input = form.querySelector("#review-course-search");
-    const listbox = form.querySelector("#review-course-suggestions");
+  function setupReviewSearchSelect(form, fieldType) {
+    const select = form.querySelector("#review-" + fieldType);
+    const input = form.querySelector("#review-" + fieldType + "-search");
+    const listbox = form.querySelector("#review-" + fieldType + "-suggestions");
     const wrapper = input && input.closest(".review-course-search-wrap");
 
     if (!select || !input || !listbox || !wrapper) {
       return;
     }
 
-    // The select remains the sole source of the submitted course code.
+    // Preserve the native select as the submitted course or semester value.
     // Only display matching suggestions after an actual search query.
     const courses = Array.from(select.options)
       .filter(function (option) {
@@ -4718,7 +4734,7 @@ function getProfessorUrl(professor) {
 
       results.forEach(function (course, index) {
         const option = document.createElement("div");
-        option.id = "review-course-option-" + index;
+        option.id = "review-" + fieldType + "-option-" + index;
         option.className = "review-course-suggestion";
         option.setAttribute("role", "option");
         option.setAttribute("aria-selected", "false");
@@ -4737,7 +4753,9 @@ function getProfessorUrl(professor) {
         const empty = document.createElement("div");
         empty.className = "review-course-no-results";
         empty.setAttribute("role", "status");
-        empty.textContent = "No matching courses";
+        empty.textContent = fieldType === "course"
+          ? "No matching courses"
+          : "No matching semesters";
         listbox.appendChild(empty);
       } else if (matches.length > MAX_SUGGESTIONS) {
         const more = document.createElement("div");
@@ -4809,7 +4827,7 @@ function getProfessorUrl(professor) {
       }
     });
 
-    // Reopening a review preserves the previously chosen course.
+    // Retain course and semester selections when reopening the drawer.
     if (select.value) {
       const selected = courses.find(function (course) {
         return course.code === select.value;
@@ -4847,6 +4865,7 @@ function getProfessorUrl(professor) {
       }
 
       if (select.id === "review-course" ||
+          select.id === "review-semester" ||
           select.id === "review-rating" ||
           select.id === "review-recommend") {
         return;
@@ -5166,7 +5185,8 @@ function getProfessorUrl(professor) {
 
     populateReviewCourseSelect(form);
     setupReviewChoiceMenus(form);
-    setupReviewCourseSearch(form);
+    setupReviewSearchSelect(form, "course");
+    setupReviewSearchSelect(form, "semester");
     setupReviewDependsField(form);
     setupReviewCompactControls(form);
 
@@ -5196,8 +5216,9 @@ function getProfessorUrl(professor) {
 
         const visibleControl = missingField.id === "review-rating"
           ? form.querySelector("[data-review-rating='1']")
-          : missingField.id === "review-course"
-            ? form.querySelector("#review-course-search")
+          : missingField.id === "review-course" ||
+            missingField.id === "review-semester"
+            ? form.querySelector("#" + missingField.id + "-search")
             : missingField.nextElementSibling &&
               missingField.nextElementSibling.querySelector(
                 ".review-choice-button"
