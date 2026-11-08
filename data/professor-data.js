@@ -962,9 +962,10 @@
 
     .professor-profile-info > div:not(.professor-profile-identity) > span:first-child {
       color: #777;
+      font-family: Arial, sans-serif;
       font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.01em;
+      font-weight: 400;
+      letter-spacing: normal;
       text-transform: uppercase;
     }
 
