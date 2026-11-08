@@ -1,0 +1,6088 @@
+(function () {
+  const professors = [
+    { id: "eslam-badr", name: "Eslam Badr", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Calculus 1, Linear Algebra", group: "A-F", email: "eslammath@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793702504/sztnt1mkiieumbmihhv1.png" },
+    { id: "kate-ellis", name: "Kate Ellis", department: "Psychology", displayDepartment: "PSYC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "kate.ellis@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793648828/yywrnyebmy41tpn6efed.png" },
+    { id: "aya-musmar", name: "Aya Musmar", department: "Architecture", displayDepartment: "ARCH", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "aya.musmar@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793649917/lwzsdfu2qokguxldi0om.png" },
+    { id: "tamir-el-khouly", name: "Tamir El-Khouly", department: "Architecture", displayDepartment: "ARCH", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "t.el-khouly@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785765913/Tamir_El-Khouly_r80cnx.png" },
+    { id: "wael-el-mahallawy", name: "Wael El Mahallawy", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "wfawzy@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785765912/Wael_El-Mahallawy_ajg1rj.png" },
+    { id: "addison-ellis", name: "Addison Ellis", department: "Philosophy", displayDepartment: "PHIL", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793648436/iw8h5ymou2xm5k0b7ne9.png" },
+    { id: "daoud-siniora", name: "Daoud Siniora", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "daoud.siniora@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793718848/72f62805-f9c9-43d9-9b06-40e3117f26ad.png" },
+    { id: "tamer-el-leithy", name: "Tamer El-Leithy", department: "Arab and Islamic Civilizations", displayDepartment: "ARIC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785764419/Tamer_El-Leithy_d25vt8.png" },
+    { id: "peter-barsoum", name: "Peter Barsoum", department: "Rhetoric and Composition", displayDepartment: "RHET", filterDepartment: "Rhetoric & Writing", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "pbarsoum@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785764419/Peter_Barsoum_fbvgzf.png" },
+    { id: "maha-bali", name: "Maha Bali", department: "Center for Learning and Teaching", displayDepartment: "CLT", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "bali@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793733358/8a7da883-aad0-4e39-8332-16d11333828a.png" },
+    { id: "mohamed-aly", name: "Mohamed Aly", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mfawzyaly@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793963813/c4118660-53ef-43e4-85ad-d568adc564a9.png" },
+    { id: "karim-banawan", name: "Karim Banawan", department: "Electronics and Communications Engineering", displayDepartment: "ECE", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "karim.banawan@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732675/de1b5766-fc3b-406c-8a83-1c4c6457dad1.png" },
+    { id: "karim-seddik", name: "Karim Seddik", department: "Electronics and Communications Engineering", displayDepartment: "ECE", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "kseddik@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732650/000f244d-89e6-42d1-a706-955c97577a0c.png" },
+    { id: "suher-zada", name: "Suher Zada", department: "Biology", displayDepartment: "BIOL", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "suzada@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703162/kd2i9rsegyzh230ht9ig.png" },
+    { id: "karim-addas", name: "Karim Addas", department: "Physics", displayDepartment: "PHYS", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "kaddas@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732574/7ca4de48-ec64-4af2-b3e9-208dcf6493bd.png" },
+    { id: "tamer-elbatt", name: "Tamer ElBatt", department: "Computer Science and Engineering", displayDepartment: "CSCE", filterDepartment: "Computer Science", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "tamer.elbatt@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793962307/f85389e6-7517-4c3e-a309-aa8bcd8888a8.png" },
+    { id: "hani-henry", name: "Hani Henry", department: "Psychology", displayDepartment: "PSYC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hhenry@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703159/ouithn8if6ccl9gffzfa.jpg" },
+    { id: "yasmine-motawy", name: "Yasmine Motawy", department: "Rhetoric and Composition", displayDepartment: "RHET", filterDepartment: "Rhetoric & Writing", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "ymotawy@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793715750/iikqgeg9xgpihbw1k0tw.png" },
+    { id: "catarina-belo", name: "Catarina Belo", department: "Philosophy", displayDepartment: "PHIL", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "cbelo@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793718680/ecc6a59f-eee9-4d18-a61c-f1be0bb3becb.png" },
+    { id: "yasmine-ahmed", name: "Yasmine Ahmed", department: "Core Curriculum", displayDepartment: "CORE", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "yasminemoataz@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785764398/Yasmine_Ahmed_g1ohx6.png" },
+    { id: "nihal-nagi", name: "Nihal Nagi", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785764398/Nihal_Nagi_dgdper.png" },
+    { id: "salah-al-agha", name: "Salah Al-Agha", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "salah.alagha@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793802535/dea92160-2037-408a-ae5e-df345585473c.png" },
+    { id: "richard-fincham", name: "Richard Fincham", department: "Philosophy", displayDepartment: "PHIL", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "rfincham@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703209/o3xsb11xwahokdyghseq.jpg" },
+    { id: "ehab-elsawy", name: "Ehab ElSawy", department: "Chemistry", displayDepartment: "CHEM", filterDepartment: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "A-F", email: "ehab.elsawy@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703166/ymrpykrdnjxianfocuur.png" },
+    { id: "nageh-allam", name: "Nageh Allam", department: "Physics", displayDepartment: "PHYS", filterDepartment: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", email: "nageh.allam@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558061/c0f7ea2d-853f-4973-8dbe-5040bc8e917a.png" },
+    { id: "tamer-shoeib", name: "Tamer Shoeib", department: "Chemistry", displayDepartment: "CHEM", filterDepartment: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", email: "t.shoeib@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703164/tltp5hnirzesjr6ihhbb.png" },
+    { id: "hassan-azazy", name: "Hassan Azazy", department: "Chemistry", displayDepartment: "CHEM", filterDepartment: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "G-M", email: "hazzazy@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703163/syclzbuuroxxejwd99oh.png" },
+    { id: "ibrahim-abotaleb", name: "Ibrahim Abotaleb", department: "Construction Engineering", displayDepartment: "CENG", filterDepartment: "Engineering", status: "No ratings yet", course: "CSCE 1101", group: "G-M", email: "ibrahimsalah@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730417/0dcf17e2-5e8d-480c-aa5e-b2c9f84cf626.png" },
+    { id: "arthur-bos", name: "Arthur Bos", department: "Biology", displayDepartment: "BIOL", filterDepartment: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "A-F", email: "arbos@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793703165/wieyufbwn0w8uexw3sel.png" },
+    { id: "walid-fouad", name: "Walid Fouad", department: "Biology", displayDepartment: "BIOL", filterDepartment: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", email: "wfouad@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785288250/Walid_Fouad_khxyvf.png" },
+    { id: "mohamed-badran", name: "Mohamed Badran", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "CSCE 1101", group: "G-M", email: "mobadran@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793964482/a9ebac0a-bd53-48cb-b339-48ff3206ce3d.png" },
+    { id: "ahmed-abdellatif", name: "Ahmed Abdellatif", department: "Biology", displayDepartment: "BIOL", filterDepartment: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "A-F", email: "ahmed.abdellatif@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793716894/q9m5fsngtegh7ut0ypeq.png" },
+    { id: "wafik-lotfallah", name: "Wafik Lotfallah", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "CSCE 1101", group: "N-Z", email: "lotfallah@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1785326069/Wafik_Lotfallah_to4w8v.png" },
+    { id: "laila-elserty", name: "Laila ElSerty", department: "Rhetoric and Composition", displayDepartment: "RHET", filterDepartment: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "G-M", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793733106/61c92489-2acf-4113-82e3-413591dbf55e.png" },
+    { id: "mariah-fairley", name: "Mariah Fairley", department: "English Language Instruction", displayDepartment: "ELI", filterDepartment: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", email: "mariah@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793878981/55520a58-a9ba-4d9a-b610-1f249f851eaf.png" },
+    { id: "gretchen-mccullough", name: "Gretchen McCullough", department: "Rhetoric and Composition", displayDepartment: "RHET", filterDepartment: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", email: "gretchen@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793648756/dlnhr6egw8r9vtxy81ca.png" },
+    { id: "kathleen-saville", name: "Kathleen Saville", department: "Rhetoric and Composition", displayDepartment: "RHET", filterDepartment: "Rhetoric & Writing", status: "No ratings yet", course: "CSCE 1101", group: "G-M", email: "ksaville@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732860/fc30a3d3-89b5-4493-9b0c-6e795e0b5455.png" },
+    { id: "fikry-boutros", name: "Fikry Boutros", department: "Rhetoric and Composition", displayDepartment: "RHET", filterDepartment: "Humanities", status: "No ratings yet", course: "CSCE 1101", group: "A-F", email: "fsb@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793877758/35f4282b-cb05-461f-a0df-ede0822f8609.png" },
+    { id: "mostafa-abbas", name: "Mostafa Abbas", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "hala-abd-alhak", name: "Hala Abd Alhak", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "areeg-abdalla", name: "Areeg Abdalla", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "hassan-abdalla", name: "Hassan Abdalla", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "nadine-abdalla", name: "Nadine Abdalla", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "nadine.abdalla@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793876738/f4f0e3c3-e397-4149-82fc-eda9af868a02.png" },
+    { id: "wael-abdallah", name: "Wael Abdallah", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "wael.mostafa@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786199112/Wael_Abdallah_nxhjof.jpg" },
+    { id: "mohamed-abdallah", name: "Mohamed Abdallah", department: "Construction Engineering", displayDepartment: "CENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mohamed-abdallah@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793963485/db1ab610-4d8c-4ed9-90b7-0b8516361491.png" },
+    { id: "rasha-abdulla", name: "Rasha Abdulla", department: "Journalism and Mass Communication", displayDepartment: "JRMC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "rasha@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793801397/0db4ce11-b1de-4f84-b970-ed6fcc1ff03b.png" },
+    { id: "s-abdel-azeem", name: "Sherif Abdel Azeem", department: "Electronics and Communications Engineering", displayDepartment: "ECE", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "shazeem@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786232652/Sherif_Abdel_Azeem_dgckli.png" },
+    { id: "omar-abdelaziz", name: "Omar Abdelaziz", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793801224/0b479fe4-cb49-47dd-adbd-6121fc73ed62.png" },
+    { id: "rehab-abdel-aziz", name: "Rehab Abdel-Aziz", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "youssef-abdel-aziz", name: "Youssef Abdel Aziz", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "amr-abdel-kawi", name: "Amr Abdelkawi", department: "Architecture", displayDepartment: "ARCH", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "akawi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793649651/kyz1qvybc8dvryoq9bwb.png" },
+    { id: "tarek-abdel-kawi", name: "Tarek Abdel Kawi", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmed-abdel-meguid", name: "Ahmed Abdelmeguid", department: "Accounting", displayDepartment: "ACCT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "a_meguid@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793716911/ticrvzydbtj7dvpdmkr8.png" },
+    { id: "sherif-abdel-mohsen", name: "Sherif Abdelmohsen", department: "Architecture", displayDepartment: "ARCH", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "sherifmorad@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786018329/Sherif_Abdelmohsen_wlbl66.png" },
+    { id: "mohamed-abdel-mooty", name: "Mohamed Abdel Mooty", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "anwar-abd-elnaser", name: "Anwar Abd ElNaser", department: "Chemistry", displayDepartment: "CHEM", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "anwar.abdelnaser@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793718314/cf697f63-aee6-4721-a6a6-81f4f52191be.png" },
+    { id: "shahinaz-abdel-rahman", name: "Shahinaz Abdel Rahman", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ashraf-abdelraouf", name: "Ashraf Abdelraouf", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "alaa-abdel-salam", name: "Alaa Abdel Salam", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "laila-abdel-salam", name: "Laila Abdel Salam", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ahmed-abdel-wahab", name: "Ahmed Abdel Wahab", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "dalal-abo-el-seoud", name: "Dalal Abo El Seoud", department: "Arabic Language Instruction", displayDepartment: "ALIN", filterDepartment: "Rhetoric & Writing", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "dalalas@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793877168/648e723e-7a80-42bb-8216-86412106d856.png" },
+    { id: "walid-aboelsoud", name: "Walid Aboelsoud", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "walid.aboelsoud@aucegypt.edu", image: "https://eng.asu.edu.eg/ar/download?sid=uttCRzZ4WPD66gdEtHWNnUylxj9yA4MhweVnfGulUjs%3D" },
+    { id: "mohamed-abotera", name: "Mohamed Abotera", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ahmed-abou-auf", name: "Ahmed Abou-Auf", department: "Electronics and Communications Engineering", displayDepartment: "ECE", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "aabouauf@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793717022/smkstnjpsxidtpyqavtq.png" },
+    { id: "tarek-abou-el-seoud", name: "Tarek Abou El Seoud", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "essam-abou-el-zahab", name: "Essam Abou El-Zahab", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "hend-abou-ghaly", name: "Hend Abou Ghaly", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "noha-abou-khatwa", name: "Noha Abou-Khatwa", department: "Arab and Islamic Civilizations", displayDepartment: "ARIC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "nkhatwa@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786199957/Noha_Abou-Khatwa_cf0x24.jpg" },
+    { id: "nidaa-aboulhosn", name: "Nidaa Aboulhosn", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "nidaa.aboulhosn@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786199993/Nidaa_Aboulhosn_mtr9ny.jpg" },
+    { id: "mohamed-abou-zeid", name: "Mohamed Abou-Zeid", department: "Construction Engineering", displayDepartment: "CENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mnagiba@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793963684/27fc50fc-5e43-47b8-9ef1-083dc0d12ac5.png" },
+    { id: "reham-abou-zeid", name: "Reham Abou-Zeid", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "hanan-abozaied", name: "Hanan Abozaied", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mohamed-abu-el-kheir", name: "Mohamed Abu El Kheir", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "amr-abu-helw", name: "Amr Abu Helw", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "nayera-abusetit", name: "Nayera Abusetit", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "amr-adly", name: "Amr Adly", department: "Political Science", displayDepartment: "POLS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "amradly82@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793877009/13d8f2b5-f143-4494-8e7f-d170c49c0f42.png" },
+    { id: "reem-ahmed", name: "Reem Ahmed", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "samah-ahmed", name: "Samah Ahmed", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "firas-al-atraqshi", name: "Firas Al-Atraqchi", department: "Journalism and Mass Communication", displayDepartment: "JRMC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "falatraqchi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793719329/3eb68694-e023-41f7-9648-80521146e456.png" },
+    { id: "eman-al-ayyat", name: "Eman Al-Ayyat", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "mohamed-alhalaby", name: "Mohamed Alhalaby", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ramy-ali", name: "Ramy Ali", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "aya-alkholy", name: "Aya Alkholy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "salma-al-saady", name: "Salma Al-Saady", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ibrahim-al-sahouly", name: "Ibrahim Al-Sahouly", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ramy-aly", name: "Ramy Aly", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "ramy.aly@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805141/5280f586-0045-44f3-93eb-62891165d065.png" },
+    { id: "sherif-aly", name: "Sherif Aly", department: "Computer Science and Engineering", displayDepartment: "CSCE", filterDepartment: "Computer Science", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "sgamal@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793962769/871e63a6-5073-4406-ac78-69ae799f6872.png" },
+    { id: "hassanein-amer", name: "Hassanein Amer", department: "Electronics and Communications Engineering", displayDepartment: "ECE", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hamer@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793731412/b290248f-744c-43f3-9a1c-7c48b90027ff.png" },
+    { id: "mona-amer", name: "Mona Amer", department: "Psychology", displayDepartment: "PSYC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "monaamer@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/2023-02/Copy%20of%20IMG_3682.jpg" },
+    { id: "ayatalla-amin", name: "Ayatalla Amin", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "dina-amin", name: "Dina Amin", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "dina.a@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559201/4afc6619-9e14-4e3d-bc0f-3b1814ba704a.png" },
+    { id: "khaled-amin", name: "Khaled Amin", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "asma-amleh", name: "Asma Amleh", department: "Biology", displayDepartment: "BIOL", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "aamleh@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793718501/2884052d-05b8-456b-a081-f21d07962dd4.png" },
+    { id: "mohamed-anany", name: "Mohamed Anany", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mohab-anis", name: "Mohab Anis", department: "Electronics and Communications Engineering", displayDepartment: "ECE", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "manis@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793963397/7de012a0-9ef9-434b-b4e0-0a6d55d9eabd.png" },
+    { id: "marina-apaydin", name: "Marina Apaydin", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793879196/5e85f401-6c17-4a3a-a2a8-feb9ad4ff20a.png" },
+    { id: "mustafa-arafa", name: "Mustafa Arafa", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mharafa@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793558739/800ea61f-86a8-4493-b325-7f7f11c9f16b.png" },
+    { id: "maher-asham", name: "Maher Asham", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "iman-ashmawy", name: "Iman Ashmawy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "yara-ashour", name: "Yara Ashour", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ali-atef", name: "Ali Atef", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "sara-attawiya", name: "Sara Attawiya", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ali-awni", name: "Ali Awni", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ahawni@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793717787/768a20de-7410-40cf-98ec-6daeebf447cf.png" },
+    { id: "mariam-ayad", name: "Mariam Ayad", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "m.ayad@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793879038/44a3d4a0-e5f9-404d-80ca-2975c60b2cce.png" },
+    { id: "mina-ayad", name: "Mina Ayad", department: "Economics", displayDepartment: "ECON", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mina_sami@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793963163/9bcbcb6f-963f-45d1-a101-84a3c73ba013.png" },
+    { id: "maysa-ayoub", name: "Maysa Ayoub", department: "Center for Migration and Refugee Studies", displayDepartment: "CMRS", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "maysa@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793879607/319b7b15-650d-4508-a8c2-b3c5641a49af.png" },
+    { id: "nahed-azab", name: "Nahed Azab", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "nazab@aucegypt.edu", image: "https://menaobservatory.ai/storage/ad44c57d9a38ac815b437302719823a4.jpg" },
+    { id: "khalid-azzouz", name: "Khalid Azzouz", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "nesrine-badawi", name: "Nesrine Badawi", department: "Political Science", displayDepartment: "POLS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "nbadawi@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786201449/Nesrine_Badawi_apyijm.jpg" },
+    { id: "mohga-badran", name: "Mohga Badran", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mabadran@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/mohga_badran_1.jpg" },
+    { id: "roba-bairakdar", name: "Roba Bairakdar", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793801342/6b80efe7-f6db-46a4-bca4-8b789dd9ef7c.png" },
+    { id: "mohamed-baitie", name: "Mohamed Baitie", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "may-bakr", name: "May Bakr", department: "Biology", displayDepartment: "BIOL", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "may.bakr@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793879430/72ce198b-5b9b-43e5-84c2-5efed1fef6c5.png" },
+    { id: "yousra-bakr", name: "Yousra Bakr", department: "Journalism and Mass Communication", displayDepartment: "JRMC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786233958/Yousra_Bakr_qbqarn.png" },
+    { id: "christopher-barker", name: "Chris Barker", department: "Political Science", displayDepartment: "POLS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "chris.barker@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793718809/c6c22323-e054-47bc-9dda-f61924c62104.png" },
+    { id: "ghada-barsoum", name: "Ghada Barsoum", department: "Public Policy and Administration", displayDepartment: "PPAD", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "gbarsoum@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793719364/2d786b47-7bdf-422c-96ec-7bee45496464.png" },
+    { id: "reem-bassiouney", name: "Reem Bassiouney", department: "Applied Linguistics and Educational Studies", displayDepartment: "ALES", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "reem.bassiouney@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786201805/Reem_Bassiouney_sry5re.jpg" },
+    { id: "dina-bassiouni", name: "Dina Bassiouni", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "dbassiouni@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793877369/34b6afd9-cbf4-4c89-a551-523019960a5c.png" },
+    { id: "mohamed-basuony", name: "Mohamed Basuony", department: "Accounting", displayDepartment: "ACCT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mohamed.basuony@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793715916/0441600d-7dd0-4b8f-a367-f8f4a68695c1.png" },
+    { id: "nizar-becheikh", name: "Nizar Becheikh", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "nbecheikh@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786201978/Nizar_Becheikh_ysujiw.jpg" },
+    { id: "teklu-bekele", name: "Teklu Bekele", department: "Applied Linguistics and Educational Studies", displayDepartment: "ALES", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "teklu.abate@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786234309/Teklu_Bekele_zvvqiz.png" },
+    { id: "shahjahan-bhuiyan", name: "Shahjahan Bhuiyan", department: "Public Policy and Administration", displayDepartment: "PPAD", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "sbhuiyan@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786202121/Shahjahan_Bhuiyan_lec2fw.jpg" },
+    { id: "mohammed-bouaddi", name: "Mohammed Bouaddi", department: "Economics", displayDepartment: "ECON", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "m.bouaddi@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786202174/Mohammed_Bouaddi_rbtgg3.jpg" },
+    { id: "kamal-boutros", name: "Kamal Boutros", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "jochen-braun", name: "Jochen Braun", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "jochen.braun@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732497/5d9114da-2546-40be-b12b-89934b90e152.png" },
+    { id: "heather-browne", name: "Heather Browne", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "rodrigo-brum", name: "Rodrigo Brum", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786027912/Rodrigo_Brum_szl4mi.jpg" },
+    { id: "melanie-carter", name: "Melanie Carter", department: "Rhetoric and Composition", displayDepartment: "RHET", filterDepartment: "Rhetoric & Writing", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mcarter@aucegypt.edu", image: "user.png" },
+    { id: "rim-cherif", name: "Rim Cherif", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786234576/Rim_Cherif_cp0spq.png" },
+    { id: "sungsoo-chun", name: "Sungsoo Chun", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786234650/Sungsoo_Chun_ypxogd.png" },
+    { id: "amira-dabour", name: "Amira Dabour", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "khaled-dahawy", name: "Khaled Dahawy", department: "Accounting", displayDepartment: "ACCT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "dahawy@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732962/860ff953-b580-4384-b6ad-457efb036d89.png" },
+    { id: "lubna-dairanieh", name: "Lubna Dairanieh", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "moataz-darwish", name: "Moataz Darwish", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "moataz.darwish@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793963302/4a836c39-dbdd-4c74-8ce8-bd908ac42b07.png" },
+    { id: "mohamed-darwish", name: "Mohamed Darwish", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mark-deets", name: "Mark Deets", department: "History", displayDepartment: "HIST", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mark.deets@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793800988/d387010e-f63f-4901-b227-b6e5dfc561c7.png" },
+    { id: "reem-deif", name: "Reem Deif", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "veronica-del-puerto", name: "Veronica Del Puerto", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "nabil-diab", name: "Nabil Diab", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "khairy-doma", name: "Khairy Doma", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "el-khayam-dorra", name: "El Khayam Dorra", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "dina-ebeid", name: "Dina Ebeid", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "d.makramebeid@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793719084/8f7af358-84fa-43ce-95ae-51a59c52ce4f.png" },
+    { id: "yasmine-eissa", name: "Yasmine Eissa", department: "Economics", displayDepartment: "ECON", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "yasmeen_rida@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786202729/Yasmine_Eissa_yia24f.jpg" },
+    { id: "hadeel-el-ahraf", name: "Hadeel El-Ahraf", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "maha-el-ashram", name: "Maha El-Ashram", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ashraf-el-assaly", name: "Ashraf El Assaly", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "amira-el-ayouty", name: "Amira El Ayouty", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "ahmed-elbanbi", name: "Ahmed ElBanbi", department: "Petroleum and Energy Engineering", displayDepartment: "PENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ahmed.elbanbi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793717418/a78149c3-6355-4404-b5fb-2bfb50a5368f.png" },
+    { id: "dina-el-baradie", name: "Dina El-baradie", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "dina-el-basiouny", name: "Dina El-Bassiouny", department: "Accounting", displayDepartment: "ACCT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793877553/d747e33c-2bb0-4797-be04-0bc581468c39.png" },
+    { id: "dina-elbawab", name: "Dina Elbawab", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "ahmed-elbayoumi", name: "Ahmed Elbayoumi", department: "Accounting", displayDepartment: "ACCT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ahmed.elbayoumi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793717547/908d60f4-cfe3-4031-bd1d-a59d72374616.png" },
+    { id: "maha-el-bedaiwy", name: "Maha El-Bedaiwy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "randa-elbedawy", name: "Randa El Bedawy", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "rbedawy@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786235612/Randa_El_Bedawy_ybip6w.png" },
+    { id: "amina-el-bindary", name: "Amina El-Bindary", department: "Arab and Islamic Civilizations", displayDepartment: "ARIC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "abendary@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793718012/ac851f40-1ee2-43e7-bb4e-7a611099e556.png" },
+    { id: "alia-el-bolock", name: "Alia El Bolock", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793798224/83808d1b-30bc-4475-a5e9-3f18f4dc45d7.png" },
+    { id: "alaa-el-butch", name: "Alaa El Butch", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "sherif-el-dabaa", name: "Sherif El-Dabaa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "marwa-el-daly", name: "Marwa El Daly", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "seif-eldawlatly", name: "Seif Eldawlatly", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793806434/188e2a64-102f-49de-98cf-9de29567d570.png" },
+    { id: "heba-el-deeb", name: "Heba El Deeb", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "heba-el-deghaidy", name: "Heba El-Deghaidy", department: "Applied Linguistics and Educational Studies", displayDepartment: "ALES", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "h.eldeghaidy@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793878253/5871f327-a7b9-44d6-9a7f-4a9a32a4ee1c.png" },
+    { id: "reem-el-degwi", name: "Reem El Degwi", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "lameese-eldesouky", name: "Lameese Eldesouky", department: "Psychology", displayDepartment: "PSYC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "lameese.eldesouky@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793733186/bb1880b9-50a2-4ef1-864c-1a0338e775dc.png" },
+    { id: "lobna-el-dessouky", name: "Lobna El-Dessouky", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "tarek-el-domiaty", name: "Tarek El Domiaty", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "nellie-el-enany", name: "Nellie El-Enany", department: "Department of Management", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "nellie.elenany@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1788470953/Nellie_El_Anany_hhsf3h.jpg" },
+    { id: "raghda-el-essawi", name: "Raghda El Essawi", department: "Applied Linguistics and Educational Studies", displayDepartment: "ALES", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "ressawi@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786236836/Raghda_El_Essawi_ymgzcp.png" },
+    { id: "ashraf-el-fiqi", name: "Ashraf El Fiqi", department: "Physics", displayDepartment: "PHYS", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "elfiqi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730076/a7cdb6ee-1b0d-4ec6-a697-8ef30300743a.png" },
+    { id: "nadia-el-gamel", name: "Nadia El Gamel", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "amani-el-gammal", name: "Amani El-Gammal", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "mohamed-el-gayar", name: "Mohamed El Gayar", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ingy-el-gazzar", name: "Ingy El Gazzar", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ahmed-el-gendy", name: "Ahmed El-Gendy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "yasmeen-el-ghazaly", name: "Yasmeen El-Ghazaly", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793801188/b984772b-f2fe-48b2-b259-f2ef7013ac1c.png" },
+    { id: "mohamed-el-hadidi", name: "Mohamed El-Hadidi", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "salah-el-haggar", name: "Salah El Haggar", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "elhaggar@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793802889/52ced89c-0473-40f7-a3ff-8967fb4a0338.png" },
+    { id: "moataz-el-helaly", name: "Moataz El Helaly", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805694/85ae59e3-6f58-44da-9335-7782cee5860a.png" },
+    { id: "amr-el-kadi", name: "Amr El-Kadi", department: "Computer Science and Engineering", displayDepartment: "CSCE", filterDepartment: "Computer Science", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "elkadi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560587/48421bd4-b7ea-45b0-9636-e62d3e20225a.png" },
+    { id: "mohamed-elkaramany", name: "Mohamed Elkaramany", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "soha-elkassas", name: "Soha ElKassas", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "khalil-elkhodary", name: "Khalil Elkhodary", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793801891/8e8f2edf-f400-40e2-874b-dad726ebfa6f.png" },
+    { id: "rasha-el-kholy", name: "Rasha El Kholy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "hoda-el-kolaly", name: "Hoda El Kolaly", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793731782/164e7853-e786-4306-8f99-9faa2d523c2e.png" },
+    { id: "rehab-el-maghraby", name: "Rehab El-Maghraby", department: "Chemistry", displayDepartment: "CHEM", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "rehabelmaghraby@aucegypt.edu", image: "user.png" },
+    { id: "rabab-el-mahdi", name: "Rabab El Mahdi", department: "Political Science", displayDepartment: "POLS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "relmahdi@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786236933/Rabab_El_Mahdi_wfis4f.png" },
+    { id: "hanan-el-malla", name: "Hanan El Malla", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "reham-el-morally", name: "Reham El Morally", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "mohamed-el-morsi", name: "Mohamed El Morsi", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805720/f30b63e0-e2e9-4aac-967c-d6aba7484a17.png" },
+    { id: "amr-el-mougy", name: "Amr El Mougy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805459/eeb6794c-7c10-4836-964d-c1150c6fecd0.png" },
+    { id: "seham-elmrayed", name: "Seham Elmrayed", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "mahmoud-el-nably", name: "Mahmoud El Nably", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "hanan-el-naghy", name: "Hanan El Naghy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "shaymaa-el-nawawy", name: "Shaymaa El Nawawy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "waleed-el-nemr", name: "Waleed El-Nemr", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ibrahim-elnur", name: "Ibrahim Elnur", department: "Political Science", displayDepartment: "POLS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "ielnur@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793731924/215e3966-c820-4c60-b0e6-45af3170226e.png" },
+    { id: "mona-elrakhawy", name: "Mona Elrakhawy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mona-el-roby-saleh", name: "Mona El Roby Saleh", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "tamer-el-said", name: "Tamer El Said", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmed-el-sayed", name: "Ahmed El Sayed", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "mayyada-el-sayed", name: "Mayyada El-Sayed", department: "Chemistry", displayDepartment: "CHEM", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mayyada@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793962924/63b8de82-9202-45a3-93a2-0c3da0eec104.png" },
+    { id: "salma-el-sayeh", name: "Salma El Sayeh", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "dalia-el-serafy", name: "Dalia El Serafy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "walaa-el-sharkawy", name: "Walaa El Sharkawy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "yasser-el-shayeb", name: "Yasser El Shayeb", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793827534/b153bb71-2d9a-4113-9778-892000328619.png" },
+    { id: "sherif-el-sheemy", name: "Sherif El-Sheemy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "omar-el-shenety", name: "Omar El-Shenety", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "maha-el-shinnawy", name: "Maha ElShinnawy", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mshinnawy@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793878461/f6fd9a04-0c89-42ac-9695-caee5723aefa.png" },
+    { id: "ahmed-el-sonbaty", name: "Ahmed El Sonbaty", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "ghalia-el-srakbi", name: "Ghalia El Srakbi", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "ghalia.s@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793719462/dfbb6b56-3027-4366-b1ee-aceab7923efb.png" },
+    { id: "asmaa-el-taher", name: "Asmaa El-Taher", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "yomna-el-taweel", name: "Yomna El Taweel", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "dina-el-turky", name: "Dina El Turky", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "amira-elwaan", name: "Amira Elwaan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "sherwat-elwan", name: "Sherwat Elwan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "rehab-emad-el-din", name: "Rehab Emad El din", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "waled-emam", name: "Waled Emam", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "aly-erfan", name: "Aly Erfan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793800075/9a9e4c99-6156-4d59-87ae-164d3f47c16b.png" },
+    { id: "amal-esawi", name: "Amal Esawi", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "a_esawi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793717967/ea700aef-d50c-4e8c-b6b0-1bfd39220c76.png" },
+    { id: "ahmed-essam", name: "Ahmed Essam", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "abdelmaged-essawey", name: "Abdelmaged Essawey", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "magdy-eteiba", name: "Magdy Eteiba", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ahmed-ezeldin", name: "Ahmed Ezeldin", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "abdel-ezz-el-arab", name: "Abdel Ezz El-Arab", department: "History", displayDepartment: "HIST", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ezelarab@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793716076/tluj5vzvqyrg2xapbgcf.png" },
+    { id: "hagar-fadlallah", name: "Hagar Fadlallah", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ahmed-faheem", name: "Ahmed Faheem", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "mohamed-fahmy", name: "Mohamed Fahmy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "shahira-fahmy", name: "Shahira Fahmy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793806475/64bc05cc-65da-4550-9028-7cb02fd85b85.png" },
+    { id: "sherif-fahmy", name: "Sherif Fahmy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793806508/acb5cb26-24b5-4231-9e30-f15175b1656e.png" },
+    { id: "sherif-fakher", name: "Sherif Fakher", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "mahmoud-farag", name: "Mahmoud Farag", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "yasmin-farag", name: "Yasmin Farag", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "karim-farahat", name: "Karim Farahat", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "marian-fares", name: "Marian Fares", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "noah-farhadi", name: "Noah Farhadi", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "shadi-farid", name: "Shadi Farid", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "dalia-farouk", name: "Dalia Farouk", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "heba-fathelbab", name: "Heba Fathelbab", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805593/b3b0e3c9-2a5b-4fd3-bf92-6eb3c7b4a4db.png" },
+    { id: "ahmed-fayed", name: "Ahmed Fayed", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "ashraf-fouad", name: "Ashraf Fouad", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "dina-fouad", name: "Dina Fouad", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "jasmin-fouad", name: "Jasmin Fouad", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "jfouad@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732351/e9d1a3d5-dc79-42bc-afdd-d3cd642174f7.png" },
+    { id: "mai-fouad", name: "Mai Fouad", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "rania-fouad", name: "Rania Fouad", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "yasser-gadallah", name: "Yasser Gadallah", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "aya-galal", name: "Aya Galal", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "galal-galal-edeen", name: "Galal Galal-Edeen", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "galaledeen@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793802152/a19aa1c0-a12c-420d-8de3-94004076cda8.png" },
+    { id: "alexandra-gazis", name: "Alexandra Gazis", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "atta-gebril", name: "Atta Gebril", department: "Applied Linguistics and Educational Studies", displayDepartment: "ALES", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "agebril@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793718600/6406d3e5-96c4-4615-8568-4144b4d8e772.png" },
+    { id: "seham-ghalwash", name: "Seham Ghalwash", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "pascale-ghazaleh", name: "Pascale Ghazaleh", department: "History", displayDepartment: "HIST", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "ghazaleh@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/2024-04/pascale_ghazaleh-2.jpg" },
+    { id: "dina-gomaa", name: "Dina Gomaa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "sherif-goubran", name: "Sherif Goubran", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "alexander-grechenko", name: "Alexander Grechenko", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "elena-grechenko", name: "Elena Grechenko", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "chelsea-green", name: "Chelsea Green", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "cgreen@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793718716/7e973fd9-60dd-4e32-8807-b72722f402f1.png" },
+    { id: "minas-guirguis", name: "Minas Guirguis", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ali-hadi", name: "Ali Hadi", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ahadi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793717875/39f59e45-48c6-47a7-9ddc-332251e3de5d.png" },
+    { id: "may-haggag", name: "May Haggag", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793879515/c94e98b7-4888-4d5c-ac35-e533bfb2a699.png" },
+    { id: "fouad-halbouni", name: "Fouad Halbouni", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "maryam-hamdy", name: "Maryam Hamdy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ola-hamdy", name: "Ola Hamdy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmed-hamed", name: "Ahmed Hamed", department: "Physics", displayDepartment: "PHYS", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ahmed.mhamed@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793801925/2fc66884-6c80-4e47-beb7-339178f54195.png" },
+    { id: "heba-hanafy", name: "Heba Hanafy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "nelly-hanna", name: "Nelly Hanna", department: "Arab and Islamic Civilizations", displayDepartment: "ARIC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "nhanna@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/2023-10/nelly_hanna.jpg" },
+    { id: "john-harris", name: "John Harris", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ola-hashad", name: "Ola Hashad", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmed-hassan", name: "Ahmed Hassan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "mohamed-hassan", name: "Mohamed Hassan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "nora-hassan", name: "Nora Hassan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "hamed-hassouna", name: "Hamed Hassouna", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mohamed-hatem", name: "Mohamed Hatem", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "michel-hebert", name: "Michel Hebert", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mhebert@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793963032/ebfdf706-25f3-4158-bc03-d02850ff02f0.png" },
+    { id: "gerda-heck", name: "Gerda Heck", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "gerda.heck@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793877952/823d2147-1b2b-44e9-9309-23788dfbb3f2.png" },
+    { id: "mostafa-hefny", name: "Mostafa Hefny", department: "Political Science", displayDepartment: "POLS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mostafa.hefny@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/hefny.pic_1.jpg" },
+    { id: "hesham-hegazi", name: "Hesham Hegazi", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "hanan-hegazy", name: "Hanan Hegazy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ibrahim-hegazy", name: "Ibrahim Hegazy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mohamed-hegazy", name: "Mohamed Hegazy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ahmed-helmy", name: "Ahmed Helmy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "kamila-helmy", name: "Kamila Helmy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "omneya-helmy", name: "Omneya Helmy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "michelle-henry", name: "Michelle Henry", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "dina-heshmat", name: "Dina Heshmat", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "dina.heshmat@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730743/9487dd54-2f66-474b-91d8-0e6d11852902.png" },
+    { id: "rana-hindy", name: "Rana Hindy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "john-hoey", name: "John Hoey", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805631/d88bb845-d19a-4178-bb5c-cec865e6d929.png" },
+    { id: "dina-hosni", name: "Dina Hosni", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "ossama-hosny", name: "Ossama Hosny", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ibrahim-ibrahim", name: "Ibrahim Ibrahim", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mohamed-ibrahim", name: "Mohamed Ibrahim", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "youssra-ibrahim", name: "Youssra Ibrahim", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "salima-ikram", name: "Salima Ikram", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "salima@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793801812/f9729669-8af8-4467-91bc-8b987778d7b6.png" },
+    { id: "maged-iskandar", name: "Maged Iskandar", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "howaida-ismaeel", name: "Howaida Ismaeel", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "samah-ismaeil", name: "Samah Ismaeil", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ayman-ismail", name: "Ayman Ismail", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "aymanism@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730182/eab80d96-d68f-44d6-8ddc-b234713594ff.png" },
+    { id: "mohamed-ismail", name: "Mohamed Ismail", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "yehea-ismail", name: "Yehea Ismail", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "amr-kais", name: "Amr Kais", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "andreas-kakarougkas", name: "Andreas Kakarougkas", department: "Biology", displayDepartment: "BIOL", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "a.kakarougkas@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730132/40e5103b-afad-4016-94d0-c117aacad711.png" },
+    { id: "laila-kamal", name: "Laila Kamal", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "abeer-kamel", name: "Abeer Kamel", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "bassel-kamel", name: "Bassel Kamel", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "omar-kandeel", name: "Omar Kandeel", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "aly-kandil", name: "Aly Kandil", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "nariman-kandil", name: "Nariman Kandil", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ibrahim-karkouti", name: "Ibrahim Karkouti", department: "Applied Linguistics and Educational Studies", displayDepartment: "ALES", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "ibrahim.karkouti@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793731977/e184ede7-658e-4704-bb38-a2c9e1765115.png" },
+    { id: "fotna-kassabgy", name: "Fotna Kassabgy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "maye-kassem", name: "Maye Kassem", department: "Political Science", displayDepartment: "POLS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mayekasm@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793962732/89a5206e-56c0-49fa-812c-0f4eb1364ca5.png" },
+    { id: "evette-khair", name: "Evette Khair", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "lobna-khairy", name: "Lobna Khairy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "amany-khalifa", name: "Amany Khalifa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "moustafa-khalil", name: "Moustafa Khalil", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "gurusewak-khalsa", name: "Gurusewak Khalsa", department: "Psychology", displayDepartment: "PSYC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "g.khalsa@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793719534/de2e371d-fcd8-4a03-a966-c5c49a8cc6a6.png" },
+    { id: "ahmad-khan", name: "Ahmad Khan", department: "Arab and Islamic Civilizations", displayDepartment: "ARIC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ahmad.khan@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793649232/tzb5lmbtaprwcggkwgvg.png" },
+    { id: "safwan-khedr", name: "Safwan Khedr", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "abdelaziz-khlaifat", name: "Abdelaziz Khlaifat", department: "Petroleum Engineering", displayDepartment: "PENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "abdelaziz.khlaifat@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793801521/9026c223-5881-47ca-a449-77c0a5a982be.png" },
+    { id: "hanan-kholoussy", name: "Hanan Kholoussy", department: "History", displayDepartment: "HIST", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hkholoussy@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793719674/e0d43298-f40c-43d3-a1ae-35c02dbaebf3.png" },
+    { id: "malek-khouri", name: "Malek Khouri", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mkhouri@aucegypt.edu", image: "user.png" },
+    { id: "heba-kotb", name: "Heba Kotb", department: "Psychology", displayDepartment: "PSYC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hebakotb@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793731611/d4074f57-eb98-425d-99d9-2f8660b137bc.png" },
+    { id: "susy-kotit", name: "Susy Kotit", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "sean-lee", name: "Sean Lee", department: "Political Science", displayDepartment: "POLS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "sean.lee@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/2019-08/oib.jpg" },
+    { id: "tamara-maatouk", name: "Tamara Maatouk", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "tamara.maatouk@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/2025-09/Tamara%20Maatouk.jpg" },
+    { id: "tarek-madkour", name: "Tarek Madkour", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "dina-mahmoud", name: "Dina Mahmoud", department: "Computer Science and Engineering", displayDepartment: "CSCE", filterDepartment: "Computer Science", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "dina-mahmoud@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805516/419f647a-8b43-4e30-b40f-9b4f81306321.png" },
+    { id: "mostafa-mahmoud", name: "Mostafa Mahmoud", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "sanaa-makhlouf", name: "Sanaa Makhlouf", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "sherif-makhlouf", name: "Sherif Makhlouf", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "habib-maki", name: "Maki Habib", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "maki@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730878/7062d2fa-26db-43a0-beee-ca97d9307b56.png" },
+    { id: "wael-mamdouh", name: "Wael Mamdouh", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "mohy-mansour", name: "Mohy Mansour", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mariam-marei", name: "Mariam Marei", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "islam-mashaly", name: "Islam Mashaly", department: "Architecture", displayDepartment: "ARCH", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "islammashaly@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793802115/1986e621-32a5-4706-beb1-d361ed6d6440.png" },
+    { id: "joseph-massad", name: "Joseph Massad", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "joseph.massad@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732788/f9ea9a19-69a2-4935-bff3-50d77b811608.png" },
+    { id: "javed-maswood", name: "Javed Maswood", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "heba-matbouli", name: "Heba Matbouli", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "reda-mazloum", name: "Reda Mazloum", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "william-melaney", name: "William Melaney", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "hakim-meshriki", name: "Hakim Meshreki", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hmeshreki@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730992/c1229096-bcf2-412e-92ba-b3ebfca5f2f1.png" },
+    { id: "michael-messiha", name: "Michael Messiha", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "euan-metz", name: "Euan Metz", department: "Philosophy", displayDepartment: "PHIL", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "euan.metz@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560986/f912336a-beac-489d-87d5-594405c19c17.png" },
+    { id: "mikhail-mikhail", name: "Mikhail Mikhail", department: "Computer Science and Engineering", displayDepartment: "CSCE", filterDepartment: "Computer Science", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mikhail@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793826625/895714eb-78a1-467c-80e3-46a36711aa1a.png" },
+    { id: "daria-mizza", name: "Daria Mizza", department: "Applied Linguistics and Educational Studies", displayDepartment: "ALES", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "daria.mizza@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730567/0a7bac9f-06ae-4fba-98b6-a1dfdf27b5ba.png" },
+    { id: "abeer-mohamed", name: "Abeer Mohamed", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "nabil-mohareb", name: "Nabil Mohareb", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmed-mohib", name: "Ahmed Mohib", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "martin-moraw", name: "Martin Moraw", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "maggie-morgan", name: "Maggie Morgan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ian-morrison", name: "Ian Morrison", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "imorrison@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793731862/a968cff7-9d84-474f-9baa-9c59ab783667.png" },
+    { id: "ola-morsy", name: "Ola Morsy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmed-mostafa", name: "Ahmed Mostafa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "magda-mostafa", name: "Magda Mostafa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "salwa-mostafa", name: "Salwa Mostafa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "youssef-mostafa", name: "Youssef Mostafa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "lobna-mourad", name: "Lobna Mourad", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "maha-mourad", name: "Maha Mourad", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "m_mourad@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793733426/33e5427b-00ce-4c50-bc03-7201f6547bc3.png" },
+    { id: "hanan-moussa", name: "Hanan Moussa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805568/49c91689-66bd-44d1-9765-332fda861666.png" },
+    { id: "ahmed-moustafa", name: "Ahmed Moustafa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "amoustafa@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805473/nnfua4zvlrtkurjrfti7.jpg" },
+    { id: "rida-moustafa", name: "Rida Moustafa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "mark-muehlhaeusler", name: "Mark Muehlhaeusler", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "isabel-muller", name: "Isabel Müller", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "isabel.muller@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732120/f094c3e0-6c2e-4775-99c4-459990310e78.png" },
+    { id: "maha-muttardi", name: "Maha Muttardi", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "peter-nasr", name: "Peter Nasr", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "khalid-nassar", name: "Khalid Nassar", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ashraf-nassef", name: "Ashraf Nassef", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "nassef@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730371/4c8f6981-af76-428d-8b07-08052f308ec0.png" },
+    { id: "haytham-nawar", name: "Haytham Nawar", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "Haytham.nawar@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793802078/fa8b1303-4e79-498a-86ef-0a3db5ef303b.png" },
+    { id: "ahmed-nawara", name: "Ahmed Nawara", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "maya-nicolas", name: "Maya Nicolas", department: "Biology", displayDepartment: "BIOL", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "maya.nicolas@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793879550/bc49f83b-cf26-4ad7-a2be-f05b35b8d8e2.png" },
+    { id: "mohamed-noaman", name: "Mohamed Noaman", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "bernard-o-kane", name: "Bernard O'Kane", department: "Arab and Islamic Civilizations", displayDepartment: "ARIC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "bokane@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560796/465356fd-4c1f-408b-bdb9-95cf14443e16.png" },
+    { id: "iman-omary", name: "Iman Omary", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mohamed-orabi", name: "Mohamed Orabi", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "moustafa-oraby", name: "Moustafa Oraby", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ahmed-radwan", name: "Ahmed Radwan", department: "Construction Engineering", displayDepartment: "CENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ahosney@aucegypt.edu", image: "user.png" },
+    { id: "basma-rady", name: "Basma Rady", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "ahmed-rafea", name: "Ahmed Rafea", department: "Computer Science and Engineering", displayDepartment: "CSCE", filterDepartment: "Computer Science", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "rafea@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793729565/3f3fb875-b3ca-46bb-a750-4db77c6e02e9.png" },
+    { id: "david-rafferty", name: "David Rafferty", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "david.rafferty@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560887/f1eb633e-cd5d-46a4-9ac3-8b7453b3c041.png" },
+    { id: "youssef-ragheb", name: "Youssef Ragheb", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "sherine-ramzy", name: "Sherine Ramzy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "mohamed-rashwan", name: "Mohamed Rashwan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "dina-rateb", name: "Dina Rateb", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "elizabeth-rauh", name: "Elizabeth Rauh", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "elizabeth.rauh@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793649353/b4jmn5aslmihjz0xjty3.png" },
+    { id: "rasha-reda", name: "Rasha Reda", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "dalia-refaat", name: "Dalia Refaat", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "ahmed-refai", name: "Ahmed Refai", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "areej-remah", name: "Areej Remah", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "h-rizzo", name: "H. Rizzo", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hrizzo@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793561165/c605ba76-bb09-4485-80ff-3284e20b8e8f.png" },
+    { id: "elena-romeo", name: "Elena Romeo", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "thomas-rule", name: "Thomas Rule", department: "Philosophy", displayDepartment: "PHIL", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786375436/thomas_rule_iicyfh.jpg" },
+    { id: "abd-elnasser-saad", name: "Abd-Elnasser Saad", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "noha-saada", name: "Noha Saada", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmed-saafan", name: "Ahmed Saafan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "hanan-sabea", name: "Hanan Sabea", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hsabea@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793731232/bdf4b188-c1dc-4f3f-90aa-58456ca46d05.png" },
+    { id: "nouran-sabry", name: "Nouran Sabry", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "wafaa-sabry", name: "Wafaa Sabry", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "amr-sadek", name: "Amr Sadek", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "sara-sadek", name: "Sara Sadek", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "suzanne-safwat", name: "Suzanne Safwat", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "nermine-said", name: "Nermine Said", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793806384/365d363d-9981-4774-b933-d400323009f5.png" },
+    { id: "fayrouz-sakr-ashour", name: "Fayrouz Sakr-Ashour", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "fayrouz.ashour@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730927/c18d2a65-8c11-4181-af30-26f81dc931f6.png" },
+    { id: "rana-salah-eldeen", name: "Rana Salah Eldeen", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "yasmine-salah-el-din", name: "Yasmine Salah El-Din", department: "English Language Instruction", displayDepartment: "ELI", filterDepartment: "Rhetoric & Writing", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "yasmine@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793802754/9750d996-8247-48bd-945d-9d08c96fbf32.png" },
+    { id: "steven-salaita", name: "Steven Salaita", department: "English and Comparative Literature", displayDepartment: "ECLT", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmed-salama", name: "Ahmed Salama", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "cherif-salama", name: "Cherif Salama", department: "Computer Science and Engineering", displayDepartment: "CSCE", filterDepartment: "Computer Science", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "cherif.salama@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730447/807bc24b-f417-443d-abc7-cd701d0865d6.png" },
+    { id: "mohamed-salama", name: "Mohamed Salama", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "dina-saleh", name: "Dina Saleh", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "khaled-saleh", name: "Khaled Saleh", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "nesma-saleh", name: "Nesma Saleh", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "hanadi-salem", name: "Hanadi Salem", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hgsalem@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793731177/761ba0bb-ff18-4743-b209-e955243a791a.png" },
+    { id: "maram-salem", name: "Maram Salem", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ahmed-sallam", name: "Ahmed Sallam", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "khaled-samaha", name: "Khaled Samaha", department: "Accounting", displayDepartment: "ACCT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "ksamaha@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793733022/829b75f8-de51-471d-b8d7-796a38bfb784.png" },
+    { id: "naglaa-samir", name: "Naglaa Samir", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "rania-samir", name: "Rania Samir", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmad-saqfalhait", name: "Ahmad Saqfalhait", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ahmad.saqfalhait@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793729230/1e233fae-dfb8-471b-b560-2ea009993df6.png" },
+    { id: "ezzeldin-sayed-ahmed", name: "Ezzeldin Sayed-Ahmed", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "ariane-schneck", name: "Ariane Schneck", department: "Philosophy", displayDepartment: "PHIL", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793718405/d5443166-7029-4cfa-8c26-7c1cc6278d39.png" },
+    { id: "olivier-schouteden", name: "Olivier Schouteden", department: "History", displayDepartment: "HIST", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "olivier.schouteden@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/2025-01/20190910-_dsc4926-2_0.jpg" },
+    { id: "manuel-schwab", name: "Manuel Schwab", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "manuel.schwab@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793878819/c3bc410c-c855-486c-ab81-038a02c65da7.png" },
+    { id: "sherif-sedky", name: "Sherif Sedky", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "brenda-segone", name: "Brenda M. Segone", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793730599/5eee419a-5ad5-4fed-a86c-e0b1af79e652.png" },
+    { id: "aya-selim", name: "Aya Selim", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "dalia-selim", name: "Dalia Selim", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "miral-selim", name: "Miral Selim", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "engy-serag", name: "Engy Serag", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "mohamed-serag", name: "Mohamed Serag", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805759/2ca2d759-ed45-4a0b-8de7-7b4e8810aade.png" },
+    { id: "mohamed-serry", name: "Mohamed Serry", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793805788/c5742058-796f-4d1c-bd70-4249f50b35dd.png" },
+    { id: "sherif-sewiha", name: "Sherif Sewiha", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "amr-shaarawi", name: "Amr Shaarawi", department: "Physics", displayDepartment: "PHYS", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "shaarawi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793729990/40288fc1-f3ba-4e1f-98a1-381df41b2a8e.png" },
+    { id: "hesham-shafick", name: "Hesham Shafick", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "reem-shaheed", name: "Reem Shaheed", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmad-shahin", name: "Ahmad Shahin", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "irene-shaker", name: "Irene Shaker", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "ismail-shaker", name: "Ismail Shaker", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "may-shalaby", name: "May Shalaby", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mohamed-shalan", name: "Mohamed Shalan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "hamed-shamma", name: "Hamed Shamma", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "hossam-sharara", name: "Hossam Sharara", department: "Computer Science and Engineering", displayDepartment: "CSCE", filterDepartment: "Computer Science", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hossam.sharara@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732019/105262d0-4c46-4c9a-bf2b-e237a11824ec.png" },
+    { id: "tarek-shawki", name: "Tarek Shawki", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793801960/9d0967ff-fef0-4f39-b843-8a4c77252b89.png" },
+    { id: "nermeen-shehata", name: "Nermeen Shehata", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "nader-shenouda", name: "Nader Shenouda", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "ahmed-sherif", name: "Ahmed Sherif", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "nagwa-sherif", name: "Nagwa Sherif", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "shahdan-sherif", name: "Shahdan Sherif", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "amro-shetta", name: "Amro Shetta", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "hania-sholkamy", name: "Hania Sholkamy", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hanias@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793801859/45ad174c-2f07-4eed-a51a-37ac765d8244.png" },
+    { id: "marwah-siam", name: "Marwah Siam", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "sarah-smierciak", name: "Sarah Smierciak", department: "Political Science", displayDepartment: "POLS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "sarah.smierciak@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/2023-10/20230905-_dsc2079%20%281%29.jpg" },
+    { id: "ezzeldin-soliman", name: "Ezzeldin Soliman", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "marwa-soliman", name: "Marwa Soliman", department: "Rhetoric and Composition", displayDepartment: "RHET", filterDepartment: "Rhetoric & Writing", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "marwasol@aucegypt.edu", image: "user.png" },
+    { id: "mohamed-swillam", name: "Mohamed Swillam", department: "Physics", displayDepartment: "PHYS", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "m.swillam@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793802035/e052515f-d6ad-4acd-b6b7-f7b2b10a9a5a.png" },
+    { id: "robert-switzer", name: "Robert Switzer", department: "Philosophy", displayDepartment: "PHIL", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "switzer@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/2024-03/Robert%20Switzer%20-%20Low%20res%20240%20kb%20%281231x2000%29.jpeg" },
+    { id: "maryam-taghavi", name: "Maryam Taghavi", department: "Arts", displayDepartment: "ARTS", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "maryam.taghavi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793879328/1fec9da9-8ddf-4e4a-8722-7958567b7e8c.png" },
+    { id: "adam-talib", name: "Adam Talib", department: "Arab and Islamic Civilizations", displayDepartment: "ARIC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "atalib@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793560521/19723afa-0308-433b-8d8a-41d00b33575e.png" },
+    { id: "hatem-tallima", name: "Hatem Tallima", department: "Chemistry", displayDepartment: "CHEM", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793731567/400cf43d-65c1-40d4-8b96-14cfacfc57cd.png" },
+    { id: "imane-tarkhan", name: "Imane Tarkhan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "islam-tharwat", name: "Ismaeel Tharwat", department: "Economics", displayDepartment: "ECON", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793732232/9b9481ab-48d0-424d-ac7a-da7dd8d6b70b.png" },
+    { id: "ahmed-tolba", name: "Ahmed Tolba", department: "Management", displayDepartment: "MGMT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ahmedtolba@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793717666/ce8175d2-f34b-4b2a-969c-7d73b20f62ab.png" },
+    { id: "alessandro-topa", name: "Alessandro Topa", department: "Philosophy", displayDepartment: "PHIL", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "a.topa@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793559770/90a70470-6bf5-4541-a256-181a5df5ee44.png" },
+    { id: "rabab-wahba", name: "Rabab Wahba", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "dahlia-wahdan", name: "Dahlia Wahdan", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "rasha-wahieb", name: "Rasha Wahieb", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "martena-william", name: "Martena William", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "shahira-yacout", name: "Shahira Yacout", department: "Arabic Language Instruction", displayDepartment: "ALI", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "yacout@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786029228/Shahira_Yacout_hihddh.png" },
+    { id: "nancy-yassa", name: "Nancy Yassa", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "maaly-younis", name: "Maaly Younis", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "mostafa-youssef", name: "Mostafa Youssef", department: "Mechanical Engineering", displayDepartment: "MENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "MOSTAFA.YOUSSEF@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786029047/Mostafa_Youssef_njznek.jpg" },
+    { id: "moustafa-youssef", name: "Moustafa Youssef", department: "Computer Science and Engineering", displayDepartment: "CSCE", filterDepartment: "Computer Science", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "moustafa-youssef@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793962616/725826ae-2829-4596-95a8-a78121a3e2fe.png" },
+    { id: "noha-youssef", name: "Noha Youssef", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "nayoussef@aucegypt.edu", image: "https://res.cloudinary.com/hpsuzs6q/image/upload/v1786028794/Noha_Youssef_vw2ddh.png" },
+    { id: "youssri-youssri-ahmed", name: "Youssri Youssri Ahmed", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
+    { id: "malak-zaalouk", name: "Malak Zaalouk", department: "Applied Linguistics and Educational Studies", displayDepartment: "ALES", filterDepartment: "Rhetoric & Writing", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "mz@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793878662/795a8187-f4a4-4c5d-9de5-6aea17dabf5f.png" },
+    { id: "angie-zaher", name: "Angie Zaher", department: "Accounting", displayDepartment: "ACCT", filterDepartment: "Business", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "angie.zaher@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793718170/8c471e1b-9306-4225-b3d3-70e704ef3a20.png" },
+    { id: "aida-zakaria", name: "Aida Zakaria", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "", image: "user.png" },
+    { id: "nour-zaki", name: "Nour Zaki", department: "Psychology", displayDepartment: "PSYC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "nourzaki@aucegypt.edu", image: "https://www.aucegypt.edu/sites/default/files/2025-12/dsc00069_2.jpg" },
+    { id: "hassan-zaky", name: "Hassan Zaky", department: "Psychology", displayDepartment: "PSYC", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "hzaky@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793878106/10a24e7f-1de1-43b9-9bee-a923d2722177.png" },
+    { id: "heba-t-allah-zaky", name: "Heba T-allah Zaky", department: "Department coming soon", displayDepartment: "AUC", filterDepartment: "Other", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "", image: "user.png" },
+    { id: "rana-abdelaziz", name: "Rana Abdelaziz", department: "Mathematics and Actuarial Science", displayDepartment: "MACT", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "ranasalah@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793963956/dab27bf6-a2a2-4df8-bfc0-cf2f74e7b5bd.png" },
+    { id: "anastasia-gkoliomyti", name: "Anastasia Gkoliomyti", department: "Architecture", displayDepartment: "ARCH", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "anastasia.gkoliomyti@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793964052/f05000a6-656d-471f-84dd-99f63934f31e.png" },
+    { id: "ahmed-gowida", name: "Ahmed Gowida", department: "Petroleum Engineering", displayDepartment: "PENG", filterDepartment: "Engineering", status: "No ratings yet", course: "Courses coming soon", group: "A-F", email: "ahmed.gowida@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793964035/041f7ce4-f703-472a-b7bd-3c623435f76e.png" },
+    { id: "sikandra-kurdi", name: "Sikandra Kurdi", department: "Public Policy and Administration", displayDepartment: "PPAD", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "sikandra.kurdi@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793964226/004bd4b7-a05d-4a3a-868b-493881388895.png" },
+    { id: "joanne-mary-rowland", name: "Joanne Mary Rowland", department: "Sociology, Egyptology and Anthropology", displayDepartment: "SEA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "joanne.rowland@aucegypt.edu", image: "https://res.cloudinary.com/dhtamisqn/image/upload/v1793964246/b3a8a244-a54c-4bd1-b9c2-7e97a283eafa.png" },
+  ];
+
+  window.aucAtlasProfessors = professors;
+
+  if (!document.getElementById("professors-grid")) {
+    return;
+  }
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .professors-browser {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .filters-panel {
+      position: sticky;
+      top: 120px;
+      padding: 14px;
+      border-radius: 26px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 22px 55px rgba(42, 32, 20, 0.1);
+      display: grid;
+      gap: 8px;
+    }
+
+    .filters-heading {
+      padding: 10px 14px 6px;
+      color: rgba(192, 154, 92, 0.84);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .filter-toggle {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.62);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-toggle:hover,
+    .filter-item.open .filter-toggle {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
+
+    .chevron {
+      width: 9px;
+      height: 9px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+      font-size: 0;
+    }
+
+    .filter-content {
+      display: grid;
+      gap: 8px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      padding: 0 8px;
+      transition: max-height 0.42s ease, opacity 0.28s ease, padding 0.42s ease;
+    }
+
+    .filter-item.open .filter-content {
+      max-height: 560px;
+      opacity: 1;
+      padding: 10px 8px 12px;
+    }
+
+    .filter-item.open .department-filter-content {
+      max-height: 420px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(192, 154, 92, 0.48) transparent;
+    }
+
+    .department-filter-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .department-filter-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .department-filter-content::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.48);
+    }
+
+    .filter-item.open .chevron {
+      transform: rotate(225deg);
+    }
+
+    .filter-content label {
+      position: relative;
+      min-height: 40px;
+      padding: 0 12px 0 22px;
+      border-radius: 14px;
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition:
+        background 0.22s ease,
+        color 0.22s ease,
+        transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .rating-filter-option {
+      gap: 9px;
+    }
+
+    .rating-filter-stars {
+      min-width: 62px;
+      color: #c09a5c;
+      font-size: 13px;
+      letter-spacing: 1px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .filter-content input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .filter-content label:hover,
+    .filter-content label:has(input:checked) {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
+
+    .filter-content label:active {
+      transform: scale(0.97);
+    }
+
+    .filter-content label:has(input:checked) {
+      animation: professorFilterOptionSelected 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes professorFilterOptionSelected {
+      0% {
+        transform: scale(1);
+      }
+
+      45% {
+        transform: scale(0.97);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .professors-search-box {
+      width: min(100%, 560px);
+      margin: 0 auto 24px;
+    }
+
+    .professors-search-box input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.78);
+      color: #171717;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      outline: none;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .professors-search-box input[type="search"]::-webkit-search-cancel-button {
+      filter: brightness(0);
+      cursor: pointer;
+    }
+
+    .professors-search-box input:focus {
+      border-color: rgba(192, 154, 92, 0.58);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow:
+        0 0 0 4px rgba(192, 154, 92, 0.12),
+        0 14px 36px rgba(42, 32, 20, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .professor-card {
+      min-height: 350px;
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .professors-grid.is-filtering .professor-card,
+    .professors-grid.is-filtering .professors-empty {
+      animation: professorFilterResultIn 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes professorFilterResultIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .filter-content label:has(input:checked),
+      .professors-grid.is-filtering .professor-card,
+      .professors-grid.is-filtering .professors-empty {
+        animation: none;
+      }
+    }
+
+    .professor-card:hover,
+    .professor-card:focus-visible {
+      border-color: rgba(192, 154, 92, 0.34);
+      box-shadow: 0 30px 80px rgba(42, 32, 20, 0.14);
+      transform: translateY(-3px);
+    }
+
+    .professor-card:focus-visible {
+      outline: 3px solid rgba(192, 154, 92, 0.26);
+      outline-offset: 4px;
+    }
+
+    .professors-result-count {
+      margin-bottom: 18px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .professors-empty {
+      padding: 28px;
+      border-radius: 24px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.72);
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .professors-view-more {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: min(100%, 340px);
+      min-height: 54px;
+      padding: 0 22px;
+      border: 1px solid #171717;
+      border-radius: 999px;
+      background: #171717;
+      color: #ffffff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .professors-view-more span {
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 10px;
+    }
+
+    .professors-view-more:hover,
+    .professors-view-more:focus-visible {
+      border-color: rgba(192, 154, 92, 0.84);
+      background: rgba(192, 154, 92, 0.84);
+      color: #171717;
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .professors-view-more:hover span,
+    .professors-view-more:focus-visible span {
+      color: rgba(23, 23, 23, 0.62);
+    }
+
+    .professors-browser.professor-profile-mode {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .professors-browser.professor-profile-mode .filters-panel,
+    .professors-browser.professor-profile-mode .professors-search-box {
+      display: none;
+    }
+
+    .professors-grid.professor-profile-grid {
+      width: min(100%, 1380px);
+      margin: 0 auto;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .professors-grid.professor-profile-grid .professor-profile-main {
+      min-width: 0;
+      display: grid;
+      align-content: start;
+      gap: 18px;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .professors-grid.professor-profile-grid .professor-profile-card {
+      width: 100%;
+      margin: 0;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .professors-grid.professor-profile-grid .professor-review-insights {
+      width: 100%;
+      margin: 0;
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .professors-grid.professor-profile-grid .professor-reviews-section {
+      width: 100%;
+      margin: 0;
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .professors-header.professor-profile-heading {
+      width: min(100%, 1500px);
+      margin: 0 auto 22px;
+      align-items: center;
+    }
+
+    .professors-header.professor-profile-heading .professors-kicker {
+      font-weight: 700;
+    }
+
+    .professors-header.professor-profile-heading h1 {
+      font-size: clamp(30px, 3.2vw, 46px);
+      font-weight: 600;
+      line-height: 1.05;
+    }
+
+    .professors-header.professor-profile-heading p:not(.professors-kicker) {
+      max-width: 500px;
+      justify-self: end;
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    .professor-profile-card {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 20px 54px rgba(42, 32, 20, 0.1);
+      display: grid;
+      grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+      align-items: stretch;
+    }
+
+    .professor-profile-image {
+      position: relative;
+      min-height: 260px;
+      background: rgba(23, 23, 23, 0.04);
+    }
+
+    .professor-profile-image img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center 18%;
+    }
+
+    /* Recenter Ahmed Moustafa in his full-size profile portrait only. */
+    .professor-profile-image--ahmed-moustafa img {
+      object-position: 75% 18%;
+    }
+
+    .professor-profile-body {
+      padding: 24px;
+      display: grid;
+      align-content: start;
+      gap: 14px;
+    }
+
+    .professor-profile-info {
+      max-width: 660px;
+      display: grid;
+      gap: 15px;
+    }
+
+
+    /* Give the faculty profile a clear name-first hierarchy. */
+    .professor-profile-info .professor-profile-identity {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+      padding-bottom: 13px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .professor-profile-name {
+      margin: 0;
+      color: #171717;
+      font-size: clamp(24px, 2.2vw, 30px);
+      font-weight: 650;
+      letter-spacing: -0.025em;
+      line-height: 1.13;
+      overflow-wrap: anywhere;
+    }
+
+    .professor-profile-department {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.6);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    .professor-profile-info div {
+      display: grid;
+      gap: 4px;
+    }
+
+    .professor-profile-info > div:not(.professor-profile-identity) > span:first-child {
+      color: #ac864a;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: normal;
+      text-transform: none;
+    }
+
+    .professor-profile-value,
+    .professor-profile-email {
+      color: #303030;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.5;
+      text-decoration: none;
+    }
+
+    .professor-profile-email.is-empty {
+      color: rgba(23, 23, 23, 0.48);
+    }
+
+    .professor-profile-course-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .professor-profile-course-link {
+      min-height: 32px;
+      padding: 0 10px;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      border-radius: 999px;
+      background: rgba(247, 244, 238, 0.72);
+      color: rgba(23, 23, 23, 0.7);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.3;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .professor-profile-course-link:hover {
+      border-color: rgba(192, 154, 92, 0.34);
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+      transform: translateY(-1px);
+    }
+
+    body.review-modal-open {
+      overflow: hidden;
+      padding-right: var(--review-scrollbar-compensation, 0px);
+    }
+
+    .professor-review-panel {
+      margin-top: 6px;
+      width: fit-content;
+    }
+
+    .professor-review-panel[open] {
+      position: relative;
+      z-index: 1200;
+    }
+
+    .professor-review-toggle {
+      width: fit-content;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: #171717;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      list-style: none;
+      transform: translateY(0) scale(1);
+      transform-origin: center;
+      transition:
+        transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+        background 180ms ease,
+        box-shadow 180ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .professor-review-toggle:hover {
+      background: #242424;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .professor-review-toggle:active {
+      transform: translateY(0) scale(0.965);
+      transition-duration: 90ms;
+    }
+
+    .professor-review-toggle:focus-visible {
+      outline: 3px solid rgba(192, 154, 92, 0.28);
+      outline-offset: 4px;
+    }
+
+    .professor-review-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .review-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      background: rgba(247, 244, 238, 0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 1;
+      animation: none;
+      will-change: opacity;
+    }
+
+    .professor-review-form {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 1201;
+      width: min(820px, calc(100% - 32px));
+      max-height: min(82vh, 760px);
+      margin: 0;
+      padding: 24px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-gutter: stable;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 34px 90px rgba(42, 32, 20, 0.2);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      opacity: 1;
+      transform: translate(-50%, -50%);
+      transform-origin: center center;
+      animation: none;
+    }
+
+    .review-modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 2px;
+    }
+
+    .review-modal-header h2 {
+      margin: 0;
+      color: #171717;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.1;
+    }
+
+    .review-progress {
+      display: grid;
+      gap: 8px;
+    }
+
+    .review-progress-label {
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .review-progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+    }
+
+    .review-progress-fill {
+      width: 33.333%;
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(192, 154, 92, 0.88);
+      display: block;
+      transition: width 0.24s ease;
+    }
+
+    .review-step {
+      display: none;
+      border: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .review-step.is-active {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      animation: reviewStepIn 0.22s ease both;
+    }
+
+    .review-step-heading {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 5px;
+    }
+
+    .review-step-heading span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .review-step-heading p {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .review-section-heading {
+      grid-column: 1 / -1;
+      margin-top: 10px;
+      color: #a67c39;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .review-section-heading::after {
+      content: "";
+      height: 2px;
+      flex: 1;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.28);
+    }
+
+    .review-section-heading:first-of-type {
+      margin-top: 0;
+    }
+
+    .review-field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .review-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .review-field label {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .review-field input,
+    .review-field select,
+    .review-field textarea {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.58);
+      color: #171717;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      outline: none;
+    }
+
+    .review-field select {
+      appearance: none;
+      background:
+        linear-gradient(45deg, transparent 50%, rgba(23, 23, 23, 0.58) 50%) calc(100% - 18px) 50% / 7px 7px no-repeat,
+        linear-gradient(135deg, rgba(23, 23, 23, 0.58) 50%, transparent 50%) calc(100% - 13px) 50% / 7px 7px no-repeat,
+        rgba(255, 255, 255, 0.58);
+    }
+
+    .review-field select option {
+      background: #fffdf8;
+      color: #171717;
+      font-weight: 400;
+    }
+
+    .review-native-select {
+      display: none;
+    }
+
+    .review-choice {
+      position: relative;
+    }
+
+    .review-choice-button {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 40px 0 14px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.58);
+      color: #171717;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .review-choice-button::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid rgba(23, 23, 23, 0.58);
+      border-bottom: 1.5px solid rgba(23, 23, 23, 0.58);
+      transform: rotate(45deg) translateY(-2px);
+      pointer-events: none;
+    }
+
+    .review-choice.open .review-choice-button,
+    .review-choice-button:focus-visible {
+      border-color: rgba(192, 154, 92, 0.5);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.1);
+      outline: none;
+    }
+
+    .review-choice-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      z-index: 4;
+      max-height: 230px;
+      padding: 6px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 18px 45px rgba(42, 32, 20, 0.16);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .review-choice.open .review-choice-menu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .review-choice-search-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 0 0 6px;
+      background: rgba(255, 255, 255, 0.98);
+    }
+
+    .review-choice-search {
+      width: 100%;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 12px;
+      background: rgba(247, 244, 238, 0.74);
+      color: #171717;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 400;
+      outline: none;
+    }
+
+    .review-choice-search:focus {
+      border-color: rgba(192, 154, 92, 0.5);
+      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.1);
+    }
+
+    .review-field[hidden],
+    .review-choice-option[hidden] {
+      display: none;
+    }
+
+    .review-choice-option {
+      width: 100%;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.72);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .review-choice-option:hover,
+    .review-choice-option.is-selected {
+      background: rgba(192, 154, 92, 0.12);
+      color: #171717;
+    }
+
+    .review-field textarea {
+      min-height: 112px;
+      padding: 13px 14px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .review-field input::placeholder,
+    .review-field textarea::placeholder {
+      color: rgba(23, 23, 23, 0.38);
+    }
+
+    .review-field input:focus,
+    .review-field select:focus,
+    .review-field textarea:focus {
+      border-color: rgba(192, 154, 92, 0.5);
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.1);
+    }
+
+    .review-anonymous-option {
+      grid-column: 1 / -1;
+      min-width: 0;
+      padding: 16px 0 0;
+      border-top: 1px solid rgba(23, 23, 23, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      cursor: pointer;
+    }
+
+    .review-anonymous-copy {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .review-anonymous-copy strong {
+      color: #171717;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .review-anonymous-copy small {
+      color: rgba(23, 23, 23, 0.5);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    .review-anonymous-option input {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      margin: 0;
+      flex: 0 0 46px;
+      appearance: none;
+      -webkit-appearance: none;
+      border: 1px solid rgba(23, 23, 23, 0.13);
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.12);
+      box-shadow: inset 0 1px 3px rgba(23, 23, 23, 0.12);
+      cursor: pointer;
+      outline: none;
+      transition:
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
+    }
+
+    .review-anonymous-option input::before {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 7px rgba(23, 23, 23, 0.22);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .review-anonymous-option input:checked {
+      border-color: rgba(154, 112, 48, 0.8);
+      background: #c09a5c;
+      box-shadow:
+        inset 0 1px 3px rgba(90, 58, 15, 0.18),
+        0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .review-anonymous-option input:checked::before {
+      transform: translateX(20px);
+    }
+
+    .review-anonymous-option input:focus-visible {
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.2);
+    }
+
+    .review-submit-button {
+      width: fit-content;
+      min-height: 46px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.96);
+      color: #171717;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .review-submit-button:disabled {
+      opacity: 0.58;
+      cursor: wait;
+    }
+
+    .review-form-message {
+      grid-column: 1 / -1;
+      min-height: 20px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .review-form-message.is-success {
+      color: #23613f;
+    }
+
+    .review-form-message.is-error {
+      color: #9b2f2f;
+    }
+
+    .professor-review-insights {
+      width: min(100%, 1120px);
+      margin: 22px auto 0;
+      padding: 16px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 14px 38px rgba(42, 32, 20, 0.07);
+      display: grid;
+      gap: 12px;
+    }
+
+    .professor-review-insights-header,
+    .professor-reviews-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .professor-review-insights-header span,
+    .professor-reviews-header span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .professor-review-insights-header h2,
+    .professor-reviews-header h2 {
+      margin-top: 3px;
+      color: #171717;
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.08;
+    }
+
+    .professor-review-insights-header p,
+    .professor-reviews-header p {
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-align: right;
+      text-transform: uppercase;
+    }
+
+    .professor-review-insights-header p {
+      color: rgba(23, 23, 23, 0.68);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      text-transform: none;
+    }
+
+
+    /* Loading placeholders for Class patterns: mimic compact stat rows. */
+    .professor-review-stat-skeleton {
+      display: grid;
+      gap: 15px;
+      padding: 5px 0 7px;
+    }
+
+    .professor-review-stat-skeleton-row {
+      display: grid;
+      gap: 9px;
+    }
+
+    .professor-review-stat-skeleton-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .professor-review-stat-skeleton-line,
+    .professor-review-stat-skeleton-track,
+    .professor-review-stats-count-loading {
+      display: block;
+      height: 10px;
+      border-radius: 6px;
+      background: rgba(23, 23, 23, 0.065);
+    }
+
+    .professor-review-stat-skeleton-line {
+      width: 39%;
+    }
+
+    .professor-review-stat-skeleton-line.is-value {
+      width: 27%;
+    }
+
+    .professor-review-stat-skeleton-row:nth-child(2) .professor-review-stat-skeleton-line {
+      width: 48%;
+    }
+
+    .professor-review-stat-skeleton-row:nth-child(3) .professor-review-stat-skeleton-line {
+      width: 34%;
+    }
+
+    .professor-review-stat-skeleton-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      opacity: 0.8;
+    }
+
+    .professor-review-stats-count-loading {
+      width: 90px;
+      height: 10px;
+      margin: 3px 0;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .professor-review-stat-skeleton-line,
+      .professor-review-stat-skeleton-track,
+      .professor-review-stats-count-loading {
+        animation: professor-review-loading-pulse 1.7s ease-in-out infinite;
+      }
+    }
+
+    .professor-review-stats {
+      display: grid;
+      gap: 10px;
+    }
+
+    .professor-review-stat-row {
+      min-width: 0;
+    }
+
+    .professor-review-stat-row:first-child > .professor-review-stat-details-toggle {
+      padding-top: 4px;
+    }
+
+    .professor-review-stat-head {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .professor-review-stat-label {
+      min-width: 0;
+      flex: 1 1 auto;
+      color: rgba(23, 23, 23, 0.74);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      line-height: 1.45;
+      text-transform: none;
+    }
+
+    .professor-review-stat-value {
+      min-width: 0;
+      color: rgba(23, 23, 23, 0.60);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      line-height: 1.45;
+      text-align: right;
+      text-transform: none;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+    }
+
+    .professor-review-stat-value strong {
+      color: #171717;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .professor-review-stat-value span:last-child {
+      color: #a67e3e;
+      font-weight: 700;
+    }
+
+    .professor-review-stat-track,
+    .professor-review-stat-answer-track {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+    }
+
+    .professor-review-stat-track {
+      height: 7px;
+    }
+
+    .professor-review-stat-fill {
+      width: var(--stat-width, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: #c09a5c;
+      display: block;
+      transform: scaleX(0);
+      transform-origin: left center;
+      animation:
+        professorReviewStatFill
+        0.72s
+        cubic-bezier(0.16, 1, 0.3, 1)
+        var(--stat-delay, 0ms)
+        forwards;
+    }
+
+    /* The summary covers the full label and progress bar, making each stat row expandable. */
+    .professor-review-stat-details-toggle {
+      width: 100%;
+      padding: 8px 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      display: grid;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .professor-review-stat-details-toggle:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    .professor-review-stat-details-toggle:hover .professor-review-stat-label,
+    .professor-review-stat-row.open .professor-review-stat-label {
+      color: #171717;
+    }
+
+    .professor-review-stat-chevron {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 6px;
+      margin: 0 2px;
+      border-right: 1.5px solid rgba(23, 23, 23, 0.55);
+      border-bottom: 1.5px solid rgba(23, 23, 23, 0.55);
+      transform: rotate(45deg);
+      transition: transform 0.22s ease;
+    }
+
+    .professor-review-stat-row.open .professor-review-stat-chevron {
+      transform: rotate(225deg);
+    }
+
+    .professor-review-stat-breakdown {
+      display: grid;
+      gap: 9px;
+      max-height: 0;
+      padding: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition:
+        max-height 0.42s ease,
+        opacity 0.28s ease,
+        padding 0.42s ease;
+    }
+
+    .professor-review-stat-row.open .professor-review-stat-breakdown {
+      max-height: var(--stat-expanded-height, 520px);
+      opacity: 1;
+      padding: 2px 0 11px;
+    }
+
+    .professor-review-stat-total,
+    .professor-review-stat-answer {
+      display: grid;
+      gap: 5px;
+    }
+
+    /* Keep answers with no selections out of the initial breakdown. */
+    .professor-review-stat-answer.is-zero-answer {
+      display: none;
+    }
+
+    .professor-review-stat-breakdown.show-zero-options .professor-review-stat-answer.is-zero-answer {
+      display: grid;
+    }
+
+    .professor-review-stat-show-zeros {
+      justify-self: start;
+      margin-top: 2px;
+      padding: 4px 0;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.62);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .professor-review-stat-show-zeros:hover,
+    .professor-review-stat-show-zeros:focus-visible {
+      color: #171717;
+    }
+
+    .professor-review-stat-show-zeros:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+
+    .professor-review-stat-answer-head {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(23, 23, 23, 0.65);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      line-height: 1.45;
+      text-transform: none;
+    }
+
+    .professor-review-stat-answer-head span:first-child {
+      min-width: 0;
+      color: rgba(23, 23, 23, 0.72);
+    }
+
+    .professor-review-stat-answer-head span:last-child {
+      color: rgba(192, 154, 92, 0.96);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .professor-review-stat-answer-track {
+      height: 4px;
+    }
+
+    .professor-review-stat-answer-fill {
+      width: var(--stat-width, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(192, 154, 92, 0.58);
+      display: block;
+    }
+
+    .professor-review-stat-total-fill {
+      background: rgba(23, 23, 23, 0.22);
+    }
+
+    @keyframes professorReviewStatFill {
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .professor-review-insights-more {
+      display: grid;
+      gap: 0;
+    }
+
+    .professor-review-insights-hidden {
+      order: 1;
+      box-sizing: border-box;
+      display: grid;
+      gap: 10px;
+      margin-top: 0;
+      overflow: hidden;
+      opacity: 1;
+      transition:
+        height 0.28s ease,
+        opacity 0.22s ease,
+        transform 0.22s ease;
+    }
+
+    .professor-review-insights-more-toggle {
+      order: 2;
+      width: fit-content;
+      margin-top: 14px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #171717;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: normal;
+      text-transform: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+      transition: color 0.18s ease;
+    }
+
+    .professor-review-insights-more-toggle::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.22s ease;
+    }
+
+    .professor-review-insights-more[open] .professor-review-insights-more-toggle::after {
+      transform: rotate(225deg) translate(-1px, -1px);
+    }
+
+    .professor-review-insights-more-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .professor-review-insights-more-less {
+      display: none;
+    }
+
+    .professor-review-insights-more[open] .professor-review-insights-more-more {
+      display: none;
+    }
+
+    .professor-review-insights-more[open] .professor-review-insights-more-less {
+      display: inline;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .professor-review-stat-fill {
+        animation: none;
+        transform: scaleX(1);
+      }
+
+      .professor-review-stat-breakdown,
+      .professor-review-insights-hidden {
+        transition: none;
+      }
+    }
+
+    .professor-reviews-section {
+      width: min(100%, 720px);
+      margin: 28px auto 0;
+      display: grid;
+      gap: 16px;
+    }
+
+    .professor-reviews-header {
+      padding: 0 4px 4px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .professor-reviews-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      align-items: start;
+      gap: 14px;
+    }
+
+
+    /* Professor review loading follows the directory's quiet card skeletons. */
+    .professor-review-loading-card {
+      min-width: 0;
+      min-height: 195px;
+      padding: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.055);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.45);
+      display: grid;
+      align-content: start;
+      gap: 16px;
+    }
+
+    .professor-review-loading-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .professor-review-loading-avatar {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      border-radius: 50%;
+      background: rgba(23, 23, 23, 0.055);
+    }
+
+    .professor-review-loading-top .professor-review-loading-line {
+      flex: 1 1 auto;
+      max-width: 46%;
+    }
+
+    .professor-review-loading-rating {
+      flex: 0 0 62px;
+      width: 62px;
+      height: 12px;
+      margin-left: auto;
+    }
+
+    .professor-review-loading-detail {
+      display: grid;
+      gap: 11px;
+    }
+
+    .professor-review-loading-line,
+    .professor-review-count-loading {
+      display: block;
+      height: 11px;
+      border-radius: 6px;
+      background: rgba(23, 23, 23, 0.065);
+    }
+
+    .professor-review-loading-line.is-context { width: 52%; }
+    .professor-review-loading-line.is-note { width: 93%; }
+    .professor-review-loading-line.is-note-short { width: 67%; }
+
+    .professor-review-count-loading {
+      width: 86px;
+      height: 10px;
+      margin: 3px 0;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .professor-review-loading-avatar,
+      .professor-review-loading-line,
+      .professor-review-loading-rating,
+      .professor-review-count-loading {
+        animation: professor-review-loading-pulse 1.7s ease-in-out infinite;
+      }
+
+      @keyframes professor-review-loading-pulse {
+        0%, 100% { opacity: 0.55; }
+        50% { opacity: 1; }
+      }
+    }
+
+    .professor-review-card {
+      padding: 16px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 18px 44px rgba(42, 32, 20, 0.08);
+      display: grid;
+      align-content: start;
+      gap: 12px;
+    }
+
+    .professor-review-card-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .professor-review-author {
+      min-width: 0;
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .professor-review-avatar,
+    .professor-review-avatar-fallback {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #171717;
+      color: #fffdf8;
+      display: grid;
+      place-items: center;
+      object-fit: cover;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .professor-review-author strong {
+      display: block;
+      min-width: 0;
+      overflow: hidden;
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .professor-review-rating {
+      align-self: center;
+      transform: translateY(-2px);
+      flex: 0 0 auto;
+      color: #c09a5c;
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .professor-review-stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .professor-review-star {
+      color: rgba(23, 23, 23, 0.18);
+    }
+
+    .professor-review-star.is-filled {
+      color: #c09a5c;
+    }
+
+    .professor-review-rating-text {
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .professor-review-context {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .professor-review-context span {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .professor-review-note,
+    .professor-review-empty,
+    .professor-review-status {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.68);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .professor-review-card-actions {
+      margin-top: 2px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .professor-review-report-button {
+      padding: 4px 0;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.44);
+      font: inherit;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    .professor-review-report-button:hover,
+    .professor-review-report-button:focus-visible {
+      color: #9f2f2f;
+      outline: none;
+    }
+
+    .professor-review-report-button:disabled {
+      color: rgba(23, 23, 23, 0.38);
+      cursor: default;
+      opacity: 0.72;
+    }
+
+    body.content-report-open {
+      overflow: hidden;
+    }
+
+    .course-report-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3100;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+      opacity: 1;
+      transition:
+        opacity 0.24s ease,
+        display 0.24s;
+      transition-behavior: allow-discrete;
+      will-change: opacity;
+    }
+
+    .course-report-modal[hidden] {
+      display: none;
+      opacity: 0;
+    }
+
+    @starting-style {
+      .course-report-modal:not([hidden]) {
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-report-modal {
+        transition: none;
+      }
+    }
+
+    .course-report-backdrop {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: rgba(247, 244, 238, 0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor: pointer;
+      animation:
+        courseReportBackdropIn
+        0.24s
+        ease
+        both;
+    }
+
+    .course-report-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(500px, 100%);
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 34px 90px rgba(42, 32, 20, 0.2);
+      animation:
+        courseReportDialogIn
+        0.3s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+    }
+
+    .course-report-header {
+      padding: 24px 24px 14px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .course-report-header-copy {
+      min-width: 0;
+      display: grid;
+      gap: 7px;
+    }
+
+    .course-report-kicker {
+      margin: 0;
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .course-report-header h2 {
+      margin: 0;
+      color: #171717;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.1;
+    }
+
+    .course-report-header-copy > p:last-child {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    .course-report-close {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: rgba(23, 23, 23, 0.82);
+      font: inherit;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .course-report-close:hover,
+    .course-report-close:focus-visible {
+      background: #171717;
+      color: #ffffff;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.14);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-report-form {
+      padding: 0 24px 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .course-report-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .course-report-field > span {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .course-report-field textarea {
+      width: 100%;
+      min-height: 132px;
+      padding: 13px 14px;
+      resize: vertical;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.58);
+      color: #171717;
+      font: inherit;
+      font-size: 14px;
+      line-height: 1.55;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .course-report-field textarea:focus {
+      border-color: rgba(192, 154, 92, 0.56);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .course-report-status {
+      min-height: 0;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .course-report-status:empty {
+      display: none;
+    }
+
+    .course-report-status.error {
+      color: #9f2f2f;
+    }
+
+    .course-report-actions {
+      padding-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .course-report-cancel,
+    .course-report-submit {
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .course-report-cancel {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.58);
+      color: rgba(23, 23, 23, 0.68);
+    }
+
+    .course-report-cancel:hover,
+    .course-report-cancel:focus-visible {
+      background: #ffffff;
+      color: #171717;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.08);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-report-submit {
+      border: 0;
+      background: #171717;
+      color: #ffffff;
+    }
+
+    .course-report-submit:hover:not(:disabled),
+    .course-report-submit:focus-visible:not(:disabled) {
+      background: #242424;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.14);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-report-submit:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    @keyframes courseReportBackdropIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes courseReportDialogIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-report-backdrop,
+      .course-report-dialog {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .course-report-modal {
+        padding: 14px;
+      }
+
+      .course-report-dialog {
+        border-radius: 22px;
+      }
+
+      .course-report-header {
+        padding: 20px 18px 16px;
+      }
+
+      .course-report-form {
+        padding: 0 18px 18px;
+      }
+
+      .course-report-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .course-report-cancel,
+      .course-report-submit {
+        width: 100%;
+      }
+    }
+
+    .professor-review-empty,
+    .professor-review-status {
+      grid-column: 1 / -1;
+      padding: 22px;
+      border: 1px dashed rgba(23, 23, 23, 0.16);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.54);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .professor-review-insights-header,
+      .professor-reviews-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .professor-review-card-top {
+        align-items: center;
+      }
+
+      .professor-review-stat-labels {
+        font-size: 10px;
+      }
+    }
+
+    @keyframes reviewBackdropIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes reviewModalIn {
+      0% {
+        opacity: 0;
+        transform:
+          translate(-50%, calc(-50% + 18px))
+          scale(0.975);
+      }
+
+      45% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 1;
+        transform:
+          translate(-50%, -50%)
+          scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .review-modal-backdrop,
+      .professor-review-form {
+        animation: none;
+      }
+
+      .professor-review-toggle {
+        transition: none;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .professors-browser {
+        grid-template-columns: 1fr;
+      }
+
+      .filters-panel {
+        position: static;
+      }
+
+      .professors-grid.professor-profile-grid {
+        width: min(100%, 1120px);
+        grid-template-columns: 1fr;
+      }
+
+      .professors-grid.professor-profile-grid .professor-profile-main {
+        display: contents;
+      }
+
+      .professors-grid.professor-profile-grid .professor-review-insights {
+        grid-column: 1;
+        grid-row: 2;
+      }
+
+      .professors-grid.professor-profile-grid .professor-reviews-section {
+        grid-column: 1;
+        grid-row: 3;
+      }
+
+      .professor-profile-card {
+        grid-template-columns: 1fr;
+      }
+
+      .professor-profile-image {
+        min-height: 0;
+        height: 260px;
+      }
+
+      .professor-review-form {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      html:has(body.review-modal-open),
+      body.review-modal-open {
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
+      .review-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 5000;
+        background: rgba(247, 244, 238, 0.46);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        overscroll-behavior: none;
+        touch-action: none;
+      }
+
+      .professor-review-form {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        z-index: 5001;
+        box-sizing: border-box;
+        width: calc(100vw - 20px);
+        height: calc(100dvh - 20px);
+        max-height: calc(100dvh - 20px);
+        margin: 0;
+        padding:
+          18px
+          18px
+          max(24px, env(safe-area-inset-bottom));
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+        scrollbar-gutter: auto;
+        border-radius: 22px;
+        transform: translate(-50%, -50%);
+        animation: none;
+      }
+
+      .review-modal-header {
+        position: sticky;
+        top: -18px;
+        z-index: 20;
+        margin: -18px -18px 0;
+        padding:
+          max(18px, env(safe-area-inset-top))
+          18px
+          12px;
+        border-bottom: 1px solid rgba(23, 23, 23, 0.07);
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+
+      .review-step.is-active {
+        grid-template-columns: 1fr;
+      }
+
+      .review-field,
+      .review-field.full,
+      .review-anonymous-option,
+      .review-form-message {
+        min-width: 0;
+        grid-column: 1 / -1;
+      }
+
+      .review-anonymous-option {
+        margin-bottom: 0;
+      }
+
+      .review-field input,
+      .review-field select,
+      .review-field textarea,
+      .review-choice,
+      .review-choice-button {
+        max-width: 100%;
+      }
+
+      .review-choice-menu {
+        position: static;
+        display: none;
+        max-height: min(260px, 36dvh);
+        margin-top: 8px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        opacity: 1;
+        pointer-events: none;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .review-choice.open .review-choice-menu {
+        display: grid;
+        pointer-events: auto;
+        transform: none;
+      }
+
+      .review-submit-button {
+        position: static;
+        width: 100%;
+        min-height: 52px;
+        grid-column: 1 / -1;
+        margin-top: 10px;
+        flex-shrink: 0;
+        box-shadow:
+          0 10px 26px rgba(42, 32, 20, 0.14);
+      }
+
+      .professor-review-toggle {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .professor-profile-body,
+      .professor-review-insights,
+      .professor-reviews-section {
+        min-width: 0;
+      }
+    }
+
+    /* Professor reviews use the same edge-to-edge drawer pattern as uploads.
+       Mounting the drawer under <body> avoids the profile card's overflow clip. */
+    html:has(body.review-modal-open) {
+      overflow: hidden;
+    }
+
+    .review-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      background: rgba(247, 244, 238, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .professor-review-form {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: auto;
+      z-index: 5001;
+      box-sizing: border-box;
+      width: min(520px, 100vw);
+      height: 100dvh;
+      max-height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-radius: 24px 0 0 24px;
+      background: #fff;
+      transform: translateX(0);
+      animation: none;
+      box-shadow: -20px 0 80px rgba(42, 32, 20, 0.16);
+    }
+
+    .professor-review-form:focus {
+      outline: none;
+    }
+
+    .review-modal-header {
+      position: relative;
+      top: auto;
+      z-index: 2;
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 24px 24px 18px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: #fff;
+    }
+
+    .review-drawer-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      min-width: 0;
+      padding: 22px 24px 32px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+      gap: 18px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .review-drawer-body .review-field,
+    .review-drawer-body .review-field.full,
+    .review-drawer-body .review-anonymous-option {
+      min-width: 0;
+      grid-column: 1 / -1;
+    }
+
+    .review-drawer-body .review-choice-menu {
+      position: static;
+      display: none;
+      max-height: min(230px, 34dvh);
+      margin-top: 8px;
+      opacity: 1;
+      pointer-events: none;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .review-drawer-body .review-choice.open .review-choice-menu {
+      display: grid;
+      pointer-events: auto;
+      transform: none;
+    }
+
+    .review-drawer-footer {
+      flex: 0 0 auto;
+      display: grid;
+      gap: 8px;
+      padding: 16px 24px 20px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      background: #fff;
+      box-shadow: 0 -8px 22px rgba(42, 32, 20, 0.035);
+    }
+
+    .review-drawer-footer .review-submit-button {
+      position: static;
+      width: 100%;
+      min-height: 50px;
+      margin: 0;
+      background: #171717;
+      color: #fff;
+      box-shadow: none;
+    }
+
+    .review-drawer-footer .review-form-message {
+      margin: 0;
+    }
+
+    .review-drawer-footer .review-form-message:empty {
+      display: none;
+    }
+
+    .review-drawer-footer .review-cancel-button {
+      min-height: 34px;
+      padding: 4px 10px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.56);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .review-drawer-footer .review-cancel-button:hover {
+      color: #171717;
+      background: rgba(23, 23, 23, 0.04);
+    }
+
+    .review-drawer-footer .review-cancel-button:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 640px) {
+      .professor-review-form {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        padding: 0;
+        border-radius: 0;
+        transform: translateX(0);
+      }
+
+      .review-modal-header {
+        top: auto;
+        margin: 0;
+        padding: max(18px, env(safe-area-inset-top)) 18px 14px;
+      }
+
+      .review-drawer-body {
+        padding: 20px 18px 28px;
+      }
+
+      .review-drawer-footer {
+        padding: 14px 18px max(18px, env(safe-area-inset-bottom));
+      }
+
+      .review-drawer-footer .review-submit-button {
+        min-height: 52px;
+        margin: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .professor-review-form,
+      .review-modal-backdrop {
+        animation: none;
+      }
+    }
+
+    /* Compact, progressive-disclosure layout for the professor review drawer. */
+    .review-drawer-body {
+      gap: 12px;
+      padding-top: 18px;
+      padding-bottom: 22px;
+    }
+
+    .review-core-section {
+      display: grid;
+      gap: 16px;
+      padding: 0 0 18px;
+    }
+
+    .review-core-section h3 {
+      margin: 0;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+
+    .review-core-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .review-core-grid .review-field {
+      min-width: 0;
+    }
+
+    .review-drawer-body .review-field {
+      gap: 6px;
+    }
+
+    .review-drawer-body .review-field label {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.045em;
+    }
+
+    .review-drawer-body .review-choice-button,
+    .review-drawer-body .review-field input,
+    .review-drawer-body .review-field select {
+      min-height: 43px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .review-drawer-body .review-choice-button {
+      padding-left: 12px;
+      padding-right: 27px;
+      line-height: 1.35;
+    }
+
+    .review-drawer-body .review-choice-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .review-drawer-body .review-choice-button::after {
+      right: 12px;
+    }
+
+    .review-rating-stars {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .review-rating-star {
+      width: 43px;
+      height: 43px;
+      padding: 0;
+      flex: 0 0 43px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: transparent;
+      color: #d2d2d2;
+      font: inherit;
+      font-size: 32px;
+      line-height: 1;
+      cursor: pointer;
+      transition: color 0.15s ease, transform 0.15s ease;
+    }
+
+    .review-rating-star.is-active {
+      color: #c09a5c;
+    }
+
+    .review-rating-star:hover {
+      transform: translateY(-1px);
+    }
+
+    .review-rating-star:focus-visible,
+    .review-recommend-options button:focus-visible,
+    .review-accordion summary:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 3px;
+    }
+
+    .review-recommend-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .review-recommend-options button {
+      min-height: 40px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 11px;
+      background: #fff;
+      color: rgba(23, 23, 23, 0.74);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .review-recommend-options button.is-active {
+      border-color: #c09a5c;
+      background: rgba(192, 154, 92, 0.13);
+      color: #171717;
+    }
+
+    .review-accordion {
+      min-width: 0;
+      border-top: 1px solid rgba(23, 23, 23, 0.09);
+    }
+
+    .review-accordion summary {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 25px 14px 0;
+      position: relative;
+      cursor: pointer;
+      list-style: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .review-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .review-accordion summary::after {
+      content: "";
+      position: absolute;
+      right: 6px;
+      top: calc(50% - 5px);
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid rgba(23, 23, 23, 0.6);
+      border-bottom: 1.5px solid rgba(23, 23, 23, 0.6);
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+    }
+
+    .review-accordion[open] summary::after {
+      transform: translateY(4px) rotate(225deg);
+    }
+
+    .review-accordion-label {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .review-accordion-label strong {
+      color: #171717;
+      font-size: 14px;
+      line-height: 1.2;
+      font-weight: 650;
+    }
+
+    .review-accordion-label small {
+      font-size: 11px;
+      color: rgba(23, 23, 23, 0.52);
+      line-height: 1.3;
+    }
+
+    .review-accordion-meta {
+      flex: 0 0 auto;
+      color: rgba(23, 23, 23, 0.55);
+      font-size: 10px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .review-accordion-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+      padding: 0 0 20px;
+    }
+
+    .review-drawer-body .review-anonymous-option {
+      margin: 0;
+      padding: 15px 0 0;
+    }
+
+    .review-drawer-footer {
+      padding-top: 12px;
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+    }
+
+    .review-drawer-footer .review-submit-button {
+      min-height: 46px;
+      font-size: 11px;
+    }
+
+    @media (max-width: 440px) {
+      .review-core-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .review-accordion summary {
+        flex-wrap: wrap;
+        row-gap: 6px;
+      }
+
+      .review-accordion-meta {
+        font-size: 10px;
+      }
+
+      .review-rating-stars {
+        gap: 3px;
+      }
+
+      .review-rating-star {
+        width: 40px;
+        flex-basis: 40px;
+      }
+    }
+
+    /* Only show a small, relevant course suggestion list after typing. */
+    .review-course-search-wrap {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .review-drawer-body .review-course-search-input {
+      box-sizing: border-box;
+      width: 100%;
+      height: 43px;
+      min-height: 43px;
+      padding: 0 13px 0 35px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.86);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .review-course-search-wrap::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 13px;
+      z-index: 1;
+      width: 12px;
+      height: 12px;
+      border: 1.5px solid rgba(23, 23, 23, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .review-course-search-wrap::after {
+      content: "";
+      position: absolute;
+      top: 26px;
+      left: 24px;
+      z-index: 1;
+      width: 6px;
+      height: 1.5px;
+      border-radius: 2px;
+      background: rgba(23, 23, 23, 0.5);
+      transform: rotate(45deg);
+      transform-origin: left center;
+      pointer-events: none;
+    }
+
+    .review-drawer-body .review-course-search-input:focus {
+      border-color: rgba(192, 154, 92, 0.55);
+      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.11);
+    }
+
+    .review-course-suggestions {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 30;
+      padding: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 13px;
+      background: #fff;
+      box-shadow: 0 16px 32px rgba(42, 32, 20, 0.14);
+    }
+
+    .review-course-suggestions[hidden] {
+      display: none;
+    }
+
+    .review-course-suggestion {
+      padding: 10px 11px;
+      border-radius: 8px;
+      color: #272727;
+      font-size: 12px;
+      line-height: 1.45;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+
+    .review-course-suggestion:hover,
+    .review-course-suggestion.is-active {
+      background: rgba(192, 154, 92, 0.13);
+    }
+
+    .review-course-no-results,
+    .review-course-more-results {
+      padding: 9px 11px;
+      color: rgba(23, 23, 23, 0.55);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+  `;
+  document.head.appendChild(style);
+
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function normalize(value) {
+    return String(value || "").toLowerCase().trim();
+  }
+
+  function normalizeProfessorId(value) {
+    return normalize(value)
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+function getProfessorId(professor) {
+  return normalizeProfessorId(professor.id || professor.name);
+}
+
+function getCurrentProfessorId() {
+  const legacyProfessorId = new URLSearchParams(
+    window.location.search
+  ).get("id");
+
+  if (legacyProfessorId) {
+    return normalizeProfessorId(legacyProfessorId);
+  }
+
+  const pathMatch = window.location.pathname.match(
+    /^\/professors\/([^/]+)\/?$/i
+  );
+
+  if (!pathMatch) {
+    return "";
+  }
+
+  return normalizeProfessorId(pathMatch[1]);
+}
+
+function getProfessorUrl(professor) {
+  return (
+    "/professors/" +
+    encodeURIComponent(getProfessorId(professor))
+  );
+}
+
+  function getCheckedValues(group) {
+    return Array.from(document.querySelectorAll('[data-filter-group="' + group + '"]:checked')).map(function (input) {
+      return input.value;
+    });
+  }
+
+  function getProfessorDepartment(professor) {
+    const department = String(
+      professor && professor.department
+        ? professor.department
+        : ""
+    ).trim();
+
+    if (
+      !department ||
+      normalize(department) === "department coming soon"
+    ) {
+      return "Other";
+    }
+
+    return department;
+  }
+
+  function populateDepartmentFilters() {
+    const container = document.getElementById(
+      "department-filter-options"
+    );
+
+    if (
+      !container ||
+      container.dataset.departmentOptionsReady === "true"
+    ) {
+      return;
+    }
+
+    const departmentNames = Array.from(
+      new Set(
+        professors.map(function (professor) {
+          return getProfessorDepartment(professor);
+        })
+      )
+    )
+      .filter(function (department) {
+        return department !== "Other";
+      })
+      .sort(function (firstDepartment, secondDepartment) {
+        return firstDepartment.localeCompare(secondDepartment);
+      });
+
+    container.innerHTML = "";
+
+    departmentNames.forEach(function (department) {
+      const label = document.createElement("label");
+      const input = document.createElement("input");
+
+      input.type = "checkbox";
+      input.value = department;
+      input.dataset.filterGroup = "department";
+
+      label.appendChild(input);
+      label.appendChild(
+        document.createTextNode(" " + department)
+      );
+
+      container.appendChild(label);
+    });
+
+    container.dataset.departmentOptionsReady = "true";
+  }
+
+  function getProfessorRatingStatus(professor) {
+    const ratingValue = parseFloat(
+      String(
+        professor.averageRating ||
+        professor.averageStars ||
+        professor.rating ||
+        ""
+      ).replace(",", ".")
+    );
+
+    if (!Number.isFinite(ratingValue) || ratingValue <= 0) {
+      return "No ratings yet";
+    }
+
+    const roundedRating = Math.max(
+      1,
+      Math.min(5, Math.round(ratingValue))
+    );
+
+    return roundedRating === 1
+      ? "1 star"
+      : roundedRating + " stars";
+  }
+
+  function professorMatches(professor) {
+    const searchInput = document.getElementById("professor-search-input");
+    const query = normalize(searchInput ? searchInput.value : "");
+    const departments = getCheckedValues("department");
+    const statuses = getCheckedValues("status");
+    const groups = getCheckedValues("group");
+    const ratingStatus = getProfessorRatingStatus(professor);
+    const professorDepartment =
+      getProfessorDepartment(professor);
+
+    const searchableText = normalize([
+      getProfessorId(professor),
+      professor.name,
+      professor.department,
+      professor.displayDepartment,
+      professor.filterDepartment,
+      professor.status,
+      ratingStatus,
+      professor.course,
+      professor.group
+    ].join(" "));
+    const matchesSearch = !query || searchableText.includes(query);
+    const matchesDepartment =
+      !departments.length ||
+      departments.includes(professorDepartment);
+    const matchesStatus =
+      !statuses.length ||
+      statuses.includes(ratingStatus);
+    const matchesGroup =
+      !groups.length ||
+      groups.includes(professor.group);
+
+    return (
+      matchesSearch &&
+      matchesDepartment &&
+      matchesStatus &&
+      matchesGroup
+    );
+  }
+
+  function getReviewDateLabel(value) {
+    const date = new Date(value);
+
+    if (!value || Number.isNaN(date.getTime())) {
+      return "Just now";
+    }
+
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
+
+  function getReviewAuthorInitials(name) {
+    const initials = String(name || "AUC student")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(function (part) {
+        return part.charAt(0).toUpperCase();
+      })
+      .join("");
+
+    return initials || "A";
+  }
+
+  function renderReviewAvatar(review) {
+    const authorName = review.authorName || "AUC student";
+
+    if (review.authorPhotoURL) {
+      return '<img class="professor-review-avatar" src="' + escapeHtml(review.authorPhotoURL) + '" alt="' + escapeHtml(authorName) + ' profile photo">';
+    }
+
+    return '<span class="professor-review-avatar-fallback">' + escapeHtml(getReviewAuthorInitials(authorName)) + '</span>';
+  }
+
+  function getReviewStatRows(reviews) {
+    const safeReviews = Array.isArray(reviews) ? reviews : [];
+    const configs = [
+      {
+        key: "recommendation",
+        label: "Would take again",
+        options: ["Yes", "Depends", "No"],
+        sentence: function (answer) {
+          if (answer.value === "Yes") return answer.percent + "% of students would take this course with this professor again.";
+          if (answer.value === "Depends") return answer.percent + "% of students say it depends on the course or situation.";
+          return answer.percent + "% of students would not take this course with this professor again.";
+        }
+      },
+      { key: "attendancePolicy", label: "Attendance policy", options: ["Required", "Sometimes checked", "Not important", "Not sure"], sentence: function (answer) { return answer.percent + "% of students report attendance policy is " + answer.value.toLowerCase() + "."; } },
+      { key: "workload", label: "Workload", options: ["Light", "Moderate", "Heavy"], sentence: function (answer) { return answer.percent + "% of students report workload is " + answer.value.toLowerCase() + "."; } },
+      { key: "lectureUsefulness", label: "Lecture usefulness", options: ["Essential", "Helpful", "Attending means less work at home", "Skippable", "Not lecture-based"], sentence: function (answer) { return answer.percent + "% of students report lecture usefulness is " + answer.value.toLowerCase() + "."; } },
+      { key: "officeHours", label: "Office hours/help", options: ["Helpful", "Available but limited", "Hard to reach", "Did not use"], sentence: function (answer) { return answer.percent + "% of students report office hours/help is " + answer.value.toLowerCase() + "."; } },
+      { key: "gradingStyle", label: "Grading style", options: ["Exams-heavy", "Projects-heavy", "Assignments-heavy", "Participation-heavy", "Mixed"], sentence: function (answer) { return answer.percent + "% of students report grading style is " + answer.value.replace(/-/g, " ").toLowerCase() + "."; } },
+      { key: "examDifficulty", label: "Exam difficulty", options: ["Easier than class material", "Matches class material", "Harder than class material", "No exams"], sentence: function (answer) { return answer.percent + "% of students report exam difficulty is " + answer.value.toLowerCase() + "."; } },
+      { key: "gradingTransparency", label: "Grading transparency", options: ["Rubric is clear", "Somewhat clear", "Unclear"], sentence: function (answer) { return answer.percent + "% of students report grading transparency is " + answer.value.toLowerCase() + "."; } },
+      { key: "feedbackQuality", label: "Feedback quality", options: ["Helpful", "Minimal", "None", "Not applicable"], sentence: function (answer) { return answer.percent + "% of students report feedback quality is " + answer.value.toLowerCase() + "."; } }
+    ];
+
+    return configs.map(function (config) {
+      const values = safeReviews.map(function (review) {
+        return String(review[config.key] || "").trim();
+      }).filter(Boolean);
+      const counts = values.reduce(function (result, value) {
+        result[value] = (result[value] || 0) + 1;
+        return result;
+      }, {});
+
+      if (!values.length) {
+        return null;
+      }
+
+      const optionValues = config.options.slice();
+
+      Object.keys(counts).forEach(function (value) {
+        if (!optionValues.includes(value)) {
+          optionValues.push(value);
+        }
+      });
+
+      const answers = optionValues.map(function (value, index) {
+        const count = counts[value] || 0;
+        const rawPercent = values.length ? (count / values.length) * 100 : 0;
+
+        return {
+          value,
+          count,
+          colorIndex: index,
+          percent: Math.round(rawPercent),
+          width: Number(rawPercent.toFixed(2))
+        };
+      });
+      const topAnswer = answers.slice().sort(function (a, b) {
+        return b.count - a.count || a.colorIndex - b.colorIndex;
+      })[0];
+
+      return {
+        label: config.label,
+        total: values.length,
+        topAnswer,
+        summary: config.sentence(topAnswer),
+        answers
+      };
+    }).filter(function (row) {
+      return row && row.topAnswer && row.topAnswer.count > 0;
+    });
+  }
+
+  function renderReviewInsightSummary(summary) {
+    const safeSummary = String(summary || "");
+    const reportMatch = safeSummary.match(/^(\d+% of students report\s+)(.*)$/);
+    const studentMatch = safeSummary.match(/^(\d+% of students\s+)(.*)$/);
+    const parts = reportMatch || studentMatch;
+
+    if (!parts) {
+      return escapeHtml(safeSummary);
+    }
+
+    return escapeHtml(parts[1]) + "<strong>" + escapeHtml(parts[2]) + "</strong>";
+  }
+
+  function renderProfessorReviewStatsSkeleton() {
+    // Reserves the same compact bar-chart structure as loaded Class patterns.
+    return '<div class="professor-review-stat-skeleton" aria-hidden="true">' +
+      Array.from({ length: 3 }, function () {
+        return [
+          '<div class="professor-review-stat-skeleton-row">',
+            '<div class="professor-review-stat-skeleton-head">',
+              '<span class="professor-review-stat-skeleton-line"></span>',
+              '<span class="professor-review-stat-skeleton-line is-value"></span>',
+            '</div>',
+            '<span class="professor-review-stat-skeleton-track"></span>',
+          '</div>'
+        ].join("");
+      }).join("") +
+      '</div>';
+  }
+
+  function renderProfessorReviewStats(reviews) {
+    const panel = document.getElementById("professor-review-stats");
+    const statsCount = document.getElementById("professor-review-stats-count");
+    const safeReviews = Array.isArray(reviews) ? reviews : [];
+    const priorityLabels = ["Would take again", "Workload", "Exam difficulty", "Grading style", "Grading transparency", "Lecture usefulness", "Attendance policy", "Office hours/help", "Feedback quality"];
+    const rows = getReviewStatRows(safeReviews).slice().sort(function (a, b) {
+      const aPriority = priorityLabels.includes(a.label) ? priorityLabels.indexOf(a.label) : priorityLabels.length;
+      const bPriority = priorityLabels.includes(b.label) ? priorityLabels.indexOf(b.label) : priorityLabels.length;
+
+      return aPriority - bPriority || b.topAnswer.percent - a.topAnswer.percent || a.label.localeCompare(b.label);
+    });
+
+    function getCompactStatValue(value) {
+      const compactValues = {
+        "Matches class material": "Matches class",
+        "Easier than class material": "Easier than class",
+        "Harder than class material": "Harder than class",
+        "Sometimes checked": "Sometimes",
+        "Available but limited": "Limited",
+        "Did not use": "Not used",
+        "Attending means less work at home": "Worth attending",
+        "Rubric is clear": "Clear rubric"
+      };
+
+      return compactValues[value] || String(value || "").replace(/-/g, " ");
+    }
+
+    function renderStatBreakdown(row) {
+      const answers = Array.isArray(row.answers) ? row.answers : [];
+      const hasZeroOptions = answers.some(function (answer) {
+        return Number(answer.count || 0) === 0;
+      });
+      const answerMarkup = answers.map(function (answer) {
+        const answerValue = getCompactStatValue(answer.value);
+        const answerPercent = Number(answer.percent || 0);
+        const answerWidth = Math.max(0, Math.min(100, Number(answer.width || 0)));
+        const answerMeta = answerPercent + "%";
+
+        return `
+          <div class="professor-review-stat-answer${Number(answer.count || 0) === 0 ? " is-zero-answer" : ""}">
+            <div class="professor-review-stat-answer-head">
+              <span>${escapeHtml(answerValue)}</span>
+              <span>${escapeHtml(answerMeta)}</span>
+            </div>
+
+            <div
+              class="professor-review-stat-answer-track"
+              role="img"
+              aria-label="${escapeHtml(row.label + ": " + answerValue + ", " + answerMeta)}"
+            >
+              <span
+                class="professor-review-stat-answer-fill"
+                style="--stat-width: ${escapeHtml(String(answerWidth))}%;"
+              ></span>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return answerMarkup + (hasZeroOptions
+        ? '<button class="professor-review-stat-show-zeros" type="button" aria-expanded="false">Show all options</button>'
+        : "");
+    }
+
+    function renderStatRow(row, index) {
+      const displayValue = getCompactStatValue(row.topAnswer.value);
+      const delay = Math.min(index * 55, 275);
+
+      return `
+        <div class="professor-review-stat-row">
+          <button class="professor-review-stat-details-toggle" type="button"
+                  aria-expanded="false" aria-controls="professor-review-stat-breakdown-${index}">
+            <div class="professor-review-stat-head">
+              <span class="professor-review-stat-label">${escapeHtml(row.label)}</span>
+
+              <div class="professor-review-stat-value">
+                <strong>${escapeHtml(displayValue)}</strong>
+                <span aria-hidden="true">·</span>
+                <span>${escapeHtml(row.topAnswer.percent + "%")}</span>
+              </div>
+              <span class="professor-review-stat-chevron" aria-hidden="true"></span>
+            </div>
+
+            <div
+              class="professor-review-stat-track"
+              role="img"
+              aria-label="${escapeHtml(row.label + ": " + displayValue + ", selected by " + row.topAnswer.percent + "% of responses")}"
+            >
+              <span
+                class="professor-review-stat-fill"
+                style="--stat-width: ${escapeHtml(String(row.topAnswer.width))}%; --stat-delay: ${delay}ms;"
+              ></span>
+            </div>
+          </button>
+
+          <div id="professor-review-stat-breakdown-${index}" class="professor-review-stat-breakdown" aria-hidden="true">
+            ${renderStatBreakdown(row)}
+          </div>
+        </div>
+      `;
+    }
+
+    if (statsCount) {
+      statsCount.classList.remove("is-loading");
+      statsCount.removeAttribute("aria-label");
+      statsCount.textContent = safeReviews.length
+        ? "Based on " + safeReviews.length + " student " +
+          (safeReviews.length === 1 ? "review" : "reviews")
+        : "No student reviews yet";
+    }
+
+    if (!panel) {
+      return;
+    }
+
+    panel.removeAttribute("aria-busy");
+    panel.removeAttribute("role");
+    panel.removeAttribute("aria-label");
+
+    if (!rows.length) {
+      panel.innerHTML = '<p class="professor-review-status">Review stats will appear after students answer the review choices.</p>';
+      return;
+    }
+
+    const visibleRows = rows.slice(0, 5);
+    const hiddenRows = rows.slice(5);
+
+    const hiddenMarkup = hiddenRows.length
+      ? `
+        <details class="professor-review-insights-more">
+          <summary class="professor-review-insights-more-toggle">
+            <span class="professor-review-insights-more-more">Show more</span>
+            <span class="professor-review-insights-more-less">Show less</span>
+          </summary>
+
+          <div class="professor-review-insights-hidden">
+            ${hiddenRows.map(function (row, index) {
+              return renderStatRow(row, index + visibleRows.length);
+            }).join("")}
+          </div>
+        </details>
+      `
+      : "";
+
+    panel.innerHTML = visibleRows.map(renderStatRow).join("") + hiddenMarkup;
+
+    panel
+      .querySelectorAll(".professor-review-stat-row")
+      .forEach(setupProfessorReviewStatAnimation);
+
+    panel
+      .querySelectorAll(".professor-review-insights-more")
+      .forEach(setupProfessorReviewDetailAnimation);
+  }
+
+  // Match the Department filter: toggling a class drives a max-height/opacity transition.
+  function setupProfessorReviewStatAnimation(row) {
+    const button = row.querySelector(".professor-review-stat-details-toggle");
+    const breakdown = row.querySelector(".professor-review-stat-breakdown");
+
+    if (!button || !breakdown) {
+      return;
+    }
+
+    function updateExpandedHeight() {
+      // Recalculate after hiding/showing options so the existing CSS transition
+      // expands to the content rather than clipping it.
+      breakdown.style.setProperty(
+        "--stat-expanded-height",
+        (breakdown.scrollHeight + 16) + "px"
+      );
+    }
+
+    button.addEventListener("click", function () {
+      updateExpandedHeight();
+      const open = row.classList.toggle("open");
+      button.setAttribute("aria-expanded", String(open));
+      breakdown.setAttribute("aria-hidden", String(!open));
+    });
+
+    const showZeros = breakdown.querySelector(".professor-review-stat-show-zeros");
+    if (showZeros) {
+      showZeros.addEventListener("click", function () {
+        const showingAll = breakdown.classList.toggle("show-zero-options");
+        showZeros.textContent = showingAll ? "Hide zero-percent options" : "Show all options";
+        showZeros.setAttribute("aria-expanded", String(showingAll));
+        updateExpandedHeight();
+      });
+    }
+  }
+
+  function setupProfessorReviewDetailAnimation(details) {
+    const summary = details.querySelector("summary");
+    const content = details.querySelector(".professor-review-insights-hidden");
+
+    if (!summary || !content || details.dataset.reviewAnimationReady === "true") {
+      return;
+    }
+
+    let closeTimer = null;
+    details.dataset.reviewAnimationReady = "true";
+
+    if (!details.open) {
+      content.style.height = "0px";
+      content.style.opacity = "0";
+      content.style.transform = "translateY(-6px)";
+    }
+
+    summary.addEventListener("click", function (event) {
+      event.preventDefault();
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        if (closeTimer) {
+          window.clearTimeout(closeTimer);
+          closeTimer = null;
+        }
+        details.open = !details.open;
+        content.style.height = "";
+        content.style.opacity = "";
+        content.style.transform = "";
+        return;
+      }
+
+      if (closeTimer) {
+        window.clearTimeout(closeTimer);
+        closeTimer = null;
+      }
+
+      if (details.open) {
+        content.style.height = content.scrollHeight + "px";
+        content.style.opacity = "1";
+        content.style.transform = "translateY(0)";
+
+        window.requestAnimationFrame(function () {
+          content.style.height = "0px";
+          content.style.opacity = "0";
+          content.style.transform = "translateY(-6px)";
+        });
+
+        closeTimer = window.setTimeout(function () {
+          details.open = false;
+        }, 280);
+
+        return;
+      }
+
+      details.open = true;
+      content.style.height = "0px";
+      content.style.opacity = "0";
+      content.style.transform = "translateY(-6px)";
+
+      window.requestAnimationFrame(function () {
+        content.style.height = content.scrollHeight + "px";
+        content.style.opacity = "1";
+        content.style.transform = "translateY(0)";
+      });
+    });
+
+    content.addEventListener("transitionend", function (event) {
+      if (
+        event.propertyName === "height" &&
+        details.open &&
+        content.style.height !== "0px"
+      ) {
+        content.style.height = "auto";
+        content.style.opacity = "";
+        content.style.transform = "";
+      }
+    });
+  }
+
+  function renderReviewStars(rating) {
+    const safeRating = Math.max(0, Math.min(5, Math.round(Number(rating || 0))));
+
+    if (!safeRating) {
+      return '<span class="professor-review-rating-text">Not rated</span>';
+    }
+
+    const stars = Array.from({ length: 5 }, function (_, index) {
+      return '<span class="professor-review-star' + (index < safeRating ? ' is-filled' : '') + '">&#9733;</span>';
+    }).join("");
+
+    return '<span class="professor-review-stars" aria-label="' + safeRating + ' out of 5 stars">' + stars + '</span>';
+  }
+
+  function getReviewedProfessorCourses(reviews) {
+    const safeReviews = Array.isArray(reviews) ? reviews : [];
+    const availableCourses = Array.isArray(window.aucAtlasCourses)
+      ? window.aucAtlasCourses
+      : [];
+    const coursesByCode = new Map();
+    const reviewedCourses = new Map();
+
+    availableCourses.forEach(function (course) {
+      const courseCode = String(course && course.code ? course.code : "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toUpperCase();
+
+      if (courseCode) {
+        coursesByCode.set(courseCode, course);
+      }
+    });
+
+    safeReviews.forEach(function (review) {
+      const courseCode = String(review.courseCode || review.courseTaken || "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toUpperCase();
+      const course = coursesByCode.get(courseCode);
+
+      if (course) {
+        reviewedCourses.set(courseCode, course);
+      }
+    });
+
+    return Array.from(reviewedCourses.values()).sort(function (firstCourse, secondCourse) {
+      return firstCourse.code.localeCompare(secondCourse.code);
+    });
+  }
+
+  function renderProfessorCourses(reviews) {
+    const row = document.getElementById("professor-teaches-row");
+    const list = document.getElementById("professor-teaches-list");
+
+    if (!row || !list) {
+      return;
+    }
+
+    const reviewedCourses = getReviewedProfessorCourses(reviews);
+
+    row.hidden = !reviewedCourses.length;
+
+    if (!reviewedCourses.length) {
+      list.textContent = "";
+      return;
+    }
+
+    list.textContent = reviewedCourses.map(function (course) {
+      return course.title || course.code;
+    }).join(", ");
+  }
+
+  function submitProfessorReviewReport(
+    button
+  ) {
+    const targetId =
+      button.dataset.reportReview;
+    const targetLabel =
+      button.dataset.reportLabel ||
+      "this review";
+
+    if (!targetId) {
+      return;
+    }
+
+    let modal = document.getElementById(
+      "professor-review-report-modal"
+    );
+
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.className = "course-report-modal";
+      modal.id = "professor-review-report-modal";
+      modal.hidden = true;
+      modal.innerHTML = `
+        <button
+          class="course-report-backdrop"
+          type="button"
+          aria-label="Close report panel"
+          data-close-professor-review-report
+        ></button>
+
+        <section
+          class="course-report-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="professor-review-report-title"
+        >
+          <header class="course-report-header">
+            <div class="course-report-header-copy">
+              <p class="course-report-kicker">Content moderation</p>
+              <h2 id="professor-review-report-title">Report review</h2>
+              <p id="professor-review-report-copy">
+                Tell us what is wrong with this review. Our moderators will review your report.
+              </p>
+            </div>
+
+            <button
+              class="course-report-close"
+              type="button"
+              aria-label="Close report panel"
+              data-close-professor-review-report
+            >×</button>
+          </header>
+
+          <form
+            class="course-report-form"
+            id="professor-review-report-form"
+          >
+            <label class="course-report-field">
+              <span>Reason for report</span>
+              <textarea
+                id="professor-review-report-reason"
+                name="reason"
+                maxlength="1000"
+                placeholder="Describe the issue with this review..."
+                required
+              ></textarea>
+            </label>
+
+            <p
+              class="course-report-status"
+              id="professor-review-report-status"
+              aria-live="polite"
+            ></p>
+
+            <div class="course-report-actions">
+              <button
+                class="course-report-cancel"
+                type="button"
+                data-close-professor-review-report
+              >Cancel</button>
+
+              <button
+                class="course-report-submit"
+                id="professor-review-report-submit"
+                type="submit"
+              >Submit report</button>
+            </div>
+          </form>
+        </section>
+      `;
+
+      document.body.appendChild(modal);
+    }
+
+    const form = document.getElementById(
+      "professor-review-report-form"
+    );
+    const copy = document.getElementById(
+      "professor-review-report-copy"
+    );
+    const reasonInput = document.getElementById(
+      "professor-review-report-reason"
+    );
+    const status = document.getElementById(
+      "professor-review-report-status"
+    );
+    const submitButton = document.getElementById(
+      "professor-review-report-submit"
+    );
+
+    if (
+      !form ||
+      !copy ||
+      !reasonInput ||
+      !status ||
+      !submitButton
+    ) {
+      return;
+    }
+
+    function closeReportPanel() {
+      modal.hidden = true;
+      document.body.classList.remove(
+        "content-report-open"
+      );
+      form.reset();
+      status.textContent = "";
+      status.className = "course-report-status";
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit report";
+
+      if (
+        modal.reportSourceButton &&
+        !modal.reportSourceButton.disabled
+      ) {
+        modal.reportSourceButton.focus();
+      }
+    }
+
+    if (modal.dataset.ready !== "true") {
+      modal.dataset.ready = "true";
+
+      modal
+        .querySelectorAll(
+          "[data-close-professor-review-report]"
+        )
+        .forEach(function (closeButton) {
+          closeButton.addEventListener(
+            "click",
+            closeReportPanel
+          );
+        });
+
+      document.addEventListener(
+        "keydown",
+        function (event) {
+          if (
+            event.key === "Escape" &&
+            !modal.hidden
+          ) {
+            closeReportPanel();
+          }
+        }
+      );
+
+      form.addEventListener(
+        "submit",
+        async function (event) {
+          event.preventDefault();
+
+          const activeButton =
+            modal.reportSourceButton;
+          const activeTargetId =
+            modal.dataset.targetId || "";
+          const cleanedReason =
+            reasonInput.value.trim();
+
+          if (cleanedReason.length < 3) {
+            status.textContent =
+              "Briefly explain why you are reporting this content.";
+            status.className =
+              "course-report-status error";
+            reasonInput.focus();
+            return;
+          }
+
+          status.textContent = "";
+          status.className =
+            "course-report-status";
+          submitButton.disabled = true;
+          submitButton.textContent =
+            "Submitting...";
+
+          if (activeButton) {
+            activeButton.disabled = true;
+            activeButton.textContent =
+              "Reporting...";
+          }
+
+          try {
+            const response = await fetch(
+              "/api/content-reports",
+              {
+                method: "POST",
+                credentials: "same-origin",
+                cache: "no-store",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type":
+                    "application/json"
+                },
+                body: JSON.stringify({
+                  targetType: "review",
+                  targetId:
+                    activeTargetId,
+                  reason: cleanedReason
+                })
+              }
+            );
+
+            const data = await response
+              .json()
+              .catch(function () {
+                return {};
+              });
+
+            if (
+              response.status !== 409 &&
+              !response.ok
+            ) {
+              throw new Error(
+                data.error ||
+                  "Could not submit the report."
+              );
+            }
+
+            if (activeButton) {
+              activeButton.textContent =
+                "Reported";
+              activeButton.disabled = true;
+            }
+
+            modal.hidden = true;
+            document.body.classList.remove(
+              "content-report-open"
+            );
+            form.reset();
+          } catch (error) {
+            status.textContent =
+              error.message ||
+              "Could not submit the report.";
+            status.className =
+              "course-report-status error";
+            submitButton.disabled = false;
+            submitButton.textContent =
+              "Submit report";
+
+            if (activeButton) {
+              activeButton.disabled = false;
+              activeButton.textContent =
+                modal.reportSourceOriginalText ||
+                "Report";
+            }
+          }
+        }
+      );
+    }
+
+    modal.reportSourceButton = button;
+    modal.reportSourceOriginalText =
+      button.textContent;
+    modal.dataset.targetId = targetId;
+
+    copy.textContent =
+      "Tell us what is wrong with " +
+      targetLabel +
+      ". Our moderators will review your report.";
+
+    form.reset();
+    status.textContent = "";
+    status.className = "course-report-status";
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit report";
+
+    modal.hidden = false;
+    document.body.classList.add(
+      "content-report-open"
+    );
+
+    window.setTimeout(function () {
+      reasonInput.focus();
+    }, 0);
+  }
+
+  function setupProfessorReviewReports(
+    list
+  ) {
+    if (
+      !list ||
+      list.dataset.reportReady ===
+        "true"
+    ) {
+      return;
+    }
+
+    list.dataset.reportReady = "true";
+
+    list.addEventListener(
+      "click",
+      function (event) {
+        const button =
+          event.target.closest(
+            "[data-report-review]"
+          );
+
+        if (
+          !button ||
+          !list.contains(button)
+        ) {
+          return;
+        }
+
+        submitProfessorReviewReport(
+          button
+        );
+      }
+    );
+  }
+
+  function renderProfessorReviewLoadingCards() {
+    // Skeletons reserve the real review-card grid without implying a review count.
+    return Array.from({ length: 3 }, function () {
+      return [
+        '<article class="professor-review-loading-card" aria-hidden="true">',
+          '<div class="professor-review-loading-top">',
+            '<span class="professor-review-loading-avatar"></span>',
+            '<span class="professor-review-loading-line"></span>',
+            '<span class="professor-review-loading-rating professor-review-loading-line"></span>',
+          '</div>',
+          '<div class="professor-review-loading-detail">',
+            '<span class="professor-review-loading-line is-context"></span>',
+            '<span class="professor-review-loading-line is-note"></span>',
+            '<span class="professor-review-loading-line is-note-short"></span>',
+          '</div>',
+        '</article>'
+      ].join("");
+    }).join("");
+  }
+
+  function renderProfessorReviews(reviews) {
+    const list = document.getElementById("professor-reviews-list");
+    const count = document.getElementById("professor-reviews-count");
+    const safeReviews = Array.isArray(reviews) ? reviews : [];
+
+    renderProfessorReviewStats(safeReviews);
+    renderProfessorCourses(safeReviews);
+
+    if (!list) {
+      return;
+    }
+
+    list.removeAttribute("aria-busy");
+    list.removeAttribute("role");
+    list.removeAttribute("aria-label");
+
+    setupProfessorReviewReports(
+      list
+    );
+
+    if (count) {
+      count.classList.remove("is-loading");
+      count.removeAttribute("aria-label");
+      count.textContent = safeReviews.length + " " + (safeReviews.length === 1 ? "review" : "reviews");
+    }
+
+    if (!safeReviews.length) {
+      list.innerHTML = '<p class="professor-review-empty">No reviews yet. Be the first to leave one.</p>';
+      return;
+    }
+
+    list.innerHTML = safeReviews.map(function (review) {
+      const rating = Number(review.rating || 0);
+      const reviewId = escapeHtml(review.id || "");
+      const reportLabel = escapeHtml(
+        [
+          review.professorName ||
+            "professor review",
+          review.courseTaken ||
+            review.courseCode
+        ]
+          .filter(Boolean)
+          .join(" · ")
+      );
+      const reportButton = reviewId
+        ? `
+          <div class="professor-review-card-actions">
+            <button
+              class="professor-review-report-button"
+              type="button"
+              data-report-review="${reviewId}"
+              data-report-label="${reportLabel}"
+            >Report</button>
+          </div>
+        `
+        : "";
+
+      return `
+        <article class="professor-review-card">
+          <div class="professor-review-card-top">
+            <div class="professor-review-author">
+              ${renderReviewAvatar(review)}
+              <div>
+                <strong>${escapeHtml(review.authorName || "AUC student")}</strong>
+              </div>
+            </div>
+
+            <div class="professor-review-rating">${renderReviewStars(rating)}</div>
+          </div>
+
+          <div class="professor-review-context">
+            <span>${escapeHtml(review.courseTaken || "Course not listed")}</span>
+            <span aria-hidden="true">·</span>
+            <span>${escapeHtml(review.semesterTaken || "Semester not listed")}</span>
+          </div>
+
+          <p class="professor-review-note">${escapeHtml(review.studentNote || "No written note.")}</p>
+
+          ${reportButton}
+        </article>
+      `;
+    }).join("");
+  }
+
+  async function loadProfessorReviews(professorId) {
+    const list = document.getElementById("professor-reviews-list");
+    const count = document.getElementById("professor-reviews-count");
+    const stats = document.getElementById("professor-review-stats");
+    const statsCount = document.getElementById("professor-review-stats-count");
+
+    if (list) {
+      list.setAttribute("aria-busy", "true");
+      list.setAttribute("role", "status");
+      list.setAttribute("aria-label", "Loading student reviews");
+      list.innerHTML = renderProfessorReviewLoadingCards();
+    }
+
+    if (count) {
+      count.classList.add("is-loading");
+      count.setAttribute("aria-label", "Loading reviews");
+      count.innerHTML = '<span class="professor-review-count-loading" aria-hidden="true"></span>';
+    }
+
+    if (stats) {
+      stats.setAttribute("role", "status");
+      stats.setAttribute("aria-busy", "true");
+      stats.setAttribute("aria-label", "Loading class patterns");
+      stats.innerHTML = renderProfessorReviewStatsSkeleton();
+    }
+
+    if (statsCount) {
+      statsCount.classList.add("is-loading");
+      statsCount.setAttribute("aria-label", "Loading review count");
+      statsCount.innerHTML = '<span class="professor-review-stats-count-loading" aria-hidden="true"></span>';
+    }
+
+    try {
+      const response = await fetch("/api/professor-reviews?professorId=" + encodeURIComponent(professorId), {
+        credentials: "same-origin"
+      });
+      const data = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not load reviews.");
+      }
+
+      renderProfessorReviews(data.reviews || []);
+    } catch (error) {
+      if (count) {
+        count.classList.remove("is-loading");
+        count.removeAttribute("aria-label");
+        count.textContent = "Reviews unavailable";
+      }
+
+      if (list) {
+        list.removeAttribute("aria-busy");
+        list.removeAttribute("role");
+        list.removeAttribute("aria-label");
+        list.innerHTML = '<p class="professor-review-status">Could not load reviews right now.</p>';
+      }
+
+      if (stats) {
+        stats.removeAttribute("aria-busy");
+        stats.removeAttribute("role");
+        stats.removeAttribute("aria-label");
+        stats.innerHTML = '<p class="professor-review-status">Could not load review stats right now.</p>';
+      }
+
+      if (statsCount) {
+        statsCount.classList.remove("is-loading");
+        statsCount.removeAttribute("aria-label");
+        statsCount.textContent = "Review stats unavailable";
+      }
+    }
+  }
+
+  function renderProfessorProfile(grid, professor) {
+    document.title = professor.name + " | AUC Atlas";
+
+    const professorEmail = professor.email || "";
+    const professorEmailMarkup = professorEmail
+      ? '<span class="professor-profile-email">' + escapeHtml(professorEmail) + '</span>'
+      : '<span class="professor-profile-email is-empty">Email coming soon</span>';
+    const pageHeader = document.querySelector(".professors-header");
+
+    if (pageHeader) {
+      pageHeader.classList.add("professor-profile-heading");
+      pageHeader.innerHTML = `
+        <div>
+          <h1>${escapeHtml(professor.name)}</h1>
+        </div>
+      `;
+    }
+
+    grid.innerHTML = `
+      <div class="professor-profile-main">
+      <article class="professor-profile-card">
+        <div class="professor-profile-image${getProfessorId(professor) === "ahmed-moustafa" ? " professor-profile-image--ahmed-moustafa" : ""}">
+          <img src="${escapeHtml(professor.image || "user.png")}" alt="${escapeHtml(professor.name)}">
+        </div>
+        <div class="professor-profile-body">
+          <div class="professor-profile-info">
+            <div class="professor-profile-identity">
+              <h1 class="professor-profile-name">${escapeHtml(professor.name)}</h1>
+              <p class="professor-profile-department">${escapeHtml(professor.department || "Department coming soon")}</p>
+            </div>
+
+            <div>
+              <span>Email</span>
+              ${professorEmailMarkup}
+            </div>
+
+            <div id="professor-teaches-row" hidden>
+              <span>Teaches</span>
+              <span class="professor-profile-value professor-profile-course-list" id="professor-teaches-list"></span>
+            </div>
+          </div>
+
+          <details class="professor-review-panel">
+            <summary class="professor-review-toggle">Leave a review</summary>
+
+            <div class="review-modal-backdrop" aria-hidden="true"></div>
+
+            <form class="professor-review-form" role="dialog" aria-modal="true" aria-labelledby="review-drawer-title" tabindex="-1">
+
+              <div class="review-modal-header">
+                <h2 id="review-drawer-title">Leave a review</h2>
+              </div>
+
+              <input type="hidden" name="professorId" value="${escapeHtml(getProfessorId(professor))}">
+              <input type="hidden" name="professorName" value="${escapeHtml(professor.name)}">
+
+              <div class="review-drawer-body">
+              <section class="review-core-section" aria-labelledby="review-core-heading">
+                <h3 id="review-core-heading">Course &amp; rating</h3>
+                <div class="review-core-grid">
+              <div class="review-field">
+                <label for="review-course-search">Course taken</label>
+                <select id="review-course" name="courseTaken" class="review-native-select" required>
+                  <option value="" selected disabled>Choose course</option>
+                </select>
+                <div class="review-course-search-wrap">
+                  <input
+                    id="review-course-search"
+                    class="review-course-search-input"
+                    type="search"
+                    placeholder="Search courses by code or title"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-controls="review-course-suggestions"
+                    aria-expanded="false"
+                  >
+                  <div id="review-course-suggestions" class="review-course-suggestions" role="listbox" aria-label="Matching courses" hidden></div>
+                </div>
+              </div>
+
+              <div class="review-field">
+                <label for="review-semester-search">Semester taken</label>
+                <select id="review-semester" name="semesterTaken" class="review-native-select" required>
+                  <option value="" selected disabled>Choose semester</option>
+                  <option>Fall 2026</option>
+                  <option>Summer 2026</option>
+                  <option>Spring 2026</option>
+                  <option>Winter 2026</option>
+                  <option>Fall 2025</option>
+                  <option>Summer 2025</option>
+                  <option>Spring 2025</option>
+                  <option>Winter 2025</option>
+                  <option>Fall 2024</option>
+                  <option>Summer 2024</option>
+                  <option>Spring 2024</option>
+                  <option>Winter 2024</option>
+                  <option>Fall 2023</option>
+                  <option>Summer 2023</option>
+                  <option>Spring 2023</option>
+                  <option>Winter 2023</option>
+                  <option>Fall 2022</option>
+                  <option>Summer 2022</option>
+                  <option>Spring 2022</option>
+                  <option>Winter 2022</option>
+                  <option>Fall 2021</option>
+                  <option>Summer 2021</option>
+                  <option>Spring 2021</option>
+                  <option>Winter 2021</option>
+                  <option>Fall 2020</option>
+                  <option>Summer 2020</option>
+                  <option>Spring 2020</option>
+                  <option>Winter 2020</option>
+                  <option>Fall 2019</option>
+                  <option>Summer 2019</option>
+                  <option>Spring 2019</option>
+                  <option>Winter 2019</option>
+                  <option>Fall 2018</option>
+                  <option>Summer 2018</option>
+                  <option>Spring 2018</option>
+                  <option>Winter 2018</option>
+                </select>
+                <div class="review-course-search-wrap">
+                  <input
+                    id="review-semester-search"
+                    class="review-course-search-input"
+                    type="search"
+                    placeholder="Search semesters (e.g. Fall 2026)"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-controls="review-semester-suggestions"
+                    aria-expanded="false"
+                  >
+                  <div id="review-semester-suggestions" class="review-course-suggestions" role="listbox" aria-label="Matching semesters" hidden></div>
+                </div>
+              </div>
+                </div>
+
+              <div class="review-field review-rating-field">
+                <label id="review-rating-label" for="review-rating">Overall rating</label>
+                <select id="review-rating" class="review-native-select" name="rating" required>
+                  <option value="" selected disabled>Choose rating</option>
+                  <option value="5">5 stars</option>
+                  <option value="4">4 stars</option>
+                  <option value="3">3 stars</option>
+                  <option value="2">2 stars</option>
+                  <option value="1">1 star</option>
+                </select>
+                <div class="review-rating-stars" role="group" aria-labelledby="review-rating-label">
+                  <button type="button" class="review-rating-star" data-review-rating="1" aria-label="1 star" aria-pressed="false">★</button>
+                  <button type="button" class="review-rating-star" data-review-rating="2" aria-label="2 stars" aria-pressed="false">★</button>
+                  <button type="button" class="review-rating-star" data-review-rating="3" aria-label="3 stars" aria-pressed="false">★</button>
+                  <button type="button" class="review-rating-star" data-review-rating="4" aria-label="4 stars" aria-pressed="false">★</button>
+                  <button type="button" class="review-rating-star" data-review-rating="5" aria-label="5 stars" aria-pressed="false">★</button>
+                </div>
+              </div>
+
+              <div class="review-field review-recommend-field">
+                <label id="review-recommend-label" for="review-recommend">Would you recommend this professor?</label>
+                <select id="review-recommend" class="review-native-select" name="recommendation">
+                  <option value="" selected>Choose recommendation</option>
+                  <option>Yes</option>
+                  <option>Depends</option>
+                  <option>No</option>
+                </select>
+                <div class="review-recommend-options" role="group" aria-labelledby="review-recommend-label">
+                  <button type="button" data-review-recommend="Yes" aria-pressed="false">Yes</button>
+                  <button type="button" data-review-recommend="Depends" aria-pressed="false">Depends</button>
+                  <button type="button" data-review-recommend="No" aria-pressed="false">No</button>
+                </div>
+              </div>
+
+              <div class="review-field full" data-depends-reason hidden>
+                <label for="review-recommend-reason">If your answer depends, what does it depend on?</label>
+                <input id="review-recommend-reason" name="recommendationReason" type="text" maxlength="220" placeholder="Example: Great for lectures, harder for exams">
+              </div>
+              </section>
+
+              <details class="review-accordion" data-review-section="experience">
+                <summary>
+                  <span class="review-accordion-label">
+                    <strong>Class experience</strong>
+                    <small>Attendance, workload, lectures &amp; office hours</small>
+                  </span>
+                  <span class="review-accordion-meta" data-review-count>0/4 answered</span>
+                </summary>
+                <div class="review-accordion-body">
+
+              <div class="review-field">
+                <label for="review-attendance">Attendance policy</label>
+                <select id="review-attendance" name="attendancePolicy">
+                  <option value="" selected>Choose attendance policy</option>
+                  <option>Required</option>
+                  <option>Sometimes checked</option>
+                  <option>Not important</option>
+                  <option>Not sure</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-workload">Workload</label>
+                <select id="review-workload" name="workload">
+                  <option value="" selected>Choose workload</option>
+                  <option>Light</option>
+                  <option>Moderate</option>
+                  <option>Heavy</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-lecture">Lecture usefulness</label>
+                <select id="review-lecture" name="lectureUsefulness">
+                  <option value="" selected>Choose lecture usefulness</option>
+                  <option>Essential</option>
+                  <option>Helpful</option>
+                  <option>Skippable</option>
+                  <option>Not lecture-based</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-office-hours">Office hours/help</label>
+                <select id="review-office-hours" name="officeHours">
+                  <option value="" selected>Choose an option</option>
+                  <option>Helpful</option>
+                  <option>Available but limited</option>
+                  <option>Hard to reach</option>
+                  <option>Did not use</option>
+                </select>
+              </div>
+                </div>
+              </details>
+
+              <details class="review-accordion" data-review-section="grading">
+                <summary>
+                  <span class="review-accordion-label">
+                    <strong>Grading &amp; advice</strong>
+                    <small>Exams, marking, feedback &amp; comments</small>
+                  </span>
+                  <span class="review-accordion-meta" data-review-count>0/4 answered</span>
+                </summary>
+                <div class="review-accordion-body">
+
+              <div class="review-field">
+                <label for="review-grading-style">Grading style</label>
+                <select id="review-grading-style" name="gradingStyle">
+                  <option value="" selected>Choose grading style</option>
+                  <option>Exams-heavy</option>
+                  <option>Projects-heavy</option>
+                  <option>Assignments-heavy</option>
+                  <option>Participation-heavy</option>
+                  <option>Mixed</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-exam-difficulty">Exam difficulty</label>
+                <select id="review-exam-difficulty" name="examDifficulty">
+                  <option value="" selected>Choose exam difficulty</option>
+                  <option>Easier than class material</option>
+                  <option>Matches class material</option>
+                  <option>Harder than class material</option>
+                  <option>No exams</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-transparency">Grading transparency</label>
+                <select id="review-transparency" name="gradingTransparency">
+                  <option value="" selected>Choose grading transparency</option>
+                  <option>Rubric is clear</option>
+                  <option>Somewhat clear</option>
+                  <option>Unclear</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="review-feedback">Feedback quality</label>
+                <select id="review-feedback" name="feedbackQuality">
+                  <option value="" selected>Choose feedback quality</option>
+                  <option>Helpful</option>
+                  <option>Minimal</option>
+                  <option>None</option>
+                  <option>Not applicable</option>
+                </select>
+              </div>
+
+              <div class="review-field full">
+                <label for="review-note">Additional comments (optional)</label>
+                <textarea id="review-note" name="studentNote" maxlength="5000"></textarea>
+              </div>
+                </div>
+              </details>
+
+              <label class="review-anonymous-option">
+                <span class="review-anonymous-copy">
+                  <strong>Post anonymously</strong>
+                  <small>Your name and profile photo won’t appear with this review.</small>
+                </span>
+                <input name="isAnonymous" type="checkbox" value="true">
+              </label>
+
+              </div>
+
+              <div class="review-drawer-footer">
+                <button class="review-submit-button" type="submit">Submit Review</button>
+                <p class="review-form-message" aria-live="polite"></p>
+                <button class="review-cancel-button" type="button">Cancel</button>
+              </div>
+            </form>
+          </details>
+        </div>
+      </article>
+
+      <section class="professor-reviews-section" aria-label="Student reviews for ${escapeHtml(professor.name)}">
+        <div class="professor-reviews-header">
+          <div>
+            <h2>What students said</h2>
+          </div>
+          <p id="professor-reviews-count" class="is-loading" aria-label="Loading reviews"><span class="professor-review-count-loading" aria-hidden="true"></span></p>
+        </div>
+
+        <div class="professor-reviews-list" id="professor-reviews-list" role="status" aria-busy="true" aria-label="Loading student reviews">
+          ${renderProfessorReviewLoadingCards()}
+        </div>
+      </section>
+      </div>
+
+      <section class="professor-review-insights" aria-label="Review stats for ${escapeHtml(professor.name)}">
+        <div class="professor-review-insights-header">
+          <div>
+            <h2>Class patterns</h2>
+          </div>
+          <p id="professor-review-stats-count" class="is-loading" aria-label="Loading review count"><span class="professor-review-stats-count-loading" aria-hidden="true"></span></p>
+        </div>
+
+        <div class="professor-review-stats" id="professor-review-stats" role="status" aria-busy="true" aria-label="Loading class patterns">
+          ${renderProfessorReviewStatsSkeleton()}
+        </div>
+      </section>
+    `;
+
+    setupReviewModalBehavior(grid);
+    loadProfessorReviews(getProfessorId(professor));
+  }
+
+  function populateReviewCourseSelect(form) {
+    const select = form.querySelector("#review-course");
+    const courses = Array.isArray(window.aucAtlasCourses) ? window.aucAtlasCourses : [];
+
+    if (!select || select.dataset.courseOptionsReady === "true") {
+      return;
+    }
+
+    const currentValue = select.value;
+    const placeholder = document.createElement("option");
+
+    select.dataset.courseOptionsReady = "true";
+    select.innerHTML = "";
+    placeholder.value = "";
+    placeholder.textContent = "Choose course";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
+    courses.forEach(function (course) {
+      const code = String(course && course.code ? course.code : "").trim();
+      const title = String(course && course.title ? course.title : "").trim();
+
+      if (!code) {
+        return;
+      }
+
+      const option = document.createElement("option");
+
+      option.value = code;
+      option.textContent = code + (title ? " - " + title : "");
+      select.appendChild(option);
+    });
+
+    if (currentValue) {
+      select.value = currentValue;
+    }
+  }
+
+  function setupReviewDependsField(form) {
+    const select = form.querySelector("#review-recommend");
+    const field = form.querySelector("[data-depends-reason]");
+    const input = form.querySelector("#review-recommend-reason");
+
+    if (!select || !field || field.dataset.dependsReady === "true") {
+      return;
+    }
+
+    field.dataset.dependsReady = "true";
+
+    function syncDependsField() {
+      const shouldShow = select.value === "Depends";
+
+      field.hidden = !shouldShow;
+
+      if (!shouldShow && input) {
+        input.value = "";
+      }
+    }
+
+    select.addEventListener("change", syncDependsField);
+    syncDependsField();
+  }
+
+  function setupReviewSearchSelect(form, fieldType) {
+    const select = form.querySelector("#review-" + fieldType);
+    const input = form.querySelector("#review-" + fieldType + "-search");
+    const listbox = form.querySelector("#review-" + fieldType + "-suggestions");
+    const wrapper = input && input.closest(".review-course-search-wrap");
+
+    if (!select || !input || !listbox || !wrapper) {
+      return;
+    }
+
+    // Preserve the native select as the submitted course or semester value.
+    // Only display matching suggestions after an actual search query.
+    const courses = Array.from(select.options)
+      .filter(function (option) {
+        return Boolean(option.value);
+      })
+      .map(function (option) {
+        const code = option.value;
+        const label = option.textContent.trim();
+        return {
+          code: code,
+          label: label,
+          searchText: (code + " " + label).toLowerCase()
+        };
+      });
+
+    const MAX_SUGGESTIONS = 5;
+    let results = [];
+    let activeIndex = -1;
+
+    function hideSuggestions() {
+      listbox.hidden = true;
+      listbox.replaceChildren();
+      results = [];
+      activeIndex = -1;
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+    }
+
+    function highlightSuggestion(index) {
+      if (!results.length) {
+        return;
+      }
+
+      activeIndex = (index + results.length) % results.length;
+      listbox.querySelectorAll("[role='option']").forEach(
+        function (option, optionIndex) {
+          const active = optionIndex === activeIndex;
+          option.classList.toggle("is-active", active);
+          option.setAttribute("aria-selected", String(active));
+          if (active) {
+            input.setAttribute("aria-activedescendant", option.id);
+            option.scrollIntoView({ block: "nearest" });
+          }
+        }
+      );
+    }
+
+    function selectCourse(course) {
+      select.value = course.code;
+      input.value = course.label;
+      hideSuggestions();
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      input.focus();
+    }
+
+    function showSuggestions() {
+      const query = input.value.toLowerCase().trim();
+      if (!query) {
+        hideSuggestions();
+        return;
+      }
+
+      const words = query.split(/\s+/).filter(Boolean);
+      const matches = courses.filter(function (course) {
+        return words.every(function (word) {
+          return course.searchText.includes(word);
+        });
+      });
+
+      // Prioritize course-code and title-prefix matches, not dataset order.
+      matches.sort(function (a, b) {
+        function rank(course) {
+          const code = course.code.toLowerCase();
+          const label = course.label.toLowerCase();
+          return code.startsWith(query) ? 0 :
+            label.startsWith(query) ? 1 : 2;
+        }
+        return rank(a) - rank(b) ||
+          a.code.localeCompare(b.code);
+      });
+
+      results = matches.slice(0, MAX_SUGGESTIONS);
+      activeIndex = -1;
+      listbox.replaceChildren();
+      input.removeAttribute("aria-activedescendant");
+
+      results.forEach(function (course, index) {
+        const option = document.createElement("div");
+        option.id = "review-" + fieldType + "-option-" + index;
+        option.className = "review-course-suggestion";
+        option.setAttribute("role", "option");
+        option.setAttribute("aria-selected", "false");
+        option.textContent = course.label;
+        option.addEventListener("mousedown", function (event) {
+          // Preserve keyboard focus on desktop without blocking touch taps.
+          event.preventDefault();
+        });
+        option.addEventListener("click", function () {
+          selectCourse(course);
+        });
+        listbox.appendChild(option);
+      });
+
+      if (!matches.length) {
+        const empty = document.createElement("div");
+        empty.className = "review-course-no-results";
+        empty.setAttribute("role", "status");
+        empty.textContent = fieldType === "course"
+          ? "No matching courses"
+          : "No matching semesters";
+        listbox.appendChild(empty);
+      } else if (matches.length > MAX_SUGGESTIONS) {
+        const more = document.createElement("div");
+        more.className = "review-course-more-results";
+        more.textContent = "Keep typing to narrow the results";
+        listbox.appendChild(more);
+      }
+
+      listbox.hidden = false;
+      input.setAttribute("aria-expanded", "true");
+    }
+
+    input.addEventListener("input", function () {
+      if (select.value) {
+        select.value = "";
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      showSuggestions();
+    });
+
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !listbox.hidden) {
+        event.preventDefault();
+        event.stopPropagation();
+        hideSuggestions();
+        return;
+      }
+
+      if (event.key === "Tab") {
+        hideSuggestions();
+        return;
+      }
+
+      if (event.key === "ArrowDown" ||
+          event.key === "ArrowUp") {
+        if (listbox.hidden && input.value.trim() && !select.value) {
+          showSuggestions();
+        }
+        if (listbox.hidden || !results.length) {
+          return;
+        }
+
+        event.preventDefault();
+        highlightSuggestion(
+          activeIndex + (event.key === "ArrowDown" ? 1 : -1)
+        );
+        return;
+      }
+
+      if (event.key === "Enter" && !listbox.hidden &&
+          activeIndex >= 0 && results[activeIndex]) {
+        event.preventDefault();
+        selectCourse(results[activeIndex]);
+      } else if (event.key === "Enter" && !select.value) {
+        // Do not submit an unresolved free-text course query.
+        event.preventDefault();
+      }
+    });
+
+    document.addEventListener("pointerdown", function (event) {
+      if (!wrapper.contains(event.target)) {
+        hideSuggestions();
+      }
+    });
+
+    select.addEventListener("change", function () {
+      if (!select.value && !input.matches(":focus")) {
+        input.value = "";
+      }
+    });
+
+    // Retain course and semester selections when reopening the drawer.
+    if (select.value) {
+      const selected = courses.find(function (course) {
+        return course.code === select.value;
+      });
+      input.value = selected ? selected.label : "";
+    }
+    hideSuggestions();
+  }
+
+  function setupReviewChoiceMenus(form) {
+    function resetChoiceSearch(choice) {
+      const searchInput = choice.querySelector(".review-choice-search");
+
+      if (searchInput) {
+        searchInput.value = "";
+      }
+
+      choice.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+        optionButton.hidden = false;
+      });
+    }
+
+    function closeChoices(exceptChoice) {
+      form.querySelectorAll(".review-choice.open").forEach(function (choice) {
+        if (choice !== exceptChoice) {
+          choice.classList.remove("open");
+          resetChoiceSearch(choice);
+        }
+      });
+    }
+
+    form.querySelectorAll("select").forEach(function (select) {
+      if (select.dataset.reviewChoiceReady === "true") {
+        return;
+      }
+
+      if (select.id === "review-course" ||
+          select.id === "review-semester" ||
+          select.id === "review-rating" ||
+          select.id === "review-recommend") {
+        return;
+      }
+
+      select.dataset.reviewChoiceReady = "true";
+      select.classList.add("review-native-select");
+
+      const choice = document.createElement("div");
+      const button = document.createElement("button");
+      const label = document.createElement("span");
+      const menu = document.createElement("div");
+      const isSearchable = select.id === "review-course";
+      let searchInput = null;
+
+      choice.className = "review-choice";
+      button.className = "review-choice-button";
+      button.type = "button";
+      label.className = "review-choice-label";
+      menu.className = "review-choice-menu";
+
+      function syncLabel() {
+        const selectedOption = select.options[select.selectedIndex];
+        label.textContent = selectedOption ? selectedOption.textContent : "";
+      }
+
+      function syncSelectedOption() {
+        menu.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+          optionButton.classList.toggle("is-selected", optionButton.dataset.choiceValue === select.value);
+        });
+      }
+
+      function filterChoiceOptions(query) {
+        const terms = String(query || "")
+          .toLowerCase()
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
+
+        menu.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
+          const searchText = optionButton.dataset.choiceSearchText || "";
+          const hasValue = Boolean(optionButton.dataset.choiceValue);
+          const matches = !terms.length || (hasValue && terms.every(function (term) {
+            return searchText.indexOf(term) !== -1;
+          }));
+
+          optionButton.hidden = !matches;
+        });
+      }
+
+      if (isSearchable) {
+        const searchWrap = document.createElement("div");
+
+        searchInput = document.createElement("input");
+        searchInput.type = "search";
+        searchInput.className = "review-choice-search";
+        searchInput.placeholder = "Search courses";
+        searchInput.setAttribute("aria-label", "Search courses");
+        searchInput.setAttribute("autocomplete", "new-password");
+        searchInput.setAttribute("autocorrect", "off");
+        searchInput.setAttribute("autocapitalize", "none");
+        searchInput.setAttribute("spellcheck", "false");
+
+        searchWrap.className = "review-choice-search-wrap";
+        searchWrap.appendChild(searchInput);
+        menu.appendChild(searchWrap);
+
+        searchInput.addEventListener("input", function () {
+          filterChoiceOptions(searchInput.value);
+        });
+
+        searchInput.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            resetChoiceSearch(choice);
+            choice.classList.remove("open");
+          }
+        });
+      }
+
+      Array.from(select.options).forEach(function (option) {
+        const optionButton = document.createElement("button");
+
+        optionButton.className = "review-choice-option";
+        optionButton.type = "button";
+        optionButton.disabled = option.disabled;
+        optionButton.dataset.choiceValue = option.value;
+        optionButton.dataset.choiceSearchText = (option.value + " " + option.textContent).toLowerCase();
+        optionButton.textContent = option.textContent;
+        menu.appendChild(optionButton);
+      });
+
+      button.appendChild(label);
+      choice.appendChild(button);
+      choice.appendChild(menu);
+      select.insertAdjacentElement("afterend", choice);
+      syncLabel();
+      syncSelectedOption();
+
+      button.addEventListener("click", function (event) {
+        const willOpen = !choice.classList.contains("open");
+
+        event.stopPropagation();
+        closeChoices(choice);
+        choice.classList.toggle("open", willOpen);
+
+        if (willOpen && searchInput) {
+          window.setTimeout(function () {
+            searchInput.focus();
+          }, 0);
+        } else {
+          resetChoiceSearch(choice);
+        }
+      });
+
+      menu.addEventListener("click", function (event) {
+        const optionButton = event.target.closest("[data-choice-value]");
+
+        if (!optionButton || optionButton.disabled) {
+          return;
+        }
+
+        select.value = optionButton.dataset.choiceValue;
+        syncLabel();
+        syncSelectedOption();
+        choice.classList.remove("open");
+        resetChoiceSearch(choice);
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+
+      select.addEventListener("change", function () {
+        syncLabel();
+        syncSelectedOption();
+      });
+    });
+
+    form.addEventListener("click", function (event) {
+      if (!event.target.closest(".review-choice")) {
+        closeChoices();
+      }
+    });
+  }
+
+  async function submitProfessorReview(form, panel) {
+    const submitButton = form.querySelector(".review-submit-button");
+    const message = form.querySelector(".review-form-message");
+    const formData = new FormData(form);
+    const payload = {};
+
+    formData.forEach(function (value, key) {
+      payload[key] = value;
+    });
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
+    }
+
+    if (message) {
+      message.className = "review-form-message";
+      message.textContent = "";
+    }
+
+    try {
+      const response = await fetch("/api/professor-reviews", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not save your review. Please log in and try again.");
+      }
+
+      if (Array.isArray(data.reviews)) {
+        renderProfessorReviews(data.reviews);
+      } else {
+        await loadProfessorReviews(payload.professorId);
+      }
+
+      if (message) {
+        message.className = "review-form-message is-success";
+        message.textContent = "Review submitted. Thanks for helping other students.";
+      }
+
+      window.setTimeout(function () {
+        panel.dispatchEvent(
+          new CustomEvent("review-request-close")
+        );
+      }, 900);
+    } catch (error) {
+      if (message) {
+        message.className = "review-form-message is-error";
+        message.textContent = error.message || "Could not save your review. Please try again.";
+      }
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Review";
+      }
+    }
+  }
+
+  function setupReviewCompactControls(form) {
+    const rating = form.querySelector("#review-rating");
+    const recommendation = form.querySelector("#review-recommend");
+
+    function syncCompactControls() {
+      const chosenRating = Number(rating.value || 0);
+
+      form.querySelectorAll("[data-review-rating]").forEach(
+        function (button) {
+          const starValue = Number(button.dataset.reviewRating);
+          button.classList.toggle(
+            "is-active",
+            chosenRating >= starValue
+          );
+          button.setAttribute(
+            "aria-pressed",
+            String(chosenRating === starValue)
+          );
+        }
+      );
+
+      form.querySelectorAll("[data-review-recommend]").forEach(
+        function (button) {
+          const isSelected =
+            button.dataset.reviewRecommend === recommendation.value;
+          button.classList.toggle("is-active", isSelected);
+          button.setAttribute("aria-pressed", String(isSelected));
+        }
+      );
+    }
+
+    function updateAccordionCounts() {
+      form.querySelectorAll("[data-review-section]").forEach(
+        function (section) {
+          const fields = Array.from(
+            section.querySelectorAll("select")
+          );
+          const answered = fields.filter(function (select) {
+            return Boolean(select.value);
+          }).length;
+          const count = section.querySelector("[data-review-count]");
+
+          if (count) {
+            count.textContent =
+              answered + "/" + fields.length + " answered";
+          }
+        }
+      );
+    }
+
+    form.querySelectorAll("[data-review-rating]").forEach(
+      function (button) {
+        button.addEventListener("click", function () {
+          rating.value = button.dataset.reviewRating;
+          rating.dispatchEvent(
+            new Event("change", { bubbles: true })
+          );
+        });
+      }
+    );
+
+    form.querySelectorAll("[data-review-recommend]").forEach(
+      function (button) {
+        button.addEventListener("click", function () {
+          recommendation.value = button.dataset.reviewRecommend;
+          recommendation.dispatchEvent(
+            new Event("change", { bubbles: true })
+          );
+        });
+      }
+    );
+
+    form.addEventListener("change", function () {
+      syncCompactControls();
+      updateAccordionCounts();
+    });
+
+    syncCompactControls();
+    updateAccordionCounts();
+  }
+
+  function setupReviewModalBehavior(grid) {
+    const panel = grid.querySelector(".professor-review-panel");
+    const form = grid.querySelector(".professor-review-form");
+    const backdrop = grid.querySelector(".review-modal-backdrop");
+    const reviewToggle = panel
+      ? panel.querySelector(".professor-review-toggle")
+      : null;
+    const cancelButton = form
+      ? form.querySelector(".review-cancel-button")
+      : null;
+    const drawerBody = form
+      ? form.querySelector(".review-drawer-body")
+      : null;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    if (!panel || !form || !reviewToggle || !backdrop) {
+      return;
+    }
+
+    let portalActive = false;
+    let closing = false;
+    let formAnimation = null;
+    let backdropAnimation = null;
+
+    populateReviewCourseSelect(form);
+    setupReviewChoiceMenus(form);
+    setupReviewSearchSelect(form, "course");
+    setupReviewSearchSelect(form, "semester");
+    setupReviewDependsField(form);
+    setupReviewCompactControls(form);
+
+    // Native select controls are visually replaced; validate them through
+    // the visible controls rather than attempting focus on hidden selects.
+    form.noValidate = true;
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const requiredFields = [
+        form.querySelector("#review-course"),
+        form.querySelector("#review-semester"),
+        form.querySelector("#review-rating")
+      ];
+      const missingField = requiredFields.find(function (field) {
+        return !field || !field.value;
+      });
+
+      if (missingField) {
+        const message = form.querySelector(".review-form-message");
+        if (message) {
+          message.className = "review-form-message is-error";
+          message.textContent =
+            "Choose a course, semester and overall rating before submitting.";
+        }
+
+        const visibleControl = missingField.id === "review-rating"
+          ? form.querySelector("[data-review-rating='1']")
+          : missingField.id === "review-course" ||
+            missingField.id === "review-semester"
+            ? form.querySelector("#" + missingField.id + "-search")
+            : missingField.nextElementSibling &&
+              missingField.nextElementSibling.querySelector(
+                ".review-choice-button"
+              );
+        if (visibleControl) {
+          visibleControl.focus();
+          visibleControl.scrollIntoView({
+            block: "nearest",
+            behavior: "smooth"
+          });
+        }
+        return;
+      }
+
+      submitProfessorReview(form, panel);
+    });
+
+    function cancelAnimations() {
+      if (formAnimation) {
+        formAnimation.cancel();
+        formAnimation = null;
+      }
+
+      if (backdropAnimation) {
+        backdropAnimation.cancel();
+        backdropAnimation = null;
+      }
+    }
+
+    function mountReviewDrawer() {
+      if (portalActive) {
+        return;
+      }
+
+      document.body.appendChild(backdrop);
+      document.body.appendChild(form);
+      portalActive = true;
+    }
+
+    function restoreReviewDrawer() {
+      if (!portalActive) {
+        return;
+      }
+
+      panel.appendChild(backdrop);
+      panel.appendChild(form);
+      portalActive = false;
+    }
+
+    function clearOpenChoices() {
+      form.querySelectorAll(".review-choice.open").forEach(
+        function (choice) {
+          choice.classList.remove("open");
+        }
+      );
+    }
+
+    function syncReviewModalLock() {
+      document.body.classList.toggle(
+        "review-modal-open",
+        panel.open
+      );
+
+      if (panel.open) {
+        mountReviewDrawer();
+        return;
+      }
+
+      clearOpenChoices();
+      restoreReviewDrawer();
+      document.body.style.removeProperty(
+        "--review-scrollbar-compensation"
+      );
+    }
+
+    function focusReviewDrawer() {
+      try {
+        form.focus({ preventScroll: true });
+      } catch (error) {
+        form.focus();
+      }
+    }
+
+    function openReviewModal() {
+      if (panel.open || closing) {
+        return;
+      }
+
+      const scrollbarWidth = Math.max(
+        0,
+        window.innerWidth -
+          document.documentElement.clientWidth
+      );
+
+      document.body.style.setProperty(
+        "--review-scrollbar-compensation",
+        scrollbarWidth + "px"
+      );
+
+      panel.setAttribute("open", "");
+      syncReviewModalLock();
+
+      if (drawerBody) {
+        drawerBody.scrollTop = 0;
+      }
+
+      cancelAnimations();
+      if (!reducedMotion.matches) {
+        formAnimation = form.animate(
+          [
+            { transform: "translateX(100%)" },
+            { transform: "translateX(0)" }
+          ],
+          {
+            duration: 320,
+            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+            fill: "both"
+          }
+        );
+
+        backdropAnimation = backdrop.animate(
+          [{ opacity: 0 }, { opacity: 1 }],
+          {
+            duration: 280,
+            easing: "ease-out",
+            fill: "both"
+          }
+        );
+
+        const openingAnimation = formAnimation;
+        openingAnimation.finished.then(function () {
+          if (formAnimation === openingAnimation) {
+            openingAnimation.cancel();
+            formAnimation = null;
+          }
+        }).catch(function () {});
+
+        const openingBackdrop = backdropAnimation;
+        openingBackdrop.finished.then(function () {
+          if (backdropAnimation === openingBackdrop) {
+            openingBackdrop.cancel();
+            backdropAnimation = null;
+          }
+        }).catch(function () {});
+      }
+
+      focusReviewDrawer();
+    }
+
+    function finishClosingReviewModal() {
+      cancelAnimations();
+      panel.removeAttribute("open");
+      closing = false;
+      syncReviewModalLock();
+
+      try {
+        reviewToggle.focus({ preventScroll: true });
+      } catch (error) {
+        reviewToggle.focus();
+      }
+    }
+
+    function closeReviewModal() {
+      if (!panel.open || closing) {
+        return;
+      }
+
+      closing = true;
+      clearOpenChoices();
+      cancelAnimations();
+
+      if (reducedMotion.matches) {
+        finishClosingReviewModal();
+        return;
+      }
+
+      formAnimation = form.animate(
+        [
+          { transform: "translateX(0)" },
+          { transform: "translateX(100%)" }
+        ],
+        {
+          duration: 250,
+          easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+          fill: "both"
+        }
+      );
+
+      backdropAnimation = backdrop.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        {
+          duration: 220,
+          easing: "ease-in",
+          fill: "both"
+        }
+      );
+
+      formAnimation.finished
+        .then(finishClosingReviewModal)
+        .catch(finishClosingReviewModal);
+    }
+
+    reviewToggle.addEventListener("click", function (event) {
+      event.preventDefault();
+
+      if (panel.open) {
+        closeReviewModal();
+      } else {
+        openReviewModal();
+      }
+    });
+
+    backdrop.addEventListener("click", closeReviewModal);
+
+    if (cancelButton) {
+      cancelButton.addEventListener("click", closeReviewModal);
+    }
+
+    panel.addEventListener(
+      "review-request-close",
+      closeReviewModal
+    );
+    panel.addEventListener(
+      "toggle",
+      syncReviewModalLock
+    );
+
+    document.addEventListener("keydown", function (event) {
+      if (!panel.open || closing) {
+        return;
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeReviewModal();
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusable = Array.from(form.querySelectorAll(
+        "button:not([disabled]), " +
+        "input:not([type='hidden']):not([disabled]), " +
+        "select:not([disabled]), " +
+        "textarea:not([disabled]), " +
+        "[tabindex]:not([tabindex='-1'])"
+      )).filter(function (element) {
+        return element.getClientRects().length > 0;
+      });
+
+      if (!focusable.length) {
+        event.preventDefault();
+        form.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (!form.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey &&
+        document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey &&
+        document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    syncReviewModalLock();
+  }
+
+  function renderProfessorNotFound(grid, professorId) {
+    document.title = "Professor Not Found | AUC Atlas";
+    grid.innerHTML = `
+      <div class="professors-empty">
+        Professor "${escapeHtml(professorId)}" was not found. <a href="professors.html">Back to all professors</a>.
+      </div>
+    `;
+  }
+
+  const professorPageSize = 30;
+  let professorVisibleLimit = professorPageSize;
+  let professorFilterAnimationTimer = 0;
+  let professorReviewSummariesLoaded = false;
+  let professorReviewSummariesFailed = false;
+  let professorReviewSummariesPromise = null;
+
+  function getProfessorCardImageUrl(imageURL) {
+    const safeImageURL =
+      String(imageURL || "user.png").trim() ||
+      "user.png";
+
+    if (
+      safeImageURL.includes("res.cloudinary.com") &&
+      safeImageURL.includes("/image/upload/")
+    ) {
+      return safeImageURL.replace(
+        "/image/upload/",
+        "/image/upload/f_auto,q_auto:good,c_fill,g_auto,w_720,h_456/"
+      );
+    }
+
+    return safeImageURL;
+  }
+
+  function getProfessorCardRatingLabel(professor) {
+    const reviewCount = Math.max(
+      0,
+      Number(professor.reviewCount || 0)
+    );
+    const averageRating = Number(
+      professor.averageRating || 0
+    );
+
+    if (
+      !reviewCount ||
+      !Number.isFinite(averageRating) ||
+      averageRating <= 0
+    ) {
+      return "No Stars Yet";
+    }
+
+    const filledStars = Math.max(
+      1,
+      Math.min(5, Math.round(averageRating))
+    );
+
+    return (
+      "★".repeat(filledStars) +
+      " " +
+      averageRating.toFixed(1)
+    );
+  }
+
+  function getProfessorListingPriority(professor) {
+    const hasPhoto = Boolean(
+      professor.image &&
+      String(professor.image).trim() !== "user.png"
+    );
+    const hasReviews = Number(professor.reviewCount || 0) > 0;
+
+    if (hasPhoto && hasReviews) return 0;
+    if (hasPhoto) return 1;
+    if (hasReviews) return 2;
+    return 3;
+  }
+
+  function loadProfessorReviewSummaries() {
+    if (professorReviewSummariesLoaded) {
+      return Promise.resolve();
+    }
+
+    if (professorReviewSummariesPromise) {
+      return professorReviewSummariesPromise;
+    }
+
+    professorReviewSummariesPromise = fetch(
+      "/api/professor-reviews?summaries=true",
+      {
+        credentials: "same-origin"
+      }
+    )
+      .then(function (response) {
+        return response
+          .json()
+          .catch(function () {
+            return {};
+          })
+          .then(function (data) {
+            if (!response.ok) {
+              throw new Error(
+                data.error ||
+                "Could not load professor ratings."
+              );
+            }
+
+            return data;
+          });
+      })
+      .then(function (data) {
+        const summaries =
+          data &&
+          data.summaries &&
+          typeof data.summaries === "object"
+            ? data.summaries
+            : {};
+
+        professors.forEach(function (professor) {
+          const summary =
+            summaries[getProfessorId(professor)] ||
+            {};
+          const reviewCount = Math.max(
+            0,
+            Math.floor(
+              Number(summary.reviewCount || 0)
+            )
+          );
+          const averageRating = Number(
+            summary.averageRating || 0
+          );
+
+          professor.reviewCount = reviewCount;
+          professor.averageRating =
+            Number.isFinite(averageRating) &&
+            averageRating > 0
+              ? averageRating
+              : 0;
+          professor.averageStars =
+            getProfessorCardRatingLabel(professor);
+        });
+
+        professorReviewSummariesLoaded = true;
+        renderProfessors(false, false);
+      })
+      .catch(function () {
+        professorReviewSummariesFailed = true;
+        professorReviewSummariesLoaded = true;
+        renderProfessors(false, false);
+      });
+
+    return professorReviewSummariesPromise;
+  }
+
+  function renderProfessors(animateResults, resetVisibleLimit) {
+    const grid = document.getElementById("professors-grid");
+    const browser = document.querySelector(".professors-browser");
+    const currentProfessorId = getCurrentProfessorId();
+
+    if (!grid) {
+      return;
+    }
+
+    grid.classList.toggle("professor-profile-grid", Boolean(currentProfessorId));
+
+    if (browser) {
+      browser.classList.toggle("professor-profile-mode", Boolean(currentProfessorId));
+    }
+
+    if (currentProfessorId) {
+      const professor = professors.find(function (item) {
+        return getProfessorId(item) === currentProfessorId;
+      });
+
+      if (professor) {
+        renderProfessorProfile(grid, professor);
+      } else {
+        renderProfessorNotFound(grid, currentProfessorId);
+      }
+
+      return;
+    }
+
+    document.title = "Professors | AUC Atlas";
+
+    // Wait for review summaries before showing the first directory.
+    // Reserve the final grid layout instead of showing a small floating message.
+    if (!professorReviewSummariesLoaded) {
+      grid.setAttribute("aria-busy", "true");
+      grid.setAttribute("aria-label", "Loading professors and reviews");
+      grid.innerHTML = Array.from({ length: 4 }, function () {
+        return [
+          '<div class="professor-loading-card" aria-hidden="true">',
+            '<div class="professor-loading-image"></div>',
+            '<div class="professor-loading-body">',
+              '<span class="professor-loading-line is-title"></span>',
+              '<span class="professor-loading-line is-detail"></span>',
+              '<span class="professor-loading-line is-short"></span>',
+            '</div>',
+          '</div>'
+        ].join("");
+      }).join("");
+      return;
+    }
+
+    grid.removeAttribute("aria-busy");
+    grid.setAttribute("aria-label", "Professor list");
+
+    if (resetVisibleLimit) {
+      professorVisibleLimit = professorPageSize;
+    }
+
+    const matchingProfessors = professors
+      .filter(professorMatches)
+      .sort(function (firstProfessor, secondProfessor) {
+        const priorityDifference =
+          getProfessorListingPriority(firstProfessor) -
+          getProfessorListingPriority(secondProfessor);
+
+        if (priorityDifference !== 0) {
+          return priorityDifference;
+        }
+
+        const reviewDifference =
+          Number(secondProfessor.reviewCount || 0) -
+          Number(firstProfessor.reviewCount || 0);
+
+        if (reviewDifference !== 0) {
+          return reviewDifference;
+        }
+
+        return firstProfessor.name.localeCompare(secondProfessor.name);
+      });
+
+    const visibleProfessors = matchingProfessors.slice(
+      0,
+      professorVisibleLimit
+    );
+
+    grid.innerHTML = visibleProfessors.map(function (professor, index) {
+      const shouldLoadImmediately = index < 8;
+      const reviewCount = Number(professor.reviewCount || 0);
+      const reviewLabel = professorReviewSummariesFailed
+        ? "Reviews unavailable"
+        : reviewCount + " " + (reviewCount === 1 ? "Review" : "Reviews");
+      const ratingLabel = professorReviewSummariesFailed
+        ? "Ratings unavailable"
+        : professor.averageStars || "No Stars Yet";
+
+      return `
+        <a class="professor-card" href="${escapeHtml(getProfessorUrl(professor))}" aria-label="Open ${escapeHtml(professor.name)} profile">
+          <div class="professor-card-image">
+            <img
+              src="${escapeHtml(getProfessorCardImageUrl(professor.image))}"
+              alt="${escapeHtml(professor.name)}"
+              width="720"
+              height="456"
+              loading="${shouldLoadImmediately ? "eager" : "lazy"}"
+              decoding="async"
+              fetchpriority="${index < 4 ? "high" : "auto"}"
+            >
+          </div>
+          <div class="professor-card-body">
+            <h2>${escapeHtml(professor.name)}</h2>
+            <div class="professor-meta">
+              <span>${escapeHtml(professor.displayDepartment || professor.department)}</span>
+              <span>${escapeHtml(reviewLabel)}</span>
+              <span>${escapeHtml(ratingLabel)}</span>
+            </div>
+          </div>
+        </a>
+      `;
+    }).join("");
+
+    if (!matchingProfessors.length) {
+      grid.innerHTML = '<p class="professors-empty">No professors match those filters.</p>';
+    } else if (matchingProfessors.length > professorVisibleLimit) {
+      const remainingProfessorCount =
+        matchingProfessors.length -
+        professorVisibleLimit;
+      const nextBatchSize = Math.min(
+        professorPageSize,
+        remainingProfessorCount
+      );
+
+      grid.insertAdjacentHTML(
+        "beforeend",
+        `
+          <button
+            class="professors-view-more"
+            id="professors-view-more"
+            type="button"
+            aria-label="Show ${nextBatchSize} more professors"
+          >
+            View ${nextBatchSize} more
+            <span>${remainingProfessorCount} remaining</span>
+          </button>
+        `
+      );
+
+      const viewMoreButton =
+        document.getElementById("professors-view-more");
+
+      if (viewMoreButton) {
+        viewMoreButton.addEventListener("click", function () {
+          professorVisibleLimit += professorPageSize;
+          renderProfessors(false, false);
+        });
+      }
+    }
+
+    if (animateResults) {
+      window.clearTimeout(professorFilterAnimationTimer);
+      grid.classList.remove("is-filtering");
+      void grid.offsetWidth;
+      grid.classList.add("is-filtering");
+
+      professorFilterAnimationTimer = window.setTimeout(function () {
+        grid.classList.remove("is-filtering");
+      }, 520);
+    }
+  }
+
+  function setupProfessorFilters() {
+    populateDepartmentFilters();
+
+    document.querySelectorAll(".filter-toggle").forEach(function (button) {
+      button.addEventListener("click", function () {
+        button.closest(".filter-item").classList.toggle("open");
+      });
+    });
+
+    document.querySelectorAll("#professor-filters input").forEach(function (input) {
+      input.addEventListener("change", function () {
+        renderProfessors(true, true);
+      });
+    });
+
+    const searchInput = document.getElementById("professor-search-input");
+
+    if (searchInput) {
+      searchInput.addEventListener("input", function () {
+        renderProfessors(true, true);
+      });
+    }
+
+    renderProfessors(false, true);
+
+    if (!getCurrentProfessorId()) {
+      loadProfessorReviewSummaries();
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupProfessorFilters);
+  } else {
+    setupProfessorFilters();
+  }
+})();
