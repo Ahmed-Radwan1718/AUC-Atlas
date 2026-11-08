@@ -3023,6 +3023,100 @@
         flex-basis: 40px;
       }
     }
+
+    /* Only show a small, relevant course suggestion list after typing. */
+    .review-course-search-wrap {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .review-drawer-body .review-course-search-input {
+      box-sizing: border-box;
+      width: 100%;
+      height: 43px;
+      min-height: 43px;
+      padding: 0 13px 0 35px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.86);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .review-course-search-wrap::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 13px;
+      z-index: 1;
+      width: 12px;
+      height: 12px;
+      border: 1.5px solid rgba(23, 23, 23, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .review-course-search-wrap::after {
+      content: "";
+      position: absolute;
+      top: 26px;
+      left: 24px;
+      z-index: 1;
+      width: 6px;
+      height: 1.5px;
+      border-radius: 2px;
+      background: rgba(23, 23, 23, 0.5);
+      transform: rotate(45deg);
+      transform-origin: left center;
+      pointer-events: none;
+    }
+
+    .review-drawer-body .review-course-search-input:focus {
+      border-color: rgba(192, 154, 92, 0.55);
+      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.11);
+    }
+
+    .review-course-suggestions {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 30;
+      padding: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 13px;
+      background: #fff;
+      box-shadow: 0 16px 32px rgba(42, 32, 20, 0.14);
+    }
+
+    .review-course-suggestions[hidden] {
+      display: none;
+    }
+
+    .review-course-suggestion {
+      padding: 10px 11px;
+      border-radius: 8px;
+      color: #272727;
+      font-size: 12px;
+      line-height: 1.45;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+
+    .review-course-suggestion:hover,
+    .review-course-suggestion.is-active {
+      background: rgba(192, 154, 92, 0.13);
+    }
+
+    .review-course-no-results,
+    .review-course-more-results {
+      padding: 9px 11px;
+      color: rgba(23, 23, 23, 0.55);
+      font-size: 11px;
+      line-height: 1.45;
+    }
   `;
   document.head.appendChild(style);
 
@@ -4188,10 +4282,26 @@ function getProfessorUrl(professor) {
                 <h3 id="review-core-heading">Course &amp; rating</h3>
                 <div class="review-core-grid">
               <div class="review-field">
-                <label for="review-course">Course taken</label>
-                <select id="review-course" name="courseTaken" required>
+                <label for="review-course-search">Course taken</label>
+                <select id="review-course" name="courseTaken" class="review-native-select" required>
                   <option value="" selected disabled>Choose course</option>
                 </select>
+                <div class="review-course-search-wrap">
+                  <input
+                    id="review-course-search"
+                    class="review-course-search-input"
+                    type="search"
+                    placeholder="Search courses by code or title"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-controls="review-course-suggestions"
+                    aria-expanded="false"
+                  >
+                  <div id="review-course-suggestions" class="review-course-suggestions" role="listbox" aria-label="Matching courses" hidden></div>
+                </div>
               </div>
 
               <div class="review-field">
@@ -4509,6 +4619,206 @@ function getProfessorUrl(professor) {
     syncDependsField();
   }
 
+  function setupReviewCourseSearch(form) {
+    const select = form.querySelector("#review-course");
+    const input = form.querySelector("#review-course-search");
+    const listbox = form.querySelector("#review-course-suggestions");
+    const wrapper = input && input.closest(".review-course-search-wrap");
+
+    if (!select || !input || !listbox || !wrapper) {
+      return;
+    }
+
+    // The select remains the sole source of the submitted course code.
+    // Only display matching suggestions after an actual search query.
+    const courses = Array.from(select.options)
+      .filter(function (option) {
+        return Boolean(option.value);
+      })
+      .map(function (option) {
+        const code = option.value;
+        const label = option.textContent.trim();
+        return {
+          code: code,
+          label: label,
+          searchText: (code + " " + label).toLowerCase()
+        };
+      });
+
+    const MAX_SUGGESTIONS = 5;
+    let results = [];
+    let activeIndex = -1;
+
+    function hideSuggestions() {
+      listbox.hidden = true;
+      listbox.replaceChildren();
+      results = [];
+      activeIndex = -1;
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+    }
+
+    function highlightSuggestion(index) {
+      if (!results.length) {
+        return;
+      }
+
+      activeIndex = (index + results.length) % results.length;
+      listbox.querySelectorAll("[role='option']").forEach(
+        function (option, optionIndex) {
+          const active = optionIndex === activeIndex;
+          option.classList.toggle("is-active", active);
+          option.setAttribute("aria-selected", String(active));
+          if (active) {
+            input.setAttribute("aria-activedescendant", option.id);
+            option.scrollIntoView({ block: "nearest" });
+          }
+        }
+      );
+    }
+
+    function selectCourse(course) {
+      select.value = course.code;
+      input.value = course.label;
+      hideSuggestions();
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      input.focus();
+    }
+
+    function showSuggestions() {
+      const query = input.value.toLowerCase().trim();
+      if (!query) {
+        hideSuggestions();
+        return;
+      }
+
+      const words = query.split(/\s+/).filter(Boolean);
+      const matches = courses.filter(function (course) {
+        return words.every(function (word) {
+          return course.searchText.includes(word);
+        });
+      });
+
+      // Prioritize course-code and title-prefix matches, not dataset order.
+      matches.sort(function (a, b) {
+        function rank(course) {
+          const code = course.code.toLowerCase();
+          const label = course.label.toLowerCase();
+          return code.startsWith(query) ? 0 :
+            label.startsWith(query) ? 1 : 2;
+        }
+        return rank(a) - rank(b) ||
+          a.code.localeCompare(b.code);
+      });
+
+      results = matches.slice(0, MAX_SUGGESTIONS);
+      activeIndex = -1;
+      listbox.replaceChildren();
+      input.removeAttribute("aria-activedescendant");
+
+      results.forEach(function (course, index) {
+        const option = document.createElement("div");
+        option.id = "review-course-option-" + index;
+        option.className = "review-course-suggestion";
+        option.setAttribute("role", "option");
+        option.setAttribute("aria-selected", "false");
+        option.textContent = course.label;
+        option.addEventListener("pointerdown", function (event) {
+          // Keep the input focused while selecting from the list.
+          event.preventDefault();
+        });
+        option.addEventListener("click", function () {
+          selectCourse(course);
+        });
+        listbox.appendChild(option);
+      });
+
+      if (!matches.length) {
+        const empty = document.createElement("div");
+        empty.className = "review-course-no-results";
+        empty.setAttribute("role", "status");
+        empty.textContent = "No matching courses";
+        listbox.appendChild(empty);
+      } else if (matches.length > MAX_SUGGESTIONS) {
+        const more = document.createElement("div");
+        more.className = "review-course-more-results";
+        more.textContent = "Keep typing to narrow the results";
+        listbox.appendChild(more);
+      }
+
+      listbox.hidden = false;
+      input.setAttribute("aria-expanded", "true");
+    }
+
+    input.addEventListener("input", function () {
+      if (select.value) {
+        select.value = "";
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      showSuggestions();
+    });
+
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !listbox.hidden) {
+        event.preventDefault();
+        event.stopPropagation();
+        hideSuggestions();
+        return;
+      }
+
+      if (event.key === "Tab") {
+        hideSuggestions();
+        return;
+      }
+
+      if (event.key === "ArrowDown" ||
+          event.key === "ArrowUp") {
+        if (listbox.hidden && input.value.trim() && !select.value) {
+          showSuggestions();
+        }
+        if (listbox.hidden || !results.length) {
+          return;
+        }
+
+        event.preventDefault();
+        highlightSuggestion(
+          activeIndex + (event.key === "ArrowDown" ? 1 : -1)
+        );
+        return;
+      }
+
+      if (event.key === "Enter" && !listbox.hidden &&
+          activeIndex >= 0 && results[activeIndex]) {
+        event.preventDefault();
+        selectCourse(results[activeIndex]);
+      } else if (event.key === "Enter" && !select.value) {
+        // Do not submit an unresolved free-text course query.
+        event.preventDefault();
+      }
+    });
+
+    document.addEventListener("pointerdown", function (event) {
+      if (!wrapper.contains(event.target)) {
+        hideSuggestions();
+      }
+    });
+
+    select.addEventListener("change", function () {
+      if (!select.value && !input.matches(":focus")) {
+        input.value = "";
+      }
+    });
+
+    // Reopening a review preserves the previously chosen course.
+    if (select.value) {
+      const selected = courses.find(function (course) {
+        return course.code === select.value;
+      });
+      input.value = selected ? selected.label : "";
+    }
+    hideSuggestions();
+  }
+
   function setupReviewChoiceMenus(form) {
     function resetChoiceSearch(choice) {
       const searchInput = choice.querySelector(".review-choice-search");
@@ -4536,7 +4846,8 @@ function getProfessorUrl(professor) {
         return;
       }
 
-      if (select.id === "review-rating" ||
+      if (select.id === "review-course" ||
+          select.id === "review-rating" ||
           select.id === "review-recommend") {
         return;
       }
@@ -4855,6 +5166,7 @@ function getProfessorUrl(professor) {
 
     populateReviewCourseSelect(form);
     setupReviewChoiceMenus(form);
+    setupReviewCourseSearch(form);
     setupReviewDependsField(form);
     setupReviewCompactControls(form);
 
@@ -4884,10 +5196,12 @@ function getProfessorUrl(professor) {
 
         const visibleControl = missingField.id === "review-rating"
           ? form.querySelector("[data-review-rating='1']")
-          : missingField.nextElementSibling &&
-            missingField.nextElementSibling.querySelector(
-              ".review-choice-button"
-            );
+          : missingField.id === "review-course"
+            ? form.querySelector("#review-course-search")
+            : missingField.nextElementSibling &&
+              missingField.nextElementSibling.querySelector(
+                ".review-choice-button"
+              );
         if (visibleControl) {
           visibleControl.focus();
           visibleControl.scrollIntoView({
