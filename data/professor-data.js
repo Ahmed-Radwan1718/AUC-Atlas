@@ -2615,6 +2615,174 @@
         min-width: 0;
       }
     }
+
+    /* Professor reviews use the same edge-to-edge drawer pattern as uploads.
+       Mounting the drawer under <body> avoids the profile card's overflow clip. */
+    html:has(body.review-modal-open) {
+      overflow: hidden;
+    }
+
+    .review-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      background: rgba(247, 244, 238, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .professor-review-form {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: auto;
+      z-index: 5001;
+      box-sizing: border-box;
+      width: min(520px, 100vw);
+      height: 100dvh;
+      max-height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-radius: 24px 0 0 24px;
+      background: #fff;
+      transform: translateX(0);
+      animation: none;
+      box-shadow: -20px 0 80px rgba(42, 32, 20, 0.16);
+    }
+
+    .professor-review-form:focus {
+      outline: none;
+    }
+
+    .review-modal-header {
+      position: relative;
+      top: auto;
+      z-index: 2;
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 24px 24px 18px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: #fff;
+    }
+
+    .review-close-button {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+    }
+
+    .review-drawer-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      min-width: 0;
+      padding: 22px 24px 32px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+      gap: 18px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .review-drawer-body .review-field,
+    .review-drawer-body .review-field.full,
+    .review-drawer-body .review-anonymous-option {
+      min-width: 0;
+      grid-column: 1 / -1;
+    }
+
+    .review-drawer-body .review-choice-menu {
+      position: static;
+      display: none;
+      max-height: min(230px, 34dvh);
+      margin-top: 8px;
+      opacity: 1;
+      pointer-events: none;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .review-drawer-body .review-choice.open .review-choice-menu {
+      display: grid;
+      pointer-events: auto;
+      transform: none;
+    }
+
+    .review-drawer-footer {
+      flex: 0 0 auto;
+      display: grid;
+      gap: 8px;
+      padding: 16px 24px 20px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      background: #fff;
+      box-shadow: 0 -8px 22px rgba(42, 32, 20, 0.035);
+    }
+
+    .review-drawer-footer .review-submit-button {
+      position: static;
+      width: 100%;
+      min-height: 50px;
+      margin: 0;
+      background: #171717;
+      color: #fff;
+      box-shadow: none;
+    }
+
+    .review-drawer-footer .review-form-message {
+      margin: 0;
+    }
+
+    .review-drawer-footer .review-form-message:empty {
+      display: none;
+    }
+
+    @media (max-width: 640px) {
+      .professor-review-form {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        padding: 0;
+        border-radius: 0;
+        transform: translateX(0);
+      }
+
+      .review-modal-header {
+        top: auto;
+        margin: 0;
+        padding: max(18px, env(safe-area-inset-top)) 18px 14px;
+      }
+
+      .review-drawer-body {
+        padding: 20px 18px 28px;
+      }
+
+      .review-drawer-footer {
+        padding: 14px 18px max(18px, env(safe-area-inset-bottom));
+      }
+
+      .review-drawer-footer .review-submit-button {
+        min-height: 52px;
+        margin: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .professor-review-form,
+      .review-modal-backdrop {
+        animation: none;
+      }
+    }
   `;
   document.head.appendChild(style);
 
@@ -3760,20 +3928,22 @@ function getProfessorUrl(professor) {
           <details class="professor-review-panel">
             <summary class="professor-review-toggle">Leave a review</summary>
 
-            <div class="review-modal-backdrop" onclick="this.closest('details').removeAttribute('open')"></div>
+            <div class="review-modal-backdrop" aria-hidden="true"></div>
 
-            <form class="professor-review-form" aria-label="Professor review form">
+            <form class="professor-review-form" role="dialog" aria-modal="true" aria-labelledby="review-drawer-title" tabindex="-1">
+
               <div class="review-modal-header">
                 <div>
                   <span>Professor review</span>
-                  <h2>Leave a review</h2>
+                  <h2 id="review-drawer-title">Leave a review</h2>
                 </div>
-                <button class="review-close-button" type="button" aria-label="Close review form" onclick="this.closest('details').removeAttribute('open')">&times;</button>
+                <button class="review-close-button" type="button" aria-label="Close review form">&times;</button>
               </div>
 
               <input type="hidden" name="professorId" value="${escapeHtml(getProfessorId(professor))}">
               <input type="hidden" name="professorName" value="${escapeHtml(professor.name)}">
 
+              <div class="review-drawer-body">
               <div class="review-section-heading">Course context</div>
 
               <div class="review-field">
@@ -3957,8 +4127,12 @@ function getProfessorUrl(professor) {
                 <input name="isAnonymous" type="checkbox" value="true">
               </label>
 
-              <button class="review-submit-button" type="submit">Submit Review</button>
-              <p class="review-form-message" aria-live="polite"></p>
+              </div>
+
+              <div class="review-drawer-footer">
+                <button class="review-submit-button" type="submit">Submit Review</button>
+                <p class="review-form-message" aria-live="polite"></p>
+              </div>
             </form>
           </details>
         </div>
@@ -4302,21 +4476,21 @@ function getProfessorUrl(professor) {
     const closeButton = form
       ? form.querySelector(".review-close-button")
       : null;
-    const mobileViewport = window.matchMedia(
-      "(max-width: 640px)"
-    );
+    const drawerBody = form
+      ? form.querySelector(".review-drawer-body")
+      : null;
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     );
 
-    let mobilePortalActive = false;
-    let formAnimation = null;
-    let backdropAnimation = null;
-    let closing = false;
-
-    if (!panel || !form || !reviewToggle) {
+    if (!panel || !form || !reviewToggle || !backdrop) {
       return;
     }
+
+    let portalActive = false;
+    let closing = false;
+    let formAnimation = null;
+    let backdropAnimation = null;
 
     populateReviewCourseSelect(form);
     setupReviewChoiceMenus(form);
@@ -4327,7 +4501,7 @@ function getProfessorUrl(professor) {
       submitProfessorReview(form, panel);
     });
 
-    function cancelModalAnimations() {
+    function cancelAnimations() {
       if (formAnimation) {
         formAnimation.cancel();
         formAnimation = null;
@@ -4339,41 +4513,32 @@ function getProfessorUrl(professor) {
       }
     }
 
-    function mountMobileReviewModal() {
-      if (
-        !mobileViewport.matches ||
-        mobilePortalActive
-      ) {
+    function mountReviewDrawer() {
+      if (portalActive) {
         return;
       }
 
-      if (backdrop) {
-        document.body.appendChild(backdrop);
-      }
-
+      document.body.appendChild(backdrop);
       document.body.appendChild(form);
-      mobilePortalActive = true;
+      portalActive = true;
     }
 
-    function restoreReviewModal() {
-      if (!mobilePortalActive) {
+    function restoreReviewDrawer() {
+      if (!portalActive) {
         return;
       }
 
-      if (backdrop) {
-        panel.appendChild(backdrop);
-      }
-
+      panel.appendChild(backdrop);
       panel.appendChild(form);
-      mobilePortalActive = false;
+      portalActive = false;
     }
 
     function clearOpenChoices() {
-      form
-        .querySelectorAll(".review-choice.open")
-        .forEach(function (choice) {
+      form.querySelectorAll(".review-choice.open").forEach(
+        function (choice) {
           choice.classList.remove("open");
-        });
+        }
+      );
     }
 
     function syncReviewModalLock() {
@@ -4383,38 +4548,31 @@ function getProfessorUrl(professor) {
       );
 
       if (panel.open) {
-        if (mobileViewport.matches) {
-          mountMobileReviewModal();
-        }
-
+        mountReviewDrawer();
         return;
       }
 
       clearOpenChoices();
-      restoreReviewModal();
-
+      restoreReviewDrawer();
       document.body.style.removeProperty(
         "--review-scrollbar-compensation"
       );
     }
 
-    function getOriginTransform() {
-      return {
-        transform:
-          "translate(-50%, calc(-50% + 10px)) scale(0.985)",
-        radius:
-          window.getComputedStyle(form)
-            .borderRadius || "24px"
-      };
+    function focusCloseButton() {
+      const target = closeButton || form;
+
+      try {
+        target.focus({ preventScroll: true });
+      } catch (error) {
+        target.focus();
+      }
     }
 
     function openReviewModal() {
       if (panel.open || closing) {
         return;
       }
-
-      const triggerRect =
-        reviewToggle.getBoundingClientRect();
 
       const scrollbarWidth = Math.max(
         0,
@@ -4427,131 +4585,64 @@ function getProfessorUrl(professor) {
         scrollbarWidth + "px"
       );
 
-      form.style.opacity = "0";
-
-      if (backdrop) {
-        backdrop.style.opacity = "0";
-      }
-
       panel.setAttribute("open", "");
       syncReviewModalLock();
 
-      form.scrollTop = 0;
-
-      if (reducedMotion.matches) {
-        form.style.opacity = "";
-
-        if (backdrop) {
-          backdrop.style.opacity = "";
-        }
-
-        return;
+      if (drawerBody) {
+        drawerBody.scrollTop = 0;
       }
 
-      const origin =
-        getOriginTransform(triggerRect);
-      const targetRadius =
-        window.getComputedStyle(form)
-          .borderRadius || "24px";
-
-      cancelModalAnimations();
-
-      form.style.opacity = "";
-
-      if (backdrop) {
-        backdrop.style.opacity = "";
-      }
-
-      formAnimation = form.animate(
-        [
-          {
-            opacity: 0,
-            transform: origin.transform,
-            borderRadius: origin.radius
-          },
-          {
-            opacity: 0.55,
-            offset: 0.16
-          },
-          {
-            opacity: 1,
-            transform:
-              "translate(-50%, -50%) scale(1)",
-            borderRadius: targetRadius
-          }
-        ],
-        {
-          duration: 560,
-          easing:
-            "cubic-bezier(0.16, 1, 0.3, 1)",
-          fill: "both"
-        }
-      );
-
-      if (backdrop) {
-        backdropAnimation = backdrop.animate(
+      cancelAnimations();
+      if (!reducedMotion.matches) {
+        formAnimation = form.animate(
           [
-            { opacity: 0 },
-            { opacity: 1 }
+            { transform: "translateX(100%)" },
+            { transform: "translateX(0)" }
           ],
           {
-            duration: 360,
-            easing:
-              "cubic-bezier(0.16, 1, 0.3, 1)",
+            duration: 320,
+            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
             fill: "both"
           }
         );
-      }
 
-      formAnimation.finished
-        .then(function () {
-          if (
-            !panel.open ||
-            closing ||
-            !formAnimation
-          ) {
-            return;
+        backdropAnimation = backdrop.animate(
+          [{ opacity: 0 }, { opacity: 1 }],
+          {
+            duration: 280,
+            easing: "ease-out",
+            fill: "both"
           }
+        );
 
-          formAnimation.cancel();
-          formAnimation = null;
-        })
-        .catch(function () {});
+        const openingAnimation = formAnimation;
+        openingAnimation.finished.then(function () {
+          if (formAnimation === openingAnimation) {
+            openingAnimation.cancel();
+            formAnimation = null;
+          }
+        }).catch(function () {});
 
-      if (backdropAnimation) {
-        backdropAnimation.finished
-          .then(function () {
-            if (!backdropAnimation) {
-              return;
-            }
-
-            backdropAnimation.cancel();
+        const openingBackdrop = backdropAnimation;
+        openingBackdrop.finished.then(function () {
+          if (backdropAnimation === openingBackdrop) {
+            openingBackdrop.cancel();
             backdropAnimation = null;
-          })
-          .catch(function () {});
+          }
+        }).catch(function () {});
       }
+
+      focusCloseButton();
     }
 
     function finishClosingReviewModal() {
-      cancelModalAnimations();
-
+      cancelAnimations();
       panel.removeAttribute("open");
       closing = false;
-
-      form.style.opacity = "";
-      form.style.transform = "";
-      form.style.borderRadius = "";
-
-      if (backdrop) {
-        backdrop.style.opacity = "";
-      }
-
       syncReviewModalLock();
 
       try {
-        reviewToggle.focus({
-          preventScroll: true
-        });
+        reviewToggle.focus({ preventScroll: true });
       } catch (error) {
         reviewToggle.focus();
       }
@@ -4564,164 +4655,111 @@ function getProfessorUrl(professor) {
 
       closing = true;
       clearOpenChoices();
+      cancelAnimations();
 
       if (reducedMotion.matches) {
         finishClosingReviewModal();
         return;
       }
 
-      const triggerRect =
-        reviewToggle.getBoundingClientRect();
-      const origin =
-        getOriginTransform(triggerRect);
-      const computedForm =
-        window.getComputedStyle(form);
-
-      const currentOpacity =
-        parseFloat(computedForm.opacity) || 1;
-      const currentTransform =
-        computedForm.transform === "none"
-          ? "translate(-50%, -50%) scale(1)"
-          : computedForm.transform;
-      const currentRadius =
-        computedForm.borderRadius || "24px";
-
-      cancelModalAnimations();
-
       formAnimation = form.animate(
         [
-          {
-            opacity: currentOpacity,
-            transform: currentTransform,
-            borderRadius: currentRadius
-          },
-          {
-            opacity: 0,
-            transform: origin.transform,
-            borderRadius: origin.radius
-          }
+          { transform: "translateX(0)" },
+          { transform: "translateX(100%)" }
         ],
         {
-          duration: 340,
-          easing:
-            "cubic-bezier(0.4, 0, 0.2, 1)",
+          duration: 250,
+          easing: "cubic-bezier(0.4, 0, 0.2, 1)",
           fill: "both"
         }
       );
 
-      if (backdrop) {
-        const currentBackdropOpacity =
-          parseFloat(
-            window.getComputedStyle(backdrop)
-              .opacity
-          ) || 1;
-
-        backdropAnimation = backdrop.animate(
-          [
-            {
-              opacity:
-                currentBackdropOpacity
-            },
-            {
-              opacity: 0
-            }
-          ],
-          {
-            duration: 260,
-            easing: "ease",
-            fill: "both"
-          }
-        );
-      }
+      backdropAnimation = backdrop.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        {
+          duration: 220,
+          easing: "ease-in",
+          fill: "both"
+        }
+      );
 
       formAnimation.finished
         .then(finishClosingReviewModal)
-        .catch(function () {
-          finishClosingReviewModal();
-        });
+        .catch(finishClosingReviewModal);
     }
 
-    reviewToggle.addEventListener(
-      "click",
-      function (event) {
-        event.preventDefault();
+    reviewToggle.addEventListener("click", function (event) {
+      event.preventDefault();
 
-        if (panel.open) {
-          closeReviewModal();
-        } else {
-          openReviewModal();
-        }
+      if (panel.open) {
+        closeReviewModal();
+      } else {
+        openReviewModal();
       }
-    );
+    });
 
-    if (backdrop) {
-      backdrop.onclick = null;
-
-      backdrop.addEventListener(
-        "click",
-        closeReviewModal
-      );
-
-      backdrop.addEventListener(
-        "wheel",
-        function (event) {
-          event.preventDefault();
-        },
-        { passive: false }
-      );
-    }
+    backdrop.addEventListener("click", closeReviewModal);
 
     if (closeButton) {
-      closeButton.onclick = null;
-
-      closeButton.addEventListener(
-        "click",
-        closeReviewModal
-      );
+      closeButton.addEventListener("click", closeReviewModal);
     }
 
     panel.addEventListener(
       "review-request-close",
       closeReviewModal
     );
-
     panel.addEventListener(
       "toggle",
       syncReviewModalLock
     );
 
-    document.addEventListener(
-      "keydown",
-      function (event) {
-        if (
-          event.key === "Escape" &&
-          panel.open
-        ) {
-          event.preventDefault();
-          closeReviewModal();
-        }
+    document.addEventListener("keydown", function (event) {
+      if (!panel.open || closing) {
+        return;
       }
-    );
 
-    if (
-      typeof mobileViewport.addEventListener ===
-      "function"
-    ) {
-      mobileViewport.addEventListener(
-        "change",
-        function () {
-          if (!panel.open) {
-            return;
-          }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeReviewModal();
+        return;
+      }
 
-          if (mobileViewport.matches) {
-            mountMobileReviewModal();
-          } else {
-            restoreReviewModal();
-          }
-        }
-      );
-    }
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusable = Array.from(form.querySelectorAll(
+        "button:not([disabled]), " +
+        "input:not([type='hidden']):not([disabled]), " +
+        "select:not([disabled]), " +
+        "textarea:not([disabled]), " +
+        "[tabindex]:not([tabindex='-1'])"
+      )).filter(function (element) {
+        return element.getClientRects().length > 0;
+      });
+
+      if (!focusable.length) {
+        event.preventDefault();
+        form.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (!form.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey &&
+        document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey &&
+        document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
 
     syncReviewModalLock();
   }
