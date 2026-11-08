@@ -2783,6 +2783,246 @@
         animation: none;
       }
     }
+
+    /* Compact, progressive-disclosure layout for the professor review drawer. */
+    .review-drawer-body {
+      gap: 12px;
+      padding-top: 18px;
+      padding-bottom: 22px;
+    }
+
+    .review-core-section {
+      display: grid;
+      gap: 16px;
+      padding: 0 0 18px;
+    }
+
+    .review-core-section h3 {
+      margin: 0;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+
+    .review-core-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .review-core-grid .review-field {
+      min-width: 0;
+    }
+
+    .review-drawer-body .review-field {
+      gap: 6px;
+    }
+
+    .review-drawer-body .review-field label {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.045em;
+    }
+
+    .review-drawer-body .review-choice-button,
+    .review-drawer-body .review-field input,
+    .review-drawer-body .review-field select {
+      min-height: 43px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .review-drawer-body .review-choice-button {
+      padding-left: 12px;
+      padding-right: 27px;
+      line-height: 1.35;
+    }
+
+    .review-drawer-body .review-choice-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .review-drawer-body .review-choice-button::after {
+      right: 12px;
+    }
+
+    .review-rating-stars {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .review-rating-star {
+      width: 43px;
+      height: 43px;
+      padding: 0;
+      flex: 0 0 43px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: transparent;
+      color: #d2d2d2;
+      font: inherit;
+      font-size: 32px;
+      line-height: 1;
+      cursor: pointer;
+      transition: color 0.15s ease, transform 0.15s ease;
+    }
+
+    .review-rating-star.is-active {
+      color: #c09a5c;
+    }
+
+    .review-rating-star:hover {
+      transform: translateY(-1px);
+    }
+
+    .review-rating-star:focus-visible,
+    .review-recommend-options button:focus-visible,
+    .review-accordion summary:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 3px;
+    }
+
+    .review-recommend-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .review-recommend-options button {
+      min-height: 40px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 11px;
+      background: #fff;
+      color: rgba(23, 23, 23, 0.74);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .review-recommend-options button.is-active {
+      border-color: #c09a5c;
+      background: rgba(192, 154, 92, 0.13);
+      color: #171717;
+    }
+
+    .review-accordion {
+      min-width: 0;
+      border-top: 1px solid rgba(23, 23, 23, 0.09);
+    }
+
+    .review-accordion summary {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 25px 14px 0;
+      position: relative;
+      cursor: pointer;
+      list-style: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .review-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .review-accordion summary::after {
+      content: "";
+      position: absolute;
+      right: 6px;
+      top: calc(50% - 5px);
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid rgba(23, 23, 23, 0.6);
+      border-bottom: 1.5px solid rgba(23, 23, 23, 0.6);
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+    }
+
+    .review-accordion[open] summary::after {
+      transform: translateY(4px) rotate(225deg);
+    }
+
+    .review-accordion-label {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .review-accordion-label strong {
+      color: #171717;
+      font-size: 14px;
+      line-height: 1.2;
+      font-weight: 650;
+    }
+
+    .review-accordion-label small {
+      font-size: 11px;
+      color: rgba(23, 23, 23, 0.52);
+      line-height: 1.3;
+    }
+
+    .review-accordion-meta {
+      flex: 0 0 auto;
+      color: rgba(23, 23, 23, 0.55);
+      font-size: 10px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .review-accordion-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+      padding: 0 0 20px;
+    }
+
+    .review-drawer-body .review-anonymous-option {
+      margin: 0;
+      padding: 15px 0 0;
+    }
+
+    .review-drawer-footer {
+      padding-top: 12px;
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+    }
+
+    .review-drawer-footer .review-submit-button {
+      min-height: 46px;
+      font-size: 11px;
+    }
+
+    @media (max-width: 440px) {
+      .review-core-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .review-accordion summary {
+        flex-wrap: wrap;
+        row-gap: 6px;
+      }
+
+      .review-accordion-meta {
+        font-size: 10px;
+      }
+
+      .review-rating-stars {
+        gap: 3px;
+      }
+
+      .review-rating-star {
+        width: 40px;
+        flex-basis: 40px;
+      }
+    }
   `;
   document.head.appendChild(style);
 
@@ -3944,8 +4184,9 @@ function getProfessorUrl(professor) {
               <input type="hidden" name="professorName" value="${escapeHtml(professor.name)}">
 
               <div class="review-drawer-body">
-              <div class="review-section-heading">Course context</div>
-
+              <section class="review-core-section" aria-labelledby="review-core-heading">
+                <h3 id="review-core-heading">Course &amp; rating</h3>
+                <div class="review-core-grid">
               <div class="review-field">
                 <label for="review-course">Course taken</label>
                 <select id="review-course" name="courseTaken" required>
@@ -3995,10 +4236,11 @@ function getProfessorUrl(professor) {
                   <option>Winter 2018</option>
                 </select>
               </div>
+                </div>
 
-              <div class="review-field">
-                <label for="review-rating">Overall rating</label>
-                <select id="review-rating" name="rating" required>
+              <div class="review-field review-rating-field">
+                <label id="review-rating-label" for="review-rating">Overall rating</label>
+                <select id="review-rating" class="review-native-select" name="rating" required>
                   <option value="" selected disabled>Choose rating</option>
                   <option value="5">5 stars</option>
                   <option value="4">4 stars</option>
@@ -4006,24 +4248,45 @@ function getProfessorUrl(professor) {
                   <option value="2">2 stars</option>
                   <option value="1">1 star</option>
                 </select>
+                <div class="review-rating-stars" role="group" aria-labelledby="review-rating-label">
+                  <button type="button" class="review-rating-star" data-review-rating="1" aria-label="1 star" aria-pressed="false">★</button>
+                  <button type="button" class="review-rating-star" data-review-rating="2" aria-label="2 stars" aria-pressed="false">★</button>
+                  <button type="button" class="review-rating-star" data-review-rating="3" aria-label="3 stars" aria-pressed="false">★</button>
+                  <button type="button" class="review-rating-star" data-review-rating="4" aria-label="4 stars" aria-pressed="false">★</button>
+                  <button type="button" class="review-rating-star" data-review-rating="5" aria-label="5 stars" aria-pressed="false">★</button>
+                </div>
               </div>
 
-              <div class="review-field">
-                <label for="review-recommend">Would you recommend for this course?</label>
-                <select id="review-recommend" name="recommendation">
+              <div class="review-field review-recommend-field">
+                <label id="review-recommend-label" for="review-recommend">Would you recommend this professor?</label>
+                <select id="review-recommend" class="review-native-select" name="recommendation">
                   <option value="" selected>Choose recommendation</option>
                   <option>Yes</option>
                   <option>Depends</option>
                   <option>No</option>
                 </select>
+                <div class="review-recommend-options" role="group" aria-labelledby="review-recommend-label">
+                  <button type="button" data-review-recommend="Yes" aria-pressed="false">Yes</button>
+                  <button type="button" data-review-recommend="Depends" aria-pressed="false">Depends</button>
+                  <button type="button" data-review-recommend="No" aria-pressed="false">No</button>
+                </div>
               </div>
 
               <div class="review-field full" data-depends-reason hidden>
                 <label for="review-recommend-reason">If your answer depends, what does it depend on?</label>
                 <input id="review-recommend-reason" name="recommendationReason" type="text" maxlength="220" placeholder="Example: Great for lectures, harder for exams">
               </div>
+              </section>
 
-              <div class="review-section-heading">Class experience</div>
+              <details class="review-accordion" data-review-section="experience">
+                <summary>
+                  <span class="review-accordion-label">
+                    <strong>Class experience</strong>
+                    <small>Attendance, workload, lectures &amp; office hours</small>
+                  </span>
+                  <span class="review-accordion-meta" data-review-count>0/4 answered</span>
+                </summary>
+                <div class="review-accordion-body">
 
               <div class="review-field">
                 <label for="review-attendance">Attendance policy</label>
@@ -4067,8 +4330,18 @@ function getProfessorUrl(professor) {
                   <option>Did not use</option>
                 </select>
               </div>
+                </div>
+              </details>
 
-              <div class="review-section-heading">Grading and advice</div>
+              <details class="review-accordion" data-review-section="grading">
+                <summary>
+                  <span class="review-accordion-label">
+                    <strong>Grading &amp; advice</strong>
+                    <small>Exams, marking, feedback &amp; comments</small>
+                  </span>
+                  <span class="review-accordion-meta" data-review-count>0/4 answered</span>
+                </summary>
+                <div class="review-accordion-body">
 
               <div class="review-field">
                 <label for="review-grading-style">Grading style</label>
@@ -4118,6 +4391,8 @@ function getProfessorUrl(professor) {
                 <label for="review-note">Additional comments (optional)</label>
                 <textarea id="review-note" name="studentNote" maxlength="5000"></textarea>
               </div>
+                </div>
+              </details>
 
               <label class="review-anonymous-option">
                 <span class="review-anonymous-copy">
@@ -4258,6 +4533,11 @@ function getProfessorUrl(professor) {
 
     form.querySelectorAll("select").forEach(function (select) {
       if (select.dataset.reviewChoiceReady === "true") {
+        return;
+      }
+
+      if (select.id === "review-rating" ||
+          select.id === "review-recommend") {
         return;
       }
 
@@ -4466,6 +4746,87 @@ function getProfessorUrl(professor) {
     }
   }
 
+  function setupReviewCompactControls(form) {
+    const rating = form.querySelector("#review-rating");
+    const recommendation = form.querySelector("#review-recommend");
+
+    function syncCompactControls() {
+      const chosenRating = Number(rating.value || 0);
+
+      form.querySelectorAll("[data-review-rating]").forEach(
+        function (button) {
+          const starValue = Number(button.dataset.reviewRating);
+          button.classList.toggle(
+            "is-active",
+            chosenRating >= starValue
+          );
+          button.setAttribute(
+            "aria-pressed",
+            String(chosenRating === starValue)
+          );
+        }
+      );
+
+      form.querySelectorAll("[data-review-recommend]").forEach(
+        function (button) {
+          const isSelected =
+            button.dataset.reviewRecommend === recommendation.value;
+          button.classList.toggle("is-active", isSelected);
+          button.setAttribute("aria-pressed", String(isSelected));
+        }
+      );
+    }
+
+    function updateAccordionCounts() {
+      form.querySelectorAll("[data-review-section]").forEach(
+        function (section) {
+          const fields = Array.from(
+            section.querySelectorAll("select")
+          );
+          const answered = fields.filter(function (select) {
+            return Boolean(select.value);
+          }).length;
+          const count = section.querySelector("[data-review-count]");
+
+          if (count) {
+            count.textContent =
+              answered + "/" + fields.length + " answered";
+          }
+        }
+      );
+    }
+
+    form.querySelectorAll("[data-review-rating]").forEach(
+      function (button) {
+        button.addEventListener("click", function () {
+          rating.value = button.dataset.reviewRating;
+          rating.dispatchEvent(
+            new Event("change", { bubbles: true })
+          );
+        });
+      }
+    );
+
+    form.querySelectorAll("[data-review-recommend]").forEach(
+      function (button) {
+        button.addEventListener("click", function () {
+          recommendation.value = button.dataset.reviewRecommend;
+          recommendation.dispatchEvent(
+            new Event("change", { bubbles: true })
+          );
+        });
+      }
+    );
+
+    form.addEventListener("change", function () {
+      syncCompactControls();
+      updateAccordionCounts();
+    });
+
+    syncCompactControls();
+    updateAccordionCounts();
+  }
+
   function setupReviewModalBehavior(grid) {
     const panel = grid.querySelector(".professor-review-panel");
     const form = grid.querySelector(".professor-review-form");
@@ -4495,9 +4856,48 @@ function getProfessorUrl(professor) {
     populateReviewCourseSelect(form);
     setupReviewChoiceMenus(form);
     setupReviewDependsField(form);
+    setupReviewCompactControls(form);
+
+    // Native select controls are visually replaced; validate them through
+    // the visible controls rather than attempting focus on hidden selects.
+    form.noValidate = true;
 
     form.addEventListener("submit", function (event) {
       event.preventDefault();
+
+      const requiredFields = [
+        form.querySelector("#review-course"),
+        form.querySelector("#review-semester"),
+        form.querySelector("#review-rating")
+      ];
+      const missingField = requiredFields.find(function (field) {
+        return !field || !field.value;
+      });
+
+      if (missingField) {
+        const message = form.querySelector(".review-form-message");
+        if (message) {
+          message.className = "review-form-message is-error";
+          message.textContent =
+            "Choose a course, semester and overall rating before submitting.";
+        }
+
+        const visibleControl = missingField.id === "review-rating"
+          ? form.querySelector("[data-review-rating='1']")
+          : missingField.nextElementSibling &&
+            missingField.nextElementSibling.querySelector(
+              ".review-choice-button"
+            );
+        if (visibleControl) {
+          visibleControl.focus();
+          visibleControl.scrollIntoView({
+            block: "nearest",
+            behavior: "smooth"
+          });
+        }
+        return;
+      }
+
       submitProfessorReview(form, panel);
     });
 
