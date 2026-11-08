@@ -1577,6 +1577,72 @@
       text-transform: none;
     }
 
+
+    /* Loading placeholders for Class patterns: mimic compact stat rows. */
+    .professor-review-stat-skeleton {
+      display: grid;
+      gap: 15px;
+      padding: 5px 0 7px;
+    }
+
+    .professor-review-stat-skeleton-row {
+      display: grid;
+      gap: 9px;
+    }
+
+    .professor-review-stat-skeleton-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .professor-review-stat-skeleton-line,
+    .professor-review-stat-skeleton-track,
+    .professor-review-stats-count-loading {
+      display: block;
+      height: 10px;
+      border-radius: 6px;
+      background: rgba(23, 23, 23, 0.065);
+    }
+
+    .professor-review-stat-skeleton-line {
+      width: 39%;
+    }
+
+    .professor-review-stat-skeleton-line.is-value {
+      width: 27%;
+    }
+
+    .professor-review-stat-skeleton-row:nth-child(2) .professor-review-stat-skeleton-line {
+      width: 48%;
+    }
+
+    .professor-review-stat-skeleton-row:nth-child(3) .professor-review-stat-skeleton-line {
+      width: 34%;
+    }
+
+    .professor-review-stat-skeleton-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      opacity: 0.8;
+    }
+
+    .professor-review-stats-count-loading {
+      width: 90px;
+      height: 10px;
+      margin: 3px 0;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .professor-review-stat-skeleton-line,
+      .professor-review-stat-skeleton-track,
+      .professor-review-stats-count-loading {
+        animation: professor-review-loading-pulse 1.7s ease-in-out infinite;
+      }
+    }
+
     .professor-review-stats {
       display: grid;
       gap: 10px;
@@ -3506,6 +3572,23 @@ function getProfessorUrl(professor) {
     return escapeHtml(parts[1]) + "<strong>" + escapeHtml(parts[2]) + "</strong>";
   }
 
+  function renderProfessorReviewStatsSkeleton() {
+    // Reserves the same compact bar-chart structure as loaded Class patterns.
+    return '<div class="professor-review-stat-skeleton" aria-hidden="true">' +
+      Array.from({ length: 3 }, function () {
+        return [
+          '<div class="professor-review-stat-skeleton-row">',
+            '<div class="professor-review-stat-skeleton-head">',
+              '<span class="professor-review-stat-skeleton-line"></span>',
+              '<span class="professor-review-stat-skeleton-line is-value"></span>',
+            '</div>',
+            '<span class="professor-review-stat-skeleton-track"></span>',
+          '</div>'
+        ].join("");
+      }).join("") +
+      '</div>';
+  }
+
   function renderProfessorReviewStats(reviews) {
     const panel = document.getElementById("professor-review-stats");
     const statsCount = document.getElementById("professor-review-stats-count");
@@ -3609,6 +3692,8 @@ function getProfessorUrl(professor) {
     }
 
     if (statsCount) {
+      statsCount.classList.remove("is-loading");
+      statsCount.removeAttribute("aria-label");
       statsCount.textContent = safeReviews.length
         ? "Based on " + safeReviews.length + " student " +
           (safeReviews.length === 1 ? "review" : "reviews")
@@ -3618,6 +3703,10 @@ function getProfessorUrl(professor) {
     if (!panel) {
       return;
     }
+
+    panel.removeAttribute("aria-busy");
+    panel.removeAttribute("role");
+    panel.removeAttribute("aria-label");
 
     if (!rows.length) {
       panel.innerHTML = '<p class="professor-review-status">Review stats will appear after students answer the review choices.</p>';
@@ -4280,6 +4369,7 @@ function getProfessorUrl(professor) {
     const list = document.getElementById("professor-reviews-list");
     const count = document.getElementById("professor-reviews-count");
     const stats = document.getElementById("professor-review-stats");
+    const statsCount = document.getElementById("professor-review-stats-count");
 
     if (list) {
       list.setAttribute("aria-busy", "true");
@@ -4295,7 +4385,16 @@ function getProfessorUrl(professor) {
     }
 
     if (stats) {
-      stats.innerHTML = '<p class="professor-review-status">Loading review stats...</p>';
+      stats.setAttribute("role", "status");
+      stats.setAttribute("aria-busy", "true");
+      stats.setAttribute("aria-label", "Loading class patterns");
+      stats.innerHTML = renderProfessorReviewStatsSkeleton();
+    }
+
+    if (statsCount) {
+      statsCount.classList.add("is-loading");
+      statsCount.setAttribute("aria-label", "Loading review count");
+      statsCount.innerHTML = '<span class="professor-review-stats-count-loading" aria-hidden="true"></span>';
     }
 
     try {
@@ -4326,7 +4425,16 @@ function getProfessorUrl(professor) {
       }
 
       if (stats) {
+        stats.removeAttribute("aria-busy");
+        stats.removeAttribute("role");
+        stats.removeAttribute("aria-label");
         stats.innerHTML = '<p class="professor-review-status">Could not load review stats right now.</p>';
+      }
+
+      if (statsCount) {
+        statsCount.classList.remove("is-loading");
+        statsCount.removeAttribute("aria-label");
+        statsCount.textContent = "Review stats unavailable";
       }
     }
   }
@@ -4672,11 +4780,11 @@ function getProfessorUrl(professor) {
           <div>
             <h2>Class patterns</h2>
           </div>
-          <p id="professor-review-stats-count">Loading review count...</p>
+          <p id="professor-review-stats-count" class="is-loading" aria-label="Loading review count"><span class="professor-review-stats-count-loading" aria-hidden="true"></span></p>
         </div>
 
-        <div class="professor-review-stats" id="professor-review-stats">
-          <p class="professor-review-status">Loading review stats...</p>
+        <div class="professor-review-stats" id="professor-review-stats" role="status" aria-busy="true" aria-label="Loading class patterns">
+          ${renderProfessorReviewStatsSkeleton()}
         </div>
       </section>
     `;
