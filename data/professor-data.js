@@ -4723,8 +4723,8 @@ function getProfessorUrl(professor) {
         option.setAttribute("role", "option");
         option.setAttribute("aria-selected", "false");
         option.textContent = course.label;
-        option.addEventListener("pointerdown", function (event) {
-          // Keep the input focused while selecting from the list.
+        option.addEventListener("mousedown", function (event) {
+          // Preserve keyboard focus on desktop without blocking touch taps.
           event.preventDefault();
         });
         option.addEventListener("click", function () {
