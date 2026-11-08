@@ -3847,6 +3847,77 @@
       gap: 18px;
     }
 
+    /* Match the soft four-card loading placeholders on the Professors page. */
+    .course-recent-grid[aria-busy="true"] {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .course-recent-skeleton {
+      min-width: 0;
+      min-height: 350px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.045);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.34);
+    }
+
+    .course-recent-skeleton-image {
+      height: 190px;
+      background: rgba(23, 23, 23, 0.055);
+    }
+
+    .course-recent-skeleton-body {
+      display: grid;
+      gap: 14px;
+      padding: 23px 20px;
+    }
+
+    .course-recent-skeleton-line {
+      display: block;
+      height: 12px;
+      max-width: 100%;
+      border-radius: 6px;
+      background: rgba(23, 23, 23, 0.065);
+    }
+
+    .course-recent-skeleton-line.is-title {
+      width: 72%;
+      height: 20px;
+    }
+
+    .course-recent-skeleton-line.is-detail {
+      width: 54%;
+    }
+
+    .course-recent-skeleton-line.is-short {
+      width: 36%;
+    }
+
+    @media (max-width: 1240px) {
+      .course-recent-grid[aria-busy="true"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .course-recent-grid[aria-busy="true"] {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .course-recent-skeleton-image,
+      .course-recent-skeleton-line {
+        animation: courseRecentSkeletonPulse 1.7s ease-in-out infinite;
+      }
+
+      @keyframes courseRecentSkeletonPulse {
+        0%, 100% { opacity: 0.55; }
+        50% { opacity: 1; }
+      }
+    }
+
     .course-recent-status {
       grid-column: 1 / -1;
       padding: 28px;
@@ -4854,10 +4925,42 @@
                   class="course-recent-grid"
                   id="course-recent-materials"
                   aria-live="polite"
+                  aria-busy="true"
+                  role="status"
+                  aria-label="Loading course materials"
                 >
-                  <div class="course-recent-status">
-                    <strong>Loading course materials...</strong>
-                  </div>
+                  <article class="course-recent-skeleton" aria-hidden="true">
+                    <div class="course-recent-skeleton-image"></div>
+                    <div class="course-recent-skeleton-body">
+                      <span class="course-recent-skeleton-line is-title"></span>
+                      <span class="course-recent-skeleton-line is-detail"></span>
+                      <span class="course-recent-skeleton-line is-short"></span>
+                    </div>
+                  </article>
+                  <article class="course-recent-skeleton" aria-hidden="true">
+                    <div class="course-recent-skeleton-image"></div>
+                    <div class="course-recent-skeleton-body">
+                      <span class="course-recent-skeleton-line is-title"></span>
+                      <span class="course-recent-skeleton-line is-detail"></span>
+                      <span class="course-recent-skeleton-line is-short"></span>
+                    </div>
+                  </article>
+                  <article class="course-recent-skeleton" aria-hidden="true">
+                    <div class="course-recent-skeleton-image"></div>
+                    <div class="course-recent-skeleton-body">
+                      <span class="course-recent-skeleton-line is-title"></span>
+                      <span class="course-recent-skeleton-line is-detail"></span>
+                      <span class="course-recent-skeleton-line is-short"></span>
+                    </div>
+                  </article>
+                  <article class="course-recent-skeleton" aria-hidden="true">
+                    <div class="course-recent-skeleton-image"></div>
+                    <div class="course-recent-skeleton-body">
+                      <span class="course-recent-skeleton-line is-title"></span>
+                      <span class="course-recent-skeleton-line is-detail"></span>
+                      <span class="course-recent-skeleton-line is-short"></span>
+                    </div>
+                  </article>
                 </div>
               </section>
 

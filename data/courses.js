@@ -4838,6 +4838,21 @@
     }
   }
 
+  function renderRecentMaterialSkeletons() {
+    return Array.from({ length: 4 }, function () {
+      return [
+        '<article class="course-recent-skeleton" aria-hidden="true">',
+          '<div class="course-recent-skeleton-image"></div>',
+          '<div class="course-recent-skeleton-body">',
+            '<span class="course-recent-skeleton-line is-title"></span>',
+            '<span class="course-recent-skeleton-line is-detail"></span>',
+            '<span class="course-recent-skeleton-line is-short"></span>',
+          '</div>',
+        '</article>'
+      ].join("");
+    }).join("");
+  }
+
   function renderRecentMaterials(materials) {
     const root = document.getElementById("course-recent-materials");
     const safeMaterials = Array.isArray(materials)
@@ -4993,6 +5008,11 @@ const href = courseCode
       return;
     }
 
+    root.setAttribute("aria-busy", "true");
+    root.setAttribute("role", "status");
+    root.setAttribute("aria-label", "Loading course materials");
+    root.innerHTML = renderRecentMaterialSkeletons();
+
     try {
       const response = await fetch(
         "/api/course-materials?random=true&limit=6",
@@ -5032,6 +5052,10 @@ const href = courseCode
           <p>Please try again later.</p>
         </div>
       `;
+    } finally {
+      root.removeAttribute("aria-busy");
+      root.removeAttribute("role");
+      root.removeAttribute("aria-label");
     }
   }
 
