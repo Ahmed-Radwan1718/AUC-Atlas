@@ -961,12 +961,12 @@
     }
 
     .professor-profile-info > div:not(.professor-profile-identity) > span:first-child {
-      color: #777;
+      color: #ac864a;
       font-family: Arial, sans-serif;
-      font-size: 13px;
-      font-weight: 400;
+      font-size: 12px;
+      font-weight: 500;
       letter-spacing: normal;
-      text-transform: uppercase;
+      text-transform: none;
     }
 
     .professor-profile-value,
