@@ -4839,14 +4839,24 @@
   }
 
   function renderRecentMaterialSkeletons() {
-    return Array.from({ length: 4 }, function () {
+    // Keep the placeholder grid aligned with the six-card materials layout.
+    return Array.from({ length: 6 }, function () {
       return [
         '<article class="course-recent-skeleton" aria-hidden="true">',
-          '<div class="course-recent-skeleton-image"></div>',
-          '<div class="course-recent-skeleton-body">',
+          '<div class="course-recent-skeleton-icon-shell">',
+            '<span class="course-recent-skeleton-icon"></span>',
+          '</div>',
+          '<div class="course-recent-skeleton-copy">',
+            '<span class="course-recent-skeleton-line is-type"></span>',
             '<span class="course-recent-skeleton-line is-title"></span>',
-            '<span class="course-recent-skeleton-line is-detail"></span>',
-            '<span class="course-recent-skeleton-line is-short"></span>',
+            '<span class="course-recent-skeleton-line is-course"></span>',
+          '</div>',
+          '<div class="course-recent-skeleton-footer">',
+            '<span class="course-recent-skeleton-uploader">',
+              '<span class="course-recent-skeleton-avatar"></span>',
+              '<span class="course-recent-skeleton-line is-uploader"></span>',
+            '</span>',
+            '<span class="course-recent-skeleton-line is-date"></span>',
           '</div>',
         '</article>'
       ].join("");
