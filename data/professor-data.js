@@ -1115,39 +1115,12 @@
       padding-bottom: 2px;
     }
 
-    .review-modal-header span {
-      color: rgba(192, 154, 92, 0.92);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
     .review-modal-header h2 {
-      margin-top: 4px;
+      margin: 0;
       color: #171717;
       font-size: 24px;
       font-weight: 500;
       line-height: 1.1;
-    }
-
-    .review-close-button {
-      width: 38px;
-      height: 38px;
-      border: 0;
-      border-radius: 999px;
-      background: rgba(23, 23, 23, 0.08);
-      color: #171717;
-      font: inherit;
-      font-size: 22px;
-      font-weight: 400;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-    }
-
-    .review-close-button:hover {
-      background: rgba(23, 23, 23, 0.14);
     }
 
     .review-progress {
@@ -2716,12 +2689,6 @@
         -webkit-backdrop-filter: blur(14px);
       }
 
-      .review-close-button {
-        width: 44px;
-        height: 44px;
-        flex: 0 0 44px;
-      }
-
       .review-step.is-active {
         grid-template-columns: 1fr;
       }
@@ -2842,12 +2809,6 @@
       background: #fff;
     }
 
-    .review-close-button {
-      width: 42px;
-      height: 42px;
-      flex: 0 0 42px;
-    }
-
     .review-drawer-body {
       flex: 1 1 auto;
       min-height: 0;
@@ -2913,6 +2874,29 @@
 
     .review-drawer-footer .review-form-message:empty {
       display: none;
+    }
+
+    .review-drawer-footer .review-cancel-button {
+      min-height: 34px;
+      padding: 4px 10px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.56);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .review-drawer-footer .review-cancel-button:hover {
+      color: #171717;
+      background: rgba(23, 23, 23, 0.04);
+    }
+
+    .review-drawer-footer .review-cancel-button:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 2px;
     }
 
     @media (max-width: 640px) {
@@ -4517,11 +4501,7 @@ function getProfessorUrl(professor) {
             <form class="professor-review-form" role="dialog" aria-modal="true" aria-labelledby="review-drawer-title" tabindex="-1">
 
               <div class="review-modal-header">
-                <div>
-                  <span>Professor review</span>
-                  <h2 id="review-drawer-title">Leave a review</h2>
-                </div>
-                <button class="review-close-button" type="button" aria-label="Close review form">&times;</button>
+                <h2 id="review-drawer-title">Leave a review</h2>
               </div>
 
               <input type="hidden" name="professorId" value="${escapeHtml(getProfessorId(professor))}">
@@ -4783,6 +4763,7 @@ function getProfessorUrl(professor) {
               <div class="review-drawer-footer">
                 <button class="review-submit-button" type="submit">Submit Review</button>
                 <p class="review-form-message" aria-live="polite"></p>
+                <button class="review-cancel-button" type="button">Cancel</button>
               </div>
             </form>
           </details>
@@ -5414,8 +5395,8 @@ function getProfessorUrl(professor) {
     const reviewToggle = panel
       ? panel.querySelector(".professor-review-toggle")
       : null;
-    const closeButton = form
-      ? form.querySelector(".review-close-button")
+    const cancelButton = form
+      ? form.querySelector(".review-cancel-button")
       : null;
     const drawerBody = form
       ? form.querySelector(".review-drawer-body")
@@ -5544,13 +5525,11 @@ function getProfessorUrl(professor) {
       );
     }
 
-    function focusCloseButton() {
-      const target = closeButton || form;
-
+    function focusReviewDrawer() {
       try {
-        target.focus({ preventScroll: true });
+        form.focus({ preventScroll: true });
       } catch (error) {
-        target.focus();
+        form.focus();
       }
     }
 
@@ -5617,7 +5596,7 @@ function getProfessorUrl(professor) {
         }).catch(function () {});
       }
 
-      focusCloseButton();
+      focusReviewDrawer();
     }
 
     function finishClosingReviewModal() {
@@ -5685,8 +5664,8 @@ function getProfessorUrl(professor) {
 
     backdrop.addEventListener("click", closeReviewModal);
 
-    if (closeButton) {
-      closeButton.addEventListener("click", closeReviewModal);
+    if (cancelButton) {
+      cancelButton.addEventListener("click", closeReviewModal);
     }
 
     panel.addEventListener(
