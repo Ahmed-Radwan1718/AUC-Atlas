@@ -7190,115 +7190,55 @@ function getSelectedCourseCode() {
       `;
     }
 
-    // A card represents one upload, even when it contains several files.
-    function buildUploadCardHeader(material) {
-      const uploaderName = String(
-        material.uploaderDisplayName || "AUC student"
-      ).trim() || "AUC student";
-      const initials = uploaderName
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map(function (part) {
-          return part.charAt(0);
+    function buildGroupMetadata(material) {
+      return [
+        material.professor ||
+          "Professor not listed",
+        material.semester ||
+          "Semester not listed",
+        material.uploaderDisplayName ||
+          "AUC student"
+      ]
+        .map(function (value) {
+          return escapeMaterialText(value);
         })
-        .join("")
-        .toUpperCase() || "AS";
-
-      return `
-        <div class="course-upload-card-header">
-          <span class="course-upload-card-avatar" aria-hidden="true">
-            ${escapeMaterialText(initials)}
-          </span>
-          <span class="course-upload-card-uploader">
-            ${escapeMaterialText(uploaderName)}
-          </span>
-          <span class="course-upload-card-type">
-            ${escapeMaterialText(material.materialType || "Material")}
-          </span>
-        </div>
-      `;
-    }
-
-    function buildUploadCardBody(material, fileCount, sizeLabel) {
-      const details = [
-        material.professor || "Professor not listed",
-        material.semester || "Semester not listed"
-      ].map(function (value) {
-        return escapeMaterialText(value);
-      }).join(" · ");
-
-      return `
-        <div class="course-upload-card-body">
-          <h3>${escapeMaterialText(material.title || "Course material")}</h3>
-          <p class="course-upload-card-context">${details}</p>
-          <p class="course-upload-card-size">
-            ${fileCount} ${fileCount === 1 ? "file" : "files"} ·
-            ${escapeMaterialText(sizeLabel)}
-          </p>
-        </div>
-      `;
+        .join(" · ");
     }
 
     function buildSingleRow(group) {
       const material = group.material;
+      const files = group.files;
       const fileView = getFileView(
-        group.files[0],
+        files[0],
         material,
-        group.files
+        files
       );
-      const previewAction = fileView.previewable
-        ? `
-          <button
-            class="course-upload-card-action course-material-preview-trigger"
-            type="button"
-            ${fileView.previewDataAttributes}
-            aria-label="Preview ${fileView.fileName}"
-          >Preview</button>
-        `
-        : "";
-      const downloadAction = fileView.hasDownload
-        ? `
-          <a
-            class="course-upload-card-action"
-            href="${fileView.safeDownloadUrl}"
-            target="_blank"
-            rel="noopener"
-            aria-label="Download ${fileView.fileName}"
-          >Download</a>
-        `
-        : "";
-      const reportAction = fileView.safeMaterialId
-        ? `
-          <button
-            class="course-upload-card-action course-upload-card-report"
-            type="button"
-            data-report-material="${fileView.safeMaterialId}"
-            data-report-label="${fileView.safeMaterialLabel}"
-          >Report</button>
-        `
-        : "";
+      const title =
+        escapeMaterialText(
+          material.title ||
+          "Course material"
+        );
+      const materialType =
+        escapeMaterialText(
+          material.materialType ||
+          "Material"
+        );
+      const metadata =
+        buildGroupMetadata(material) +
+        " · " +
+        fileView.safeFileSize;
 
       return `
-        <article class="course-material-row course-upload-card">
-          ${buildUploadCardHeader(material)}
-          ${buildUploadCardBody(
-            material,
-            1,
-            group.files[0].size > 0
-              ? formatMaterialFileSize(group.files[0].size)
-              : "Size unavailable"
+        <article class="course-material-row">
+          ${buildPreviewMain(
+            fileView,
+            title,
+            "",
+            metadata,
+            materialType
           )}
-          <div class="course-upload-card-footer">
-            <span class="course-upload-card-file-label">
-              ${fileView.safeFileLabel}
-            </span>
-            <div class="course-upload-card-actions">
-              ${previewAction}
-              ${downloadAction}
-              ${reportAction}
-            </div>
-          </div>
+
+          ${buildActions(fileView)}
         </article>
       `;
     }
@@ -7334,37 +7274,84 @@ function getSelectedCourseCode() {
     function buildMultiFileGroup(group) {
       const material = group.material;
       const files = group.files;
-      const hasCompleteFileSizes = files.every(function (file) {
-        return Number(file.size) > 0;
-      });
-      const totalFileSize = files.reduce(function (total, file) {
-        return total + Math.max(0, Number(file.size) || 0);
-      }, 0);
-      const sizeLabel = hasCompleteFileSizes
-        ? formatMaterialFileSize(totalFileSize)
-        : "Size unavailable";
-      const fileRows = files.map(function (file) {
-        return buildChildRow(file, material, files);
-      }).join("");
+      const title =
+        escapeMaterialText(
+          material.title ||
+          "Course material"
+        );
+      const materialType =
+        escapeMaterialText(
+          material.materialType ||
+          "Material"
+        );
+      const hasCompleteFileSizes =
+        files.every(function (fileMaterial) {
+          return Number(fileMaterial.size) > 0;
+        });
+      const totalFileSize =
+        files.reduce(
+          function (total, fileMaterial) {
+            return (
+              total +
+              Math.max(
+                0,
+                Number(fileMaterial.size) || 0
+              )
+            );
+          },
+          0
+        );
+      const groupFileSize =
+        hasCompleteFileSizes
+          ? formatMaterialFileSize(totalFileSize)
+          : "Size unavailable";
+      const metadata =
+        buildGroupMetadata(material) +
+        " · " +
+        escapeMaterialText(groupFileSize);
+
+      const fileRows = files
+        .map(function (fileMaterial) {
+          return buildChildRow(
+            fileMaterial,
+            material,
+            files
+          );
+        })
+        .join("");
 
       return `
-        <details class="course-material-group course-upload-card">
-          <summary class="course-material-group-summary">
-            ${buildUploadCardHeader(material)}
-            ${buildUploadCardBody(material, files.length, sizeLabel)}
-            <div class="course-upload-card-footer">
-              <span class="course-upload-card-file-label">
-                ${files.length} files
+        <details class="course-material-group">
+          <summary
+            class="course-material-group-summary"
+          >
+            <span class="course-material-folder-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              </svg>
+            </span>
+
+            <span class="course-material-group-copy">
+              <span
+                class="course-material-row-title-line"
+              >
+                <strong>${title}</strong>
+                <em>${materialType}</em>
               </span>
-              <span class="course-upload-card-expand">
-                View files
-                <span
-                  class="course-material-group-chevron"
-                  aria-hidden="true"
-                ></span>
-              </span>
-            </div>
+
+              <small>${metadata}</small>
+            </span>
+
+            <span class="course-material-file-count">
+              ${files.length} files
+            </span>
+
+            <span
+              class="course-material-group-chevron"
+              aria-hidden="true"
+            ></span>
           </summary>
+
           <div class="course-material-group-files">
             ${fileRows}
           </div>
