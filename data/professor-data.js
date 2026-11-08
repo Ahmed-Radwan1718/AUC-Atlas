@@ -927,6 +927,34 @@
       gap: 15px;
     }
 
+
+    /* Give the faculty profile a clear name-first hierarchy. */
+    .professor-profile-info .professor-profile-identity {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+      padding-bottom: 13px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .professor-profile-name {
+      margin: 0;
+      color: #171717;
+      font-size: clamp(24px, 2.2vw, 30px);
+      font-weight: 650;
+      letter-spacing: -0.025em;
+      line-height: 1.13;
+      overflow-wrap: anywhere;
+    }
+
+    .professor-profile-department {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.6);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
     .professor-profile-info div {
       display: grid;
       gap: 4px;
@@ -4465,9 +4493,9 @@ function getProfessorUrl(professor) {
         </div>
         <div class="professor-profile-body">
           <div class="professor-profile-info">
-            <div>
-              <span>Department</span>
-              <span class="professor-profile-value">${escapeHtml(professor.department || "Department coming soon")}</span>
+            <div class="professor-profile-identity">
+              <h1 class="professor-profile-name">${escapeHtml(professor.name)}</h1>
+              <p class="professor-profile-department">${escapeHtml(professor.department || "Department coming soon")}</p>
             </div>
 
             <div>
