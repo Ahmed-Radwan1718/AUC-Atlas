@@ -218,9 +218,36 @@ const markup = `
           </article>
 
           <aside class="course-action-stack is-loading" id="course-materials-access" aria-busy="true">
-            <div class="course-materials-loading" id="course-materials-loading" role="status" aria-live="polite">
-              <div class="course-materials-loading-spinner" aria-hidden="true"></div>
-              <p>Loading course materials</p>
+            <div class="course-materials-loading" id="course-materials-loading" role="status" aria-live="polite" aria-label="Loading course materials">
+              <span class="course-materials-loading-announcement">Loading course materials</span>
+              <div class="course-materials-skeleton" aria-hidden="true">
+                <div class="course-materials-skeleton-header">
+                  <span class="course-materials-skeleton-bar is-heading"></span>
+                  <div class="course-materials-skeleton-actions">
+                    <span class="course-materials-skeleton-bar is-upload"></span>
+                    <span class="course-materials-skeleton-menu">
+                      <span></span><span></span><span></span>
+                    </span>
+                  </div>
+                </div>
+                <div class="course-materials-skeleton-divider"></div>
+                <div class="course-materials-skeleton-row">
+                  <span class="course-materials-skeleton-folder"></span>
+                  <div class="course-materials-skeleton-copy">
+                    <span class="course-materials-skeleton-bar is-title"></span>
+                    <span class="course-materials-skeleton-bar is-meta"></span>
+                  </div>
+                  <span class="course-materials-skeleton-bar is-count"></span>
+                </div>
+                <div class="course-materials-skeleton-row">
+                  <span class="course-materials-skeleton-folder"></span>
+                  <div class="course-materials-skeleton-copy">
+                    <span class="course-materials-skeleton-bar is-title is-shorter"></span>
+                    <span class="course-materials-skeleton-bar is-meta"></span>
+                  </div>
+                  <span class="course-materials-skeleton-bar is-count"></span>
+                </div>
+              </div>
             </div>
 
             <section class="course-material-summary course-material-downloads" aria-label="Course materials">
