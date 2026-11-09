@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const admin = require("../_lib/firebaseAdmin");
 
 const {
@@ -17,15 +19,15 @@ const LOGIN_RATE_LIMIT_WINDOW_MS =
 const LOGIN_MAX_ACCOUNT_ATTEMPTS = 8;
 const LOGIN_MAX_IP_ATTEMPTS = 100;
 
-function cleanEmail(value) {
+function cleanEmail(value: any) {
   return String(value || "").trim().toLowerCase();
 }
 
-function cleanPassword(value) {
+function cleanPassword(value: any) {
   return String(value || "");
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method not allowed" });
@@ -67,7 +69,7 @@ module.exports = async function handler(req, res) {
         email,
         password
       );
-    } catch (error) {
+    } catch (error: any) {
       return res.status(401).json({
         error:
           "Incorrect email or password."
@@ -137,7 +139,7 @@ module.exports = async function handler(req, res) {
         photoURL
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.retryAfterSeconds) {
       res.setHeader(
         "Retry-After",

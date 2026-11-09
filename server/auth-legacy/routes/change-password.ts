@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const admin = require("../_lib/firebaseAdmin");
 
 const {
@@ -16,7 +18,7 @@ const PASSWORD_VERIFICATION_WINDOW_MS =
 const PASSWORD_VERIFICATION_MAX_ATTEMPTS =
   5;
 
-function isStrongPassword(password) {
+function isStrongPassword(password: any) {
   return typeof password === "string" &&
     password.length >= 10 &&
     password.length <= 48 &&
@@ -26,7 +28,7 @@ function isStrongPassword(password) {
     /[^A-Za-z0-9\s]/.test(password);
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method not allowed" });
@@ -81,7 +83,7 @@ module.exports = async function handler(req, res) {
         email,
         currentPassword
       );
-    } catch (error) {
+    } catch (error: any) {
       return res.status(401).json({
         error:
           "Current password is incorrect."
@@ -108,7 +110,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       success: true
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.retryAfterSeconds) {
       res.setHeader(
         "Retry-After",

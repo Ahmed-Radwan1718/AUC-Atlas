@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const admin = require("../_lib/firebaseAdmin");
 
 const {
@@ -14,27 +16,27 @@ const SIGNUP_RATE_LIMIT_WINDOW_MS =
 const SIGNUP_MAX_EMAIL_ATTEMPTS = 5;
 const SIGNUP_MAX_IP_ATTEMPTS = 20;
 
-function cleanString(value, maxLength) {
+function cleanString(value: any, maxLength: any) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
-function cleanEmail(value) {
+function cleanEmail(value: any) {
   return cleanString(value, 160).toLowerCase();
 }
 
-function cleanPassword(value) {
+function cleanPassword(value: any) {
   return String(value || "");
 }
 
-function cleanAucId(value) {
+function cleanAucId(value: any) {
   return String(value || "").replace(/\D/g, "").slice(0, 9);
 }
 
-function hasValidAucIdFormat(value) {
+function hasValidAucIdFormat(value: any) {
   return /^900\d{6}$/.test(cleanAucId(value));
 }
 
-function getAucIdLookupKey(value) {
+function getAucIdLookupKey(value: any) {
   const aucId = cleanAucId(value);
 
   return hasValidAucIdFormat(aucId) ? aucId : "";
@@ -52,7 +54,7 @@ function createAucIdInUseError() {
   return error;
 }
 
-async function ensureAucIdCanCreateAccount(aucId) {
+async function ensureAucIdCanCreateAccount(aucId: any) {
   const aucIdLookupKey = getAucIdLookupKey(aucId);
 
   if (!aucIdLookupKey) {
@@ -79,7 +81,7 @@ async function ensureAucIdCanCreateAccount(aucId) {
   return aucIdLookupKey;
 }
 
-async function reserveAccountAucId(aucId, uid) {
+async function reserveAccountAucId(aucId: any, uid: any) {
   const aucIdLookupKey = await ensureAucIdCanCreateAccount(aucId);
   const aucIdRef = admin.firestore().collection("accountAucIds").doc(aucIdLookupKey);
 
@@ -90,7 +92,7 @@ async function reserveAccountAucId(aucId, uid) {
       aucIdLookupKey,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
-  } catch (error) {
+  } catch (error: any) {
     if (String(error.code) === "6" || error.code === "already-exists" || /already exists/i.test(error.message || "")) {
       throw createAucIdInUseError();
     }
@@ -102,8 +104,8 @@ async function reserveAccountAucId(aucId, uid) {
 }
 
 async function consumeSignupRateLimits(
-  req,
-  email
+  req: any,
+  email: any
 ) {
   await consumeSecurityRateLimit({
     scope: "signup-ip",
@@ -128,14 +130,14 @@ async function consumeSignupRateLimits(
   });
 }
 
-async function ensureEmailCanCreateAccount(email) {
+async function ensureEmailCanCreateAccount(email: any) {
   try {
     await admin.auth().getUserByEmail(email);
 
     const error = new Error("This email is already used by another account.");
     error.statusCode = 409;
     throw error;
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === "auth/user-not-found") {
       return;
     }
@@ -156,7 +158,7 @@ function getFirebaseWebApiKey() {
   return apiKey;
 }
 
-async function sendFirebaseSignupVerificationEmail(uid) {
+async function sendFirebaseSignupVerificationEmail(uid: any) {
   const apiKey = getFirebaseWebApiKey();
   const customToken = await admin.auth().createCustomToken(uid);
   const signInData = await signInWithCustomToken(customToken);
@@ -194,7 +196,7 @@ async function sendFirebaseSignupVerificationEmail(uid) {
   }
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method not allowed" });
@@ -270,7 +272,7 @@ module.exports = async function handler(req, res) {
       });
 
       await sendFirebaseSignupVerificationEmail(userRecord.uid);
-    } catch (error) {
+    } catch (error: any) {
       if (aucIdReservation && aucIdReservation.aucIdRef) {
         await aucIdReservation.aucIdRef.delete().catch(function () {});
       }
@@ -292,7 +294,7 @@ module.exports = async function handler(req, res) {
         emailVerified: false
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     if (
       error.code ===
       "auth/email-already-exists"

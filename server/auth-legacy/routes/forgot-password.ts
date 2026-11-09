@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const {
   ensureAllowedAucEmail
 } = require("../_lib/securityHelpers");
@@ -11,7 +13,7 @@ const PASSWORD_RESET_RATE_LIMIT_WINDOW_MS =
 const PASSWORD_RESET_MAX_EMAIL_ATTEMPTS = 5;
 const PASSWORD_RESET_MAX_IP_ATTEMPTS = 20;
 
-function cleanEmail(value) {
+function cleanEmail(value: any) {
   return String(value || "")
     .trim()
     .toLowerCase()
@@ -35,7 +37,7 @@ function getFirebaseWebApiKey() {
   return apiKey;
 }
 
-function getFirebaseErrorCode(data) {
+function getFirebaseErrorCode(data: any) {
   return String(
     data &&
     data.error &&
@@ -48,7 +50,7 @@ function getFirebaseErrorCode(data) {
 }
 
 async function sendFirebasePasswordResetEmail(
-  email
+  email: any
 ) {
   const response = await fetch(
     "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" +
@@ -108,9 +110,9 @@ async function sendFirebasePasswordResetEmail(
   throw error;
 }
 
-module.exports = async function handler(
-  req,
-  res
+export default async function handler(
+  req: LegacyRequest,
+  res: LegacyReply
 ) {
   try {
     if (req.method !== "POST") {
@@ -166,7 +168,7 @@ module.exports = async function handler(
       message:
         "If an AUC Atlas account exists for this email, a password reset link has been sent."
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.retryAfterSeconds) {
       res.setHeader(
         "Retry-After",

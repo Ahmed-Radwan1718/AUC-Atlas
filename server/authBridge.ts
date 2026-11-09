@@ -21,20 +21,20 @@ type LegacyHandler = (request: {
 // We intentionally do not expose the legacy handler through arbitrary user-selected paths.
 const handlers: Record<string,() => LegacyHandler> = {
   "admin": () => require("./auth-legacy/routes/admin.js"),
-  "cleanup-material-uploads": () => require("./auth-legacy/routes/cleanup-material-uploads.js"),
-  "login": () => require("./auth-legacy/routes/login.js"),
+  "cleanup-material-uploads": () => require("./auth-legacy/routes/cleanup-material-uploads.ts").default,
+  "login": () => require("./auth-legacy/routes/login.ts").default,
   "me": () => require("./auth-legacy/routes/me.js"),
-  "signup": () => require("./auth-legacy/routes/signup.js"),
-  "logout": () => require("./auth-legacy/routes/logout.js"),
-  "forgot-password": () => require("./auth-legacy/routes/forgot-password.js"),
-  "google-auth": () => require("./auth-legacy/routes/google-auth.js"),
+  "signup": () => require("./auth-legacy/routes/signup.ts").default,
+  "logout": () => require("./auth-legacy/routes/logout.ts").default,
+  "forgot-password": () => require("./auth-legacy/routes/forgot-password.ts").default,
+  "google-auth": () => require("./auth-legacy/routes/google-auth.ts").default,
   "login-code": () => require("./auth-legacy/routes/login-code.js"),
-  "verify-login-authenticator": () => require("./auth-legacy/routes/verify-login-authenticator.js"),
-  "authenticator": () => require("./auth-legacy/routes/authenticator.js"),
-  "sessions": () => require("./auth-legacy/routes/sessions.js"),
-  "change-password": () => require("./auth-legacy/routes/change-password.js"),
-  "delete-account": () => require("./auth-legacy/routes/delete-account.js"),
-  "profile-photo": () => require("./auth-legacy/routes/profile-photo.js")
+  "verify-login-authenticator": () => require("./auth-legacy/routes/verify-login-authenticator.ts").default,
+  "authenticator": () => require("./auth-legacy/routes/authenticator.ts").default,
+  "sessions": () => require("./auth-legacy/routes/sessions.ts").default,
+  "change-password": () => require("./auth-legacy/routes/change-password.ts").default,
+  "delete-account": () => require("./auth-legacy/routes/delete-account.ts").default,
+  "profile-photo": () => require("./auth-legacy/routes/profile-photo.ts").default
 };
 
 export function knownAuthRoute(name: string) { return Object.hasOwn(handlers,name); }

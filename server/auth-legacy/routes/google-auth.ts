@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const admin = require("../_lib/firebaseAdmin");
 
 const {
@@ -17,7 +19,7 @@ const GOOGLE_LOGIN_RATE_LIMIT_WINDOW_MS =
   15 * 60 * 1000;
 const GOOGLE_LOGIN_MAX_IP_ATTEMPTS = 100;
 
-function cleanString(value, maxLength) {
+function cleanString(value: any, maxLength: any) {
   const cleanedValue = String(value || "").trim();
 
   return maxLength
@@ -25,23 +27,23 @@ function cleanString(value, maxLength) {
     : cleanedValue;
 }
 
-function cleanEmail(value) {
+function cleanEmail(value: any) {
   return cleanString(value, 160).toLowerCase();
 }
 
-function createHttpError(message, statusCode) {
+function createHttpError(message: any, statusCode: any) {
   const error = new Error(message);
   error.statusCode = statusCode;
   return error;
 }
 
-function getGoogleProvider(userRecord) {
-  return (userRecord.providerData || []).find(function (provider) {
+function getGoogleProvider(userRecord: any) {
+  return (userRecord.providerData || []).find(function (provider: any) {
     return provider && provider.providerId === "google.com";
   }) || null;
 }
 
-function getGoogleConnection(userData) {
+function getGoogleConnection(userData: any) {
   const connection =
     userData &&
     userData.googleConnection &&
@@ -55,7 +57,7 @@ function getGoogleConnection(userData) {
   };
 }
 
-function isConfirmedGoogleConnection(userRecord, userData) {
+function isConfirmedGoogleConnection(userRecord: any, userData: any) {
   const googleProvider = getGoogleProvider(userRecord);
   const connection = getGoogleConnection(userData);
 
@@ -66,7 +68,7 @@ function isConfirmedGoogleConnection(userRecord, userData) {
   );
 }
 
-function getAccountEmail(decodedUser, userRecord, userData) {
+function getAccountEmail(decodedUser: any, userRecord: any, userData: any) {
   const accountEmail = cleanEmail(
     (userData && userData.email) ||
     (decodedUser && decodedUser.email) ||
@@ -118,7 +120,7 @@ function getFirebaseClientConfig() {
       cleanString(process.env.FIREBASE_MEASUREMENT_ID)
   };
 
-  Object.keys(optionalValues).forEach(function (key) {
+  Object.keys(optionalValues).forEach(function (key: any) {
     if (optionalValues[key]) {
       firebase[key] = optionalValues[key];
     }
@@ -127,7 +129,7 @@ function getFirebaseClientConfig() {
   return firebase;
 }
 
-async function getOptionalAccountContext(req) {
+async function getOptionalAccountContext(req: any) {
   let decodedUser = null;
 
   try {
@@ -135,7 +137,7 @@ async function getOptionalAccountContext(req) {
       await getOptionalSiteSessionUser(req, {
         checkRevoked: true
       });
-  } catch (error) {
+  } catch (error: any) {
     if (
       error.statusCode === 401 ||
       error.statusCode === 403
@@ -174,7 +176,7 @@ async function getOptionalAccountContext(req) {
   };
 }
 
-async function handleGet(req, res) {
+async function handleGet(req: any, res: any) {
   const context =
     await getOptionalAccountContext(req);
 
@@ -222,7 +224,7 @@ async function handleGet(req, res) {
   });
 }
 
-async function handleConnect(req, res) {
+async function handleConnect(req: any, res: any) {
   const sessionUser =
     await getSiteSessionUser(req, {
       checkRevoked: true
@@ -336,7 +338,7 @@ async function handleConnect(req, res) {
   });
 }
 
-async function handleLogin(req, res) {
+async function handleLogin(req: any, res: any) {
   await consumeSecurityRateLimit({
     scope: "google-login-ip",
     identifier: getRequestIp(req),
@@ -511,7 +513,7 @@ async function handleLogin(req, res) {
   });
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     if (req.method === "GET") {
       return await handleGet(req, res);
@@ -547,7 +549,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({
       error: "Method not allowed"
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.retryAfterSeconds) {
       res.setHeader(
         "Retry-After",

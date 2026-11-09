@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const {
   clearSiteSessionCookie,
   ensureSiteSessionRecord,
@@ -15,7 +17,7 @@ const SESSION_REVOCATION_WINDOW_MS =
   60 * 60 * 1000;
 const SESSION_MAX_REVOCATIONS = 20;
 
-function getRequestBody(req) {
+function getRequestBody(req: any) {
   if (req.body && typeof req.body === "object") {
     return req.body;
   }
@@ -23,7 +25,7 @@ function getRequestBody(req) {
   if (typeof req.body === "string") {
     try {
       return JSON.parse(req.body);
-    } catch (error) {
+    } catch (error: any) {
       return {};
     }
   }
@@ -31,7 +33,7 @@ function getRequestBody(req) {
   return {};
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     if (req.method !== "GET" && req.method !== "DELETE") {
       return res.status(405).json({ error: "Method not allowed" });
@@ -92,7 +94,7 @@ module.exports = async function handler(req, res) {
       currentSignedOut: false,
       sessions
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(error.statusCode || 500).json({
       error: error.message || "Could not update sessions."
     });

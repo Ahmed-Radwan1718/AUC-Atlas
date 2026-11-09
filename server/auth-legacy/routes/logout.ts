@@ -1,8 +1,10 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const {
   clearCurrentSiteSession
 } = require("../_lib/securityHelpers");
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   if (
     req.method !== "POST" &&
     req.method !== "GET"

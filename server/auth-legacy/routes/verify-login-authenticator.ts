@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const admin = require("../_lib/firebaseAdmin");
 const { authenticator } = require("otplib");
 
@@ -11,11 +13,11 @@ const {
   getAuthenticatorSecret
 } = require("../_lib/securityHelpers");
 
-function cleanCode(value) {
+function cleanCode(value: any) {
   return String(value || "").trim().replace(/\D/g, "");
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method not allowed" });
@@ -79,7 +81,7 @@ module.exports = async function handler(req, res) {
         photoURL: ""
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.retryAfterSeconds) {
       res.setHeader(
         "Retry-After",

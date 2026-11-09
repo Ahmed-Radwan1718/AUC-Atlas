@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const crypto = require("crypto");
 const admin = require(
   "../_lib/firebaseAdmin"
@@ -11,14 +13,14 @@ const CLEANUP_GRACE_MS =
 const CLEANUP_BATCH_SIZE = 100;
 const CLEANUP_CONCURRENCY = 5;
 
-function cleanString(value, maxLength) {
+function cleanString(value: any, maxLength: any) {
   return String(value || "")
     .trim()
     .replace(/\s+/g, " ")
     .slice(0, maxLength);
 }
 
-function getTimestampMillis(value) {
+function getTimestampMillis(value: any) {
   if (!value) return 0;
 
   if (typeof value.toDate === "function") {
@@ -40,7 +42,7 @@ function getTimestampMillis(value) {
     : parsedDate.getTime();
 }
 
-function getRequestHeader(req, name) {
+function getRequestHeader(req: any, name: any) {
   const headers =
     req && req.headers ? req.headers : {};
   const value =
@@ -52,7 +54,7 @@ function getRequestHeader(req, name) {
     : String(value || "");
 }
 
-function hasValidCronAuthorization(req) {
+function hasValidCronAuthorization(req: any) {
   const secret = String(
     process.env.CRON_SECRET || ""
   ).trim();
@@ -78,8 +80,8 @@ function hasValidCronAuthorization(req) {
 }
 
 function clearActiveAuthorization(
-  transaction,
-  limitRef
+  transaction: any,
+  limitRef: any
 ) {
   transaction.set(
     limitRef,
@@ -95,13 +97,13 @@ function clearActiveAuthorization(
 }
 
 async function claimAuthorizationCleanup(
-  authorizationRef,
-  cutoffMs
+  authorizationRef: any,
+  cutoffMs: any
 ) {
   const db = admin.firestore();
 
   return await db.runTransaction(
-    async function (transaction) {
+    async function (transaction: any) {
       const authorizationDoc =
         await transaction.get(
           authorizationRef
@@ -186,7 +188,7 @@ async function claimAuthorizationCleanup(
 }
 
 async function finalizeAuthorizationCleanup(
-  cleanup
+  cleanup: any
 ) {
   const db = admin.firestore();
   const authorizationRef = db
@@ -199,7 +201,7 @@ async function finalizeAuthorizationCleanup(
     : null;
 
   await db.runTransaction(
-    async function (transaction) {
+    async function (transaction: any) {
       const authorizationDoc =
         await transaction.get(
           authorizationRef
@@ -233,8 +235,8 @@ async function finalizeAuthorizationCleanup(
 }
 
 async function cleanupAuthorizationDocument(
-  authorizationRef,
-  cutoffMs
+  authorizationRef: any,
+  cutoffMs: any
 ) {
   const cleanup =
     await claimAuthorizationCleanup(
@@ -255,7 +257,7 @@ async function cleanupAuthorizationDocument(
   return "file";
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   res.setHeader("Cache-Control", "no-store");
 
   if (req.method !== "GET") {
@@ -317,7 +319,7 @@ module.exports = async function handler(req, res) {
           } else {
             state.skipped += 1;
           }
-        } catch (error) {
+        } catch (error: any) {
           state.failed += 1;
         }
       }
@@ -348,7 +350,7 @@ module.exports = async function handler(req, res) {
       skipped: state.skipped,
       failed: state.failed
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({
       error: "Material cleanup failed."
     });

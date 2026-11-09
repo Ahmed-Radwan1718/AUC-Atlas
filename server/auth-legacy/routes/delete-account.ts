@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const crypto = require("crypto");
 const admin = require("../_lib/firebaseAdmin");
 
@@ -20,21 +22,21 @@ const DELETE_ACCOUNT_ATTEMPT_WINDOW_MS =
   15 * 60 * 1000;
 const DELETE_ACCOUNT_MAX_ATTEMPTS = 5;
 
-function cleanString(value, maxLength) {
+function cleanString(value: any, maxLength: any) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
-function createDeleteAccountError(message, statusCode) {
+function createDeleteAccountError(message: any, statusCode: any) {
   const error = new Error(message);
   error.statusCode = statusCode;
   return error;
 }
 
-function getRequestBody(req) {
+function getRequestBody(req: any) {
   if (typeof req.body === "string") {
     try {
       return JSON.parse(req.body || "{}");
-    } catch (error) {
+    } catch (error: any) {
       return {};
     }
   }
@@ -78,7 +80,7 @@ function getCloudinaryConfig() {
         decodeURIComponent(
           cloudinaryUrl.password || ""
         );
-    } catch (error) {}
+    } catch (error: any) {}
   }
 
   return cloudName && apiKey && apiSecret
@@ -90,10 +92,10 @@ function getCloudinaryConfig() {
     : null;
 }
 
-function signCloudinaryParams(params, apiSecret) {
+function signCloudinaryParams(params: any, apiSecret: any) {
   const signatureBase = Object.keys(params)
     .sort()
-    .map(function (key) {
+    .map(function (key: any) {
       return key + "=" + params[key];
     })
     .join("&");
@@ -104,7 +106,7 @@ function signCloudinaryParams(params, apiSecret) {
     .digest("hex");
 }
 
-async function deleteCloudinaryProfilePhoto(publicId) {
+async function deleteCloudinaryProfilePhoto(publicId: any) {
   const safePublicId = cleanString(publicId, 500);
   const config = getCloudinaryConfig();
 
@@ -158,7 +160,7 @@ async function deleteCloudinaryProfilePhoto(publicId) {
   }
 }
 
-async function deleteDocumentReferences(db, docs) {
+async function deleteDocumentReferences(db: any, docs: any) {
   const safeDocs = Array.isArray(docs)
     ? docs
     : [];
@@ -172,7 +174,7 @@ async function deleteDocumentReferences(db, docs) {
 
     safeDocs
       .slice(start, start + 400)
-      .forEach(function (doc) {
+      .forEach(function (doc: any) {
         batch.delete(doc.ref);
       });
 
@@ -180,7 +182,7 @@ async function deleteDocumentReferences(db, docs) {
   }
 }
 
-async function deleteQueryDocuments(db, query) {
+async function deleteQueryDocuments(db: any, query: any) {
   while (true) {
     const snapshot = await query.limit(200).get();
 
@@ -195,7 +197,7 @@ async function deleteQueryDocuments(db, query) {
   }
 }
 
-async function deleteUserMaterials(db, uid) {
+async function deleteUserMaterials(db: any, uid: any) {
   const query = db
     .collection("courseMaterials")
     .where("uploaderUid", "==", uid);
@@ -208,7 +210,7 @@ async function deleteUserMaterials(db, uid) {
     }
 
     await Promise.all(
-      snapshot.docs.map(function (doc) {
+      snapshot.docs.map(function (doc: any) {
         const data = doc.data() || {};
 
         return deleteStoredCourseMaterial(
@@ -224,7 +226,7 @@ async function deleteUserMaterials(db, uid) {
   }
 }
 
-async function deleteCollectionTree(collectionRef) {
+async function deleteCollectionTree(collectionRef: any) {
   while (true) {
     const snapshot =
       await collectionRef.limit(100).get();
@@ -239,7 +241,7 @@ async function deleteCollectionTree(collectionRef) {
   }
 }
 
-async function deleteDocumentTree(documentRef) {
+async function deleteDocumentTree(documentRef: any) {
   const childCollections =
     await documentRef.listCollections();
 
@@ -251,10 +253,10 @@ async function deleteDocumentTree(documentRef) {
 }
 
 async function deleteOwnedReservation(
-  db,
-  collectionName,
-  documentId,
-  uid
+  db: any,
+  collectionName: any,
+  documentId: any,
+  uid: any
 ) {
   const safeDocumentId = cleanString(
     documentId,
@@ -281,7 +283,7 @@ async function deleteOwnedReservation(
   }
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     if (req.method !== "DELETE") {
       res.setHeader("Allow", "DELETE");
@@ -364,7 +366,7 @@ module.exports = async function handler(req, res) {
         email,
         currentPassword
       );
-    } catch (error) {
+    } catch (error: any) {
       throw createDeleteAccountError(
         "Current password is incorrect.",
         401
@@ -427,7 +429,7 @@ module.exports = async function handler(req, res) {
       .get();
 
     await Promise.all(
-      pendingMaterialsSnapshot.docs.map(async function (doc) {
+      pendingMaterialsSnapshot.docs.map(async function (doc: any) {
         const authorization = doc.data() || {};
         if (!authorization.consumedAt) {
           await deletePendingCourseMaterial(authorization).catch(function () {});
@@ -495,7 +497,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       success: true
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.retryAfterSeconds) {
       res.setHeader(
         "Retry-After",

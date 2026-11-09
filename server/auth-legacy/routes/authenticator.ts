@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const admin = require("../_lib/firebaseAdmin");
 const QRCode = require("qrcode");
 const { authenticator } = require("otplib");
@@ -20,14 +22,14 @@ const SETUP_EXPIRES_MS =
 const RECENT_SETUP_AUTH_MAX_AGE_MS =
   90 * 60 * 1000;
 
-function cleanCode(value) {
+function cleanCode(value: any) {
   return String(value || "")
     .trim()
     .replace(/\D/g, "");
 }
 
 function requireRecentAuthenticatorSetup(
-  decodedUser
+  decodedUser: any
 ) {
   const authenticationTimeSeconds =
     Number(
@@ -66,10 +68,10 @@ function requireRecentAuthenticatorSetup(
 }
 
 async function verifyAuthenticatorCode(
-  uid,
-  scope,
-  code,
-  secret
+  uid: any,
+  scope: any,
+  code: any,
+  secret: any
 ) {
   await consumeAuthenticatorAttempt(
     uid,
@@ -90,7 +92,7 @@ async function verifyAuthenticatorCode(
   return true;
 }
 
-function timestampToMillis(value) {
+function timestampToMillis(value: any) {
   if (!value) return 0;
   if (typeof value.toMillis === "function") return value.toMillis();
   if (typeof value.toDate === "function") return value.toDate().getTime();
@@ -99,7 +101,7 @@ function timestampToMillis(value) {
   return Number.isNaN(date.getTime()) ? 0 : date.getTime();
 }
 
-async function getTwoFactorState(uid) {
+async function getTwoFactorState(uid: any) {
   const userRef = admin.firestore().collection("users").doc(uid);
   const userDoc = await userRef.get();
   const userData = userDoc.exists ? userDoc.data() || {} : {};
@@ -110,7 +112,7 @@ async function getTwoFactorState(uid) {
   return { userRef, userData, twoFactor };
 }
 
-async function handleSetup(res, decodedUser) {
+async function handleSetup(res: any, decodedUser: any) {
   const state = await getTwoFactorState(decodedUser.uid);
 
   if (state.twoFactor.appEnabled) {
@@ -165,7 +167,7 @@ async function handleSetup(res, decodedUser) {
   });
 }
 
-async function handleVerifySetup(req, res, decodedUser) {
+async function handleVerifySetup(req: any, res: any, decodedUser: any) {
   const code = cleanCode((req.body || {}).code);
 
   if (!/^\d{6}$/.test(code)) {
@@ -276,7 +278,7 @@ async function handleVerifySetup(req, res, decodedUser) {
   });
 }
 
-async function handleVerifySecurityPanel(req, res, decodedUser) {
+async function handleVerifySecurityPanel(req: any, res: any, decodedUser: any) {
   const code = cleanCode((req.body || {}).code);
   const state = await getTwoFactorState(decodedUser.uid);
 
@@ -328,7 +330,7 @@ async function handleVerifySecurityPanel(req, res, decodedUser) {
   });
 }
 
-async function handleDisable(req, res, decodedUser) {
+async function handleDisable(req: any, res: any, decodedUser: any) {
   const code = cleanCode((req.body || {}).code);
 
   if (!/^\d{6}$/.test(code)) {
@@ -384,7 +386,7 @@ async function handleDisable(req, res, decodedUser) {
   });
 }
 
-async function handleEmailTwoFactor(req, res, decodedUser, enabled) {
+async function handleEmailTwoFactor(req: any, res: any, decodedUser: any, enabled: any) {
   const state = await getTwoFactorState(decodedUser.uid);
 
   if (state.twoFactor.appEnabled) {
@@ -444,7 +446,7 @@ async function handleEmailTwoFactor(req, res, decodedUser, enabled) {
   });
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method not allowed" });
@@ -508,7 +510,7 @@ module.exports = async function handler(req, res) {
     }
 
     return res.status(400).json({ error: "Unknown two-factor authentication action." });
-  } catch (error) {
+  } catch (error: any) {
     if (error.retryAfterSeconds) {
       res.setHeader(
         "Retry-After",

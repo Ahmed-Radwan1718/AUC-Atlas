@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const crypto = require("crypto");
 const admin = require("../_lib/firebaseAdmin");
 
@@ -25,7 +27,7 @@ const PROFILE_PHOTO_UPLOAD_WINDOW_MS = 60 * 60 * 1000;
 const PROFILE_PHOTO_MUTATIONS_PER_HOUR = 10;
 const PROFILE_PHOTO_MUTATION_WINDOW_MS = 60 * 60 * 1000;
 
-function getFirstName(fullName, email) {
+function getFirstName(fullName: any, email: any) {
   const name = String(fullName || "").trim();
 
   if (name) {
@@ -46,7 +48,7 @@ function getCloudinaryConfig() {
       cloudName = cloudName || cloudinaryUrl.hostname;
       apiKey = apiKey || decodeURIComponent(cloudinaryUrl.username || "");
       apiSecret = apiSecret || decodeURIComponent(cloudinaryUrl.password || "");
-    } catch (error) {}
+    } catch (error: any) {}
   }
 
   if (!cloudName || !apiKey || !apiSecret) {
@@ -58,13 +60,13 @@ function getCloudinaryConfig() {
   return { cloudName, apiKey, apiSecret };
 }
 
-function createProfilePhotoError(message, statusCode) {
+function createProfilePhotoError(message: any, statusCode: any) {
   const error = new Error(message);
   error.statusCode = statusCode;
   return error;
 }
 
-function createProfilePhotoRateLimitError(retryAfterSeconds) {
+function createProfilePhotoRateLimitError(retryAfterSeconds: any) {
   const safeRetryAfterSeconds = Math.max(
     1,
     Math.ceil(Number(retryAfterSeconds) || 1)
@@ -84,7 +86,7 @@ function createProfilePhotoRateLimitError(retryAfterSeconds) {
   return error;
 }
 
-function getTimestampMillis(value) {
+function getTimestampMillis(value: any) {
   if (!value) return 0;
   if (typeof value.toDate === "function") return value.toDate().getTime();
   if (typeof value.seconds === "number") return value.seconds * 1000;
@@ -94,15 +96,15 @@ function getTimestampMillis(value) {
   return Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
 }
 
-function getSafePublicIdPart(value) {
+function getSafePublicIdPart(value: any) {
   return String(value || "").replace(/[^\w-]/g, "_");
 }
 
-function getProfilePhotoPublicIdPrefix(uid) {
+function getProfilePhotoPublicIdPrefix(uid: any) {
   return PROFILE_PHOTO_PUBLIC_ID_PREFIX + "/" + getSafePublicIdPart(uid);
 }
 
-function createProfilePhotoPublicId(uid) {
+function createProfilePhotoPublicId(uid: any) {
   return (
     getProfilePhotoPublicIdPrefix(uid) +
     "/" +
@@ -112,7 +114,7 @@ function createProfilePhotoPublicId(uid) {
   );
 }
 
-function isExpectedProfilePhotoPublicId(uid, publicId) {
+function isExpectedProfilePhotoPublicId(uid: any, publicId: any) {
   const prefix = getProfilePhotoPublicIdPrefix(uid) + "/";
   const suffix = String(publicId || "").slice(prefix.length);
 
@@ -122,22 +124,22 @@ function isExpectedProfilePhotoPublicId(uid, publicId) {
   );
 }
 
-function signCloudinaryParams(params, apiSecret) {
-  const signatureBase = Object.keys(params).sort().map(function (key) {
+function signCloudinaryParams(params: any, apiSecret: any) {
+  const signatureBase = Object.keys(params).sort().map(function (key: any) {
     return key + "=" + params[key];
   }).join("&");
 
   return crypto.createHash("sha1").update(signatureBase + apiSecret).digest("hex");
 }
 
-async function consumeProfilePhotoUploadAttempt(uid) {
+async function consumeProfilePhotoUploadAttempt(uid: any) {
   const db = admin.firestore();
   const limitRef = db
     .collection("profilePhotoUploadLimits")
     .doc(uid);
   const nowMs = Date.now();
 
-  await db.runTransaction(async function (transaction) {
+  await db.runTransaction(async function (transaction: any) {
     const limitDoc = await transaction.get(limitRef);
     const data = limitDoc.exists
       ? limitDoc.data() || {}
@@ -186,7 +188,7 @@ async function consumeProfilePhotoUploadAttempt(uid) {
   });
 }
 
-function isExpectedCloudinaryPhotoUrl(photoURL, config, publicId) {
+function isExpectedCloudinaryPhotoUrl(photoURL: any, config: any, publicId: any) {
   try {
     const parsedUrl = new URL(String(photoURL || ""));
     const pathname = decodeURIComponent(parsedUrl.pathname || "");
@@ -197,12 +199,12 @@ function isExpectedCloudinaryPhotoUrl(photoURL, config, publicId) {
       pathname.indexOf("/" + config.cloudName + "/image/upload/") === 0 &&
       pathname.indexOf("/" + publicId) !== -1
     );
-  } catch (error) {
+  } catch (error: any) {
     return false;
   }
 }
 
-async function getCloudinaryPhotoDetails(config, publicId) {
+async function getCloudinaryPhotoDetails(config: any, publicId: any) {
   const response = await fetch(
     "https://api.cloudinary.com/v1_1/" +
       encodeURIComponent(config.cloudName) +
@@ -240,9 +242,9 @@ async function getCloudinaryPhotoDetails(config, publicId) {
 }
 
 async function verifyCloudinaryPhoto(
-  config,
-  publicId,
-  submittedVersion
+  config: any,
+  publicId: any,
+  submittedVersion: any
 ) {
   const asset = await getCloudinaryPhotoDetails(
     config,
@@ -278,7 +280,7 @@ async function verifyCloudinaryPhoto(
   return String(asset.secure_url || "").trim();
 }
 
-async function destroyCloudinaryPhoto(config, publicId) {
+async function destroyCloudinaryPhoto(config: any, publicId: any) {
   const timestamp = String(Math.floor(Date.now() / 1000));
   const signedParams = {
     invalidate: "true",
@@ -301,7 +303,7 @@ async function destroyCloudinaryPhoto(config, publicId) {
   }).catch(function () {});
 }
 
-async function getAccountUser(uid, fallbackEmail) {
+async function getAccountUser(uid: any, fallbackEmail: any) {
   const userRecord = await admin.auth().getUser(uid);
   const userDoc = await admin.firestore().collection("users").doc(uid).get();
   const userData = userDoc.exists ? userDoc.data() || {} : {};
@@ -327,11 +329,11 @@ async function getAccountUser(uid, fallbackEmail) {
 }
 
 async function saveProfilePhoto(
-  uid,
-  decodedUser,
-  photoURL,
-  publicId,
-  config
+  uid: any,
+  decodedUser: any,
+  photoURL: any,
+  publicId: any,
+  config: any
 ) {
   const userRef = admin.firestore().collection("users").doc(uid);
   const userDoc = await userRef.get();
@@ -370,7 +372,7 @@ async function saveProfilePhoto(
   return getAccountUser(uid, decodedUser.email || "");
 }
 
-async function removeProfilePhoto(uid, decodedUser, config) {
+async function removeProfilePhoto(uid: any, decodedUser: any, config: any) {
   const userRef = admin.firestore().collection("users").doc(uid);
   const userDoc = await userRef.get();
   const userData = userDoc.exists
@@ -399,7 +401,7 @@ async function removeProfilePhoto(uid, decodedUser, config) {
   return getAccountUser(uid, decodedUser.email || "");
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method not allowed" });
@@ -517,7 +519,7 @@ module.exports = async function handler(req, res) {
     }
 
     throw createProfilePhotoError("Unsupported profile photo action.", 400);
-  } catch (error) {
+  } catch (error: any) {
     res.setHeader("Cache-Control", "no-store");
 
     if (error.retryAfterSeconds) {
