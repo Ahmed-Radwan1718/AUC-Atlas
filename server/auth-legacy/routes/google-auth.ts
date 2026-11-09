@@ -19,7 +19,7 @@ const GOOGLE_LOGIN_RATE_LIMIT_WINDOW_MS =
   15 * 60 * 1000;
 const GOOGLE_LOGIN_MAX_IP_ATTEMPTS = 100;
 
-function cleanString(value: any, maxLength: any) {
+function cleanString(value: unknown, maxLength?: number) {
   const cleanedValue = String(value || "").trim();
 
   return maxLength
@@ -103,13 +103,13 @@ function getFirebaseClientConfig() {
     );
   }
 
-  const firebase = {
+  const firebase: Record<string, string> = {
     apiKey,
     authDomain,
     projectId
   };
 
-  const optionalValues = {
+  const optionalValues: Record<string, string> = {
     appId:
       cleanString(process.env.FIREBASE_APP_ID),
     storageBucket:
@@ -120,7 +120,7 @@ function getFirebaseClientConfig() {
       cleanString(process.env.FIREBASE_MEASUREMENT_ID)
   };
 
-  Object.keys(optionalValues).forEach(function (key: any) {
+  Object.keys(optionalValues).forEach(function (key: string) {
     if (optionalValues[key]) {
       firebase[key] = optionalValues[key];
     }
