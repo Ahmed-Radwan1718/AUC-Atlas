@@ -5,9 +5,6 @@ function submitProfessorReviewReport(
   ) {
     const targetId =
       button.dataset.reportReview;
-    const targetLabel =
-      button.dataset.reportLabel ||
-      "this review";
 
     if (!targetId) {
       return;
@@ -39,9 +36,6 @@ function submitProfessorReviewReport(
           <header class="course-report-header">
             <div class="course-report-header-copy">
               <h2 id="professor-review-report-title">Report review</h2>
-              <p id="professor-review-report-copy">
-                Tell us what is wrong with this review. Our moderators will review your report.
-              </p>
             </div>
 
           </header>
@@ -92,9 +86,6 @@ function submitProfessorReviewReport(
     const form = document.getElementById(
       "professor-review-report-form"
     );
-    const copy = document.getElementById(
-      "professor-review-report-copy"
-    );
     const reasonInput = document.getElementById(
       "professor-review-report-reason"
     );
@@ -107,7 +98,6 @@ function submitProfessorReviewReport(
 
     if (
       !form ||
-      !copy ||
       !reasonInput ||
       !status ||
       !submitButton
@@ -326,11 +316,6 @@ function submitProfessorReviewReport(
     modal.reportSourceOriginalText =
       button.textContent;
     modal.dataset.targetId = targetId;
-
-    copy.textContent =
-      "Tell us what is wrong with " +
-      targetLabel +
-      ". Our moderators will review your report.";
 
     form.reset();
     status.textContent = "";
