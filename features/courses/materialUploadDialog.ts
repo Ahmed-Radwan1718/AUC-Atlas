@@ -72,8 +72,9 @@ function setupCourseUploadStart() {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let drawerAnimation = null;
     let backdropAnimation = null;
+    let closing = false;
 
-    function cancelOpeningAnimations() {
+    function cancelAnimations() {
       if (drawerAnimation) {
         drawerAnimation.cancel();
         drawerAnimation = null;
@@ -85,7 +86,7 @@ function setupCourseUploadStart() {
     }
 
     function animateOpening() {
-      cancelOpeningAnimations();
+      cancelAnimations();
       if (reducedMotion.matches || !drawer || !backdrop) return;
 
       // Match Leave a review's slide distance, duration, and easing.
@@ -128,6 +129,8 @@ function setupCourseUploadStart() {
     }
 
     function openQuickMaterialUpload() {
+      if (!modal.hidden || closing) return;
+
       lastTrigger =
         document.activeElement instanceof HTMLElement
           ? document.activeElement
@@ -198,18 +201,57 @@ function setupCourseUploadStart() {
       }, 0);
     }
 
-    function closeQuickMaterialUpload() {
-      cancelOpeningAnimations();
+    function finishClosingQuickMaterialUpload() {
+      cancelAnimations();
       modal.hidden = true;
+      closing = false;
       document.body.classList.remove(
         "quick-material-upload-open"
       );
       button.setAttribute("aria-expanded", "false");
-      closeMaterialChoiceMenus();
 
       if (lastTrigger) {
         lastTrigger.focus();
       }
+    }
+
+    function closeQuickMaterialUpload() {
+      if (modal.hidden || closing) return;
+
+      closing = true;
+      closeMaterialChoiceMenus();
+      cancelAnimations();
+
+      if (reducedMotion.matches || !drawer || !backdrop) {
+        finishClosingQuickMaterialUpload();
+        return;
+      }
+
+      // Match Leave a review's exit slide and backdrop fade.
+      drawerAnimation = drawer.animate(
+        [
+          { transform: "translateX(0)" },
+          { transform: "translateX(100%)" }
+        ],
+        {
+          duration: 250,
+          easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+          fill: "both"
+        }
+      );
+
+      backdropAnimation = backdrop.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        {
+          duration: 220,
+          easing: "ease-in",
+          fill: "both"
+        }
+      );
+
+      drawerAnimation.finished
+        .then(finishClosingQuickMaterialUpload)
+        .catch(finishClosingQuickMaterialUpload);
     }
 
     button.addEventListener(
