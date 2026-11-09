@@ -498,7 +498,7 @@ async function verifyLoginCode(
     });
   }
 
-  let userRecord = null;
+  let userRecord: any = null;
 
   if (recovery) {
     loginChallenge =

@@ -17,7 +17,7 @@ jobs:
           node-version: "22"
       - run: npm install --no-audit --no-fund
       - run: npm run test:cleanup
-      - run: node --test tests/faq-sitemap.test.cjs
+      - run: npm run test:faq
       - run: npm run typecheck
       - run: npm run build
 

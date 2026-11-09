@@ -1,11 +1,16 @@
 "use strict";
 
-const assert = require("node:assert/strict");
-const { readFileSync } = require("node:fs");
-const path = require("node:path");
-const { test } = require("node:test");
-const vm = require("node:vm");
-const ts = require("typescript");
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import * as path from "node:path";
+import { test } from "node:test";
+import vm from "node:vm";
+import ts from "typescript";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+
+const require = createRequire(import.meta.url);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const cleanupSource = ts.transpileModule(
   readFileSync(
@@ -16,35 +21,35 @@ const cleanupSource = ts.transpileModule(
 ).outputText;
 const CRON_SECRET = "mock-cron-secret-with-at-least-32-characters";
 
-function createHarness(options = {}) {
+function createHarness(options: any = {}) {
   const authorizations = new Map(
     Object.entries(options.authorizations || {}).map(([id, data]) => [id, { ...data }])
   );
   const limits = new Map(
     Object.entries(options.limits || {}).map(([id, data]) => [id, { ...data }])
   );
-  const deletedFiles = [];
+  const deletedFiles: any[] = [];
   let queries = 0;
 
-  const getCollectionMap = (ref) =>
+  const getCollectionMap = (ref: any) =>
     ref.collection === "materialUploadAuthorizations" ? authorizations : limits;
 
   const db = {
-    collection(collection) {
+    collection(collection: string) {
       return {
-        doc(id) {
+        doc(id: string) {
           return { collection, id };
         },
-        where(field, op, threshold) {
+        where(field: string, op: string, threshold: Date) {
           assert.equal(collection, "materialUploadAuthorizations");
           assert.equal(field, "expiresAt");
           assert.equal(op, "<=");
           return {
-            orderBy(sortField, direction) {
+            orderBy(sortField: string, direction: string) {
               assert.equal(sortField, "expiresAt");
               assert.equal(direction, "asc");
               return {
-                limit(count) {
+                limit(count: number) {
                   return {
                     async get() {
                       queries += 1;
@@ -65,17 +70,17 @@ function createHarness(options = {}) {
         }
       };
     },
-    async runTransaction(callback) {
-      const operations = [];
+    async runTransaction(callback: any) {
+      const operations: any[] = [];
       const transaction = {
-        async get(ref) {
+        async get(ref: any) {
           const current = getCollectionMap(ref).get(ref.id);
           return { exists: Boolean(current), data: () => current ? { ...current } : undefined };
         },
-        set(ref, data, settings) {
+        set(ref: any, data: any, settings?: any) {
           operations.push({ operation: "set", ref, data, merge: settings?.merge === true });
         },
-        delete(ref) {
+        delete(ref: any) {
           operations.push({ operation: "delete", ref });
         }
       };
@@ -94,16 +99,16 @@ function createHarness(options = {}) {
   };
 
   const firestore = () => db;
-  firestore.Timestamp = { fromDate: date => date };
+  firestore.Timestamp = { fromDate: (date: Date) => date };
   firestore.FieldValue = { serverTimestamp: () => new Date() };
-  const module = { exports: {} };
+  const module: { exports: any } = { exports: {} };
   vm.runInNewContext(cleanupSource, {
     module,
     exports: module.exports,
     Buffer,
     Date,
     process: { env: { CRON_SECRET: options.secret === undefined ? CRON_SECRET : options.secret } },
-    require(id) {
+    require(id: string) {
       if (id === "crypto") return require("node:crypto");
       if (id === "../_lib/firebaseAdmin") return { firestore };
       if (id === "../_lib/courseMaterialStorage") {
@@ -119,14 +124,14 @@ function createHarness(options = {}) {
     }
   }, { filename: "cleanup-material-uploads.ts" });
 
-  async function request(method, authorization) {
+  async function request(method: string, authorization?: string) {
     const response = {
       statusCode: 200,
-      headers: {},
-      body: null,
-      setHeader(name, value) { this.headers[name.toLowerCase()] = value; return this; },
-      status(code) { this.statusCode = code; return this; },
-      json(body) { this.body = body; return this; }
+      headers: {} as Record<string, string>,
+      body: null as any,
+      setHeader(name: string, value: string) { this.headers[name.toLowerCase()] = value; return this; },
+      status(code: number) { this.statusCode = code; return this; },
+      json(body: any) { this.body = body; return this; }
     };
     await module.exports.default({
       method,

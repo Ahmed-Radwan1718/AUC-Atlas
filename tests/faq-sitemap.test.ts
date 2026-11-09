@@ -1,11 +1,14 @@
 "use strict";
 
-const assert = require("node:assert/strict");
-const { readFileSync } = require("node:fs");
-const path = require("node:path");
-const { test } = require("node:test");
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import * as path from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
-const fromRoot = file => readFileSync(path.join(__dirname, "..", file), "utf8");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const fromRoot = (file: string) => readFileSync(path.join(__dirname, "..", file), "utf8");
 
 const contentModule = fromRoot("features/faq/faqContent.ts");
 const encodedMarkup = contentModule.split("export const faqMarkup = ")[1]?.trim().replace(/;$/, "");
