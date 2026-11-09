@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const admin = require("../_lib/firebaseAdmin");
 const {
   createAdminError,
@@ -12,19 +14,19 @@ const {
   deleteStoredCourseMaterial
 } = require("../_lib/courseMaterialStorage");
 
-function cleanString(value, maxLength) {
+function cleanString(value: any, maxLength: any) {
   return String(value || "").trim().replace(/\s+/g, " ").slice(0, maxLength);
 }
 
-function cleanMultiline(value, maxLength) {
+function cleanMultiline(value: any, maxLength: any) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
-function getRequestBody(req) {
+function getRequestBody(req: any) {
   if (typeof req.body === "string") {
     try {
       return JSON.parse(req.body || "{}");
-    } catch (error) {
+    } catch (error: any) {
       return {};
     }
   }
@@ -32,7 +34,7 @@ function getRequestBody(req) {
   return req.body || {};
 }
 
-function getTimestampMillis(value) {
+function getTimestampMillis(value: any) {
   if (!value) return 0;
   if (typeof value.toDate === "function") return value.toDate().getTime();
   if (typeof value.seconds === "number") return value.seconds * 1000;
@@ -42,12 +44,12 @@ function getTimestampMillis(value) {
   return Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
 }
 
-function getTimestampIso(value) {
+function getTimestampIso(value: any) {
   const millis = getTimestampMillis(value);
   return millis ? new Date(millis).toISOString() : "";
 }
 
-function serializeReview(doc) {
+function serializeReview(doc: any) {
   const data = doc.data() || {};
 
   return {
@@ -64,7 +66,7 @@ function serializeReview(doc) {
   };
 }
 
-function serializeMaterial(doc) {
+function serializeMaterial(doc: any) {
   const data = doc.data() || {};
 
   return {
@@ -86,7 +88,7 @@ function serializeMaterial(doc) {
   };
 }
 
-function serializeReport(doc) {
+function serializeReport(doc: any) {
   const data = doc.data() || {};
   const targetSnapshot =
     data.targetSnapshot &&
@@ -126,7 +128,7 @@ function serializeReport(doc) {
   };
 }
 
-function serializeAudit(doc) {
+function serializeAudit(doc: any) {
   const data = doc.data() || {};
 
   return {
@@ -142,7 +144,7 @@ function serializeAudit(doc) {
   };
 }
 
-async function writeAuditLog(actor, details) {
+async function writeAuditLog(actor: any, details: any) {
   const data = details || {};
   const createdAtIso = new Date().toISOString();
 
@@ -159,7 +161,7 @@ async function writeAuditLog(actor, details) {
   });
 }
 
-async function revokeStoredSessions(uid, reason) {
+async function revokeStoredSessions(uid: any, reason: any) {
   const sessionsSnapshot = await admin.firestore()
     .collection("users")
     .doc(uid)
@@ -173,7 +175,7 @@ async function revokeStoredSessions(uid, reason) {
 
   const batch = admin.firestore().batch();
 
-  sessionsSnapshot.forEach(function (sessionDoc) {
+  sessionsSnapshot.forEach(function (sessionDoc: any) {
     batch.set(sessionDoc.ref, {
       revokedAt: admin.firestore.FieldValue.serverTimestamp(),
       revokedReason: reason || "admin_action"
@@ -183,7 +185,7 @@ async function revokeStoredSessions(uid, reason) {
   await batch.commit();
 }
 
-async function listAllUsers(actor) {
+async function listAllUsers(actor: any) {
   const userRecords = [];
   let pageToken;
 
@@ -202,7 +204,7 @@ async function listAllUsers(actor) {
   const configuredAdminUids = new Set(
     String(process.env.ADMIN_UIDS || "")
       .split(/[\s,]+/)
-      .map(function (uid) {
+      .map(function (uid: any) {
         return uid.trim();
       })
       .filter(Boolean)
@@ -218,7 +220,7 @@ async function listAllUsers(actor) {
     const userBatch = await Promise.all(
       userRecords
         .slice(index, index + 25)
-        .map(async function (userRecord) {
+        .map(async function (userRecord: any) {
           const userRef = db
             .collection("users")
             .doc(userRecord.uid);
@@ -302,7 +304,7 @@ async function listAllUsers(actor) {
     users.push.apply(users, userBatch);
   }
 
-  users.sort(function (a, b) {
+  users.sort(function (a: any, b: any) {
     return (
       getTimestampMillis(b.createdAt) -
       getTimestampMillis(a.createdAt)
@@ -312,7 +314,7 @@ async function listAllUsers(actor) {
   return users;
 }
 
-async function getDashboardData(actor) {
+async function getDashboardData(actor: any) {
   const db = admin.firestore();
   const results = await Promise.all([
     db.collection("professorReviews").get(),
@@ -334,38 +336,38 @@ async function getDashboardData(actor) {
   const reports = [];
   const audits = [];
 
-  reviewsSnapshot.forEach(function (doc) {
+  reviewsSnapshot.forEach(function (doc: any) {
     reviews.push(serializeReview(doc));
   });
 
-  materialsSnapshot.forEach(function (doc) {
+  materialsSnapshot.forEach(function (doc: any) {
     firestoreMaterials.push(
       serializeMaterial(doc)
     );
   });
 
-  reportsSnapshot.forEach(function (doc) {
+  reportsSnapshot.forEach(function (doc: any) {
     reports.push(serializeReport(doc));
   });
 
-  auditSnapshot.forEach(function (doc) {
+  auditSnapshot.forEach(function (doc: any) {
     audits.push(serializeAudit(doc));
   });
 
   const materials = firestoreMaterials
-    .filter(function (material) {
+    .filter(function (material: any) {
       return material.status !== "rejected";
     });
 
-  reviews.sort(function (a, b) {
+  reviews.sort(function (a: any, b: any) {
     return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
   });
 
-  materials.sort(function (a, b) {
+  materials.sort(function (a: any, b: any) {
     return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
   });
 
-  reports.sort(function (a, b) {
+  reports.sort(function (a: any, b: any) {
     return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
   });
 
@@ -380,7 +382,7 @@ async function getDashboardData(actor) {
       users: users.length,
       reviews: Number(reviewCountSnapshot.data().count || 0),
       materials: materials.length,
-      bannedUsers: users.filter(function (user) {
+      bannedUsers: users.filter(function (user: any) {
         return user.disabled;
       }).length
     },
@@ -392,7 +394,7 @@ async function getDashboardData(actor) {
   };
 }
 
-async function lookupUser(uid) {
+async function lookupUser(uid: any) {
   const safeUid = cleanString(uid, 160);
 
   if (!safeUid) {
@@ -403,7 +405,7 @@ async function lookupUser(uid) {
 
   try {
     userRecord = await admin.auth().getUser(safeUid);
-  } catch (error) {
+  } catch (error: any) {
     if (error && error.code === "auth/user-not-found") {
       throw createAdminError("No Firebase user was found with that UID.", 404);
     }
@@ -443,10 +445,10 @@ async function lookupUser(uid) {
 }
 
 async function resolveOpenReportsForTarget(
-  actor,
-  targetType,
-  targetId,
-  resolution
+  actor: any,
+  targetType: any,
+  targetId: any,
+  resolution: any
 ) {
   const safeTargetType = cleanString(
     targetType,
@@ -482,7 +484,7 @@ async function resolveOpenReportsForTarget(
   let resolvedCount = 0;
 
   reportsSnapshot.forEach(
-    function (reportDoc) {
+    function (reportDoc: any) {
       const reportData =
         reportDoc.data() || {};
 
@@ -530,7 +532,7 @@ async function resolveOpenReportsForTarget(
   return resolvedCount;
 }
 
-async function handleDeleteReview(actor, body) {
+async function handleDeleteReview(actor: any, body: any) {
   const reviewId = cleanString(body.reviewId, 160);
   const reason = cleanMultiline(body.reason, 500);
 
@@ -569,7 +571,7 @@ async function handleDeleteReview(actor, body) {
   return { success: true };
 }
 
-async function handleApproveMaterial(actor, body) {
+async function handleApproveMaterial(actor: any, body: any) {
   const materialId = cleanString(
     body.materialId,
     180
@@ -656,7 +658,7 @@ async function handleApproveMaterial(actor, body) {
   return { success: true };
 }
 
-async function handleDeleteMaterial(actor, body) {
+async function handleDeleteMaterial(actor: any, body: any) {
   const materialId = cleanString(body.materialId, 180);
   const reason = cleanMultiline(body.reason, 500);
 
@@ -704,8 +706,8 @@ async function handleDeleteMaterial(actor, body) {
 }
 
 async function handleDismissReport(
-  actor,
-  body
+  actor: any,
+  body: any
 ) {
   const reportId = cleanString(
     body.reportId,
@@ -778,7 +780,7 @@ async function handleDismissReport(
   };
 }
 
-async function handleSetUserBan(actor, body) {
+async function handleSetUserBan(actor: any, body: any) {
   const uid = cleanString(body.uid, 160);
   const banned = body.banned === true;
   const reason = cleanMultiline(body.reason, 500);
@@ -799,7 +801,7 @@ async function handleSetUserBan(actor, body) {
 
   try {
     userRecord = await admin.auth().getUser(uid);
-  } catch (error) {
+  } catch (error: any) {
     if (error && error.code === "auth/user-not-found") {
       throw createAdminError("No Firebase user was found with that UID.", 404);
     }
@@ -843,7 +845,7 @@ async function handleSetUserBan(actor, body) {
   };
 }
 
-async function handleRevokeUserSessions(actor, body) {
+async function handleRevokeUserSessions(actor: any, body: any) {
   const uid = cleanString(body.uid, 160);
   const reason = cleanMultiline(body.reason, 500);
 
@@ -859,7 +861,7 @@ async function handleRevokeUserSessions(actor, body) {
 
   try {
     userRecord = await admin.auth().getUser(uid);
-  } catch (error) {
+  } catch (error: any) {
     if (error && error.code === "auth/user-not-found") {
       throw createAdminError("No Firebase user was found with that UID.", 404);
     }
@@ -886,7 +888,7 @@ async function handleRevokeUserSessions(actor, body) {
   };
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     res.setHeader(
       "Cache-Control",
@@ -1038,7 +1040,7 @@ module.exports = async function handler(req, res) {
     return res
       .status(200)
       .json(result);
-  } catch (error) {
+  } catch (error: any) {
     res.setHeader(
       "Cache-Control",
       "no-store"

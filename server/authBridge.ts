@@ -20,15 +20,15 @@ type LegacyHandler = (request: {
 // Server-only compatibility boundary: retain the original authentication and security code.
 // We intentionally do not expose the legacy handler through arbitrary user-selected paths.
 const handlers: Record<string,() => LegacyHandler> = {
-  "admin": () => require("./auth-legacy/routes/admin.js"),
+  "admin": () => require("./auth-legacy/routes/admin.ts").default,
   "cleanup-material-uploads": () => require("./auth-legacy/routes/cleanup-material-uploads.ts").default,
   "login": () => require("./auth-legacy/routes/login.ts").default,
-  "me": () => require("./auth-legacy/routes/me.js"),
+  "me": () => require("./auth-legacy/routes/me.ts").default,
   "signup": () => require("./auth-legacy/routes/signup.ts").default,
   "logout": () => require("./auth-legacy/routes/logout.ts").default,
   "forgot-password": () => require("./auth-legacy/routes/forgot-password.ts").default,
   "google-auth": () => require("./auth-legacy/routes/google-auth.ts").default,
-  "login-code": () => require("./auth-legacy/routes/login-code.js"),
+  "login-code": () => require("./auth-legacy/routes/login-code.ts").default,
   "verify-login-authenticator": () => require("./auth-legacy/routes/verify-login-authenticator.ts").default,
   "authenticator": () => require("./auth-legacy/routes/authenticator.ts").default,
   "sessions": () => require("./auth-legacy/routes/sessions.ts").default,

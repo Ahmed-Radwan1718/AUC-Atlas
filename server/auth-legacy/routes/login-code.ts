@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const crypto = require("crypto");
 const admin = require("../_lib/firebaseAdmin");
 
@@ -28,33 +30,33 @@ const VERIFY_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 const VERIFY_MAX_EMAIL_ATTEMPTS = 12;
 const VERIFY_MAX_IP_ATTEMPTS = 100;
 
-function cleanAction(value) {
+function cleanAction(value: any) {
   return String(value || "")
     .trim()
     .toLowerCase()
     .slice(0, 20);
 }
 
-function cleanEmail(value) {
+function cleanEmail(value: any) {
   return String(value || "")
     .trim()
     .toLowerCase()
     .slice(0, 160);
 }
 
-function cleanChallengeId(value) {
+function cleanChallengeId(value: any) {
   return String(value || "")
     .trim()
     .toLowerCase();
 }
 
-function cleanCode(value) {
+function cleanCode(value: any) {
   return String(value || "")
     .replace(/\D/g, "")
     .slice(0, 6);
 }
 
-function createHttpError(message, statusCode) {
+function createHttpError(message: any, statusCode: any) {
   const error = new Error(message);
   error.statusCode = statusCode;
   return error;
@@ -79,9 +81,9 @@ function getEmailCodeSecret() {
 }
 
 function createLoginCodeHash(
-  challengeId,
-  uid,
-  code
+  challengeId: any,
+  uid: any,
+  code: any
 ) {
   return crypto
     .createHmac("sha256", getEmailCodeSecret())
@@ -97,8 +99,8 @@ function createLoginCodeHash(
 }
 
 function loginCodeHashesMatch(
-  storedHash,
-  suppliedHash
+  storedHash: any,
+  suppliedHash: any
 ) {
   const storedBuffer = Buffer.from(
     String(storedHash || ""),
@@ -120,7 +122,7 @@ function loginCodeHashesMatch(
   );
 }
 
-function timestampToMillis(value) {
+function timestampToMillis(value: any) {
   if (!value) {
     return 0;
   }
@@ -170,10 +172,10 @@ function getResendConfiguration() {
   };
 }
 
-async function getUserByEmail(email) {
+async function getUserByEmail(email: any) {
   try {
     return await admin.auth().getUserByEmail(email);
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === "auth/user-not-found") {
       return null;
     }
@@ -183,9 +185,9 @@ async function getUserByEmail(email) {
 }
 
 async function sendLoginCodeEmail(
-  email,
-  code,
-  challengeId
+  email: any,
+  code: any,
+  challengeId: any
 ) {
   const resend = getResendConfiguration();
 
@@ -254,8 +256,8 @@ async function sendLoginCodeEmail(
 }
 
 async function consumeRequestRateLimits(
-  req,
-  email
+  req: any,
+  email: any
 ) {
   await consumeSecurityRateLimit({
     scope: "email-login-code-request-ip",
@@ -279,8 +281,8 @@ async function consumeRequestRateLimits(
 }
 
 async function consumeVerifyRateLimits(
-  req,
-  email
+  req: any,
+  email: any
 ) {
   await consumeSecurityRateLimit({
     scope: "email-login-code-verify-ip",
@@ -304,7 +306,7 @@ async function consumeVerifyRateLimits(
 }
 
 function createGenericRequestResponse(
-  challengeId
+  challengeId: any
 ) {
   return {
     success: true,
@@ -317,8 +319,8 @@ function createGenericRequestResponse(
 }
 
 async function requestLoginCode(
-  req,
-  res
+  req: any,
+  res: any
 ) {
   const body = req.body || {};
   const recovery =
@@ -461,8 +463,8 @@ async function requestLoginCode(
 }
 
 async function verifyLoginCode(
-  req,
-  res
+  req: any,
+  res: any
 ) {
   const body = req.body || {};
   const recovery =
@@ -568,7 +570,7 @@ async function verifyLoginCode(
   const verificationResult =
     await admin.firestore()
       .runTransaction(
-        async function (transaction) {
+        async function (transaction: any) {
           const challengeDoc =
             await transaction.get(
               challengeRef
@@ -884,9 +886,9 @@ async function verifyLoginCode(
   });
 }
 
-module.exports = async function handler(
-  req,
-  res
+export default async function handler(
+  req: LegacyRequest,
+  res: LegacyReply
 ) {
   try {
     if (req.method !== "POST") {
@@ -917,7 +919,7 @@ module.exports = async function handler(
       error:
         "Invalid sign-in code action."
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.retryAfterSeconds) {
       res.setHeader(
         "Retry-After",

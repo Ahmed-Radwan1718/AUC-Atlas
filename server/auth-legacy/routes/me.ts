@@ -1,3 +1,5 @@
+import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+
 const admin = require("../_lib/firebaseAdmin");
 
 const {
@@ -12,7 +14,7 @@ const PROFILE_UPDATE_WINDOW_MS =
   60 * 60 * 1000;
 const PROFILE_MAX_UPDATES = 20;
 
-function getFirstName(fullName, email) {
+function getFirstName(fullName: any, email: any) {
   const name = String(fullName || "").trim();
 
   if (name) {
@@ -22,25 +24,25 @@ function getFirstName(fullName, email) {
   return String(email || "").split("@")[0] || "there";
 }
 
-function cleanString(value, maxLength) {
+function cleanString(value: any, maxLength: any) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
-function cleanAucId(value) {
+function cleanAucId(value: any) {
   return String(value || "").replace(/\D/g, "").slice(0, 9);
 }
 
-function hasValidAucIdFormat(value) {
+function hasValidAucIdFormat(value: any) {
   return /^900\d{6}$/.test(cleanAucId(value));
 }
 
-function getAucIdLookupKey(value) {
+function getAucIdLookupKey(value: any) {
   const aucId = cleanAucId(value);
 
   return hasValidAucIdFormat(aucId) ? aucId : "";
 }
 
-function createProfileError(message, statusCode) {
+function createProfileError(message: any, statusCode: any) {
   const error = new Error(message);
   error.statusCode = statusCode;
   return error;
@@ -49,7 +51,7 @@ function createProfileError(message, statusCode) {
 const DISPLAY_NAME_CHANGE_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
 const AUC_ID_CHANGE_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
 
-function getDateFromStoredValue(value) {
+function getDateFromStoredValue(value: any) {
   if (!value) {
     return null;
   }
@@ -70,7 +72,7 @@ function getDateFromStoredValue(value) {
   return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
 }
 
-function getUnlockDateText(unlockDate) {
+function getUnlockDateText(unlockDate: any) {
   if (!unlockDate) {
     return "";
   }
@@ -82,7 +84,7 @@ function getUnlockDateText(unlockDate) {
   });
 }
 
-function getDisplayNameUnlockDate(value) {
+function getDisplayNameUnlockDate(value: any) {
   const lastChangeDate = getDateFromStoredValue(value);
 
   if (!lastChangeDate) {
@@ -92,7 +94,7 @@ function getDisplayNameUnlockDate(value) {
   return new Date(lastChangeDate.getTime() + DISPLAY_NAME_CHANGE_COOLDOWN_MS);
 }
 
-function getAucIdUnlockDate(value) {
+function getAucIdUnlockDate(value: any) {
   const lastChangeDate = getDateFromStoredValue(value);
 
   if (!lastChangeDate) {
@@ -102,15 +104,15 @@ function getAucIdUnlockDate(value) {
   return new Date(lastChangeDate.getTime() + AUC_ID_CHANGE_COOLDOWN_MS);
 }
 
-function getDisplayNameUnlockDateText(value) {
+function getDisplayNameUnlockDateText(value: any) {
   return getUnlockDateText(getDisplayNameUnlockDate(value));
 }
 
-function getAucIdUnlockDateText(value) {
+function getAucIdUnlockDateText(value: any) {
   return getUnlockDateText(getAucIdUnlockDate(value));
 }
 
-async function getTwoFactorResponse(uid, userData) {
+async function getTwoFactorResponse(uid: any, userData: any) {
   const twoFactorData = userData && userData.twoFactor && typeof userData.twoFactor === "object"
     ? userData.twoFactor
     : {};
@@ -130,7 +132,7 @@ async function getTwoFactorResponse(uid, userData) {
   };
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req: LegacyRequest, res: LegacyReply) {
   try {
     if (req.method === "PATCH") {
       const decodedUser = await getSiteSessionUser(req, {
@@ -198,7 +200,7 @@ module.exports = async function handler(req, res) {
       let displayNameChanged = false;
       let aucIdChanged = false;
 
-      await db.runTransaction(async function (transaction) {
+      await db.runTransaction(async function (transaction: any) {
         const userDoc = await transaction.get(userRef);
         const userData = userDoc.exists ? userDoc.data() || {} : {};
         const currentAucIdLookupKey = userData.aucIdLookupKey || getAucIdLookupKey(userData.aucId || "");
@@ -358,7 +360,7 @@ module.exports = async function handler(req, res) {
         aucIdLastChangedAt
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("AUC Atlas /api/me failed:", {
       message: error && error.message ? error.message : "",
       code: error && error.code ? error.code : "",
