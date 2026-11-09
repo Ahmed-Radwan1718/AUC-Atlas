@@ -421,6 +421,11 @@
       padding: 24px;
       display: grid;
       place-items: center;
+      opacity: 1;
+      /* The shared modal's will-change: opacity isolates its backdrop,
+         preventing backdrop-filter from blurring the underlying page. */
+      will-change: auto;
+      transition: none;
     }
 
     .quick-material-upload-modal[hidden] {
@@ -433,9 +438,9 @@
       width: 100%;
       height: 100%;
       border: 0;
-      background: rgba(23, 23, 23, 0.32);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: rgba(247, 244, 238, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       cursor: default;
     }
 
@@ -456,7 +461,7 @@
     }
 
     .quick-material-upload-header {
-      padding-right: 54px;
+      padding-right: 0;
     }
 
     .quick-material-upload-kicker {
@@ -537,6 +542,30 @@
       justify-content: center;
     }
 
+    .quick-material-upload-cancel {
+      width: 100%;
+      min-height: 34px;
+      padding: 6px 12px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.56);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .quick-material-upload-cancel:hover {
+      color: #171717;
+      background: rgba(23, 23, 23, 0.04);
+    }
+
+    .quick-material-upload-cancel:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 2px;
+    }
+
     .material-upload-status.success {
       color: #2f8f5b;
     }
@@ -577,7 +606,7 @@
       }
 
       .quick-material-upload-header {
-        padding-right: 52px;
+        padding-right: 0;
       }
 
       .quick-material-upload-dialog .material-upload-grid {

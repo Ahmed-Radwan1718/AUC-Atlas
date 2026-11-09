@@ -19,16 +19,7 @@ const dialogsMarkup = `
       aria-modal="true"
       aria-labelledby="quick-material-upload-title"
     >
-      <button
-        class="quick-material-upload-close"
-        id="quick-material-upload-close"
-        type="button"
-        aria-label="Close upload form"
-        data-close-quick-material-upload
-      >×</button>
-
       <header class="quick-material-upload-header">
-        <p class="quick-material-upload-kicker">Share course material</p>
         <h2 id="quick-material-upload-title">Upload material</h2>
         <p class="quick-material-upload-copy">
           Share notes, slides, assignments, and other course resources with your classmates.
@@ -242,6 +233,12 @@ const dialogsMarkup = `
           data-material-role="status"
           aria-live="polite"
         ></p>
+
+        <button
+          class="quick-material-upload-cancel"
+          type="button"
+          data-close-quick-material-upload
+        >Cancel</button>
       </form>
     </section>
   </div>

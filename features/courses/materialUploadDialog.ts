@@ -14,10 +14,6 @@ function setupCourseUploadStart() {
     const form = document.getElementById(
       "quick-material-upload-form"
     );
-    const closeButton = document.getElementById(
-      "quick-material-upload-close"
-    );
-
     if (
       !button ||
       !modal ||
@@ -122,14 +118,23 @@ function setupCourseUploadStart() {
             )
           : null;
 
+      // Focus the first usable form control now that the decorative
+      // header close button has been removed.
       window.setTimeout(function () {
-        if (courseCode && closeButton) {
-          closeButton.focus();
-        } else if (courseChoiceButton) {
-          courseChoiceButton.focus();
-        } else if (closeButton) {
-          closeButton.focus();
-        }
+        if (modal.hidden) return;
+
+        const professorChoice = form.querySelector(
+          "#quick-material-professor + .material-choice " +
+          ".material-professor-search-input, " +
+          "#quick-material-professor + .material-choice " +
+          ".material-choice-button"
+        );
+        const firstField = form.querySelector(
+          "input:not([type='file']):not([type='checkbox'])"
+        );
+        const target = (courseCode ? professorChoice : courseChoiceButton)
+          || firstField;
+        if (target) target.focus({ preventScroll: true });
       }, 0);
     }
 
