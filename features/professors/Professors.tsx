@@ -39,34 +39,40 @@ export default function Professors() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [query, setQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [departmentOpen, setDepartmentOpen] = useState(false);
   const [ratingOpen, setRatingOpen] = useState(false);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [visibleLimit, setVisibleLimit] = useState(30);
   const activeSearchTransition = useRef<ViewTransition | null>(null);
+  const searchVersion = useRef(0);
 
   function updateSearch(value: string) {
-    const update = () => {
-      setQuery(value);
+    // Never delay updates to the controlled search input.
+    setQuery(value);
+    const version = ++searchVersion.current;
+    const updateResults = () => {
+      if (version !== searchVersion.current) return;
+      setSearchQuery(value);
       setVisibleLimit(30);
     };
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || loading) {
-      update();
+      updateResults();
       return;
     }
 
-    // Snapshot the old and new grids so results crossfade instead of popping.
-    // flushSync ensures React has committed the new results for the snapshot.
+    // The old and new result grids crossfade, without animating the input.
     if (document.startViewTransition) {
       activeSearchTransition.current?.skipTransition();
-      const transition = document.startViewTransition(() => flushSync(update));
+      const transition = document.startViewTransition(() => flushSync(updateResults));
       activeSearchTransition.current = transition;
-      void transition.finished.finally(() => {
+      const clearTransition = () => {
         if (activeSearchTransition.current === transition) activeSearchTransition.current = null;
-      });
+      };
+      void transition.finished.then(clearTransition, clearTransition);
     } else {
-      flushSync(update);
+      flushSync(updateResults);
       // Gentle fallback for browsers without the View Transitions API.
       document.getElementById("professors-grid")?.animate(
         [{ opacity: 0.72, transform: "translateY(5px)" }, { opacity: 1, transform: "translateY(0)" }],
@@ -102,11 +108,11 @@ export default function Professors() {
       item.filterDepartment, item.status, ratingStatus(item.averageRating),
       item.course, item.group
     ].join(" "));
-    return (!query || searchable.includes(normalize(query)))
+    return (!searchQuery || searchable.includes(normalize(searchQuery)))
       && (!selectedDepartments.length || selectedDepartments.includes(department(item)))
       && (!selectedRatings.length || selectedRatings.includes(ratingStatus(item.averageRating)));
   }).sort((a,b) => priority(a) - priority(b)
-    || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name)), [items,query,selectedDepartments,selectedRatings]);
+    || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name)), [items,searchQuery,selectedDepartments,selectedRatings]);
 
   function toggle(list: string[], item: string, setter: (value: string[]) => void) {
     setter(list.includes(item) ? list.filter(x=>x!==item) : [...list,item]);
