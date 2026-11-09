@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { flushSync } from "react-dom";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { professors, type Professor } from "../../data/professors";
 import "./professors.css";
 import "./professors-ui-1.css";
@@ -10,6 +9,7 @@ import "./professors-ui-3.css";
 
 type RatedProfessor = Professor & { reviewCount: number; averageRating: number };
 type RatingSummary = { reviewCount?: number; averageRating?: number };
+type CardSnapshot = { element: HTMLAnchorElement; rect: DOMRect };
 
 const department = (item: Professor): string =>
   !item.department || item.department.trim().toLowerCase() === "department coming soon"
@@ -39,47 +39,40 @@ export default function Professors() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [query, setQuery] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
   const [departmentOpen, setDepartmentOpen] = useState(false);
   const [ratingOpen, setRatingOpen] = useState(false);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [visibleLimit, setVisibleLimit] = useState(30);
-  const activeSearchTransition = useRef<ViewTransition | null>(null);
-  const searchVersion = useRef(0);
+  const gridRef = useRef<HTMLElement | null>(null);
+  const previousCardsRef = useRef<Map<string, CardSnapshot> | null>(null);
+  const cardAnimationsRef = useRef<Map<string, Animation>>(new Map());
+  const leavingCardsRef = useRef<Set<HTMLAnchorElement>>(new Set());
 
-  // Reserve the crossfade for deliberate actions. Never animate every keystroke.
-  function crossfadeResults(updateResults: () => void) {
-    if (loading || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !document.startViewTransition) {
-      updateResults();
+  // Remember each card's *current visual position*, including mid-animation,
+  // before React changes the results. No debounce or delay to the search input.
+  function updateWithFluidLayout(update: () => void) {
+    const grid = gridRef.current;
+    if (!grid || loading || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      previousCardsRef.current = null;
+      update();
       return;
     }
 
-    activeSearchTransition.current?.skipTransition();
-    const transition = document.startViewTransition(() => flushSync(updateResults));
-    activeSearchTransition.current = transition;
-    const clearTransition = () => {
-      if (activeSearchTransition.current === transition) activeSearchTransition.current = null;
-    };
-    void transition.finished.then(clearTransition, clearTransition);
+    const snapshot = new Map<string, CardSnapshot>();
+    grid.querySelectorAll<HTMLAnchorElement>(".professor-card[data-professor-id]").forEach(card => {
+      const id = card.dataset.professorId;
+      if (id) snapshot.set(id, { element: card, rect: card.getBoundingClientRect() });
+    });
+    previousCardsRef.current = snapshot;
+    update();
   }
 
   function updateSearch(value: string) {
-    // Both the input and results update immediately during normal typing.
-    setQuery(value);
-    const version = ++searchVersion.current;
-    const updateResults = () => {
-      // An interrupted clear should never overwrite more recent typing.
-      if (version !== searchVersion.current) return;
-      setSearchQuery(value);
+    updateWithFluidLayout(() => {
+      setQuery(value);
       setVisibleLimit(30);
-    };
-    if (!value && searchQuery) {
-      crossfadeResults(updateResults);
-    } else {
-      activeSearchTransition.current?.skipTransition();
-      updateResults();
-    }
+    });
   }
 
   useEffect(() => {
@@ -109,19 +102,121 @@ export default function Professors() {
       item.filterDepartment, item.status, ratingStatus(item.averageRating),
       item.course, item.group
     ].join(" "));
-    return (!searchQuery || searchable.includes(normalize(searchQuery)))
+    return (!query || searchable.includes(normalize(query)))
       && (!selectedDepartments.length || selectedDepartments.includes(department(item)))
       && (!selectedRatings.length || selectedRatings.includes(ratingStatus(item.averageRating)));
   }).sort((a,b) => priority(a) - priority(b)
-    || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name)), [items,searchQuery,selectedDepartments,selectedRatings]);
+    || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name)), [items,query,selectedDepartments,selectedRatings]);
+
+  // FLIP: measure old positions, let React reflow, then animate the difference.
+  // Reading positions while an old animation is active lets rapid typing
+  // continue from the card's visible position rather than snapping back.
+  useLayoutEffect(() => {
+    const previous = previousCardsRef.current;
+    previousCardsRef.current = null;
+    const grid = gridRef.current;
+    if (!previous || !grid) return;
+
+    const current = new Map<string, HTMLAnchorElement>();
+    grid.querySelectorAll<HTMLAnchorElement>(".professor-card[data-professor-id]").forEach(card => {
+      const id = card.dataset.professorId;
+      if (id) current.set(id, card);
+    });
+
+    // Cancel old transforms before measuring final layout. Nothing paints
+    // between this cancellation and the replacement animations.
+    for (const animation of cardAnimationsRef.current.values()) animation.cancel();
+    cardAnimationsRef.current.clear();
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    for (const [id, card] of current) {
+      const old = previous.get(id);
+      if (!old) {
+        // A newly matching professor appears gently, without scaling.
+        const animation = card.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: 170, easing: "ease-out"
+        });
+        cardAnimationsRef.current.set(id, animation);
+        animation.onfinish = () => {
+          if (cardAnimationsRef.current.get(id) === animation) cardAnimationsRef.current.delete(id);
+        };
+        continue;
+      }
+
+      const target = card.getBoundingClientRect();
+      const dx = old.rect.left - target.left;
+      const dy = old.rect.top - target.top;
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue;
+
+      // Preserve an existing hover transform when a card is repositioned.
+      const base = window.getComputedStyle(card).transform;
+      const start = `translate(${dx}px, ${dy}px)${base === "none" ? "" : " " + base}`;
+      const end = base === "none" ? "translate(0px, 0px)" : base;
+      const animation = card.animate([{ transform: start }, { transform: end }], {
+        duration: 240, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "both"
+      });
+      cardAnimationsRef.current.set(id, animation);
+      animation.onfinish = () => {
+        if (cardAnimationsRef.current.get(id) === animation) cardAnimationsRef.current.delete(id);
+        animation.cancel(); // Remove the temporary transform; preserve :hover styles.
+      };
+    }
+
+    // React removes nonmatching cards immediately. Fade a short-lived visual
+    // copy at the card's former screen coordinates so they don't disappear.
+    for (const [id, old] of previous) {
+      if (current.has(id)) continue;
+      const { rect } = old;
+      if (rect.bottom < 0 || rect.top > window.innerHeight) continue;
+      const ghost = old.element.cloneNode(true) as HTMLAnchorElement;
+      ghost.setAttribute("aria-hidden", "true");
+      ghost.tabIndex = -1;
+      ghost.inert = true;
+      Object.assign(ghost.style, {
+        position: "fixed",
+        top: rect.top + "px",
+        left: rect.left + "px",
+        width: rect.width + "px",
+        height: rect.height + "px",
+        margin: "0",
+        transform: "none",
+        transition: "none",
+        pointerEvents: "none",
+        zIndex: "5"
+      });
+      document.body.appendChild(ghost);
+      leavingCardsRef.current.add(ghost);
+      const disappear = () => {
+        ghost.remove();
+        leavingCardsRef.current.delete(ghost);
+      };
+      const animation = ghost.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 160, easing: "ease-in"
+      });
+      animation.onfinish = disappear;
+      animation.oncancel = disappear;
+    }
+
+    // Match the empty state to the same gentle entrance.
+    const empty = grid.querySelector<HTMLElement>(".professors-empty");
+    if (empty && previous.size) {
+      empty.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: 170, easing: "ease-out"
+      });
+    }
+  }, [results, visibleLimit, loading]);
+
+  useEffect(() => () => {
+    for (const animation of cardAnimationsRef.current.values()) animation.cancel();
+    cardAnimationsRef.current.clear();
+    for (const ghost of leavingCardsRef.current) ghost.remove();
+    leavingCardsRef.current.clear();
+  }, []);
 
   function toggle(list: string[], item: string, setter: (value: string[]) => void) {
-    const next = list.includes(item) ? list.filter(x => x !== item) : [...list, item];
-    const version = ++searchVersion.current;
-    crossfadeResults(() => {
-      if (version !== searchVersion.current) return;
-      setter(next);
-      setSearchQuery(query);
+    updateWithFluidLayout(() => {
+      setter(list.includes(item) ? list.filter(x => x !== item) : [...list, item]);
       setVisibleLimit(30);
     });
   }
@@ -167,7 +262,7 @@ export default function Professors() {
                 aria-label="Search professors" value={query}
                 onChange={event=>updateSearch(event.target.value)}/>
             </div>
-            <section className="professors-grid" id="professors-grid" aria-label={loading?"Loading professors and reviews":"Professor list"}
+            <section className="professors-grid" id="professors-grid" ref={gridRef} aria-label={loading?"Loading professors and reviews":"Professor list"}
               aria-busy={loading}>
               {loading ? Array.from({length:4},(_,index)=><div className="professor-loading-card" aria-hidden="true" key={index}>
                 <div className="professor-loading-image"/>
@@ -181,7 +276,7 @@ export default function Professors() {
                   const rating = item.reviewCount && Number.isFinite(item.averageRating) && item.averageRating>0
                     ? <><span className="professor-card-stars">{"★".repeat(Math.max(1,Math.min(5,Math.round(item.averageRating))))}</span>{" " + item.averageRating.toFixed(1)}</>
                     : "No Stars Yet";
-                  return <a className="professor-card" key={item.id} href={"/professors/"+encodeURIComponent(item.id)}
+                  return <a className="professor-card" key={item.id} data-professor-id={item.id} href={"/professors/"+encodeURIComponent(item.id)}
                     aria-label={"Open "+item.name+" profile"}>
                     <div className="professor-card-image">
                       <img src={photo(item.image)} alt={item.name} width={720} height={456}
@@ -199,7 +294,7 @@ export default function Professors() {
                 })}
                 {!results.length && <p className="professors-empty">No professors match those filters.</p>}
                 {results.length>visibleLimit && <button className="professors-view-more" type="button"
-                  onClick={()=>setVisibleLimit(x=>x+30)}>
+                  onClick={()=>updateWithFluidLayout(() => setVisibleLimit(x=>x+30))}>
                   View {Math.min(30,results.length-visibleLimit)} more
                   <span>{results.length-visibleLimit} remaining</span>
                 </button>}
