@@ -1058,3 +1058,143 @@
         opacity: 1;
       }
     }
+
+    /* Review reports share the right-edge drawer pattern of Leave Review. */
+    html:has(body.content-report-open) {
+      overflow: hidden;
+    }
+
+    #professor-review-report-modal {
+      padding: 0;
+      display: block;
+      transition: none;
+      place-items: unset;
+    }
+
+    #professor-review-report-modal[hidden] {
+      display: none;
+    }
+
+    #professor-review-report-modal .course-report-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(247, 244, 238, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      animation: courseReportBackdropIn 280ms ease-out both;
+    }
+
+    #professor-review-report-modal .course-report-dialog {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: auto;
+      width: min(520px, 100vw);
+      height: 100dvh;
+      max-height: 100dvh;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      border-radius: 24px 0 0 24px;
+      background: #fff;
+      box-shadow: -20px 0 80px rgba(42, 32, 20, 0.16);
+      animation: professorReportDrawerIn 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    #professor-review-report-modal.is-closing .course-report-dialog,
+    #professor-review-report-modal.is-closing .course-report-backdrop {
+      animation: none;
+    }
+
+    #professor-review-report-modal .course-report-header {
+      flex: 0 0 auto;
+      padding: 24px 24px 18px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: #fff;
+    }
+
+    #professor-review-report-modal .course-report-form {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    #professor-review-report-modal .course-report-drawer-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 22px 24px 32px;
+      display: grid;
+      align-content: start;
+      gap: 14px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #professor-review-report-modal .course-report-field textarea {
+      min-height: 180px;
+    }
+
+    #professor-review-report-modal .course-report-actions {
+      flex: 0 0 auto;
+      margin-top: auto;
+      padding: 16px 24px max(20px, env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      background: #fff;
+      box-shadow: 0 -8px 22px rgba(42, 32, 20, 0.035);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #professor-review-report-modal .course-report-submit {
+      width: 100%;
+      min-height: 50px;
+    }
+
+    #professor-review-report-modal .course-report-cancel {
+      min-height: 34px;
+      align-self: center;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+    }
+
+    @keyframes professorReportDrawerIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+
+    @media (max-width: 640px) {
+      #professor-review-report-modal .course-report-dialog {
+        right: 0;
+        left: 0;
+        width: 100vw;
+        border-radius: 0;
+      }
+
+      #professor-review-report-modal .course-report-header {
+        padding: max(18px, env(safe-area-inset-top)) 18px 14px;
+      }
+
+      #professor-review-report-modal .course-report-drawer-body {
+        padding: 20px 18px 28px;
+      }
+
+      #professor-review-report-modal .course-report-actions {
+        padding: 14px 18px max(18px, env(safe-area-inset-bottom));
+        display: flex;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #professor-review-report-modal .course-report-dialog,
+      #professor-review-report-modal .course-report-backdrop {
+        animation: none;
+      }
+    }

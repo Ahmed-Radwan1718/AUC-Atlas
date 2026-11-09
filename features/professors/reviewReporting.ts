@@ -1,5 +1,5 @@
 // @ts-nocheck
-// Preserved original AUC Atlas review-report modal interactions.
+// Professor review reporting uses the same right-side drawer pattern as Leave Review.
 function submitProfessorReviewReport(
     button
   ) {
@@ -57,6 +57,7 @@ function submitProfessorReviewReport(
             class="course-report-form"
             id="professor-review-report-form"
           >
+            <div class="course-report-drawer-body">
             <label class="course-report-field">
               <span>Reason for report</span>
               <textarea
@@ -73,19 +74,20 @@ function submitProfessorReviewReport(
               id="professor-review-report-status"
               aria-live="polite"
             ></p>
+            </div>
 
             <div class="course-report-actions">
-              <button
-                class="course-report-cancel"
-                type="button"
-                data-close-professor-review-report
-              >Cancel</button>
-
               <button
                 class="course-report-submit"
                 id="professor-review-report-submit"
                 type="submit"
               >Submit report</button>
+
+              <button
+                class="course-report-cancel"
+                type="button"
+                data-close-professor-review-report
+              >Cancel</button>
             </div>
           </form>
         </section>
@@ -120,11 +122,10 @@ function submitProfessorReviewReport(
       return;
     }
 
-    function closeReportPanel() {
+    function finishClosingReportPanel() {
       modal.hidden = true;
-      document.body.classList.remove(
-        "content-report-open"
-      );
+      modal.classList.remove("is-closing");
+      document.body.classList.remove("content-report-open");
       form.reset();
       status.textContent = "";
       status.className = "course-report-status";
@@ -135,8 +136,41 @@ function submitProfessorReviewReport(
         modal.reportSourceButton &&
         !modal.reportSourceButton.disabled
       ) {
-        modal.reportSourceButton.focus();
+        try {
+          modal.reportSourceButton.focus({ preventScroll: true });
+        } catch {
+          modal.reportSourceButton.focus();
+        }
       }
+    }
+
+    function closeReportPanel() {
+      if (modal.hidden || modal.classList.contains("is-closing")) {
+        return;
+      }
+
+      const drawer = modal.querySelector(".course-report-dialog");
+      const backdrop = modal.querySelector(".course-report-backdrop");
+      if (!drawer || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        finishClosingReportPanel();
+        return;
+      }
+
+      modal.classList.add("is-closing");
+      const closingAnimation = drawer.animate(
+        [{ transform: "translateX(0)" }, { transform: "translateX(100%)" }],
+        { duration: 250, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "both" }
+      );
+      if (backdrop) {
+        backdrop.animate(
+          [{ opacity: 1 }, { opacity: 0 }],
+          { duration: 220, easing: "ease-in", fill: "both" }
+        );
+      }
+      closingAnimation.finished.then(
+        finishClosingReportPanel,
+        finishClosingReportPanel
+      );
     }
 
     if (modal.dataset.ready !== "true") {
@@ -156,11 +190,46 @@ function submitProfessorReviewReport(
       document.addEventListener(
         "keydown",
         function (event) {
-          if (
-            event.key === "Escape" &&
-            !modal.hidden
-          ) {
+          if (modal.hidden || modal.classList.contains("is-closing")) {
+            return;
+          }
+
+          if (event.key === "Escape") {
+            event.preventDefault();
             closeReportPanel();
+            return;
+          }
+
+          if (event.key !== "Tab") {
+            return;
+          }
+
+          const focusable = Array.from(
+            modal.querySelectorAll(
+              ".course-report-dialog button:not([disabled]), " +
+              ".course-report-dialog textarea:not([disabled]), " +
+              ".course-report-dialog [tabindex]:not([tabindex='-1'])"
+            )
+          ).filter(function (element) {
+            return element.getClientRects().length > 0;
+          });
+          if (!focusable.length) {
+            event.preventDefault();
+            reasonInput.focus();
+            return;
+          }
+
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          const inside = modal.querySelector(".course-report-dialog")
+            .contains(document.activeElement);
+
+          if (!inside || (event.shiftKey && document.activeElement === first)) {
+            event.preventDefault();
+            (event.shiftKey ? last : first).focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
           }
         }
       );
@@ -242,11 +311,7 @@ function submitProfessorReviewReport(
               activeButton.disabled = true;
             }
 
-            modal.hidden = true;
-            document.body.classList.remove(
-              "content-report-open"
-            );
-            form.reset();
+            closeReportPanel();
           } catch (error) {
             status.textContent =
               error.message ||
@@ -268,6 +333,10 @@ function submitProfessorReviewReport(
       );
     }
 
+    if (modal.classList.contains("is-closing")) {
+      return;
+    }
+
     modal.reportSourceButton = button;
     modal.reportSourceOriginalText =
       button.textContent;
@@ -285,12 +354,12 @@ function submitProfessorReviewReport(
     submitButton.textContent = "Submit report";
 
     modal.hidden = false;
-    document.body.classList.add(
-      "content-report-open"
-    );
+    document.body.classList.add("content-report-open");
 
     window.setTimeout(function () {
-      reasonInput.focus();
+      if (!modal.hidden && !modal.classList.contains("is-closing")) {
+        reasonInput.focus({ preventScroll: true });
+      }
     }, 0);
   }
 
