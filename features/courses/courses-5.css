@@ -30,4 +30,258 @@
         animation: none;
       }
     }
-  
+
+
+    /* Upload Material and Leave a Review share the same drawer shell and
+       typography, while retaining their own form controls and workflows. */
+    html:has(body.quick-material-upload-open) {
+      overflow: hidden;
+    }
+
+    .quick-material-upload-modal,
+    .quick-material-upload-modal.is-course-detail-upload {
+      height: 100dvh;
+      padding: 0;
+      display: grid;
+      place-items: stretch end;
+    }
+
+    .quick-material-upload-dialog,
+    .quick-material-upload-modal.is-course-detail-upload .quick-material-upload-dialog {
+      box-sizing: border-box;
+      position: relative;
+      top: 0;
+      right: 0;
+      width: min(520px, 100vw);
+      height: 100dvh;
+      max-height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 0;
+      border-radius: 24px 0 0 24px;
+      background: #ffffff;
+      box-shadow: -20px 0 80px rgba(42, 32, 20, 0.16);
+      animation: courseUploadDrawerIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .quick-material-upload-header {
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 24px 24px 18px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: #ffffff;
+    }
+
+    .quick-material-upload-header h2 {
+      margin: 0;
+      color: #171717;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.1;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    .quick-material-upload-dialog .material-upload-form {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      min-height: 0;
+      min-width: 0;
+      gap: 0;
+    }
+
+    .quick-material-upload-body {
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+      padding: 22px 24px 32px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+      gap: 18px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .quick-material-upload-section-title {
+      margin: 0;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+
+    .quick-material-upload-dialog .material-upload-grid,
+    .quick-material-upload-modal.is-course-detail-upload .material-upload-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .quick-material-upload-body .material-upload-field {
+      min-width: 0;
+      gap: 6px;
+    }
+
+    .quick-material-upload-body .material-upload-field > span:first-child {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.045em;
+      line-height: 1.4;
+    }
+
+    .quick-material-upload-body .material-upload-field input:not([type="file"]),
+    .quick-material-upload-body .material-choice-button,
+    .quick-material-upload-body .material-choice-search,
+    .quick-material-upload-body .material-professor-search-input {
+      box-sizing: border-box;
+      min-height: 43px;
+      padding: 0 13px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 12px;
+      background: #ffffff;
+      color: #171717;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .quick-material-upload-body .material-choice-button {
+      padding-right: 27px;
+    }
+
+    .quick-material-upload-body .material-choice-menu,
+    .quick-material-upload-dialog .material-choice-menu {
+      position: static;
+      display: none;
+      width: 100%;
+      max-height: min(230px, 34dvh);
+      margin-top: 8px;
+      overflow-y: auto;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: none;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .quick-material-upload-body .material-choice.open .material-choice-menu {
+      display: grid;
+      pointer-events: auto;
+    }
+
+    .quick-material-upload-body .material-file-control {
+      min-height: 122px;
+      border-radius: 12px;
+      background: #ffffff;
+    }
+
+    .quick-material-upload-body .material-anonymous-option {
+      min-width: 0;
+      margin-top: 4px;
+      padding: 17px 0 0;
+      border-top: 1px solid rgba(23, 23, 23, 0.1);
+    }
+
+    .quick-material-upload-body .material-anonymous-option small {
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    /* The same toggle appearance used by Leave a Review. */
+    .quick-material-upload-body .material-anonymous-option input {
+      border: 1px solid rgba(23, 23, 23, 0.13);
+      background: rgba(23, 23, 23, 0.12);
+      box-shadow: inset 0 1px 3px rgba(23, 23, 23, 0.12);
+    }
+
+    .quick-material-upload-body .material-anonymous-option input::before {
+      width: 18px;
+      height: 18px;
+      box-shadow: 0 2px 7px rgba(23, 23, 23, 0.22);
+    }
+
+    .quick-material-upload-body .material-anonymous-option input:checked {
+      border-color: rgba(154, 112, 48, 0.8);
+      background: #c09a5c;
+      box-shadow: inset 0 1px 3px rgba(90, 58, 15, 0.18),
+        0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .quick-material-upload-footer {
+      flex: 0 0 auto;
+      min-width: 0;
+      padding: 12px 24px max(14px, env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      background: #ffffff;
+      box-shadow: 0 -8px 22px rgba(42, 32, 20, 0.035);
+      display: grid;
+      gap: 8px;
+    }
+
+    .quick-material-upload-dialog .quick-material-upload-footer .material-upload-button {
+      width: 100%;
+      min-height: 46px;
+      margin: 0;
+      background: #171717;
+      color: #ffffff;
+      font-size: 11px;
+      box-shadow: none;
+    }
+
+    .quick-material-upload-footer .quick-material-upload-cancel {
+      min-height: 34px;
+      margin: 0;
+      padding: 4px 10px;
+    }
+
+    .quick-material-upload-footer .material-upload-status {
+      margin: 0;
+    }
+
+    @media (max-width: 640px) {
+      .quick-material-upload-modal,
+      .quick-material-upload-modal.is-course-detail-upload {
+        height: 100dvh;
+        padding: 0;
+        align-items: stretch;
+      }
+
+      .quick-material-upload-dialog,
+      .quick-material-upload-modal.is-course-detail-upload .quick-material-upload-dialog {
+        width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        border-radius: 0;
+      }
+
+      .quick-material-upload-header {
+        padding: max(18px, env(safe-area-inset-top)) 18px 14px;
+      }
+
+      .quick-material-upload-body {
+        padding: 20px 18px 28px;
+      }
+
+      .quick-material-upload-footer {
+        padding: 14px 18px max(18px, env(safe-area-inset-bottom));
+      }
+
+      .quick-material-upload-dialog .quick-material-upload-footer .material-upload-button {
+        min-height: 52px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .quick-material-upload-dialog,
+      .quick-material-upload-modal.is-course-detail-upload .quick-material-upload-dialog {
+        animation: none;
+      }
+    }

@@ -27,6 +27,8 @@ const dialogsMarkup = `
         class="material-upload-form"
         id="quick-material-upload-form"
       >
+        <div class="quick-material-upload-body">
+          <h3 class="quick-material-upload-section-title">Material details</h3>
         <div class="material-upload-grid">
           <label class="material-upload-field quick-material-course-field">
             <span>Course</span>
@@ -166,7 +168,7 @@ const dialogsMarkup = `
           aria-live="polite"
         ></div>
 
-                <label class="material-anonymous-option">
+        <label class="material-anonymous-option">
           <span>
             <strong>Upload anonymously</strong>
             <small>Hide your name from other students</small>
@@ -179,6 +181,9 @@ const dialogsMarkup = `
           >
         </label>
 
+        </div>
+
+        <div class="quick-material-upload-footer">
         <button
           class="material-upload-button"
           id="quick-material-upload-button"
@@ -236,6 +241,7 @@ const dialogsMarkup = `
           type="button"
           data-close-quick-material-upload
         >Cancel</button>
+        </div>
       </form>
     </section>
   </div>
