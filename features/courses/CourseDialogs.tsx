@@ -21,9 +21,6 @@ const dialogsMarkup = `
     >
       <header class="quick-material-upload-header">
         <h2 id="quick-material-upload-title">Upload material</h2>
-        <p class="quick-material-upload-copy">
-          Share notes, slides, assignments, and other course resources with your classmates.
-        </p>
       </header>
 
       <form
