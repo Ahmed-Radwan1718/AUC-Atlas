@@ -23,10 +23,10 @@ const CRON_SECRET = "mock-cron-secret-with-at-least-32-characters";
 
 function createHarness(options: any = {}) {
   const authorizations = new Map(
-    Object.entries(options.authorizations || {}).map(([id, data]) => [id, { ...(data as Record<string, unknown>) }])
+    Object.entries(options.authorizations || {}).map(([id, data]) => [id, { ...(data as Record<string, any>) }])
   );
   const limits = new Map(
-    Object.entries(options.limits || {}).map(([id, data]) => [id, { ...(data as Record<string, unknown>) }])
+    Object.entries(options.limits || {}).map(([id, data]) => [id, { ...(data as Record<string, any>) }])
   );
   const deletedFiles: any[] = [];
   let queries = 0;
@@ -220,8 +220,8 @@ test("expired pending files are deleted; consumed records lose only metadata; gr
   assert.equal(service.authorizations.has("pending"), false);
   assert.equal(service.authorizations.has("consumed"), false);
   assert.equal(service.authorizations.has("recent"), true);
-  assert.equal(service.limits.get("student-1").activeAuthorizationId, "");
-  assert.equal(service.limits.get("student-2").activeAuthorizationId, "");
+  assert.equal(service.limits.get("student-1")!.activeAuthorizationId, "");
+  assert.equal(service.limits.get("student-2")!.activeAuthorizationId, "");
 });
 
 test("provider failure preserves the authorization and active marker for a later retry", async () => {
@@ -245,7 +245,7 @@ test("provider failure preserves the authorization and active marker for a later
   assert.equal(response.body.failed, 1);
   assert.equal(response.body.filesDeleted, 0);
   assert.equal(service.authorizations.has("pending"), true);
-  assert.equal(service.limits.get("student-1").activeAuthorizationId, "pending");
+  assert.equal(service.limits.get("student-1")!.activeAuthorizationId, "pending");
 });
 
 test("a successful authenticated run with no expired authorizations is a no-op", async () => {
