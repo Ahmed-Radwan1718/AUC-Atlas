@@ -38,19 +38,12 @@ function submitProfessorReviewReport(
         >
           <header class="course-report-header">
             <div class="course-report-header-copy">
-              <p class="course-report-kicker">Content moderation</p>
               <h2 id="professor-review-report-title">Report review</h2>
               <p id="professor-review-report-copy">
                 Tell us what is wrong with this review. Our moderators will review your report.
               </p>
             </div>
 
-            <button
-              class="course-report-close"
-              type="button"
-              aria-label="Close report panel"
-              data-close-professor-review-report
-            >×</button>
           </header>
 
           <form
