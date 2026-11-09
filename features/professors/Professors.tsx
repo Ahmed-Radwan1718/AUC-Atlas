@@ -134,7 +134,7 @@ export default function Professors() {
               </div>) : <>
                 {results.slice(0,visibleLimit).map((item,index) => {
                   const rating = item.reviewCount && Number.isFinite(item.averageRating) && item.averageRating>0
-                    ? "★".repeat(Math.max(1,Math.min(5,Math.round(item.averageRating)))) + " " + item.averageRating.toFixed(1)
+                    ? <><span className="professor-card-stars">{"★".repeat(Math.max(1,Math.min(5,Math.round(item.averageRating))))}</span>{" " + item.averageRating.toFixed(1)}</>
                     : "No Stars Yet";
                   return <a className="professor-card" key={item.id} href={"/professors/"+encodeURIComponent(item.id)}
                     aria-label={"Open "+item.name+" profile"}>

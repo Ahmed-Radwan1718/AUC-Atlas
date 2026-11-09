@@ -191,6 +191,10 @@
       white-space: nowrap;
     }
 
+    .professor-meta .professor-card-stars {
+      color: #c09a5c;
+    }
+
     .professor-meta span + span::before {
       content: "•";
       margin: 0 8px;
