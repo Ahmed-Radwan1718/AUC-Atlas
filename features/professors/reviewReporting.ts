@@ -123,6 +123,8 @@ function submitProfessorReviewReport(
     }
 
     function finishClosingReportPanel() {
+      window.clearTimeout(modal.reportCloseTimer);
+      modal.reportCloseTimer = null;
       modal.hidden = true;
       modal.classList.remove("is-closing");
       document.body.classList.remove("content-report-open");
@@ -149,28 +151,16 @@ function submitProfessorReviewReport(
         return;
       }
 
-      const drawer = modal.querySelector(".course-report-dialog");
-      const backdrop = modal.querySelector(".course-report-backdrop");
-      if (!drawer || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         finishClosingReportPanel();
         return;
       }
 
+      // Use a cancelable timer rather than an animation.finished promise:
+      // opening a report during the exit animation must never be ignored.
       modal.classList.add("is-closing");
-      const closingAnimation = drawer.animate(
-        [{ transform: "translateX(0)" }, { transform: "translateX(100%)" }],
-        { duration: 250, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "both" }
-      );
-      if (backdrop) {
-        backdrop.animate(
-          [{ opacity: 1 }, { opacity: 0 }],
-          { duration: 220, easing: "ease-in", fill: "both" }
-        );
-      }
-      closingAnimation.finished.then(
-        finishClosingReportPanel,
-        finishClosingReportPanel
-      );
+      window.clearTimeout(modal.reportCloseTimer);
+      modal.reportCloseTimer = window.setTimeout(finishClosingReportPanel, 250);
     }
 
     if (modal.dataset.ready !== "true") {
@@ -333,9 +323,11 @@ function submitProfessorReviewReport(
       );
     }
 
-    if (modal.classList.contains("is-closing")) {
-      return;
-    }
+    // Reopening during an exit cancels the pending close instead of
+    // leaving the drawer hidden or stuck in its closing state.
+    window.clearTimeout(modal.reportCloseTimer);
+    modal.reportCloseTimer = null;
+    modal.classList.remove("is-closing");
 
     modal.reportSourceButton = button;
     modal.reportSourceOriginalText =
