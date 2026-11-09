@@ -646,9 +646,7 @@
 
     .course-detail-prereq-link {
       color: #171717;
-      text-decoration: underline;
-      text-decoration-color: rgba(192,154,92,0.72);
-      text-underline-offset: 3px;
+      text-decoration: none;
       transition: color 0.18s ease;
     }
     .course-detail-prereq-link:hover,
