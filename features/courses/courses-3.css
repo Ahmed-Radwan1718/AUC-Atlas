@@ -749,6 +749,65 @@
       text-align: center;
     }
 
+    /* Empty libraries have an intentional visual state, not a drop zone. */
+    .course-material-downloads.is-empty .course-material-empty-state {
+      min-height: 176px;
+      padding: 28px 18px 34px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      text-align: center;
+    }
+
+    .course-material-downloads.is-empty .course-material-empty-icon {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 5px;
+      flex: 0 0 auto;
+      color: #171717;
+    }
+
+    .course-material-downloads.is-empty .course-material-empty-state h3 {
+      margin: 0;
+      color: #171717;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .course-material-downloads.is-empty .course-material-empty-state p {
+      margin: 0;
+      max-width: 440px;
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    /* Keep the filter icon, but remove its circular button styling only
+       when there are no files. The populated library is untouched. */
+    .course-material-downloads.is-empty
+      .course-material-filter-list .material-choice-button,
+    .course-material-downloads.is-empty
+      .course-material-filter-list .material-choice-button:hover,
+    .course-material-downloads.is-empty
+      .course-material-filter-list.open .material-choice-button {
+      border-color: transparent;
+      border-radius: 8px;
+      background: transparent;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .course-material-downloads.is-empty
+      .course-material-filter-list .material-choice-button:focus-visible {
+      outline: 2px solid #171717;
+      outline-offset: 2px;
+    }
+
+
     @media (max-width: 640px) {
       .course-material-preview-tile {
         grid-template-columns: 52px minmax(0, 1fr);
