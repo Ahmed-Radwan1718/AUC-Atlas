@@ -34,3 +34,6 @@ module.exports = {
   deleteStoredCourseMaterial,
   deletePendingCourseMaterial
 };
+
+// Keep each migrated CommonJS helper scoped to its own TypeScript module.
+export {};

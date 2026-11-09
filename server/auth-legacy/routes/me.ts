@@ -242,7 +242,7 @@ export default async function handler(req: LegacyRequest, res: LegacyReply) {
         }
 
         const now = admin.firestore.FieldValue.serverTimestamp();
-        const updateData = {
+        const updateData: any = {
           fullName,
           aucId,
           aucIdLookupKey,

@@ -330,7 +330,7 @@ async function requestLoginCode(
   let email = cleanEmail(
     body.email
   );
-  let userRecord = null;
+  let userRecord: any = null;
 
   if (recovery) {
     loginChallenge =
@@ -448,7 +448,7 @@ async function requestLoginCode(
       )
   });
 
-  const responseData =
+  const responseData: any =
     createGenericRequestResponse(
       challengeId
     );

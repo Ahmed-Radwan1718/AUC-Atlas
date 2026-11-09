@@ -18,3 +18,6 @@ if (
 }
 
 module.exports = admin;
+
+// Keep each migrated CommonJS helper scoped to its own TypeScript module.
+export {};

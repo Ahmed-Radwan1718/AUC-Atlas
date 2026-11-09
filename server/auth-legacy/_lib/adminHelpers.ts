@@ -174,7 +174,7 @@ function getRequestHeader(req: any, name: any) {
     : String(value || "");
 }
 
-function createAdminAccessError(message: any) {
+function createAdminAccessError(message?: any) {
   return createAdminError(
     message ||
       "Enter your administrator password to continue.",
@@ -320,7 +320,7 @@ async function getAdminAuthenticationRequirements(
 }
 
 function createAdminChallengeError(
-  message: any
+  message?: any
 ) {
   const error = createAdminError(
     message ||
@@ -877,3 +877,6 @@ module.exports = {
   verifyAdminAuthenticator,
   requireFreshAdminAccess
 };
+
+// Keep each migrated CommonJS helper scoped to its own TypeScript module.
+export {};

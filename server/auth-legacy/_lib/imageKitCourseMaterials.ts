@@ -109,7 +109,7 @@ function imageKitHeaders() {
   };
 }
 
-async function imageKitApi(path: any, options: any) {
+async function imageKitApi(path: any, options?: any) {
   let response;
 
   try {
@@ -249,3 +249,6 @@ module.exports = {
   isImageKitMaterialPath,
   isImageKitFileId
 };
+
+// Keep each migrated CommonJS helper scoped to its own TypeScript module.
+export {};

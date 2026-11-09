@@ -497,7 +497,7 @@ async function saveSiteSession(uid: any, sessionHash: any, req: any, options: an
   const details = getSessionDetailsFromRequest(req);
   const sessionRef = admin.firestore().collection("users").doc(uid).collection("sessions").doc(sessionHash);
   const now = admin.firestore.FieldValue.serverTimestamp();
-  const updateData = Object.assign({}, details, {
+  const updateData: any = Object.assign({}, details, {
     uid,
     sessionId: sessionHash,
     lastSeenAt: now
@@ -570,9 +570,9 @@ function getSiteSessionDisplayKey(session: any) {
 
 async function getUserSiteSessions(uid: any, currentSessionHash: any) {
   const snapshot = await admin.firestore().collection("users").doc(uid).collection("sessions").get();
-  const sessions = [];
+  const sessions: any[] = [];
   const sessionsByKey = new Map();
-  const cleanup = [];
+  const cleanup: Promise<any>[] = [];
 
   snapshot.forEach(function (doc: any) {
     const data = doc.data() || {};
@@ -1276,7 +1276,7 @@ function getSecurityPanelAccessDocumentId(decodedUser: any) {
     .slice(0, 180) || "legacy-session";
 }
 
-function createSecurityPanelAccessError(message: any) {
+function createSecurityPanelAccessError(message?: any) {
   const error = new Error(
     message || "Enter your authenticator code to open the Security panel."
   );
@@ -1421,3 +1421,6 @@ module.exports = {
   issueSecurityPanelAccess,
   requireSecurityPanelAccess
 };
+
+// Keep each migrated CommonJS helper scoped to its own TypeScript module.
+export {};

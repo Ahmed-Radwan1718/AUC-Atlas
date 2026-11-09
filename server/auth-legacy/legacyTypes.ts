@@ -25,5 +25,9 @@ declare global {
     retryAfterSeconds?: number;
     firebaseErrorCode?: string;
     code?: string;
+    firebaseError?: unknown;
+    requiresTwoFactor?: boolean;
+    sessionCookieTimeout?: boolean;
+    revokedReason?: string;
   }
 }

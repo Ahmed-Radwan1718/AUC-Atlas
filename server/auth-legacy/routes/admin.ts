@@ -186,11 +186,11 @@ async function revokeStoredSessions(uid: any, reason: any) {
 }
 
 async function listAllUsers(actor: any) {
-  const userRecords = [];
-  let pageToken;
+  const userRecords: any[] = [];
+  let pageToken: string | undefined;
 
   do {
-    const page = await admin
+    const page: any = await admin
       .auth()
       .listUsers(1000, pageToken);
 
@@ -210,7 +210,7 @@ async function listAllUsers(actor: any) {
       .filter(Boolean)
   );
   const db = admin.firestore();
-  const users = [];
+  const users: any[] = [];
 
   for (
     let index = 0;
@@ -331,10 +331,10 @@ async function getDashboardData(actor: any) {
   const auditSnapshot = results[3];
   const users = results[4];
   const reviewCountSnapshot = results[5];
-  const reviews = [];
-  const firestoreMaterials = [];
-  const reports = [];
-  const audits = [];
+  const reviews: any[] = [];
+  const firestoreMaterials: any[] = [];
+  const reports: any[] = [];
+  const audits: any[] = [];
 
   reviewsSnapshot.forEach(function (doc: any) {
     reviews.push(serializeReview(doc));
