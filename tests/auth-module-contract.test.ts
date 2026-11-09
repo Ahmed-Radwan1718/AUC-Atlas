@@ -17,7 +17,7 @@ function typescriptFiles(directory: string): string[] {
 
 test("Firebase Admin default export is imported correctly throughout authentication", () => {
   const firebaseSource = readFileSync(path.join(authDirectory, "_lib/firebaseAdmin.ts"), "utf8");
-  assert.match(firebaseSource, /export\\s+default\\s+admin\\s*;/);
+  assert.match(firebaseSource, /export\s+default\s+admin\s*;/);
 
   let importCount = 0;
   for (const filename of typescriptFiles(authDirectory)) {
@@ -32,7 +32,7 @@ test("Firebase Admin default export is imported correctly throughout authenticat
         node.expression.text === "require" &&
         node.arguments.length === 1 &&
         ts.isStringLiteral(node.arguments[0]) &&
-        /(?:^|\\/)firebaseAdmin(?:\\.ts)?$/.test(node.arguments[0].text)
+        /(?:^|\/)firebaseAdmin(?:\.ts)?$/.test(node.arguments[0].text)
       ) {
         importCount += 1;
         assert.ok(
