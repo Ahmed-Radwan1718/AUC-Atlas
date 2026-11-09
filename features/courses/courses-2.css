@@ -812,9 +812,9 @@
       min-height: 44px;
       height: 44px;
       padding: 0;
-      border: 1px solid rgba(23, 23, 23, 0.12);
-      border-radius: 999px;
-      background: rgba(23, 23, 23, 0.04);
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
       color: rgba(23, 23, 23, 0.78);
       font: inherit;
       font-size: 0;
@@ -845,14 +845,16 @@
     }
 
     .course-material-filter-list .material-choice-button:hover,
-    .course-material-filter-list .material-choice-button:focus-visible,
     .course-material-filter-list.open .material-choice-button {
-      border-color: rgba(192, 154, 92, 0.42);
-      background: rgba(255, 255, 255, 0.94);
+      background: transparent;
       color: #171717;
-      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.1);
-      outline: none;
+      box-shadow: none;
       transform: translateY(-1px);
+    }
+
+    .course-material-filter-list .material-choice-button:focus-visible {
+      outline: 2px solid #171717;
+      outline-offset: 2px;
     }
 
     .course-material-filter-list .material-choice-button:active {
