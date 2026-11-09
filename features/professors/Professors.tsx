@@ -48,36 +48,37 @@ export default function Professors() {
   const activeSearchTransition = useRef<ViewTransition | null>(null);
   const searchVersion = useRef(0);
 
-  function updateSearch(value: string) {
-    // Never delay updates to the controlled search input.
-    setQuery(value);
-    const version = ++searchVersion.current;
-    const updateResults = () => {
-      if (version !== searchVersion.current) return;
-      setSearchQuery(value);
-      setVisibleLimit(30);
-    };
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || loading) {
+  // Reserve the crossfade for deliberate actions. Never animate every keystroke.
+  function crossfadeResults(updateResults: () => void) {
+    if (loading || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !document.startViewTransition) {
       updateResults();
       return;
     }
 
-    // The old and new result grids crossfade, without animating the input.
-    if (document.startViewTransition) {
-      activeSearchTransition.current?.skipTransition();
-      const transition = document.startViewTransition(() => flushSync(updateResults));
-      activeSearchTransition.current = transition;
-      const clearTransition = () => {
-        if (activeSearchTransition.current === transition) activeSearchTransition.current = null;
-      };
-      void transition.finished.then(clearTransition, clearTransition);
+    activeSearchTransition.current?.skipTransition();
+    const transition = document.startViewTransition(() => flushSync(updateResults));
+    activeSearchTransition.current = transition;
+    const clearTransition = () => {
+      if (activeSearchTransition.current === transition) activeSearchTransition.current = null;
+    };
+    void transition.finished.then(clearTransition, clearTransition);
+  }
+
+  function updateSearch(value: string) {
+    // Both the input and results update immediately during normal typing.
+    setQuery(value);
+    const version = ++searchVersion.current;
+    const updateResults = () => {
+      // An interrupted clear should never overwrite more recent typing.
+      if (version !== searchVersion.current) return;
+      setSearchQuery(value);
+      setVisibleLimit(30);
+    };
+    if (!value && searchQuery) {
+      crossfadeResults(updateResults);
     } else {
-      flushSync(updateResults);
-      // Gentle fallback for browsers without the View Transitions API.
-      document.getElementById("professors-grid")?.animate(
-        [{ opacity: 0.72, transform: "translateY(5px)" }, { opacity: 1, transform: "translateY(0)" }],
-        { duration: 220, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
-      );
+      activeSearchTransition.current?.skipTransition();
+      updateResults();
     }
   }
 
@@ -115,8 +116,14 @@ export default function Professors() {
     || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name)), [items,searchQuery,selectedDepartments,selectedRatings]);
 
   function toggle(list: string[], item: string, setter: (value: string[]) => void) {
-    setter(list.includes(item) ? list.filter(x=>x!==item) : [...list,item]);
-    setVisibleLimit(30);
+    const next = list.includes(item) ? list.filter(x => x !== item) : [...list, item];
+    const version = ++searchVersion.current;
+    crossfadeResults(() => {
+      if (version !== searchVersion.current) return;
+      setter(next);
+      setSearchQuery(query);
+      setVisibleLimit(30);
+    });
   }
   return (
     <main className="professors-page">
