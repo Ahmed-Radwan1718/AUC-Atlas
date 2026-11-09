@@ -23,10 +23,10 @@ const CRON_SECRET = "mock-cron-secret-with-at-least-32-characters";
 
 function createHarness(options: any = {}) {
   const authorizations = new Map(
-    Object.entries(options.authorizations || {}).map(([id, data]) => [id, { ...data }])
+    Object.entries(options.authorizations || {}).map(([id, data]) => [id, { ...(data as Record<string, unknown>) }])
   );
   const limits = new Map(
-    Object.entries(options.limits || {}).map(([id, data]) => [id, { ...data }])
+    Object.entries(options.limits || {}).map(([id, data]) => [id, { ...(data as Record<string, unknown>) }])
   );
   const deletedFiles: any[] = [];
   let queries = 0;
@@ -113,7 +113,7 @@ function createHarness(options: any = {}) {
       if (id === "../_lib/firebaseAdmin") return { firestore };
       if (id === "../_lib/courseMaterialStorage") {
         return {
-          async deletePendingCourseMaterial(cleanup) {
+          async deletePendingCourseMaterial(cleanup: any) {
             deletedFiles.push({ ...cleanup });
             if (options.failDeletion) throw new Error("Mock storage failure");
             return true;
