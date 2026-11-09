@@ -207,42 +207,13 @@
     }
 
 
-    /* Only clearing search or changing filters uses the View Transition API.
-       The result cards never translate, scale, or stagger as the grid changes. */
-    .professors-page .professors-grid:not(.professor-profile-grid) {
-      view-transition-name: professors-search-results;
+    /* Keep the viewport width stable while filtering short and long grids. */
+    html:has(.professors-page) {
+      scrollbar-gutter: stable;
     }
 
-    @keyframes professorSearchFadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-
-    @keyframes professorSearchFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    ::view-transition-old(root),
-    ::view-transition-new(root),
-    ::view-transition-group(professors-search-results) {
-      animation: none;
-    }
-
-    ::view-transition-old(professors-search-results) {
-      animation: 150ms ease-in both professorSearchFadeOut;
-    }
-
-    ::view-transition-new(professors-search-results) {
-      animation: 150ms ease-out both professorSearchFadeIn;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      ::view-transition-old(professors-search-results),
-      ::view-transition-new(professors-search-results) {
-        animation: none;
-      }
-    }
+    /* Card positions are animated by the Web Animations API after layout,
+       instead of animating the entire grid or staggering each result. */
 
     .professor-card {
       min-height: 350px;
