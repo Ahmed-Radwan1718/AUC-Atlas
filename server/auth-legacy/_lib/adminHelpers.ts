@@ -868,7 +868,7 @@ async function requireFreshAdminAccess(
   return true;
 }
 
-module.exports = {
+export {
   createAdminError,
   ensureAdminUser,
   isAdminUid,
@@ -877,6 +877,3 @@ module.exports = {
   verifyAdminAuthenticator,
   requireFreshAdminAccess
 };
-
-// Keep each migrated CommonJS helper scoped to its own TypeScript module.
-export {};

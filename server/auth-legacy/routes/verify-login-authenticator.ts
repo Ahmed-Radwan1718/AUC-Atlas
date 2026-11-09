@@ -1,6 +1,6 @@
 import type { LegacyRequest, LegacyReply } from "../legacyTypes";
 
-const admin = require("../_lib/firebaseAdmin");
+const admin = require("../_lib/firebaseAdmin").default;
 const { authenticator } = require("otplib");
 
 const {

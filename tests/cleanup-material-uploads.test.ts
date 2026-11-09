@@ -110,7 +110,7 @@ function createHarness(options: any = {}) {
     process: { env: { CRON_SECRET: options.secret === undefined ? CRON_SECRET : options.secret } },
     require(id: string) {
       if (id === "crypto") return require("node:crypto");
-      if (id === "../_lib/firebaseAdmin") return { firestore };
+      if (id === "../_lib/firebaseAdmin") return { default: { firestore } };
       if (id === "../_lib/courseMaterialStorage") {
         return {
           async deletePendingCourseMaterial(cleanup: any) {

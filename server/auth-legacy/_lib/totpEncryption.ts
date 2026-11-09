@@ -225,10 +225,7 @@ function decryptTotpSecret(
   }
 }
 
-module.exports = {
+export {
   encryptTotpSecret,
   decryptTotpSecret
 };
-
-// Keep each migrated CommonJS helper scoped to its own TypeScript module.
-export {};

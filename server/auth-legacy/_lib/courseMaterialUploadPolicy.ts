@@ -111,7 +111,7 @@ function doesMaterialMimeMatchFileName(fileName: any, mimeType: any) {
   );
 }
 
-module.exports = {
+export {
   MATERIAL_MAX_FILE_BYTES,
   MATERIAL_USER_QUOTA_BYTES,
   MATERIAL_UPLOAD_AUTH_TTL_SECONDS,
@@ -123,6 +123,3 @@ module.exports = {
   isAllowedMaterialMimeType,
   doesMaterialMimeMatchFileName
 };
-
-// Keep each migrated CommonJS helper scoped to its own TypeScript module.
-export {};

@@ -1396,7 +1396,7 @@ async function requireSecurityPanelAccess(req: any, decodedUser: any) {
   return true;
 }
 
-module.exports = {
+export {
   isAllowedAucEmail,
   ensureAllowedAucEmail,
   signInWithPassword,
@@ -1421,6 +1421,3 @@ module.exports = {
   issueSecurityPanelAccess,
   requireSecurityPanelAccess
 };
-
-// Keep each migrated CommonJS helper scoped to its own TypeScript module.
-export {};

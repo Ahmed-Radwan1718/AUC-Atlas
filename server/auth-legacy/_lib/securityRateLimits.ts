@@ -277,11 +277,8 @@ async function clearSecurityRateLimit(
     .catch(function () {});
 }
 
-module.exports = {
+export {
   getRequestIp,
   consumeSecurityRateLimit,
   clearSecurityRateLimit
 };
-
-// Keep each migrated CommonJS helper scoped to its own TypeScript module.
-export {};

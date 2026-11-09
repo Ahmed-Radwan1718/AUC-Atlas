@@ -240,7 +240,7 @@ function buildSignedImageKitMaterialUrl(filePath: any) {
     "?ik-t=" + expires + "&ik-s=" + signature;
 }
 
-module.exports = {
+export {
   createImageKitUploadAuthorization,
   getImageKitMaterial,
   deleteImageKitMaterial,
@@ -249,6 +249,3 @@ module.exports = {
   isImageKitMaterialPath,
   isImageKitFileId
 };
-
-// Keep each migrated CommonJS helper scoped to its own TypeScript module.
-export {};

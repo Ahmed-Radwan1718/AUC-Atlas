@@ -30,10 +30,7 @@ async function deletePendingCourseMaterial(authorization: any) {
   return deleteCloudinaryMaterial(data.storageKey);
 }
 
-module.exports = {
+export {
   deleteStoredCourseMaterial,
   deletePendingCourseMaterial
 };
-
-// Keep each migrated CommonJS helper scoped to its own TypeScript module.
-export {};
