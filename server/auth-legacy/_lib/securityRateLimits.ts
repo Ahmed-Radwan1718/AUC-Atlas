@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const admin = require("./firebaseAdmin");
 
-function cleanString(value, maxLength) {
+function cleanString(value: any, maxLength: any) {
   return String(value || "")
     .trim()
     .slice(0, maxLength);
@@ -17,7 +17,7 @@ function getRateLimitSecret() {
   );
 }
 
-function getRequestHeader(req, name) {
+function getRequestHeader(req: any, name: any) {
   const headers =
     req && req.headers ? req.headers : {};
   const value =
@@ -29,7 +29,7 @@ function getRequestHeader(req, name) {
     : String(value || "");
 }
 
-function getRequestIp(req) {
+function getRequestIp(req: any) {
   const forwardedFor = getRequestHeader(
     req,
     "x-forwarded-for"
@@ -56,7 +56,7 @@ function getRequestIp(req) {
   ).toLowerCase();
 }
 
-function timestampToMillis(value) {
+function timestampToMillis(value: any) {
   if (!value) return 0;
 
   if (
@@ -89,8 +89,8 @@ function timestampToMillis(value) {
 }
 
 function getRateLimitDocumentId(
-  scope,
-  identifier
+  scope: any,
+  identifier: any
 ) {
   return crypto
     .createHmac(
@@ -109,8 +109,8 @@ function getRateLimitDocumentId(
 }
 
 function createRateLimitError(
-  message,
-  retryAfterSeconds
+  message: any,
+  retryAfterSeconds: any
 ) {
   const error = new Error(
     message ||
@@ -129,7 +129,7 @@ function createRateLimitError(
 }
 
 async function consumeSecurityRateLimit(
-  options
+  options: any
 ) {
   const settings = options || {};
   const scope = cleanString(
@@ -174,7 +174,7 @@ async function consumeSecurityRateLimit(
   const nowMs = Date.now();
 
   await db.runTransaction(
-    async function (transaction) {
+    async function (transaction: any) {
       const rateLimitDoc =
         await transaction.get(
           rateLimitRef
@@ -249,8 +249,8 @@ async function consumeSecurityRateLimit(
 }
 
 async function clearSecurityRateLimit(
-  scope,
-  identifier
+  scope: any,
+  identifier: any
 ) {
   const safeScope = cleanString(
     scope,

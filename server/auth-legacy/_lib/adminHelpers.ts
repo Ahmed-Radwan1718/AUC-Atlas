@@ -18,9 +18,9 @@ const ADMIN_ACCESS_HEADER_NAME =
   "x-auc-admin-access";
 
 function createAdminError(
-  message,
-  statusCode,
-  code
+  message: any,
+  statusCode: any,
+  code: any
 ) {
   const error = new Error(message);
 
@@ -37,14 +37,14 @@ function getConfiguredAdminUids() {
   return new Set(
     String(process.env.ADMIN_UIDS || "")
       .split(/[\s,]+/)
-      .map(function (uid) {
+      .map(function (uid: any) {
         return uid.trim();
       })
       .filter(Boolean)
   );
 }
 
-function userRecordHasAdminClaim(userRecord) {
+function userRecordHasAdminClaim(userRecord: any) {
   return Boolean(
     userRecord &&
     userRecord.customClaims &&
@@ -52,7 +52,7 @@ function userRecordHasAdminClaim(userRecord) {
   );
 }
 
-async function isAdminUid(uid) {
+async function isAdminUid(uid: any) {
   const safeUid = String(uid || "").trim();
 
   if (!safeUid) {
@@ -70,7 +70,7 @@ async function isAdminUid(uid) {
     return userRecordHasAdminClaim(
       userRecord
     );
-  } catch (error) {
+  } catch (error: any) {
     if (
       error &&
       error.code === "auth/user-not-found"
@@ -82,7 +82,7 @@ async function isAdminUid(uid) {
   }
 }
 
-async function ensureAdminUser(req) {
+async function ensureAdminUser(req: any) {
   const decodedUser =
     await getSiteSessionUser(req, {
       checkRevoked: true
@@ -126,7 +126,7 @@ async function ensureAdminUser(req) {
   };
 }
 
-function timestampToMillis(value) {
+function timestampToMillis(value: any) {
   if (!value) {
     return 0;
   }
@@ -160,7 +160,7 @@ function timestampToMillis(value) {
     : date.getTime();
 }
 
-function getRequestHeader(req, name) {
+function getRequestHeader(req: any, name: any) {
   const headers =
     req && req.headers ? req.headers : {};
   const lowerName =
@@ -174,7 +174,7 @@ function getRequestHeader(req, name) {
     : String(value || "");
 }
 
-function createAdminAccessError(message) {
+function createAdminAccessError(message: any) {
   return createAdminError(
     message ||
       "Enter your administrator password to continue.",
@@ -183,7 +183,7 @@ function createAdminAccessError(message) {
   );
 }
 
-function getAdminSessionId(actor) {
+function getAdminSessionId(actor: any) {
   const siteSessionId = String(
     actor &&
     actor.decodedUser &&
@@ -206,9 +206,9 @@ function getAdminSessionId(actor) {
 }
 
 function getAdminAccessHash(
-  uid,
-  siteSessionId,
-  token
+  uid: any,
+  siteSessionId: any,
+  token: any
 ) {
   return crypto
     .createHash("sha256")
@@ -224,8 +224,8 @@ function getAdminAccessHash(
 }
 
 function safeEqualHex(
-  savedValue,
-  submittedValue
+  savedValue: any,
+  submittedValue: any
 ) {
   const saved = String(savedValue || "");
   const submitted = String(
@@ -258,7 +258,7 @@ function safeEqualHex(
   );
 }
 
-function getAdminAccessRef(actor) {
+function getAdminAccessRef(actor: any) {
   const siteSessionId =
     getAdminSessionId(actor);
 
@@ -269,7 +269,7 @@ function getAdminAccessRef(actor) {
     .doc(siteSessionId);
 }
 
-async function getAdminTwoFactorState(uid) {
+async function getAdminTwoFactorState(uid: any) {
   const userRef = admin.firestore()
     .collection("users")
     .doc(uid);
@@ -300,7 +300,7 @@ async function getAdminTwoFactorState(uid) {
 }
 
 async function getAdminAuthenticationRequirements(
-  actor
+  actor: any
 ) {
   const twoFactor =
     await getAdminTwoFactorState(
@@ -320,7 +320,7 @@ async function getAdminAuthenticationRequirements(
 }
 
 function createAdminChallengeError(
-  message
+  message: any
 ) {
   const error = createAdminError(
     message ||
@@ -335,9 +335,9 @@ function createAdminChallengeError(
 }
 
 function getAdminChallengeHash(
-  uid,
-  siteSessionId,
-  token
+  uid: any,
+  siteSessionId: any,
+  token: any
 ) {
   return crypto
     .createHash("sha256")
@@ -353,8 +353,8 @@ function getAdminChallengeHash(
 }
 
 async function createAdminAccess(
-  actor,
-  authenticatorVerified
+  actor: any,
+  authenticatorVerified: any
 ) {
   const siteSessionId =
     getAdminSessionId(actor);
@@ -402,7 +402,7 @@ async function createAdminAccess(
 }
 
 async function createAdminChallenge(
-  actor
+  actor: any
 ) {
   const siteSessionId =
     getAdminSessionId(actor);
@@ -442,8 +442,8 @@ async function createAdminChallenge(
 }
 
 async function requireAdminChallenge(
-  actor,
-  tokenValue
+  actor: any,
+  tokenValue: any
 ) {
   const token = String(
     tokenValue || ""
@@ -527,8 +527,8 @@ async function requireAdminChallenge(
 }
 
 async function consumeAdminChallenge(
-  actor,
-  tokenValue
+  actor: any,
+  tokenValue: any
 ) {
   const validated =
     await requireAdminChallenge(
@@ -538,7 +538,7 @@ async function consumeAdminChallenge(
 
   await admin.firestore()
     .runTransaction(
-      async function (transaction) {
+      async function (transaction: any) {
         const accessDoc =
           await transaction.get(
             validated.accessRef
@@ -596,8 +596,8 @@ async function consumeAdminChallenge(
 }
 
 async function authenticateAdminPassword(
-  actor,
-  passwordValue
+  actor: any,
+  passwordValue: any
 ) {
   const password = String(
     passwordValue || ""
@@ -624,7 +624,7 @@ async function authenticateAdminPassword(
         actor.email,
         password
       );
-  } catch (error) {
+  } catch (error: any) {
     throw createAdminError(
       "Incorrect administrator password.",
       401,
@@ -687,9 +687,9 @@ async function authenticateAdminPassword(
 }
 
 async function verifyAdminAuthenticator(
-  actor,
-  challengeTokenValue,
-  codeValue
+  actor: any,
+  challengeTokenValue: any,
+  codeValue: any
 ) {
   const code = String(
     codeValue || ""
@@ -774,8 +774,8 @@ async function verifyAdminAuthenticator(
 }
 
 async function requireFreshAdminAccess(
-  req,
-  actor
+  req: any,
+  actor: any
 ) {
   const token = getRequestHeader(
     req,

@@ -42,41 +42,41 @@ function createRandomToken() {
   return crypto.randomBytes(32).toString("hex");
 }
 
-function isExpired(timestamp) {
+function isExpired(timestamp: any) {
   if (!timestamp) return true;
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
   return date.getTime() <= Date.now();
 }
 
-function getLoginChallengeHash(uid, challengeId, token, salt) {
+function getLoginChallengeHash(uid: any, challengeId: any, token: any, salt: any) {
   return crypto
     .createHmac("sha256", getSecuritySecret())
     .update("login-challenge:" + uid + ":" + challengeId + ":" + token + ":" + salt)
     .digest("hex");
 }
 
-function getSiteSessionHash(sessionId) {
+function getSiteSessionHash(sessionId: any) {
   return crypto
     .createHmac("sha256", getSecuritySecret())
     .update("site-session:" + sessionId)
     .digest("hex");
 }
 
-function getSecurityPanelAccessHash(uid, siteSessionId, token) {
+function getSecurityPanelAccessHash(uid: any, siteSessionId: any, token: any) {
   return crypto
     .createHmac("sha256", getSecuritySecret())
     .update("security-panel:" + uid + ":" + siteSessionId + ":" + token)
     .digest("hex");
 }
 
-function getRequestHeader(req, name) {
+function getRequestHeader(req: any, name: any) {
   const headers = req && req.headers ? req.headers : {};
   const value = headers[name] || headers[String(name || "").toLowerCase()];
 
   return Array.isArray(value) ? String(value[0] || "") : String(value || "");
 }
 
-function getSessionClientIp(req) {
+function getSessionClientIp(req: any) {
   const forwardedFor = getRequestHeader(req, "x-forwarded-for").split(",")[0].trim();
   const realIp = getRequestHeader(req, "x-real-ip").trim();
   const socketIp = req && req.socket && req.socket.remoteAddress ? req.socket.remoteAddress : "";
@@ -84,11 +84,11 @@ function getSessionClientIp(req) {
   return String(forwardedFor || realIp || socketIp || "").slice(0, 80);
 }
 
-function getBrowserVersion(match) {
+function getBrowserVersion(match: any) {
   return match && match[1] ? String(match[1]).split(".")[0] : "";
 }
 
-function getSessionBrowserDetails(userAgent) {
+function getSessionBrowserDetails(userAgent: any) {
   const value = String(userAgent || "");
   let match = value.match(/EdgA?\/([\d.]+)/) || value.match(/EdgiOS\/([\d.]+)/);
 
@@ -123,7 +123,7 @@ function getSessionBrowserDetails(userAgent) {
   return { key: "chrome", name: "Browser", version: "" };
 }
 
-function getSessionPlatformLabel(userAgent) {
+function getSessionPlatformLabel(userAgent: any) {
   const value = String(userAgent || "");
 
   if (/iPad/.test(value)) return "iPadOS";
@@ -136,7 +136,7 @@ function getSessionPlatformLabel(userAgent) {
   return "Device";
 }
 
-function getSessionDeviceType(userAgent) {
+function getSessionDeviceType(userAgent: any) {
   const value = String(userAgent || "");
 
   if (/iPad|Tablet/.test(value)) return "Tablet";
@@ -145,7 +145,7 @@ function getSessionDeviceType(userAgent) {
   return "Desktop";
 }
 
-function getSessionDetailsFromRequest(req) {
+function getSessionDetailsFromRequest(req: any) {
   const userAgent = getRequestHeader(req, "user-agent").slice(0, 600);
   const browser = getSessionBrowserDetails(userAgent);
   const osName = getSessionPlatformLabel(userAgent);
@@ -165,7 +165,7 @@ function getSessionDetailsFromRequest(req) {
   };
 }
 
-function sessionTimestampToMillis(value) {
+function sessionTimestampToMillis(value: any) {
   if (!value) return 0;
   if (typeof value.toDate === "function") return value.toDate().getTime();
   if (typeof value.seconds === "number") return value.seconds * 1000;
@@ -175,7 +175,7 @@ function sessionTimestampToMillis(value) {
   return Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
 }
 
-function serializeSessionTimestamp(value) {
+function serializeSessionTimestamp(value: any) {
   const millis = sessionTimestampToMillis(value);
 
   return millis
@@ -184,7 +184,7 @@ function serializeSessionTimestamp(value) {
 }
 
 function createAuthenticatorAttemptLimitError(
-  retryAfterSeconds
+  retryAfterSeconds: any
 ) {
   const safeRetryAfterSeconds = Math.max(
     1,
@@ -211,7 +211,7 @@ function createAuthenticatorAttemptLimitError(
   return error;
 }
 
-function getAuthenticatorAttemptDocumentId(scope) {
+function getAuthenticatorAttemptDocumentId(scope: any) {
   return String(scope || "")
     .trim()
     .toLowerCase()
@@ -221,8 +221,8 @@ function getAuthenticatorAttemptDocumentId(scope) {
 }
 
 async function consumeAuthenticatorAttempt(
-  uid,
-  scope
+  uid: any,
+  scope: any
 ) {
   const safeUid = String(uid || "").trim();
   const documentId =
@@ -246,7 +246,7 @@ async function consumeAuthenticatorAttempt(
   const nowMs = Date.now();
 
   await db.runTransaction(
-    async function (transaction) {
+    async function (transaction: any) {
       const attemptDoc =
         await transaction.get(attemptRef);
       const data = attemptDoc.exists
@@ -308,8 +308,8 @@ async function consumeAuthenticatorAttempt(
 }
 
 async function clearAuthenticatorAttempts(
-  uid,
-  scope
+  uid: any,
+  scope: any
 ) {
   const safeUid = String(uid || "").trim();
   const documentId =
@@ -328,7 +328,7 @@ async function clearAuthenticatorAttempts(
     .catch(function () {});
 }
 
-function isSiteSessionActive(data) {
+function isSiteSessionActive(data: any) {
   return Boolean(
     data &&
     !data.revokedAt &&
@@ -336,11 +336,11 @@ function isSiteSessionActive(data) {
   );
 }
 
-function cleanAuthEmail(value) {
+function cleanAuthEmail(value: any) {
   return String(value || "").trim().toLowerCase();
 }
 
-function isAllowedAucEmail(email) {
+function isAllowedAucEmail(email: any) {
   const normalizedEmail = cleanAuthEmail(email);
   const atIndex = normalizedEmail.indexOf("@");
 
@@ -351,13 +351,13 @@ function isAllowedAucEmail(email) {
   return normalizedEmail.slice(atIndex + 1) === ALLOWED_AUC_EMAIL_DOMAIN;
 }
 
-function createAucEmailRequiredError(action) {
+function createAucEmailRequiredError(action: any) {
   const error = new Error("Please use your AUC email address (@aucegypt.edu) to " + (action || "continue") + ".");
   error.statusCode = 403;
   return error;
 }
 
-function ensureAllowedAucEmail(email, action) {
+function ensureAllowedAucEmail(email: any, action: any) {
   const normalizedEmail = cleanAuthEmail(email);
 
   if (!isAllowedAucEmail(normalizedEmail)) {
@@ -367,7 +367,7 @@ function ensureAllowedAucEmail(email, action) {
   return normalizedEmail;
 }
 
-async function getDecodedUserEmail(decodedUser) {
+async function getDecodedUserEmail(decodedUser: any) {
   const tokenEmail = cleanAuthEmail(decodedUser && decodedUser.email);
 
   if (tokenEmail) {
@@ -382,12 +382,12 @@ async function getDecodedUserEmail(decodedUser) {
   return "";
 }
 
-async function ensureDecodedUserHasAllowedAucEmail(decodedUser, action) {
+async function ensureDecodedUserHasAllowedAucEmail(decodedUser: any, action: any) {
   const email = await getDecodedUserEmail(decodedUser);
   return ensureAllowedAucEmail(email, action);
 }
 
-function appendSetCookie(res, cookieValue) {
+function appendSetCookie(res: any, cookieValue: any) {
   const existing = res.getHeader("Set-Cookie");
 
   if (!existing) {
@@ -398,21 +398,21 @@ function appendSetCookie(res, cookieValue) {
   res.setHeader("Set-Cookie", Array.isArray(existing) ? existing.concat(cookieValue) : [existing, cookieValue]);
 }
 
-function setCookie(res, name, value, maxAgeSeconds) {
+function setCookie(res: any, name: any, value: any, maxAgeSeconds: any) {
   appendSetCookie(
     res,
     name + "=" + encodeURIComponent(value) + "; Max-Age=" + maxAgeSeconds + "; Path=/; HttpOnly; SameSite=Lax" + (IS_PRODUCTION ? "; Secure" : "")
   );
 }
 
-function clearCookie(res, name) {
+function clearCookie(res: any, name: any) {
   appendSetCookie(
     res,
     name + "=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax" + (IS_PRODUCTION ? "; Secure" : "")
   );
 }
 
-function getCookie(req, name) {
+function getCookie(req: any, name: any) {
   const cookieHeader = req.headers.cookie || "";
   const cookies = cookieHeader.split(";");
 
@@ -439,7 +439,7 @@ function getFirebaseWebApiKey() {
   return apiKey;
 }
 
-async function firebaseAuthRest(endpoint, payload) {
+async function firebaseAuthRest(endpoint: any, payload: any) {
   const response = await fetch(
     "https://identitytoolkit.googleapis.com/v1/" + endpoint + "?key=" + encodeURIComponent(getFirebaseWebApiKey()),
     {
@@ -465,7 +465,7 @@ async function firebaseAuthRest(endpoint, payload) {
   return data;
 }
 
-async function signInWithPassword(email, password) {
+async function signInWithPassword(email: any, password: any) {
   return await firebaseAuthRest("accounts:signInWithPassword", {
     email,
     password,
@@ -473,14 +473,14 @@ async function signInWithPassword(email, password) {
   });
 }
 
-async function signInWithCustomToken(customToken) {
+async function signInWithCustomToken(customToken: any) {
   return await firebaseAuthRest("accounts:signInWithCustomToken", {
     token: customToken,
     returnSecureToken: true
   });
 }
 
-function getCurrentSiteSessionHash(req) {
+function getCurrentSiteSessionHash(req: any) {
   const sessionId = getCookie(
     req,
     SITE_SESSION_ID_COOKIE_NAME
@@ -493,7 +493,7 @@ function getCurrentSiteSessionHash(req) {
   return getSiteSessionHash(sessionId);
 }
 
-async function saveSiteSession(uid, sessionHash, req, options) {
+async function saveSiteSession(uid: any, sessionHash: any, req: any, options: any) {
   const details = getSessionDetailsFromRequest(req);
   const sessionRef = admin.firestore().collection("users").doc(uid).collection("sessions").doc(sessionHash);
   const now = admin.firestore.FieldValue.serverTimestamp();
@@ -517,7 +517,7 @@ async function saveSiteSession(uid, sessionHash, req, options) {
   };
 }
 
-async function createSiteSessionRecord(decodedUser, req, res) {
+async function createSiteSessionRecord(decodedUser: any, req: any, res: any) {
   if (!decodedUser || !decodedUser.uid) {
     return { id: "" };
   }
@@ -540,7 +540,7 @@ async function createSiteSessionRecord(decodedUser, req, res) {
   return { id: sessionHash };
 }
 
-async function ensureSiteSessionRecord(decodedUser, req, res) {
+async function ensureSiteSessionRecord(decodedUser: any, req: any, res: any) {
   const currentSessionHash = getCurrentSiteSessionHash(req);
 
   if (decodedUser && decodedUser.uid && currentSessionHash) {
@@ -551,7 +551,7 @@ async function ensureSiteSessionRecord(decodedUser, req, res) {
   return await createSiteSessionRecord(decodedUser, req, res);
 }
 
-function getSiteSessionDisplayKey(session) {
+function getSiteSessionDisplayKey(session: any) {
   const userAgent = String(session.userAgent || "").trim().toLowerCase();
   const ipAddress = String(session.ipAddress || "").trim().toLowerCase();
 
@@ -568,13 +568,13 @@ function getSiteSessionDisplayKey(session) {
   ].join("|");
 }
 
-async function getUserSiteSessions(uid, currentSessionHash) {
+async function getUserSiteSessions(uid: any, currentSessionHash: any) {
   const snapshot = await admin.firestore().collection("users").doc(uid).collection("sessions").get();
   const sessions = [];
   const sessionsByKey = new Map();
   const cleanup = [];
 
-  snapshot.forEach(function (doc) {
+  snapshot.forEach(function (doc: any) {
     const data = doc.data() || {};
 
     if (data.revokedAt) {
@@ -626,13 +626,13 @@ async function getUserSiteSessions(uid, currentSessionHash) {
     }
   });
 
-  sessionsByKey.forEach(function (session) {
+  sessionsByKey.forEach(function (session: any) {
     sessions.push(session);
   });
 
   await Promise.all(cleanup.slice(0, 20));
 
-  sessions.sort(function (a, b) {
+  sessions.sort(function (a: any, b: any) {
     if (a.current !== b.current) {
       return a.current ? -1 : 1;
     }
@@ -640,7 +640,7 @@ async function getUserSiteSessions(uid, currentSessionHash) {
     return b.lastSeenAtMs - a.lastSeenAtMs;
   });
 
-  return sessions.map(function (session) {
+  return sessions.map(function (session: any) {
     return {
       id: session.id,
       browserKey: session.browserKey,
@@ -660,7 +660,7 @@ async function getUserSiteSessions(uid, currentSessionHash) {
   });
 }
 
-async function revokeUserSiteSession(uid, sessionId, revokedReason) {
+async function revokeUserSiteSession(uid: any, sessionId: any, revokedReason: any) {
   const cleanSessionId = String(sessionId || "").trim();
 
   if (!/^[a-f0-9]{64}$/i.test(cleanSessionId)) {
@@ -686,7 +686,7 @@ async function revokeUserSiteSession(uid, sessionId, revokedReason) {
   return { id: cleanSessionId };
 }
 
-async function createSiteSessionFromIdToken(idToken, res, req) {
+async function createSiteSessionFromIdToken(idToken: any, res: any, req: any) {
   const decodedToken = await admin.auth().verifyIdToken(idToken);
   await ensureDecodedUserHasAllowedAucEmail(decodedToken, "continue");
 
@@ -699,7 +699,7 @@ async function createSiteSessionFromIdToken(idToken, res, req) {
       admin.auth().createSessionCookie(idToken, {
         expiresIn: SITE_SESSION_EXPIRES_MS
       }),
-      new Promise(function (_, reject) {
+      new Promise(function (_: any, reject: any) {
         setTimeout(function () {
           const error = new Error("session-cookie-timeout");
           error.sessionCookieTimeout = true;
@@ -707,7 +707,7 @@ async function createSiteSessionFromIdToken(idToken, res, req) {
         }, 2500);
       })
     ]);
-  } catch (error) {
+  } catch (error: any) {
     if (!error || !error.sessionCookieTimeout) {
       throw error;
     }
@@ -728,7 +728,7 @@ async function createSiteSessionFromIdToken(idToken, res, req) {
   return sessionCookie;
 }
 
-async function createSiteSessionForUid(uid, res, req) {
+async function createSiteSessionForUid(uid: any, res: any, req: any) {
   const customToken = await admin.auth().createCustomToken(uid);
   const signInData = await signInWithCustomToken(customToken);
   const sessionCookie = await createSiteSessionFromIdToken(signInData.idToken, res, req);
@@ -738,12 +738,12 @@ async function createSiteSessionForUid(uid, res, req) {
   });
 }
 
-function clearSiteSessionCookie(res) {
+function clearSiteSessionCookie(res: any) {
   clearCookie(res, SITE_SESSION_COOKIE_NAME);
   clearCookie(res, SITE_SESSION_ID_COOKIE_NAME);
 }
 
-async function getSiteSessionUser(req, options) {
+async function getSiteSessionUser(req: any, options: any) {
   const settings = options || {};
   const sessionCookie = getCookie(
     req,
@@ -867,15 +867,15 @@ async function getSiteSessionUser(req, options) {
   return decodedUser;
 }
 
-async function getOptionalSiteSessionUser(req, options) {
+async function getOptionalSiteSessionUser(req: any, options: any) {
   try {
     return await getSiteSessionUser(req, options);
-  } catch (error) {
+  } catch (error: any) {
     return null;
   }
 }
 
-async function clearCurrentSiteSession(req, res) {
+async function clearCurrentSiteSession(req: any, res: any) {
   const sessionHash = getCurrentSiteSessionHash(req);
   const decodedUser = await getOptionalSiteSessionUser(req, {
     checkRevoked: false
@@ -889,9 +889,9 @@ async function clearCurrentSiteSession(req, res) {
 }
 
 async function createLoginChallenge(
-  uid,
-  res,
-  details
+  uid: any,
+  res: any,
+  details: any
 ) {
   const db = admin.firestore();
   const challengeRef = db
@@ -947,7 +947,7 @@ async function createLoginChallenge(
   return { challengeId };
 }
 
-async function getLoginChallenge(req) {
+async function getLoginChallenge(req: any) {
   const cookieValue = getCookie(
     req,
     LOGIN_CHALLENGE_COOKIE_NAME
@@ -1064,7 +1064,7 @@ async function getLoginChallenge(req) {
 }
 
 async function consumeLoginChallenge(
-  challenge
+  challenge: any
 ) {
   if (
     !challenge ||
@@ -1082,7 +1082,7 @@ async function consumeLoginChallenge(
   const db = admin.firestore();
 
   await db.runTransaction(
-    async function (transaction) {
+    async function (transaction: any) {
       const challengeDoc =
         await transaction.get(
           challenge.ref
@@ -1129,7 +1129,7 @@ async function consumeLoginChallenge(
   return challenge;
 }
 
-async function clearLoginChallenge(req, res) {
+async function clearLoginChallenge(req: any, res: any) {
   const cookieValue = getCookie(
     req,
     LOGIN_CHALLENGE_COOKIE_NAME
@@ -1165,7 +1165,7 @@ async function clearLoginChallenge(req, res) {
     .catch(function () {});
 }
 
-async function getAuthenticatorSecret(uid) {
+async function getAuthenticatorSecret(uid: any) {
   const safeUid = String(
     uid || ""
   ).trim();
@@ -1264,7 +1264,7 @@ async function getAuthenticatorSecret(uid) {
   return legacyUserSecret;
 }
 
-function getSecurityPanelAccessDocumentId(decodedUser) {
+function getSecurityPanelAccessDocumentId(decodedUser: any) {
   const siteSessionId = String(
     decodedUser && decodedUser.siteSessionId
       ? decodedUser.siteSessionId
@@ -1276,7 +1276,7 @@ function getSecurityPanelAccessDocumentId(decodedUser) {
     .slice(0, 180) || "legacy-session";
 }
 
-function createSecurityPanelAccessError(message) {
+function createSecurityPanelAccessError(message: any) {
   const error = new Error(
     message || "Enter your authenticator code to open the Security panel."
   );
@@ -1285,7 +1285,7 @@ function createSecurityPanelAccessError(message) {
   return error;
 }
 
-async function issueSecurityPanelAccess(decodedUser) {
+async function issueSecurityPanelAccess(decodedUser: any) {
   if (!decodedUser || !decodedUser.uid) {
     throw createSecurityPanelAccessError("Please log in again.");
   }
@@ -1319,7 +1319,7 @@ async function issueSecurityPanelAccess(decodedUser) {
   };
 }
 
-async function requireSecurityPanelAccess(req, decodedUser) {
+async function requireSecurityPanelAccess(req: any, decodedUser: any) {
   if (!decodedUser || !decodedUser.uid) {
     throw createSecurityPanelAccessError("Please log in again.");
   }
