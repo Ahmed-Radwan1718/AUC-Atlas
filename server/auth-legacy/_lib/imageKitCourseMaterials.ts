@@ -9,11 +9,11 @@ const IMAGEKIT_MATERIAL_PATH_PATTERN =
   /^\/auc-atlas\/materials\/[a-f0-9]{36}\.(?:pdf|docx?|pptx?|xlsx?|jpe?g|png)$/i;
 const IMAGEKIT_FILE_ID_PATTERN = /^[a-f0-9]{24}$/i;
 
-function cleanString(value, maxLength) {
+function cleanString(value: any, maxLength: any) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
-function imageKitError(message, statusCode) {
+function imageKitError(message: any, statusCode: any) {
   const error = new Error(message);
   error.statusCode = statusCode;
   return error;
@@ -35,7 +35,7 @@ function getImageKitConfig() {
   let url;
   try {
     url = new URL(urlEndpoint);
-  } catch (error) {
+  } catch (error: any) {
     throw imageKitError("The ImageKit URL endpoint is invalid.", 500);
   }
 
@@ -47,15 +47,15 @@ function getImageKitConfig() {
   return { publicKey, privateKey, urlEndpoint };
 }
 
-function isImageKitMaterialPath(path) {
+function isImageKitMaterialPath(path: any) {
   return IMAGEKIT_MATERIAL_PATH_PATTERN.test(cleanString(path, 100));
 }
 
-function isImageKitFileId(id) {
+function isImageKitFileId(id: any) {
   return IMAGEKIT_FILE_ID_PATTERN.test(cleanString(id, 100));
 }
 
-function imageKitMaterialPath(authorizationId, fileName) {
+function imageKitMaterialPath(authorizationId: any, fileName: any) {
   const safeId = cleanString(authorizationId, 80);
   const extension = getMaterialFileExtension(fileName);
 
@@ -72,7 +72,7 @@ function imageKitMaterialPath(authorizationId, fileName) {
   return path;
 }
 
-function createImageKitUploadAuthorization(authorizationId, fileName, ttlSeconds) {
+function createImageKitUploadAuthorization(authorizationId: any, fileName: any, ttlSeconds: any) {
   const config = getImageKitConfig();
   const filePath = imageKitMaterialPath(authorizationId, fileName);
   const token = crypto.randomUUID();
@@ -109,7 +109,7 @@ function imageKitHeaders() {
   };
 }
 
-async function imageKitApi(path, options) {
+async function imageKitApi(path: any, options: any) {
   let response;
 
   try {
@@ -117,7 +117,7 @@ async function imageKitApi(path, options) {
       ...options,
       headers: { ...imageKitHeaders(), ...(options && options.headers) }
     });
-  } catch (error) {
+  } catch (error: any) {
     throw imageKitError("Could not connect to ImageKit storage.", 502);
   }
 
@@ -143,7 +143,7 @@ async function imageKitApi(path, options) {
   return response.json().catch(function () { return null; });
 }
 
-async function getImageKitMaterial(fileId) {
+async function getImageKitMaterial(fileId: any) {
   const safeId = cleanString(fileId, 80);
   if (!isImageKitFileId(safeId)) {
     throw imageKitError("Course material file not found.", 404);
@@ -164,7 +164,7 @@ async function getImageKitMaterial(fileId) {
   };
 }
 
-async function findImageKitMaterialByPath(filePath) {
+async function findImageKitMaterialByPath(filePath: any) {
   const safePath = cleanString(filePath, 100);
   if (!isImageKitMaterialPath(safePath)) {
     return null;
@@ -182,7 +182,7 @@ async function findImageKitMaterialByPath(filePath) {
     throw imageKitError("Could not search ImageKit materials.", 502);
   }
 
-  const match = results.find(function (item) {
+  const match = results.find(function (item: any) {
     return item && item.filePath === safePath &&
       isImageKitFileId(item.fileId);
   });
@@ -190,7 +190,7 @@ async function findImageKitMaterialByPath(filePath) {
   return match ? getImageKitMaterial(match.fileId) : null;
 }
 
-async function deleteImageKitMaterial(fileId, expectedPath) {
+async function deleteImageKitMaterial(fileId: any, expectedPath: any) {
   const safeId = cleanString(fileId, 80);
   if (!isImageKitFileId(safeId)) {
     return false;
@@ -204,7 +204,7 @@ async function deleteImageKitMaterial(fileId, expectedPath) {
   let file;
   try {
     file = await getImageKitMaterial(safeId);
-  } catch (error) {
+  } catch (error: any) {
     if (error.statusCode === 404) return false;
     throw error;
   }
@@ -217,13 +217,13 @@ async function deleteImageKitMaterial(fileId, expectedPath) {
   return true;
 }
 
-async function deletePendingImageKitMaterial(filePath) {
+async function deletePendingImageKitMaterial(filePath: any) {
   const file = await findImageKitMaterialByPath(filePath);
   if (!file) return false;
   return deleteImageKitMaterial(file.fileId, filePath);
 }
 
-function buildSignedImageKitMaterialUrl(filePath) {
+function buildSignedImageKitMaterialUrl(filePath: any) {
   const safePath = cleanString(filePath, 100);
   if (!isImageKitMaterialPath(safePath)) {
     throw imageKitError("Course material file not found.", 404);

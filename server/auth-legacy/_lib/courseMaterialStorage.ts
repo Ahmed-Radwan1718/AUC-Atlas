@@ -6,7 +6,7 @@ const {
   deletePendingImageKitMaterial
 } = require("./imageKitCourseMaterials");
 
-async function deleteStoredCourseMaterial(material) {
+async function deleteStoredCourseMaterial(material: any) {
   const data = material || {};
 
   if (data.storageProvider === "imagekit") {
@@ -20,7 +20,7 @@ async function deleteStoredCourseMaterial(material) {
   return deleteCloudinaryMaterial(data.storageKey);
 }
 
-async function deletePendingCourseMaterial(authorization) {
+async function deletePendingCourseMaterial(authorization: any) {
   const data = authorization || {};
 
   if (data.storageProvider === "imagekit") {

@@ -7,7 +7,7 @@ const ENCRYPTION_IV_BYTES = 12;
 const ENCRYPTION_TAG_BYTES = 16;
 
 function createTotpEncryptionError(
-  message
+  message: any
 ) {
   const error = new Error(
     message ||
@@ -53,7 +53,7 @@ function getTotpEncryptionKey() {
 }
 
 function getAuthenticatedContext(
-  context
+  context: any
 ) {
   const safeContext = String(
     context || ""
@@ -73,8 +73,8 @@ function getAuthenticatedContext(
 }
 
 function encryptTotpSecret(
-  secret,
-  context
+  secret: any,
+  context: any
 ) {
   const cleanSecret = String(
     secret || ""
@@ -128,8 +128,8 @@ function encryptTotpSecret(
 }
 
 function decryptTotpSecret(
-  encryptedSecret,
-  context
+  encryptedSecret: any,
+  context: any
 ) {
   const data =
     encryptedSecret &&
@@ -210,7 +210,7 @@ function decryptTotpSecret(
     }
 
     return plaintext;
-  } catch (error) {
+  } catch (error: any) {
     if (
       error &&
       error.code ===

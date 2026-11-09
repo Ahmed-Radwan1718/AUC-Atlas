@@ -1,4 +1,4 @@
-function getPositiveInteger(value, fallbackValue, maximumValue) {
+function getPositiveInteger(value: any, fallbackValue: any, maximumValue: any) {
   const parsedValue = Number(value);
 
   if (!Number.isSafeInteger(parsedValue) || parsedValue <= 0) {
@@ -38,7 +38,7 @@ const MATERIAL_ALLOWED_MIME_TYPES = Object.freeze([
   "image/png"
 ]);
 
-const MATERIAL_MIME_TYPES_BY_EXTENSION = Object.freeze({
+const MATERIAL_MIME_TYPES_BY_EXTENSION: Readonly<Record<string, readonly string[]>> = Object.freeze({
   pdf: ["application/pdf"],
   doc: ["application/msword"],
   docx: [
@@ -57,10 +57,10 @@ const MATERIAL_MIME_TYPES_BY_EXTENSION = Object.freeze({
   png: ["image/png"]
 });
 
-function cleanMaterialFileName(value) {
+function cleanMaterialFileName(value: any) {
   const fileName = String(value || "")
     .split(/[\\/]/)
-    .pop()
+    .pop()!
     .replace(/\s*\|\s*/g, " ")
     .replace(/[\u0000-\u001f\u007f]/g, "")
     .trim()
@@ -69,14 +69,14 @@ function cleanMaterialFileName(value) {
   return fileName;
 }
 
-function getMaterialFileExtension(fileName) {
+function getMaterialFileExtension(fileName: any) {
   const safeFileName = cleanMaterialFileName(fileName);
   const match = safeFileName.match(/\.([A-Za-z0-9]+)$/);
 
   return match ? match[1].toLowerCase() : "";
 }
 
-function normalizeMaterialMimeType(value) {
+function normalizeMaterialMimeType(value: any) {
   return String(value || "")
     .split(";")[0]
     .trim()
@@ -84,7 +84,7 @@ function normalizeMaterialMimeType(value) {
     .slice(0, 160);
 }
 
-function isAllowedMaterialFileName(fileName) {
+function isAllowedMaterialFileName(fileName: any) {
   return Boolean(
     MATERIAL_MIME_TYPES_BY_EXTENSION[
       getMaterialFileExtension(fileName)
@@ -92,13 +92,13 @@ function isAllowedMaterialFileName(fileName) {
   );
 }
 
-function isAllowedMaterialMimeType(mimeType) {
+function isAllowedMaterialMimeType(mimeType: any) {
   return MATERIAL_ALLOWED_MIME_TYPES.includes(
     normalizeMaterialMimeType(mimeType)
   );
 }
 
-function doesMaterialMimeMatchFileName(fileName, mimeType) {
+function doesMaterialMimeMatchFileName(fileName: any, mimeType: any) {
   const allowedMimeTypes = MATERIAL_MIME_TYPES_BY_EXTENSION[
     getMaterialFileExtension(fileName)
   ];

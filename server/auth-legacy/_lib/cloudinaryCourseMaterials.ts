@@ -9,15 +9,15 @@ const CLOUDINARY_MATERIAL_PUBLIC_ID_PATTERN =
 const CLOUDINARY_ASSET_ID_PATTERN =
   /^[A-Za-z0-9_-]{16,160}$/;
 
-function cleanString(value, maxLength) {
+function cleanString(value: any, maxLength: any) {
   return String(value || "")
     .trim()
     .slice(0, maxLength);
 }
 
 function createCloudinaryMaterialError(
-  message,
-  statusCode
+  message: any,
+  statusCode: any
 ) {
   const error = new Error(message);
 
@@ -63,7 +63,7 @@ function getCloudinaryConfig() {
             cloudinaryUrl.password || ""
           );
       }
-    } catch (error) {}
+    } catch (error: any) {}
   }
 
   if (!cloudName || !apiKey || !apiSecret) {
@@ -81,11 +81,11 @@ function getCloudinaryConfig() {
 }
 
 function signCloudinaryParams(
-  params,
-  apiSecret
+  params: any,
+  apiSecret: any
 ) {
   const signatureBase = Object.keys(params)
-    .filter(function (key) {
+    .filter(function (key: any) {
       return (
         params[key] !== undefined &&
         params[key] !== null &&
@@ -93,7 +93,7 @@ function signCloudinaryParams(
       );
     })
     .sort()
-    .map(function (key) {
+    .map(function (key: any) {
       return key + "=" + String(params[key]);
     })
     .join("&");
@@ -104,15 +104,15 @@ function signCloudinaryParams(
     .digest("hex");
 }
 
-function isCloudinaryMaterialPublicId(value) {
+function isCloudinaryMaterialPublicId(value: any) {
   return CLOUDINARY_MATERIAL_PUBLIC_ID_PATTERN.test(
     cleanString(value, 80)
   );
 }
 
 function getCloudinaryMaterialPublicId(
-  authorizationId,
-  fileName
+  authorizationId: any,
+  fileName: any
 ) {
   const safeAuthorizationId = cleanString(
     authorizationId,
@@ -150,8 +150,8 @@ function getCloudinaryMaterialPublicId(
 }
 
 function createCloudinaryUploadAuthorization(
-  authorizationId,
-  fileName
+  authorizationId: any,
+  fileName: any
 ) {
   const config = getCloudinaryConfig();
   const publicId =
@@ -186,7 +186,7 @@ function createCloudinaryUploadAuthorization(
   };
 }
 
-async function getCloudinaryMaterial(publicId) {
+async function getCloudinaryMaterial(publicId: any) {
   const safePublicId = cleanString(
     publicId,
     80
@@ -280,7 +280,7 @@ async function getCloudinaryMaterial(publicId) {
 }
 
 async function deleteCloudinaryMaterial(
-  publicId
+  publicId: any
 ) {
   const safePublicId = cleanString(
     publicId,
@@ -348,8 +348,8 @@ async function deleteCloudinaryMaterial(
 }
 
 function buildCloudinaryAssetDownloadUrl(
-  assetId,
-  dispositionType
+  assetId: any,
+  dispositionType: any
 ) {
   const safeAssetId = cleanString(
     assetId,
