@@ -64,7 +64,9 @@
       border-radius: 24px 0 0 24px;
       background: #ffffff;
       box-shadow: -20px 0 80px rgba(42, 32, 20, 0.16);
-      animation: courseUploadDrawerIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+      /* The entrance animation is driven by the same Web Animations API
+         as Leave a Review; avoid competing with CSS keyframes. */
+      animation: none;
     }
 
     .quick-material-upload-header {

@@ -67,6 +67,65 @@ function setupCourseUploadStart() {
     });
 
     let lastTrigger = null;
+    const drawer = modal.querySelector(".quick-material-upload-dialog");
+    const backdrop = modal.querySelector(".quick-material-upload-backdrop");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let drawerAnimation = null;
+    let backdropAnimation = null;
+
+    function cancelOpeningAnimations() {
+      if (drawerAnimation) {
+        drawerAnimation.cancel();
+        drawerAnimation = null;
+      }
+      if (backdropAnimation) {
+        backdropAnimation.cancel();
+        backdropAnimation = null;
+      }
+    }
+
+    function animateOpening() {
+      cancelOpeningAnimations();
+      if (reducedMotion.matches || !drawer || !backdrop) return;
+
+      // Match Leave a review's slide distance, duration, and easing.
+      drawerAnimation = drawer.animate(
+        [
+          { transform: "translateX(100%)" },
+          { transform: "translateX(0)" }
+        ],
+        {
+          duration: 320,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          fill: "both"
+        }
+      );
+
+      backdropAnimation = backdrop.animate(
+        [{ opacity: 0 }, { opacity: 1 }],
+        {
+          duration: 280,
+          easing: "ease-out",
+          fill: "both"
+        }
+      );
+
+      const openingDrawer = drawerAnimation;
+      openingDrawer.finished.then(function () {
+        if (drawerAnimation === openingDrawer) {
+          openingDrawer.cancel();
+          drawerAnimation = null;
+        }
+      }).catch(function () {});
+
+      const openingBackdrop = backdropAnimation;
+      openingBackdrop.finished.then(function () {
+        if (backdropAnimation === openingBackdrop) {
+          openingBackdrop.cancel();
+          backdropAnimation = null;
+        }
+      }).catch(function () {});
+    }
 
     function openQuickMaterialUpload() {
       lastTrigger =
@@ -96,6 +155,7 @@ function setupCourseUploadStart() {
         "quick-material-upload-open"
       );
       button.setAttribute("aria-expanded", "true");
+      animateOpening();
 
       setMaterialUploadStatus("", "", form);
       setMaterialUploadProgress(
@@ -139,6 +199,7 @@ function setupCourseUploadStart() {
     }
 
     function closeQuickMaterialUpload() {
+      cancelOpeningAnimations();
       modal.hidden = true;
       document.body.classList.remove(
         "quick-material-upload-open"
