@@ -207,40 +207,37 @@
     }
 
 
-    /* Search results change as a single, gentle crossfade and slide.
-       The input remains outside the transition so typing stays responsive. */
+    /* Only clearing search or changing filters uses the View Transition API.
+       The result cards never translate, scale, or stagger as the grid changes. */
     .professors-page .professors-grid:not(.professor-profile-grid) {
       view-transition-name: professors-search-results;
     }
 
-    @keyframes professorSearchResultsOut {
-      to { opacity: 0; transform: translateY(-8px); }
+    @keyframes professorSearchFadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
     }
 
-    @keyframes professorSearchResultsIn {
-      from { opacity: 0; transform: translateY(10px); }
+    @keyframes professorSearchFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     ::view-transition-old(root),
-    ::view-transition-new(root) {
+    ::view-transition-new(root),
+    ::view-transition-group(professors-search-results) {
       animation: none;
     }
 
-    ::view-transition-group(professors-search-results) {
-      animation-duration: 280ms;
-      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
     ::view-transition-old(professors-search-results) {
-      animation: 170ms ease-in both professorSearchResultsOut;
+      animation: 150ms ease-in both professorSearchFadeOut;
     }
 
     ::view-transition-new(professors-search-results) {
-      animation: 280ms cubic-bezier(0.22, 1, 0.36, 1) both professorSearchResultsIn;
+      animation: 150ms ease-out both professorSearchFadeIn;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      ::view-transition-group(professors-search-results),
       ::view-transition-old(professors-search-results),
       ::view-transition-new(professors-search-results) {
         animation: none;
@@ -255,27 +252,8 @@
       transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     }
 
-    .professors-grid.is-filtering .professor-card,
-    .professors-grid.is-filtering .professors-empty {
-      animation: professorFilterResultIn 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    @keyframes professorFilterResultIn {
-      from {
-        opacity: 0;
-        transform: translateY(14px) scale(0.985);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
     @media (prefers-reduced-motion: reduce) {
-      .filter-content label:has(input:checked),
-      .professors-grid.is-filtering .professor-card,
-      .professors-grid.is-filtering .professors-empty {
+      .filter-content label:has(input:checked) {
         animation: none;
       }
     }
