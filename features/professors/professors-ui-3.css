@@ -1,0 +1,719 @@
+/* Original professor browser and review styles, section 3/3. */
+
+
+    @keyframes reviewModalIn {
+      0% {
+        opacity: 0;
+        transform:
+          translate(-50%, calc(-50% + 18px))
+          scale(0.975);
+      }
+
+      45% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 1;
+        transform:
+          translate(-50%, -50%)
+          scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .review-modal-backdrop,
+      .professor-review-form {
+        animation: none;
+      }
+
+      .professor-review-toggle {
+        transition: none;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .professors-browser {
+        grid-template-columns: 1fr;
+      }
+
+      .filters-panel {
+        position: static;
+      }
+
+      .professors-grid.professor-profile-grid {
+        width: min(100%, 1120px);
+        grid-template-columns: 1fr;
+      }
+
+      .professors-grid.professor-profile-grid .professor-profile-main {
+        display: contents;
+      }
+
+      .professors-grid.professor-profile-grid .professor-review-insights {
+        grid-column: 1;
+        grid-row: 2;
+      }
+
+      .professors-grid.professor-profile-grid .professor-reviews-section {
+        grid-column: 1;
+        grid-row: 3;
+      }
+
+      .professor-profile-card {
+        grid-template-columns: 1fr;
+      }
+
+      .professor-profile-image {
+        min-height: 0;
+        height: 260px;
+      }
+
+      .professor-review-form {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      html:has(body.review-modal-open),
+      body.review-modal-open {
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
+      .review-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 5000;
+        background: rgba(247, 244, 238, 0.46);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        overscroll-behavior: none;
+        touch-action: none;
+      }
+
+      .professor-review-form {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        z-index: 5001;
+        box-sizing: border-box;
+        width: calc(100vw - 20px);
+        height: calc(100dvh - 20px);
+        max-height: calc(100dvh - 20px);
+        margin: 0;
+        padding:
+          18px
+          18px
+          max(24px, env(safe-area-inset-bottom));
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+        scrollbar-gutter: auto;
+        border-radius: 22px;
+        transform: translate(-50%, -50%);
+        animation: none;
+      }
+
+      .review-modal-header {
+        position: sticky;
+        top: -18px;
+        z-index: 20;
+        margin: -18px -18px 0;
+        padding:
+          max(18px, env(safe-area-inset-top))
+          18px
+          12px;
+        border-bottom: 1px solid rgba(23, 23, 23, 0.07);
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+
+      .review-step.is-active {
+        grid-template-columns: 1fr;
+      }
+
+      .review-field,
+      .review-field.full,
+      .review-anonymous-option,
+      .review-form-message {
+        min-width: 0;
+        grid-column: 1 / -1;
+      }
+
+      .review-anonymous-option {
+        margin-bottom: 0;
+      }
+
+      .review-field input,
+      .review-field select,
+      .review-field textarea,
+      .review-choice,
+      .review-choice-button {
+        max-width: 100%;
+      }
+
+      .review-choice-menu {
+        position: static;
+        display: none;
+        max-height: min(260px, 36dvh);
+        margin-top: 8px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        opacity: 1;
+        pointer-events: none;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .review-choice.open .review-choice-menu {
+        display: grid;
+        pointer-events: auto;
+        transform: none;
+      }
+
+      .review-submit-button {
+        position: static;
+        width: 100%;
+        min-height: 52px;
+        grid-column: 1 / -1;
+        margin-top: 10px;
+        flex-shrink: 0;
+        box-shadow:
+          0 10px 26px rgba(42, 32, 20, 0.14);
+      }
+
+      .professor-review-toggle {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .professor-profile-body,
+      .professor-review-insights,
+      .professor-reviews-section {
+        min-width: 0;
+      }
+    }
+
+    /* Professor reviews use the same edge-to-edge drawer pattern as uploads.
+       Mounting the drawer under <body> avoids the profile card's overflow clip. */
+    html:has(body.review-modal-open) {
+      overflow: hidden;
+    }
+
+    .review-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      background: rgba(247, 244, 238, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .professor-review-form {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: auto;
+      z-index: 5001;
+      box-sizing: border-box;
+      width: min(520px, 100vw);
+      height: 100dvh;
+      max-height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-radius: 24px 0 0 24px;
+      background: #fff;
+      transform: translateX(0);
+      animation: none;
+      box-shadow: -20px 0 80px rgba(42, 32, 20, 0.16);
+    }
+
+    .professor-review-form:focus {
+      outline: none;
+    }
+
+    .review-modal-header {
+      position: relative;
+      top: auto;
+      z-index: 2;
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 24px 24px 18px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      background: #fff;
+    }
+
+    .review-drawer-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      min-width: 0;
+      padding: 22px 24px 32px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+      gap: 18px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .review-drawer-body .review-field,
+    .review-drawer-body .review-field.full,
+    .review-drawer-body .review-anonymous-option {
+      min-width: 0;
+      grid-column: 1 / -1;
+    }
+
+    .review-drawer-body .review-choice-menu {
+      position: static;
+      display: none;
+      max-height: min(230px, 34dvh);
+      margin-top: 8px;
+      opacity: 1;
+      pointer-events: none;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .review-drawer-body .review-choice.open .review-choice-menu {
+      display: grid;
+      pointer-events: auto;
+      transform: none;
+    }
+
+    .review-drawer-footer {
+      flex: 0 0 auto;
+      display: grid;
+      gap: 8px;
+      padding: 16px 24px 20px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      background: #fff;
+      box-shadow: 0 -8px 22px rgba(42, 32, 20, 0.035);
+    }
+
+    .review-drawer-footer .review-submit-button {
+      position: static;
+      width: 100%;
+      min-height: 50px;
+      margin: 0;
+      background: #171717;
+      color: #fff;
+      box-shadow: none;
+    }
+
+    .review-drawer-footer .review-form-message {
+      margin: 0;
+    }
+
+    .review-drawer-footer .review-form-message:empty {
+      display: none;
+    }
+
+    .review-drawer-footer .review-cancel-button {
+      min-height: 34px;
+      padding: 4px 10px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.56);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .review-drawer-footer .review-cancel-button:hover {
+      color: #171717;
+      background: rgba(23, 23, 23, 0.04);
+    }
+
+    .review-drawer-footer .review-cancel-button:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 640px) {
+      .professor-review-form {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        padding: 0;
+        border-radius: 0;
+        transform: translateX(0);
+      }
+
+      .review-modal-header {
+        top: auto;
+        margin: 0;
+        padding: max(18px, env(safe-area-inset-top)) 18px 14px;
+      }
+
+      .review-drawer-body {
+        padding: 20px 18px 28px;
+      }
+
+      .review-drawer-footer {
+        padding: 14px 18px max(18px, env(safe-area-inset-bottom));
+      }
+
+      .review-drawer-footer .review-submit-button {
+        min-height: 52px;
+        margin: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .professor-review-form,
+      .review-modal-backdrop {
+        animation: none;
+      }
+    }
+
+    /* Compact, progressive-disclosure layout for the professor review drawer. */
+    .review-drawer-body {
+      gap: 12px;
+      padding-top: 18px;
+      padding-bottom: 22px;
+    }
+
+    .review-core-section {
+      display: grid;
+      gap: 16px;
+      padding: 0 0 18px;
+    }
+
+    .review-core-section h3 {
+      margin: 0;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+
+    .review-core-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .review-core-grid .review-field {
+      min-width: 0;
+    }
+
+    .review-drawer-body .review-field {
+      gap: 6px;
+    }
+
+    .review-drawer-body .review-field label {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.045em;
+    }
+
+    .review-drawer-body .review-choice-button,
+    .review-drawer-body .review-field input,
+    .review-drawer-body .review-field select {
+      min-height: 43px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .review-drawer-body .review-choice-button {
+      padding-left: 12px;
+      padding-right: 27px;
+      line-height: 1.35;
+    }
+
+    .review-drawer-body .review-choice-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .review-drawer-body .review-choice-button::after {
+      right: 12px;
+    }
+
+    .review-rating-stars {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .review-rating-star {
+      width: 43px;
+      height: 43px;
+      padding: 0;
+      flex: 0 0 43px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: transparent;
+      color: #d2d2d2;
+      font: inherit;
+      font-size: 32px;
+      line-height: 1;
+      cursor: pointer;
+      transition: color 0.15s ease, transform 0.15s ease;
+    }
+
+    .review-rating-star.is-active {
+      color: #c09a5c;
+    }
+
+    .review-rating-star:hover {
+      transform: translateY(-1px);
+    }
+
+    .review-rating-star:focus-visible,
+    .review-recommend-options button:focus-visible,
+    .review-accordion summary:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 3px;
+    }
+
+    .review-recommend-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .review-recommend-options button {
+      min-height: 40px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 11px;
+      background: #fff;
+      color: rgba(23, 23, 23, 0.74);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .review-recommend-options button.is-active {
+      border-color: #c09a5c;
+      background: rgba(192, 154, 92, 0.13);
+      color: #171717;
+    }
+
+    .review-accordion {
+      min-width: 0;
+      border-top: 1px solid rgba(23, 23, 23, 0.09);
+    }
+
+    .review-accordion summary {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 25px 14px 0;
+      position: relative;
+      cursor: pointer;
+      list-style: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .review-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .review-accordion summary::after {
+      content: "";
+      position: absolute;
+      right: 6px;
+      top: calc(50% - 5px);
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid rgba(23, 23, 23, 0.6);
+      border-bottom: 1.5px solid rgba(23, 23, 23, 0.6);
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+    }
+
+    .review-accordion[open] summary::after {
+      transform: translateY(4px) rotate(225deg);
+    }
+
+    .review-accordion-label {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .review-accordion-label strong {
+      color: #171717;
+      font-size: 14px;
+      line-height: 1.2;
+      font-weight: 650;
+    }
+
+    .review-accordion-label small {
+      font-size: 11px;
+      color: rgba(23, 23, 23, 0.52);
+      line-height: 1.3;
+    }
+
+    .review-accordion-meta {
+      flex: 0 0 auto;
+      color: rgba(23, 23, 23, 0.55);
+      font-size: 10px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .review-accordion-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+      padding: 0 0 20px;
+    }
+
+    .review-drawer-body .review-anonymous-option {
+      margin: 0;
+      padding: 15px 0 0;
+    }
+
+    .review-drawer-footer {
+      padding-top: 12px;
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+    }
+
+    .review-drawer-footer .review-submit-button {
+      min-height: 46px;
+      font-size: 11px;
+    }
+
+    @media (max-width: 440px) {
+      .review-core-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .review-accordion summary {
+        flex-wrap: wrap;
+        row-gap: 6px;
+      }
+
+      .review-accordion-meta {
+        font-size: 10px;
+      }
+
+      .review-rating-stars {
+        gap: 3px;
+      }
+
+      .review-rating-star {
+        width: 40px;
+        flex-basis: 40px;
+      }
+    }
+
+    /* Only show a small, relevant course suggestion list after typing. */
+    .review-course-search-wrap {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .review-drawer-body .review-course-search-input {
+      box-sizing: border-box;
+      width: 100%;
+      height: 43px;
+      min-height: 43px;
+      padding: 0 13px 0 35px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.86);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .review-course-search-wrap::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 13px;
+      z-index: 1;
+      width: 12px;
+      height: 12px;
+      border: 1.5px solid rgba(23, 23, 23, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .review-course-search-wrap::after {
+      content: "";
+      position: absolute;
+      top: 26px;
+      left: 24px;
+      z-index: 1;
+      width: 6px;
+      height: 1.5px;
+      border-radius: 2px;
+      background: rgba(23, 23, 23, 0.5);
+      transform: rotate(45deg);
+      transform-origin: left center;
+      pointer-events: none;
+    }
+
+    .review-drawer-body .review-course-search-input:focus {
+      border-color: rgba(192, 154, 92, 0.55);
+      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.11);
+    }
+
+    .review-course-suggestions {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 30;
+      padding: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 13px;
+      background: #fff;
+      box-shadow: 0 16px 32px rgba(42, 32, 20, 0.14);
+    }
+
+    .review-course-suggestions[hidden] {
+      display: none;
+    }
+
+    .review-course-suggestion {
+      padding: 10px 11px;
+      border-radius: 8px;
+      color: #272727;
+      font-size: 12px;
+      line-height: 1.45;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+
+    .review-course-suggestion:hover,
+    .review-course-suggestion.is-active {
+      background: rgba(192, 154, 92, 0.13);
+    }
+
+    .review-course-no-results,
+    .review-course-more-results {
+      padding: 9px 11px;
+      color: rgba(23, 23, 23, 0.55);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+  

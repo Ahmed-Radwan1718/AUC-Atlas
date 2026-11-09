@@ -1,0 +1,106 @@
+name: Build and typecheck
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --no-audit --no-fund
+      - run: npm run test:cleanup
+      - run: node --test tests/faq-sitemap.test.cjs
+      - run: npm run typecheck
+      - run: npm run build
+
+      - name: Smoke-test all Phase 4 page routes
+        run: |
+          npm run start > /tmp/atlas-next.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for i in $(seq 1 25); do
+            if curl -fsS http://127.0.0.1:3000/ >/dev/null; then break; fi
+            sleep 1
+          done
+          for route in / /professors /professors/eslam-badr /courses /courses/chem-1005 /gpa-calculator /degree-progression /terms /privacy /login /signup /forgot-password /accounts /admin /faq; do
+            echo "Checking $route"
+            curl --fail --silent --show-error --location "http://127.0.0.1:3000$route" > /dev/null || {
+              cat /tmp/atlas-next.log
+              exit 1
+            }
+          done
+
+          check_status() {
+            expected="$1"
+            shift
+            actual=$(curl -s -o /dev/null -w '%{http_code}' "$@")
+            if [ "$actual" != "$expected" ]; then
+              echo "Expected HTTP $expected, received $actual from $*"
+              exit 1
+            fi
+          }
+          check_status 404 http://127.0.0.1:3000/missing-page-check
+          curl --silent --show-error http://127.0.0.1:3000/missing-page-check | grep -Fq 'Ackk, page not found.'
+          curl --fail --silent --show-error http://127.0.0.1:3000/terms | grep -Fq 'Acceptance and Legal Framework'
+          curl --fail --silent --show-error http://127.0.0.1:3000/privacy | grep -Fq 'About This Privacy Notice'
+          curl --fail --silent --show-error http://127.0.0.1:3000/faq > /tmp/atlas-faq.html
+          grep -Fq 'What can I use AUC Atlas for?' /tmp/atlas-faq.html
+          grep -Fq 'faq-answer-16' /tmp/atlas-faq.html
+          check_status 200 http://127.0.0.1:3000/sitemap.xml
+          check_status 200 http://127.0.0.1:3000/robots.txt
+          curl --fail --silent --show-error http://127.0.0.1:3000/sitemap.xml > /tmp/atlas-sitemap.xml
+          curl --fail --silent --show-error http://127.0.0.1:3000/robots.txt | grep -Fq 'Sitemap: https://aucatlas.com/sitemap.xml'
+          node -e 'const xml=require("fs").readFileSync("/tmp/atlas-sitemap.xml","utf8"); const urls=xml.split("<loc>").slice(1).map(s=>s.split("</loc>")[0]); const root="https://aucatlas.com"; const required=[root+"/",root+"/faq",root+"/professors/eslam-badr",root+"/courses/chem-1005"]; const forbidden=["/admin","/accounts","/login","/signup","/forgot-password"]; if (urls.length<1500 || new Set(urls).size!==urls.length || required.some(u=>!urls.includes(u)) || urls.some(u=>u.endsWith(".html") || forbidden.some(p=>u===root+p || u.startsWith(root+p+"/")))) {console.error("Sitemap validation failed:",urls.length); process.exit(1)}'
+
+          check_status 200 http://127.0.0.1:3000/api/me
+          check_status 401 http://127.0.0.1:3000/api/academic-progress
+          check_status 401 http://127.0.0.1:3000/api/course-materials
+          check_status 401 http://127.0.0.1:3000/api/course-material-download
+          check_status 401 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/imagekit-auth
+          check_status 400 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/login
+          check_status 400 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/signup
+          check_status 400 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/forgot-password
+          check_status 400 -X POST -H 'Content-Type: application/json' -d '{"action":"invalid"}' http://127.0.0.1:3000/api/login-code
+          check_status 400 -X POST -H 'Content-Type: application/json' -d '{"action":"invalid"}' http://127.0.0.1:3000/api/google-auth
+          check_status 401 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/authenticator
+          check_status 401 http://127.0.0.1:3000/api/sessions
+          check_status 401 http://127.0.0.1:3000/api/admin
+          check_status 401 http://127.0.0.1:3000/api/cleanup-material-uploads
+          check_status 401 -H 'Authorization: Bearer invalid-test-token' http://127.0.0.1:3000/api/cleanup-material-uploads
+          check_status 405 -X POST http://127.0.0.1:3000/api/cleanup-material-uploads
+          node -e "const c = require('./vercel.json').crons; if (c.length !== 1 || c[0].path !== '/api/cleanup-material-uploads' || c[0].schedule !== '0 3 * * *') process.exit(1)"
+          check_status 401 -X POST -H 'Content-Type: application/json' -d '{"action":"getAuthenticationRequirements"}' http://127.0.0.1:3000/api/admin
+          check_status 405 -X PATCH -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/admin
+          check_status 405 http://127.0.0.1:3000/api/logout
+          check_status 200 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/logout
+
+          # Apply the same protections to HTML, the administrator page and APIs.
+          for route in / /admin /api/me; do
+            header_file=$(mktemp)
+            curl --fail --silent --show-error -D "$header_file" -o /dev/null "http://127.0.0.1:3000$route"
+            for header in Content-Security-Policy X-Content-Type-Options Referrer-Policy Cross-Origin-Opener-Policy Permissions-Policy X-Frame-Options Strict-Transport-Security; do
+              if ! grep -qi "^$header:" "$header_file"; then
+                echo "Missing $header on $route"
+                exit 1
+              fi
+            done
+            grep -i '^Content-Security-Policy:' "$header_file" | grep -Fq "object-src 'none'"
+            grep -i '^Content-Security-Policy:' "$header_file" | grep -Fq "frame-ancestors 'self'"
+            if grep -i '^Content-Security-Policy:' "$header_file" | grep -Fq "'unsafe-eval'"; then
+              echo "Production CSP must not allow unsafe-eval on $route"
+              exit 1
+            fi
+            rm "$header_file"
+          done
+          curl --fail --silent --show-error -D /tmp/atlas-admin-headers -o /dev/null http://127.0.0.1:3000/admin
+          grep -qi '^X-Robots-Tag: noindex, nofollow, noarchive' /tmp/atlas-admin-headers
+          node -e "if (require('./firebase.json').firestore?.rules !== 'firestore.rules') process.exit(1)"
+          grep -Fq 'allow read, write: if false;' firestore.rules

@@ -1,0 +1,1060 @@
+/* Original professor browser and review styles, section 2/3. */
+
+
+    .review-submit-button:disabled {
+      opacity: 0.58;
+      cursor: wait;
+    }
+
+    .review-form-message {
+      grid-column: 1 / -1;
+      min-height: 20px;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .review-form-message.is-success {
+      color: #23613f;
+    }
+
+    .review-form-message.is-error {
+      color: #9b2f2f;
+    }
+
+    .professor-review-insights {
+      width: min(100%, 1120px);
+      margin: 22px auto 0;
+      padding: 16px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 14px 38px rgba(42, 32, 20, 0.07);
+      display: grid;
+      gap: 12px;
+    }
+
+    .professor-review-insights-header,
+    .professor-reviews-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .professor-review-insights-header span,
+    .professor-reviews-header span {
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .professor-review-insights-header h2,
+    .professor-reviews-header h2 {
+      margin-top: 3px;
+      color: #171717;
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.08;
+    }
+
+    .professor-review-insights-header p,
+    .professor-reviews-header p {
+      color: rgba(23, 23, 23, 0.54);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-align: right;
+      text-transform: uppercase;
+    }
+
+    .professor-review-insights-header p {
+      color: rgba(23, 23, 23, 0.68);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      text-transform: none;
+    }
+
+
+    /* Loading placeholders for Class patterns: mimic compact stat rows. */
+    .professor-review-stat-skeleton {
+      display: grid;
+      gap: 15px;
+      padding: 5px 0 7px;
+    }
+
+    .professor-review-stat-skeleton-row {
+      display: grid;
+      gap: 9px;
+    }
+
+    .professor-review-stat-skeleton-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .professor-review-stat-skeleton-line,
+    .professor-review-stat-skeleton-track,
+    .professor-review-stats-count-loading {
+      display: block;
+      height: 10px;
+      border-radius: 6px;
+      background: rgba(23, 23, 23, 0.065);
+    }
+
+    .professor-review-stat-skeleton-line {
+      width: 39%;
+    }
+
+    .professor-review-stat-skeleton-line.is-value {
+      width: 27%;
+    }
+
+    .professor-review-stat-skeleton-row:nth-child(2) .professor-review-stat-skeleton-line {
+      width: 48%;
+    }
+
+    .professor-review-stat-skeleton-row:nth-child(3) .professor-review-stat-skeleton-line {
+      width: 34%;
+    }
+
+    .professor-review-stat-skeleton-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      opacity: 0.8;
+    }
+
+    .professor-review-stats-count-loading {
+      width: 90px;
+      height: 10px;
+      margin: 3px 0;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .professor-review-stat-skeleton-line,
+      .professor-review-stat-skeleton-track,
+      .professor-review-stats-count-loading {
+        animation: professor-review-loading-pulse 1.7s ease-in-out infinite;
+      }
+    }
+
+    .professor-review-stats {
+      display: grid;
+      gap: 10px;
+    }
+
+    .professor-review-stat-row {
+      min-width: 0;
+    }
+
+    .professor-review-stat-row:first-child > .professor-review-stat-details-toggle {
+      padding-top: 4px;
+    }
+
+    .professor-review-stat-head {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .professor-review-stat-label {
+      min-width: 0;
+      flex: 1 1 auto;
+      color: rgba(23, 23, 23, 0.74);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      line-height: 1.45;
+      text-transform: none;
+    }
+
+    .professor-review-stat-value {
+      min-width: 0;
+      color: rgba(23, 23, 23, 0.60);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      line-height: 1.45;
+      text-align: right;
+      text-transform: none;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+    }
+
+    .professor-review-stat-value strong {
+      color: #171717;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .professor-review-stat-value span:last-child {
+      color: #a67e3e;
+      font-weight: 700;
+    }
+
+    .professor-review-stat-track,
+    .professor-review-stat-answer-track {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+    }
+
+    .professor-review-stat-track {
+      height: 7px;
+    }
+
+    .professor-review-stat-fill {
+      width: var(--stat-width, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: #c09a5c;
+      display: block;
+      transform: scaleX(0);
+      transform-origin: left center;
+      animation:
+        professorReviewStatFill
+        0.72s
+        cubic-bezier(0.16, 1, 0.3, 1)
+        var(--stat-delay, 0ms)
+        forwards;
+    }
+
+    /* The summary covers the full label and progress bar, making each stat row expandable. */
+    .professor-review-stat-details-toggle {
+      width: 100%;
+      padding: 8px 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      display: grid;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .professor-review-stat-details-toggle:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    .professor-review-stat-details-toggle:hover .professor-review-stat-label,
+    .professor-review-stat-row.open .professor-review-stat-label {
+      color: #171717;
+    }
+
+    .professor-review-stat-chevron {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 6px;
+      margin: 0 2px;
+      border-right: 1.5px solid rgba(23, 23, 23, 0.55);
+      border-bottom: 1.5px solid rgba(23, 23, 23, 0.55);
+      transform: rotate(45deg);
+      transition: transform 0.22s ease;
+    }
+
+    .professor-review-stat-row.open .professor-review-stat-chevron {
+      transform: rotate(225deg);
+    }
+
+    .professor-review-stat-breakdown {
+      display: grid;
+      gap: 9px;
+      max-height: 0;
+      padding: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition:
+        max-height 0.42s ease,
+        opacity 0.28s ease,
+        padding 0.42s ease;
+    }
+
+    .professor-review-stat-row.open .professor-review-stat-breakdown {
+      max-height: var(--stat-expanded-height, 520px);
+      opacity: 1;
+      padding: 2px 0 11px;
+    }
+
+    .professor-review-stat-total,
+    .professor-review-stat-answer {
+      display: grid;
+      gap: 5px;
+    }
+
+    /* Keep answers with no selections out of the initial breakdown. */
+    .professor-review-stat-answer.is-zero-answer {
+      display: none;
+    }
+
+    .professor-review-stat-breakdown.show-zero-options .professor-review-stat-answer.is-zero-answer {
+      display: grid;
+    }
+
+    .professor-review-stat-show-zeros {
+      justify-self: start;
+      margin-top: 2px;
+      padding: 4px 0;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.62);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .professor-review-stat-show-zeros:hover,
+    .professor-review-stat-show-zeros:focus-visible {
+      color: #171717;
+    }
+
+    .professor-review-stat-show-zeros:focus-visible {
+      outline: 2px solid #c09a5c;
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+
+    .professor-review-stat-answer-head {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(23, 23, 23, 0.65);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: normal;
+      line-height: 1.45;
+      text-transform: none;
+    }
+
+    .professor-review-stat-answer-head span:first-child {
+      min-width: 0;
+      color: rgba(23, 23, 23, 0.72);
+    }
+
+    .professor-review-stat-answer-head span:last-child {
+      color: rgba(192, 154, 92, 0.96);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .professor-review-stat-answer-track {
+      height: 4px;
+    }
+
+    .professor-review-stat-answer-fill {
+      width: var(--stat-width, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(192, 154, 92, 0.58);
+      display: block;
+    }
+
+    .professor-review-stat-total-fill {
+      background: rgba(23, 23, 23, 0.22);
+    }
+
+    @keyframes professorReviewStatFill {
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .professor-review-insights-more {
+      display: grid;
+      gap: 0;
+    }
+
+    .professor-review-insights-hidden {
+      order: 1;
+      box-sizing: border-box;
+      display: grid;
+      gap: 10px;
+      margin-top: 0;
+      overflow: hidden;
+      opacity: 1;
+      transition:
+        height 0.28s ease,
+        opacity 0.22s ease,
+        transform 0.22s ease;
+    }
+
+    .professor-review-insights-more-toggle {
+      order: 2;
+      width: fit-content;
+      margin-top: 14px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #171717;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: normal;
+      text-transform: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+      transition: color 0.18s ease;
+    }
+
+    .professor-review-insights-more-toggle::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.22s ease;
+    }
+
+    .professor-review-insights-more[open] .professor-review-insights-more-toggle::after {
+      transform: rotate(225deg) translate(-1px, -1px);
+    }
+
+    .professor-review-insights-more-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .professor-review-insights-more-less {
+      display: none;
+    }
+
+    .professor-review-insights-more[open] .professor-review-insights-more-more {
+      display: none;
+    }
+
+    .professor-review-insights-more[open] .professor-review-insights-more-less {
+      display: inline;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .professor-review-stat-fill {
+        animation: none;
+        transform: scaleX(1);
+      }
+
+      .professor-review-stat-breakdown,
+      .professor-review-insights-hidden {
+        transition: none;
+      }
+    }
+
+    .professor-reviews-section {
+      width: min(100%, 720px);
+      margin: 28px auto 0;
+      display: grid;
+      gap: 16px;
+    }
+
+    .professor-reviews-header {
+      padding: 0 4px 4px;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .professor-reviews-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      align-items: start;
+      gap: 14px;
+    }
+
+
+    /* Professor review loading follows the directory's quiet card skeletons. */
+    .professor-review-loading-card {
+      min-width: 0;
+      min-height: 195px;
+      padding: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.055);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.45);
+      display: grid;
+      align-content: start;
+      gap: 16px;
+    }
+
+    .professor-review-loading-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .professor-review-loading-avatar {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      border-radius: 50%;
+      background: rgba(23, 23, 23, 0.055);
+    }
+
+    .professor-review-loading-top .professor-review-loading-line {
+      flex: 1 1 auto;
+      max-width: 46%;
+    }
+
+    .professor-review-loading-rating {
+      flex: 0 0 62px;
+      width: 62px;
+      height: 12px;
+      margin-left: auto;
+    }
+
+    .professor-review-loading-detail {
+      display: grid;
+      gap: 11px;
+    }
+
+    .professor-review-loading-line,
+    .professor-review-count-loading {
+      display: block;
+      height: 11px;
+      border-radius: 6px;
+      background: rgba(23, 23, 23, 0.065);
+    }
+
+    .professor-review-loading-line.is-context { width: 52%; }
+    .professor-review-loading-line.is-note { width: 93%; }
+    .professor-review-loading-line.is-note-short { width: 67%; }
+
+    .professor-review-count-loading {
+      width: 86px;
+      height: 10px;
+      margin: 3px 0;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .professor-review-loading-avatar,
+      .professor-review-loading-line,
+      .professor-review-loading-rating,
+      .professor-review-count-loading {
+        animation: professor-review-loading-pulse 1.7s ease-in-out infinite;
+      }
+
+      @keyframes professor-review-loading-pulse {
+        0%, 100% { opacity: 0.55; }
+        50% { opacity: 1; }
+      }
+    }
+
+    .professor-review-card {
+      padding: 16px;
+      border: 1px solid rgba(23, 23, 23, 0.09);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 18px 44px rgba(42, 32, 20, 0.08);
+      display: grid;
+      align-content: start;
+      gap: 12px;
+    }
+
+    .professor-review-card-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .professor-review-author {
+      min-width: 0;
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .professor-review-avatar,
+    .professor-review-avatar-fallback {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #171717;
+      color: #fffdf8;
+      display: grid;
+      place-items: center;
+      object-fit: cover;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .professor-review-author strong {
+      display: block;
+      min-width: 0;
+      overflow: hidden;
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .professor-review-rating {
+      align-self: center;
+      transform: translateY(-2px);
+      flex: 0 0 auto;
+      color: #c09a5c;
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .professor-review-stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .professor-review-star {
+      color: rgba(23, 23, 23, 0.18);
+    }
+
+    .professor-review-star.is-filled {
+      color: #c09a5c;
+    }
+
+    .professor-review-rating-text {
+      color: rgba(23, 23, 23, 0.48);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .professor-review-context {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .professor-review-context span {
+      color: rgba(23, 23, 23, 0.62);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .professor-review-note,
+    .professor-review-empty,
+    .professor-review-status {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.68);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .professor-review-card-actions {
+      margin-top: 2px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .professor-review-report-button {
+      padding: 4px 0;
+      border: 0;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.44);
+      font: inherit;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    .professor-review-report-button:hover,
+    .professor-review-report-button:focus-visible {
+      color: #9f2f2f;
+      outline: none;
+    }
+
+    .professor-review-report-button:disabled {
+      color: rgba(23, 23, 23, 0.38);
+      cursor: default;
+      opacity: 0.72;
+    }
+
+    body.content-report-open {
+      overflow: hidden;
+    }
+
+    .course-report-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3100;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+      opacity: 1;
+      transition:
+        opacity 0.24s ease,
+        display 0.24s;
+      transition-behavior: allow-discrete;
+      will-change: opacity;
+    }
+
+    .course-report-modal[hidden] {
+      display: none;
+      opacity: 0;
+    }
+
+    @starting-style {
+      .course-report-modal:not([hidden]) {
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-report-modal {
+        transition: none;
+      }
+    }
+
+    .course-report-backdrop {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: rgba(247, 244, 238, 0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor: pointer;
+      animation:
+        courseReportBackdropIn
+        0.24s
+        ease
+        both;
+    }
+
+    .course-report-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(500px, 100%);
+      overflow: hidden;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 34px 90px rgba(42, 32, 20, 0.2);
+      animation:
+        courseReportDialogIn
+        0.3s
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+    }
+
+    .course-report-header {
+      padding: 24px 24px 14px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .course-report-header-copy {
+      min-width: 0;
+      display: grid;
+      gap: 7px;
+    }
+
+    .course-report-kicker {
+      margin: 0;
+      color: rgba(192, 154, 92, 0.92);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .course-report-header h2 {
+      margin: 0;
+      color: #171717;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.1;
+    }
+
+    .course-report-header-copy > p:last-child {
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    .course-report-close {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: rgba(23, 23, 23, 0.82);
+      font: inherit;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .course-report-close:hover,
+    .course-report-close:focus-visible {
+      background: #171717;
+      color: #ffffff;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.14);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-report-form {
+      padding: 0 24px 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .course-report-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .course-report-field > span {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .course-report-field textarea {
+      width: 100%;
+      min-height: 132px;
+      padding: 13px 14px;
+      resize: vertical;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      border-radius: 14px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.58);
+      color: #171717;
+      font: inherit;
+      font-size: 14px;
+      line-height: 1.55;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .course-report-field textarea:focus {
+      border-color: rgba(192, 154, 92, 0.56);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
+    .course-report-status {
+      min-height: 0;
+      margin: 0;
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .course-report-status:empty {
+      display: none;
+    }
+
+    .course-report-status.error {
+      color: #9f2f2f;
+    }
+
+    .course-report-actions {
+      padding-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .course-report-cancel,
+    .course-report-submit {
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .course-report-cancel {
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(255, 255, 255, 0.58);
+      color: rgba(23, 23, 23, 0.68);
+    }
+
+    .course-report-cancel:hover,
+    .course-report-cancel:focus-visible {
+      background: #ffffff;
+      color: #171717;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.08);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-report-submit {
+      border: 0;
+      background: #171717;
+      color: #ffffff;
+    }
+
+    .course-report-submit:hover:not(:disabled),
+    .course-report-submit:focus-visible:not(:disabled) {
+      background: #242424;
+      box-shadow: 0 8px 22px rgba(23, 23, 23, 0.14);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .course-report-submit:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    @keyframes courseReportBackdropIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes courseReportDialogIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-report-backdrop,
+      .course-report-dialog {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .course-report-modal {
+        padding: 14px;
+      }
+
+      .course-report-dialog {
+        border-radius: 22px;
+      }
+
+      .course-report-header {
+        padding: 20px 18px 16px;
+      }
+
+      .course-report-form {
+        padding: 0 18px 18px;
+      }
+
+      .course-report-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .course-report-cancel,
+      .course-report-submit {
+        width: 100%;
+      }
+    }
+
+    .professor-review-empty,
+    .professor-review-status {
+      grid-column: 1 / -1;
+      padding: 22px;
+      border: 1px dashed rgba(23, 23, 23, 0.16);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.54);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .professor-review-insights-header,
+      .professor-reviews-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .professor-review-card-top {
+        align-items: center;
+      }
+
+      .professor-review-stat-labels {
+        font-size: 10px;
+      }
+    }
+
+    @keyframes reviewBackdropIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
