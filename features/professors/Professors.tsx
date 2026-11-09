@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { professors, type Professor } from "../../data/professors";
 import "./professors.css";
 import "./professors-ui-1.css";
@@ -43,6 +44,37 @@ export default function Professors() {
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [visibleLimit, setVisibleLimit] = useState(30);
+  const activeSearchTransition = useRef<ViewTransition | null>(null);
+
+  function updateSearch(value: string) {
+    const update = () => {
+      setQuery(value);
+      setVisibleLimit(30);
+    };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || loading) {
+      update();
+      return;
+    }
+
+    // Snapshot the old and new grids so results crossfade instead of popping.
+    // flushSync ensures React has committed the new results for the snapshot.
+    if (document.startViewTransition) {
+      activeSearchTransition.current?.skipTransition();
+      const transition = document.startViewTransition(() => flushSync(update));
+      activeSearchTransition.current = transition;
+      void transition.finished.finally(() => {
+        if (activeSearchTransition.current === transition) activeSearchTransition.current = null;
+      });
+    } else {
+      flushSync(update);
+      // Gentle fallback for browsers without the View Transitions API.
+      document.getElementById("professors-grid")?.animate(
+        [{ opacity: 0.72, transform: "translateY(5px)" }, { opacity: 1, transform: "translateY(0)" }],
+        { duration: 220, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
+      );
+    }
+  }
+
   useEffect(() => {
     let active = true;
     fetch("/api/professor-reviews?summaries=true", {
@@ -120,7 +152,7 @@ export default function Professors() {
             <div className="professors-search-box">
               <input id="professor-search-input" type="search" placeholder="Search professors..."
                 aria-label="Search professors" value={query}
-                onChange={event=>{setQuery(event.target.value);setVisibleLimit(30);}}/>
+                onChange={event=>updateSearch(event.target.value)}/>
             </div>
             <section className="professors-grid" id="professors-grid" aria-label={loading?"Loading professors and reviews":"Professor list"}
               aria-busy={loading}>
