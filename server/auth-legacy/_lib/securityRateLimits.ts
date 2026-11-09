@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const admin = require("./firebaseAdmin");
+const admin = require("./firebaseAdmin").default;
 
 function cleanString(value: any, maxLength: any) {
   return String(value || "")

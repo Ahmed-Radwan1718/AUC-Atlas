@@ -3,7 +3,7 @@ import type { LegacyRequest, LegacyReply } from "../legacyTypes";
 const crypto = require("crypto");
 const admin = require(
   "../_lib/firebaseAdmin"
-);
+).default;
 const {
   deletePendingCourseMaterial
 } = require("../_lib/courseMaterialStorage");

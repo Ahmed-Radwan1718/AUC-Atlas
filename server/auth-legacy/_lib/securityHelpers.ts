@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const admin = require("./firebaseAdmin");
+const admin = require("./firebaseAdmin").default;
 const {
   encryptTotpSecret,
   decryptTotpSecret

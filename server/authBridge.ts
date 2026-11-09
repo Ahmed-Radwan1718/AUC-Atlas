@@ -124,7 +124,11 @@ export async function legacyAuthRoute(request: NextRequest, routeName: string): 
     if(!headers.has("content-type"))response.headers.set("Content-Type",
       typeof responseBody==="string"?"text/plain; charset=utf-8":"application/json; charset=utf-8");
     return response;
-  } catch {
+  } catch (error) {
+    console.error("[AUC Atlas] Authentication handler failed", {
+      route: routeName,
+      errorType: error instanceof Error ? error.name : typeof error
+    });
     return NextResponse.json({error:"Could not process this account request."},
       {status:500,headers:{"Cache-Control":"private, no-store, max-age=0"}});
   }
