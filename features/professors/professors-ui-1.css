@@ -206,6 +206,47 @@
       transform: translateY(-1px);
     }
 
+
+    /* Search results change as a single, gentle crossfade and slide.
+       The input remains outside the transition so typing stays responsive. */
+    .professors-page .professors-grid:not(.professor-profile-grid) {
+      view-transition-name: professors-search-results;
+    }
+
+    @keyframes professorSearchResultsOut {
+      to { opacity: 0; transform: translateY(-8px); }
+    }
+
+    @keyframes professorSearchResultsIn {
+      from { opacity: 0; transform: translateY(10px); }
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
+
+    ::view-transition-group(professors-search-results) {
+      animation-duration: 280ms;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    ::view-transition-old(professors-search-results) {
+      animation: 170ms ease-in both professorSearchResultsOut;
+    }
+
+    ::view-transition-new(professors-search-results) {
+      animation: 280ms cubic-bezier(0.22, 1, 0.36, 1) both professorSearchResultsIn;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      ::view-transition-group(professors-search-results),
+      ::view-transition-old(professors-search-results),
+      ::view-transition-new(professors-search-results) {
+        animation: none;
+      }
+    }
+
     .professor-card {
       min-height: 350px;
       color: inherit;
