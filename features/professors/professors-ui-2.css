@@ -1070,6 +1070,9 @@
       display: block;
       opacity: 1;
       transition: none;
+      /* The base modal's will-change: opacity creates a backdrop root,
+         preventing its child backdrop-filter from blurring the page. */
+      will-change: auto;
       place-items: unset;
     }
 
