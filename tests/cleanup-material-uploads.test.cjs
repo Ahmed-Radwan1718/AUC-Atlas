@@ -5,11 +5,15 @@ const { readFileSync } = require("node:fs");
 const path = require("node:path");
 const { test } = require("node:test");
 const vm = require("node:vm");
+const ts = require("typescript");
 
-const cleanupSource = readFileSync(
-  path.resolve(__dirname, "../server/auth-legacy/routes/cleanup-material-uploads.js"),
-  "utf8"
-);
+const cleanupSource = ts.transpileModule(
+  readFileSync(
+    path.resolve(__dirname, "../server/auth-legacy/routes/cleanup-material-uploads.ts"),
+    "utf8"
+  ),
+  { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }
+).outputText;
 const CRON_SECRET = "mock-cron-secret-with-at-least-32-characters";
 
 function createHarness(options = {}) {
@@ -95,6 +99,7 @@ function createHarness(options = {}) {
   const module = { exports: {} };
   vm.runInNewContext(cleanupSource, {
     module,
+    exports: module.exports,
     Buffer,
     Date,
     process: { env: { CRON_SECRET: options.secret === undefined ? CRON_SECRET : options.secret } },
@@ -112,7 +117,7 @@ function createHarness(options = {}) {
       }
       throw new Error("Unexpected server dependency: " + id);
     }
-  }, { filename: "cleanup-material-uploads.js" });
+  }, { filename: "cleanup-material-uploads.ts" });
 
   async function request(method, authorization) {
     const response = {
@@ -123,7 +128,7 @@ function createHarness(options = {}) {
       status(code) { this.statusCode = code; return this; },
       json(body) { this.body = body; return this; }
     };
-    await module.exports({
+    await module.exports.default({
       method,
       headers: authorization ? { authorization } : {}
     }, response);
