@@ -574,8 +574,9 @@
 
     .course-detail-kicker {
       color: rgba(192, 154, 92, 0.96);
+      font-family: Arial, sans-serif;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 500;
       letter-spacing: 0.09em;
       line-height: 1.4;
       text-transform: uppercase;
@@ -621,8 +622,9 @@
 
     .course-detail-stat > span {
       color: rgba(192, 154, 92, 0.96);
+      font-family: Arial, sans-serif;
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 500;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
