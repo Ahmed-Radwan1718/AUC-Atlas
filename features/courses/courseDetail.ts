@@ -3,6 +3,7 @@ import { courses } from "../../data/courses";
 import { professors } from "../../data/professors";
 import { getCourseUrl, getProfessorProfileUrl, normalizeCourseCode, escapeMaterialText, recordCourseView } from "./courseDiscovery";
 import { setupCourseMaterialsAccess } from "./courseMaterialsUI";
+import { summarizeCoursePrerequisite } from "./prerequisiteDisplay";
 
 function setCourseDetailText(id, value) {
     const element = document.getElementById(id);
@@ -129,14 +130,15 @@ function setCourseDetailText(id, value) {
 
   
 function renderCoursePrerequisites(value) {
+    const source = summarizeCoursePrerequisite(value);
     const target = document.getElementById("course-detail-prerequisite");
-    if (!target) return;
-    const source = String(value || "");
+    if (!target) return Boolean(source);
+
     const existing = new Set(courses.map(function (course) {
       return normalizeCourseCode(course.code);
     }));
     let result = "", cursor = 0;
-    for (const match of source.matchAll(/\b[A-Z]{2,5}\s*\d{4}\b/gi)) {
+    for (const match of source.matchAll(/\b[A-Z]{2,5}\s*\d{4}[A-Z]?\b/gi)) {
       result += escapeMaterialText(source.slice(cursor, match.index));
       const code = normalizeCourseCode(match[0]);
       result += existing.has(code)
@@ -146,6 +148,7 @@ function renderCoursePrerequisites(value) {
       cursor = match.index + match[0].length;
     }
     target.innerHTML = result + escapeMaterialText(source.slice(cursor));
+    return Boolean(source);
   }
 
   function renderCourseDetail(courseCode) {
@@ -196,10 +199,10 @@ function renderCoursePrerequisites(value) {
         "Course description coming soon."
     );
     setCourseDetailText("course-detail-level", selectedCourse.level);
-    renderCoursePrerequisites(selectedCourse.prerequisite);
+    const hasDisplayedPrerequisite = renderCoursePrerequisites(selectedCourse.prerequisite);
 
-    if (prerequisiteRow) prerequisiteRow.hidden = !selectedCourse.prerequisite;
-    if (detailsGrid) detailsGrid.hidden = !selectedCourse.prerequisite;
+    if (prerequisiteRow) prerequisiteRow.hidden = !hasDisplayedPrerequisite;
+    if (detailsGrid) detailsGrid.hidden = !hasDisplayedPrerequisite;
 
     recordCourseView(selectedCourse.code);
     loadCourseProfessors(selectedCourse);
