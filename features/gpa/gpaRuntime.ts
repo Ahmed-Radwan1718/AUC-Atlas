@@ -20,6 +20,13 @@ export function mountGpaCalculator() {
     const semesterCreditsOutput = document.getElementById("semester-credits");
     const qualityPointsOutput = document.getElementById("quality-points");
 
+    const creditValues = [1, 2, 3, 4, 5, 6];
+
+    function normalizeCredits(value) {
+      const amount = Number(value);
+      return creditValues.includes(amount) ? String(amount) : "3";
+    }
+
     const grades = [
       ["", "Grade"],
       ["4.0", "A"],
@@ -375,12 +382,7 @@ export function mountGpaCalculator() {
         courseName.value =
           String(course.name || "");
 
-        courseCredits.value =
-          String(
-            course.credits == null
-              ? ""
-              : course.credits
-          );
+        courseCredits.value = normalizeCredits(course.credits);
 
         courseGrade.value =
           String(course.grade || "");
@@ -408,7 +410,13 @@ export function mountGpaCalculator() {
 
       row.innerHTML = `
         <input class="course-name" type="text" placeholder="Course name" value="${courseName}">
-        <input class="course-credits" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Credits" value="${credits}" aria-label="Credits">
+        <div class="credits-dropdown">
+          <select class="course-credits" aria-label="Credits">
+            ${creditValues.map(function (value) {
+              return `<option value="${value}"${normalizeCredits(credits) === String(value) ? " selected" : ""}>${value}</option>`;
+            }).join("")}
+          </select>
+        </div>
         <div class="grade-dropdown">
           <input class="course-grade" type="hidden" value="${grade}">
           <button class="grade-toggle" type="button" aria-label="Grade">
@@ -431,10 +439,7 @@ export function mountGpaCalculator() {
       const gradeToggleLabel = row.querySelector(".grade-toggle-label");
       const gradeMenu = row.querySelector(".grade-menu");
 
-      creditsInput.addEventListener("input", function () {
-        creditsInput.value = creditsInput.value.replace(/[^0-9]/g, "");
-        calculateGpa();
-      });
+      creditsInput.addEventListener("change", calculateGpa);
 
       row.querySelector(".course-name").addEventListener("input", calculateGpa);
 
