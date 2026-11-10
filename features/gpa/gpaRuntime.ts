@@ -593,7 +593,7 @@ export function mountGpaCalculator() {
         animateSummaryNumber(semesterGpaOutput, overallGpa, 2);
       } else {
         if (semesterGpaOutput.gpaAnimationFrame) cancelAnimationFrame(semesterGpaOutput.gpaAnimationFrame);
-        semesterGpaOutput.textContent = "—";
+        semesterGpaOutput.textContent = "0";
       }
       animateSummaryNumber(semesterCreditsOutput, totalCredits, 0);
       animateSummaryNumber(qualityPointsOutput, totalQualityPoints, 2);
