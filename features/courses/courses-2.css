@@ -861,46 +861,111 @@
       transform: translateY(0) scale(0.94);
     }
 
+    /* Match the compact, floating dropdown used by the GPA calculator. */
     .course-material-filter-list .material-choice-menu {
+      top: calc(100% + 10px);
       right: 0;
       left: auto;
-      width: min(280px, calc(100vw - 48px));
-      max-height: min(320px, 52vh);
+      box-sizing: border-box;
+      width: min(216px, calc(100vw - 48px));
+      max-height: min(280px, 52vh);
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 8px;
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 18px 42px rgba(42, 32, 20, 0.14);
       display: grid;
       gap: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(23, 23, 23, 0.28) transparent;
       visibility: hidden;
       opacity: 0;
       pointer-events: none;
-      transform: translateY(-7px) scale(0.96);
+      transform: translate3d(0, -9px, 0) scale(0.975);
       transform-origin: top right;
       transition:
-        opacity 0.18s ease,
-        transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-        visibility 0.18s ease;
+        opacity 0.28s ease-in-out,
+        transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 0.34s;
     }
 
     .course-material-filter-list.open .material-choice-menu {
       visibility: visible;
       opacity: 1;
       pointer-events: auto;
-      transform: translateY(0) scale(1);
+      transform: translate3d(0, 0, 0) scale(1);
+      transition:
+        opacity 0.3s ease-out,
+        transform 0.36s cubic-bezier(0.16, 1, 0.3, 1),
+        visibility 0s;
     }
 
     .course-material-filter-list .material-choice-option {
-      min-height: 38px;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      position: relative;
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 40px;
+      padding: 10px 12px 10px 20px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: rgba(23, 23, 23, 0.66);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: normal;
+      line-height: 1.3;
+      text-align: left;
+      text-transform: none;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease;
     }
 
-    .course-material-filter-list .material-choice-option[aria-selected="true"] {
-      background: rgba(192, 154, 92, 0.14);
+    .course-material-filter-list .material-choice-option::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 11px;
+      bottom: 11px;
+      width: 2px;
+      border-radius: 999px;
+      background: rgba(192, 154, 92, 0.92);
+      opacity: 0;
+      transform: scaleY(0.35);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .course-material-filter-list .material-choice-option:hover,
+    .course-material-filter-list .material-choice-option[aria-selected="true"],
+    .course-material-filter-list .material-choice-option:focus-visible {
+      background: rgba(192, 154, 92, 0.12);
       color: #171717;
+    }
+
+    .course-material-filter-list .material-choice-option:hover::before,
+    .course-material-filter-list .material-choice-option[aria-selected="true"]::before,
+    .course-material-filter-list .material-choice-option:focus-visible::before {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+
+    .course-material-filter-list .material-choice-option:focus-visible {
+      outline: 2px solid rgba(192, 154, 92, 0.45);
+      outline-offset: -2px;
     }
 
     .course-material-filter-list .material-choice-option:active {
       transform: scale(0.97);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .course-material-filter-list .material-choice-menu,
+      .course-material-filter-list .material-choice-option,
+      .course-material-filter-list .material-choice-option::before {
+        transition: none;
+      }
     }
 
     .course-materials-list {
