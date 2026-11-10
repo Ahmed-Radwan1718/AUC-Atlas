@@ -580,36 +580,7 @@ function renderCourseMaterials(materials) {
           material.title ||
           "Course material"
         );
-      const materialType =
-        escapeMaterialText(
-          material.materialType ||
-          "Material"
-        );
-      const hasCompleteFileSizes =
-        files.every(function (fileMaterial) {
-          return Number(fileMaterial.size) > 0;
-        });
-      const totalFileSize =
-        files.reduce(
-          function (total, fileMaterial) {
-            return (
-              total +
-              Math.max(
-                0,
-                Number(fileMaterial.size) || 0
-              )
-            );
-          },
-          0
-        );
-      const groupFileSize =
-        hasCompleteFileSizes
-          ? formatMaterialFileSize(totalFileSize)
-          : "Size unavailable";
-      const metadata =
-        buildGroupMetadata(material) +
-        " · " +
-        escapeMaterialText(groupFileSize);
+      const metadata = buildGroupMetadata(material);
 
       const fileRows = files
         .map(function (fileMaterial) {
@@ -637,7 +608,6 @@ function renderCourseMaterials(materials) {
                 class="course-material-row-title-line"
               >
                 <strong>${title}</strong>
-                <em>${materialType}</em>
               </span>
 
               <small>${metadata}</small>
