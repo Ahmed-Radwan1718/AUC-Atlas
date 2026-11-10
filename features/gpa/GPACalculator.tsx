@@ -24,7 +24,7 @@ const markup = `
           </div>
           <button class="gpa-add-semester" type="button" id="add-semester">
             <span class="gpa-add-semester-icon" aria-hidden="true">+</span>
-            Add another semester
+            Add semester
           </button>
         </section>
 
