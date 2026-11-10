@@ -129,7 +129,7 @@
 .gpa-row.is-entering, .gpa-row.is-removing { opacity: 0; transform: translateY(-7px); pointer-events: none; }
 .gpa-row:has(.grade-dropdown.open, .grade-dropdown.is-closing) { z-index: 35; }
 /* Give the course name field a little breathing room before Credits. */
-.gpa-row > .course-name { width: calc(100% - 60px); }
+.gpa-row > .course-name { width: min(100%, 420px); }
 .gpa-semester:has(.grade-dropdown.open, .grade-dropdown.is-closing) { z-index: 6; }
 .gpa-row input:not([type="hidden"]), .grade-toggle {
   width: 100%;
