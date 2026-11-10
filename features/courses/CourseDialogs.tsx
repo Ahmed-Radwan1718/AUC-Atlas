@@ -168,19 +168,6 @@ const dialogsMarkup = `
           aria-live="polite"
         ></div>
 
-        <label class="material-anonymous-option">
-          <span>
-            <strong>Upload anonymously</strong>
-            <small>Hide your name from other students</small>
-          </span>
-          <input
-            id="quick-material-anonymous"
-            data-material-role="anonymous"
-            type="checkbox"
-            value="true"
-          >
-        </label>
-
         </div>
 
         <div class="quick-material-upload-footer">
