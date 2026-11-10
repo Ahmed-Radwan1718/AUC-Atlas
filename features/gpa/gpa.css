@@ -128,8 +128,8 @@
 }
 .gpa-row.is-entering, .gpa-row.is-removing { opacity: 0; transform: translateY(-7px); pointer-events: none; }
 .gpa-row:has(.grade-dropdown.open, .grade-dropdown.is-closing) { z-index: 35; }
-/* Give the course name field a little breathing room before Credits. */
-.gpa-row > .course-name { width: min(100%, 420px); }
+/* Keep course names compact on desktop without squeezing smaller screens. */
+.gpa-row > .course-name { max-width: 520px; }
 .gpa-semester:has(.grade-dropdown.open, .grade-dropdown.is-closing) { z-index: 6; }
 .gpa-row input:not([type="hidden"]), .grade-toggle {
   width: 100%;
@@ -422,7 +422,7 @@ body.gpa-dialog-open { overflow: hidden; }
   .semester-course-count { font-size: 10px; }
   .gpa-table-head { display: none; }
   .gpa-row { grid-template-columns: minmax(0,1fr) 84px 36px; grid-template-areas: "course course remove" "credits grade grade"; gap: 9px; padding: 9px 0; }
-  .gpa-row > .course-name { grid-area: course; width: 100%; }
+  .gpa-row > .course-name { grid-area: course; width: 100%; max-width: none; }
   .gpa-row > .credits-dropdown { grid-area: credits; }
   .gpa-row > .grade-dropdown:not(.credits-dropdown) { grid-area: grade; }
   .gpa-row > .remove-course { grid-area: remove; justify-self: end; }
