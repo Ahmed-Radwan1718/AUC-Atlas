@@ -1167,6 +1167,11 @@
       white-space: nowrap;
     }
 
+    .course-material-group-copy small {
+      font-size: 10px;
+      font-weight: 400;
+    }
+
     .course-material-preview-label {
       color: rgba(192, 154, 92, 0.96);
       font-family: Arial, sans-serif;
