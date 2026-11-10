@@ -87,10 +87,6 @@ const markup = `
                       <span class="course-recent-skeleton-line is-course"></span>
                     </div>
                     <div class="course-recent-skeleton-footer">
-                      <span class="course-recent-skeleton-uploader">
-                        <span class="course-recent-skeleton-avatar"></span>
-                        <span class="course-recent-skeleton-line is-uploader"></span>
-                      </span>
                       <span class="course-recent-skeleton-line is-date"></span>
                     </div>
                   </article>
@@ -104,10 +100,6 @@ const markup = `
                       <span class="course-recent-skeleton-line is-course"></span>
                     </div>
                     <div class="course-recent-skeleton-footer">
-                      <span class="course-recent-skeleton-uploader">
-                        <span class="course-recent-skeleton-avatar"></span>
-                        <span class="course-recent-skeleton-line is-uploader"></span>
-                      </span>
                       <span class="course-recent-skeleton-line is-date"></span>
                     </div>
                   </article>
@@ -121,10 +113,6 @@ const markup = `
                       <span class="course-recent-skeleton-line is-course"></span>
                     </div>
                     <div class="course-recent-skeleton-footer">
-                      <span class="course-recent-skeleton-uploader">
-                        <span class="course-recent-skeleton-avatar"></span>
-                        <span class="course-recent-skeleton-line is-uploader"></span>
-                      </span>
                       <span class="course-recent-skeleton-line is-date"></span>
                     </div>
                   </article>
@@ -138,10 +126,6 @@ const markup = `
                       <span class="course-recent-skeleton-line is-course"></span>
                     </div>
                     <div class="course-recent-skeleton-footer">
-                      <span class="course-recent-skeleton-uploader">
-                        <span class="course-recent-skeleton-avatar"></span>
-                        <span class="course-recent-skeleton-line is-uploader"></span>
-                      </span>
                       <span class="course-recent-skeleton-line is-date"></span>
                     </div>
                   </article>
@@ -155,10 +139,6 @@ const markup = `
                       <span class="course-recent-skeleton-line is-course"></span>
                     </div>
                     <div class="course-recent-skeleton-footer">
-                      <span class="course-recent-skeleton-uploader">
-                        <span class="course-recent-skeleton-avatar"></span>
-                        <span class="course-recent-skeleton-line is-uploader"></span>
-                      </span>
                       <span class="course-recent-skeleton-line is-date"></span>
                     </div>
                   </article>
@@ -172,10 +152,6 @@ const markup = `
                       <span class="course-recent-skeleton-line is-course"></span>
                     </div>
                     <div class="course-recent-skeleton-footer">
-                      <span class="course-recent-skeleton-uploader">
-                        <span class="course-recent-skeleton-avatar"></span>
-                        <span class="course-recent-skeleton-line is-uploader"></span>
-                      </span>
                       <span class="course-recent-skeleton-line is-date"></span>
                     </div>
                   </article>
