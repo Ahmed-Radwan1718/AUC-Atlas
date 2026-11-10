@@ -62,8 +62,7 @@ const markup = `
 
         <div class="gpa-sidebar">
         <aside class="gpa-summary" aria-label="GPA overview">
-          <span class="summary-label">Your GPA</span>
-          <div class="summary-gpa" id="semester-gpa" aria-label="Overall GPA">—</div>
+          <div class="summary-gpa" id="semester-gpa" aria-label="Overall GPA">0</div>
           <p class="summary-caption">Across all graded courses</p>
           <div class="summary-items">
             <div class="summary-item">
