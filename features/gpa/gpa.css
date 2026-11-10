@@ -240,8 +240,24 @@
 }
 .grade-option:focus-visible { outline: 2px solid rgba(192,154,92,.45); outline-offset: -2px; }
 .semester-course-footer { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 24px; padding-top: 22px; border-top: 1px solid rgba(23,23,23,.08); }
-.gpa-action.semester-add-course { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; border: 0; padding: 0 16px; background: rgba(192,154,92,.12); color: #7f5c28; font-size: 12px; }
-.gpa-action.semester-add-course:hover { background: rgba(192,154,92,.19); }
+.gpa-action.semester-add-course {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 0 20px;
+  border: 1px solid rgba(23,23,23,.12);
+  border-radius: 999px;
+  background: #fff;
+  color: #171717;
+  font-size: 13px;
+  font-weight: 700;
+}
+.gpa-action.semester-add-course:hover {
+  background: #fff;
+  border-color: rgba(23,23,23,.27);
+}
 .semester-add-course span { font-size: 20px; line-height: 1; font-weight: 400; }
 .semester-result { display: flex; gap: 12px; align-items: center; }
 .semester-result span { color: var(--gpa-muted); font-size: 12px; }
