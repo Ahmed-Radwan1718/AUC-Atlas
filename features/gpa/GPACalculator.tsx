@@ -11,18 +11,7 @@ const markup = `
         <div class="gpa-header-copy">
           <h1>GPA Calculator.</h1>
         </div>
-        <div class="gpa-header-tools">
-          <span class="gpa-save-message" id="gpa-save-message" role="status" aria-live="polite"></span>
-          <button class="gpa-action primary gpa-save-button" type="button" id="save-gpa-plan">Save plan</button>
-          <div class="gpa-overflow-wrap">
-            <button class="gpa-overflow-button" id="gpa-overflow-button" type="button" aria-label="More GPA plan actions" aria-haspopup="menu" aria-controls="gpa-overflow-menu" aria-expanded="false">
-              <span aria-hidden="true">•••</span>
-            </button>
-            <div class="gpa-overflow-menu" id="gpa-overflow-menu" role="menu" hidden>
-              <button type="button" id="reset-courses" role="menuitem">Reset plan</button>
-            </div>
-          </div>
-        </div>
+
       </header>
 
       <div class="gpa-layout">
@@ -39,6 +28,7 @@ const markup = `
           </button>
         </section>
 
+        <div class="gpa-sidebar">
         <aside class="gpa-summary" aria-label="GPA overview">
           <span class="summary-label">Your GPA</span>
           <div class="summary-gpa" id="semester-gpa" aria-label="Overall GPA">—</div>
@@ -58,6 +48,19 @@ const markup = `
             </div>
           </div>
         </aside>
+        <div class="gpa-header-tools">
+          <button class="gpa-action primary gpa-save-button" type="button" id="save-gpa-plan">Save plan</button>
+          <div class="gpa-overflow-wrap">
+            <button class="gpa-overflow-button" id="gpa-overflow-button" type="button" aria-label="More GPA plan actions" aria-haspopup="menu" aria-controls="gpa-overflow-menu" aria-expanded="false">
+              <span aria-hidden="true">•••</span>
+            </button>
+            <div class="gpa-overflow-menu" id="gpa-overflow-menu" role="menu" hidden>
+              <button type="button" id="reset-courses" role="menuitem">Reset plan</button>
+            </div>
+          </div>
+        </div>
+        <span class="gpa-save-message" id="gpa-save-message" role="status" aria-live="polite"></span>
+        </div>
       </div>
     </div>
 
