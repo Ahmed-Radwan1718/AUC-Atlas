@@ -9,9 +9,7 @@ const markup = `
     <div class="gpa-inner">
       <header class="gpa-header">
         <div class="gpa-header-copy">
-          <span class="gpa-kicker">Academic tools</span>
           <h1>GPA Calculator.</h1>
-          <p>Add your courses and grades to plan your semesters and keep track of your GPA.</p>
         </div>
         <div class="gpa-header-tools">
           <span class="gpa-save-message" id="gpa-save-message" role="status" aria-live="polite"></span>
@@ -29,10 +27,6 @@ const markup = `
 
       <div class="gpa-layout">
         <section class="gpa-panel" aria-label="Your semesters">
-          <div class="gpa-section-heading">
-            <h2>Your semesters</h2>
-            <p>Organize your courses by term. Your results update as you enter grades.</p>
-          </div>
           <div class="gpa-semesters" id="gpa-semesters" aria-live="off">
             <div class="gpa-loading" role="status">
               <span class="gpa-loading-spinner" aria-hidden="true"></span>
