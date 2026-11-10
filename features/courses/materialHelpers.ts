@@ -108,23 +108,12 @@ function escapeMaterialText(value) {
       encodeURIComponent(value);
   }
 
-  function submitContentReport(
-    button,
-    targetType,
-    targetId,
-    targetLabel
-  ) {
-    const modal = document.getElementById(
-      "course-report-modal"
-    );
+  function submitContentReport(button, targetType, targetId, targetLabel) {
+    const modal = document.getElementById("course-report-modal");
+    if (!modal || !targetType || !targetId) return;
+
     const form = document.getElementById(
       "course-report-form"
-    );
-    const title = document.getElementById(
-      "course-report-title"
-    );
-    const copy = document.getElementById(
-      "course-report-copy"
     );
     const reasonInput = document.getElementById(
       "course-report-reason"
@@ -137,10 +126,7 @@ function escapeMaterialText(value) {
     );
 
     if (
-      !modal ||
       !form ||
-      !title ||
-      !copy ||
       !reasonInput ||
       !status ||
       !submitButton
@@ -148,11 +134,12 @@ function escapeMaterialText(value) {
       return;
     }
 
-    function closeReportPanel() {
+    function finishClosingReportPanel() {
+      window.clearTimeout(modal.reportCloseTimer);
+      modal.reportCloseTimer = null;
       modal.hidden = true;
-      document.body.classList.remove(
-        "content-report-open"
-      );
+      modal.classList.remove("is-closing");
+      document.body.classList.remove("content-report-open");
       form.reset();
       status.textContent = "";
       status.className = "course-report-status";
@@ -163,8 +150,29 @@ function escapeMaterialText(value) {
         modal.reportSourceButton &&
         !modal.reportSourceButton.disabled
       ) {
-        modal.reportSourceButton.focus();
+        try {
+          modal.reportSourceButton.focus({ preventScroll: true });
+        } catch {
+          modal.reportSourceButton.focus();
+        }
       }
+    }
+
+    function closeReportPanel() {
+      if (modal.hidden || modal.classList.contains("is-closing")) {
+        return;
+      }
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        finishClosingReportPanel();
+        return;
+      }
+
+      // Use a cancelable timer rather than an animation.finished promise:
+      // opening a report during the exit animation must never be ignored.
+      modal.classList.add("is-closing");
+      window.clearTimeout(modal.reportCloseTimer);
+      modal.reportCloseTimer = window.setTimeout(finishClosingReportPanel, 250);
     }
 
     if (modal.dataset.ready !== "true") {
@@ -184,11 +192,46 @@ function escapeMaterialText(value) {
       document.addEventListener(
         "keydown",
         function (event) {
-          if (
-            event.key === "Escape" &&
-            !modal.hidden
-          ) {
+          if (modal.hidden || modal.classList.contains("is-closing")) {
+            return;
+          }
+
+          if (event.key === "Escape") {
+            event.preventDefault();
             closeReportPanel();
+            return;
+          }
+
+          if (event.key !== "Tab") {
+            return;
+          }
+
+          const focusable = Array.from(
+            modal.querySelectorAll(
+              ".course-report-dialog button:not([disabled]), " +
+              ".course-report-dialog textarea:not([disabled]), " +
+              ".course-report-dialog [tabindex]:not([tabindex='-1'])"
+            )
+          ).filter(function (element) {
+            return element.getClientRects().length > 0;
+          });
+          if (!focusable.length) {
+            event.preventDefault();
+            reasonInput.focus();
+            return;
+          }
+
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          const inside = modal.querySelector(".course-report-dialog")
+            .contains(document.activeElement);
+
+          if (!inside || (event.shiftKey && document.activeElement === first)) {
+            event.preventDefault();
+            (event.shiftKey ? last : first).focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
           }
         }
       );
@@ -242,8 +285,7 @@ function escapeMaterialText(value) {
                     "application/json"
                 },
                 body: JSON.stringify({
-                  targetType:
-                    activeTargetType,
+                  targetType: activeTargetType,
                   targetId:
                     activeTargetId,
                   reason: cleanedReason
@@ -273,11 +315,7 @@ function escapeMaterialText(value) {
               activeButton.disabled = true;
             }
 
-            modal.hidden = true;
-            document.body.classList.remove(
-              "content-report-open"
-            );
-            form.reset();
+            closeReportPanel();
           } catch (error) {
             status.textContent =
               error.message ||
@@ -299,17 +337,18 @@ function escapeMaterialText(value) {
       );
     }
 
+    // Reopening during an exit cancels the pending close instead of
+    // leaving the drawer hidden or stuck in its closing state.
+    window.clearTimeout(modal.reportCloseTimer);
+    modal.reportCloseTimer = null;
+    modal.classList.remove("is-closing");
+
     modal.reportSourceButton = button;
     modal.reportSourceOriginalText =
       button.textContent;
     modal.dataset.targetType = targetType;
     modal.dataset.targetId = targetId;
-
-    title.textContent = "Report material";
-    copy.textContent =
-      "Tell us what is wrong with " +
-      (targetLabel || "this course material") +
-      ". Our moderators will review your report.";
+    modal.dataset.targetLabel = String(targetLabel || "this course material");
 
     form.reset();
     status.textContent = "";
@@ -318,12 +357,12 @@ function escapeMaterialText(value) {
     submitButton.textContent = "Submit report";
 
     modal.hidden = false;
-    document.body.classList.add(
-      "content-report-open"
-    );
+    document.body.classList.add("content-report-open");
 
     window.setTimeout(function () {
-      reasonInput.focus();
+      if (!modal.hidden && !modal.classList.contains("is-closing")) {
+        reasonInput.focus({ preventScroll: true });
+      }
     }, 0);
   }
 

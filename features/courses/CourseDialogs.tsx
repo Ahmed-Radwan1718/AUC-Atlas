@@ -326,71 +326,63 @@ const dialogsMarkup = `
     hidden
   >
     <button
-      class="course-report-backdrop"
-      type="button"
-      aria-label="Close report panel"
-      data-close-course-report
-    ></button>
-
-    <section
-      class="course-report-dialog"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="course-report-title"
-    >
-      <header class="course-report-header">
-        <div class="course-report-header-copy">
-          <p class="course-report-kicker">Content moderation</p>
-          <h2 id="course-report-title">Report material</h2>
-          <p id="course-report-copy">
-            Tell us what is wrong with this course material. Our moderators will review your report.
-          </p>
-        </div>
-
-        <button
-          class="course-report-close"
-          type="button"
-          aria-label="Close report panel"
-          data-close-course-report
-        >×</button>
-      </header>
-
-      <form
-        class="course-report-form"
-        id="course-report-form"
-      >
-        <label class="course-report-field">
-          <span>Reason for report</span>
-          <textarea
-            id="course-report-reason"
-            name="reason"
-            maxlength="1000"
-            placeholder="Describe the issue with this material..."
-            required
-          ></textarea>
-        </label>
-
-        <p
-          class="course-report-status"
-          id="course-report-status"
-          aria-live="polite"
-        ></p>
-
-        <div class="course-report-actions">
-          <button
-            class="course-report-cancel"
-            type="button"
-            data-close-course-report
-          >Cancel</button>
-
-          <button
-            class="course-report-submit"
-            id="course-report-submit"
-            type="submit"
-          >Submit report</button>
-        </div>
-      </form>
-    </section>
+              class="course-report-backdrop"
+              type="button"
+              aria-label="Close report panel"
+              data-close-course-report
+            ></button>
+    
+            <section
+              class="course-report-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="course-report-title"
+            >
+              <header class="course-report-header">
+                <div class="course-report-header-copy">
+                  <h2 id="course-report-title">Report material</h2>
+                </div>
+    
+              </header>
+    
+              <form
+                class="course-report-form"
+                id="course-report-form"
+              >
+                <div class="course-report-drawer-body">
+                <label class="course-report-field">
+                  <span>Reason for report</span>
+                  <textarea
+                    id="course-report-reason"
+                    name="reason"
+                    maxlength="1000"
+                    placeholder="Describe the issue with this material..."
+                    required
+                  ></textarea>
+                </label>
+    
+                <p
+                  class="course-report-status"
+                  id="course-report-status"
+                  aria-live="polite"
+                ></p>
+                </div>
+    
+                <div class="course-report-actions">
+                  <button
+                    class="course-report-submit"
+                    id="course-report-submit"
+                    type="submit"
+                  >Submit report</button>
+    
+                  <button
+                    class="course-report-cancel"
+                    type="button"
+                    data-close-course-report
+                  >Cancel</button>
+                </div>
+              </form>
+            </section>
   </div>
 
   `;
