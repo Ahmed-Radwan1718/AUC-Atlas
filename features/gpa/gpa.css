@@ -31,7 +31,7 @@
   font-weight: 700;
   text-transform: uppercase;
 }
-.gpa-header-tools { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+.gpa-header-tools { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; }
 .gpa-save-message { display: block; margin-top: 9px; color: var(--gpa-muted); font-size: 12px; line-height: 1.5; text-align: right; }
 .gpa-save-message:empty { display: none; }
 .gpa-save-message.success { color: #2f7d53; }
@@ -375,7 +375,7 @@ body.gpa-dialog-open { overflow: hidden; }
   .gpa-inner { width: calc(100% - 24px); }
   .gpa-header { flex-direction: column; align-items: stretch; gap: 18px; margin-bottom: 24px; }
   .gpa-header h1 { font-size: 30px; }
-  .gpa-header-tools { justify-content: flex-end; }
+  .gpa-header-tools { justify-content: center; }
   .gpa-summary { display: block; padding: 25px 27px; border-radius: 34px; }
   .summary-gpa { font-size: 58px; margin-top: 13px; }
   .summary-items { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-top: 22px; padding: 20px 0 0; border: 0; border-top: 1px solid rgba(23,23,23,.1); min-width: 0; }
