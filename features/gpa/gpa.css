@@ -31,8 +31,8 @@
   font-weight: 700;
   text-transform: uppercase;
 }
-.gpa-header-tools { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding-bottom: 2px; }
-.gpa-save-message { max-width: 240px; color: var(--gpa-muted); font-size: 12px; line-height: 1.5; text-align: right; }
+.gpa-header-tools { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+.gpa-save-message { display: block; margin-top: 9px; color: var(--gpa-muted); font-size: 12px; line-height: 1.5; text-align: right; }
 .gpa-save-message:empty { display: none; }
 .gpa-save-message.success { color: #2f7d53; }
 .gpa-save-message.error { color: #a54842; }
@@ -88,6 +88,7 @@
 .gpa-overflow-menu button:hover { background: #fbefed; }
 
 .gpa-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 32px; align-items: start; }
+.gpa-sidebar { position: sticky; top: 112px; min-width: 0; }
 .gpa-panel { min-width: 0; }
 .gpa-semesters { display: grid; gap: 24px; }
 .gpa-semester {
@@ -220,8 +221,6 @@
 .gpa-add-semester-icon { width: 30px; height: 30px; border: 1px solid rgba(151,113,64,.4); border-radius: 50%; display: grid; place-items: center; font-size: 23px; font-weight: 400; }
 
 .gpa-summary {
-  position: sticky;
-  top: 112px;
   padding: 34px 30px;
   border: 1px solid var(--gpa-border);
   border-radius: 44px;
@@ -257,7 +256,8 @@ body.gpa-dialog-open { overflow: hidden; }
 @media (max-width: 820px) {
   .gpa-page { padding-top: 122px; }
   .gpa-layout { grid-template-columns: minmax(0,1fr); }
-  .gpa-summary { position: static; order: -1; display: grid; grid-template-columns: 1fr auto; column-gap: 24px; border-radius: 38px; }
+  .gpa-sidebar { position: static; order: -1; }
+  .gpa-summary { display: grid; grid-template-columns: 1fr auto; column-gap: 24px; border-radius: 38px; }
   .summary-gpa { grid-column: 1; }
   .summary-caption { grid-column: 1; }
   .summary-items { grid-column: 2; grid-row: 1 / span 3; margin: 0; padding: 0 0 0 25px; border-top: 0; border-left: 1px solid rgba(23,23,23,.1); min-width: 150px; }
@@ -267,8 +267,7 @@ body.gpa-dialog-open { overflow: hidden; }
   .gpa-inner { width: calc(100% - 24px); }
   .gpa-header { flex-direction: column; align-items: stretch; gap: 18px; margin-bottom: 24px; }
   .gpa-header h1 { font-size: 30px; }
-  .gpa-header-tools { justify-content: flex-end; flex-wrap: wrap; }
-  .gpa-save-message { margin-right: auto; text-align: left; }
+  .gpa-header-tools { justify-content: flex-end; }
   .gpa-summary { display: block; padding: 25px 27px; border-radius: 34px; }
   .summary-gpa { font-size: 58px; margin-top: 13px; }
   .summary-items { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-top: 22px; padding: 20px 0 0; border: 0; border-top: 1px solid rgba(23,23,23,.1); min-width: 0; }
