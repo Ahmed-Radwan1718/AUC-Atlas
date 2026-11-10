@@ -629,6 +629,42 @@
 
 
     /* Horizontal carousel of three-row pages, retaining each row's styling. */
+    .home-lowest-carousel-shell {
+      width: 100%;
+      position: relative;
+    }
+
+    /* Thin gold progress indicator lives in the card's existing bottom padding. */
+    .home-lowest-carousel-progress {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: -8px;
+      height: 2px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.08);
+      pointer-events: none;
+    }
+
+    .home-lowest-carousel-progress-fill {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #c09a5c;
+      transform-origin: left center;
+      animation: homeLowestCarouselProgress 15s linear forwards;
+    }
+
+    .home-lowest-carousel-shell.is-paused .home-lowest-carousel-progress-fill {
+      animation-play-state: paused;
+    }
+
+    @keyframes homeLowestCarouselProgress {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
     .home-lowest-carousel {
       width: 100%;
       /* Show exactly three of the existing 82px professor rows. */
@@ -658,6 +694,11 @@
     @media (prefers-reduced-motion: reduce) {
       .home-lowest-carousel-track.is-sliding {
         transition: none;
+      }
+
+      .home-lowest-carousel-progress-fill {
+        animation: none;
+        transform: scaleX(1);
       }
     }
 

@@ -107,23 +107,44 @@ function LowRatedProfessorSlider({ rankings }: { rankings: RatedProfessor[] }) {
   const pageCount = Math.ceil(rankings.length / 3);
   const [pageIndex, setPageIndex] = useState(0);
   const [sliding, setSliding] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [tabHidden, setTabHidden] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const paused = hovered || focused || tabHidden;
 
   useEffect(() => {
-    if (pageCount <= 1) return;
-    const interval = window.setInterval(() => {
-      if (document.hidden) return;
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        setPageIndex(current => (current + 1) % pageCount);
-      } else {
-        setSliding(true);
-      }
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotion = () => setReducedMotion(media.matches);
+    updateMotion();
+    media.addEventListener("change", updateMotion);
+    return () => media.removeEventListener("change", updateMotion);
+  }, []);
+
+  useEffect(() => {
+    const updateVisibility = () => setTabHidden(document.hidden);
+    updateVisibility();
+    document.addEventListener("visibilitychange", updateVisibility);
+    return () => document.removeEventListener("visibilitychange", updateVisibility);
+  }, []);
+
+  // The gold bar's animation ending is the clock for each carousel slide.
+  // This keeps its progress aligned with the actual change, even after pausing.
+  const finishCountdown = () => {
+    if (!paused && !sliding && !reducedMotion) setSliding(true);
+  };
+
+  // Respect reduced-motion preferences without relying on a visual animation.
+  useEffect(() => {
+    if (pageCount <= 1 || !reducedMotion || paused) return;
+    const timer = window.setInterval(() => {
+      setPageIndex(current => (current + 1) % pageCount);
     }, 15000);
-    return () => window.clearInterval(interval);
-  }, [pageCount]);
+    return () => window.clearInterval(timer);
+  }, [pageCount, reducedMotion, paused]);
 
   useEffect(() => {
     if (!sliding) return;
-    // Match the 600 ms CSS slide and reset the track after it has exited.
     const timer = window.setTimeout(() => {
       setPageIndex(current => (current + 1) % pageCount);
       setSliding(false);
@@ -131,21 +152,32 @@ function LowRatedProfessorSlider({ rankings }: { rankings: RatedProfessor[] }) {
     return () => window.clearTimeout(timer);
   }, [sliding, pageCount]);
 
-  // The existing three rows are rendered unchanged when no cycling is needed.
   if (pageCount <= 1) return <>{professorRows(rankings)}</>;
 
   const pageAt = (index: number) => Array.from({ length: 3 }, (_, offset) =>
     rankings[(index * 3 + offset) % rankings.length]
   );
   const current = pageIndex % pageCount;
-  return <div className="home-lowest-carousel" aria-label="Professors rated 2 stars or less">
-    <div className={"home-lowest-carousel-track" + (sliding ? " is-sliding" : "")}>
-      <div className="home-lowest-carousel-slide">
-        {professorRows(pageAt(current))}
+  return <div className={"home-lowest-carousel-shell" + (paused ? " is-paused" : "")}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={event => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
+      }}>
+    <div className="home-lowest-carousel" aria-label="Professors rated 2 stars or less">
+      <div className={"home-lowest-carousel-track" + (sliding ? " is-sliding" : "")}>
+        <div className="home-lowest-carousel-slide">
+          {professorRows(pageAt(current))}
+        </div>
+        <div className="home-lowest-carousel-slide" aria-hidden="true">
+          {professorRows(pageAt((current + 1) % pageCount), true)}
+        </div>
       </div>
-      <div className="home-lowest-carousel-slide" aria-hidden="true">
-        {professorRows(pageAt((current + 1) % pageCount), true)}
-      </div>
+    </div>
+    <div className="home-lowest-carousel-progress" aria-hidden="true">
+      <span key={pageIndex} className="home-lowest-carousel-progress-fill"
+        onAnimationEnd={finishCountdown}/>
     </div>
   </div>;
 }
