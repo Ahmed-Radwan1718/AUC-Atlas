@@ -956,6 +956,7 @@ export const courseEntries: Array<[string, string]> = [
     ["ARIC 3324", "Non-Muslim Communities in the Muslim World"],
     ["ARIC 3344", "Caliphs and Sultans in the Age of Crusades and Mongols"],
     ["CHEM 2001", "Egypt Water Crisis: Challenges and Solutions"],
+    ["CORE 1010", "Freshman Seminar"],
     ["CORE 1099", "Selected Topics for Core Curriculum"],
     ["CORE 1130", "The Human Spirit"],
     ["CORE 2096", "Selected Topics for the Core Curriculum in Global Studies"],

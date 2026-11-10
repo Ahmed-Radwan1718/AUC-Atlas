@@ -1,5 +1,7 @@
 // Original AUC Atlas course descriptions, part 1 of 5.
 export const courseDescriptions1: Record<string, string> = {
+    "CORE 1010":
+      "A first-year multidisciplinary seminar taken alongside RHET 1010 in a shared learning community. Using a common theme, students explore ideas across disciplines and develop critical reading, thinking, discussion, and academic inquiry skills as part of AUC\u0027s liberal arts education.",
     "CHEM 1005":
       "Chemical stoichiometry; atomic structure and periodicity; an overview of chemical bonding with a discussion of models and theories of covalent bonding; introduction to structure and chemistry of organic compounds.",
     "CHEM 1015":
