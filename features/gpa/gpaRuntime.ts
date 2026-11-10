@@ -50,6 +50,38 @@ export function mountGpaCalculator() {
       return grade ? grade[1] : "Grade";
     }
 
+    function closeGpaDropdowns() {
+      semestersRoot.querySelectorAll(".grade-dropdown.open").forEach(function (dropdown) {
+        dropdown.classList.remove("open");
+        const toggle = dropdown.querySelector(".grade-toggle");
+        const menu = dropdown.querySelector(".grade-menu");
+        if (toggle) toggle.setAttribute("aria-expanded", "false");
+        if (menu) menu.hidden = true;
+      });
+    }
+
+    function toggleGpaDropdown(dropdown) {
+      const shouldOpen = !dropdown.classList.contains("open");
+      closeGpaDropdowns();
+      if (!shouldOpen) return;
+
+      const toggle = dropdown.querySelector(".grade-toggle");
+      const menu = dropdown.querySelector(".grade-menu");
+      if (!toggle || !menu) return;
+
+      dropdown.classList.add("open");
+      menu.hidden = false;
+      toggle.setAttribute("aria-expanded", "true");
+    }
+
+    function syncGpaDropdownOptions(menu, dataAttribute, value) {
+      menu.querySelectorAll(".grade-option").forEach(function (option) {
+        const selected = option.getAttribute(dataAttribute) === value;
+        option.classList.toggle("active", selected);
+        option.setAttribute("aria-pressed", String(selected));
+      });
+    }
+
     function prefersReducedMotion() {
       return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     }
@@ -384,6 +416,8 @@ export function mountGpaCalculator() {
 
         courseCredits.value = normalizeCredits(course.credits);
         row.querySelector(".credits-toggle-label").textContent = courseCredits.value;
+        row.querySelector(".credits-toggle").setAttribute("aria-label", "Credits: " + courseCredits.value);
+        syncGpaDropdownOptions(row.querySelector(".credits-menu"), "data-credit-value", courseCredits.value);
 
         courseGrade.value =
           String(course.grade || "");
@@ -392,6 +426,13 @@ export function mountGpaCalculator() {
           getGradeLabel(
             courseGrade.value
           );
+        row.querySelector(".grade-dropdown:not(.credits-dropdown) .grade-toggle")
+          .setAttribute("aria-label", "Grade: " + getGradeLabel(courseGrade.value));
+        syncGpaDropdownOptions(
+          row.querySelector(".grade-dropdown:not(.credits-dropdown) .grade-menu"),
+          "data-grade-value",
+          courseGrade.value
+        );
       });
 
       if (animateSemester) {
@@ -444,33 +485,28 @@ export function mountGpaCalculator() {
       const creditsToggleLabel = row.querySelector(".credits-toggle-label");
       const creditsMenu = row.querySelector(".credits-menu");
       const gradeInput = row.querySelector(".course-grade");
-      const gradeDropdown = row.querySelector(".grade-dropdown");
-      const gradeToggle = row.querySelector(".grade-toggle");
-      const gradeToggleLabel = row.querySelector(".grade-toggle-label");
-      const gradeMenu = row.querySelector(".grade-menu");
+      const gradeDropdown = row.querySelector(".grade-dropdown:not(.credits-dropdown)");
+      const gradeToggle = gradeDropdown.querySelector(".grade-toggle");
+      const gradeToggleLabel = gradeDropdown.querySelector(".grade-toggle-label");
+      const gradeMenu = gradeDropdown.querySelector(".grade-menu");
+
+      creditsToggle.setAttribute("aria-label", "Credits: " + creditsInput.value);
+      gradeToggle.setAttribute("aria-label", "Grade: " + getGradeLabel(gradeInput.value));
+      syncGpaDropdownOptions(creditsMenu, "data-credit-value", creditsInput.value);
+      syncGpaDropdownOptions(gradeMenu, "data-grade-value", gradeInput.value);
 
       creditsToggle.addEventListener("click", function () {
-        const isOpen = !creditsMenu.hidden;
-        document.querySelectorAll(".grade-menu").forEach(function (menu) {
-          menu.hidden = true;
-        });
-        document.querySelectorAll(".grade-dropdown").forEach(function (dropdown) {
-          dropdown.classList.remove("open");
-          const toggle = dropdown.querySelector(".grade-toggle");
-          if (toggle) toggle.setAttribute("aria-expanded", "false");
-        });
-        creditsMenu.hidden = isOpen;
-        creditsDropdown.classList.toggle("open", !isOpen);
-        creditsToggle.setAttribute("aria-expanded", String(!isOpen));
+        toggleGpaDropdown(creditsDropdown);
       });
 
-      row.querySelectorAll(".grade-option[data-credit-value]").forEach(function (option) {
+      creditsMenu.querySelectorAll(".grade-option").forEach(function (option) {
         option.addEventListener("click", function () {
           creditsInput.value = normalizeCredits(option.dataset.creditValue);
           creditsToggleLabel.textContent = creditsInput.value;
-          creditsMenu.hidden = true;
-          creditsDropdown.classList.remove("open");
-          creditsToggle.setAttribute("aria-expanded", "false");
+          creditsToggle.setAttribute("aria-label", "Credits: " + creditsInput.value);
+          syncGpaDropdownOptions(creditsMenu, "data-credit-value", creditsInput.value);
+          closeGpaDropdowns();
+          creditsToggle.focus();
           calculateGpa();
         });
       });
@@ -478,30 +514,17 @@ export function mountGpaCalculator() {
       row.querySelector(".course-name").addEventListener("input", calculateGpa);
 
       gradeToggle.addEventListener("click", function () {
-        const isOpen = !gradeMenu.hidden;
-
-        document.querySelectorAll(".grade-menu").forEach(function (menu) {
-          menu.hidden = true;
-        });
-
-        document.querySelectorAll(".grade-dropdown").forEach(function (dropdown) {
-          dropdown.classList.remove("open");
-          const toggle = dropdown.querySelector(".grade-toggle");
-          if (toggle) toggle.setAttribute("aria-expanded", "false");
-        });
-
-        gradeMenu.hidden = isOpen;
-        gradeDropdown.classList.toggle("open", !isOpen);
-        gradeToggle.setAttribute("aria-expanded", String(!isOpen));
+        toggleGpaDropdown(gradeDropdown);
       });
 
-      row.querySelectorAll(".grade-option[data-grade-value]").forEach(function (option) {
+      gradeMenu.querySelectorAll(".grade-option").forEach(function (option) {
         option.addEventListener("click", function () {
           gradeInput.value = option.dataset.gradeValue;
-          gradeToggleLabel.textContent = option.textContent;
-          gradeMenu.hidden = true;
-          gradeDropdown.classList.remove("open");
-          gradeToggle.setAttribute("aria-expanded", "false");
+          gradeToggleLabel.textContent = getGradeLabel(gradeInput.value);
+          gradeToggle.setAttribute("aria-label", "Grade: " + getGradeLabel(gradeInput.value));
+          syncGpaDropdownOptions(gradeMenu, "data-grade-value", gradeInput.value);
+          closeGpaDropdowns();
+          gradeToggle.focus();
           calculateGpa();
         });
       });
@@ -783,38 +806,9 @@ export function mountGpaCalculator() {
       );
     }
 
-    document.addEventListener(
-      "click",
-      function (event) {
-        if (
-          event.target.closest(
-            ".grade-dropdown"
-          )
-        ) {
-          return;
-        }
-
-        document
-          .querySelectorAll(
-            ".grade-menu"
-          )
-          .forEach(function (menu) {
-            menu.hidden = true;
-          });
-
-        document
-          .querySelectorAll(
-            ".grade-dropdown"
-          )
-          .forEach(
-            function (dropdown) {
-              dropdown.classList.remove("open");
-              const toggle = dropdown.querySelector(".grade-toggle");
-              if (toggle) toggle.setAttribute("aria-expanded", "false");
-            }
-          );
-      }
-    );
+    document.addEventListener("click", function (event) {
+      if (!event.target.closest(".grade-dropdown")) closeGpaDropdowns();
+    });
 
     semestersRoot.addEventListener(
       "input",
@@ -857,7 +851,13 @@ export function mountGpaCalculator() {
     }
 
     document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && !resetDialog.hidden) closeResetDialog();
+      if (event.key !== "Escape") return;
+      const openDropdown = semestersRoot.querySelector(".grade-dropdown.open");
+      if (openDropdown) {
+        closeGpaDropdowns();
+        openDropdown.querySelector(".grade-toggle")?.focus();
+      }
+      if (!resetDialog.hidden) closeResetDialog();
     });
 
     resetButton.addEventListener("click", function () {
