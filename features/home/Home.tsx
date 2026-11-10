@@ -61,27 +61,35 @@ function AnimatedCount({ value, initial = "0" }: { value: number | null; initial
   }, [value]);
   return <strong ref={ref}>{text}</strong>;
 }
-function professorItems(items: RankedProfessor[], lowestFirst: boolean) {
-  return items.map(summary => {
+type RatedProfessor = {
+  professor: (typeof professors)[number];
+  average: number;
+  count: number;
+};
+
+function professorItems(items: RankedProfessor[], lowestFirst: boolean): RatedProfessor[] {
+  const rankings = items.map(summary => {
     const professor = professorLookup.get(summary.professorId);
     const average = Number(summary.averageRating);
     const count = Math.max(0, Math.round(Number(summary.reviewCount) || 0));
     return { professor, average, count };
-  }).filter((item): item is { professor: (typeof professors)[number]; average: number; count: number } =>
-    Boolean(item.professor?.name) && Number.isFinite(item.average) && item.average > 0 && item.count > 0
-  ).sort((a,b) => (lowestFirst ? a.average - b.average : b.average - a.average) || b.count - a.count)
-    .slice(0, 3);
+  }).filter((item): item is RatedProfessor =>
+    Boolean(item.professor?.name) && Number.isFinite(item.average) &&
+    item.average > 0 && item.count > 0 && (!lowestFirst || item.average <= 2)
+  ).sort((a, b) =>
+    (lowestFirst ? a.average - b.average : b.average - a.average) || b.count - a.count
+  );
+  // Cycle through every qualifying low-rated professor; keep the other card at three.
+  return lowestFirst ? rankings : rankings.slice(0, 3);
 }
-function RatedProfessors({ items, lowest }: { items: RankedProfessor[]; lowest: boolean }) {
-  const rankings = professorItems(items, lowest);
-  if (!rankings.length) return <p className="home-latest-status">
-    {lowest ? "Lowest-rated" : "Top-reviewed"} professors will appear here once ratings are available.
-  </p>;
+
+function professorRows(rankings: RatedProfessor[], inactive = false) {
   return rankings.map(({ professor, average, count }) => {
     const department = professor.displayDepartment || professor.department || "AUC";
     const label = count === 1 ? "review" : "reviews";
     return <a className="home-latest-item home-latest-person"
-        href={"/professors/" + encodeURIComponent(professor.id)} key={professor.id}>
+        href={"/professors/" + encodeURIComponent(professor.id)} key={professor.id}
+        tabIndex={inactive ? -1 : undefined}>
       <img src={professor.image || assetsRoot + "user.png"} alt=""/>
       <span className="home-latest-person-copy">
         <strong>{professor.name}</strong>
@@ -94,6 +102,64 @@ function RatedProfessors({ items, lowest }: { items: RankedProfessor[]; lowest: 
     </a>;
   });
 }
+
+function LowRatedProfessorSlider({ rankings }: { rankings: RatedProfessor[] }) {
+  const pageCount = Math.ceil(rankings.length / 3);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [sliding, setSliding] = useState(false);
+
+  useEffect(() => {
+    if (pageCount <= 1) return;
+    const interval = window.setInterval(() => {
+      if (document.hidden) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        setPageIndex(current => (current + 1) % pageCount);
+      } else {
+        setSliding(true);
+      }
+    }, 15000);
+    return () => window.clearInterval(interval);
+  }, [pageCount]);
+
+  useEffect(() => {
+    if (!sliding) return;
+    // Match the 600 ms CSS slide and reset the track after it has exited.
+    const timer = window.setTimeout(() => {
+      setPageIndex(current => (current + 1) % pageCount);
+      setSliding(false);
+    }, 650);
+    return () => window.clearTimeout(timer);
+  }, [sliding, pageCount]);
+
+  // The existing three rows are rendered unchanged when no cycling is needed.
+  if (pageCount <= 1) return <>{professorRows(rankings)}</>;
+
+  const pageAt = (index: number) => Array.from({ length: 3 }, (_, offset) =>
+    rankings[(index * 3 + offset) % rankings.length]
+  );
+  const current = pageIndex % pageCount;
+  return <div className="home-lowest-carousel" aria-label="Professors rated 2 stars or less">
+    <div className={"home-lowest-carousel-track" + (sliding ? " is-sliding" : "")}>
+      <div className="home-lowest-carousel-slide">
+        {professorRows(pageAt(current))}
+      </div>
+      <div className="home-lowest-carousel-slide" aria-hidden="true">
+        {professorRows(pageAt((current + 1) % pageCount), true)}
+      </div>
+    </div>
+  </div>;
+}
+
+function RatedProfessors({ items, lowest }: { items: RankedProfessor[]; lowest: boolean }) {
+  const rankings = professorItems(items, lowest);
+  if (!rankings.length) return <p className="home-latest-status">
+    {lowest ? "Lowest-rated" : "Top-reviewed"} professors will appear here once ratings are available.
+  </p>;
+  return lowest
+    ? <LowRatedProfessorSlider rankings={rankings}/>
+    : <>{professorRows(rankings)}</>;
+}
+
 function getMaterialIcon(material: CourseMaterial): { icon: string | null; fallback: string } {
   const name = String(material.fileName || material.title || "").trim().toLowerCase();
   const extensionMatch = name.match(/\.([a-z0-9]{1,8})$/);

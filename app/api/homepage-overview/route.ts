@@ -100,8 +100,9 @@ export async function GET() {
       latestMaterials(3),
       rankedProfessors()
     ]);
-    const lowest = [...rankings].sort((a, b) => a.averageRating - b.averageRating
-      || b.reviewCount - a.reviewCount || a.professorName.localeCompare(b.professorName)).slice(0, 3);
+    const lowest = rankings.filter(professor => professor.averageRating <= 2)
+      .sort((a, b) => a.averageRating - b.averageRating
+        || b.reviewCount - a.reviewCount || a.professorName.localeCompare(b.professorName));
     return NextResponse.json({
       reviewCount: Number(reviewCount.data().count || 0),
       materialCount: Number(materialCount.data().count || 0),
