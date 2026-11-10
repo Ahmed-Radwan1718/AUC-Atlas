@@ -471,12 +471,6 @@ function slugifyMaterialValue(value) {
             "file",
             "material-file"
           );
-        const anonymousInput =
-          getMaterialFormControl(
-            form,
-            "anonymous",
-            "material-anonymous"
-          );
         const files =
           fileInput && fileInput.files
             ? Array.from(fileInput.files)
@@ -493,10 +487,9 @@ function slugifyMaterialValue(value) {
         const title = titleInput
           ? titleInput.value.trim()
           : "";
-        const isAnonymous = Boolean(
-          anonymousInput &&
-          anonymousInput.checked
-        );
+        // Uploader identity is hidden from other students on every upload.
+        // The server retains ownership details for account management.
+        const isAnonymous = true;
 
         if (
           !activeCourse ||
