@@ -444,7 +444,8 @@
 
     .home-latest-card {
       min-width: 0;
-      min-height: 390px;
+      /* Header + three existing 82px rows + bottom padding. */
+      min-height: 324px;
       overflow: hidden;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 28px;
