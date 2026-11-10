@@ -1055,7 +1055,7 @@
       font: inherit;
       text-align: left;
       display: grid;
-      grid-template-columns: 40px minmax(0, 1fr) auto;
+      grid-template-columns: 40px minmax(0, 1fr);
       align-items: center;
       gap: 11px;
     }
@@ -1170,16 +1170,6 @@
     .course-material-group-copy small {
       font-size: 10px;
       font-weight: 400;
-    }
-
-    .course-material-preview-label {
-      color: rgba(192, 154, 92, 0.96);
-      font-family: Arial, sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      white-space: nowrap;
     }
 
     .course-material-compact-download {
