@@ -443,15 +443,6 @@ function renderCourseMaterials(materials) {
           `
           : "";
 
-      const previewMarkup =
-        fileView.previewable
-          ? `
-            <span
-              class="course-material-preview-label"
-            >Preview</span>
-          `
-          : "";
-
       const content = `
         ${fileView.fileIcon}
 
@@ -468,7 +459,6 @@ function renderCourseMaterials(materials) {
           <small>${metadataText}</small>
         </span>
 
-        ${previewMarkup}
       `;
 
       if (fileView.previewable) {
@@ -611,10 +601,6 @@ function renderCourseMaterials(materials) {
               </span>
 
               <small>${metadata}</small>
-            </span>
-
-            <span class="course-material-file-count">
-              ${files.length} files
             </span>
 
             <span
