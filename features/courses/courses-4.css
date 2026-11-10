@@ -1067,7 +1067,7 @@
     .course-material-downloads .course-material-group-summary {
       min-height: 72px;
       padding: 11px 6px;
-      grid-template-columns: 36px minmax(0, 1fr) auto 14px;
+      grid-template-columns: 36px minmax(0, 1fr) 14px;
       gap: 12px;
       border-radius: 12px;
     }
@@ -1139,7 +1139,7 @@
 
     @media (max-width: 640px) {
       .course-material-downloads .course-material-group-summary {
-        grid-template-columns: 30px minmax(0, 1fr) auto 12px;
+        grid-template-columns: 30px minmax(0, 1fr) 12px;
         gap: 8px;
         padding: 10px 0;
       }
