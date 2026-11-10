@@ -767,14 +767,12 @@ export function mountGpaCalculator() {
           "error"
         );
       } finally {
-        const loadingState =
-          semestersRoot.querySelector(
-            ".gpa-loading"
-          );
-
-        if (loadingState) {
-          loadingState.remove();
-        }
+        const loadingState = semestersRoot.querySelector(".gpa-loading");
+        if (loadingState) loadingState.remove();
+        semestersRoot.setAttribute("aria-busy", "false");
+        addSemesterButton.hidden = false;
+        saveGpaButton.disabled = false;
+        resetButton.disabled = false;
       }
     }
 

@@ -16,13 +16,45 @@ const markup = `
 
       <div class="gpa-layout">
         <section class="gpa-panel" aria-label="Your semesters">
-          <div class="gpa-semesters" id="gpa-semesters" aria-live="off">
-            <div class="gpa-loading" role="status">
-              <span class="gpa-loading-spinner" aria-hidden="true"></span>
-              <span>Loading your GPA plan...</span>
+          <div class="gpa-semesters" id="gpa-semesters" aria-live="off" aria-busy="true">
+            <div class="gpa-loading" role="status" aria-label="Loading your GPA plan">
+              <span class="gpa-loading-a11y">Loading your GPA plan...</span>
+              <div class="gpa-skeleton-top" aria-hidden="true">
+                <span class="gpa-skeleton-shape gpa-skeleton-title"></span>
+                <span class="gpa-skeleton-shape gpa-skeleton-count"></span>
+              </div>
+              <div class="gpa-skeleton-labels" aria-hidden="true">
+                <span class="gpa-skeleton-shape"></span>
+                <span class="gpa-skeleton-shape"></span>
+                <span class="gpa-skeleton-shape"></span>
+              </div>
+              <div class="gpa-skeleton-rows" aria-hidden="true">
+                <div class="gpa-skeleton-row">
+                  <span class="gpa-skeleton-shape gpa-skeleton-input"></span>
+                  <span class="gpa-skeleton-shape gpa-skeleton-input"></span>
+                  <span class="gpa-skeleton-shape gpa-skeleton-input"></span>
+                  <span class="gpa-skeleton-shape gpa-skeleton-remove"></span>
+                </div>
+                <div class="gpa-skeleton-row">
+                  <span class="gpa-skeleton-shape gpa-skeleton-input"></span>
+                  <span class="gpa-skeleton-shape gpa-skeleton-input"></span>
+                  <span class="gpa-skeleton-shape gpa-skeleton-input"></span>
+                  <span class="gpa-skeleton-shape gpa-skeleton-remove"></span>
+                </div>
+                <div class="gpa-skeleton-row">
+                  <span class="gpa-skeleton-shape gpa-skeleton-input"></span>
+                  <span class="gpa-skeleton-shape gpa-skeleton-input"></span>
+                  <span class="gpa-skeleton-shape gpa-skeleton-input"></span>
+                  <span class="gpa-skeleton-shape gpa-skeleton-remove"></span>
+                </div>
+              </div>
+              <div class="gpa-skeleton-footer" aria-hidden="true">
+                <span class="gpa-skeleton-shape gpa-skeleton-add"></span>
+                <span class="gpa-skeleton-shape gpa-skeleton-result"></span>
+              </div>
             </div>
           </div>
-          <button class="gpa-add-semester" type="button" id="add-semester">
+          <button class="gpa-add-semester" type="button" id="add-semester" hidden>
             <span class="gpa-add-semester-icon" aria-hidden="true">+</span>
             Add semester
           </button>
@@ -49,8 +81,8 @@ const markup = `
           </div>
         </aside>
         <div class="gpa-header-tools">
-          <button class="gpa-action primary gpa-save-button" type="button" id="save-gpa-plan">Save plan</button>
-          <button class="gpa-action reset-plan" type="button" id="reset-courses">Reset plan</button>
+          <button class="gpa-action primary gpa-save-button" type="button" id="save-gpa-plan" disabled>Save plan</button>
+          <button class="gpa-action reset-plan" type="button" id="reset-courses" disabled>Reset plan</button>
         </div>
         <span class="gpa-save-message" id="gpa-save-message" role="status" aria-live="polite"></span>
         </div>
