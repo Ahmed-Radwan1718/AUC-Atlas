@@ -1135,7 +1135,7 @@
       color: rgba(145, 101, 35, 0.96);
       font-size: 7px;
       font-style: normal;
-      font-weight: 900;
+      font-weight: 500;
       letter-spacing: 0.06em;
       line-height: 1.2;
       text-transform: uppercase;
@@ -1168,10 +1168,11 @@
     }
 
     .course-material-preview-label {
-      color: rgba(145, 101, 35, 0.9);
-      font-size: 8px;
-      font-weight: 400;
-      letter-spacing: 0.06em;
+      color: rgba(192, 154, 92, 0.96);
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       white-space: nowrap;
     }
