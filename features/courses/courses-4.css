@@ -116,52 +116,8 @@
       align-self: end;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 14px;
-    }
-
-    .course-recent-uploader {
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: rgba(23, 23, 23, 0.52);
-      font-size: 10px;
-      font-weight: 700;
-      line-height: 1.4;
-    }
-
-    .course-recent-uploader-avatar {
-      position: relative;
-      width: 24px;
-      height: 24px;
-      flex: 0 0 24px;
-      overflow: hidden;
-      border: 1px solid rgba(192, 154, 92, 0.22);
-      border-radius: 50%;
-      background: rgba(192, 154, 92, 0.1);
-      color: #a67c39;
-      font-size: 10px;
-      font-weight: 900;
-      display: grid;
-      place-items: center;
-      text-transform: uppercase;
-    }
-
-    .course-recent-uploader-avatar img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: inherit;
-      object-fit: cover;
-      display: block;
-    }
-
-    .course-recent-uploader-name {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     .course-recent-card small {
@@ -276,30 +232,8 @@
       align-self: end;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 14px;
-    }
-
-    .course-recent-skeleton-uploader {
-      min-width: 0;
-      flex: 1 1 auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .course-recent-skeleton-avatar {
-      width: 24px;
-      height: 24px;
-      flex: 0 0 24px;
-      border-radius: 50%;
-      background: rgba(23, 23, 23, 0.065);
-    }
-
-    .course-recent-skeleton-line.is-uploader {
-      width: 60%;
-      max-width: 128px;
-      height: 10px;
     }
 
     .course-recent-skeleton-line.is-date {
@@ -310,8 +244,7 @@
 
     @media (prefers-reduced-motion: no-preference) {
       .course-recent-skeleton-icon,
-      .course-recent-skeleton-line,
-      .course-recent-skeleton-avatar {
+      .course-recent-skeleton-line {
         animation: courseRecentSkeletonPulse 1.7s ease-in-out infinite;
       }
 
