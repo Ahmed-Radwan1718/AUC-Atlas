@@ -13,8 +13,6 @@ export function mountGpaCalculator() {
     const resetButton = document.getElementById("reset-courses");
     const gpaSaveMessage = document.getElementById("gpa-save-message");
     const semesterCountOutput = document.getElementById("semester-count");
-    const overflowButton = document.getElementById("gpa-overflow-button");
-    const overflowMenu = document.getElementById("gpa-overflow-menu");
     const resetDialog = document.getElementById("gpa-reset-dialog");
     const confirmResetButton = document.getElementById("gpa-confirm-reset");
     const cancelResetButton = document.getElementById("gpa-cancel-reset");
@@ -811,33 +809,17 @@ export function mountGpaCalculator() {
       saveGpaCalculator
     );
 
-    function setOverflowOpen(open) {
-      overflowMenu.hidden = !open;
-      overflowButton.setAttribute("aria-expanded", String(open));
-    }
-
     function closeResetDialog() {
       resetDialog.hidden = true;
       document.body.classList.remove("gpa-dialog-open");
-      overflowButton.focus();
+      resetButton.focus();
     }
 
-    overflowButton.addEventListener("click", function () {
-      setOverflowOpen(overflowMenu.hidden);
-    });
-
-    document.addEventListener("pointerdown", function (event) {
-      if (!event.target.closest(".gpa-overflow-wrap")) setOverflowOpen(false);
-    });
-
     document.addEventListener("keydown", function (event) {
-      if (event.key !== "Escape") return;
-      if (!resetDialog.hidden) closeResetDialog();
-      else setOverflowOpen(false);
+      if (event.key === "Escape" && !resetDialog.hidden) closeResetDialog();
     });
 
     resetButton.addEventListener("click", function () {
-      setOverflowOpen(false);
       resetDialog.hidden = false;
       document.body.classList.add("gpa-dialog-open");
       cancelResetButton.focus();

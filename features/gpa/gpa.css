@@ -37,7 +37,7 @@
 .gpa-save-message.success { color: #2f7d53; }
 .gpa-save-message.error { color: #a54842; }
 
-.gpa-action, .gpa-overflow-button {
+.gpa-action {
   min-height: 46px;
   border: 1px solid var(--gpa-border);
   border-radius: 999px;
@@ -50,42 +50,24 @@
   cursor: pointer;
   transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
 }
-.gpa-action:hover, .gpa-overflow-button:hover { background: white; border-color: rgba(192,154,92,.48); transform: translateY(-1px); }
-.gpa-action:active, .gpa-overflow-button:active { transform: translateY(0); }
+.gpa-action:hover { background: white; border-color: rgba(192,154,92,.48); transform: translateY(-1px); }
+.gpa-action:active { transform: translateY(0); }
 .gpa-action:disabled { opacity: .55; cursor: wait; transform: none; }
 .gpa-action.primary { background: var(--gpa-ink); border-color: var(--gpa-ink); color: white; }
 .gpa-action.primary:hover:not(:disabled) { background: #343434; border-color: #343434; }
 .gpa-action.secondary { background: #fff; }
 .gpa-action.danger { background: #a54842; border-color: #a54842; color: white; }
 .gpa-action.danger:hover { background: #8e352f; border-color: #8e352f; }
-.gpa-overflow-wrap { position: relative; }
-.gpa-overflow-button { display: grid; place-items: center; height: 46px; width: 46px; padding: 0; font-size: 18px; line-height: 1; letter-spacing: 2px; }
-.gpa-overflow-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 10px);
-  z-index: 50;
-  min-width: 172px;
-  padding: 8px;
-  border: 1px solid var(--gpa-border);
-  border-radius: 24px;
+.gpa-action.reset-plan {
   background: #fff;
-  box-shadow: 0 20px 55px rgba(42,32,20,.13);
-}
-.gpa-overflow-menu button {
-  width: 100%;
-  padding: 12px 16px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
+  border-color: rgba(165,72,66,.2);
   color: #a54842;
-  text-align: left;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
 }
-.gpa-overflow-menu button:hover { background: #fbefed; }
+.gpa-action.reset-plan:hover:not(:disabled) {
+  background: #fff;
+  border-color: rgba(165,72,66,.45);
+  color: #8e352f;
+}
 
 .gpa-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 32px; align-items: start; }
 .gpa-sidebar { position: sticky; top: 112px; min-width: 0; }

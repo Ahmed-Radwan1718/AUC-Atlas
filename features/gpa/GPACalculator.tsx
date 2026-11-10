@@ -50,14 +50,7 @@ const markup = `
         </aside>
         <div class="gpa-header-tools">
           <button class="gpa-action primary gpa-save-button" type="button" id="save-gpa-plan">Save plan</button>
-          <div class="gpa-overflow-wrap">
-            <button class="gpa-overflow-button" id="gpa-overflow-button" type="button" aria-label="More GPA plan actions" aria-haspopup="menu" aria-controls="gpa-overflow-menu" aria-expanded="false">
-              <span aria-hidden="true">•••</span>
-            </button>
-            <div class="gpa-overflow-menu" id="gpa-overflow-menu" role="menu" hidden>
-              <button type="button" id="reset-courses" role="menuitem">Reset plan</button>
-            </div>
-          </div>
+          <button class="gpa-action reset-plan" type="button" id="reset-courses">Reset plan</button>
         </div>
         <span class="gpa-save-message" id="gpa-save-message" role="status" aria-live="polite"></span>
         </div>
