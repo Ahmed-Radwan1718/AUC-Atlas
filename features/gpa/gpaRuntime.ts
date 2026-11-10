@@ -12,10 +12,15 @@ export function mountGpaCalculator() {
     const saveGpaButton = document.getElementById("save-gpa-plan");
     const resetButton = document.getElementById("reset-courses");
     const gpaSaveMessage = document.getElementById("gpa-save-message");
+    const semesterCountOutput = document.getElementById("semester-count");
+    const overflowButton = document.getElementById("gpa-overflow-button");
+    const overflowMenu = document.getElementById("gpa-overflow-menu");
+    const resetDialog = document.getElementById("gpa-reset-dialog");
+    const confirmResetButton = document.getElementById("gpa-confirm-reset");
+    const cancelResetButton = document.getElementById("gpa-cancel-reset");
     const semesterGpaOutput = document.getElementById("semester-gpa");
     const semesterCreditsOutput = document.getElementById("semester-credits");
     const qualityPointsOutput = document.getElementById("quality-points");
-    const cumulativeGpaOutput = document.getElementById("cumulative-gpa");
 
     const grades = [
       ["", "Grade"],
@@ -263,7 +268,8 @@ export function mountGpaCalculator() {
         <div class="semester-courses"></div>
 
         <div class="semester-course-footer">
-          <button class="gpa-action semester-add-course" type="button" aria-label="Add course" title="Add course">+</button>
+          <button class="gpa-action semester-add-course" type="button"><span aria-hidden="true">+</span> Add course</button>
+          <div class="semester-result"><span>Semester GPA</span><strong class="semester-gpa-value" aria-label="Semester GPA">—</strong></div>
         </div>
       `;
 
@@ -471,39 +477,45 @@ export function mountGpaCalculator() {
     }
 
     function calculateGpa() {
-      document.querySelectorAll(".gpa-semester").forEach(function (semester) {
-        const count = semester.querySelectorAll(".gpa-row:not(.is-removing)").length;
-        const courseCount = semester.querySelector(".semester-course-count");
-
-        if (courseCount) {
-          courseCount.textContent = count + (count === 1 ? " course" : " courses");
-        }
-      });
-
       let totalCredits = 0;
       let totalQualityPoints = 0;
+      const semesters = semestersRoot.querySelectorAll(".gpa-semester:not(.is-removing)");
 
-      document.querySelectorAll(".gpa-row").forEach(function (row) {
-        const credits = Number(row.querySelector(".course-credits").value || 0);
-        const gradeValue = row.querySelector(".course-grade").value;
+      semesters.forEach(function (semester) {
+        const rows = semester.querySelectorAll(".gpa-row:not(.is-removing)");
+        const count = rows.length;
+        const courseCount = semester.querySelector(".semester-course-count");
+        if (courseCount) courseCount.textContent = count + (count === 1 ? " course" : " courses");
 
-        if (gradeValue === "") {
-          return;
-        }
+        let semesterCredits = 0;
+        let semesterPoints = 0;
 
-        const grade = Number(gradeValue);
-        totalCredits += credits;
-        totalQualityPoints += credits * grade;
+        rows.forEach(function (row) {
+          const credits = Number(row.querySelector(".course-credits").value || 0);
+          const gradeValue = row.querySelector(".course-grade").value;
+          if (gradeValue === "" || !Number.isFinite(credits) || credits <= 0) return;
+
+          semesterCredits += credits;
+          semesterPoints += credits * Number(gradeValue);
+        });
+
+        const value = semester.querySelector(".semester-gpa-value");
+        if (value) value.textContent = semesterCredits ? (semesterPoints / semesterCredits).toFixed(2) : "—";
+        totalCredits += semesterCredits;
+        totalQualityPoints += semesterPoints;
       });
 
-      const semesterGpa = totalCredits ? totalQualityPoints / totalCredits : 0;
-      const cumulativeGpa = semesterGpa;
-
-      updateGpaColor(semesterGpa, totalCredits > 0);
-      animateSummaryNumber(semesterGpaOutput, semesterGpa, 2);
+      const overallGpa = totalCredits ? totalQualityPoints / totalCredits : 0;
+      if (semesterCountOutput) semesterCountOutput.textContent = String(semesters.length);
+      updateGpaColor(overallGpa, totalCredits > 0);
+      if (totalCredits) {
+        animateSummaryNumber(semesterGpaOutput, overallGpa, 2);
+      } else {
+        if (semesterGpaOutput.gpaAnimationFrame) cancelAnimationFrame(semesterGpaOutput.gpaAnimationFrame);
+        semesterGpaOutput.textContent = "—";
+      }
       animateSummaryNumber(semesterCreditsOutput, totalCredits, 0);
       animateSummaryNumber(qualityPointsOutput, totalQualityPoints, 2);
-      animateSummaryNumber(cumulativeGpaOutput, cumulativeGpa, 2);
     }
 
     function showGpaSaveMessage(
@@ -558,7 +570,7 @@ export function mountGpaCalculator() {
     async function saveGpaCalculator() {
       saveGpaButton.disabled = true;
       saveGpaButton.textContent =
-        "Saving...";
+        "Saving…";
       showGpaSaveMessage("", "");
 
       try {
@@ -622,7 +634,7 @@ export function mountGpaCalculator() {
       } finally {
         saveGpaButton.disabled = false;
         saveGpaButton.textContent =
-          "Save GPA Plan";
+          "Save plan";
       }
     }
 
@@ -799,19 +811,49 @@ export function mountGpaCalculator() {
       saveGpaCalculator
     );
 
-    resetButton.addEventListener(
-      "click",
-      function () {
-        semestersRoot.innerHTML = "";
+    function setOverflowOpen(open) {
+      overflowMenu.hidden = !open;
+      overflowButton.setAttribute("aria-expanded", String(open));
+    }
 
-        createSemesterBlock(
-          "Semester 1"
-        );
+    function closeResetDialog() {
+      resetDialog.hidden = true;
+      document.body.classList.remove("gpa-dialog-open");
+      overflowButton.focus();
+    }
 
-        calculateGpa();
-        markGpaPlanUnsaved();
-      }
-    );
+    overflowButton.addEventListener("click", function () {
+      setOverflowOpen(overflowMenu.hidden);
+    });
+
+    document.addEventListener("pointerdown", function (event) {
+      if (!event.target.closest(".gpa-overflow-wrap")) setOverflowOpen(false);
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") return;
+      if (!resetDialog.hidden) closeResetDialog();
+      else setOverflowOpen(false);
+    });
+
+    resetButton.addEventListener("click", function () {
+      setOverflowOpen(false);
+      resetDialog.hidden = false;
+      document.body.classList.add("gpa-dialog-open");
+      cancelResetButton.focus();
+    });
+
+    cancelResetButton.addEventListener("click", closeResetDialog);
+    resetDialog.addEventListener("click", function (event) {
+      if (event.target === resetDialog) closeResetDialog();
+    });
+    confirmResetButton.addEventListener("click", function () {
+      semestersRoot.innerHTML = "";
+      createSemesterBlock("Semester 1");
+      calculateGpa();
+      markGpaPlanUnsaved();
+      closeResetDialog();
+    });
 
     loadSavedGpaCalculator();
   
