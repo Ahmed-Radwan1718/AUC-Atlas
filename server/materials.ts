@@ -12,7 +12,6 @@ function millis(value: unknown): number {
 }
 export function serializeMaterialData(id: string, data: DocumentData) {
   const ms = millis(data.createdAt || data.createdAtIso);
-  const anonymous = data.isAnonymous === true || clean(data.isAnonymous,10).toLowerCase() === "true";
   return {
     id, courseCode: data.courseCode || "", courseTitle: data.courseTitle || "",
     professor: data.professor || "", semester: data.semester || "",
@@ -22,9 +21,7 @@ export function serializeMaterialData(id: string, data: DocumentData) {
     downloadUrl: id ? "/api/course-material-download?id=" + encodeURIComponent(id) : "",
     fileId: "", size: Number(data.size || 0), fileType: data.fileType || "",
     status: data.status === "rejected" ? "rejected" : "approved",
-    isAnonymous: anonymous, uploaderUid: anonymous ? "" : (data.uploaderUid || ""),
-    uploaderDisplayName: anonymous ? "Anonymous student" : (data.uploaderDisplayName || "AUC student"),
-    uploaderPhotoURL: anonymous ? "" : (data.uploaderPhotoURL || ""),
+    // Uploader identities stay on the server for moderation and ownership.
     createdAt: ms ? new Date(ms).toISOString() : (data.createdAtIso || "")
   };
 }
