@@ -56,7 +56,21 @@ export function mountGpaCalculator() {
         const toggle = dropdown.querySelector(".grade-toggle");
         const menu = dropdown.querySelector(".grade-menu");
         if (toggle) toggle.setAttribute("aria-expanded", "false");
-        if (menu) menu.hidden = true;
+        if (menu) {
+          // Keep the menu rendered so its fade/slide-out transition can finish.
+          menu.setAttribute("aria-hidden", "true");
+          menu.setAttribute("inert", "");
+        }
+
+        window.clearTimeout(dropdown.gpaCloseTimer);
+        if (prefersReducedMotion()) {
+          dropdown.classList.remove("is-closing");
+        } else {
+          dropdown.classList.add("is-closing");
+          dropdown.gpaCloseTimer = window.setTimeout(function () {
+            dropdown.classList.remove("is-closing");
+          }, 380);
+        }
       });
     }
 
@@ -69,8 +83,11 @@ export function mountGpaCalculator() {
       const menu = dropdown.querySelector(".grade-menu");
       if (!toggle || !menu) return;
 
+      window.clearTimeout(dropdown.gpaCloseTimer);
+      dropdown.classList.remove("is-closing");
       dropdown.classList.add("open");
-      menu.hidden = false;
+      menu.removeAttribute("inert");
+      menu.setAttribute("aria-hidden", "false");
       toggle.setAttribute("aria-expanded", "true");
     }
 
@@ -458,7 +475,7 @@ export function mountGpaCalculator() {
             <span class="credits-toggle-label">${normalizeCredits(credits)}</span>
             <span class="grade-chevron" aria-hidden="true"></span>
           </button>
-          <div class="grade-menu credits-menu" hidden>
+          <div class="grade-menu credits-menu" aria-hidden="true" inert>
             ${creditValues.map(function (value) {
               return `<button class="grade-option" type="button" data-credit-value="${value}">${value}</button>`;
             }).join("")}
@@ -470,7 +487,7 @@ export function mountGpaCalculator() {
             <span class="grade-toggle-label">${getGradeLabel(grade)}</span>
             <span class="grade-chevron"></span>
           </button>
-          <div class="grade-menu" hidden>
+          <div class="grade-menu" aria-hidden="true" inert>
             ${grades.map(function (item) {
               return `<button class="grade-option" type="button" data-grade-value="${item[0]}">${item[1]}</button>`;
             }).join("")}
