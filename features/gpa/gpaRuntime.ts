@@ -383,6 +383,7 @@ export function mountGpaCalculator() {
           String(course.name || "");
 
         courseCredits.value = normalizeCredits(course.credits);
+        row.querySelector(".credits-toggle-label").textContent = courseCredits.value;
 
         courseGrade.value =
           String(course.grade || "");
@@ -410,16 +411,21 @@ export function mountGpaCalculator() {
 
       row.innerHTML = `
         <input class="course-name" type="text" placeholder="Course name" value="${courseName}">
-        <div class="credits-dropdown">
-          <select class="course-credits" aria-label="Credits">
+        <div class="grade-dropdown credits-dropdown">
+          <input class="course-credits" type="hidden" value="${normalizeCredits(credits)}">
+          <button class="grade-toggle credits-toggle" type="button" aria-label="Credits" aria-expanded="false">
+            <span class="credits-toggle-label">${normalizeCredits(credits)}</span>
+            <span class="grade-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="grade-menu credits-menu" hidden>
             ${creditValues.map(function (value) {
-              return `<option value="${value}"${normalizeCredits(credits) === String(value) ? " selected" : ""}>${value}</option>`;
+              return `<button class="grade-option" type="button" data-credit-value="${value}">${value}</button>`;
             }).join("")}
-          </select>
+          </div>
         </div>
         <div class="grade-dropdown">
           <input class="course-grade" type="hidden" value="${grade}">
-          <button class="grade-toggle" type="button" aria-label="Grade">
+          <button class="grade-toggle" type="button" aria-label="Grade" aria-expanded="false">
             <span class="grade-toggle-label">${getGradeLabel(grade)}</span>
             <span class="grade-chevron"></span>
           </button>
@@ -433,13 +439,41 @@ export function mountGpaCalculator() {
       `;
 
       const creditsInput = row.querySelector(".course-credits");
+      const creditsDropdown = row.querySelector(".credits-dropdown");
+      const creditsToggle = row.querySelector(".credits-toggle");
+      const creditsToggleLabel = row.querySelector(".credits-toggle-label");
+      const creditsMenu = row.querySelector(".credits-menu");
       const gradeInput = row.querySelector(".course-grade");
       const gradeDropdown = row.querySelector(".grade-dropdown");
       const gradeToggle = row.querySelector(".grade-toggle");
       const gradeToggleLabel = row.querySelector(".grade-toggle-label");
       const gradeMenu = row.querySelector(".grade-menu");
 
-      creditsInput.addEventListener("change", calculateGpa);
+      creditsToggle.addEventListener("click", function () {
+        const isOpen = !creditsMenu.hidden;
+        document.querySelectorAll(".grade-menu").forEach(function (menu) {
+          menu.hidden = true;
+        });
+        document.querySelectorAll(".grade-dropdown").forEach(function (dropdown) {
+          dropdown.classList.remove("open");
+          const toggle = dropdown.querySelector(".grade-toggle");
+          if (toggle) toggle.setAttribute("aria-expanded", "false");
+        });
+        creditsMenu.hidden = isOpen;
+        creditsDropdown.classList.toggle("open", !isOpen);
+        creditsToggle.setAttribute("aria-expanded", String(!isOpen));
+      });
+
+      row.querySelectorAll(".grade-option[data-credit-value]").forEach(function (option) {
+        option.addEventListener("click", function () {
+          creditsInput.value = normalizeCredits(option.dataset.creditValue);
+          creditsToggleLabel.textContent = creditsInput.value;
+          creditsMenu.hidden = true;
+          creditsDropdown.classList.remove("open");
+          creditsToggle.setAttribute("aria-expanded", "false");
+          calculateGpa();
+        });
+      });
 
       row.querySelector(".course-name").addEventListener("input", calculateGpa);
 
@@ -452,18 +486,22 @@ export function mountGpaCalculator() {
 
         document.querySelectorAll(".grade-dropdown").forEach(function (dropdown) {
           dropdown.classList.remove("open");
+          const toggle = dropdown.querySelector(".grade-toggle");
+          if (toggle) toggle.setAttribute("aria-expanded", "false");
         });
 
         gradeMenu.hidden = isOpen;
         gradeDropdown.classList.toggle("open", !isOpen);
+        gradeToggle.setAttribute("aria-expanded", String(!isOpen));
       });
 
-      row.querySelectorAll(".grade-option").forEach(function (option) {
+      row.querySelectorAll(".grade-option[data-grade-value]").forEach(function (option) {
         option.addEventListener("click", function () {
           gradeInput.value = option.dataset.gradeValue;
           gradeToggleLabel.textContent = option.textContent;
           gradeMenu.hidden = true;
           gradeDropdown.classList.remove("open");
+          gradeToggle.setAttribute("aria-expanded", "false");
           calculateGpa();
         });
       });
@@ -772,9 +810,9 @@ export function mountGpaCalculator() {
           )
           .forEach(
             function (dropdown) {
-              dropdown.classList.remove(
-                "open"
-              );
+              dropdown.classList.remove("open");
+              const toggle = dropdown.querySelector(".grade-toggle");
+              if (toggle) toggle.setAttribute("aria-expanded", "false");
             }
           );
       }

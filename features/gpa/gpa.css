@@ -128,7 +128,7 @@
 }
 .gpa-row.is-entering, .gpa-row.is-removing { opacity: 0; transform: translateY(-7px); pointer-events: none; }
 .gpa-row:has(.grade-dropdown.open) { z-index: 35; }
-.gpa-row input:not([type="hidden"]), .gpa-row select.course-credits, .grade-toggle {
+.gpa-row input:not([type="hidden"]), .grade-toggle {
   width: 100%;
   min-width: 0;
   height: 50px;
@@ -144,30 +144,18 @@
   transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
 .gpa-row input::placeholder { color: rgba(23,23,23,.38); font-weight: 400; }
-.gpa-row .credits-dropdown { position: relative; min-width: 0; }
-.gpa-row .credits-dropdown::after {
-  content: "";
+.credits-dropdown .credits-toggle {
+  position: relative;
+  justify-content: center;
+  padding: 0 25px 0 12px;
+}
+.credits-dropdown .credits-toggle .grade-chevron {
   position: absolute;
-  top: calc(50% - 3px);
   right: 14px;
-  width: 7px;
-  height: 7px;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  transform: rotate(45deg);
-  color: rgba(23,23,23,.65);
-  pointer-events: none;
 }
-.gpa-row select.course-credits {
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-  text-align: center;
-  text-align-last: center;
-  padding: 0 24px 0 10px;
-}
-.gpa-row input:not([type="hidden"]):hover, .gpa-row select.course-credits:hover, .grade-toggle:hover { border-color: rgba(23,23,23,.2); }
-.gpa-row input:not([type="hidden"]):focus, .gpa-row select.course-credits:focus, .grade-dropdown.open .grade-toggle {
+.credits-dropdown .credits-menu .grade-option { text-align: center; }
+.gpa-row input:not([type="hidden"]):hover, .grade-toggle:hover { border-color: rgba(23,23,23,.2); }
+.gpa-row input:not([type="hidden"]):focus, .grade-dropdown.open .grade-toggle {
   border-color: rgba(23,23,23,.32);
   box-shadow: none;
 }
@@ -293,7 +281,7 @@ body.gpa-dialog-open { overflow: hidden; }
   .gpa-row > .credits-dropdown { grid-area: credits; }
   .gpa-row > .grade-dropdown { grid-area: grade; }
   .gpa-row > .remove-course { grid-area: remove; justify-self: end; }
-  .gpa-row input:not([type="hidden"]), .gpa-row select.course-credits, .grade-toggle { height: 46px; font-size: 13px; }
+  .gpa-row input:not([type="hidden"]), .grade-toggle { height: 46px; font-size: 13px; }
   .semester-course-footer { flex-wrap: wrap; gap: 15px; }
   .semester-result { margin-left: auto; }
   .semester-gpa-value { font-size: 22px; }
