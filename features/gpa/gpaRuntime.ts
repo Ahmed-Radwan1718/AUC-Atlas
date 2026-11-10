@@ -790,10 +790,7 @@ export function mountGpaCalculator() {
 
         calculateGpa();
 
-        showGpaSaveMessage(
-          "Saved GPA plan loaded.",
-          "success"
-        );
+
       } catch (error) {
         semestersRoot.innerHTML = "";
 
