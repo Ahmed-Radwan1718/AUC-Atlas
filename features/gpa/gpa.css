@@ -269,10 +269,10 @@
   margin-top: 20px;
   min-height: 46px;
   padding: 0 20px;
-  border: 1px solid rgba(23,23,23,.12);
+  border: 1px solid var(--gpa-ink);
   border-radius: 999px;
-  background: #fff;
-  color: #171717;
+  background: var(--gpa-ink);
+  color: #fff;
   font: inherit;
   font-size: 13px;
   font-weight: 700;
@@ -283,7 +283,7 @@
   gap: 9px;
   transition: background .18s ease, border-color .18s ease, transform .18s ease;
 }
-.gpa-add-semester:hover { background: #fff; border-color: rgba(23,23,23,.27); transform: translateY(-1px); }
+.gpa-add-semester:hover { background: #343434; border-color: #343434; transform: translateY(-1px); }
 .gpa-add-semester-icon { display: inline-block; font-size: 20px; font-weight: 400; line-height: 1; }
 
 .gpa-summary {
