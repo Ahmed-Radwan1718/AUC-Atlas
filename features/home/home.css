@@ -630,6 +630,8 @@
     /* Move only the existing three professor rows; no card styling changes. */
     .home-lowest-carousel {
       width: 100%;
+      /* Exactly three existing 82px professor rows fit in the viewport. */
+      height: 246px;
       overflow: hidden;
     }
 
