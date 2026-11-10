@@ -166,14 +166,8 @@ function renderCourseMaterials(materials) {
         material.id ||
         "legacy-" + index
       ).trim();
-      const uploaderKey = String(
-        material.uploaderUid ||
-        material.uploaderDisplayName ||
-        ""
-      ).trim();
-      const groupKey =
-        groupId + "::" + uploaderKey;
-
+      // Group by the upload ID, without displaying uploader identity.
+      const groupKey = groupId;
       let group = groupsByKey.get(groupKey);
 
       if (!group) {
@@ -504,9 +498,7 @@ function renderCourseMaterials(materials) {
         material.professor ||
           "Professor not listed",
         material.semester ||
-          "Semester not listed",
-        material.uploaderDisplayName ||
-          "AUC student"
+          "Semester not listed"
       ]
         .map(function (value) {
           return escapeMaterialText(value);
