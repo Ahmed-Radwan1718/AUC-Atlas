@@ -202,4 +202,11 @@ test("the main route changes to materials while individual course pages stay on 
   assert.match(component,/\/api\/material-directory/);
   assert.match(component,/file\.downloadUrl/); // secure links are provided by the server
   assert.match(component,/setupCourseUploadStart/);
+  // The large decorative hero was removed; keep the upload action accessible.
+  assert.doesNotMatch(component,/materials-hub-hero|Find the material\./);
+  assert.match(component,/materials-hub-toolbar/);
+  assert.match(component,/id="course-upload-start"/);
+  const css=read("features/courses/materials-directory.css");
+  assert.doesNotMatch(css,/materials-hub-hero|materials-art-/);
+
 });

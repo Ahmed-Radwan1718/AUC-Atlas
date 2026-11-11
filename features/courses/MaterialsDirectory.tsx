@@ -151,28 +151,14 @@ export default function MaterialsDirectory() {
   return <>
     <main className="materials-hub">
       <div className="materials-hub-inner">
-        <header className="materials-hub-hero">
-          <div className="materials-hub-hero-copy">
-            <p className="materials-eyebrow">AUC Atlas / Student library</p>
-            <h1>Find the material.<br/><span>Get to studying.</span></h1>
-            <p className="materials-hero-description">Past exams, lecture notes, slides and practice sheets shared by students. Everything organized around the files you actually need.</p>
-            <div className="materials-hub-hero-actions">
-              <button id="course-upload-start" className="materials-primary-action"
-                type="button" disabled={locked} aria-haspopup="dialog"
-                aria-controls="quick-material-upload-modal" aria-expanded="false">
-                <span aria-hidden="true">＋</span> Upload material
-              </button>
-              <span className="materials-hero-caption">Have something useful? Share it with other AUC students.</span>
-            </div>
-          </div>
-          <div className="materials-hub-hero-art" aria-hidden="true">
-            <div className="materials-art-orbit materials-art-orbit-one"/>
-            <div className="materials-art-orbit materials-art-orbit-two"/>
-            <div className="materials-art-file materials-art-file-back"><span>NOTES</span><i/><i/><i/></div>
-            <div className="materials-art-file materials-art-file-front"><span>PAST EXAM</span><b>MATH 2010</b><i/><i/><i/><i/></div>
-            <div className="materials-art-bubble">✦</div>
-          </div>
-        </header>
+        <div className="materials-hub-toolbar">
+          <h1>Materials</h1>
+          <button id="course-upload-start" className="materials-primary-action"
+            type="button" disabled={locked} aria-haspopup="dialog"
+            aria-controls="quick-material-upload-modal" aria-expanded="false">
+            <span aria-hidden="true">＋</span> Upload material
+          </button>
+        </div>
 
         <section className="materials-search-panel" aria-label="Find study materials">
           <label className="materials-search-field" htmlFor="materials-search-input">
