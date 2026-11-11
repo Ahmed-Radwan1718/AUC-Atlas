@@ -1,17 +1,21 @@
 // @ts-nocheck
 import { populateReviewCourseSelect, setupReviewDependsField, setupReviewSearchSelect, setupReviewChoiceMenus } from "./reviewControls";
-import { renderProfessorReviews } from "./reviewPresentation";
+import { renderProfessorReviews, renderProfessorReviewsLocked, renderProfessorReviewsUnavailable } from "./reviewPresentation";
 
 async function loadProfessorReviews(professorId) {
   try {
     const response=await fetch("/api/professor-reviews?professorId="+encodeURIComponent(professorId),{
       credentials:"same-origin", cache:"no-store", headers:{Accept:"application/json"}
     });
-    if(!response.ok)throw Error("Could not load reviews.");
-    const data=await response.json();
-    renderProfessorReviews(Array.isArray(data.reviews)?data.reviews:[]);
+    if (response.status === 401) {
+      renderProfessorReviewsLocked();
+      return;
+    }
+    if (!response.ok) throw Error("Could not load reviews.");
+    const data = await response.json();
+    renderProfessorReviews(Array.isArray(data.reviews) ? data.reviews : []);
   } catch {
-    renderProfessorReviews([]);
+    renderProfessorReviewsUnavailable();
   }
 }
 

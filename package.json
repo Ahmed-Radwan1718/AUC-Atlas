@@ -9,9 +9,10 @@
     "typecheck": "tsc --noEmit",
     "test:cleanup": "node --test tests/cleanup-material-uploads.test.ts",
     "test:upload-security": "node --test tests/material-upload-security.test.ts",
+    "test:review-privacy": "node --test tests/professor-review-privacy.test.ts",
     "test:auc-id": "node --test tests/auc-id-verification.test.ts",
     "test:faq": "node --test tests/faq-sitemap.test.ts",
-    "test": "node --test tests/cleanup-material-uploads.test.ts tests/faq-sitemap.test.ts tests/auth-module-contract.test.ts tests/course-prerequisites.test.ts tests/auc-id-verification.test.ts tests/material-upload-security.test.ts",
+    "test": "node --test tests/cleanup-material-uploads.test.ts tests/faq-sitemap.test.ts tests/auth-module-contract.test.ts tests/course-prerequisites.test.ts tests/auc-id-verification.test.ts tests/material-upload-security.test.ts tests/professor-review-privacy.test.ts",
     "test:auth": "node --test tests/auth-module-contract.test.ts",
     "test:prerequisites": "node --test tests/course-prerequisites.test.ts"
   },

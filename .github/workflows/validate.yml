@@ -18,6 +18,7 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run test:cleanup
       - run: npm run test:upload-security
+      - run: npm run test:review-privacy
       - run: npm run test:faq
       - run: npm run test:auth
       - run: npm run test:auc-id
@@ -68,6 +69,12 @@ jobs:
           check_status 401 http://127.0.0.1:3000/api/academic-progress
           check_status 401 http://127.0.0.1:3000/api/course-materials
           check_status 401 http://127.0.0.1:3000/api/course-material-download
+          check_status 401 http://127.0.0.1:3000/api/professor-reviews
+          check_status 401 'http://127.0.0.1:3000/api/professor-reviews?summaries=true'
+          check_status 401 'http://127.0.0.1:3000/api/professor-reviews?professorId=eslam-badr'
+          check_status 401 'http://127.0.0.1:3000/api/professor-reviews?professorId=eslam-badr&countOnly=true'
+          check_status 401 'http://127.0.0.1:3000/api/professor-reviews?courseCode=MATH2010'
+          check_status 401 'http://127.0.0.1:3000/api/professor-reviews?mine=true'
           check_status 401 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/imagekit-auth
           check_status 400 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/login
           check_status 400 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/signup

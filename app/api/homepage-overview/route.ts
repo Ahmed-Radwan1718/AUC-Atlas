@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { type QueryDocumentSnapshot, type DocumentData } from "firebase-admin/firestore";
 import { firestore } from "../../../server/firebase";
+import { optionalSessionUser } from "../../../server/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -90,28 +91,34 @@ async function latestMaterials(limit: number) {
     .slice(0, safeLimit);
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const headers = { "Cache-Control": "private, no-store" };
+  const user = await optionalSessionUser(request);
   try {
     const db = firestore();
-    const [reviewCount, materialCount, latestReviewData, latestMaterialData, rankings] = await Promise.all([
-      db.collection("professorReviews").count().get(),
+    // Public homepage statistics and course-material previews remain available.
+    // Professor review counts, rankings, and individual review metadata are
+    // only queried for verified AUC Atlas sessions.
+    const [materialCount, latestMaterialData, reviewCount, latestReviewData, rankings] = await Promise.all([
       db.collection("courseMaterials").where("status", "==", "approved").count().get(),
-      latestReviews(3),
       latestMaterials(3),
-      rankedProfessors()
+      user ? db.collection("professorReviews").count().get() : Promise.resolve(null),
+      user ? latestReviews(3) : Promise.resolve([]),
+      user ? rankedProfessors() : Promise.resolve([])
     ]);
     const lowest = rankings.filter(professor => professor.averageRating <= 2)
       .sort((a, b) => a.averageRating - b.averageRating
         || b.reviewCount - a.reviewCount || a.professorName.localeCompare(b.professorName));
     return NextResponse.json({
-      reviewCount: Number(reviewCount.data().count || 0),
+      reviewsLocked: !user,
+      reviewCount: reviewCount ? Number(reviewCount.data().count || 0) : null,
       materialCount: Number(materialCount.data().count || 0),
       latestReviews: latestReviewData,
       latestMaterials: latestMaterialData,
       topReviewedProfessors: rankings.slice(0, 12),
       lowestRatedProfessors: lowest
-    }, { headers: { "Cache-Control": "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400" } });
+    }, { headers });
   } catch {
-    return NextResponse.json({ error: "Could not load the homepage overview." }, { status: 500 });
+    return NextResponse.json({ error: "Could not load the homepage overview." }, { status: 500, headers });
   }
 }

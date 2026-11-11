@@ -20,9 +20,7 @@ type Material = {
 };
 type MaterialState = { loading: boolean; locked: boolean; materials: Material[] };
 
-const reviewCache = new Map<string, { count: number; fetchedAt: number }>();
-const reviewRequests = new Map<string, Promise<number | null>>();
-const reviewCacheLifetime = 15 * 60 * 1000;
+type ReviewCount = number | "locked" | null;
 
 function normalize(value: unknown): string {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -51,33 +49,21 @@ function getMatchScore(query: string, primary: string, values: unknown[]): numbe
   });
   return score + Math.max(0, 50 - normalizedPrimary.length);
 }
-function cachedReviewCount(id: string): number | null {
-  const entry = reviewCache.get(id);
-  if (!entry) return null;
-  if (Date.now() - entry.fetchedAt > reviewCacheLifetime) {
-    reviewCache.delete(id);
+async function getReviewCount(id: string): Promise<ReviewCount> {
+  // Do not cache review-derived data across account sign-out or account changes.
+  try {
+    const response = await fetch(
+      "/api/professor-reviews?professorId=" + encodeURIComponent(id) + "&countOnly=true",
+      { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } }
+    );
+    if (response.status === 401) return "locked";
+    if (!response.ok) return null;
+    const data = await response.json();
+    const count = Number(data.reviewCount || 0);
+    return Number.isFinite(count) ? Math.max(0, Math.floor(count)) : null;
+  } catch {
     return null;
   }
-  return entry.count;
-}
-async function getReviewCount(id: string): Promise<number | null> {
-  const cached = cachedReviewCount(id);
-  if (cached !== null) return cached;
-  const pending = reviewRequests.get(id);
-  if (pending) return pending;
-  const request: Promise<number | null> = fetch(
-    "/api/professor-reviews?professorId=" + encodeURIComponent(id) + "&countOnly=true",
-    { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } }
-  ).then(response => {
-    if (!response.ok) throw Error("Could not load review count");
-    return response.json();
-  }).then(data => {
-    const count = Number(data.reviewCount || 0);
-    reviewCache.set(id, { count, fetchedAt: Date.now() });
-    return count;
-  }).catch(() => null).finally(() => reviewRequests.delete(id));
-  reviewRequests.set(id, request);
-  return request;
 }
 function SearchResultLink({
   result, index, activeIndex, onHover, onNavigate
@@ -85,7 +71,7 @@ function SearchResultLink({
   result: SearchResult; index: number; activeIndex: number;
   onHover: (index: number) => void; onNavigate: () => void;
 }) {
-  const [reviews, setReviews] = useState<number | null>(result.professorId ? cachedReviewCount(result.professorId) : null);
+  const [reviews, setReviews] = useState<ReviewCount>(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     if (!result.professorId) return;
@@ -98,7 +84,7 @@ function SearchResultLink({
     return () => { live = false; };
   }, [result.professorId]);
   const meta = result.professorId
-    ? [result.department, failed ? "Reviews unavailable" : reviews === null
+    ? [result.department, reviews === "locked" ? "Sign in to see reviews" : failed ? "Reviews unavailable" : reviews === null
       ? "Loading reviews..." : reviews + " " + (reviews === 1 ? "review" : "reviews")].filter(Boolean).join(" · ")
     : result.meta;
   return (

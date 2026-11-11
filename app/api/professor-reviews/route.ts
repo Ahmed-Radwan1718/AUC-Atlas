@@ -44,6 +44,12 @@ async function getSummaries(): Promise<Record<string, Summary>> {
   return summaries;
 }
 export async function GET(request: NextRequest) {
+  const headers = { "Cache-Control": "private, no-store" };
+  const user = await optionalSessionUser(request);
+  if (!user) return NextResponse.json(
+    { error: "Sign in with a verified AUC account to view professor reviews." },
+    { status: 401, headers }
+  );
   const query = request.nextUrl.searchParams;
   try {
     if ((query.get("summaries") || query.get("summary")) === "true") {
@@ -53,29 +59,31 @@ export async function GET(request: NextRequest) {
         message: "Too many professor-review summary requests. Please try again later."
       });
       return NextResponse.json({ summaries: await getSummaries() }, {
-        headers: { "Cache-Control": "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400" }
+        headers
       });
     }
 
     const mine = (query.get("mine") || query.get("author") || "").trim().slice(0,20);
     if(mine==="true"||mine==="me"){
-      const user=await optionalSessionUser(request);
-      if(!user)return NextResponse.json({ error: "not-signed-in" }, {status:401});
-      return NextResponse.json({ reviews: await authorReviews(user.uid) });
+      return NextResponse.json({ reviews: await authorReviews(user.uid) }, { headers });
     }
     const courseCode=String(query.get("courseCode")||query.get("courseTaken")||"").trim().toUpperCase().slice(0,60);
-    if(courseCode) return NextResponse.json({ reviews: await courseReviews(courseCode) });
+    if(courseCode) return NextResponse.json({ reviews: await courseReviews(courseCode) }, { headers });
     const professorId=String(query.get("professorId")||"").trim().replace(/\s+/g," ").slice(0,80);
     if(!professorId)throw new ReviewError("Professor or course not found.",400);
     if(query.get("countOnly")==="true"){
       const snapshot=await firestore().collection("professorReviews").where("professorId","==",professorId).count().get();
-      return NextResponse.json({ reviewCount:Number(snapshot.data().count||0) });
+      return NextResponse.json({ reviewCount:Number(snapshot.data().count||0) }, { headers });
     }
-    return NextResponse.json({ reviews:await professorReviews(professorId) });
+    return NextResponse.json({ reviews:await professorReviews(professorId) }, { headers });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Could not load reviews." }, {
       status: error instanceof ReviewError ? error.statusCode : error instanceof RateLimitError ? 429 : 500,
-      headers: error instanceof ReviewError && error.retryAfterSeconds ? { "Retry-After": String(error.retryAfterSeconds) } : error instanceof RateLimitError ? { "Retry-After": String(error.retryAfterSeconds) } : {}
+      headers: {
+        ...headers,
+        ...(error instanceof ReviewError && error.retryAfterSeconds ? { "Retry-After": String(error.retryAfterSeconds) } :
+          error instanceof RateLimitError ? { "Retry-After": String(error.retryAfterSeconds) } : {})
+      }
     });
   }
 }

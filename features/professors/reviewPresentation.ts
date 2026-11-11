@@ -88,5 +88,39 @@ function renderProfessorReviews(reviews) {
     }).join("");
   }
 
-  
-export { renderProfessorReviews };
+
+// The API returns no review data for unsigned or unverified visitors.
+// Replace skeletons without treating protected reviews as an empty dataset.
+function renderProfessorReviewAccessMessage(locked) {
+  const list = document.getElementById("professor-reviews-list");
+  const count = document.getElementById("professor-reviews-count");
+  const stats = document.getElementById("professor-review-stats");
+  const statsCount = document.getElementById("professor-review-stats-count");
+  const form = document.querySelector(".professor-review-panel");
+  const message = locked
+    ? 'Sign in with a verified AUC account to read professor reviews. <a href="/login">Sign in</a>'
+    : "Professor reviews are temporarily unavailable. Please try again.";
+  if (form) form.hidden = locked;
+  for (const element of [list, stats]) {
+    if (!element) continue;
+    element.removeAttribute("aria-busy");
+    element.removeAttribute("role");
+    element.removeAttribute("aria-label");
+    element.innerHTML = '<p class="professor-review-empty">' + message + "</p>";
+  }
+  for (const element of [count, statsCount]) {
+    if (!element) continue;
+    element.classList.remove("is-loading");
+    element.removeAttribute("aria-label");
+    element.textContent = locked ? "Sign in to view" : "Unavailable";
+  }
+}
+
+function renderProfessorReviewsLocked() {
+  renderProfessorReviewAccessMessage(true);
+}
+function renderProfessorReviewsUnavailable() {
+  renderProfessorReviewAccessMessage(false);
+}
+
+export { renderProfessorReviews, renderProfessorReviewsLocked, renderProfessorReviewsUnavailable };

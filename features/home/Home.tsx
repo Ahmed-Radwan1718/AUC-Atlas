@@ -18,7 +18,8 @@ type CourseMaterial = {
   fileName?: string; fileType?: string; createdAt?: string;
 };
 type Overview = {
-  reviewCount: number;
+  reviewsLocked: boolean;
+  reviewCount: number | null;
   lowestRatedProfessors: RankedProfessor[];
   topReviewedProfessors: RankedProfessor[];
   latestMaterials: CourseMaterial[];
@@ -243,7 +244,7 @@ export default function Home() {
     let active = true;
     void homepageMonthlyVisits().then(count => { if (active) setVisits(count); });
     void fetch("/api/homepage-overview", {
-      method: "GET", credentials: "same-origin", headers: { Accept: "application/json" }
+      method: "GET", credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" }
     }).then(response => {
       if (!response.ok) throw Error("Could not load homepage activity");
       return response.json() as Promise<Overview>;
@@ -273,7 +274,7 @@ export default function Home() {
         <div className="home-stats-grid">
           <article className="home-stat"><AnimatedCount value={professors.length}/><span>Professors listed</span></article>
           <article className="home-stat"><AnimatedCount value={courses.length}/><span>Courses available</span></article>
-          <article className="home-stat"><AnimatedCount value={overview ? overview.reviewCount : null} initial="—"/><span>Student reviews</span></article>
+          <article className="home-stat"><AnimatedCount value={overview ? overview.reviewCount : null} initial="—"/><span>{overview?.reviewsLocked ? "Student reviews · sign in to view" : "Student reviews"}</span></article>
           <article className="home-stat"><AnimatedCount value={visits} initial="—"/><span>Visits this month</span></article>
         </div>
       </section>
@@ -289,7 +290,10 @@ export default function Home() {
               <a href="/professors">View all →</a>
             </div>
             <div className="home-latest-list" id="home-lowest-professors">
-              {overview || failed ? <RatedProfessors items={lowest} lowest/> : <p className="home-latest-status">Loading lowest-rated professors...</p>}
+              {overview?.reviewsLocked
+                ? <p className="home-latest-status"><a href="/login">Sign in with a verified AUC account</a> to see professor ratings.</p>
+                : overview || failed ? <RatedProfessors items={lowest} lowest/>
+                : <p className="home-latest-status">Loading lowest-rated professors...</p>}
             </div>
           </article>
           <article className="home-latest-card">
@@ -307,7 +311,10 @@ export default function Home() {
               <a href="/professors">View all →</a>
             </div>
             <div className="home-latest-list" id="home-latest-professors">
-              {overview || failed ? <RatedProfessors items={highest} lowest={false}/> : <p className="home-latest-status">Loading top-reviewed professors...</p>}
+              {overview?.reviewsLocked
+                ? <p className="home-latest-status"><a href="/login">Sign in with a verified AUC account</a> to see professor ratings.</p>
+                : overview || failed ? <RatedProfessors items={highest} lowest={false}/>
+                : <p className="home-latest-status">Loading top-reviewed professors...</p>}
             </div>
           </article>
         </div>

@@ -38,6 +38,7 @@ export default function Professors() {
   const [items, setItems] = useState<RatedProfessor[]>(initialProfessors);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const [reviewsLocked, setReviewsLocked] = useState(false);
   const [query, setQuery] = useState("");
   const [departmentOpen, setDepartmentOpen] = useState(false);
   const [ratingOpen, setRatingOpen] = useState(false);
@@ -81,15 +82,17 @@ export default function Professors() {
       credentials: "same-origin", cache: "no-store",
       headers: { Accept: "application/json" }
     }).then(async response => {
+      if (response.status === 401) return { summaries: {} as Record<string, RatingSummary>, locked: true };
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw Error(data.error || "Could not load professor ratings.");
-      return data as { summaries: Record<string, RatingSummary> };
+      return { summaries: (data as { summaries: Record<string, RatingSummary> }).summaries, locked: false };
     }).then(data => {
       if (!active) return;
+      setReviewsLocked(data.locked);
       setItems(professors.map(item => ({
         ...item,
-        reviewCount: Math.max(0, Math.floor(Number(data.summaries?.[item.id]?.reviewCount || 0))),
-        averageRating: Math.max(0, Number(data.summaries?.[item.id]?.averageRating || 0))
+        reviewCount: data.locked ? 0 : Math.max(0, Math.floor(Number(data.summaries?.[item.id]?.reviewCount || 0))),
+        averageRating: data.locked ? 0 : Math.max(0, Number(data.summaries?.[item.id]?.averageRating || 0))
       })));
     }).catch(() => { if (active) setFailed(true); })
       .finally(() => { if (active) setLoading(false); });
@@ -238,7 +241,7 @@ export default function Professors() {
                 </label>)}
               </div>
             </div>
-            <div className={`filter-item ${ratingOpen ? "open" : ""}`}>
+            <div className={`filter-item ${ratingOpen ? "open" : ""}`} hidden={reviewsLocked}>
               <button className="filter-toggle" type="button" onClick={() => setRatingOpen(x=>!x)}>
                 <span>Rating Status</span><span className="chevron">⌄</span>
               </button>
@@ -262,6 +265,9 @@ export default function Professors() {
                 aria-label="Search professors" value={query}
                 onChange={event=>updateSearch(event.target.value)}/>
             </div>
+            {reviewsLocked && <p className="professors-empty" role="status">
+              <a href="/login">Sign in with your verified AUC account</a> to see professor ratings and reviews.
+            </p>
             <section className="professors-grid" id="professors-grid" ref={gridRef} aria-label={loading?"Loading professors and reviews":"Professor list"}
               aria-busy={loading}>
               {loading ? Array.from({length:4},(_,index)=><div className="professor-loading-card" aria-hidden="true" key={index}>
@@ -286,8 +292,8 @@ export default function Professors() {
                       <h2>{item.name}</h2>
                       <div className="professor-meta">
                         <span>{item.displayDepartment||item.department}</span>
-                        <span>{failed?"Reviews unavailable":item.reviewCount+" "+(item.reviewCount===1?"Review":"Reviews")}</span>
-                        <span>{failed?"Ratings unavailable":rating}</span>
+                        <span>{reviewsLocked?"Reviews for verified accounts":failed?"Reviews unavailable":item.reviewCount+" "+(item.reviewCount===1?"Review":"Reviews")}</span>
+                        <span>{reviewsLocked?"Sign in to view ratings":failed?"Ratings unavailable":rating}</span>
                       </div>
                     </div>
                   </a>;
