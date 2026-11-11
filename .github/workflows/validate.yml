@@ -19,6 +19,7 @@ jobs:
       - run: npm run test:cleanup
       - run: npm run test:upload-security
       - run: npm run test:review-privacy
+      - run: npm run test:material-directory
       - run: npm run test:faq
       - run: npm run test:auth
       - run: npm run test:auc-id
@@ -68,6 +69,8 @@ jobs:
           check_status 200 http://127.0.0.1:3000/api/me
           check_status 401 http://127.0.0.1:3000/api/academic-progress
           check_status 401 http://127.0.0.1:3000/api/course-materials
+          check_status 401 http://127.0.0.1:3000/api/material-directory
+          check_status 401 'http://127.0.0.1:3000/api/material-directory?q=MATH'
           check_status 401 http://127.0.0.1:3000/api/course-material-download
           check_status 401 http://127.0.0.1:3000/api/professor-reviews
           check_status 401 'http://127.0.0.1:3000/api/professor-reviews?summaries=true'
