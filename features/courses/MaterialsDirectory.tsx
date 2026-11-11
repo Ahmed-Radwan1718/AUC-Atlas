@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { courses } from "../../data/courses";
+import { courses, type Course } from "../../data/courses";
 import CourseDialogs from "./CourseDialogs";
 import { setupCourseUploadStart } from "./materialUploadDialog";
 import "./courses-1.css";
@@ -17,13 +17,14 @@ type Material = {
   courseCode: string;
   courseTitle: string;
   materialType: string;
-  professor: string;
   semester: string;
+  professor: string;
   fileName: string;
   fileType: string;
   size: number;
   createdAt: string;
   downloadUrl: string;
+  uploadGroupId?: string;
 };
 type DirectoryResponse = {
   materials?: Material[];
@@ -31,245 +32,322 @@ type DirectoryResponse = {
   nextCursor?: string | null;
   error?: string;
 };
-const filters = [
-  { value: "", label: "All files" },
-  { value: "Past exam", label: "Past exams" },
-  { value: "Notes", label: "Notes" },
-  { value: "Slides", label: "Slides" },
-  { value: "Practice sheet", label: "Practice sheets" },
-  { value: "Past assignments", label: "Assignments" },
-  { value: "Review sheet", label: "Review sheets" },
-  { value: "Lab file", label: "Lab files" },
-  { value: "Syllabus", label: "Syllabi" }
+type UploadGroup = { key: string; files: Material[] };
+const materialTypes = [
+  { label: "All", value: "" },
+  { label: "Past exams", value: "Past exam" },
+  { label: "Slides", value: "Slides" },
+  { label: "Notes", value: "Notes" }
 ];
-const slug = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
-const courseLink = (code: string) => code ? "/courses/" + encodeURIComponent(slug(code)) + "#course-materials-access" : "/courses";
-const formatDate = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "Date unavailable" :
-    date.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
-};
-const formatSize = (bytes: number) => {
-  if(!Number.isFinite(bytes)||bytes<=0)return "";
-  return bytes>=1024*1024 ? (bytes/(1024*1024)).toFixed(1)+" MB" : Math.max(1,Math.ceil(bytes/1024))+" KB";
-};
-const iconName = (file: Material) => {
-  const ext = (file.fileName.match(/\.([a-z0-9]+)$/i)?.[1] || "").toLowerCase();
-  const icons: Record<string,string> = {
-    pdf:"pdf.png",doc:"doc.png",docx:"doc.png",ppt:"ppt.png",pptx:"ppt.png",
-    xls:"xls.png",xlsx:"xls.png",png:"png.png",jpg:"jpg.png",jpeg:"jpg.png"
-  };
-  return icons[ext] ? "/"+icons[ext] : "";
-};
+const seasons = ["Fall","Summer","Spring","Winter"];
+const semesterOptions = Array.from({length: 9},(_,i)=>2026-i).flatMap(year=>
+  seasons.map(season=>season+" "+year)
+);
 const normalize = (value:string) => value.toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
-const courseIndex = new Map(courses.map(course=>[normalize(course.code),course.title]));
+const slug = (value:string) => value.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+const courseHref = (code:string) => "/courses/"+encodeURIComponent(slug(code))+"#course-materials-access";
+const sizeLabel = (bytes:number) => {
+  if (!Number.isFinite(bytes) || bytes<=0) return "";
+  return bytes>=1048576 ? (bytes/1048576).toFixed(1)+" MB" : Math.ceil(bytes/1024)+" KB";
+};
+const inlineUrl = (url:string) => url+(url.includes("?")?"&":"?")+"disposition=inline";
+const formatDate = (value:string) => {
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+};
+
+function DownloadIcon() {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"
+    strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3h16v-3"/>
+  </svg>;
+}
+function DocumentIcon({folder=false}:{folder?:boolean}) {
+  return folder ?
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    </svg> :
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
+      <path d="M14 3v5h5M9 12h6M9 16h5"/>
+    </svg>;
+}
+function FileRow({file,child=false}:{file:Material;child?:boolean}) {
+  const title = (child ? file.fileName : file.title) || file.fileName || "Study material";
+  const metadata = [
+    file.semester,
+    file.professor,
+    sizeLabel(file.size),
+    formatDate(file.createdAt)
+  ].filter(Boolean).join(" · ");
+  return <div className={"material-finder-file"+(child?" is-child":"")}>
+    <span className="material-finder-file-icon"><DocumentIcon/></span>
+    <div className="material-finder-file-copy">
+      <a className="material-finder-file-name" href={inlineUrl(file.downloadUrl)}
+        target="_blank" rel="noopener noreferrer"
+        title={"Preview "+title}>{title}</a>
+      <span className="material-finder-file-info">{metadata}</span>
+    </div>
+    <a className="material-finder-download" href={file.downloadUrl}
+      target="_blank" rel="noopener noreferrer"
+      aria-label={"Download "+(file.fileName || title)}
+      title={"Download "+(file.fileName || title)}><DownloadIcon/></a>
+  </div>;
+}
 
 export default function MaterialsDirectory() {
-  const [search, setSearch] = useState("");
-  const [type, setType] = useState("");
-  const [semester, setSemester] = useState("");
-  const [materials, setMaterials] = useState<Material[]>([]);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [locked, setLocked] = useState(false);
-  const [error, setError] = useState("");
-  const [revision, setRevision] = useState(0);
+  const [courseQuery,setCourseQuery] = useState("");
+  const [selectedCode,setSelectedCode] = useState("");
+  const [suggestionsOpen,setSuggestionsOpen] = useState(false);
+  const [activeSuggestion,setActiveSuggestion] = useState(0);
+  const [type,setType] = useState("");
+  const [semester,setSemester] = useState("");
+  const [materials,setMaterials] = useState<Material[]>([]);
+  const [cursor,setCursor] = useState<string|null>(null);
+  const [nextCursor,setNextCursor] = useState<string|null>(null);
+  const [loading,setLoading] = useState(false);
+  const [locked,setLocked] = useState(false);
+  const [error,setError] = useState("");
+  const [revision,setRevision] = useState(0);
 
-  useEffect(() => {
-    setupCourseUploadStart();
-    const update = () => { setCursor(null); setRevision(value=>value+1); };
-    window.addEventListener("auc-materials-updated",update);
-    return () => window.removeEventListener("auc-materials-updated",update);
-  }, []);
+  const course = useMemo(()=>courses.find(entry=>entry.code===selectedCode),[selectedCode]);
+  const suggestions = useMemo(()=>{
+    const query=normalize(courseQuery);
+    if (query.length<2) return [] as Course[];
+    const terms=query.split(" ").filter(Boolean);
+    return courses
+      .filter(entry=>{
+        const text=normalize(entry.code+" "+entry.title);
+        return terms.every(term=>text.includes(term));
+      })
+      .sort((a,b)=>{
+        const aCode=normalize(a.code);
+        const bCode=normalize(b.code);
+        const aRank=aCode===query?0:aCode.startsWith(query)?1:2;
+        const bRank=bCode===query?0:bCode.startsWith(query)?1:2;
+        return aRank-bRank||a.code.localeCompare(b.code);
+      }).slice(0,6);
+  },[courseQuery]);
 
-  useEffect(() => {
-    let alive = true;
-    const controller = new AbortController();
-    setLoading(true);
-    setError("");
-    if (!cursor) {
-      setMaterials([]);
-      setNextCursor(null);
+  const groups = useMemo(()=>{
+    const byId=new Map<string,UploadGroup>();
+    for(const file of materials){
+      // Only combine files genuinely uploaded as a bundle; matching titles
+      // alone do not establish that two submissions belong together.
+      const key=file.uploadGroupId && !file.uploadGroupId.startsWith("single-")
+        ? file.uploadGroupId : file.id;
+      if (!byId.has(key)) byId.set(key,{key,files:[]});
+      byId.get(key)!.files.push(file);
     }
-    const timeout = window.setTimeout(async () => {
-      try {
-        const params = new URLSearchParams();
-        if (search.trim()) params.set("q",search.trim());
-        if (type) params.set("type",type);
-        if (semester) params.set("semester",semester);
-        if (cursor) params.set("cursor",cursor);
-        const response = await fetch("/api/material-directory?"+params.toString(),{
+    return [...byId.values()];
+  },[materials]);
+
+  function chooseCourse(entry:Course) {
+    setCourseQuery(entry.code);
+    setSelectedCode(entry.code);
+    setSuggestionsOpen(false);
+    setCursor(null);
+  }
+  function changeCourseInput(value:string) {
+    setCourseQuery(value);
+    const match=courses.find(entry=>
+      normalize(entry.code)===normalize(value) || normalize(entry.title)===normalize(value));
+    setSelectedCode(match?.code||"");
+    setCursor(null);
+    setSuggestionsOpen(true);
+    setActiveSuggestion(0);
+  }
+  function handleCourseKey(event:React.KeyboardEvent<HTMLInputElement>) {
+    if(event.key==="Escape") {setSuggestionsOpen(false);return;}
+    if(!suggestionsOpen||!suggestions.length)return;
+    if(event.key==="ArrowDown") {
+      event.preventDefault();
+      setActiveSuggestion(index=>(index+1)%suggestions.length);
+    }else if(event.key==="ArrowUp"){
+      event.preventDefault();
+      setActiveSuggestion(index=>(index+suggestions.length-1)%suggestions.length);
+    }else if(event.key==="Enter"){
+      event.preventDefault();
+      chooseCourse(suggestions[activeSuggestion]||suggestions[0]);
+    }
+  }
+
+  useEffect(()=>{
+    setupCourseUploadStart();
+    const update=()=>{setCursor(null);setRevision(n=>n+1);};
+    window.addEventListener("auc-materials-updated",update);
+    return ()=>window.removeEventListener("auc-materials-updated",update);
+  },[]);
+
+  useEffect(()=>{
+    let active=true;
+    const controller=new AbortController();
+    if(!cursor){setMaterials([]);setNextCursor(null);}
+    setError("");
+    if(!selectedCode){
+      setLoading(false);
+      setLocked(false);
+      return ()=>{active=false;controller.abort();};
+    }
+    setLoading(true);
+    const timer=window.setTimeout(async()=>{
+      try{
+        const params=new URLSearchParams({courseCode:selectedCode});
+        if(type)params.set("type",type);
+        if(semester)params.set("semester",semester);
+        if(cursor)params.set("cursor",cursor);
+        const response=await fetch("/api/material-directory?"+params.toString(),{
           credentials:"same-origin",cache:"no-store",
           headers:{Accept:"application/json"},signal:controller.signal
         });
-        const data = await response.json().catch(()=>({})) as DirectoryResponse;
-        if (!alive) return;
-        if (response.status === 401 || response.status === 403) {
+        const body=await response.json().catch(()=>({})) as DirectoryResponse;
+        if(!active)return;
+        if(response.status===401||response.status===403){
           setLocked(true);
           setMaterials([]);
           setNextCursor(null);
           return;
         }
-        if (!response.ok) throw new Error(data.error || "Could not load study materials.");
+        if(!response.ok)throw Error(body.error||"Could not load study materials.");
         setLocked(false);
-        const incoming = Array.isArray(data.materials) ? data.materials : [];
-        setMaterials(previous => {
+        const incoming=Array.isArray(body.materials)?body.materials:[];
+        setMaterials(old=>{
           if(!cursor)return incoming;
-          const seen = new Set(previous.map(item=>item.id));
-          return [...previous,...incoming.filter(item=>!seen.has(item.id))];
+          const existing=new Set(old.map(item=>item.id));
+          return [...old,...incoming.filter(item=>!existing.has(item.id))];
         });
-        setNextCursor(data.hasMore && data.nextCursor ? data.nextCursor : null);
-      } catch (failure) {
-        if (!alive || controller.signal.aborted) return;
-        setError(failure instanceof Error ? failure.message : "Could not load study materials.");
-      } finally {
-        if (alive) setLoading(false);
+        setNextCursor(body.hasMore&&body.nextCursor?body.nextCursor:null);
+      }catch(failure){
+        if(!active||controller.signal.aborted)return;
+        setError(failure instanceof Error?failure.message:"Could not load study materials.");
+      }finally{
+        if(active)setLoading(false);
       }
-    },search && !cursor ? 300 : 0);
-    return () => {
-      alive = false;
-      controller.abort();
-      window.clearTimeout(timeout);
-    };
-  },[search,type,semester,cursor,revision]);
-
-  const relatedCourses = useMemo(() => {
-    const query = normalize(search);
-    if (query.length<2) return [];
-    const terms = query.split(" ").filter(Boolean);
-    return courses.filter(course => {
-      const haystack = normalize([course.code,course.title].join(" "));
-      return terms.every(term=>haystack.includes(term));
-    }).slice(0,5);
-  },[search]);
-
-  const resetPage = () => setCursor(null);
-  const hasFilters = Boolean(search || type || semester);
-  const loadingFirstPage = loading && !cursor;
+    },0);
+    return ()=>{active=false;controller.abort();window.clearTimeout(timer);};
+  },[selectedCode,type,semester,cursor,revision]);
 
   return <>
     <main className="materials-hub">
       <div className="materials-hub-inner">
-        <div className="materials-hub-toolbar">
-          <h1>Materials</h1>
-          <button id="course-upload-start" className="materials-primary-action"
-            type="button" disabled={locked} aria-haspopup="dialog"
-            aria-controls="quick-material-upload-modal" aria-expanded="false">
-            <span aria-hidden="true">＋</span> Upload material
-          </button>
-        </div>
-
-        <section className="materials-search-panel" aria-label="Find study materials">
-          <label className="materials-search-field" htmlFor="materials-search-input">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <circle cx="10.8" cy="10.8" r="6.7"/><path d="m16 16 5 5"/>
-            </svg>
-            <input id="materials-search-input" type="search" value={search}
-              onChange={event=>{setSearch(event.target.value);resetPage();}}
-              autoComplete="off" placeholder="Search MATH 2010, midterms, lecture notes, professors..."
-              aria-label="Search materials by title, course, or professor"/>
-          </label>
-          <div className="materials-filter-row">
-            <div className="materials-type-filters" role="group" aria-label="Filter by material type">
-              {filters.map(filter=><button key={filter.value} type="button"
-                className={"materials-type-chip"+(filter.value===type?" is-selected":"")}
-                aria-pressed={filter.value===type}
-                onClick={()=>{setType(filter.value);resetPage();}}>{filter.label}</button>)}
-            </div>
-          </div>
-        </section>
-
-        <section className="materials-directory-section" aria-labelledby="materials-directory-title">
-          <div className="materials-directory-top">
-            <div>
-              <span className="materials-section-kicker">The library</span>
-              <h2 id="materials-directory-title">{hasFilters ? "Search results" : "Recently uploaded"}</h2>
-              <p>Browse study files from newest to oldest. Open or download a file, or visit its course page.</p>
-            </div>
-            <label className="materials-semester-label" htmlFor="materials-semester-select">
-              Semester
-              <select id="materials-semester-select" value={semester}
-                onChange={event=>{setSemester(event.target.value);resetPage();}}>
-                <option value="">All semesters</option>
-                {["Fall 2026","Summer 2026","Spring 2026","Winter 2026","Fall 2025","Summer 2025","Spring 2025","Winter 2025","Fall 2024","Spring 2024","Fall 2023","Spring 2023","Fall 2022","Spring 2022"].map(item=>
-                  <option key={item} value={item}>{item}</option>)}
-              </select>
-            </label>
+        <section className="material-finder" aria-labelledby="material-finder-title">
+          <div className="material-finder-head">
+            <h1 id="material-finder-title">Materials</h1>
+            <button id="course-upload-start" className="material-finder-upload"
+              type="button" disabled={locked} aria-haspopup="dialog"
+              aria-controls="quick-material-upload-modal" aria-expanded="false">
+              <span aria-hidden="true">＋</span> Upload
+            </button>
           </div>
 
-          {locked ? <div className="materials-directory-empty">
-            <div className="materials-empty-symbol" aria-hidden="true">🔒</div>
-            <h3>Study materials are for verified AUC students.</h3>
-            <p>Sign in with your verified university email to browse, preview and download files shared by students.</p>
-            <a href="/login" className="materials-primary-link">Sign in to browse</a>
-          </div> : <>
-            {error && <div className="materials-directory-error" role="alert">
-              <p>{error}</p>
-              <button type="button" onClick={()=>setRevision(n=>n+1)}>Try again</button>
+          <div className="material-finder-field">
+            <label htmlFor="material-finder-course">Course</label>
+            <div className="material-finder-autocomplete">
+              <input id="material-finder-course" type="search"
+                value={courseQuery} onChange={event=>changeCourseInput(event.target.value)}
+                onFocus={()=>setSuggestionsOpen(true)}
+                onBlur={()=>setSuggestionsOpen(false)}
+                onKeyDown={handleCourseKey}
+                placeholder="Search a course code or name..."
+                autoComplete="off"
+                role="combobox" aria-autocomplete="list"
+                aria-expanded={suggestionsOpen&&suggestions.length>0}
+                aria-controls="material-finder-suggestions"/>
+              {suggestionsOpen&&suggestions.length>0&&<div id="material-finder-suggestions"
+                className="material-finder-suggestions" role="listbox"
+                aria-label="Matching courses">
+                {suggestions.map((entry,index)=>
+                  <button key={entry.code} type="button" role="option"
+                    aria-selected={index===activeSuggestion}
+                    className={index===activeSuggestion?"is-active":""}
+                    onMouseDown={event=>event.preventDefault()}
+                    onClick={()=>chooseCourse(entry)}>
+                    <strong>{entry.code}</strong><span>{entry.title}</span>
+                  </button>)}
+              </div>}
+            </div>
+          </div>
+
+          <fieldset className="material-finder-types">
+            <legend>Material type</legend>
+            <div className="material-finder-radios">
+              {materialTypes.map(option=><label key={option.label} className="material-finder-radio">
+                <input type="radio" name="finder-type" value={option.value}
+                  checked={type===option.value}
+                  onChange={()=>{setType(option.value);setCursor(null);}}/>
+                <span>{option.label}</span>
+              </label>)}
+            </div>
+          </fieldset>
+
+          <div className="material-finder-field">
+            <label htmlFor="material-finder-semester">Semester</label>
+            <select id="material-finder-semester" value={semester}
+              onChange={event=>{setSemester(event.target.value);setCursor(null);}}>
+              <option value="">All semesters</option>
+              {semesterOptions.map(value=><option value={value} key={value}>{value}</option>)}
+            </select>
+          </div>
+
+          <section className="material-finder-results" aria-labelledby="material-finder-results-title">
+            <div className="material-finder-results-head">
+              <h2 id="material-finder-results-title">Available materials</h2>
+              {selectedCode&&!locked&&!error&&!loading&&<span aria-live="polite">
+                {materials.length}{nextCursor?"+":""} {materials.length===1&&!nextCursor?"result":"results"}
+              </span>}
+            </div>
+            {!selectedCode&&<div className="material-finder-message">
+              Search for a course above to see its past exams, slides and notes.
             </div>}
-            {loadingFirstPage && <div className="materials-file-list" aria-label="Loading materials" aria-busy="true">
-              {Array.from({length:5},(_,i)=><div className="materials-file-skeleton" key={i} aria-hidden="true"><span/><div><i/><i/></div><span/></div>)}
+            {selectedCode&&course&&!locked&&<div className="material-finder-course-context">
+              <span>{course.code} · {course.title}</span>
+              <a href={courseHref(course.code)}>View course page</a>
             </div>}
-            {!!materials.length && <div className="materials-file-list">
-              {materials.map(file=>{
-                const name = file.title || file.fileName || "Course material";
-                const courseTitle = file.courseTitle || courseIndex.get(normalize(file.courseCode)) || "";
-                const icon = iconName(file);
-                const details = [
-                  file.professor,
-                  file.semester,
-                  formatSize(file.size),
-                  formatDate(file.createdAt)
-                ].filter(Boolean);
-                return <article className="materials-file-row" key={file.id}>
-                  <div className="materials-file-icon" aria-hidden="true">
-                    {icon ? <img src={icon} alt=""/> : <span>FILE</span>}
+            {locked&&<div className="material-finder-message">
+              <strong>Verified AUC account required.</strong>
+              <span> <a href="/login">Sign in</a> to view and download materials.</span>
+            </div>}
+            {error&&<div className="material-finder-message is-error" role="alert">
+              {error} <button type="button" onClick={()=>setRevision(n=>n+1)}>Try again</button>
+            </div>}
+            {selectedCode&&loading&&!cursor&&!locked&&
+              <div className="material-finder-loading" role="status" aria-label="Loading materials">
+                {Array.from({length:3},(_,index)=><div key={index}><span/><span/></div>)}
+              </div>}
+            {!locked&&groups.length>0&&<div className="material-finder-list">
+              {groups.map(group=>{
+                if(group.files.length===1)return <FileRow file={group.files[0]} key={group.key}/>;
+                const first=group.files[0];
+                return <details key={group.key} className="material-finder-group">
+                  <summary className="material-finder-group-head">
+                    <span className="material-finder-file-icon"><DocumentIcon folder/></span>
+                    <span className="material-finder-file-copy">
+                      <span className="material-finder-file-name">{first.title||"Material bundle"}</span>
+                      <span className="material-finder-file-info">
+                        {group.files.length} files{first.semester?" · "+first.semester:""}
+                      </span>
+                    </span>
+                    <span className="material-finder-expand" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div className="material-finder-group-children">
+                    {group.files.map(file=><FileRow file={file} key={file.id} child/>)}
                   </div>
-                  <div className="materials-file-details">
-                    <div className="materials-file-tagline">
-                      <span className="materials-file-type">{file.materialType || "Material"}</span>
-                      {file.courseCode && <span className="materials-file-course-code">{file.courseCode}</span>}
-                    </div>
-                    <h3>{name}</h3>
-                    {courseTitle && <p className="materials-file-course-title">{courseTitle}</p>}
-                    <p className="materials-file-meta">{details.join(" · ")}</p>
-                  </div>
-                  <div className="materials-file-actions">
-                    {file.downloadUrl && <a className="materials-download-link" href={file.downloadUrl}
-                      target="_blank" rel="noopener noreferrer">Download <span aria-hidden="true">↗</span></a>}
-                    {file.courseCode && <a className="materials-course-link" href={courseLink(file.courseCode)}>View course</a>}
-                  </div>
-                </article>;
+                </details>;
               })}
             </div>}
-            {!loading && !materials.length && !error && <div className="materials-directory-empty">
-              <div className="materials-empty-symbol" aria-hidden="true">⌕</div>
-              <h3>{hasFilters ? "No matching files on this page." : "No materials uploaded yet."}</h3>
-              <p>{nextCursor ? "Try browsing older uploads to find more matches." :
-                hasFilters ? "Try a different course code or remove a filter." :
-                "When students upload their first files, they’ll appear here."}</p>
-              {hasFilters && <button type="button" className="materials-clear-filters"
-                onClick={()=>{setSearch("");setType("");setSemester("");resetPage();}}>Clear filters</button>}
-            </div>}
-            {nextCursor && !error && <div className="materials-load-more">
-              <button type="button" onClick={()=>setCursor(nextCursor)} disabled={loading}>
-                {loading ? "Loading older files..." : "Load more materials"}
+            {selectedCode&&!locked&&!loading&&!error&&materials.length===0&&
+              <div className="material-finder-message">
+                {nextCursor ? "No matches among the newest uploads. Load older files to keep looking." :
+                  "No matching materials yet. Try another type or semester."}
+              </div>}
+            {nextCursor&&!locked&&!error&&<div className="material-finder-pagination">
+              <button type="button" disabled={loading} onClick={()=>setCursor(nextCursor)}>
+                {loading?"Loading...":"Load older materials"}
               </button>
             </div>}
-          </>}
-
-          {!!relatedCourses.length && <div className="materials-course-suggestions">
-            <div className="materials-course-suggestions-heading">
-              <h3>Matching courses</h3>
-              <p>Looking for a particular course? Go straight to its material collection.</p>
-            </div>
-            <div className="materials-course-suggestion-list">
-              {relatedCourses.map(course=><a href={courseLink(course.code)} key={course.code}>
-                <strong>{course.code}</strong><span>{course.title}</span><span aria-hidden="true">↗</span>
-              </a>)}
-            </div>
-          </div>}
+          </section>
         </section>
       </div>
     </main>

@@ -22,8 +22,9 @@ const materialTypes = new Set([
 const clean = (value: unknown, max: number) => String(value ?? "").trim().replace(/\s+/g," ").slice(0,max);
 const normalize = (value: unknown) => clean(value,500).toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
 
-function matchesMaterial(data: Record<string,unknown>, terms: string[], type: string, semester: string) {
+function matchesMaterial(data: Record<string,unknown>, terms: string[], type: string, semester: string, courseCode: string) {
   if (clean(data.status,40).toLowerCase() === "rejected") return false;
+  if (courseCode && normalize(data.courseCode) !== courseCode) return false;
   if (type && normalize(data.materialType || data.type || data.category) !== type) return false;
   if (semester && normalize(data.semester) !== semester) return false;
   if (!terms.length) return true;
@@ -51,6 +52,9 @@ export async function GET(request: NextRequest) {
     const params = request.nextUrl.searchParams;
     const rawQuery = clean(params.get("q"),100);
     const terms = normalize(rawQuery).split(/\s+/).filter(Boolean);
+    // A selected course is an exact filter, not a loose text match that could
+    // accidentally include another course with a similar code.
+    const courseCode = normalize(clean(params.get("courseCode"),40));
     const rawType = normalize(params.get("type"));
     const type = rawType && materialTypes.has(rawType) ? rawType : "";
     const semester = normalize(clean(params.get("semester"),80));
@@ -84,7 +88,7 @@ export async function GET(request: NextRequest) {
         lastId = doc.id;
         scanned++;
         const data = doc.data();
-        if (matchesMaterial(data,terms,type,semester))
+        if (matchesMaterial(data,terms,type,semester,courseCode))
           materials.push(serializeMaterialData(doc.id,data));
         if (materials.length >= pageSize) break;
       }

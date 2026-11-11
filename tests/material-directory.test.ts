@@ -204,9 +204,31 @@ test("the main route changes to materials while individual course pages stay on 
   assert.match(component,/setupCourseUploadStart/);
   // The large decorative hero was removed; keep the upload action accessible.
   assert.doesNotMatch(component,/materials-hub-hero|Find the material\./);
-  assert.match(component,/materials-hub-toolbar/);
+  assert.match(component,/material-finder-head/);
+  assert.match(component,/material-finder-course/);
+  assert.match(component,/role="combobox"/);
+  assert.match(component,/material-finder-radios/);
+  assert.match(component,/material-finder-semester/);
+  assert.match(component,/material-finder-results-title/);
+  assert.match(component,/uploadGroupId/);
+  assert.match(component,/DownloadIcon/);
   assert.match(component,/id="course-upload-start"/);
   const css=read("features/courses/materials-directory.css");
   assert.doesNotMatch(css,/materials-hub-hero|materials-art-/);
+  assert.match(css,/material-finder-file/);
+  assert.doesNotMatch(component,/Recently uploaded|materials-type-chip/);
 
+});
+
+test("course selection is an exact filter, not a fuzzy match with another course",async()=>{
+  const app=harness({files:[
+    demo(1,{courseCode:"MACT 1121",title:"Final exam",materialType:"Past exam"}),
+    demo(2,{courseCode:"MACT 1122",title:"Final exam",materialType:"Past exam"}),
+    demo(3,{courseCode:"MACT 1121",title:"Lecture notes",materialType:"Notes"})
+  ]});
+  const results=await app.get("courseCode=MACT%201121&type=Past%20exam");
+  assert.equal(results.status,200);
+  assert.deepEqual(Array.from(results.body.materials).map((file:any)=>file.id),["file-0001"]);
+  const all=await app.get("courseCode=MACT%201121");
+  assert.equal(all.body.materials.length,2);
 });
