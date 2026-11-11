@@ -44,7 +44,7 @@ function setupCourseUploadStart() {
           ? getCourseByCode(courseInput.value)
           : null;
       },
-      onSuccess: async function () {
+      onSuccess: function () {
         const courseCode = getSelectedCourseCode();
         const currentCourse = courseCode ? getCourseByCode(courseCode) : null;
         if (currentCourse) {
@@ -60,13 +60,9 @@ function setupCourseUploadStart() {
               new Event("change", { bubbles: true })
             );
           }
-          await loadCourseMaterials(currentCourse);
-        } else {
-          await loadRecentMaterials();
+          return loadCourseMaterials(currentCourse);
         }
-        // The file-first hub uses its own paginated directory instead of
-        // the legacy six-item random-materials preview.
-        window.dispatchEvent(new Event("auc-materials-updated"));
+        return loadRecentMaterials();
       }
     });
 
