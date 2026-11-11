@@ -19,6 +19,7 @@ jobs:
       - run: npm run test:cleanup
       - run: npm run test:faq
       - run: npm run test:auth
+      - run: npm run test:auc-id
       - run: npm run test:prerequisites
       - run: npm run typecheck
       - run: npm run build

@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const admin = require("./firebaseAdmin").default;
+const { claimVerifiedAucId } = require("./aucIdClaims");
 const {
   encryptTotpSecret,
   decryptTotpSecret
@@ -689,6 +690,9 @@ async function revokeUserSiteSession(uid: any, sessionId: any, revokedReason: an
 async function createSiteSessionFromIdToken(idToken: any, res: any, req: any) {
   const decodedToken = await admin.auth().verifyIdToken(idToken);
   await ensureDecodedUserHasAllowedAucEmail(decodedToken, "continue");
+  // Do this before writing any session cookies so registration is finalized
+  // only for a verified AUC email, regardless of the login method.
+  await claimVerifiedAucId(decodedToken.uid);
 
   const fallbackSessionPrefix = "idtoken.";
   let sessionCookie = "";

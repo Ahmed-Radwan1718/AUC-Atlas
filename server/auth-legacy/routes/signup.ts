@@ -10,6 +10,7 @@ const {
   getRequestIp,
   consumeSecurityRateLimit
 } = require("../_lib/securityRateLimits");
+const { ensureAucIdCanCreateAccount } = require("../_lib/aucIdClaims");
 
 const SIGNUP_RATE_LIMIT_WINDOW_MS =
   30 * 60 * 1000;
@@ -36,71 +37,8 @@ function hasValidAucIdFormat(value: any) {
   return /^900\d{6}$/.test(cleanAucId(value));
 }
 
-function getAucIdLookupKey(value: any) {
-  const aucId = cleanAucId(value);
-
-  return hasValidAucIdFormat(aucId) ? aucId : "";
-}
-
 function createInvalidAucIdError() {
-  const error = new Error("AUC ID number must start with 900 and be 9 digits total.");
-  error.statusCode = 400;
-  return error;
-}
-
-function createAucIdInUseError() {
-  const error = new Error("This AUC ID number is already used by another account.");
-  error.statusCode = 409;
-  return error;
-}
-
-async function ensureAucIdCanCreateAccount(aucId: any) {
-  const aucIdLookupKey = getAucIdLookupKey(aucId);
-
-  if (!aucIdLookupKey) {
-    throw createInvalidAucIdError();
-  }
-
-  const db = admin.firestore();
-  const aucIdReservationRef = db.collection("accountAucIds").doc(aucIdLookupKey);
-  const aucIdReservationDoc = await aucIdReservationRef.get();
-
-  if (aucIdReservationDoc.exists) {
-    throw createAucIdInUseError();
-  }
-
-  const [exactAucIdSnapshot, normalizedAucIdSnapshot] = await Promise.all([
-    db.collection("users").where("aucId", "==", aucIdLookupKey).limit(1).get(),
-    db.collection("users").where("aucIdLookupKey", "==", aucIdLookupKey).limit(1).get()
-  ]);
-
-  if (!exactAucIdSnapshot.empty || !normalizedAucIdSnapshot.empty) {
-    throw createAucIdInUseError();
-  }
-
-  return aucIdLookupKey;
-}
-
-async function reserveAccountAucId(aucId: any, uid: any) {
-  const aucIdLookupKey = await ensureAucIdCanCreateAccount(aucId);
-  const aucIdRef = admin.firestore().collection("accountAucIds").doc(aucIdLookupKey);
-
-  try {
-    await aucIdRef.create({
-      uid,
-      aucId: aucIdLookupKey,
-      aucIdLookupKey,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-  } catch (error: any) {
-    if (String(error.code) === "6" || error.code === "already-exists" || /already exists/i.test(error.message || "")) {
-      throw createAucIdInUseError();
-    }
-
-    throw error;
-  }
-
-  return { aucIdLookupKey, aucIdRef };
+  return Object.assign(new Error("AUC ID number must start with 900 and be 9 digits total."), { statusCode: 400 });
 }
 
 async function consumeSignupRateLimits(
@@ -254,16 +192,15 @@ export default async function handler(req: LegacyRequest, res: LegacyReply) {
       emailVerified: false
     });
 
-    let aucIdReservation = null;
     const userRef = admin.firestore().collection("users").doc(userRecord.uid);
-
     try {
-      aucIdReservation = await reserveAccountAucId(aucId, userRecord.uid);
-
+      // An unverified registration does not reserve or block the student ID.
+      // All verified login methods claim it atomically on their first session.
       await userRef.set({
         fullName,
         aucId,
-        aucIdLookupKey: aucIdReservation.aucIdLookupKey,
+        aucIdLookupKey: aucId,
+        aucIdClaimStatus: "pending_verification",
         email,
         authProvider: "password",
         emailVerified: false,
@@ -273,10 +210,6 @@ export default async function handler(req: LegacyRequest, res: LegacyReply) {
 
       await sendFirebaseSignupVerificationEmail(userRecord.uid);
     } catch (error: any) {
-      if (aucIdReservation && aucIdReservation.aucIdRef) {
-        await aucIdReservation.aucIdRef.delete().catch(function () {});
-      }
-
       await userRef.delete().catch(function () {});
       await admin.auth().deleteUser(userRecord.uid).catch(function () {});
       throw error;
