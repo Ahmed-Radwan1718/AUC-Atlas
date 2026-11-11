@@ -89,7 +89,11 @@ function harness(initial: {
       return { default: firebase };
     }
   }, { filename: "aucIdClaims.ts" });
-  return { ...module.exports, users, reservations, auth };
+  const claims = module.exports as {
+    ensureAucIdCanCreateAccount: (id: string) => Promise<string>;
+    claimVerifiedAucId: (uid: string) => Promise<void>;
+  };
+  return { ...claims, users, reservations, auth };
 }
 
 test("signup allows unverified legacy reservations and pending user profiles", async () => {
