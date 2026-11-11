@@ -13,7 +13,7 @@
 }
 .gpa-page *, .gpa-page *::before, .gpa-page *::after { box-sizing: border-box; }
 .gpa-page [hidden] { display: none !important; }
-.gpa-inner { width: min(1380px, calc(100% - 48px)); margin: 0 auto; }
+.gpa-inner { width: min(1220px, calc(100% - 48px)); margin: 0 auto; }
 
 .gpa-header {
   display: flex;
