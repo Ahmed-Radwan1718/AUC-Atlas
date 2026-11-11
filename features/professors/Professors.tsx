@@ -267,7 +267,7 @@ export default function Professors() {
             </div>
             {reviewsLocked && <p className="professors-empty" role="status">
               <a href="/login">Sign in with your verified AUC account</a> to see professor ratings and reviews.
-            </p>
+            </p>}
             <section className="professors-grid" id="professors-grid" ref={gridRef} aria-label={loading?"Loading professors and reviews":"Professor list"}
               aria-busy={loading}>
               {loading ? Array.from({length:4},(_,index)=><div className="professor-loading-card" aria-hidden="true" key={index}>
