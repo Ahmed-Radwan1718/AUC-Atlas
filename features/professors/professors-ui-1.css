@@ -197,18 +197,6 @@
       cursor: pointer;
     }
 
-    .professors-search-box input:focus {
-      border-color: rgba(23, 23, 23, 0.28);
-      background: rgba(255, 255, 255, 0.96);
-      box-shadow: none;
-      transform: none;
-    }
-
-    .professors-search-box input:focus-visible {
-      outline: 2px solid rgba(23, 23, 23, 0.48);
-      outline-offset: 2px;
-    }
-
 
     /* Keep the viewport width stable while filtering short and long grids. */
     html:has(.professors-page) {
