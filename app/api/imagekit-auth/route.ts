@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { optionalSessionUser } from "../../../server/session";
 import { authorizeMaterial, cancelMaterial, MaterialUploadError, verifiedMaterialUser } from "../../../server/materialUpload";
+import { RateLimitError } from "../../../server/security";
 
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
@@ -18,7 +19,7 @@ export async function POST(request:NextRequest){
     }
     return NextResponse.json(await authorizeMaterial(user,body),{headers});
   }catch(error){
-    const status=error instanceof MaterialUploadError?error.statusCode:500;
-    return NextResponse.json({error:error instanceof Error?error.message:"Could not prepare upload."},{status,headers});
+    const status=error instanceof MaterialUploadError?error.statusCode:error instanceof RateLimitError?429:500;
+    return NextResponse.json({error:error instanceof Error?error.message:"Could not prepare upload."},{status,headers:{...headers,...(error instanceof RateLimitError?{"Retry-After":String(error.retryAfterSeconds)}:{})}});
   }
 }

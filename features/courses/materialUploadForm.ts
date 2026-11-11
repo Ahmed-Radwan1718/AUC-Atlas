@@ -284,28 +284,6 @@ function slugifyMaterialValue(value) {
       }
     );
 
-    formData.append(
-      "publicKey",
-      String(authorization && authorization.publicKey || "")
-    );
-    formData.append(
-      "token",
-      String(authorization && authorization.token || "")
-    );
-    formData.append(
-      "expire",
-      String(authorization && authorization.expire || "")
-    );
-    formData.append(
-      "signature",
-      String(
-        authorization &&
-        authorization.signature
-          ? authorization.signature
-          : ""
-      )
-    );
-
     return new Promise(function (resolve, reject) {
       const request = new XMLHttpRequest();
 
@@ -653,12 +631,11 @@ function slugifyMaterialValue(value) {
                 imagekitFilePath
               ) ||
               uploadUrl !==
-                "https://upload.imagekit.io/api/v1/files/upload" ||
-              !auth.publicKey ||
-              !auth.signature ||
-              !auth.token ||
-              !Number.isSafeInteger(Number(auth.expire)) ||
-              Number(auth.expire) <= Date.now() / 1000 ||
+                "https://upload.imagekit.io/api/v2/files/upload" ||
+              !auth.uploadParameters ||
+              !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(
+                String(auth.uploadParameters.token || "")
+              ) ||
               !auth.uploadParameters ||
               auth.uploadParameters.fileName !==
                 imagekitFilePath.split("/").pop() ||
@@ -666,7 +643,8 @@ function slugifyMaterialValue(value) {
                 "/auc-atlas/materials" ||
               auth.uploadParameters.isPrivateFile !== "true" ||
               auth.uploadParameters.useUniqueFileName !== "false" ||
-              auth.uploadParameters.overwriteFile !== "false"
+              auth.uploadParameters.overwriteFile !== "false" ||
+              !String(auth.uploadParameters.checks || "").includes('"file.size"')
             ) {
               throw new Error(
                 "The secure ImageKit upload authorization is incomplete."

@@ -2,7 +2,8 @@ import { randomBytes, randomUUID, createHmac } from "node:crypto";
 import { FieldValue, Timestamp, type DocumentReference, type DocumentData } from "firebase-admin/firestore";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { firebaseAuth, firestore } from "./firebase";
-import { allowedMime, maxMaterialBytes, safeFileName, MaterialFileError } from "./materialFiles";
+import { allowedMime, maxMaterialBytes, safeFileName } from "./materialFiles";
+import { consumeRateLimit } from "./security";
 import { serializeMaterialData } from "./materials";
 
 export class MaterialUploadError extends Error {
@@ -18,6 +19,30 @@ const pathPattern = /^\/auc-atlas\/materials\/[a-f0-9]{36}\.(?:pdf|docx?|pptx?|x
 const idPattern = /^[a-f0-9]{24}$/i;
 const authorizationPattern = /^[a-f0-9]{36}$/i;
 const mimeFor = (fileName: string) => allowedMime[ext(fileName)] || "";
+const materialFolder = "/auc-atlas/materials";
+const maxActiveUploads = 2;
+const uploadGraceMs = 5 * 60 * 1000;
+function signedV2Upload(publicKey: string, privateKey: string, filePath: string, fileSize: number, expiry: number) {
+  // ImageKit V2 signs ALL upload parameters. V1 signed only token + expiry,
+  // allowing a client to change destination, size limits, or privacy settings.
+  const fields = {
+    fileName: filePath.split("/").pop()!,
+    folder: materialFolder,
+    isPrivateFile: "true",
+    useUniqueFileName: "false",
+    overwriteFile: "false",
+    checks: '"file.size" > 0 AND "file.size" <= ' + fileSize
+  };
+  const encode = (data: unknown) => Buffer.from(JSON.stringify(data)).toString("base64url");
+  const header = encode({alg: "HS256",typ: "JWT",kid: publicKey});
+  const payload = encode({...fields,iat:Math.floor(Date.now()/1000),exp:expiry,jti:randomUUID()});
+  const signingInput = header + "." + payload;
+  const signature = createHmac("sha256",privateKey).update(signingInput).digest("base64url");
+  return {
+    uploadUrl: "https://upload.imagekit.io/api/v2/files/upload",
+    uploadParameters: {...fields,token:signingInput + "." + signature}
+  };
+}
 const maxQuota = () => {
   const value = Number(process.env.COURSE_MATERIAL_USER_QUOTA_BYTES);
   return Number.isSafeInteger(value) && value > 0 ? Math.min(value, 5*1024*1024*1024) : 250*1024*1024;
@@ -67,37 +92,65 @@ export async function authorizeMaterial(user: DecodedIdToken, body: Record<strin
   if (!courseCode || !professor || !semester || !materialType || !title || !fileType ||
     !Number.isSafeInteger(fileSize) || fileSize <= 0 || fileSize > maxBytes)
     throw new MaterialUploadError("Choose a supported course-material file up to 25MB.",400);
-  if (await totalStoredBytes(profile.uid) + fileSize > maxQuota())
-    throw new MaterialUploadError("Your course-material storage quota has been reached.",413);
-
-  const {publicKey, privateKey} = imageKitKeys();
-  const authorizationId = randomBytes(18).toString("hex");
-  const filePath = "/auc-atlas/materials/" + authorizationId + "." + ext(fileName);
-  if (!pathPattern.test(filePath)) throw new MaterialUploadError("Could not prepare the ImageKit upload.",400);
-  const ttl = authTtl();
-  const expire = Math.floor(Date.now()/1000) + ttl;
-  const token = randomUUID();
-  const signature = createHmac("sha1", privateKey).update(token+expire).digest("hex");
-  const date = new Date(expire*1000);
-  const db = firestore();
-  await db.collection("materialUploadAuthorizations").doc(authorizationId).set({
-    authorizationId, uploaderUid:profile.uid, courseCode, courseTitle, professor, semester,
-    materialType, title, isAnonymous, fileName, uploadFileName:fileName,
-    fileSize, fileType, storageKey:filePath, storageProvider:"imagekit",
-    folder:"/auc-atlas/materials", uploaderDisplayName:profile.displayName,
-    uploaderPhotoURL:profile.photoURL, createdAt:FieldValue.serverTimestamp(),
-    createdAtIso:new Date().toISOString(), expiresAt:Timestamp.fromDate(date),
-    consumedAt:null, cancelledAt:null
+  // Shared Firestore rate limit applies to authorization issuance, not downloads.
+  await consumeRateLimit({
+    scope:"material-upload-authorization-user",identifier:profile.uid,
+    maxAttempts:10,windowMs:60*60*1000,
+    message:"Too many upload attempts. You can request up to 10 upload authorizations per hour."
   });
+
+  const {publicKey,privateKey} = imageKitKeys();
+  const authorizationId = randomBytes(18).toString("hex");
+  const filePath = materialFolder + "/" + authorizationId + "." + ext(fileName);
+  if(!pathPattern.test(filePath))throw new MaterialUploadError("Could not prepare the ImageKit upload.",400);
+  const expiry = Math.floor(Date.now()/1000) + authTtl();
+  const date = new Date(expiry*1000);
+  const db = firestore();
+  const ref = db.collection("materialUploadAuthorizations").doc(authorizationId);
+  const savedQuery = db.collection("courseMaterials").where("uploaderUid","==",profile.uid);
+  const pendingQuery = db.collection("materialUploadAuthorizations").where("uploaderUid","==",profile.uid);
+  const limitRef = db.collection("materialUploadLimits").doc(profile.uid);
+
+  await db.runTransaction(async tx => {
+    // Both pending reservations and completed uploads are counted in this
+    // transaction, so parallel authorization requests cannot bypass quotas.
+    const [_,saved,authorizations] = await Promise.all([
+      tx.get(limitRef),tx.get(savedQuery),tx.get(pendingQuery)
+    ]);
+    const now = Date.now();
+    const pending = authorizations.docs.map(doc => doc.data()).filter(data =>
+      !data.consumedAt && !data.cancelledAt && !data.cleanupStartedAt &&
+      expiryMillis(data.expiresAt) + uploadGraceMs > now
+    );
+    const active = pending.filter(data => expiryMillis(data.expiresAt) > now);
+    if(active.length>=maxActiveUploads)
+      throw new MaterialUploadError("Finish or cancel a pending upload before starting another (maximum 2).",429);
+    const storedBytes = saved.docs.reduce((sum,doc) => {
+      const data=doc.data();
+      return clean(data.status,40).toLowerCase()==="rejected" ? sum :
+        sum+Math.max(0,Number(data.size)||0);
+    },0);
+    const pendingBytes = pending.reduce((sum,data) => sum+Math.max(0,Number(data.fileSize)||0),0);
+    if(storedBytes+pendingBytes+fileSize>maxQuota())
+      throw new MaterialUploadError("Your storage quota, including pending uploads, has been reached.",413);
+
+    // Serializes concurrent authorizations for the same user; avoids query
+    // phantom races when both requests start with identical pending counts.
+    tx.set(limitRef,{lastAuthorizationAt:FieldValue.serverTimestamp()},{merge:true});
+    tx.create(ref,{
+      authorizationId,uploaderUid:profile.uid,courseCode,courseTitle,professor,semester,
+      materialType,title,isAnonymous,fileName,uploadFileName:fileName,
+      fileSize,fileType,storageKey:filePath,storageProvider:"imagekit",
+      folder:materialFolder,uploaderDisplayName:profile.displayName,
+      uploaderPhotoURL:profile.photoURL,createdAt:FieldValue.serverTimestamp(),
+      createdAtIso:new Date().toISOString(),expiresAt:Timestamp.fromDate(date),
+      consumedAt:null,cancelledAt:null
+    });
+  });
+  const signed = signedV2Upload(publicKey,privateKey,filePath,fileSize,expiry);
   return {
-    authorizationId, storageKey:filePath, imagekitFilePath:filePath,
-    uploadUrl:"https://upload.imagekit.io/api/v1/files/upload",
-    publicKey, token, expire, signature,
-    uploadParameters:{
-      fileName:filePath.split("/").pop(), folder:"/auc-atlas/materials",
-      isPrivateFile:"true",useUniqueFileName:"false",overwriteFile:"false"
-    },
-    fileType, expiresAt:date.toISOString(),
+    authorizationId,storageKey:filePath,imagekitFilePath:filePath,
+    ...signed,fileType,expiresAt:date.toISOString(),
     limits:{maxFileBytes:maxBytes,userQuotaBytes:maxQuota()}
   };
 }

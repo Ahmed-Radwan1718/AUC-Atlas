@@ -61,3 +61,35 @@ v2 migration. The original repository was only used as a read-only reference.
 Do not reintroduce the original `vercel.json` rewrites or security headers:
 Next.js handles v2's dynamic professor/course routes, and the response
 security headers are already configured in `next.config.ts`.
+
+## Upload abuse controls (v2)
+
+- The upload authorizer requires a verified AUC session and uses a Firestore-backed limit
+  of **10 authorization attempts per account per rolling hour**. Cancelled/failed
+  attempts still count against this limit.
+- A student may have at most **two unexpired, unconsumed upload authorizations**.
+  Authorizations are reserved atomically with a per-user limit document, so parallel
+  requests cannot bypass the concurrent-upload check.
+- The student's **250 MB default storage quota includes registered course materials
+  and pending upload sizes**. Five minutes of grace after token expiry remain
+  reserved while a successful upload can still be registered.
+- ImageKit **V2** upload JWTs bind the authorized filename, fixed
+  `/auc-atlas/materials` folder, private-file flag, no-overwrite settings, and
+  a server-enforced size check to a short-lived signed token. The private key stays
+  server-side. V1 upload signatures are no longer issued.
+- Cancelled authorizations stop reserving quota immediately. If a client uploads
+  after cancelling (while a previously issued token is still valid), the scheduled
+  cleanup will remove the unregistered object after expiry.
+- The existing scheduled cleanup continues deleting abandoned files and removing
+  consumed authorization metadata. It does not change any registered material.
+
+### Production verification
+
+ImageKit V2 is a provider API change. Before relying on production uploads, test one
+PDF and one Office document on a staging ImageKit account, and confirm that exceeding
+the signed file-size limit, modifying the upload folder or removing `isPrivateFile`
+is rejected by ImageKit. GitHub CI uses mocks, not live ImageKit credentials.
+
+The scheduled cleanup processes at most 100 expired authorizations per daily run.
+Monitor `scanned` and `failed` counts as traffic increases; a saturated queue
+needs a higher-capacity cleanup strategy or a more frequent schedule where supported.
