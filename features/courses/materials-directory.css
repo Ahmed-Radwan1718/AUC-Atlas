@@ -1,211 +1,409 @@
-/* Minimal course-first material finder; individual course pages keep their styles. */
+/* Search-first Materials hub. Course details and upload dialogs retain their own styles. */
 .materials-hub {
   min-height: 100vh;
-  padding: 118px 20px 100px;
+  padding: 132px 22px 100px;
   background: #f7f4ee;
-  color: #22221f;
+  color: #232320;
 }
 .materials-hub * { box-sizing: border-box; }
 .materials-hub-inner {
-  width: min(820px, 100%);
+  width: min(940px, 100%);
   margin: 0 auto;
 }
 .material-finder {
-  background: #fffdfa;
-  border: 1px solid #dedbd6;
-  border-radius: 18px;
-  padding: 26px 30px 24px;
+  position: relative;
+  width: 100%;
+  margin: 0;
 }
 .material-finder-head {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 23px;
+  gap: 24px;
+  margin: 0 0 25px;
 }
 .material-finder-head h1 {
+  margin: 0 0 8px;
+  font-size: clamp(25px, 3.4vw, 34px);
+  font-weight: 750;
+  line-height: 1.16;
+  letter-spacing: -.035em;
+}
+.material-finder-head p {
   margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -.015em;
-  line-height: 1.2;
+  color: #77736b;
+  font-size: 14px;
+  line-height: 1.55;
 }
 .material-finder-upload {
-  border: 1px solid #e6ddcc;
-  background: #f5eee2;
-  color: #4b3a22;
-  padding: 7px 12px;
-  min-height: 33px;
-  border-radius: 9px;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  transition: background .16s ease;
-}
-.material-finder-upload:hover:not(:disabled) { background: #eee1cb; }
-.material-finder-upload:disabled { opacity: .45; cursor: not-allowed; }
-.material-finder-upload span { font-size: 17px; line-height: 1; }
-.material-finder-field { margin: 0 0 20px; }
-.material-finder-field > label, .material-finder-types legend {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 13px;
-  font-weight: 650;
-  color: #62605b;
-}
-.material-finder-autocomplete { position: relative; }
-.material-finder-field input,
-.material-finder-field select {
-  display: block;
-  width: 100%;
-  height: 43px;
-  border: 1px solid #d8d7d4;
-  border-radius: 25px;
-  padding: 0 18px;
-  background: #fff;
-  color: #252522;
+  justify-content: center;
+  flex: none;
+  gap: 5px;
+  min-height: 35px;
+  padding: 7px 12px;
+  margin-top: 5px;
+  border: 1px solid #ded8ce;
+  border-radius: 10px;
+  background: #fffdfa;
+  color: #5b4a34;
   font: inherit;
-  font-size: 14px;
-  line-height: 1.4;
-  outline: none;
-  transition: border-color .2s, box-shadow .2s;
-}
-.material-finder-field input::placeholder { color: #93918a; }
-.material-finder-field input:focus,
-.material-finder-field select:focus {
-  border-color: #a58a65;
-  box-shadow: 0 0 0 3px rgba(181,152,105,.12);
-}
-.material-finder-field select {
-  appearance: auto;
+  font-size: 12px;
+  font-weight: 650;
   cursor: pointer;
+  transition: border-color .16s, background .16s;
+}
+.material-finder-upload span { font-size: 17px; line-height: 1; }
+.material-finder-upload:hover:not(:disabled) {
+  background: #f4eee4;
+  border-color: #d5c8b6;
+}
+.material-finder-upload:disabled { opacity: .45; cursor: not-allowed; }
+.material-finder-autocomplete { position: relative; z-index: 5; }
+.material-finder-course-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 59px;
+  padding: 0 19px;
+  border: 1px solid #dcd8d1;
+  border-radius: 17px;
+  background: #fffdfa;
+  box-shadow: 0 4px 20px rgba(34, 31, 23, .035);
+  transition: border-color .16s, box-shadow .16s;
+}
+.material-finder-course-search:focus-within {
+  border-color: #b89a69;
+  box-shadow: 0 0 0 3px rgba(184, 154, 105, .12);
+}
+.material-finder-search-icon {
+  display: inline-flex;
+  flex: none;
+  width: 19px;
+  height: 19px;
+  color: #99938a;
+}
+.material-finder-search-icon svg { width: 100%; height: 100%; }
+.material-finder-course-search input {
+  min-width: 0;
+  flex: 1;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #252521;
+  font: inherit;
+  font-size: 15px;
+}
+.material-finder-course-search input::placeholder { color: #aaa49d; }
+.material-finder-clear {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f1eee8;
+  color: #777168;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+}
+.material-finder-clear:hover { background: #e9e3d9; color: #3b3832; }
+.material-finder-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 .material-finder-suggestions {
   position: absolute;
-  top: calc(100% + 5px);
+  top: calc(100% + 7px);
   left: 0;
   right: 0;
-  padding: 5px;
-  background: #fffefa;
-  border: 1px solid #dcd8cf;
-  box-shadow: 0 16px 38px rgba(32,28,19,.12);
-  border-radius: 13px;
   z-index: 30;
-  max-height: 320px;
+  padding: 7px;
+  max-height: 352px;
   overflow-y: auto;
+  border: 1px solid #e1dcd3;
+  border-radius: 15px;
+  background: #fffefa;
+  box-shadow: 0 18px 44px rgba(32, 28, 19, .13);
 }
 .material-finder-suggestions button {
-  width: 100%;
-  min-height: 44px;
   display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 8px 13px;
+  gap: 15px;
+  width: 100%;
+  min-height: 47px;
+  padding: 9px 13px;
   border: 0;
-  border-radius: 8px;
-  text-align: left;
+  border-radius: 9px;
   background: transparent;
   color: #24231f;
+  text-align: left;
   font: inherit;
-  font-size: 12px;
   cursor: pointer;
 }
 .material-finder-suggestions button:hover,
 .material-finder-suggestions button.is-active { background: #f4f0e8; }
-.material-finder-suggestions strong { flex: none; font-weight: 750; min-width: 78px; }
-.material-finder-suggestions span { color: #77716a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.material-finder-types {
-  border: 0;
-  padding: 0;
-  margin: 0 0 20px;
-  min-width: 0;
+.material-finder-suggestions strong {
+  flex: none;
+  min-width: 91px;
+  font-size: 12px;
+  font-weight: 750;
 }
-.material-finder-radios { display: flex; flex-wrap: wrap; align-items: center; gap: 13px 22px; }
-.material-finder-radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: #2f2f2c; }
-.material-finder-radio input {
-  appearance: auto;
-  width: 19px;
-  height: 19px;
+.material-finder-suggestions span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #77716a;
+  font-size: 12px;
+}
+.material-finder-no-suggestions {
   margin: 0;
-  accent-color: #222521;
+  padding: 13px;
+  color: #77716a;
+  font-size: 13px;
+}
+.material-finder-recent { margin-top: 25px; }
+.material-finder-recent h2 {
+  margin: 0 0 11px;
+  color: #777168;
+  font-size: 12px;
+  font-weight: 650;
+}
+.material-finder-recent-list { display: flex; flex-wrap: wrap; gap: 9px; }
+.material-finder-recent-list button {
+  padding: 9px 14px;
+  border: 1px solid #e2ddd4;
+  border-radius: 30px;
+  background: #fffdfa;
+  color: #4d493f;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
   cursor: pointer;
+  transition: border-color .16s, background .16s;
+}
+.material-finder-recent-list button:hover {
+  border-color: #cbbb9f;
+  background: #f3ede3;
 }
 .material-finder-results {
-  border-top: 1px solid #e9e6e0;
-  margin-top: 23px;
-  padding-top: 22px;
+  margin-top: 39px;
+  padding-top: 30px;
+  border-top: 1px solid #e2ded7;
 }
-.material-finder-results-head { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 12px; }
-.material-finder-results-head h2 { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: -.008em; }
-.material-finder-results-head > span { color: #77736e; font-size: 12px; }
-.material-finder-course-context {
+.material-finder-course-head {
   display: flex;
+  align-items: flex-end;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  color: #858078;
-  font-size: 12px;
-  padding: 2px 0 9px 28px;
+  gap: 24px;
+  margin-bottom: 25px;
 }
-.material-finder-course-context a { color: #8d6a38; text-decoration: none; }
-.material-finder-course-context a:hover { text-decoration: underline; }
+.material-finder-eyebrow {
+  display: inline-block;
+  margin-bottom: 7px;
+  color: #b18a55;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .13em;
+}
+.material-finder-course-head h2 {
+  margin: 0;
+  color: #24231f;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 750;
+  letter-spacing: -.025em;
+}
+.material-finder-course-head p {
+  margin: 5px 0 0;
+  color: #7d7770;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.material-finder-course-link {
+  flex: none;
+  padding-bottom: 5px;
+  color: #94754c;
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+.material-finder-course-link:hover { text-decoration: underline; }
+.material-finder-course-link span { margin-left: 3px; }
+.material-finder-controls { margin: 0 0 26px; }
+.material-finder-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 17px;
+}
+.material-finder-type {
+  min-height: 35px;
+  padding: 8px 14px;
+  border: 1px solid #dedad3;
+  border-radius: 25px;
+  background: transparent;
+  color: #6b665f;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .16s, border-color .16s, color .16s;
+}
+.material-finder-type:hover { border-color: #b6a68b; color: #34312d; }
+.material-finder-type.is-selected {
+  border-color: #34352f;
+  background: #34352f;
+  color: #fff;
+}
+.material-finder-refinements {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.material-finder-file-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 13px;
+  border: 1px solid #ddd9d2;
+  border-radius: 10px;
+  background: #fffdfa;
+}
+.material-finder-file-search .material-finder-search-icon {
+  width: 16px;
+  height: 16px;
+}
+.material-finder-file-search input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  outline: 0;
+  color: #33312c;
+  font: inherit;
+  font-size: 12px;
+}
+.material-finder-file-search input::placeholder { color: #9b958d; }
+.material-finder-semester { flex: none; width: 190px; }
+.material-finder-semester select {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #ddd9d2;
+  border-radius: 10px;
+  background: #fffdfa;
+  color: #55514a;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.material-finder-file-search:focus-within,
+.material-finder-semester select:focus {
+  border-color: #b89a69;
+  box-shadow: 0 0 0 3px rgba(184, 154, 105, .10);
+  outline: 0;
+}
+.material-finder-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e3ded6;
+}
+.material-finder-list-head h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: -.008em;
+}
+.material-finder-list-head > span { color: #8b857d; font-size: 11px; }
 .material-finder-list { width: 100%; }
 .material-finder-file,
 .material-finder-group-head {
   display: grid;
-  grid-template-columns: 20px minmax(0, 1fr) 34px;
-  gap: 13px;
+  grid-template-columns: 42px minmax(0, 1fr) 36px;
   align-items: center;
-  padding: 13px 1px;
-  min-height: 63px;
-  border-bottom: 1px solid #f0eeea;
+  gap: 14px;
+  padding: 14px 3px;
+  min-height: 76px;
+  border-bottom: 1px solid #eae6e0;
 }
-.material-finder-file:last-child,
-.material-finder-group:last-child > .material-finder-group-head { border-bottom-color: transparent; }
-.material-finder-file-icon { width: 19px; height: 21px; color: #575650; display: inline-flex; align-items: center; justify-content: center; }
-.material-finder-file-icon svg { width: 19px; height: 19px; }
-.material-finder-file-copy { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.material-finder-file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: #ece8df;
+  color: #797268;
+}
+.material-finder-file-icon svg { width: 20px; height: 20px; }
+.material-finder-file-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
 .material-finder-file-name {
-  display: inline-block;
   max-width: 100%;
-  color: #242421;
-  text-decoration: none;
+  color: #302d29;
   font-size: 13px;
+  line-height: 1.45;
   font-weight: 650;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+a.material-finder-file-name:hover { color: #946b3a; text-decoration: underline; }
+.material-finder-file-info {
+  color: #8a847b;
+  font-size: 11px;
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
-a.material-finder-file-name:hover { color: #966c30; text-decoration: underline; }
-.material-finder-file-info {
-  color: #85817c;
-  font-size: 11px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
 .material-finder-download {
-  width: 34px;
-  height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #595853;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  color: #767068;
   text-decoration: none;
 }
 .material-finder-download svg { width: 18px; height: 18px; }
-.material-finder-download:hover { color: #181b16; background: #f2eee8; }
-.material-finder-group { border-bottom: 1px solid #efebe6; }
+.material-finder-download:hover { color: #252521; background: #ebe6de; }
+.material-finder-group { border-bottom: 1px solid #eae6e0; }
 .material-finder-group-head {
-  list-style: none;
   border: 0;
+  list-style: none;
   cursor: pointer;
 }
 .material-finder-group-head::-webkit-details-marker { display: none; }
-.material-finder-group-head:hover { background: #faf8f4; }
+.material-finder-group-head:hover { background: rgba(255, 253, 250, .6); }
 .material-finder-expand {
   justify-self: center;
   color: #77736c;
@@ -215,61 +413,116 @@ a.material-finder-file-name:hover { color: #966c30; text-decoration: underline; 
 }
 .material-finder-group[open] .material-finder-expand { transform: rotate(180deg); }
 .material-finder-group-children {
-  padding: 0 4px 6px 32px;
-  border-left: 2px solid #eee8de;
-  margin-left: 9px;
+  padding: 0 3px 5px 31px;
+  margin-left: 22px;
+  border-left: 2px solid #e6dfd4;
 }
-.material-finder-group-children .material-finder-file { min-height: 54px; padding: 9px 0; }
+.material-finder-group-children .material-finder-file {
+  min-height: 66px;
+  padding: 10px 0;
+}
+.material-finder-group-children .material-finder-file-icon {
+  width: 35px;
+  height: 35px;
+}
+.material-finder-group-children .material-finder-file {
+  grid-template-columns: 35px minmax(0, 1fr) 36px;
+}
 .material-finder-group-children .material-finder-file:last-child { border-bottom: 0; }
-.material-finder-message {
+.material-finder-message,
+.material-finder-empty {
+  padding: 25px 0;
+  color: #79736c;
   font-size: 13px;
-  color: #75716a;
   line-height: 1.7;
-  padding: 14px 0 6px;
 }
 .material-finder-message strong { color: #3b3935; }
 .material-finder-message a { color: #946e3b; font-weight: 700; }
 .material-finder-message.is-error { color: #8e4c40; }
-.material-finder-message button {
+.material-finder-message button,
+.material-finder-empty button {
+  margin: 0 0 0 6px;
+  padding: 3px 4px;
   border: none;
   background: transparent;
-  padding: 3px 7px;
-  color: #8e4c40;
-  cursor: pointer;
-  font-weight: 750;
-  text-decoration: underline;
-}
-.material-finder-pagination { display: flex; justify-content: center; margin-top: 18px; }
-.material-finder-pagination button {
+  color: #916b3c;
   font: inherit;
-  padding: 10px 17px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.material-finder-message.is-error button { color: #8e4c40; }
+.material-finder-empty p { margin: 0; }
+.material-finder-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 21px;
+}
+.material-finder-pagination button {
+  padding: 11px 19px;
+  border: 1px solid #ded8ce;
+  border-radius: 10px;
+  background: #fffdfa;
+  color: #514e49;
+  font: inherit;
   font-size: 12px;
   font-weight: 700;
-  border: 1px solid #ded8ce;
-  background: transparent;
-  border-radius: 10px;
-  color: #514e49;
   cursor: pointer;
 }
-.material-finder-pagination button:hover:not(:disabled) { background: #f6f1e8; }
+.material-finder-pagination button:hover:not(:disabled) { background: #f1ebe1; }
 .material-finder-pagination button:disabled { opacity: .55; cursor: default; }
-.material-finder-loading { padding: 8px 0; }
-.material-finder-loading > div { display: flex; flex-direction: column; justify-content: center; gap: 9px; height: 65px; border-bottom: 1px solid #f0eeea; padding-left: 33px; }
-.material-finder-loading span { display: block; height: 10px; width: 50%; background: #efede9; border-radius: 7px; animation: finderPulse 1.8s ease-in-out infinite; }
-.material-finder-loading span:last-child { width: 26%; height: 8px; }
+.material-finder-loading { padding: 5px 0; }
+.material-finder-loading > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 9px;
+  height: 76px;
+  padding-left: 58px;
+  border-bottom: 1px solid #eae6e0;
+}
+.material-finder-loading span {
+  display: block;
+  width: 48%;
+  height: 10px;
+  border-radius: 7px;
+  background: #e9e3da;
+  animation: finderPulse 1.8s ease-in-out infinite;
+}
+.material-finder-loading span:last-child { width: 24%; height: 8px; }
 @keyframes finderPulse { 50% { opacity: .45; } }
-.material-finder :is(a,button,input,select,summary):focus-visible { outline: 2px solid #ad8d5c; outline-offset: 3px; }
+.material-finder :is(a,button,input,select,summary):focus-visible {
+  outline: 2px solid #ad8d5c;
+  outline-offset: 3px;
+}
 @media (max-width: 640px) {
-  .materials-hub { padding: 100px 12px 65px; }
-  .material-finder { padding: 20px 16px; border-radius: 15px; }
-  .material-finder-radios { gap: 11px 14px; }
-  .material-finder-radio { font-size: 13px; }
-  .material-finder-field input,.material-finder-field select { font-size: 13px; }
-  .material-finder-file,.material-finder-group-head { gap: 10px; grid-template-columns: 18px minmax(0,1fr) 32px; }
+  .materials-hub { padding: 105px 15px 65px; }
+  .material-finder-head { gap: 12px; margin-bottom: 22px; }
+  .material-finder-head h1 { font-size: 26px; }
+  .material-finder-head p { font-size: 12px; }
+  .material-finder-upload { margin-top: 2px; }
+  .material-finder-course-search { height: 54px; padding: 0 14px; border-radius: 13px; }
+  .material-finder-course-search input { font-size: 13px; }
+  .material-finder-suggestions strong { min-width: 76px; }
+  .material-finder-results { margin-top: 32px; padding-top: 25px; }
+  .material-finder-course-head { align-items: flex-start; }
+  .material-finder-course-head h2 { font-size: 23px; }
+  .material-finder-refinements { flex-direction: column; align-items: stretch; }
+  .material-finder-file-search { flex: none; width: 100%; }
+  .material-finder-semester { width: 100%; }
+  .material-finder-file,.material-finder-group-head {
+    grid-template-columns: 36px minmax(0, 1fr) 32px;
+    gap: 10px;
+  }
+  .material-finder-file-icon { width: 36px; height: 36px; }
   .material-finder-file-name { font-size: 12px; }
   .material-finder-file-info { font-size: 10px; }
-  .material-finder-course-context { padding-left: 0; }
-  .material-finder-group-children { padding-left: 13px; }
+  .material-finder-group-children { margin-left: 18px; padding-left: 15px; }
+  .material-finder-group-children .material-finder-file {
+    grid-template-columns: 30px minmax(0, 1fr) 32px;
+  }
+  .material-finder-group-children .material-finder-file-icon { width: 30px; height: 30px; }
+  .material-finder-list-head > span { font-size: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .material-finder * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
