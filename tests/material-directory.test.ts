@@ -207,8 +207,15 @@ test("the main route changes to materials while individual course pages stay on 
   assert.match(component,/material-finder-head/);
   assert.match(component,/material-finder-course/);
   assert.match(component,/role="combobox"/);
-  assert.match(component,/material-finder-radios/);
+  // Type chips and secondary filters appear only after a course is selected.
+  assert.match(component,/course && <section className="material-finder-results"/);
+  assert.match(component,/material-finder-types/);
+  assert.match(component,/aria-pressed=\{type === option.value\}/);
   assert.match(component,/material-finder-semester/);
+  assert.match(component,/material-finder-file-query/);
+  assert.match(component,/params.set\("q", debouncedFileQuery\)/);
+  assert.match(component,/recentCoursesKey/);
+  assert.doesNotMatch(component,/material-finder-radios/);
   assert.match(component,/material-finder-results-title/);
   assert.match(component,/uploadGroupId/);
   assert.match(component,/DownloadIcon/);
