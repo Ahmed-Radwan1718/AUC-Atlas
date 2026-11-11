@@ -191,40 +191,24 @@ test("invalid cursor is rejected instead of querying arbitrary documents",async(
   assert.equal(result.status,400);
 });
 
-test("the main route changes to materials while individual course pages stay on the original view",()=>{
+test("the Courses landing and existing course detail routes remain available",()=>{
   const home=read("app/courses/page.tsx");
   const detail=read("app/courses/[slug]/page.tsx");
   const navbar=read("components/Header.tsx");
-  const component=read("features/courses/MaterialsDirectory.tsx");
-  assert.match(home,/MaterialsDirectory/);
+  const component=read("features/courses/Courses.tsx");
+  assert.match(home,/import Courses from/);
+  assert.match(home,/return <Courses \/>/);
+  assert.doesNotMatch(home,/MaterialsDirectory/);
   assert.match(detail,/return <Courses courseSlug={slug}/);
-  assert.match(navbar,/href: "\/courses", label: "Materials"/);
-  assert.match(component,/\/api\/material-directory/);
-  assert.match(component,/file\.downloadUrl/); // secure links are provided by the server
-  assert.match(component,/setupCourseUploadStart/);
-  // The large decorative hero was removed; keep the upload action accessible.
-  assert.doesNotMatch(component,/materials-hub-hero|Find the material\./);
-  assert.match(component,/material-finder-head/);
-  assert.match(component,/material-finder-course/);
-  assert.match(component,/role="combobox"/);
-  // Type chips and secondary filters appear only after a course is selected.
-  assert.match(component,/course && <section className="material-finder-results"/);
-  assert.match(component,/material-finder-types/);
-  assert.match(component,/aria-pressed=\{type === option.value\}/);
-  assert.match(component,/material-finder-semester/);
-  assert.match(component,/material-finder-file-query/);
-  assert.match(component,/params.set\("q", debouncedFileQuery\)/);
-  assert.match(component,/recentCoursesKey/);
-  assert.doesNotMatch(component,/material-finder-radios/);
-  assert.match(component,/material-finder-results-title/);
-  assert.match(component,/uploadGroupId/);
-  assert.match(component,/DownloadIcon/);
+  assert.match(navbar,/href: "\/courses", label: "Courses"/);
+  assert.match(component,/initializeCourses\(courseSlug\)/);
+  assert.match(component,/id="course-search-input"/);
+  assert.match(component,/id="courses-home-content"/);
+  assert.match(component,/id="course-popular-grid"/);
+  assert.match(component,/id="course-recent-materials"/);
+  assert.match(component,/id="course-materials-list"/);
   assert.match(component,/id="course-upload-start"/);
-  const css=read("features/courses/materials-directory.css");
-  assert.doesNotMatch(css,/materials-hub-hero|materials-art-/);
-  assert.match(css,/material-finder-file/);
-  assert.doesNotMatch(component,/Recently uploaded|materials-type-chip/);
-
+  assert.match(component,/CourseDialogs/);
 });
 
 test("course selection is an exact filter, not a fuzzy match with another course",async()=>{
