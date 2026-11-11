@@ -147,7 +147,7 @@ test("paginated directory continues without skipping or duplicating material",as
   const three=await app.get("cursor="+encodeURIComponent(two.body.nextCursor));
   assert.equal(three.body.materials.length,7);
   assert.equal(three.body.hasMore,false);
-  const ids=[...one.body.materials,...two.body.materials,...three.body.materials].map(x=>x.id);
+  const ids=[...one.body.materials,...two.body.materials,...three.body.materials].map((x:any)=>x.id);
   assert.equal(new Set(ids).size,55);
 });
 
@@ -158,10 +158,10 @@ test("searches titles, course codes, professors, and filters material type and s
     demo(3,{title:"Practice 2",materialType:"Practice sheet",semester:"Fall 2026"})
   ]});
   const result=await app.get("q=practice&type=Practice%20sheet&semester=Spring%202026");
-  assert.deepEqual(Array.from(result.body.materials).map(x=>x.id),["file-0001"]);
+  assert.deepEqual(Array.from(result.body.materials).map((x:any)=>x.id),["file-0001"]);
   assert.equal(result.body.hasMore,false);
   const professor=await app.get("q=example");
-  assert.deepEqual(Array.from(professor.body.materials).map(x=>x.id),["file-0001"]);
+  assert.deepEqual(Array.from(professor.body.materials).map((x:any)=>x.id),["file-0001"]);
   const course=await app.get("q=math%202010");
   assert.equal(course.body.materials.length,3);
 });
@@ -169,7 +169,7 @@ test("searches titles, course codes, professors, and filters material type and s
 test("rejected files never appear, even when matching the search",async()=>{
   const app=harness({files:[demo(1,{status:"rejected"}),demo(2)]});
   const result=await app.get("");
-  assert.deepEqual(Array.from(result.body.materials).map(x=>x.id),["file-0002"]);
+  assert.deepEqual(Array.from(result.body.materials).map((x:any)=>x.id),["file-0002"]);
 });
 
 test("sparse searches can continue beyond the bounded scan window",async()=>{
