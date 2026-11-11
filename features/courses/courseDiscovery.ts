@@ -310,7 +310,6 @@ function normalize(value) {
             '<span class="course-recent-skeleton-icon"></span>',
           '</div>',
           '<div class="course-recent-skeleton-copy">',
-            '<span class="course-recent-skeleton-line is-type"></span>',
             '<span class="course-recent-skeleton-line is-title"></span>',
             '<span class="course-recent-skeleton-line is-course"></span>',
           '</div>',
@@ -408,10 +407,6 @@ const href = courseCode
           </div>
 
           <div class="course-recent-card-copy">
-            <span class="course-recent-type">
-              ${escapeMaterialText(material.materialType || "Course material")}
-            </span>
-
             <h3>${escapeMaterialText(material.title || "Course material")}</h3>
             <p>${escapeMaterialText(courseLabel || "AUC course material")}</p>
           </div>
