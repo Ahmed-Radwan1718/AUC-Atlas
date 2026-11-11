@@ -440,7 +440,9 @@ export default function MaterialsDirectory() {
               })}
             </div>}
             {!locked && !loading && !searchingFiles && !error && materials.length === 0 && <div className="material-finder-empty">
-              <p>{hasFilters ? "No materials match those filters." : "No study materials have been uploaded for this course yet."}</p>
+              <p>{nextCursor
+                ? "No matching files among newer uploads. Load more to check older materials."
+                : hasFilters ? "No materials match those filters." : "No study materials have been uploaded for this course yet."}</p>
               {hasFilters && <button type="button" onClick={clearFilters}>Clear filters</button>}
             </div>}
             {nextCursor && !locked && !error && !searchingFiles && <div className="material-finder-pagination">
