@@ -1,6 +1,6 @@
 # Professor department verification — 2026-11-12
 
-Official-source department updates: **69** records. Original unknown: **288**; remaining unknown: **219**. The import preserves names, email addresses, profile photos, and other fields. A department was assigned only when supported by AUC university-owned sources. Some short names in AUC Atlas differ from the full official faculty profile names. Department display abbreviations and filter categories follow the existing Atlas convention.
+Official-source department updates: **119** records. Original unknown: **288**; remaining unknown: **169**. The import preserves names, email addresses, profile photos, and other fields. A department was assigned only when supported by AUC university-owned sources. Some short names in AUC Atlas differ from the full official faculty profile names. Department display abbreviations and filter categories follow the existing Atlas convention.
 
 | Atlas professor | Department assigned | Official source |
 |---|---|---|
@@ -75,3 +75,60 @@ Official-source department updates: **69** records. Original unknown: **288**; r
 | Mohamed Elkaramany | Public Policy and Administration | [AUC record](https://www.aucegypt.edu/news/meet-our-new-faculty-2025) |
 
 Unresolved entries remain `Department coming soon` rather than being guessed. AUC faculty listings are not necessarily comprehensive for adjunct, visiting, historical, or otherwise unlisted professors. Not every official directory `Department` value is a teaching department (e.g., Main Library); where applicable the official unit is used as displayed by AUC.
+
+## Additional verified teaching-subject matches — 2026-11-12
+
+The following **50** records were added in a second pass. These matches use an identical AUC email address and Coursicle's AUC course-subject listing, or a directly linked university or scholarly source. Teaching subject is a strong indicator for these assignments but does **not** independently prove a formal employment appointment in that department. For subjects with distinct program prefixes (MKTG, MOIS, OPMG, ENTR, FINC), the repository's broader `Management` department category follows AUC's departmental organization. Music and Theatre map to the Department of the Arts. Broad or ambiguous subjects, including FYE, SCI, and CORE alone, were left unresolved. Source URLs below permit review.
+
+| Atlas professor | Assigned department | Verification source |
+|---|---|---|
+| Areeg Abdalla | Mathematics and Actuarial Science | [Evidence](https://www.coursicle.com/aucegypt/professors/Areeg+Abdalla/) |
+| Rehab Abdel-Aziz | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Rehab+Abdel-Aziz/) |
+| Ashraf Abdelraouf | Computer Science and Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Ashraf+Abdelraouf/) |
+| Reham Abou-Zeid | Architecture | [Evidence](https://www.coursicle.com/aucegypt/professors/Reham+Abou-Zeid/) |
+| Mohamed Alhalaby | Computer Science and Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Mohamed+Alhalaby/) |
+| Ibrahim Al-Sahouly | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Ibrahim+Al-Sahouly/) |
+| Khaled Amin | Public Policy and Administration | [Evidence](https://www.coursicle.com/aucegypt/professors/Khaled+Amin/) |
+| Khalid Azzouz | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Khalid+Azzouz/) |
+| Kamal Boutros | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Kamal+Boutros/) |
+| Maha El-Ashram | Mathematics and Actuarial Science | [Evidence](https://www.coursicle.com/aucegypt/professors/Maha+El-Ashram/) |
+| Dina El-baradie | History | [Evidence](https://www.coursicle.com/aucegypt/professors/Dina+El-baradie/) |
+| Maha El-Bedaiwy | Mechanical Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Maha+El-Bedaiwy/) |
+| Sherif El-Dabaa | Arts | [Evidence](https://www.coursicle.com/aucegypt/professors/Sherif+El-Dabaa/) |
+| Lobna El-Dessouky | Accounting | [Evidence](https://www.coursicle.com/aucegypt/professors/Lobna+El-Dessouky/) |
+| Amani El-Gammal | Mathematics and Actuarial Science | [Evidence](https://www.coursicle.com/aucegypt/professors/Amani+El-Gammal/) |
+| Soha ElKassas | Construction Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Soha+ElKassas/) |
+| Waleed El-Nemr | Construction Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Waleed+El-Nemr/) |
+| Asmaa El-Taher | Arts | [Evidence](https://www.coursicle.com/aucegypt/professors/Asmaa+El-Taher/) |
+| Ahmed Essam | Mathematics and Actuarial Science | [Evidence](https://www.coursicle.com/aucegypt/professors/Ahmed+Essam/) |
+| Karim Farahat | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Karim+Farahat/) |
+| Mahmoud Farag | Mechanical Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Mahmoud+Farag/) |
+| Shadi Farid | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Shadi+Farid/) |
+| Ahmed Fayed | Public Policy and Administration | [Evidence](https://www.coursicle.com/aucegypt/professors/Ahmed+Fayed/) |
+| Yasmin Farag | Accounting | [Evidence](https://www.coursicle.com/aucegypt/professors/Yasmin+Farag/) |
+| Javed Maswood | Political Science | [Evidence](https://www.aucegypt.edu/fac/syed-maswood) |
+| Mohamed Orabi | Physics | [Evidence](https://www.coursicle.com/aucegypt/professors/Mohamed+Orabi/) |
+| Amro Shetta | Chemistry | [Evidence](https://pubmed.ncbi.nlm.nih.gov/34280444/) |
+| Alexandra Gazis | Psychology | [Evidence](https://www.coursicle.com/aucegypt/professors/Alexandra+Gazis/) |
+| Alexander Grechenko | Arts | [Evidence](https://www.coursicle.com/aucegypt/professors/Alexander+Grechenko/) |
+| Fouad Halbouni | Sociology, Egyptology and Anthropology | [Evidence](https://www.coursicle.com/aucegypt/professors/Fouad+Halbouni/) |
+| Ola Hashad | Arabic Language Instruction | [Evidence](https://www.aucegypt.edu/ar/node/36826) |
+| Hesham Hegazi | Mechanical Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Hesham+Hegazi/) |
+| Omneya Helmy | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Omneya+Helmy/) |
+| Ibrahim Ibrahim | Mathematics and Actuarial Science | [Evidence](https://www.coursicle.com/aucegypt/professors/Ibrahim+Ibrahim/) |
+| Howaida Ismaeel | Computer Science and Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Howaida+Ismaeel/) |
+| Amr Kais | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Amr+Kais/) |
+| Lobna Khairy | Journalism and Mass Communication | [Evidence](https://www.coursicle.com/aucegypt/professors/Lobna+Khairy/) |
+| Mohy Mansour | Mechanical Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Mohy+Mansour/) |
+| Ahmed Mohib | Mechanical Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Ahmed+Mohib/) |
+| Salwa Mostafa | Mathematics and Actuarial Science | [Evidence](https://www.coursicle.com/aucegypt/professors/Salwa+Mostafa/) |
+| Maha Muttardi | Mathematics and Actuarial Science | [Evidence](https://www.coursicle.com/aucegypt/professors/Maha+Muttardi/) |
+| Ahmed Nawara | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Ahmed+Nawara/) |
+| Noha Saada | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Noha+Saada/) |
+| Abd-Elnasser Saad | Mathematics and Actuarial Science | [Evidence](https://www.coursicle.com/aucegypt/professors/Abd-Elnasser+Saad/) |
+| Ahmed Salama | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Ahmed+Salama/) |
+| Dina Saleh | Arts | [Evidence](https://www.coursicle.com/aucegypt/professors/Dina+Saleh/) |
+| Nesma Saleh | Mathematics and Actuarial Science | [Evidence](https://www.coursicle.com/aucegypt/professors/Nesma+Saleh/) |
+| Irene Shaker | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Irene+Shaker/) |
+| Ismail Shaker | Architecture | [Evidence](https://www.coursicle.com/aucegypt/professors/Ismail+Shaker/) |
+| Nader Shenouda | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Nader+Shenouda/) |
