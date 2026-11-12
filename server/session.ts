@@ -3,6 +3,7 @@ import type { DecodedIdToken } from "firebase-admin/auth";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { firebaseAuth, firestore } from "./firebase";
 import { sessionHash } from "./security";
+import { isProfessorEmail } from "./professorEmails";
 
 const production = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
 const sessionCookieName = production ? "__Host-auc_atlas_session" : "auc_atlas_session";
@@ -33,9 +34,10 @@ export async function optionalSessionUser(request: NextRequest): Promise<Decoded
     const decoded = idTokenFallback
       ? await auth.verifyIdToken(tokenCookie.slice("idtoken.".length), true)
       : await auth.verifySessionCookie(tokenCookie, true);
-    if (!decoded?.uid || !isAllowedAucEmail(decoded.email)) return null;
+    if (!decoded?.uid || !isAllowedAucEmail(decoded.email) || isProfessorEmail(decoded.email)) return null;
     const user = await auth.getUser(decoded.uid);
-    if (!user.emailVerified || !isAllowedAucEmail(user.email || decoded.email)) return null;
+    const accountEmail = user.email || decoded.email;
+    if (!user.emailVerified || !isAllowedAucEmail(accountEmail) || isProfessorEmail(accountEmail)) return null;
 
     const hash = sessionHash(sessionId);
     const ref = firestore().collection("users").doc(decoded.uid).collection("sessions").doc(hash);
