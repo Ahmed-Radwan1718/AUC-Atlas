@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const admin = require("./firebaseAdmin").default;
 const { claimVerifiedAucId } = require("./aucIdClaims");
+const { assertStudentAccountEmail } = require("../../professorEmails");
 const {
   encryptTotpSecret,
   decryptTotpSecret
@@ -364,6 +365,10 @@ function ensureAllowedAucEmail(email: any, action: any) {
   if (!isAllowedAucEmail(normalizedEmail)) {
     throw createAucEmailRequiredError(action);
   }
+
+  // Deny professor addresses before registration, login, recovery or
+  // creating a new site session; this check is shared by every auth flow.
+  assertStudentAccountEmail(normalizedEmail);
 
   return normalizedEmail;
 }
@@ -801,6 +806,9 @@ async function getSiteSessionUser(req: any, options: any) {
     userRecord.email ||
     decodedUser.email
   );
+
+  // A previously created session must not bypass the same email policy.
+  ensureAllowedAucEmail(authoritativeEmail, "continue");
 
   if (
     !userRecord.emailVerified ||
