@@ -1,6 +1,6 @@
 # Professor department verification — 2026-11-12
 
-Official-source department updates: **119** records. Original unknown: **288**; remaining unknown: **169**. The import preserves names, email addresses, profile photos, and other fields. A department was assigned only when supported by AUC university-owned sources. Some short names in AUC Atlas differ from the full official faculty profile names. Department display abbreviations and filter categories follow the existing Atlas convention.
+Official-source department updates: **129** records. Original unknown: **288**; remaining unknown: **159**. The import preserves names, email addresses, profile photos, and other fields. A department was assigned only when supported by AUC university-owned sources. Some short names in AUC Atlas differ from the full official faculty profile names. Department display abbreviations and filter categories follow the existing Atlas convention.
 
 | Atlas professor | Department assigned | Official source |
 |---|---|---|
@@ -132,3 +132,20 @@ The following **50** records were added in a second pass. These matches use an i
 | Irene Shaker | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Irene+Shaker/) |
 | Ismail Shaker | Architecture | [Evidence](https://www.coursicle.com/aucegypt/professors/Ismail+Shaker/) |
 | Nader Shenouda | Management | [Evidence](https://www.coursicle.com/aucegypt/professors/Nader+Shenouda/) |
+
+## Further published affiliation evidence — 2026-11-12
+
+These **10** cases were resolved from AUC university publications, research pages, course records with email matches, and a PPAD faculty-member's public list of current adjunct instructors. For historical appointments, the department reflects the AUC affiliation documented in the source, not a guarantee of current employment.
+
+| Professor | Department | Source |
+|---|---|---|
+| Reham El Morally | Public Policy and Administration | [Evidence](https://huss.aucegypt.edu/academics/departments/history/alumni) |
+| Marwa El Daly | Public Policy and Administration | [Evidence](https://books.google.com/books/about/Al_Waqf.html?id=B4hnEAAAQBAJ) |
+| Iman Ashmawy | Public Policy and Administration | [Evidence](https://eg.linkedin.com/in/dalia-wahdan-7b8b0215) |
+| Yasser El Shayeb | Petroleum and Energy Engineering | [Evidence](https://www.aucegypt.edu/news/aucs-center-excellence-water-offers-scholarships-students-egypt-study-water-engineering) |
+| Ashraf El Assaly | Construction Engineering | [Evidence](https://www.coursicle.com/aucegypt/professors/Ashraf+Assaly/) |
+| Aya Galal | Biology | [Evidence](https://fount.aucegypt.edu/faculty_journal_articles/4672/) |
+| Maher Asham | Management | [Evidence](https://fount.aucegypt.edu/etds/1666/) |
+| John Harris | Public Policy and Administration | [Evidence](https://eg.linkedin.com/in/dalia-wahdan-7b8b0215) |
+| Dahlia Wahdan | Public Policy and Administration | [Evidence](https://eg.linkedin.com/in/dalia-wahdan-7b8b0215) |
+| Ola Morsy | Psychology | [Evidence](https://www.aucegypt.edu/news/stories/fighting-back-international-day-elimination-violence-against-women) |
