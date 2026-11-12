@@ -1,6 +1,6 @@
 # Professor department verification — 2026-11-12
 
-Official-source department updates: **129** records. Original unknown: **288**; remaining unknown: **159**. The import preserves names, email addresses, profile photos, and other fields. A department was assigned only when supported by AUC university-owned sources. Some short names in AUC Atlas differ from the full official faculty profile names. Department display abbreviations and filter categories follow the existing Atlas convention.
+Research-backed department updates: **129** records. Original unknown: **288**; remaining unknown: **159**. The import preserves names, email addresses, profile photos, and other fields. Departments in the first batch were supported by AUC university-owned sources; later batches also used matching AUC email addresses in course rosters, published affiliations, and documented teaching programs, with evidence type and sources noted below. Some short names in AUC Atlas differ from the full official faculty profile names. Department display abbreviations and filter categories follow the existing Atlas convention.
 
 | Atlas professor | Department assigned | Official source |
 |---|---|---|
