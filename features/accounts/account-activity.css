@@ -238,7 +238,7 @@
 }
 
 #account-panel-reviews .account-review-head p::before {
-  content: "–";
+  content: "·";
   margin-right: 7px;
 }
 
