@@ -223,6 +223,25 @@
   min-width: 0;
 }
 
+/* Professor and date share one line; the date keeps its muted styling. */
+#account-panel-reviews .account-review-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  column-gap: 7px;
+  row-gap: 3px;
+}
+
+#account-panel-reviews .account-review-head p {
+  white-space: nowrap;
+}
+
+#account-panel-reviews .account-review-head p::before {
+  content: "–";
+  margin-right: 7px;
+}
+
 #account-panel-reviews .account-review-head h3,
 #account-panel-reviews .account-upload-head h3 {
   font-size: 16px;
