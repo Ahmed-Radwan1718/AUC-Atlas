@@ -31,24 +31,7 @@ export async function courseMaterials(courseCode:string):Promise<Material[]> {
   return snapshot.docs.map(serializeMaterial).filter(x=>x.status!=="rejected")
     .sort((a,b)=>millis(b.createdAt)-millis(a.createdAt));
 }
-export async function randomCourseMaterials(limit:unknown):Promise<Material[]> {
-  const cap=Math.max(1,Math.min(12,Math.floor(Number(limit)||6)));
-  const snapshot=await firestore().collection("courseMaterials").get();
-  const grouped=new Map<string,Material>();
-  snapshot.forEach(doc=>{
-    const item=serializeMaterial(doc);
-    if(item.status==="rejected")return;
-    const key=clean(item.uploadGroupId,80)||item.id;
-    const previous=grouped.get(key);
-    if(!previous||millis(item.createdAt)>millis(previous.createdAt))grouped.set(key,item);
-  });
-  const results=[...grouped.values()];
-  for(let i=results.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [results[i],results[j]]=[results[j],results[i]];
-  }
-  return results.slice(0,cap);
-}
+export { randomCourseMaterials } from "./materialDiscovery";
 export async function userMaterials(uid:string):Promise<Material[]>{
   const snapshot=await firestore().collection("courseMaterials")
     .where("uploaderUid","==",uid).limit(200).get();

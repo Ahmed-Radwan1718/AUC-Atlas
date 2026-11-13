@@ -619,6 +619,7 @@ async function handleApproveMaterial(actor: any, body: any) {
     approvedByAdminUid: actor.uid,
     approvedByAdminEmail: actor.email
   }, { merge: true });
+  await require("../../materialDiscovery").refreshMaterialDiscovery(materialId, materialData.uploadGroupId);
 
   await writeAuditLog(actor, {
     action: "approve_material",
@@ -664,6 +665,7 @@ async function handleDeleteMaterial(actor: any, body: any) {
     deletedByAdminUid: actor.uid,
     adminDeletionReason: reason
   }, { merge: true });
+  await require("../../materialDiscovery").refreshMaterialDiscovery(materialId, materialData.uploadGroupId);
 
   await writeAuditLog(actor, {
     action: "delete_material",
