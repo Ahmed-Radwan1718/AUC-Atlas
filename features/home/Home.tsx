@@ -213,6 +213,24 @@ function getMaterialIcon(material: CourseMaterial): { icon: string | null; fallb
   };
   return { icon: icons[extension] || null, fallback: (extension || "FILE").slice(0, 5).toUpperCase() };
 }
+// Match the three 82px rows in the resolved cards to avoid layout shifts while loading.
+function HomeLatestSkeleton({ kind }: { kind: "professor" | "material" }) {
+  const label = kind === "professor" ? "Loading professor ratings" : "Loading recent course materials";
+  return <div className={"home-latest-skeleton home-latest-skeleton-" + kind} role="status" aria-label={label}>
+    <span className="home-latest-skeleton-announcement">{label}</span>
+    {Array.from({ length: 3 }, (_, index) =>
+      <div className="home-latest-skeleton-row" aria-hidden="true" key={index}>
+        <span className="home-latest-skeleton-thumbnail"/>
+        <span className="home-latest-skeleton-copy">
+          <span className="home-latest-skeleton-line home-latest-skeleton-title"/>
+          <span className="home-latest-skeleton-line home-latest-skeleton-detail"/>
+        </span>
+        <span className="home-latest-skeleton-arrow"/>
+      </div>
+    )}
+  </div>;
+}
+
 function LatestMaterials({ materials }: { materials: CourseMaterial[] }) {
   if (!materials.length) return <p className="home-latest-status">New approved course materials will appear here.</p>;
   return materials.slice(0, 3).map(material => {
@@ -293,7 +311,7 @@ export default function Home() {
               {overview?.reviewsLocked
                 ? <p className="home-latest-status"><a href="/login">Sign in with a verified AUC account</a> to see professor ratings.</p>
                 : overview || failed ? <RatedProfessors items={lowest} lowest/>
-                : <p className="home-latest-status">Loading lowest-rated professors...</p>}
+                : <HomeLatestSkeleton kind="professor"/>}
             </div>
           </article>
           <article className="home-latest-card">
@@ -302,7 +320,7 @@ export default function Home() {
               <a href="/courses">View all →</a>
             </div>
             <div className="home-latest-list" id="home-latest-materials">
-              {overview || failed ? <LatestMaterials materials={materials}/> : <p className="home-latest-status">Loading new materials...</p>}
+              {overview || failed ? <LatestMaterials materials={materials}/> : <HomeLatestSkeleton kind="material"/>}
             </div>
           </article>
           <article className="home-latest-card">
@@ -314,7 +332,7 @@ export default function Home() {
               {overview?.reviewsLocked
                 ? <p className="home-latest-status"><a href="/login">Sign in with a verified AUC account</a> to see professor ratings.</p>
                 : overview || failed ? <RatedProfessors items={highest} lowest={false}/>
-                : <p className="home-latest-status">Loading top-reviewed professors...</p>}
+                : <HomeLatestSkeleton kind="professor"/>}
             </div>
           </article>
         </div>
