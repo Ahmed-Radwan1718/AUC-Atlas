@@ -318,7 +318,7 @@ async function getDashboardData(actor: any) {
   const db = admin.firestore();
   const results = await Promise.all([
     db.collection("professorReviews").get(),
-    db.collection("courseMaterials").limit(25).get(),
+    db.collection("courseMaterials").get(),
     db.collection("contentReports").where("status", "==", "open").limit(25).get(),
     db.collection("adminAuditLogs").orderBy("createdAt", "desc").limit(10).get(),
     listAllUsers(actor),
@@ -389,7 +389,7 @@ async function getDashboardData(actor: any) {
     users,
     reports: reports.slice(0, 250),
     reviews,
-    materials: materials.slice(0, 250),
+    materials,
     auditLogs: audits
   };
 }

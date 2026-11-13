@@ -185,6 +185,14 @@ export function initializeAdmin() {
     document.getElementById("admin-review-prev");
   const reviewNext =
     document.getElementById("admin-review-next");
+  const materialPagination =
+    document.getElementById("admin-material-pagination");
+  const materialPageInfo =
+    document.getElementById("admin-material-page-info");
+  const materialPrev =
+    document.getElementById("admin-material-prev");
+  const materialNext =
+    document.getElementById("admin-material-next");
   const reportSearch =
     document.getElementById(
       "admin-report-search"
@@ -219,8 +227,10 @@ export function initializeAdmin() {
     document.getElementById("admin-user-next");
   const userPageSize = Number.MAX_SAFE_INTEGER;
   const reviewPageSize = 25;
+  const materialPageSize = 25;
   let userPage = 1;
   let reviewPage = 1;
+  let materialPage = 1;
   let selectedUserUid = "";
   const toast =
     document.getElementById(
@@ -1187,10 +1197,24 @@ export function initializeAdmin() {
 
     if (!filtered.length) {
       materialList.innerHTML = '<div class="admin-empty">No matching uploaded materials were found.</div>';
+      materialPagination.hidden = true;
       return;
     }
 
-    materialList.innerHTML = filtered.map(function (material) {
+    const pageCount = Math.ceil(filtered.length / materialPageSize);
+    materialPage = Math.max(1, Math.min(materialPage, pageCount));
+    const start = (materialPage - 1) * materialPageSize;
+    const visibleMaterials = filtered.slice(start, start + materialPageSize);
+
+    materialPagination.hidden = pageCount <= 1;
+    materialPageInfo.textContent =
+      (start + 1).toLocaleString("en-US") + "–" +
+      Math.min(start + materialPageSize, filtered.length).toLocaleString("en-US") +
+      " of " + filtered.length.toLocaleString("en-US") + " uploads";
+    materialPrev.disabled = materialPage === 1;
+    materialNext.disabled = materialPage === pageCount;
+
+    materialList.innerHTML = visibleMaterials.map(function (material) {
       const status = normalizeSearch(
         material.status || "pending"
       );
@@ -1478,7 +1502,26 @@ export function initializeAdmin() {
   reviewNext.addEventListener("click", function () {
     changeReviewPage(reviewPage + 1);
   });
-  materialSearch.addEventListener("input", renderMaterials);
+  materialSearch.addEventListener("input", function () {
+    materialPage = 1;
+    renderMaterials();
+  });
+
+  function changeMaterialPage(nextPage) {
+    materialPage = nextPage;
+    renderMaterials();
+    materialList.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+
+  materialPrev.addEventListener("click", function () {
+    if (materialPage > 1) {
+      changeMaterialPage(materialPage - 1);
+    }
+  });
+
+  materialNext.addEventListener("click", function () {
+    changeMaterialPage(materialPage + 1);
+  });
   userSearch.addEventListener("input", function () {
     userPage = 1;
     renderUsers();
