@@ -1,0 +1,466 @@
+/* Activity History: AUC Atlas' compact, editorial account view. */
+.account-header-heading { min-width: 0; }
+
+.account-header-kicker {
+  display: block;
+  margin-bottom: 12px;
+  color: #a67b3e;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.account-page.is-activity-view .account-header h1 {
+  font-size: clamp(34px, 4.5vw, 58px);
+}
+
+#account-panel-reviews {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#account-panel-reviews .account-activity-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+#account-panel-reviews .account-activity-tabs {
+  margin: 0;
+  padding: 5px;
+  background: rgba(255, 255, 255, 0.62);
+  border-color: rgba(23, 23, 23, 0.10);
+  box-shadow: 0 10px 30px rgba(42, 32, 20, 0.04);
+  flex-shrink: 0;
+}
+
+#account-panel-reviews .account-activity-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 43px;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+#account-panel-reviews .account-activity-tab.active {
+  background: rgba(192, 154, 92, 0.17);
+  color: #171717;
+  box-shadow: none;
+}
+
+#account-panel-reviews .account-activity-tab:hover:not(.active) {
+  background: rgba(192, 154, 92, 0.08);
+  box-shadow: none;
+}
+
+#account-panel-reviews .account-activity-count {
+  min-width: 22px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: rgba(23, 23, 23, 0.06);
+  color: rgba(23, 23, 23, 0.60);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.3;
+  text-align: center;
+}
+
+#account-panel-reviews .account-activity-tab.active .account-activity-count {
+  background: rgba(192, 154, 92, 0.22);
+  color: #795723;
+}
+
+#account-panel-reviews .account-activity-tools {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  flex: 1 1 300px;
+}
+
+#account-panel-reviews .account-activity-search {
+  position: relative;
+  flex: 0 1 270px;
+  min-width: 0;
+}
+
+#account-panel-reviews .account-activity-search input {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 16px 0 42px;
+  border: 1px solid rgba(23, 23, 23, 0.11);
+  border-radius: 999px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.75);
+  color: #171717;
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#account-panel-reviews .account-activity-search input::placeholder {
+  color: rgba(23, 23, 23, 0.46);
+}
+
+#account-panel-reviews .account-activity-search input:focus {
+  border-color: rgba(192, 154, 92, 0.65);
+  box-shadow: 0 0 0 4px rgba(192, 154, 92, 0.12);
+}
+
+#account-panel-reviews .account-activity-search-icon {
+  position: absolute;
+  top: 15px;
+  left: 17px;
+  width: 13px;
+  height: 13px;
+  border: 1.7px solid rgba(23, 23, 23, 0.52);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+#account-panel-reviews .account-activity-search-icon::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 1.7px;
+  top: 10px;
+  left: 10px;
+  border-radius: 2px;
+  background: rgba(23, 23, 23, 0.52);
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
+
+#account-panel-reviews .account-activity-order {
+  white-space: nowrap;
+  color: rgba(23, 23, 23, 0.50);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+#account-panel-reviews .account-review-list,
+#account-panel-reviews .account-upload-list {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid rgba(23, 23, 23, 0.09);
+  border-radius: 23px;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 16px 40px rgba(42, 32, 20, 0.045);
+}
+
+#account-panel-reviews .account-review-item,
+#account-panel-reviews .account-upload-item {
+  position: relative;
+  padding: 19px 21px;
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  min-width: 0;
+}
+
+#account-panel-reviews .account-review-item:not(:last-child),
+#account-panel-reviews .account-upload-item:not(:last-child) {
+  border-bottom: 1px solid rgba(23, 23, 23, 0.075);
+}
+
+#account-panel-reviews .account-review-item:hover,
+#account-panel-reviews .account-upload-item:hover {
+  background: rgba(192, 154, 92, 0.035);
+}
+
+#account-panel-reviews .account-review-professor-photo,
+#account-panel-reviews .account-upload-file-visual {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border: 0;
+  border-radius: 16px;
+  background: rgba(192, 154, 92, 0.09);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+#account-panel-reviews .account-review-professor-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+#account-panel-reviews .account-review-body,
+#account-panel-reviews .account-upload-body {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding-right: 0;
+}
+
+#account-panel-reviews .account-review-head,
+#account-panel-reviews .account-upload-head {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+#account-panel-reviews .account-review-head h3,
+#account-panel-reviews .account-upload-head h3 {
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+#account-panel-reviews .account-review-head p,
+#account-panel-reviews .account-upload-head p {
+  margin: 0;
+  color: rgba(23, 23, 23, 0.47);
+  font-size: 11px;
+}
+
+#account-panel-reviews .account-review-meta,
+#account-panel-reviews .account-upload-meta {
+  display: flex;
+  gap: 3px 9px;
+  align-items: center;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+#account-panel-reviews .account-review-meta span,
+#account-panel-reviews .account-upload-meta span {
+  display: inline;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(23, 23, 23, 0.56);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+#account-panel-reviews .account-review-meta span:first-child,
+#account-panel-reviews .account-upload-meta span:first-child {
+  color: #95703b;
+  font-weight: 800;
+}
+
+#account-panel-reviews .account-review-meta span:not(:last-child)::after,
+#account-panel-reviews .account-upload-meta span:not(:last-child)::after {
+  content: "·";
+  margin-left: 9px;
+  color: rgba(23, 23, 23, 0.24);
+}
+
+#account-panel-reviews .account-review-copy,
+#account-panel-reviews .account-upload-file-name {
+  margin: 0;
+  color: rgba(23, 23, 23, 0.64);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+#account-panel-reviews .account-review-copy {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+#account-panel-reviews .account-review-copy.is-empty {
+  color: rgba(23, 23, 23, 0.42);
+  font-style: italic;
+}
+
+#account-panel-reviews .account-upload-file-visual .account-upload-file-icon {
+  display: block;
+  width: 43px;
+  height: 43px;
+  object-fit: contain;
+}
+
+#account-panel-reviews .account-upload-file-visual .account-upload-file-icon-fallback {
+  display: grid;
+  place-items: center;
+  border: 0;
+  padding: 0;
+  color: #86612d;
+  background: transparent;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+#account-panel-reviews .account-activity-item-aside {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 17px;
+}
+
+#account-panel-reviews .account-review-rating,
+#account-panel-reviews .account-review-actions,
+#account-panel-reviews .account-upload-actions {
+  position: static;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+#account-panel-reviews .account-review-rating {
+  color: #c09a5c;
+  font-size: 15px;
+  line-height: 1.2;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+#account-panel-reviews .account-review-actions,
+#account-panel-reviews .account-upload-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+#account-panel-reviews .account-review-action-button,
+#account-panel-reviews .account-upload-download-button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: rgba(23, 23, 23, 0.72);
+  background: transparent;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+#account-panel-reviews .account-upload-download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: normal;
+}
+
+#account-panel-reviews .account-review-action-button.is-danger {
+  border-color: transparent;
+  background: transparent;
+  color: rgba(23, 23, 23, 0.54);
+}
+
+#account-panel-reviews .account-review-action-button.is-danger:hover,
+#account-panel-reviews .account-review-action-button.is-danger:focus-visible {
+  border-color: rgba(199, 54, 54, 0.22);
+  background: rgba(199, 54, 54, 0.08);
+  color: #b73030;
+}
+
+#account-panel-reviews .account-review-action-button:focus-visible,
+#account-panel-reviews .account-upload-download-button:focus-visible,
+#account-panel-reviews .account-activity-tab:focus-visible {
+  outline: 2px solid rgba(192, 154, 92, 0.92);
+  outline-offset: 3px;
+}
+
+#account-panel-reviews .account-empty-state {
+  margin: 0;
+  padding: 35px 24px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: center;
+}
+
+#account-panel-reviews .account-message:not(:empty) {
+  margin-top: 14px;
+}
+
+@media (max-width: 1100px) {
+  #account-panel-reviews .account-activity-order { display: none; }
+}
+
+@media (max-width: 700px) {
+  #account-panel-reviews .account-activity-toolbar { align-items: stretch; }
+  #account-panel-reviews .account-activity-tabs {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #account-panel-reviews .account-activity-tools { flex-basis: 100%; }
+  #account-panel-reviews .account-activity-search { flex: 1 1 auto; }
+  #account-panel-reviews .account-review-item,
+  #account-panel-reviews .account-upload-item {
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-items: start;
+    padding: 17px 14px;
+    gap: 8px 13px;
+  }
+  #account-panel-reviews .account-review-professor-photo,
+  #account-panel-reviews .account-upload-file-visual {
+    width: 56px;
+    height: 56px;
+    border-radius: 13px;
+  }
+  #account-panel-reviews .account-activity-item-aside {
+    grid-column: 2;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #account-panel-reviews .account-review-actions,
+  #account-panel-reviews .account-upload-actions {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  #account-panel-reviews .account-review-item,
+  #account-panel-reviews .account-upload-item {
+    gap: 8px 11px;
+    padding: 15px 12px;
+  }
+  #account-panel-reviews .account-activity-item-aside {
+    align-items: flex-start;
+  }
+  #account-panel-reviews .account-upload-actions {
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #account-panel-reviews .account-review-professor-photo,
+  #account-panel-reviews .account-review-action-button {
+    transition: none;
+  }
+}

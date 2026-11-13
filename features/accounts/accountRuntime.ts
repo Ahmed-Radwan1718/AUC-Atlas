@@ -81,6 +81,13 @@ export function initializeAccounts(){
     const securityAccessCodeInputs = Array.from(document.querySelectorAll("[data-security-access-code-input]"));
     const securityAccessSubmit = document.getElementById("security-access-submit");
     const securityAccessMessage = document.getElementById("security-access-message");
+    const accountPage = document.querySelector(".account-page");
+    const accountPageKicker = document.getElementById("account-page-kicker");
+    const accountPageTitle = document.getElementById("account-page-title");
+    const accountPageDescription = document.getElementById("account-page-description");
+    const accountActivitySearch = document.getElementById("account-activity-search");
+    const accountReviewCount = document.getElementById("account-review-count");
+    const accountUploadCount = document.getElementById("account-upload-count");
     const accountActivityTabs = document.querySelectorAll("[data-account-activity-tab]");
     const accountActivitySections = document.querySelectorAll("[data-account-activity-section]");
     const accountReviewList = document.getElementById("account-review-list");
@@ -381,6 +388,16 @@ export function initializeAccounts(){
     }
 
     function activateAccountPanel(panelName) {
+      const isActivity = panelName === "reviews";
+      if (accountPage) accountPage.classList.toggle("is-activity-view", isActivity);
+      if (accountPageKicker) accountPageKicker.textContent = isActivity ? "Your account / Contributions" : "Your account";
+      if (accountPageTitle) accountPageTitle.textContent = isActivity ? "Activity History" : "My Account";
+      if (accountPageDescription) {
+        accountPageDescription.textContent = isActivity
+          ? "Manage the reviews and course materials you've shared with AUC Atlas."
+          : "Manage your details, degree progression, security, reviews, and uploaded materials.";
+      }
+
       sidebarLinks.forEach(function (link) {
         link.classList.toggle("active", link.dataset.accountPanel === panelName);
       });
@@ -1313,39 +1330,51 @@ function getAccountReviewProfessorUrl(professorId) {
 
     function renderAccountReviewHistory(reviews) {
       const safeReviews = Array.isArray(reviews) ? reviews : [];
-      accountReviewHistory = safeReviews.slice();
+      accountReviewHistory = safeReviews.slice().sort(function (a, b) {
+        const firstDate = getAccountDateFromValue(a.createdAt);
+        const secondDate = getAccountDateFromValue(b.createdAt);
+        return (secondDate ? secondDate.getTime() : 0) - (firstDate ? firstDate.getTime() : 0);
+      });
 
-      if (!accountReviewList) {
+      if (accountReviewCount) {
+        accountReviewCount.textContent = accountReviewHistory.length.toLocaleString("en-US");
+      }
+
+      if (!accountReviewList) return;
+
+      const search = String(accountActivitySearch ? accountActivitySearch.value : "").trim().toLowerCase();
+      const filteredReviews = accountReviewHistory.filter(function (review) {
+        const professor = getAccountReviewProfessor(review.professorId);
+        return !search || [
+          review.professorName, professor && professor.name, review.courseTaken,
+          review.semesterTaken, review.studentNote
+        ].join(" ").toLowerCase().includes(search);
+      });
+
+      if (!filteredReviews.length) {
+        accountReviewList.innerHTML = search && accountReviewHistory.length
+          ? `<div class="account-empty-state"><h3>No matching reviews</h3><p>Try a different professor, course, or keyword.</p></div>`
+          : `<div class="account-empty-state"><h3>No reviews yet</h3><p>Your professor and course reviews will appear here after submission.</p></div>`;
         return;
       }
 
-      if (!safeReviews.length) {
-        accountReviewList.innerHTML = `
-          <div class="account-empty-state">
-            <h3>No reviews yet</h3>
-            <p>Your professor and course reviews will appear here after submission.</p>
-          </div>
-        `;
-        return;
-      }
-
-      accountReviewList.innerHTML = safeReviews.map(function (review) {
+      accountReviewList.innerHTML = filteredReviews.map(function (review) {
         const reviewId = String(review.id || "");
         const professorId = String(review.professorId || "");
         const professor = getAccountReviewProfessor(professorId);
         const professorName = review.professorName || (professor && professor.name) || "Professor review";
-        const professorImage = professor && professor.image ? professor.image : "user.png";
+        const professorImage = professor && professor.image ? professor.image : "/user.png";
         const professorUrl = getAccountReviewProfessorUrl(professorId);
         const rating = Number(review.rating || 0);
         const professorPhoto = professorUrl
           ? `
               <a class="account-review-professor-photo" href="${escapeAccountHtml(professorUrl)}" aria-label="Open ${escapeAccountHtml(professorName)} profile">
-                <img src="${escapeAccountHtml(professorImage)}" alt="${escapeAccountHtml(professorName)}">
+                <img src="${escapeAccountHtml(professorImage)}" alt="${escapeAccountHtml(professorName)}" loading="lazy">
               </a>
             `
           : `
               <div class="account-review-professor-photo">
-                <img src="${escapeAccountHtml(professorImage)}" alt="${escapeAccountHtml(professorName)}">
+                <img src="${escapeAccountHtml(professorImage)}" alt="${escapeAccountHtml(professorName)}" loading="lazy">
               </div>
             `;
         const professorNameMarkup = professorUrl
@@ -1361,27 +1390,22 @@ function getAccountReviewProfessorUrl(professorId) {
         return `
           <article class="account-review-item">
             ${professorPhoto}
-
             <div class="account-review-body">
               <div class="account-review-head">
-                <div>
-                  <h3>${professorNameMarkup}</h3>
-                  <p>${escapeAccountHtml(getAccountReviewDateLabel(review.createdAt))}</p>
-                </div>
-
-                <span class="account-review-rating">${renderAccountReviewStars(rating)}</span>
+                <h3>${professorNameMarkup}</h3>
+                <p>${escapeAccountHtml(getAccountReviewDateLabel(review.createdAt))}</p>
               </div>
-
               <div class="account-review-meta">
                 <span>${escapeAccountHtml(review.courseTaken || "Course not listed")}</span>
                 <span>${escapeAccountHtml(review.semesterTaken || "Semester not listed")}</span>
               </div>
-
-              <p class="account-review-copy">${escapeAccountHtml(review.studentNote || "No written note.")}</p>
-
-              <div class="account-review-actions">
-                ${reviewActions}
-              </div>
+              ${review.studentNote
+                ? `<p class="account-review-copy">${escapeAccountHtml(review.studentNote)}</p>`
+                : '<p class="account-review-copy is-empty">Rating only</p>'}
+            </div>
+            <div class="account-activity-item-aside">
+              <span class="account-review-rating">${renderAccountReviewStars(rating)}</span>
+              <div class="account-review-actions">${reviewActions}</div>
             </div>
           </article>
         `;
@@ -1434,6 +1458,16 @@ function getAccountReviewProfessorUrl(professorId) {
 
     function setAccountActivityTab(tabName) {
       const activeTab = tabName === "uploads" ? "uploads" : "reviews";
+      const currentTab = Array.from(accountActivityTabs).find(function (tab) {
+        return tab.classList.contains("active");
+      });
+      const tabChanged = currentTab && currentTab.dataset.accountActivityTab !== activeTab;
+
+      if (accountActivitySearch) {
+        if (tabChanged) accountActivitySearch.value = "";
+        accountActivitySearch.placeholder = activeTab === "uploads" ? "Search uploads" : "Search reviews";
+        accountActivitySearch.setAttribute("aria-label", accountActivitySearch.placeholder);
+      }
 
       accountActivityTabs.forEach(function (tab) {
         const isActive = tab.dataset.accountActivityTab === activeTab;
@@ -1447,6 +1481,12 @@ function getAccountReviewProfessorUrl(professorId) {
         section.hidden =
           section.dataset.accountActivitySection !== activeTab;
       });
+
+      if (activeTab === "uploads") {
+        renderAccountUploadHistory(accountUploadHistory);
+      } else {
+        renderAccountReviewHistory(accountReviewHistory);
+      }
     }
 
     function getAccountUploadById(materialId) {
@@ -1480,117 +1520,81 @@ function getAccountReviewProfessorUrl(professorId) {
 
     function renderAccountUploadHistory(materials) {
       const safeMaterials = Array.isArray(materials) ? materials : [];
-      accountUploadHistory = safeMaterials.slice();
+      accountUploadHistory = safeMaterials.slice().sort(function (a, b) {
+        const firstDate = getAccountDateFromValue(a.createdAt);
+        const secondDate = getAccountDateFromValue(b.createdAt);
+        return (secondDate ? secondDate.getTime() : 0) - (firstDate ? firstDate.getTime() : 0);
+      });
 
-      if (!accountUploadList) {
+      if (accountUploadCount) {
+        accountUploadCount.textContent = accountUploadHistory.length.toLocaleString("en-US");
+      }
+
+      if (!accountUploadList) return;
+
+      const search = String(accountActivitySearch ? accountActivitySearch.value : "").trim().toLowerCase();
+      const filteredMaterials = accountUploadHistory.filter(function (material) {
+        return !search || [
+          material.title, material.fileName, material.courseCode,
+          material.materialType, material.professor, material.semester
+        ].join(" ").toLowerCase().includes(search);
+      });
+
+      if (!filteredMaterials.length) {
+        accountUploadList.innerHTML = search && accountUploadHistory.length
+          ? `<div class="account-empty-state"><h3>No matching uploads</h3><p>Try another material name, course, or category.</p></div>`
+          : `<div class="account-empty-state"><h3>No uploads yet</h3><p>Course materials uploaded from your account will appear here.</p></div>`;
         return;
       }
 
-      if (!safeMaterials.length) {
-        accountUploadList.innerHTML = `
-          <div class="account-empty-state">
-            <h3>No uploads yet</h3>
-            <p>Course materials uploaded from your account will appear here.</p>
-          </div>
-        `;
-        return;
-      }
-
-      accountUploadList.innerHTML = safeMaterials.map(function (material) {
+      accountUploadList.innerHTML = filteredMaterials.map(function (material) {
         const materialId = String(material.id || "");
         const title = material.title || "Course material";
         const fileName = material.fileName || "File name not listed";
         const extensionMatch = fileName.match(/\.([^.]+)$/);
-        const fileExtension = extensionMatch
-          ? extensionMatch[1].toLowerCase()
-          : "";
-        const extensionLabel = fileExtension
-          ? fileExtension.slice(0, 5).toUpperCase()
-          : "FILE";
-
+        const fileExtension = extensionMatch ? extensionMatch[1].toLowerCase() : "";
+        const extensionLabel = fileExtension ? fileExtension.slice(0, 5).toUpperCase() : "FILE";
         const fileIconMap = {
-          pdf: "pdf.png",
-          doc: "doc.png",
-          docx: "doc.png",
-          xls: "xls.png",
-          xlsx: "xls.png",
-          ppt: "ppt.png",
-          pptx: "ppt.png",
-          png: "png.png",
-          jpg: "jpg.png",
-          jpeg: "jpg.png"
+          pdf: "pdf.png", doc: "doc.png", docx: "doc.png",
+          xls: "xls.png", xlsx: "xls.png", ppt: "ppt.png",
+          pptx: "ppt.png", png: "png.png", jpg: "jpg.png", jpeg: "jpg.png"
         };
-
-        const fileIconUrl =
-          fileIconMap[fileExtension] || "";
-
+        const fileIconUrl = fileIconMap[fileExtension] || "";
         const fileIconMarkup = fileIconUrl
-          ? `
-              <img
-                class="account-upload-file-icon"
-                src="${escapeAccountHtml(fileIconUrl)}"
-                alt=""
-                aria-hidden="true"
-              >
-            `
-          : `
-              <span
-                class="account-upload-file-icon account-upload-file-icon-fallback"
-                aria-hidden="true"
-              >
-                ${escapeAccountHtml(extensionLabel)}
-              </span>
-            `;
+          ? `<img class="account-upload-file-icon" src="${escapeAccountHtml("/" + fileIconUrl)}" alt="" aria-hidden="true" loading="lazy">`
+          : `<span class="account-upload-file-icon account-upload-file-icon-fallback" aria-hidden="true">${escapeAccountHtml(extensionLabel)}</span>`;
 
         const downloadUrl = String(material.downloadUrl || "");
         const downloadAction = downloadUrl
-          ? `
-              <a
-                class="account-upload-download-button"
-                href="${escapeAccountHtml(downloadUrl)}"
-                target="_blank"
-                rel="noopener"
-              >Download</a>
-            `
+          ? `<a class="account-upload-download-button" href="${escapeAccountHtml(downloadUrl)}" target="_blank" rel="noopener">Download</a>`
           : "";
         const managementActions = materialId
           ? `
-              <button
-                class="account-review-action-button"
-                type="button"
-                data-account-material-edit="${escapeAccountHtml(materialId)}"
-              >Edit</button>
-
-              <button
-                class="account-review-action-button is-danger"
-                type="button"
-                data-account-material-delete="${escapeAccountHtml(materialId)}"
-              >Delete</button>
+              <button class="account-review-action-button" type="button" data-account-material-edit="${escapeAccountHtml(materialId)}">Edit</button>
+              <button class="account-review-action-button is-danger" type="button" data-account-material-delete="${escapeAccountHtml(materialId)}">Delete</button>
             `
           : "";
 
         return `
           <article class="account-upload-item">
-            ${fileIconMarkup}
-
+            <span class="account-upload-file-visual">${fileIconMarkup}</span>
             <div class="account-upload-body">
               <div class="account-upload-head">
                 <h3>${escapeAccountHtml(title)}</h3>
                 <p>${escapeAccountHtml(getAccountReviewDateLabel(material.createdAt))}</p>
               </div>
-
               <div class="account-upload-meta">
                 <span>${escapeAccountHtml(material.courseCode || "Course not listed")}</span>
                 <span>${escapeAccountHtml(material.materialType || "Category not listed")}</span>
                 <span>${escapeAccountHtml(material.professor || "Professor not listed")}</span>
                 <span>${escapeAccountHtml(material.semester || "Semester not listed")}</span>
               </div>
-
               <p class="account-upload-file-name">
                 ${escapeAccountHtml(fileName)} ·
                 ${escapeAccountHtml(formatAccountMaterialSize(material.size))}
               </p>
-
+            </div>
+            <div class="account-activity-item-aside">
               <div class="account-upload-actions">
                 ${downloadAction}
                 ${managementActions}
@@ -2947,11 +2951,34 @@ function getAccountReviewProfessorUrl(professorId) {
       });
     }
 
-    accountActivityTabs.forEach(function (tab) {
+    accountActivityTabs.forEach(function (tab, index) {
       tab.addEventListener("click", function () {
         setAccountActivityTab(tab.dataset.accountActivityTab || "reviews");
       });
+      tab.addEventListener("keydown", function (event) {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        const nextIndex = event.key === "Home" ? 0
+          : event.key === "End" ? accountActivityTabs.length - 1
+          : (index + (event.key === "ArrowRight" ? 1 : -1) + accountActivityTabs.length) % accountActivityTabs.length;
+        const nextTab = accountActivityTabs[nextIndex];
+        setAccountActivityTab(nextTab.dataset.accountActivityTab || "reviews");
+        nextTab.focus();
+      });
     });
+
+    if (accountActivitySearch) {
+      accountActivitySearch.addEventListener("input", function () {
+        const activeTab = Array.from(accountActivityTabs).find(function (tab) {
+          return tab.classList.contains("active");
+        });
+        if (activeTab && activeTab.dataset.accountActivityTab === "uploads") {
+          renderAccountUploadHistory(accountUploadHistory);
+        } else {
+          renderAccountReviewHistory(accountReviewHistory);
+        }
+      });
+    }
 
     if (accountReviewList) {
       accountReviewList.addEventListener("click", function (event) {
