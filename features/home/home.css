@@ -719,14 +719,14 @@
     }
 
 
-    /* Shared horizontal carousel of three-row pages for all home activity cards. */
-    .home-activity-carousel-shell {
+    /* Horizontal carousel of three-row pages, retaining each row's styling. */
+    .home-lowest-carousel-shell {
       width: 100%;
       position: relative;
     }
 
     /* Thin gold progress indicator lives in the card's existing bottom padding. */
-    .home-activity-carousel-progress {
+    .home-lowest-carousel-progress {
       position: absolute;
       left: 12px;
       right: 12px;
@@ -738,44 +738,44 @@
       pointer-events: none;
     }
 
-    .home-activity-carousel-progress-fill {
+    .home-lowest-carousel-progress-fill {
       display: block;
       width: 100%;
       height: 100%;
       background: #c09a5c;
       transform-origin: left center;
-      animation: homeActivityCarouselProgress 15s linear forwards;
+      animation: homeLowestCarouselProgress 15s linear forwards;
     }
 
-    .home-activity-carousel-shell.is-paused .home-activity-carousel-progress-fill {
+    .home-lowest-carousel-shell.is-paused .home-lowest-carousel-progress-fill {
       animation-play-state: paused;
     }
 
-    @keyframes homeActivityCarouselProgress {
+    @keyframes homeLowestCarouselProgress {
       from { transform: scaleX(0); }
       to { transform: scaleX(1); }
     }
 
-    .home-activity-carousel {
+    .home-lowest-carousel {
       width: 100%;
-      /* Show exactly three of the existing 82px rows in every card. */
+      /* Show exactly three of the existing 82px professor rows. */
       height: 246px;
       overflow: hidden;
     }
 
-    .home-activity-carousel-track {
+    .home-lowest-carousel-track {
       display: flex;
       flex-direction: row;
       width: 200%;
       transform: translateX(0);
     }
 
-    .home-activity-carousel-track.is-sliding {
+    .home-lowest-carousel-track.is-sliding {
       transform: translateX(-50%);
       transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .home-activity-carousel-slide {
+    .home-lowest-carousel-slide {
       flex: 0 0 50%;
       min-width: 0;
       display: flex;
@@ -783,11 +783,11 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .home-activity-carousel-track.is-sliding {
+      .home-lowest-carousel-track.is-sliding {
         transition: none;
       }
 
-      .home-activity-carousel-progress-fill {
+      .home-lowest-carousel-progress-fill {
         animation: none;
         transform: scaleX(1);
       }

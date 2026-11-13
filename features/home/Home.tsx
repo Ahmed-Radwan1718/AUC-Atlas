@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import HomeSearch from "./HomeSearch";
 import { courses } from "../../data/courses";
 import { professors } from "../../data/professors";
@@ -76,12 +76,12 @@ function professorItems(items: RankedProfessor[], lowestFirst: boolean): RatedPr
     return { professor, average, count };
   }).filter((item): item is RatedProfessor =>
     Boolean(item.professor?.name) && Number.isFinite(item.average) &&
-    item.average > 0 && item.count > 0 && (lowestFirst ? item.average <= 2 : item.average >= 4)
+    item.average > 0 && item.count > 0 && (!lowestFirst || item.average <= 2)
   ).sort((a, b) =>
     (lowestFirst ? a.average - b.average : b.average - a.average) || b.count - a.count
   );
-  // Both cards cycle through every professor meeting the rating threshold.
-  return rankings;
+  // Cycle through every qualifying low-rated professor; keep the other card at three.
+  return lowestFirst ? rankings : rankings.slice(0, 3);
 }
 
 function professorRows(rankings: RatedProfessor[], inactive = false) {
@@ -104,17 +104,8 @@ function professorRows(rankings: RatedProfessor[], inactive = false) {
   });
 }
 
-// One carousel drives all three home cards so timing, pausing and transitions match.
-function HomeThreeRowCarousel<T>({
-  items,
-  renderRows,
-  label
-}: {
-  items: T[];
-  renderRows: (rows: T[], inactive?: boolean) => ReactNode;
-  label: string;
-}) {
-  const pageCount = Math.ceil(items.length / 3);
+function LowRatedProfessorSlider({ rankings }: { rankings: RatedProfessor[] }) {
+  const pageCount = Math.ceil(rankings.length / 3);
   const [pageIndex, setPageIndex] = useState(0);
   const [sliding, setSliding] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -138,11 +129,13 @@ function HomeThreeRowCarousel<T>({
     return () => document.removeEventListener("visibilitychange", updateVisibility);
   }, []);
 
-  // The progress bar's animation is the slide clock (and pauses on hover/focus).
+  // The gold bar's animation ending is the clock for each carousel slide.
+  // This keeps its progress aligned with the actual change, even after pausing.
   const finishCountdown = () => {
     if (!paused && !sliding && !reducedMotion) setSliding(true);
   };
 
+  // Respect reduced-motion preferences without relying on a visual animation.
   useEffect(() => {
     if (pageCount <= 1 || !reducedMotion || paused) return;
     const timer = window.setInterval(() => {
@@ -160,32 +153,31 @@ function HomeThreeRowCarousel<T>({
     return () => window.clearTimeout(timer);
   }, [sliding, pageCount]);
 
-  if (pageCount <= 1) return <>{renderRows(items)}</>;
+  if (pageCount <= 1) return <>{professorRows(rankings)}</>;
 
-  // Wrap the final page to preserve exactly three rows and card height.
   const pageAt = (index: number) => Array.from({ length: 3 }, (_, offset) =>
-    items[(index * 3 + offset) % items.length]
+    rankings[(index * 3 + offset) % rankings.length]
   );
   const current = pageIndex % pageCount;
-  return <div className={"home-activity-carousel-shell" + (paused ? " is-paused" : "")}
+  return <div className={"home-lowest-carousel-shell" + (paused ? " is-paused" : "")}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={event => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
       }}>
-    <div className="home-activity-carousel" aria-label={label}>
-      <div className={"home-activity-carousel-track" + (sliding ? " is-sliding" : "")}>
-        <div className="home-activity-carousel-slide">
-          {renderRows(pageAt(current))}
+    <div className="home-lowest-carousel" aria-label="Professors rated 2 stars or less">
+      <div className={"home-lowest-carousel-track" + (sliding ? " is-sliding" : "")}>
+        <div className="home-lowest-carousel-slide">
+          {professorRows(pageAt(current))}
         </div>
-        <div className="home-activity-carousel-slide" aria-hidden="true">
-          {renderRows(pageAt((current + 1) % pageCount), true)}
+        <div className="home-lowest-carousel-slide" aria-hidden="true">
+          {professorRows(pageAt((current + 1) % pageCount), true)}
         </div>
       </div>
     </div>
-    <div className="home-activity-carousel-progress" aria-hidden="true">
-      <span key={pageIndex} className="home-activity-carousel-progress-fill"
+    <div className="home-lowest-carousel-progress" aria-hidden="true">
+      <span key={pageIndex} className="home-lowest-carousel-progress-fill"
         onAnimationEnd={finishCountdown}/>
     </div>
   </div>;
@@ -196,11 +188,9 @@ function RatedProfessors({ items, lowest }: { items: RankedProfessor[]; lowest: 
   if (!rankings.length) return <p className="home-latest-status">
     {lowest ? "Lowest-rated" : "Top-reviewed"} professors will appear here once ratings are available.
   </p>;
-  return <HomeThreeRowCarousel
-    items={rankings}
-    renderRows={professorRows}
-    label={lowest ? "Professors rated 2 stars or less" : "Professors rated 4 stars or higher"}
-  />;
+  return lowest
+    ? <LowRatedProfessorSlider rankings={rankings}/>
+    : <>{professorRows(rankings)}</>;
 }
 
 function getMaterialIcon(material: CourseMaterial): { icon: string | null; fallback: string } {
@@ -241,16 +231,16 @@ function HomeLatestSkeleton({ kind }: { kind: "professor" | "material" }) {
   </div>;
 }
 
-function materialRows(materials: CourseMaterial[], inactive = false) {
-  return materials.map(material => {
+function LatestMaterials({ materials }: { materials: CourseMaterial[] }) {
+  if (!materials.length) return <p className="home-latest-status">New approved course materials will appear here.</p>;
+  return materials.slice(0, 3).map(material => {
     const courseName = courseLookup.get(String(material.courseCode || "").trim().toUpperCase())?.title
       || material.courseTitle || "Course name unavailable";
     const slug = String(material.courseCode || "").trim().toLowerCase()
       .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
     const href = slug ? "/courses/" + encodeURIComponent(slug) + "#course-materials-access" : "/courses";
     const file = getMaterialIcon(material);
-    return <a className="home-latest-item home-latest-material" href={href} key={material.id}
-      tabIndex={inactive ? -1 : undefined}>
+    return <a className="home-latest-item home-latest-material" href={href} key={material.id}>
       <span className="home-latest-material-icon" aria-hidden="true">
         {file.icon ? <img src={assetsRoot + file.icon} alt=""/> :
           <span className="home-latest-material-icon-fallback">{file.fallback}</span>}
@@ -262,14 +252,6 @@ function materialRows(materials: CourseMaterial[], inactive = false) {
       <span className="home-latest-arrow" aria-hidden="true">→</span>
     </a>;
   });
-}
-
-function LatestMaterials({ materials }: { materials: CourseMaterial[] }) {
-  if (!materials.length) return <p className="home-latest-status">
-    New approved course materials will appear here.
-  </p>;
-  return <HomeThreeRowCarousel items={materials} renderRows={materialRows}
-    label="Recently uploaded course materials"/>;
 }
 
 export default function Home() {
