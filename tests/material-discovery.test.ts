@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import * as crypto from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
@@ -101,7 +102,7 @@ function harness(rows:Row[], pivot=0) {
   vm.runInNewContext(js,{
     module,exports:module.exports,Promise,Date,Map,Number,Math:testMath,
     require(id:string) {
-      if (id==="node:crypto")return require("node:crypto");
+      if (id==="node:crypto")return crypto;
       if (id==="firebase-admin/firestore")return {FieldPath:{documentId:()=>"__name__"}};
       if (id==="./firebase")return {firestore:()=>db};
       if (id==="./materials")return {
