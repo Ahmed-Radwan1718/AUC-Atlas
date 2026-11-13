@@ -84,7 +84,6 @@ export function initializeAccounts(){
     const securityAccessSubmit = document.getElementById("security-access-submit");
     const securityAccessMessage = document.getElementById("security-access-message");
     const accountPage = document.querySelector(".account-page");
-    const accountPageKicker = document.getElementById("account-page-kicker");
     const accountPageTitle = document.getElementById("account-page-title");
     const accountPageDescription = document.getElementById("account-page-description");
     const accountActivitySearch = document.getElementById("account-activity-search");
@@ -394,7 +393,6 @@ export function initializeAccounts(){
     function activateAccountPanel(panelName) {
       const isActivity = panelName === "reviews";
       if (accountPage) accountPage.classList.toggle("is-activity-view", isActivity);
-      if (accountPageKicker) accountPageKicker.textContent = isActivity ? "Your account / Contributions" : "Your account";
       if (accountPageTitle) accountPageTitle.textContent = isActivity ? "Activity History" : "My Account";
       if (accountPageDescription) {
         accountPageDescription.textContent = isActivity
