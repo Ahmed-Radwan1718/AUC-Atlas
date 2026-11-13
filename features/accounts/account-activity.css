@@ -1,4 +1,9 @@
 /* Activity History: AUC Atlas' compact, editorial account view. */
+/* Until the URL hash is selected on hydration, don't show a wrong heading. */
+.account-page:not([data-atlas-accounts-initialized="true"]) .account-header {
+  visibility: hidden;
+}
+
 .account-header-heading { min-width: 0; }
 
 .account-page.is-activity-view .account-header h1 {
