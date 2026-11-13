@@ -314,84 +314,62 @@ async function listAllUsers(actor: any) {
   return users;
 }
 
-async function getDashboardData(actor: any) {
+async function getDashboardData(actor: any, section: string) {
   const db = admin.firestore();
-  const results = await Promise.all([
-    db.collection("professorReviews").get(),
-    db.collection("courseMaterials").get(),
-    db.collection("contentReports").where("status", "==", "open").limit(25).get(),
-    db.collection("adminAuditLogs").orderBy("createdAt", "desc").limit(10).get(),
-    listAllUsers(actor),
-    db.collection("professorReviews").count().get()
-  ]);
-
-  const reviewsSnapshot = results[0];
-  const materialsSnapshot = results[1];
-  const reportsSnapshot = results[2];
-  const auditSnapshot = results[3];
-  const users = results[4];
-  const reviewCountSnapshot = results[5];
-  const reviews: any[] = [];
-  const firestoreMaterials: any[] = [];
-  const reports: any[] = [];
-  const audits: any[] = [];
-
-  reviewsSnapshot.forEach(function (doc: any) {
-    reviews.push(serializeReview(doc));
-  });
-
-  materialsSnapshot.forEach(function (doc: any) {
-    firestoreMaterials.push(
-      serializeMaterial(doc)
-    );
-  });
-
-  reportsSnapshot.forEach(function (doc: any) {
-    reports.push(serializeReport(doc));
-  });
-
-  auditSnapshot.forEach(function (doc: any) {
-    audits.push(serializeAudit(doc));
-  });
-
-  const materials = firestoreMaterials
-    .filter(function (material: any) {
-      return material.status !== "rejected";
-    });
-
-  reviews.sort(function (a: any, b: any) {
-    return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
-  });
-
-  materials.sort(function (a: any, b: any) {
-    return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
-  });
-
-  reports.sort(function (a: any, b: any) {
-    return getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt);
-  });
-
-  return {
+  const base = {
     success: true,
-    admin: {
-      uid: actor.uid,
-      email: actor.email,
-      displayName: actor.displayName
-    },
-    stats: {
-      users: users.length,
-      reviews: Number(reviewCountSnapshot.data().count || 0),
-      materials: materials.length,
-      bannedUsers: users.filter(function (user: any) {
-        return user.disabled;
-      }).length
-    },
-    users,
-    reports: reports.slice(0, 250),
-    reviews,
-    materials,
-    auditLogs: audits
+    admin: { uid: actor.uid, email: actor.email, displayName: actor.displayName }
   };
+
+  // Only the selected panel is read. The counts do not download the collections.
+  if (section === "users") {
+    const [users, reviewCount, materialCount, rejectedCount] = await Promise.all([
+      listAllUsers(actor),
+      db.collection("professorReviews").count().get(),
+      db.collection("courseMaterials").count().get(),
+      db.collection("courseMaterials").where("status", "==", "rejected").count().get()
+    ]);
+    return {
+      ...base,
+      stats: {
+        users: users.length,
+        reviews: Number(reviewCount.data().count || 0),
+        // Keep pending and legacy documents without status, just as before.
+        materials: Math.max(0, Number(materialCount.data().count || 0) -
+          Number(rejectedCount.data().count || 0)),
+        bannedUsers: users.filter((user: any) => user.disabled).length
+      },
+      users
+    };
+  }
+
+  if (section === "reports") {
+    const snapshot = await db.collection("contentReports")
+      .where("status", "==", "open").limit(25).get();
+    const reports = snapshot.docs.map(serializeReport);
+    reports.sort((a: any, b: any) =>
+      getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt));
+    return { ...base, reports };
+  }
+
+  if (section === "reviews") {
+    const snapshot = await db.collection("professorReviews").get();
+    const reviews = snapshot.docs.map(serializeReview);
+    reviews.sort((a: any, b: any) =>
+      getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt));
+    return { ...base, reviews, stats: { reviews: reviews.length } };
+  }
+
+  if (section === "materials") {
+    const snapshot = await db.collection("courseMaterials").get();
+    const materials = snapshot.docs.map(serializeMaterial)
+      .filter((material: any) => material.status !== "rejected");
+    materials.sort((a: any, b: any) =>
+      getTimestampMillis(b.createdAt) - getTimestampMillis(a.createdAt));
+    return { ...base, materials, stats: { materials: materials.length } };
+  }
+
+  throw createAdminError("Unknown administrator dashboard section.", 400);
 }
 
 async function lookupUser(uid: any) {
@@ -971,7 +949,8 @@ export default async function handler(req: LegacyRequest, res: LegacyReply) {
 
     if (req.method === "GET") {
       return res.status(200).json(
-        await getDashboardData(actor)
+        await getDashboardData(actor,
+          typeof req.query?.section === "string" ? req.query.section : "users")
       );
     }
 

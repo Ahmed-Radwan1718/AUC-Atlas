@@ -89,6 +89,10 @@ export function initializeAdmin() {
       storedAdminAccess.expiresAt
   };
 
+  // Cache loaded panels within this session; retain full-list search and pagination.
+  const loadedSections = new Set();
+  const sectionRequests = new Map();
+
   const loadingState =
     document.getElementById(
       "admin-loading"
@@ -563,6 +567,7 @@ export function initializeAdmin() {
   }
 
   function switchPanel(panelName) {
+    if (!["users", "reports", "reviews", "materials"].includes(panelName)) return;
     state.activePanel = panelName;
 
     navButtons.forEach(function (button) {
@@ -580,6 +585,16 @@ export function initializeAdmin() {
           "admin-panel-" + panelName
       );
     });
+
+    if (state.dashboard && !loadedSections.has(panelName) &&
+        !sectionRequests.has(panelName)) {
+      const target = {
+        users: userList, reports: reportList,
+        reviews: reviewList, materials: materialList
+      }[panelName];
+      if (target) target.innerHTML = '<div class="admin-empty">Loading...</div>';
+      void loadDashboard({ section: panelName });
+    }
   }
 
   async function completeAdminAuthentication(
@@ -616,6 +631,9 @@ export function initializeAdmin() {
       state.adminAccessToken,
       state.adminAccessExpiresAt
     );
+    // New credentials must never inherit data from a previous admin session.
+    state.dashboard = null;
+    loadedSections.clear();
 
     authPasswordInput.value = "";
     closeTwoFactorPanel();
@@ -1404,50 +1422,93 @@ export function initializeAdmin() {
 
   }
 
-  function renderDashboard() {
-    renderStats();
-    renderUsers();
-    renderReports();
-    renderReviews();
-    renderMaterials();
-    switchPanel(state.activePanel);
-  }
-
+  // Fetch the selected section once. Other panels stay on the server until opened.
   async function loadDashboard(options) {
     const settings = options || {};
-
-    try {
-      const data = await requestJson(
-        "/api/admin"
-      );
-
-      state.dashboard = data;
-      renderDashboard();
-
-      loadingState.hidden = true;
-      authState.hidden = true;
-      deniedState.hidden = true;
-      app.hidden = false;
-
-      if (settings.message) {
-        showToast(settings.message);
-      }
-    } catch (error) {
-      if (
-        error.code ===
-        "admin-fresh-auth-required"
-      ) {
-        showAuthenticationGate(
-          error.message
-        );
-        return;
-      }
-
-      showDenied(
-        error.message ||
-        "Administrator access could not be verified."
-      );
+    const section = settings.section || "users";
+    if (loadedSections.has(section) && !settings.force) {
+      if (settings.message) showToast(settings.message);
+      return;
     }
+    if (sectionRequests.has(section)) return sectionRequests.get(section);
+
+    const pending = (async function () {
+      try {
+        const data = await requestJson("/api/admin?section=" + encodeURIComponent(section));
+        if (!state.dashboard) {
+          state.dashboard = {
+            stats: {}, users: [], reports: [], reviews: [], materials: [], auditLogs: []
+          };
+        }
+        if (data.stats) {
+          state.dashboard.stats = Object.assign({}, state.dashboard.stats, data.stats);
+        }
+        if (Array.isArray(data[section])) state.dashboard[section] = data[section];
+        loadedSections.add(section);
+
+        renderStats();
+        if (section === "users") renderUsers();
+        if (section === "reports") renderReports();
+        if (section === "reviews") renderReviews();
+        if (section === "materials") renderMaterials();
+        switchPanel(state.activePanel);
+
+        loadingState.hidden = true;
+        authState.hidden = true;
+        deniedState.hidden = true;
+        app.hidden = false;
+        if (settings.message) showToast(settings.message);
+      } catch (error) {
+        if (error.code === "admin-fresh-auth-required") {
+          showAuthenticationGate(error.message);
+          return;
+        }
+        if (!state.dashboard) {
+          showDenied(error.message || "Administrator access could not be verified.");
+          return;
+        }
+        showToast(error.message || "Could not load administrator data.");
+        const target = {
+          users: userList, reports: reportList,
+          reviews: reviewList, materials: materialList
+        }[section];
+        if (target && !loadedSections.has(section)) {
+          target.innerHTML = '<div class="admin-empty">Could not load records. Switch panels to retry.</div>';
+        }
+      }
+    })();
+
+    sectionRequests.set(section, pending);
+    try { return await pending; }
+    finally { sectionRequests.delete(section); }
+  }
+
+  // Mutations update the loaded list and stats instead of refetching every record.
+  function removeModeratedContent(section, id) {
+    const list = Array.isArray(state.dashboard[section]) ? state.dashboard[section] : [];
+    const next = list.filter(function (item) { return item.id !== id; });
+    if (next.length !== list.length) {
+      state.dashboard[section] = next;
+      const stat = section === "reviews" ? "reviews" : "materials";
+      state.dashboard.stats[stat] = Math.max(0, Number(state.dashboard.stats[stat] || 0) - 1);
+      renderStats();
+      if (section === "reviews") renderReviews();
+      else renderMaterials();
+    }
+    // The target's open reports are resolved server-side; reload reports on revisit.
+    loadedSections.delete("reports");
+  }
+
+  function updateModeratedUser(nextUser) {
+    if (!nextUser || !nextUser.uid) return;
+    const users = state.dashboard.users || [];
+    const index = users.findIndex(function (user) { return user.uid === nextUser.uid; });
+    if (index < 0) return;
+    // The action response omits AUC ID and major; preserve them from the list.
+    users[index] = Object.assign({}, users[index], nextUser, { activeSessionRecords: null });
+    state.dashboard.stats.bannedUsers = users.filter(function (user) { return user.disabled; }).length;
+    renderUsers();
+    renderStats();
   }
 
   async function runBusy(button, callback) {
@@ -1555,11 +1616,11 @@ export function initializeAdmin() {
       if (targetType === "review") {
         reviewSearch.value = targetId;
         reviewPage = 1;
-        renderReviews();
+        if (loadedSections.has("reviews")) renderReviews();
         switchPanel("reviews");
       } else {
         materialSearch.value = targetId;
-        renderMaterials();
+        if (loadedSections.has("materials")) renderMaterials();
         switchPanel("materials");
       }
 
@@ -1600,10 +1661,8 @@ export function initializeAdmin() {
           reason
         });
 
-        await loadDashboard({
-          message:
-            "Content report dismissed."
-        });
+        loadedSections.delete("reports");
+        await loadDashboard({ section: "reports", message: "Content report dismissed." });
       }
     ).catch(function (error) {
       showToast(
@@ -1639,7 +1698,8 @@ export function initializeAdmin() {
         reviewId: button.dataset.deleteReview,
         reason
       });
-      await loadDashboard({ message: "Review deleted." });
+      removeModeratedContent("reviews", button.dataset.deleteReview);
+      showToast("Review deleted.");
     }).catch(function (error) {
       showToast(error.message || "Could not delete the review.");
     });
@@ -1689,10 +1749,8 @@ export function initializeAdmin() {
           reason
         });
 
-        await loadDashboard({
-          message:
-            "Uploaded content deleted."
-        });
+        removeModeratedContent("materials", deleteButton.dataset.deleteMaterial);
+        showToast("Uploaded content deleted.");
       }
     ).catch(function (error) {
       showToast(
@@ -1742,18 +1800,15 @@ export function initializeAdmin() {
       }
 
       runBusy(banButton, async function () {
-        await postAction({
+        const result = await postAction({
           action: "setUserBan",
           uid: banButton.dataset.userUid,
           banned: isBanning,
           reason
         });
 
-        await loadDashboard({
-          message: isBanning
-            ? "User banned."
-            : "User unbanned."
-        });
+        updateModeratedUser(result.user);
+        showToast(isBanning ? "User banned." : "User unbanned.");
       }).catch(function (error) {
         showToast(error.message || "Could not update the user.");
       });
@@ -1774,10 +1829,7 @@ export function initializeAdmin() {
           uid: revokeButton.dataset.userRevokeSessions,
           reason
         });
-
-        await loadDashboard({
-          message: "All user sessions were revoked."
-        });
+        showToast("All user sessions were revoked.");
       }).catch(function (error) {
         showToast(error.message || "Could not revoke the sessions.");
       });
