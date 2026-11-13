@@ -75,20 +75,14 @@ async function rankedProfessors() {
   })).sort((a, b) => b.averageRating - a.averageRating
     || b.reviewCount - a.reviewCount || a.professorName.localeCompare(b.professorName));
 }
-async function latestMaterials(limit: number) {
-  const collection = firestore().collection("courseMaterials");
-  const safeLimit = Math.max(1, Math.min(12, Math.floor(Number(limit) || 3)));
-  let snapshot;
-  try {
-    snapshot = await collection.where("status", "==", "approved")
-      .orderBy("createdAt", "desc").limit(safeLimit).get();
-  } catch {
-    snapshot = await collection.orderBy("createdAt", "desc").limit(20).get();
-  }
-  return snapshot.docs.filter(doc => clean(doc.data().status, 40).toLowerCase() === "approved")
-    .map(serializeMaterial)
-    .sort((a, b) => timestampMillis(b.createdAt) - timestampMillis(a.createdAt))
-    .slice(0, safeLimit);
+async function latestMaterials() {
+  // Read every approved upload, including those beyond the former three-item cap.
+  // Sort in memory to include documents that only have the legacy createdAtIso.
+  const snapshot = await firestore().collection("courseMaterials")
+    .where("status", "==", "approved").get();
+  return snapshot.docs.map(serializeMaterial)
+    .sort((a, b) => timestampMillis(b.createdAt) - timestampMillis(a.createdAt)
+      || a.id.localeCompare(b.id));
 }
 
 export async function GET(request: NextRequest) {
@@ -101,7 +95,7 @@ export async function GET(request: NextRequest) {
     // only queried for verified AUC Atlas sessions.
     const [materialCount, latestMaterialData, reviewCount, latestReviewData, rankings] = await Promise.all([
       db.collection("courseMaterials").where("status", "==", "approved").count().get(),
-      latestMaterials(3),
+      latestMaterials(),
       user ? db.collection("professorReviews").count().get() : Promise.resolve(null),
       user ? latestReviews(3) : Promise.resolve([]),
       user ? rankedProfessors() : Promise.resolve([])
@@ -115,7 +109,7 @@ export async function GET(request: NextRequest) {
       materialCount: Number(materialCount.data().count || 0),
       latestReviews: latestReviewData,
       latestMaterials: latestMaterialData,
-      topReviewedProfessors: rankings.slice(0, 12),
+      topReviewedProfessors: rankings.filter(professor => professor.averageRating >= 4),
       lowestRatedProfessors: lowest
     }, { headers });
   } catch {
