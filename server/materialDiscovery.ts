@@ -129,8 +129,14 @@ export async function randomCourseMaterials(limit: unknown): Promise<Material[]>
   const first = await query.startAt(Math.random()).limit(count).get();
   const docs = [...first.docs];
   if (docs.length < count) {
-    const wrapped = await query.limit(count-docs.length).get();
-    docs.push(...wrapped.docs);
+    const wrapped = await query.limit(count - docs.length).get();
+    const seen = new Set(docs.map(doc => doc.id));
+    for (const doc of wrapped.docs) {
+      if (!seen.has(doc.id)) {
+        seen.add(doc.id);
+        docs.push(doc);
+      }
+    }
   }
-  return docs.map(doc => doc.data().material as Material).filter(Boolean).slice(0,count);
+  return docs.map(doc => doc.data().material as Material).filter(Boolean).slice(0, count);
 }

@@ -139,7 +139,7 @@ test("index contains one entry per group, always representing the newest non-rej
     material("legacy","",now+100)
   ]);
   const results=await app.api.randomCourseMaterials(6);
-  const ids=results.map(item=>item.id).sort();
+  const ids=Array.from(results).map(item=>item.id).sort();
   assert.deepEqual(ids,["legacy","newer","other"]);
   assert.equal(app.tables.get("materialDiscovery")!.size,3);
 });
@@ -169,7 +169,7 @@ test("editing or rejecting a group representative updates the index without scan
   await app.api.refreshMaterialDiscovery("a-new","shared");
   assert.equal(app.reads.courseMaterials-before,2);
   const results=await app.api.randomCourseMaterials(6);
-  assert.deepEqual(results.map(item=>item.id).sort(),["a-old","unrelated"]);
+  assert.deepEqual(Array.from(results).map(item=>item.id).sort(),["a-old","unrelated"]);
 });
 
 test("selection wraps around the index and still returns distinct upload groups",async()=>{
