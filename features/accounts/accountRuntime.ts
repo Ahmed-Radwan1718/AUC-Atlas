@@ -390,7 +390,8 @@ export function initializeAccounts(){
       }
     }
 
-    function activateAccountPanel(panelName) {
+    function activateAccountPanel(panelName, options) {
+      const deferLoading = Boolean(options && options.deferLoading);
       const isActivity = panelName === "reviews";
       if (accountPage) accountPage.classList.toggle("is-activity-view", isActivity);
       if (accountPageTitle) accountPageTitle.textContent = isActivity ? "Activity History" : "My Account";
@@ -410,11 +411,13 @@ export function initializeAccounts(){
 
       window.location.hash = panelName;
 
-      if (panelName === "security") {
+      // On a deep-linked refresh, select the right panel before fetching profile
+      // data, but defer protected requests until the session is verified.
+      if (!deferLoading && panelName === "security") {
         loadAccountLoginSessions();
       }
 
-      if (panelName === "reviews") {
+      if (!deferLoading && panelName === "reviews") {
         loadAccountActivityHistory();
       }
     }
@@ -3193,21 +3196,31 @@ function getAccountReviewProfessorUrl(professorId) {
     });
 
     async function initializeAccountPage() {
-      initializeAccountMajorDropdown();
+      const hashPanel = window.location.hash.slice(1);
+      const initialPanel = ["details", "security", "reviews"].includes(hashPanel)
+        ? hashPanel
+        : "details";
 
-      const accountLoaded = await loadAccountDetails();
-
-      if (!accountLoaded) {
-        return;
+      // Choose the correct skeleton synchronously; never flash Account Details
+      // while a deep-linked panel is waiting for /api/me.
+      if (initialPanel === "security") {
+        // Security content must remain hidden until any required 2FA challenge.
+        setAccountSecurityLoading(true);
       }
+      activateAccountPanel(initialPanel, { deferLoading: true });
 
-      const initialPanel =
-        window.location.hash.replace("#", "") || "details";
+      initializeAccountMajorDropdown();
+      const accountLoaded = await loadAccountDetails();
+      if (!accountLoaded) return;
 
-      if (document.getElementById("account-panel-" + initialPanel)) {
-        await showPanel(initialPanel);
-      } else {
-        await showPanel("details");
+      if (initialPanel === "security") {
+        const allowed = await showPanel("security");
+        if (!allowed) {
+          setAccountSecurityLoading(false);
+          activateAccountPanel("details", { deferLoading: true });
+        }
+      } else if (initialPanel === "reviews") {
+        await showPanel("reviews");
       }
     }
 
