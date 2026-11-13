@@ -4,6 +4,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { firestore } from "../../../server/firebase";
 import { MaterialUploadError, registerMaterial, verifiedMaterialUser } from "../../../server/materialUpload";
 import { getOwnedMaterial } from "../../../server/materials";
+import { refreshMaterialDiscovery } from "../../../server/materialDiscovery";
 import { deleteStoredCourseMaterial } from "../../../server/materialFiles";
 
 import { courseMaterials, randomCourseMaterials, userMaterials } from "../../../server/materials";
@@ -54,6 +55,7 @@ async function mutate(request:NextRequest,method:"POST"|"PATCH"|"DELETE"){
     const body=await request.json().catch(()=>({})) as Record<string,unknown>;
     if(method==="POST"){
       const result=await registerMaterial(user,body);
+      await refreshMaterialDiscovery(result.material.id,result.material.uploadGroupId);
       return NextResponse.json(result,{status:result.alreadySaved?200:201,headers});
     }
     const materialId=String(body.materialId||"").trim().slice(0,160);
@@ -69,12 +71,14 @@ async function mutate(request:NextRequest,method:"POST"|"PATCH"|"DELETE"){
       await owned.ref.update({
         title,materialType,status,updatedAt:FieldValue.serverTimestamp(),updatedAtIso:new Date().toISOString()
       });
+      await refreshMaterialDiscovery(materialId,owned.data.uploadGroupId);
       return NextResponse.json({success:true,materials:await userMaterials(user.uid)},{headers});
     }
     // Reject the Firestore record first so a failed provider cleanup cannot expose it.
     await owned.ref.update({
       status:"rejected",deletedAt:FieldValue.serverTimestamp(),deletedAtIso:new Date().toISOString()
     });
+    await refreshMaterialDiscovery(materialId,owned.data.uploadGroupId);
     try { await deleteStoredCourseMaterial(owned.data); } catch { /* Material stays rejected if provider cleanup fails. */ }
     return NextResponse.json({success:true,materials:await userMaterials(user.uid)},{headers});
   }catch(error){
