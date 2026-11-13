@@ -3,6 +3,7 @@
 // The new Next.js layout provides the header/footer and mounts this after hydration.
 import { courses } from "../../data/courses";
 import { professors } from "../../data/professors";
+import { populateReviewCourseSelect, setupReviewDependsField, setupReviewSearchSelect, setupReviewChoiceMenus, setupReviewCompactControls } from "../professors/reviewControls";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import {
   GoogleAuthProvider, getAuth, inMemoryPersistence, linkWithPopup,
@@ -101,6 +102,7 @@ export function initializeAccounts(){
     const accountReviewEditorCancel = document.getElementById("account-review-editor-cancel");
     const accountReviewEditorForm = document.getElementById("account-review-editor-form");
     const accountReviewEditorTitle = document.getElementById("account-review-editor-title");
+    const accountReviewEditorProfessorName = document.getElementById("account-review-editor-professor-name");
     const accountReviewEditorSubmit = document.getElementById("account-review-editor-submit");
     const accountReviewEditorMessage = document.getElementById("account-review-editor-message");
     const accountMaterialEditor = document.getElementById("account-material-editor");
@@ -127,6 +129,7 @@ export function initializeAccounts(){
     let accountReviewHistory = [];
     let accountReviewLoading = false;
     let activeAccountReviewId = "";
+    let accountReviewEditorReturnFocus = null;
     let accountUploadHistory = [];
     let accountUploadLoading = false;
     let activeAccountMaterialId = "";
@@ -450,7 +453,11 @@ export function initializeAccounts(){
 
       const messageType = type || (message ? "error" : "");
       element.textContent = message;
-      element.className = "account-message" + (messageType ? " " + messageType : "");
+      if (element === accountReviewEditorMessage) {
+        element.className = "review-form-message" + (messageType ? " is-" + messageType : "");
+      } else {
+        element.className = "account-message" + (messageType ? " " + messageType : "");
+      }
     }
 
     function escapeAccountHtml(value) {
@@ -719,388 +726,49 @@ function getAccountReviewProfessorUrl(professorId) {
         : null;
     }
 
-    function populateAccountReviewCourseSelect() {
-      const select = getAccountReviewEditorField("courseTaken");
-      const courses = Array.isArray(window.aucAtlasCourses)
-        ? window.aucAtlasCourses.slice()
-        : [];
-
-      if (!select || select.dataset.courseOptionsReady === "true") {
-        return;
-      }
-
-      courses.sort(function (firstCourse, secondCourse) {
-        return String(firstCourse.code || "").localeCompare(
-          String(secondCourse.code || "")
-        );
-      });
-
-      select.innerHTML = "";
-
-      const placeholder = document.createElement("option");
-
-      placeholder.value = "";
-      placeholder.textContent = "Choose course";
-      placeholder.disabled = true;
-      placeholder.selected = true;
-      select.appendChild(placeholder);
-
-      courses.forEach(function (course) {
-        const code = String(course && course.code ? course.code : "").trim();
-        const title = String(course && course.title ? course.title : "").trim();
-
-        if (!code) {
-          return;
-        }
-
-        const option = document.createElement("option");
-
-        option.value = code;
-        option.textContent = code + (title ? " - " + title : "");
-        select.appendChild(option);
-      });
-
-      select.dataset.courseOptionsReady = "true";
+    function setupAccountReviewFormControls() {
+      if (!accountReviewEditorForm || accountReviewEditorForm.dataset.controlsReady === "true") return;
+      populateReviewCourseSelect(accountReviewEditorForm);
+      setupReviewChoiceMenus(accountReviewEditorForm);
+      setupReviewSearchSelect(accountReviewEditorForm, "course");
+      setupReviewSearchSelect(accountReviewEditorForm, "semester");
+      setupReviewDependsField(accountReviewEditorForm);
+      setupReviewCompactControls(accountReviewEditorForm);
+      accountReviewEditorForm.dataset.controlsReady = "true";
     }
 
-    function setupAccountReviewCourseChoice() {
-      populateAccountReviewCourseSelect();
-
-      const select = getAccountReviewEditorField("courseTaken");
-
-      if (
-        !select ||
-        select.dataset.accountReviewCourseChoiceReady === "true"
-      ) {
-        return;
-      }
-
-      select.dataset.accountReviewCourseChoiceReady = "true";
-      select.classList.add("review-native-select");
-
-      const choice = document.createElement("div");
-      const button = document.createElement("button");
-      const label = document.createElement("span");
-      const menu = document.createElement("div");
-      const searchWrap = document.createElement("div");
-      const searchInput = document.createElement("input");
-
-      choice.className = "review-choice";
-      choice.setAttribute("data-account-review-course-choice", "");
-
-      button.className = "review-choice-button";
-      button.type = "button";
-      button.setAttribute("aria-haspopup", "listbox");
-      button.setAttribute("aria-expanded", "false");
-      button.setAttribute("data-account-review-course-button", "");
-
-      label.className = "review-choice-label";
-
-      menu.className = "review-choice-menu";
-      menu.setAttribute("role", "listbox");
-
-      searchWrap.className = "review-choice-search-wrap";
-
-      searchInput.type = "search";
-      searchInput.className = "review-choice-search";
-      searchInput.placeholder = "Search courses";
-      searchInput.setAttribute("aria-label", "Search courses");
-      searchInput.setAttribute("autocomplete", "new-password");
-      searchInput.setAttribute("autocorrect", "off");
-      searchInput.setAttribute("autocapitalize", "none");
-      searchInput.setAttribute("spellcheck", "false");
-      searchInput.setAttribute("data-lpignore", "true");
-      searchInput.setAttribute("data-form-type", "other");
-
-      function syncChoice() {
-        const selectedOption = select.options[select.selectedIndex];
-
-        label.textContent = selectedOption
-          ? selectedOption.textContent
-          : "Choose course";
-
-        menu.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
-          optionButton.classList.toggle(
-            "is-selected",
-            optionButton.dataset.choiceValue === select.value
-          );
-        });
-      }
-
-      function filterOptions(query) {
-        const terms = String(query || "")
-          .toLowerCase()
-          .trim()
-          .split(/\s+/)
-          .filter(Boolean);
-
-        menu.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
-          const searchText = optionButton.dataset.choiceSearchText || "";
-          const hasValue = Boolean(optionButton.dataset.choiceValue);
-          const matches =
-            !terms.length ||
-            (
-              hasValue &&
-              terms.every(function (term) {
-                return searchText.indexOf(term) !== -1;
-              })
-            );
-
-          optionButton.hidden = !matches;
-        });
-      }
-
-      function closeChoice() {
+    function resetAccountReviewFormControls() {
+      if (!accountReviewEditorForm) return;
+      accountReviewEditorForm.querySelectorAll(".review-choice.open").forEach(function (choice) {
         choice.classList.remove("open");
-        button.setAttribute("aria-expanded", "false");
-        searchInput.value = "";
-        filterOptions("");
-      }
-
-      searchWrap.appendChild(searchInput);
-      menu.appendChild(searchWrap);
-
-      Array.from(select.options).forEach(function (option) {
-        const optionButton = document.createElement("button");
-
-        optionButton.className = "review-choice-option";
-        optionButton.type = "button";
-        optionButton.disabled = option.disabled;
-        optionButton.dataset.choiceValue = option.value;
-        optionButton.dataset.choiceSearchText = (
-          option.value + " " + option.textContent
-        ).toLowerCase();
-        optionButton.textContent = option.textContent;
-        optionButton.setAttribute("role", "option");
-
-        optionButton.addEventListener("click", function () {
-          if (option.disabled) {
-            return;
-          }
-
-          select.value = option.value;
-          select.dispatchEvent(new Event("change", { bubbles: true }));
-          closeChoice();
-          button.focus();
-        });
-
-        menu.appendChild(optionButton);
       });
-
-      searchInput.addEventListener("input", function () {
-        filterOptions(searchInput.value);
+      accountReviewEditorForm.querySelectorAll(".review-course-suggestions").forEach(function (suggestions) {
+        suggestions.hidden = true;
+        suggestions.replaceChildren();
       });
-
-      searchInput.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          closeChoice();
-          button.focus();
-        }
+      accountReviewEditorForm.querySelectorAll(".review-course-search-input").forEach(function (input) {
+        input.value = "";
+        input.setAttribute("aria-expanded", "false");
+        input.removeAttribute("aria-activedescendant");
       });
-
-      button.addEventListener("click", function () {
-        const shouldOpen = !choice.classList.contains("open");
-
-        choice.classList.toggle("open", shouldOpen);
-        button.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
-
-        if (shouldOpen) {
-          window.setTimeout(function () {
-            searchInput.focus();
-          }, 0);
-        } else {
-          closeChoice();
-        }
+      accountReviewEditorForm.querySelectorAll(".review-accordion").forEach(function (section) {
+        section.open = false;
       });
-
-      document.addEventListener("click", function (event) {
-        if (!choice.contains(event.target)) {
-          closeChoice();
-        }
-      });
-
-      select.addEventListener("change", syncChoice);
-
-      button.appendChild(label);
-      choice.appendChild(button);
-      choice.appendChild(menu);
-      select.insertAdjacentElement("afterend", choice);
-      syncChoice();
-
-      setupAccountReviewAdditionalChoices();
-      syncAccountReviewRecommendationReason();
-    }
-
-    function syncAccountReviewRecommendationReason() {
-      if (!accountReviewEditorForm) {
-        return;
-      }
-
-      const recommendationSelect = getAccountReviewEditorField("recommendation");
-      const reasonField = accountReviewEditorForm.querySelector(
-        "[data-account-review-depends-reason]"
-      );
-      const reasonInput = getAccountReviewEditorField("recommendationReason");
-
-      if (!recommendationSelect || !reasonField) {
-        return;
-      }
-
-      const shouldShow = recommendationSelect.value === "Depends";
-
-      reasonField.hidden = !shouldShow;
-
-      if (!shouldShow && reasonInput) {
-        reasonInput.value = "";
-      }
-    }
-
-    function setupAccountReviewAdditionalChoices() {
-      if (!accountReviewEditorForm) {
-        return;
-      }
-
-      accountReviewEditorForm.querySelectorAll("select").forEach(function (select) {
-        if (
-          select.name === "courseTaken" ||
-          select.dataset.accountReviewChoiceReady === "true"
-        ) {
-          return;
-        }
-
-        select.dataset.accountReviewChoiceReady = "true";
-        select.classList.add("review-native-select");
-
-        const choice = document.createElement("div");
-        const button = document.createElement("button");
-        const label = document.createElement("span");
-        const menu = document.createElement("div");
-
-        choice.className = "review-choice";
-        choice.setAttribute("data-account-review-choice", "");
-
-        button.className = "review-choice-button";
-        button.type = "button";
-        button.setAttribute("aria-haspopup", "listbox");
-        button.setAttribute("aria-expanded", "false");
-
-        label.className = "review-choice-label";
-
-        menu.className = "review-choice-menu";
-        menu.setAttribute("role", "listbox");
-
-        function syncChoice() {
-          const selectedOption = select.options[select.selectedIndex];
-
-          label.textContent = selectedOption
-            ? selectedOption.textContent
-            : "Choose an option";
-
-          menu.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
-            optionButton.classList.toggle(
-              "is-selected",
-              optionButton.dataset.choiceValue === select.value
-            );
-          });
-        }
-
-        function closeChoice() {
-          choice.classList.remove("open");
-          button.setAttribute("aria-expanded", "false");
-        }
-
-        Array.from(select.options).forEach(function (option) {
-          const optionButton = document.createElement("button");
-
-          optionButton.className = "review-choice-option";
-          optionButton.type = "button";
-          optionButton.disabled = option.disabled;
-          optionButton.dataset.choiceValue = option.value;
-          optionButton.textContent = option.textContent;
-          optionButton.setAttribute("role", "option");
-
-          optionButton.addEventListener("click", function () {
-            if (option.disabled) {
-              return;
-            }
-
-            select.value = option.value;
-            select.dispatchEvent(new Event("change", { bubbles: true }));
-            closeChoice();
-            button.focus();
-          });
-
-          menu.appendChild(optionButton);
-        });
-
-        button.addEventListener("click", function () {
-          const shouldOpen = !choice.classList.contains("open");
-
-          choice.classList.toggle("open", shouldOpen);
-          button.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
-        });
-
-        document.addEventListener("click", function (event) {
-          if (!choice.contains(event.target)) {
-            closeChoice();
-          }
-        });
-
-        select.addEventListener("change", syncChoice);
-
-        button.appendChild(label);
-        choice.appendChild(button);
-        choice.appendChild(menu);
-        select.insertAdjacentElement("afterend", choice);
-        syncChoice();
-      });
-
-      const recommendationSelect = getAccountReviewEditorField("recommendation");
-
-      if (
-        recommendationSelect &&
-        recommendationSelect.dataset.accountReviewDependsReady !== "true"
-      ) {
-        recommendationSelect.dataset.accountReviewDependsReady = "true";
-        recommendationSelect.addEventListener(
-          "change",
-          syncAccountReviewRecommendationReason
-        );
-      }
-
-      syncAccountReviewRecommendationReason();
-    }
-
-    function resetAccountReviewCourseChoice() {
-      if (!accountReviewEditorForm) {
-        return;
-      }
-
-      accountReviewEditorForm.querySelectorAll(".review-choice").forEach(function (choice) {
-        choice.classList.remove("open");
-
-        const button = choice.querySelector(".review-choice-button");
-        const searchInput = choice.querySelector(".review-choice-search");
-
-        if (button) {
-          button.setAttribute("aria-expanded", "false");
-        }
-
-        if (searchInput) {
-          searchInput.value = "";
-        }
-
-        choice.querySelectorAll(".review-choice-option").forEach(function (optionButton) {
-          optionButton.hidden = false;
-        });
-      });
-
       accountReviewEditorForm.querySelectorAll("select").forEach(function (select) {
         select.dispatchEvent(new Event("change", { bubbles: true }));
       });
+    }
 
-      syncAccountReviewRecommendationReason();
+    function syncAccountReviewSearchFields() {
+      ["course", "semester"].forEach(function (name) {
+        const select = accountReviewEditorForm.querySelector("#review-" + name);
+        const input = accountReviewEditorForm.querySelector("#review-" + name + "-search");
+        if (!select || !input) return;
+        const option = Array.from(select.options).find(function (item) {
+          return item.value === select.value;
+        });
+        input.value = select.value ? (option ? option.textContent : select.value) : "";
+      });
     }
 
     function isValidAccountReviewCourse(courseCode) {
@@ -1143,15 +811,19 @@ function getAccountReviewProfessorUrl(professorId) {
       }
 
       accountReviewEditor.hidden = true;
-      document.body.classList.remove("account-review-editor-open");
+      document.body.classList.remove("review-modal-open");
       activeAccountReviewId = "";
 
       if (accountReviewEditorForm) {
         accountReviewEditorForm.reset();
       }
 
-      resetAccountReviewCourseChoice();
+      resetAccountReviewFormControls();
       showMessage(accountReviewEditorMessage, "", "");
+      if (accountReviewEditorReturnFocus && accountReviewEditorReturnFocus.isConnected) {
+        accountReviewEditorReturnFocus.focus({ preventScroll: true });
+      }
+      accountReviewEditorReturnFocus = null;
     }
 
     function openAccountReviewEditor(reviewId) {
@@ -1162,18 +834,19 @@ function getAccountReviewProfessorUrl(professorId) {
         return;
       }
 
-      setupAccountReviewCourseChoice();
+      setupAccountReviewFormControls();
+      accountReviewEditorReturnFocus = document.activeElement;
 
       activeAccountReviewId = String(review.id || "");
       accountReviewEditorForm.reset();
-      resetAccountReviewCourseChoice();
+      resetAccountReviewFormControls();
 
       setAccountReviewEditorValue("reviewId", activeAccountReviewId);
       setAccountReviewEditorValue("courseTaken", review.courseTaken);
       setAccountReviewEditorValue("semesterTaken", review.semesterTaken);
       setAccountReviewEditorValue("rating", review.rating);
-      setAccountReviewEditorValue("recommendationReason", review.recommendationReason);
       setAccountReviewEditorValue("recommendation", review.recommendation);
+      setAccountReviewEditorValue("recommendationReason", review.recommendationReason);
       setAccountReviewEditorValue("attendancePolicy", review.attendancePolicy);
       setAccountReviewEditorValue("workload", review.workload);
       setAccountReviewEditorValue("lectureUsefulness", review.lectureUsefulness);
@@ -1183,22 +856,24 @@ function getAccountReviewProfessorUrl(professorId) {
       setAccountReviewEditorValue("gradingTransparency", review.gradingTransparency);
       setAccountReviewEditorValue("feedbackQuality", review.feedbackQuality);
       setAccountReviewEditorValue("studentNote", review.studentNote);
+      const anonymousField = getAccountReviewEditorField("isAnonymous");
+      if (anonymousField) anonymousField.checked = Boolean(review.isAnonymous);
+      syncAccountReviewSearchFields();
 
-      accountReviewEditorTitle.textContent =
-        review.professorName || "Professor Review";
+      accountReviewEditorTitle.textContent = "Edit review";
+      if (accountReviewEditorProfessorName) {
+        accountReviewEditorProfessorName.textContent = review.professorName || "Professor review";
+      }
 
       showMessage(accountReviewEditorMessage, "", "");
       accountReviewEditor.hidden = false;
-      document.body.classList.add("account-review-editor-open");
+      document.body.classList.add("review-modal-open");
 
+      const drawerBody = accountReviewEditorForm.querySelector(".review-drawer-body");
+      if (drawerBody) drawerBody.scrollTop = 0;
       window.setTimeout(function () {
-        const courseButton = accountReviewEditorForm.querySelector(
-          "[data-account-review-course-button]"
-        );
-
-        if (courseButton) {
-          courseButton.focus();
-        }
+        const courseSearch = accountReviewEditorForm.querySelector("#review-course-search");
+        if (courseSearch && !accountReviewEditor.hidden) courseSearch.focus();
       }, 50);
     }
 
@@ -1220,7 +895,8 @@ function getAccountReviewProfessorUrl(professorId) {
         examDifficulty: String(formData.get("examDifficulty") || ""),
         gradingTransparency: String(formData.get("gradingTransparency") || ""),
         feedbackQuality: String(formData.get("feedbackQuality") || ""),
-        studentNote: String(formData.get("studentNote") || "").trim()
+        studentNote: String(formData.get("studentNote") || "").trim(),
+        isAnonymous: Boolean(getAccountReviewEditorField("isAnonymous")?.checked)
       };
     }
 
@@ -1234,9 +910,7 @@ function getAccountReviewProfessorUrl(professorId) {
           "error"
         );
 
-        const courseButton = accountReviewEditorForm.querySelector(
-          "[data-account-review-course-button]"
-        );
+        const courseButton = accountReviewEditorForm.querySelector("#review-course-search");
 
         if (courseButton) {
           courseButton.focus();
@@ -3063,10 +2737,19 @@ function getAccountReviewProfessorUrl(professorId) {
       accountReviewEditorForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        if (!accountReviewEditorForm.reportValidity()) {
+        const course = getAccountReviewEditorField("courseTaken");
+        const semester = getAccountReviewEditorField("semesterTaken");
+        const rating = getAccountReviewEditorField("rating");
+        const recommendation = getAccountReviewEditorField("recommendation");
+        if (!course?.value || !semester?.value || !rating?.value || !recommendation?.value) {
+          showMessage(accountReviewEditorMessage, "Choose a course, semester, rating, and recommendation before saving.", "error");
+          const firstMissing = !course?.value ? "#review-course-search"
+            : !semester?.value ? "#review-semester-search"
+            : !rating?.value ? "[data-review-rating='1']"
+            : "[data-review-recommend='Yes']";
+          accountReviewEditorForm.querySelector(firstMissing)?.focus();
           return;
         }
-
         saveAccountReviewChanges();
       });
     }
@@ -3086,6 +2769,34 @@ function getAccountReviewProfessorUrl(professorId) {
     [accountReviewEditorBackdrop, accountReviewEditorClose, accountReviewEditorCancel].forEach(function (control) {
       if (control) {
         control.addEventListener("click", closeAccountReviewEditor);
+      }
+    });
+
+    // Match the Leave a Review drawer's keyboard focus containment.
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Tab" || !accountReviewEditor || accountReviewEditor.hidden || !accountReviewEditorForm) return;
+      const focusable = Array.from(accountReviewEditorForm.querySelectorAll(
+        "button:not([disabled]), input:not([type='hidden']):not([disabled]), " +
+        "select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"
+      )).filter(function (element) {
+        return element.getClientRects().length > 0;
+      });
+      if (!focusable.length) {
+        event.preventDefault();
+        accountReviewEditorForm.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!accountReviewEditorForm.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     });
 

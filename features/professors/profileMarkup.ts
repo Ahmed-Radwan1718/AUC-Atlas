@@ -26,49 +26,8 @@ function renderProfessorReviewStatsSkeleton(): string {
       '<span class="professor-review-stat-skeleton-line is-value"></span></div>' +
       '<span class="professor-review-stat-skeleton-track"></span></div>').join("") + '</div>';
 }
-export function buildProfileMarkup(professor: Professor): string {
-  const professorEmail = professor.email || "";
-  const professorEmailMarkup = professorEmail
-    ? '<span class="professor-profile-email">' + escapeHtml(professorEmail) + '</span>'
-    : '<span class="professor-profile-email is-empty">Email coming soon</span>';
-  return `
-      <div class="professor-profile-main">
-      <article class="professor-profile-card">
-        <div class="professor-profile-image${getProfessorId(professor) === "ahmed-moustafa" ? " professor-profile-image--ahmed-moustafa" : ""}">
-          <img src="${escapeHtml(professor.image && professor.image !== "user.png" ? professor.image : "/user.png")}" alt="${escapeHtml(professor.name)}">
-        </div>
-        <div class="professor-profile-body">
-          <div class="professor-profile-info">
-            <div class="professor-profile-identity">
-              <h1 class="professor-profile-name">${escapeHtml(professor.name)}</h1>
-              <p class="professor-profile-department">${escapeHtml(professor.department || "Department coming soon")}</p>
-            </div>
-
-            <div>
-              <span>Email</span>
-              ${professorEmailMarkup}
-            </div>
-
-            <div id="professor-teaches-row" hidden>
-              <span>Teaches</span>
-              <span class="professor-profile-value professor-profile-course-list" id="professor-teaches-list"></span>
-            </div>
-          </div>
-
-          <details class="professor-review-panel">
-            <summary class="professor-review-toggle">Leave a review</summary>
-
-            <div class="review-modal-backdrop" aria-hidden="true"></div>
-
-            <form class="professor-review-form" role="dialog" aria-modal="true" aria-labelledby="review-drawer-title" tabindex="-1">
-
-              <div class="review-modal-header">
-                <h2 id="review-drawer-title">Leave a review</h2>
-              </div>
-
-              <input type="hidden" name="professorId" value="${escapeHtml(getProfessorId(professor))}">
-              <input type="hidden" name="professorName" value="${escapeHtml(professor.name)}">
-
+// The exact same controls are used by the Leave and Edit Review drawers.
+export const reviewFormFieldsMarkup = `
               <div class="review-drawer-body">
               <section class="review-core-section" aria-labelledby="review-core-heading">
                 <h3 id="review-core-heading">Course &amp; rating</h3>
@@ -321,6 +280,53 @@ export function buildProfileMarkup(professor: Professor): string {
               </label>
 
               </div>
+
+`;
+
+export function buildProfileMarkup(professor: Professor): string {
+  const professorEmail = professor.email || "";
+  const professorEmailMarkup = professorEmail
+    ? '<span class="professor-profile-email">' + escapeHtml(professorEmail) + '</span>'
+    : '<span class="professor-profile-email is-empty">Email coming soon</span>';
+  return `
+      <div class="professor-profile-main">
+      <article class="professor-profile-card">
+        <div class="professor-profile-image${getProfessorId(professor) === "ahmed-moustafa" ? " professor-profile-image--ahmed-moustafa" : ""}">
+          <img src="${escapeHtml(professor.image && professor.image !== "user.png" ? professor.image : "/user.png")}" alt="${escapeHtml(professor.name)}">
+        </div>
+        <div class="professor-profile-body">
+          <div class="professor-profile-info">
+            <div class="professor-profile-identity">
+              <h1 class="professor-profile-name">${escapeHtml(professor.name)}</h1>
+              <p class="professor-profile-department">${escapeHtml(professor.department || "Department coming soon")}</p>
+            </div>
+
+            <div>
+              <span>Email</span>
+              ${professorEmailMarkup}
+            </div>
+
+            <div id="professor-teaches-row" hidden>
+              <span>Teaches</span>
+              <span class="professor-profile-value professor-profile-course-list" id="professor-teaches-list"></span>
+            </div>
+          </div>
+
+          <details class="professor-review-panel">
+            <summary class="professor-review-toggle">Leave a review</summary>
+
+            <div class="review-modal-backdrop" aria-hidden="true"></div>
+
+            <form class="professor-review-form" role="dialog" aria-modal="true" aria-labelledby="review-drawer-title" tabindex="-1">
+
+              <div class="review-modal-header">
+                <h2 id="review-drawer-title">Leave a review</h2>
+              </div>
+
+              <input type="hidden" name="professorId" value="${escapeHtml(getProfessorId(professor))}">
+              <input type="hidden" name="professorName" value="${escapeHtml(professor.name)}">
+
+              ${reviewFormFieldsMarkup}
 
               <div class="review-drawer-footer">
                 <button class="review-submit-button" type="submit">Submit Review</button>

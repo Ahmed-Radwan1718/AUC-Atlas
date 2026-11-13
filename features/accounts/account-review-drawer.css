@@ -1,0 +1,36 @@
+/* Account Edit Review: the same right-side drawer and form controls as Leave a Review. */
+.account-review-edit-overlay[hidden] { display: none !important; }
+.account-review-drawer .account-review-drawer-heading { display: grid; gap: 5px; min-width: 0; }
+.account-review-drawer .account-review-drawer-heading p {
+  color: rgba(23, 23, 23, 0.55); font-size: 12px; line-height: 1.4;
+}
+.account-review-drawer .account-review-drawer-close {
+  width: 36px; height: 36px; flex: 0 0 auto; border: 1px solid rgba(23, 23, 23, 0.1);
+  border-radius: 999px; background: white; color: #171717; font-size: 21px;
+  line-height: 1; cursor: pointer;
+}
+.account-review-drawer .account-review-drawer-close:hover { background: rgba(23, 23, 23, 0.05); }
+.account-review-drawer .account-review-drawer-close:focus-visible {
+  outline: 2px solid #c09a5c; outline-offset: 2px;
+}
+.account-review-edit-overlay:not([hidden]) .account-review-drawer {
+  animation: accountReviewDrawerSlideIn 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.account-review-edit-overlay:not([hidden]) .review-modal-backdrop {
+  animation: accountReviewBackdropFadeIn 280ms ease-out both;
+}
+@keyframes accountReviewDrawerSlideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes accountReviewBackdropFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (max-width: 640px) {
+  .account-review-drawer .account-review-drawer-close { width: 40px; height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .account-review-edit-overlay:not([hidden]) .account-review-drawer,
+  .account-review-edit-overlay:not([hidden]) .review-modal-backdrop { animation: none; }
+}

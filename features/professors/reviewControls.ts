@@ -441,4 +441,85 @@ function populateReviewCourseSelect(form) {
   }
 
   
+export function setupReviewCompactControls(form) {
+    const rating = form.querySelector("#review-rating");
+    const recommendation = form.querySelector("#review-recommend");
+
+    function syncCompactControls() {
+      const chosenRating = Number(rating.value || 0);
+
+      form.querySelectorAll("[data-review-rating]").forEach(
+        function (button) {
+          const starValue = Number(button.dataset.reviewRating);
+          button.classList.toggle(
+            "is-active",
+            chosenRating >= starValue
+          );
+          button.setAttribute(
+            "aria-pressed",
+            String(chosenRating === starValue)
+          );
+        }
+      );
+
+      form.querySelectorAll("[data-review-recommend]").forEach(
+        function (button) {
+          const isSelected =
+            button.dataset.reviewRecommend === recommendation.value;
+          button.classList.toggle("is-active", isSelected);
+          button.setAttribute("aria-pressed", String(isSelected));
+        }
+      );
+    }
+
+    function updateAccordionCounts() {
+      form.querySelectorAll("[data-review-section]").forEach(
+        function (section) {
+          const fields = Array.from(
+            section.querySelectorAll("select")
+          );
+          const answered = fields.filter(function (select) {
+            return Boolean(select.value);
+          }).length;
+          const count = section.querySelector("[data-review-count]");
+
+          if (count) {
+            count.textContent =
+              answered + "/" + fields.length + " answered";
+          }
+        }
+      );
+    }
+
+    form.querySelectorAll("[data-review-rating]").forEach(
+      function (button) {
+        button.addEventListener("click", function () {
+          rating.value = button.dataset.reviewRating;
+          rating.dispatchEvent(
+            new Event("change", { bubbles: true })
+          );
+        });
+      }
+    );
+
+    form.querySelectorAll("[data-review-recommend]").forEach(
+      function (button) {
+        button.addEventListener("click", function () {
+          recommendation.value = button.dataset.reviewRecommend;
+          recommendation.dispatchEvent(
+            new Event("change", { bubbles: true })
+          );
+        });
+      }
+    );
+
+    form.addEventListener("change", function () {
+      syncCompactControls();
+      updateAccordionCounts();
+    });
+
+    syncCompactControls();
+    updateAccordionCounts();
+  }
+
 export { populateReviewCourseSelect, setupReviewDependsField, setupReviewSearchSelect, setupReviewChoiceMenus };
