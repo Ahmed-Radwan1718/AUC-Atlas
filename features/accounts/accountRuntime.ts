@@ -1081,10 +1081,6 @@ function getAccountReviewProfessorUrl(professorId) {
                 <h3>${professorNameMarkup}</h3>
                 <p>${escapeAccountHtml(getAccountReviewDateLabel(review.createdAt))}</p>
               </div>
-              <div class="account-review-meta">
-                <span>${escapeAccountHtml(review.courseTaken || "Course not listed")}</span>
-                <span>${escapeAccountHtml(review.semesterTaken || "Semester not listed")}</span>
-              </div>
               ${review.studentNote
                 ? `<p class="account-review-copy">${escapeAccountHtml(review.studentNote)}</p>`
                 : '<p class="account-review-copy is-empty">Rating only</p>'}
