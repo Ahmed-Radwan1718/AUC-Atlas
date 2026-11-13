@@ -19,6 +19,12 @@
 .account-review-edit-overlay:not([hidden]) .review-modal-backdrop {
   animation: accountReviewBackdropFadeIn 280ms ease-out both;
 }
+
+/* Remove the CSS entrance animation before Web Animations handles closing. */
+.account-review-edit-overlay.is-closing .account-review-drawer,
+.account-review-edit-overlay.is-closing .review-modal-backdrop {
+  animation: none;
+}
 @keyframes accountReviewDrawerSlideIn {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }

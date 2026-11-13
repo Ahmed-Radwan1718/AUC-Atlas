@@ -130,6 +130,9 @@ export function initializeAccounts(){
     let accountReviewLoading = false;
     let activeAccountReviewId = "";
     let accountReviewEditorReturnFocus = null;
+    let accountReviewEditorClosing = false;
+    let accountReviewEditorDrawerAnimation = null;
+    let accountReviewEditorBackdropAnimation = null;
     let accountUploadHistory = [];
     let accountUploadLoading = false;
     let activeAccountMaterialId = "";
@@ -805,12 +808,24 @@ function getAccountReviewProfessorUrl(professorId) {
       }
     }
 
-    function closeAccountReviewEditor() {
-      if (!accountReviewEditor) {
-        return;
+    function cancelAccountReviewEditorAnimations() {
+      if (accountReviewEditorDrawerAnimation) {
+        accountReviewEditorDrawerAnimation.cancel();
+        accountReviewEditorDrawerAnimation = null;
       }
+      if (accountReviewEditorBackdropAnimation) {
+        accountReviewEditorBackdropAnimation.cancel();
+        accountReviewEditorBackdropAnimation = null;
+      }
+    }
 
+    function finishClosingAccountReviewEditor() {
+      if (!accountReviewEditor || !accountReviewEditorClosing) return;
+
+      cancelAccountReviewEditorAnimations();
       accountReviewEditor.hidden = true;
+      accountReviewEditor.classList.remove("is-closing");
+      accountReviewEditorClosing = false;
       document.body.classList.remove("review-modal-open");
       activeAccountReviewId = "";
 
@@ -826,7 +841,64 @@ function getAccountReviewProfessorUrl(professorId) {
       accountReviewEditorReturnFocus = null;
     }
 
+    function closeAccountReviewEditor() {
+      if (!accountReviewEditor || accountReviewEditor.hidden || accountReviewEditorClosing) {
+        return;
+      }
+
+      accountReviewEditorClosing = true;
+      accountReviewEditor.classList.add("is-closing");
+      accountReviewEditorForm?.querySelectorAll(".review-choice.open").forEach(function (choice) {
+        choice.classList.remove("open");
+      });
+      cancelAccountReviewEditorAnimations();
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reducedMotion || !accountReviewEditorForm || !accountReviewEditorBackdrop ||
+          typeof accountReviewEditorForm.animate !== "function" ||
+          typeof accountReviewEditorBackdrop.animate !== "function") {
+        finishClosingAccountReviewEditor();
+        return;
+      }
+
+      // Exactly match Leave a Review: 250ms slide right, 220ms backdrop fade.
+      accountReviewEditorDrawerAnimation = accountReviewEditorForm.animate(
+        [
+          { transform: "translateX(0)" },
+          { transform: "translateX(100%)" }
+        ],
+        {
+          duration: 250,
+          easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+          fill: "both"
+        }
+      );
+
+      accountReviewEditorBackdropAnimation = accountReviewEditorBackdrop.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        {
+          duration: 220,
+          easing: "ease-in",
+          fill: "both"
+        }
+      );
+
+      const closingAnimation = accountReviewEditorDrawerAnimation;
+      closingAnimation.finished
+        .then(function () {
+          if (accountReviewEditorDrawerAnimation === closingAnimation) {
+            finishClosingAccountReviewEditor();
+          }
+        })
+        .catch(function () {
+          if (accountReviewEditorDrawerAnimation === closingAnimation) {
+            finishClosingAccountReviewEditor();
+          }
+        });
+    }
+
     function openAccountReviewEditor(reviewId) {
+      if (accountReviewEditorClosing) return;
       const review = getAccountReviewById(reviewId);
 
       if (!review || !accountReviewEditor || !accountReviewEditorForm) {
