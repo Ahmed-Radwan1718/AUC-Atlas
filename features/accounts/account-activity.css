@@ -196,6 +196,11 @@
   flex-shrink: 0;
 }
 
+/* Display upload file artwork directly, without a cream/gold tile. */
+#account-panel-reviews .account-upload-file-visual {
+  background: transparent;
+}
+
 #account-panel-reviews .account-review-professor-photo img {
   width: 100%;
   height: 100%;
