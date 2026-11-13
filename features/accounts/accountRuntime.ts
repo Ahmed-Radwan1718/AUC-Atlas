@@ -21,6 +21,8 @@ export function initializeAccounts(){
     const accountPanels = document.querySelectorAll(".account-panel");
     const accountDetailsPanel = document.getElementById("account-panel-details");
     const accountDetailsLoadingState = document.getElementById("account-details-loading-state");
+    const accountSecurityPanel = document.getElementById("account-panel-security");
+    const accountSecurityLoadingState = document.getElementById("account-security-loading-state");
     const photoInput = document.getElementById("account-photo-input");
     const photoChooseButton = document.getElementById("account-photo-choose-button");
     const photoRemoveButton = document.getElementById("account-photo-remove-button");
@@ -124,8 +126,10 @@ export function initializeAccounts(){
     let displayNameLastChangedAt = null;
     let displayNameEditMode = false;
     let accountReviewHistory = [];
+    let accountReviewLoading = false;
     let activeAccountReviewId = "";
     let accountUploadHistory = [];
+    let accountUploadLoading = false;
     let activeAccountMaterialId = "";
 
     function getAccountDateFromValue(value) {
@@ -550,18 +554,23 @@ export function initializeAccounts(){
       }).join("");
     }
 
+    function setAccountSecurityLoading(loading) {
+      if (accountSecurityPanel) {
+        accountSecurityPanel.classList.toggle("is-loading", loading);
+        accountSecurityPanel.setAttribute("aria-busy", loading ? "true" : "false");
+      }
+      if (accountSecurityLoadingState) {
+        accountSecurityLoadingState.hidden = !loading;
+      }
+    }
+
     async function loadAccountLoginSessions() {
       if (!accountLoginSessionsList) {
         return;
       }
 
+      setAccountSecurityLoading(true);
       showMessage(securityMessage, "", "");
-      accountLoginSessionsList.innerHTML = `
-        <div class="account-empty-state">
-          <h3>Loading sessions</h3>
-          <p>Checking browsers and devices signed in to your account.</p>
-        </div>
-      `;
 
       try {
         const response = await fetch("/api/sessions", {
@@ -590,6 +599,8 @@ export function initializeAccounts(){
           </div>
         `;
         showMessage(securityMessage, error.message || "Could not load signed-in sessions.", "error");
+      } finally {
+        setAccountSecurityLoading(false);
       }
     }
 
@@ -1412,18 +1423,43 @@ function getAccountReviewProfessorUrl(professorId) {
       }).join("");
     }
 
+    function renderAccountActivitySkeleton(type) {
+      const list = type === "uploads" ? accountUploadList : accountReviewList;
+      if (!list) return;
+
+      const rows = Array.from({ length: 3 }, function () {
+        return `
+          <div class="account-skeleton-list-row" aria-hidden="true">
+            <span class="account-skeleton-shape account-skeleton-photo"></span>
+            <div class="account-skeleton-row-copy">
+              <span class="account-skeleton-shape account-skeleton-text"></span>
+              <span class="account-skeleton-shape account-skeleton-short"></span>
+              <span class="account-skeleton-shape account-skeleton-description"></span>
+            </div>
+            <div class="account-skeleton-row-aside">
+              <span class="account-skeleton-shape ${type === "uploads" ? "account-skeleton-button" : "account-skeleton-stars"}"></span>
+              <span class="account-skeleton-shape account-skeleton-button"></span>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      list.innerHTML = `
+        <div class="account-skeleton-list" role="status" aria-label="Loading ${type}">
+          ${rows}
+        </div>
+      `;
+    }
+
     async function loadAccountReviewHistory() {
       if (!accountReviewList) {
         return;
       }
 
+      accountReviewLoading = true;
+      if (accountReviewCount) accountReviewCount.textContent = "—";
       showMessage(reviewsMessage, "", "");
-      accountReviewList.innerHTML = `
-        <div class="account-empty-state">
-          <h3>Loading reviews</h3>
-          <p>Checking the reviews submitted from your account.</p>
-        </div>
-      `;
+      renderAccountActivitySkeleton("reviews");
 
       try {
         const response = await fetch("/api/professor-reviews?mine=true", {
@@ -1443,8 +1479,11 @@ function getAccountReviewProfessorUrl(professorId) {
           throw new Error(data.error || "Could not load your reviews.");
         }
 
+        accountReviewLoading = false;
         renderAccountReviewHistory(data.reviews || []);
       } catch (error) {
+        accountReviewLoading = false;
+        if (accountReviewCount) accountReviewCount.textContent = "—";
         accountReviewHistory = [];
         accountReviewList.innerHTML = `
           <div class="account-empty-state">
@@ -1483,9 +1522,11 @@ function getAccountReviewProfessorUrl(professorId) {
       });
 
       if (activeTab === "uploads") {
-        renderAccountUploadHistory(accountUploadHistory);
+        if (accountUploadLoading) renderAccountActivitySkeleton("uploads");
+        else renderAccountUploadHistory(accountUploadHistory);
       } else {
-        renderAccountReviewHistory(accountReviewHistory);
+        if (accountReviewLoading) renderAccountActivitySkeleton("reviews");
+        else renderAccountReviewHistory(accountReviewHistory);
       }
     }
 
@@ -1610,13 +1651,10 @@ function getAccountReviewProfessorUrl(professorId) {
         return;
       }
 
+      accountUploadLoading = true;
+      if (accountUploadCount) accountUploadCount.textContent = "—";
       showMessage(uploadsMessage, "", "");
-      accountUploadList.innerHTML = `
-        <div class="account-empty-state">
-          <h3>Loading uploads</h3>
-          <p>Checking the course materials uploaded from your account.</p>
-        </div>
-      `;
+      renderAccountActivitySkeleton("uploads");
 
       try {
         const response = await fetch("/api/course-materials?mine=true", {
@@ -1636,8 +1674,11 @@ function getAccountReviewProfessorUrl(professorId) {
           throw new Error(data.error || "Could not load your uploads.");
         }
 
+        accountUploadLoading = false;
         renderAccountUploadHistory(data.materials || []);
       } catch (error) {
+        accountUploadLoading = false;
+        if (accountUploadCount) accountUploadCount.textContent = "—";
         accountUploadHistory = [];
         accountUploadList.innerHTML = `
           <div class="account-empty-state">
@@ -2973,8 +3014,8 @@ function getAccountReviewProfessorUrl(professorId) {
           return tab.classList.contains("active");
         });
         if (activeTab && activeTab.dataset.accountActivityTab === "uploads") {
-          renderAccountUploadHistory(accountUploadHistory);
-        } else {
+          if (!accountUploadLoading) renderAccountUploadHistory(accountUploadHistory);
+        } else if (!accountReviewLoading) {
           renderAccountReviewHistory(accountReviewHistory);
         }
       });

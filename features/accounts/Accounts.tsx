@@ -7,6 +7,7 @@ import "./accounts-1.css";
 import "./accounts-2.css";
 import "./accounts-3.css";
 import "./account-activity.css";
+import "./account-skeletons.css";
 
 export default function Accounts() {
   useEffect(() => { initializeAccounts(); }, []);

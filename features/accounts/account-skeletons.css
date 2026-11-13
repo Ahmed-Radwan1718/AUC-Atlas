@@ -1,0 +1,187 @@
+/* Account page skeletons. Layout shapes reflect the real panel controls. */
+.account-skeleton-shape {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(23, 23, 23, 0.075);
+}
+
+.account-skeleton-shape::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 10%,
+    rgba(192, 154, 92, 0.16) 42%,
+    rgba(255, 255, 255, 0.64) 52%,
+    transparent 82%
+  );
+  transform: translateX(-120%);
+  animation: account-skeleton-shimmer 1.7s ease-in-out infinite;
+}
+
+@keyframes account-skeleton-shimmer {
+  to { transform: translateX(120%); }
+}
+
+.account-skeleton-title { width: 212px; max-width: 75%; height: 26px; }
+.account-skeleton-description { width: min(100%, 370px); height: 12px; }
+.account-skeleton-short { width: 125px; max-width: 82%; height: 11px; }
+.account-skeleton-text { width: 190px; max-width: 92%; height: 16px; }
+.account-skeleton-label { width: 88px; height: 10px; }
+.account-skeleton-section-title { width: 200px; height: 18px; }
+.account-skeleton-button { width: 112px; height: 38px; border-radius: 999px; }
+.account-skeleton-input { width: 100%; height: 48px; border-radius: 14px; }
+.account-skeleton-icon { width: 33px; height: 33px; border-radius: 11px; }
+.account-skeleton-avatar { width: 90px; height: 90px; border-radius: 50%; }
+.account-skeleton-divider { height: 1px; width: 100%; border-radius: 0; background: rgba(23, 23, 23, 0.07); }
+.account-skeleton-divider::after { display: none; }
+
+#account-panel-details.is-loading .account-details-loading-state {
+  display: block;
+  padding: 30px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.97);
+}
+
+#account-panel-details .account-details-loading-state[hidden] { display: none; }
+
+.account-skeleton-details,
+.account-skeleton-security {
+  width: 100%;
+  display: grid;
+  align-content: start;
+  gap: 23px;
+}
+
+.account-skeleton-heading {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.account-skeleton-profile,
+.account-skeleton-connected-card,
+.account-skeleton-security-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(23, 23, 23, 0.07);
+  border-radius: 21px;
+  background: rgba(247, 244, 238, 0.38);
+}
+
+.account-skeleton-profile-copy,
+.account-skeleton-card-copy {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.account-skeleton-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 16px;
+}
+
+.account-skeleton-field {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.account-skeleton-connected { display: grid; gap: 14px; }
+.account-skeleton-connected-card .account-skeleton-button,
+.account-skeleton-security-card .account-skeleton-button { margin-left: auto; }
+
+#account-panel-security.is-loading > :not(.account-security-loading-state) {
+  visibility: hidden;
+}
+
+/* The shared loading rule hides ordinary panel children, not the active skeleton. */
+#account-panel-security.is-loading > .account-security-loading-state {
+  visibility: visible;
+}
+
+#account-panel-security.is-loading {
+  min-height: 680px;
+  overflow: hidden;
+}
+
+#account-panel-security .account-security-loading-state {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: inherit;
+}
+
+#account-panel-security .account-security-loading-state[hidden] { display: none; }
+
+.account-skeleton-security {
+  gap: 19px;
+}
+
+.account-skeleton-security-card {
+  min-height: 100px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.account-skeleton-list { display: grid; min-width: 0; }
+.account-skeleton-list-row {
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr) 124px;
+  gap: 18px;
+  align-items: center;
+  min-width: 0;
+  padding: 19px 21px;
+}
+
+.account-skeleton-list-row:not(:last-child) {
+  border-bottom: 1px solid rgba(23, 23, 23, 0.075);
+}
+
+.account-skeleton-photo { width: 66px; height: 66px; border-radius: 16px; }
+.account-skeleton-stars { width: 93px; height: 14px; }
+.account-skeleton-row-copy { min-width: 0; display: grid; justify-items: start; gap: 9px; }
+.account-skeleton-row-copy .account-skeleton-description { max-width: 90%; }
+.account-skeleton-row-aside { display: grid; justify-items: end; gap: 17px; }
+.account-skeleton-row-aside .account-skeleton-button { width: 96px; height: 29px; }
+
+@media (max-width: 700px) {
+  #account-panel-details.is-loading .account-details-loading-state,
+  #account-panel-security .account-security-loading-state {
+    padding: 22px;
+  }
+
+  .account-skeleton-fields { grid-template-columns: 1fr; }
+  .account-skeleton-profile { gap: 13px; padding: 14px; }
+  .account-skeleton-avatar { width: 68px; height: 68px; }
+  .account-skeleton-security-card { padding: 14px; gap: 12px; }
+  .account-skeleton-security-card .account-skeleton-button { width: 74px; }
+  .account-skeleton-list-row {
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 10px 13px;
+    padding: 17px 14px;
+  }
+  .account-skeleton-photo { width: 56px; height: 56px; border-radius: 13px; }
+  .account-skeleton-row-aside { grid-column: 2; display: flex; justify-content: flex-start; }
+}
+
+@media (max-width: 420px) {
+  #account-panel-details.is-loading .account-details-loading-state,
+  #account-panel-security .account-security-loading-state { padding: 18px; }
+  .account-skeleton-connected-card .account-skeleton-button { width: 76px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-skeleton-shape::after { animation: none; }
+}
