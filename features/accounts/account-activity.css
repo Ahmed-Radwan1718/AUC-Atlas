@@ -242,6 +242,33 @@
   margin-right: 7px;
 }
 
+/* Match the reviews list: title and muted upload date share a line. */
+#account-panel-reviews .account-upload-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  column-gap: 7px;
+  row-gap: 3px;
+}
+
+#account-panel-reviews .account-upload-head p {
+  white-space: nowrap;
+}
+
+#account-panel-reviews .account-upload-head p::before {
+  content: "·";
+  margin-right: 7px;
+}
+
+#account-panel-reviews .account-upload-course {
+  margin: 0;
+  color: rgba(23, 23, 23, 0.56);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 #account-panel-reviews .account-review-head h3,
 #account-panel-reviews .account-upload-head h3 {
   font-size: 16px;

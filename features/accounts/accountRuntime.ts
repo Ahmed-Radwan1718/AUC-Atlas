@@ -1367,16 +1367,8 @@ function getAccountReviewProfessorUrl(professorId) {
                 <h3>${escapeAccountHtml(title)}</h3>
                 <p>${escapeAccountHtml(getAccountReviewDateLabel(material.createdAt))}</p>
               </div>
-              <div class="account-upload-meta">
-                <span>${escapeAccountHtml(material.courseCode || "Course not listed")}</span>
-                <span>${escapeAccountHtml(material.materialType || "Category not listed")}</span>
-                <span>${escapeAccountHtml(material.professor || "Professor not listed")}</span>
-                <span>${escapeAccountHtml(material.semester || "Semester not listed")}</span>
-              </div>
-              <p class="account-upload-file-name">
-                ${escapeAccountHtml(fileName)} ·
-                ${escapeAccountHtml(formatAccountMaterialSize(material.size))}
-              </p>
+              <p class="account-upload-course">${escapeAccountHtml(material.courseCode || "Course not listed")}</p>
+              <p class="account-upload-file-name">${escapeAccountHtml(fileName)}</p>
             </div>
             <div class="account-activity-item-aside">
               <div class="account-upload-actions">
