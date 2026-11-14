@@ -68,6 +68,25 @@ function runRoute(file: string, authenticated: boolean) {
       if(id==="../../../server/firebase")
         return {firestore:()=>db,firebaseAuth:()=>({getUser:async()=>({emailVerified:true})})};
       if(id==="firebase-admin/firestore")return {FieldValue:{serverTimestamp:()=>new Date()}};
+      if(id==="../../../server/professorRatingSummaries") return {
+        getProfessorRatingSnapshot:async()=>({
+          version:1,ready:true,reviewCount:2,
+          professors:{"prof-1":{
+            professorName:"Professor One",reviewCount:2,ratedCount:2,ratingTotal:8
+          }}
+        }),
+        professorDirectorySummaries:(stats:any)=>Object.fromEntries(
+          Object.entries(stats.professors).map(([id,row]:any)=>[
+            id,{reviewCount:row.reviewCount,averageRating:row.ratingTotal/row.ratedCount}
+          ])
+        ),
+        homepageProfessorRankings:(stats:any)=>Object.entries(stats.professors)
+          .map(([professorId,row]:any)=>({
+            professorId,professorName:row.professorName,
+            reviewCount:row.ratedCount,averageRating:row.ratingTotal/row.ratedCount
+          })),
+        updateRatingSummaryInTransaction:async()=>{}
+      };
       if(id==="../../../server/professorReviews")return mockReview;
       if(id==="../../../server/security")return {
         consumeRateLimit:async()=>{rateLimits++;},

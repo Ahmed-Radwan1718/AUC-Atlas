@@ -19,6 +19,7 @@ jobs:
       - run: npm run test:cleanup
       - run: npm run test:upload-security
       - run: npm run test:review-privacy
+      - run: npm run test:rating-summaries
       - run: npm run test:material-directory
       - run: npm run test:discovery
       - run: npm run test:faq

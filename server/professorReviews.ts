@@ -1,6 +1,7 @@
 import { FieldValue, Timestamp, type DocumentSnapshot, type QueryDocumentSnapshot } from "firebase-admin/firestore";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { firebaseAuth, firestore } from "./firebase";
+import { updateRatingSummaryInTransaction } from "./professorRatingSummaries";
 
 type Payload = Record<string, unknown>;
 type ReviewData = Record<string, unknown>;
@@ -146,6 +147,7 @@ export async function submitReview(user:DecodedIdToken,fields:ReviewData,reviewD
     if(active&&count>=35)throw new ReviewError("Too many reviews submitted. Please try again later.",429,
       Math.ceil((started+windowMs-now)/1000));
     const current=active?started:now;
+    await updateRatingSummaryInTransaction(tx,[{before:null,after:reviewData}]);
     tx.set(limitRef,{count:count+1,windowStartedAt:Timestamp.fromMillis(current),
       lastSubmissionAt:FieldValue.serverTimestamp(),expiresAt:Timestamp.fromMillis(current+windowMs)});
     tx.set(ref,reviewData);

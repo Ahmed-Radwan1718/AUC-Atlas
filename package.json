@@ -10,11 +10,12 @@
     "test:cleanup": "node --test tests/cleanup-material-uploads.test.ts",
     "test:upload-security": "node --test tests/material-upload-security.test.ts",
     "test:review-privacy": "node --test tests/professor-review-privacy.test.ts",
+    "test:rating-summaries": "node --test tests/professor-rating-summaries.test.ts",
     "test:material-directory": "node --test tests/material-directory.test.ts",
     "test:discovery": "node --test tests/material-discovery.test.ts",
     "test:auc-id": "node --test tests/auc-id-verification.test.ts",
     "test:faq": "node --test tests/faq-sitemap.test.ts",
-    "test": "node --test tests/cleanup-material-uploads.test.ts tests/faq-sitemap.test.ts tests/auth-module-contract.test.ts tests/course-prerequisites.test.ts tests/auc-id-verification.test.ts tests/material-upload-security.test.ts tests/professor-review-privacy.test.ts tests/material-directory.test.ts tests/material-discovery.test.ts tests/professor-email-policy.test.ts",
+    "test": "node --test tests/cleanup-material-uploads.test.ts tests/faq-sitemap.test.ts tests/auth-module-contract.test.ts tests/course-prerequisites.test.ts tests/auc-id-verification.test.ts tests/material-upload-security.test.ts tests/professor-review-privacy.test.ts tests/professor-rating-summaries.test.ts tests/material-directory.test.ts tests/material-discovery.test.ts tests/professor-email-policy.test.ts",
     "test:auth": "node --test tests/auth-module-contract.test.ts",
     "test:professor-emails": "node --test tests/professor-email-policy.test.ts",
     "test:prerequisites": "node --test tests/course-prerequisites.test.ts"
