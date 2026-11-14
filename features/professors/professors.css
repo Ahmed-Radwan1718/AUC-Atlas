@@ -191,8 +191,31 @@
       white-space: nowrap;
     }
 
+    /* Keep five star silhouettes visible; clip only the gold overlay to the
+       actual average (e.g. 3.5 fills exactly half of the fourth star). */
     .professor-meta .professor-card-stars {
+      position: relative;
+      display: inline-block;
+      color: rgba(23, 23, 23, 0.18);
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .professor-meta .professor-card-stars::before {
+      content: "★★★★★";
+      margin: 0;
+      color: rgba(23, 23, 23, 0.18);
+    }
+
+    .professor-meta .professor-card-stars::after {
+      content: "★★★★★";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--star-fill, 0%);
+      overflow: hidden;
       color: #c09a5c;
+      white-space: nowrap;
     }
 
     .professor-meta span + span::before {
