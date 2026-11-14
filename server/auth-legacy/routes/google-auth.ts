@@ -190,22 +190,14 @@ async function handleGet(req: any, res: any) {
         context.decodedUser.uid
       );
 
-    connected =
-      isConfirmedGoogleConnection(
-        context.userRecord,
-        context.userData
-      );
+    // Firebase Auth is the source of truth for provider linkage. An older
+    // Firestore connection marker may be missing even for an already-linked user.
+    const googleProvider =
+      getGoogleProvider(context.userRecord);
+    connected = Boolean(googleProvider);
 
-    if (connected) {
-      const googleProvider =
-        getGoogleProvider(
-          context.userRecord
-        );
-
-      googleEmail = cleanEmail(
-        googleProvider &&
-        googleProvider.email
-      );
+    if (googleProvider) {
+      googleEmail = cleanEmail(googleProvider.email);
     }
   }
 
@@ -417,34 +409,39 @@ async function handleLogin(req: any, res: any) {
   const googleProvider =
     getGoogleProvider(userRecord);
 
-  if (
-    !googleProvider ||
-    !isConfirmedGoogleConnection(
-      userRecord,
-      userData
-    )
-  ) {
+  // The Google popup authenticated this exact Firebase UID. Do not require a
+  // separate Firestore link marker or attempt to link the provider again.
+  if (!googleProvider) {
     throw createHttpError(
       "This Google account is not connected to an existing AUC Atlas account. Log in with your AUC email first, then connect Google from My Account.",
       403
     );
   }
 
-  const accountEmail =
-    getAccountEmail(
-      decodedToken,
-      userRecord,
-      userData
+  // Never treat a Google login as verification of an unverified AUC mailbox.
+  const accountEmail = cleanEmail(userRecord.email);
+  ensureAllowedAucEmail(accountEmail, "continue with Google");
+  if (!userRecord.emailVerified) {
+    throw createHttpError(
+      "Please verify your AUC email address before logging in.",
+      403
     );
+  }
 
-  const updatedUserRecord =
-    await admin.auth().updateUser(
-      decodedToken.uid,
-      {
-        email: accountEmail,
-        emailVerified: true
-      }
-    );
+  // Repair legacy links only after verifying Google's sign-in token, the
+  // existing AUC Atlas user document, and the linked Firebase provider.
+  if (!isConfirmedGoogleConnection(userRecord, userData)) {
+    await userRef.set({
+      googleConnection: {
+        providerUid: cleanString(googleProvider.uid, 200),
+        email: cleanEmail(googleProvider.email),
+        connectedAt: admin.firestore.FieldValue.serverTimestamp()
+      },
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  }
+
+  const updatedUserRecord = userRecord;
 
   const twoFactor =
     userData.twoFactor &&
