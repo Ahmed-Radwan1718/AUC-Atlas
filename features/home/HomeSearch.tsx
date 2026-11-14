@@ -13,6 +13,7 @@ type SearchResult = {
   score: number;
   professorId?: string;
   department?: string;
+  photo?: string;
 };
 type Material = {
   title?: string; courseCode?: string; materialType?: string;
@@ -88,9 +89,21 @@ function SearchResultLink({
       ? "Loading reviews..." : reviews + " " + (reviews === 1 ? "review" : "reviews")].filter(Boolean).join(" · ")
     : result.meta;
   return (
-    <a href={result.href} className={`atlas-search-result ${activeIndex === index ? "is-active" : ""}`}
+    <a href={result.href} className={`atlas-search-result ${result.type === "Professor" ? "atlas-search-result--professor" : ""} ${activeIndex === index ? "is-active" : ""}`}
       onMouseEnter={() => onHover(index)} onClick={onNavigate}>
-      <span className="atlas-search-result-type">{result.type}</span>
+      {result.type === "Professor" ? (
+        <img
+          className="atlas-search-result-avatar"
+          src={result.photo || "/user.png"}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          onError={event => {
+            const image = event.currentTarget;
+            if (!image.src.endsWith("/user.png")) image.src = "/user.png";
+          }}
+        />
+      ) : <span className="atlas-search-result-type">{result.type}</span>}
       <span className="atlas-search-result-copy"><strong>{result.title}</strong><small>{meta}</small></span>
     </a>
   );
@@ -119,6 +132,8 @@ export default function HomeSearch() {
         professor.filterDepartment, professor.course
       ]);
       return { type: "Professor" as const, title: professor.name, department, professorId: id,
+        photo: professor.image && (/^https?:\/\//.test(professor.image) || professor.image.startsWith("/"))
+          ? professor.image : "/" + (professor.image || "user.png"),
         meta: "", href: professorHref(id), score };
     }).filter(item => item.score >= 0)
       .sort((a,b) => b.score - a.score || a.title.localeCompare(b.title)).slice(0, 12);
