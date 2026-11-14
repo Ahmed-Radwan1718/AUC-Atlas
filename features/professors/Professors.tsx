@@ -26,11 +26,6 @@ const photo = (url?: string) => {
 function initialProfessors(): RatedProfessor[] {
   return professors.map(item => ({ ...item, reviewCount: 0, averageRating: 0 }));
 }
-function priority(item: RatedProfessor): number {
-  const hasPhoto = Boolean(item.image && item.image.trim() !== "user.png");
-  const hasReviews = item.reviewCount > 0;
-  return hasPhoto && hasReviews ? 0 : hasPhoto ? 1 : hasReviews ? 2 : 3;
-}
 const departments = [...new Set(professors.map(department))].filter(x => x !== "Other").sort((a,b)=>a.localeCompare(b));
 const ratingChoices = [1,2,3,4,5];
 
@@ -108,8 +103,8 @@ export default function Professors() {
     return (!query || searchable.includes(normalize(query)))
       && (!selectedDepartments.length || selectedDepartments.includes(department(item)))
       && (!selectedRatings.length || selectedRatings.includes(ratingStatus(item.averageRating)));
-  }).sort((a,b) => priority(a) - priority(b)
-    || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name)), [items,query,selectedDepartments,selectedRatings]);
+  // Sort strictly by average rating (highest first). Equal ratings retain source order.
+  }).sort((a,b) => b.averageRating - a.averageRating), [items,query,selectedDepartments,selectedRatings]);
 
   // FLIP: measure old positions, let React reflow, then animate the difference.
   // Reading positions while an old animation is active lets rapid typing
