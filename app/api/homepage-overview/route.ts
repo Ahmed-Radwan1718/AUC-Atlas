@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { type QueryDocumentSnapshot, type DocumentData } from "firebase-admin/firestore";
 import { firestore } from "../../../server/firebase";
 import { optionalSessionUser } from "../../../server/session";
+import { getProfessorRatingSnapshot, homepageProfessorRankings } from "../../../server/professorRatingSummaries";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -53,28 +54,6 @@ async function latestReviews(limit: number) {
     .orderBy("createdAt", "desc").limit(Math.max(1, Math.min(12, limit))).get();
   return snapshot.docs.map(serializeReview);
 }
-async function rankedProfessors() {
-  const reviews = await firestore().collection("professorReviews")
-    .select("professorId", "professorName", "rating").get();
-  const totals = new Map<string, { professorId: string; professorName: string; reviewCount: number; ratingTotal: number }>();
-  reviews.forEach(doc => {
-    const data = doc.data();
-    const professorId = clean(data.professorId, 80);
-    const professorName = clean(data.professorName, 120);
-    const rating = Number(data.rating || 0);
-    if (!professorId || !Number.isFinite(rating) || rating < 1 || rating > 5) return;
-    const summary = totals.get(professorId) || { professorId, professorName, reviewCount: 0, ratingTotal: 0 };
-    if (!summary.professorName && professorName) summary.professorName = professorName;
-    summary.reviewCount += 1;
-    summary.ratingTotal += rating;
-    totals.set(professorId, summary);
-  });
-  return [...totals.values()].map(({ professorId, professorName, reviewCount, ratingTotal }) => ({
-    professorId, professorName, reviewCount,
-    averageRating: Math.round((ratingTotal / reviewCount) * 100) / 100
-  })).sort((a, b) => b.averageRating - a.averageRating
-    || b.reviewCount - a.reviewCount || a.professorName.localeCompare(b.professorName));
-}
 async function latestMaterials(limit: number) {
   const collection = firestore().collection("courseMaterials");
   const safeLimit = Math.max(1, Math.min(12, Math.floor(Number(limit) || 3)));
@@ -99,19 +78,19 @@ export async function GET(request: NextRequest) {
     // Public homepage statistics and course-material previews remain available.
     // Professor review counts, rankings, and individual review metadata are
     // only queried for verified AUC Atlas sessions.
-    const [materialCount, latestMaterialData, reviewCount, latestReviewData, rankings] = await Promise.all([
+    const [materialCount, latestMaterialData, ratings, latestReviewData] = await Promise.all([
       db.collection("courseMaterials").where("status", "==", "approved").count().get(),
       latestMaterials(3),
-      user ? db.collection("professorReviews").count().get() : Promise.resolve(null),
-      user ? latestReviews(3) : Promise.resolve([]),
-      user ? rankedProfessors() : Promise.resolve([])
+      user ? getProfessorRatingSnapshot() : Promise.resolve(null),
+      user ? latestReviews(3) : Promise.resolve([])
     ]);
+    const rankings = ratings ? homepageProfessorRankings(ratings) : [];
     const lowest = rankings.filter(professor => professor.averageRating <= 2)
       .sort((a, b) => a.averageRating - b.averageRating
         || b.reviewCount - a.reviewCount || a.professorName.localeCompare(b.professorName));
     return NextResponse.json({
       reviewsLocked: !user,
-      reviewCount: reviewCount ? Number(reviewCount.data().count || 0) : null,
+      reviewCount: ratings ? ratings.reviewCount : null,
       materialCount: Number(materialCount.data().count || 0),
       latestReviews: latestReviewData,
       latestMaterials: latestMaterialData,

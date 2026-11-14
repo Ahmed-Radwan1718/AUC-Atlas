@@ -519,14 +519,16 @@ async function handleDeleteReview(actor: any, body: any) {
   }
 
   const reviewRef = admin.firestore().collection("professorReviews").doc(reviewId);
-  const reviewDoc = await reviewRef.get();
-
-  if (!reviewDoc.exists) {
-    throw createAdminError("Review not found.", 404);
-  }
-
-  const reviewData = reviewDoc.data() || {};
-  await reviewRef.delete();
+  let reviewData: any = {};
+  await admin.firestore().runTransaction(async (tx: any) => {
+    const reviewDoc = await tx.get(reviewRef);
+    if (!reviewDoc.exists) throw createAdminError("Review not found.", 404);
+    reviewData = reviewDoc.data() || {};
+    await require("../../professorRatingSummaries").updateRatingSummaryInTransaction(tx,[
+      {before:reviewData,after:null}
+    ]);
+    tx.delete(reviewRef);
+  });
   await writeAuditLog(actor, {
     action: "delete_review",
     targetType: "review",

@@ -8,40 +8,13 @@ import {
   authorReviews, ownedReview, submitReview, serializeReview
 } from "../../../server/professorReviews";
 import { consumeRateLimit, requestIp, RateLimitError } from "../../../server/security";
+import { getProfessorRatingSnapshot, professorDirectorySummaries, updateRatingSummaryInTransaction } from "../../../server/professorRatingSummaries";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type Summary = { reviewCount: number; averageRating: number };
-let summaryCache: { expiresAt: number; summaries: Record<string, Summary> | null }
-  = { expiresAt: 0, summaries: null };
-
-async function getSummaries(): Promise<Record<string, Summary>> {
-  if (summaryCache.summaries && summaryCache.expiresAt > Date.now()) return summaryCache.summaries;
-  const snapshot = await firestore().collection("professorReviews").select("professorId", "rating").get();
-  const totals = new Map<string, { reviewCount: number; ratingCount: number; ratingTotal: number }>();
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const professorId = String(data.professorId || "").trim().replace(/\s+/g, " ").slice(0, 80);
-    const rating = Number(data.rating || 0);
-    if (!professorId) return;
-    const summary = totals.get(professorId) || { reviewCount: 0, ratingCount: 0, ratingTotal: 0 };
-    summary.reviewCount += 1;
-    if (Number.isFinite(rating) && rating >= 1 && rating <= 5) {
-      summary.ratingCount += 1;
-      summary.ratingTotal += rating;
-    }
-    totals.set(professorId, summary);
-  });
-  const summaries: Record<string, Summary> = {};
-  for (const [professorId, item] of totals) {
-    summaries[professorId] = {
-      reviewCount: item.reviewCount,
-      averageRating: item.ratingCount ? Math.round((item.ratingTotal / item.ratingCount) * 100) / 100 : 0
-    };
-  }
-  summaryCache = { expiresAt: Date.now() + 60 * 60 * 1000, summaries };
-  return summaries;
+async function getSummaries() {
+  return professorDirectorySummaries(await getProfessorRatingSnapshot());
 }
 export async function GET(request: NextRequest) {
   const headers = { "Cache-Control": "private, no-store" };
@@ -102,7 +75,14 @@ async function mutate(request:NextRequest,method:"POST"|"PATCH"|"DELETE"){
     if(method==="DELETE"){
       if(!reviewId)throw new ReviewError("Review not found.",400);
       const owned=await ownedReview(reviewId,user.uid);
-      await owned.ref.delete();
+      await firestore().runTransaction(async tx=>{
+        const latest=await tx.get(owned.ref);
+        const before=latest.data()||{};
+        if(!latest.exists || (before.authorUid!==user.uid && before.authorUserId!==user.uid))
+          throw new ReviewError("You do not have permission to change that review.",403);
+        await updateRatingSummaryInTransaction(tx,[{before,after:null}]);
+        tx.delete(owned.ref);
+      });
       return NextResponse.json({success:true,reviews:await authorReviews(user.uid)});
     }
     const record=await firebaseAuth().getUser(user.uid);
@@ -114,9 +94,17 @@ async function mutate(request:NextRequest,method:"POST"|"PATCH"|"DELETE"){
     const profile=await authorProfile(user);
     const timestamp=new Date().toISOString();
     if(method==="PATCH"&&owned){
-      await owned.ref.update({
-        ...fields,authorUid:user.uid,authorUserId:user.uid,...profile,
-        updatedAt:FieldValue.serverTimestamp(),updatedAtIso:timestamp
+      await firestore().runTransaction(async tx=>{
+        const latest=await tx.get(owned.ref);
+        const before=latest.data()||{};
+        if(!latest.exists || (before.authorUid!==user.uid && before.authorUserId!==user.uid))
+          throw new ReviewError("You do not have permission to change that review.",403);
+        const after={...before,...fields,authorUid:user.uid,authorUserId:user.uid,...profile,updatedAtIso:timestamp};
+        await updateRatingSummaryInTransaction(tx,[{before,after}]);
+        tx.update(owned.ref,{
+          ...fields,authorUid:user.uid,authorUserId:user.uid,...profile,
+          updatedAt:FieldValue.serverTimestamp(),updatedAtIso:timestamp
+        });
       });
       return NextResponse.json({success:true,review:serializeReview(await owned.ref.get()),
         reviews:await authorReviews(user.uid)});

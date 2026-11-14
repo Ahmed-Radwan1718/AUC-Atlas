@@ -197,6 +197,23 @@ async function deleteQueryDocuments(db: any, query: any) {
   }
 }
 
+// Delete account reviews in batches, atomically updating professor ratings.
+// The second legacy-author query skips records deleted by the first.
+async function deleteQueryReviews(db: any, query: any) {
+  while (true) {
+    const snapshot = await query.limit(100).get();
+    if (snapshot.empty) return;
+    await db.runTransaction(async (tx: any) => {
+      const docs = await Promise.all(snapshot.docs.map((doc: any) => tx.get(doc.ref)));
+      const changes = docs.filter((doc: any) => doc.exists)
+        .map((doc: any) => ({before:doc.data() || {},after:null}));
+      if (!changes.length) return;
+      await require("../../professorRatingSummaries").updateRatingSummaryInTransaction(tx,changes);
+      for(const doc of docs) if(doc.exists) tx.delete(doc.ref);
+    });
+  }
+}
+
 async function deleteUserMaterials(db: any, uid: any) {
   const query = db
     .collection("courseMaterials")
@@ -401,7 +418,7 @@ export default async function handler(req: LegacyRequest, res: LegacyReply) {
       decodedUser.uid
     );
 
-    await deleteQueryDocuments(
+    await deleteQueryReviews(
       db,
       db
         .collection("professorReviews")
@@ -412,7 +429,7 @@ export default async function handler(req: LegacyRequest, res: LegacyReply) {
         )
     );
 
-    await deleteQueryDocuments(
+    await deleteQueryReviews(
       db,
       db
         .collection("professorReviews")
