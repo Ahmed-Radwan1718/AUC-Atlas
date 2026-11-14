@@ -99,7 +99,11 @@ async function mutate(request:NextRequest,method:"POST"|"PATCH"|"DELETE"){
         const before=latest.data()||{};
         if(!latest.exists || (before.authorUid!==user.uid && before.authorUserId!==user.uid))
           throw new ReviewError("You do not have permission to change that review.",403);
-        const after={...before,...fields,authorUid:user.uid,authorUserId:user.uid,...profile,updatedAtIso:timestamp};
+        const after={
+          ...before,...fields,
+          professorId:fields.professorId,professorName:fields.professorName,rating:fields.rating,
+          authorUid:user.uid,authorUserId:user.uid,...profile,updatedAtIso:timestamp
+        };
         await updateRatingSummaryInTransaction(tx,[{before,after}]);
         tx.update(owned.ref,{
           ...fields,authorUid:user.uid,authorUserId:user.uid,...profile,
