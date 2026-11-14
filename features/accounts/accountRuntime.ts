@@ -6,7 +6,7 @@ import { professors } from "../../data/professors";
 import { populateReviewCourseSelect, setupReviewDependsField, setupReviewSearchSelect, setupReviewChoiceMenus, setupReviewCompactControls } from "../professors/reviewControls";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import {
-  GoogleAuthProvider, getAuth, inMemoryPersistence, linkWithPopup,
+  GoogleAuthProvider, getAuth, inMemoryPersistence, linkWithPopup, reload,
   setPersistence, signInWithCustomToken, signOut
 } from "firebase/auth";
 
@@ -3231,31 +3231,39 @@ function initializeGoogleConnection(){
             authData.customToken
           );
 
-        const alreadyLinked =
-          Boolean(
-            auth.currentUser &&
-            auth.currentUser.providerData
-              .some(function (provider) {
-                return (
-                  provider &&
-                  provider.providerId ===
-                    "google.com"
-                );
-              })
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          throw new Error("Please log in again before connecting Google.");
+        }
+
+        const hasGoogleProvider = function (user) {
+          return Boolean(
+            user.providerData &&
+            user.providerData.some(function (provider) {
+              return provider && provider.providerId === "google.com";
+            })
           );
+        };
 
-        if (!alreadyLinked) {
-          const provider =
-            new GoogleAuthProvider();
+        // Refresh providerData before linking: the Google provider may
+        // already be attached in Firebase even if Firestore is out of sync.
+        await reload(currentUser);
 
-          provider.setCustomParameters({
-            prompt: "select_account"
-          });
+        if (!hasGoogleProvider(currentUser)) {
+          const provider = new GoogleAuthProvider();
+          provider.setCustomParameters({ prompt: "select_account" });
 
-          await linkWithPopup(
-            auth.currentUser,
-            provider
-          );
+          try {
+            await linkWithPopup(currentUser, provider);
+          } catch (error) {
+            if (!error || error.code !== "auth/provider-already-linked") {
+              throw error;
+            }
+            // A stale provider list can cause an unnecessary link attempt.
+            // Only recover when Firebase confirms Google is already linked.
+            await reload(currentUser);
+            if (!hasGoogleProvider(currentUser)) throw error;
+          }
         }
 
         const idToken =
