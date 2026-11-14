@@ -5,6 +5,7 @@ import { professors } from "../../data/professors";
 import { initializeAdmin } from "./adminRuntime";
 import { markup } from "./adminMarkup";
 import "./admin.css";
+import "./admin-users.css";
 
 /**
  * Preserve the original administrator UI while replacing its original
