@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { professors, type Professor } from "../../data/professors";
 import "./professors.css";
 import "./professors-ui-1.css";
@@ -275,7 +275,7 @@ export default function Professors() {
               </div>) : <>
                 {results.slice(0,visibleLimit).map((item,index) => {
                   const rating = item.reviewCount && Number.isFinite(item.averageRating) && item.averageRating>0
-                    ? <><span className="professor-card-stars">{"★".repeat(Math.max(1,Math.min(5,Math.round(item.averageRating))))}</span>{" " + item.averageRating.toFixed(1)}</>
+                    ? <><span className="professor-card-stars" aria-hidden="true" style={{ "--star-fill": `${Math.min(5, Math.max(0, item.averageRating)) * 20}%` } as CSSProperties}/>{" " + item.averageRating.toFixed(1)}</>
                     : "No Stars Yet";
                   return <a className="professor-card" key={item.id} data-professor-id={item.id} href={"/professors/"+encodeURIComponent(item.id)}
                     aria-label={"Open "+item.name+" profile"}>
