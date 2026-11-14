@@ -150,7 +150,7 @@
       overscroll-behavior: contain;
       border: 1px solid rgba(23, 23, 23, 0.12);
       border-radius: 24px;
-      background: rgba(255, 253, 248, 0.98);
+      background: #fffdf8;
       box-shadow: 0 30px 80px rgba(42, 32, 20, 0.18);
       text-align: left;
       transform-origin: top center;
@@ -163,12 +163,10 @@
 
     @keyframes atlas-search-panel-in {
       from {
-        opacity: 0;
         transform: translateY(-10px) scale(0.985);
       }
 
       to {
-        opacity: 1;
         transform: translateY(0) scale(1);
       }
     }
@@ -209,6 +207,20 @@
       align-items: center;
       transition: background 0.16s ease, transform 0.16s ease;
       animation: atlas-search-result-in 300ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
+    .atlas-search-result--professor {
+      grid-template-columns: 44px minmax(0, 1fr);
+    }
+
+    .atlas-search-result-avatar {
+      display: block;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      object-fit: cover;
+      object-position: center 18%;
+      background: #f4f0e9;
     }
 
     .atlas-search-result:nth-of-type(1) {
