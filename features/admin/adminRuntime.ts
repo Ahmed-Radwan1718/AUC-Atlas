@@ -1663,6 +1663,22 @@ export function initializeAdmin() {
     userPage = 1;
     renderUsers();
   });
+  userFilterButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      userStatusFilter = button.dataset.userFilter;
+      userFilterButtons.forEach(function (item) {
+        const active = item === button;
+        item.classList.toggle("active", active);
+        item.setAttribute("aria-pressed", String(active));
+      });
+      userPage = 1;
+      renderUsers();
+    });
+  });
+  userSort.addEventListener("change", function () {
+    userPage = 1;
+    renderUsers();
+  });
 
   userPrev.addEventListener("click", function () {
     if (userPage > 1) {
@@ -1836,28 +1852,36 @@ export function initializeAdmin() {
     });
   });
 
+  // Broken remote avatar images reveal their initials fallback.
+  usersPanel.addEventListener("error", function (event) {
+    if (event.target.matches(".admin-user-avatar img")) event.target.remove();
+  }, true);
+
+  document.addEventListener("keydown", function (event) {
+    if (userDrawerLayer.hidden) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeUserDrawer();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = Array.from(userDrawer.querySelectorAll(
+      'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), [tabindex="0"]'
+    )).filter(function (item) { return item.getClientRects().length > 0; });
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && (document.activeElement === first || !userDrawer.contains(document.activeElement))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (document.activeElement === last || !userDrawer.contains(document.activeElement))) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
   usersPanel.addEventListener("click", function (event) {
     if (event.target.closest("[data-close-user-detail]")) {
-      const uid = selectedUserUid;
-      selectedUserUid = "";
-      renderUsers();
-      const trigger = Array.from(userList.querySelectorAll("[data-user-open-uid]"))
-        .find(function (button) {
-          return button.dataset.userOpenUid === uid;
-        });
-      if (trigger) trigger.focus({ preventScroll: true });
-      return;
-    }
-
-    const openButton = event.target.closest("[data-user-open-uid]");
-    if (openButton) {
-      toggleUserDetails(openButton.dataset.userOpenUid);
-      return;
-    }
-
-    const userRow = event.target.closest(".admin-user-row[data-user-row-uid]");
-    if (userRow) {
-      toggleUserDetails(userRow.dataset.userRowUid);
+      closeUserDrawer();
       return;
     }
 
@@ -1871,9 +1895,7 @@ export function initializeAdmin() {
         isBanning ? "Violation of AUC Atlas rules" : ""
       );
 
-      if (reason === null || !window.confirm(isBanning ? "Ban this user and revoke all sessions?" : "Unban this user?")) {
-        return;
-      }
+      if (reason === null || !window.confirm(isBanning ? "Ban this user and revoke all sessions?" : "Unban this user?")) return;
 
       runBusy(banButton, async function () {
         const result = await postAction({
@@ -1882,23 +1904,17 @@ export function initializeAdmin() {
           banned: isBanning,
           reason
         });
-
         updateModeratedUser(result.user);
         showToast(isBanning ? "User banned." : "User unbanned.");
       }).catch(function (error) {
         showToast(error.message || "Could not update the user.");
       });
-
       return;
     }
 
     if (revokeButton) {
       const reason = window.prompt("Reason for revoking all sessions?", "Security reset");
-
-      if (reason === null || !window.confirm("Sign this user out of every recorded session?")) {
-        return;
-      }
-
+      if (reason === null || !window.confirm("Sign this user out of every recorded session?")) return;
       runBusy(revokeButton, async function () {
         await postAction({
           action: "revokeUserSessions",
@@ -1909,7 +1925,17 @@ export function initializeAdmin() {
       }).catch(function (error) {
         showToast(error.message || "Could not revoke the sessions.");
       });
+      return;
     }
+
+    const openButton = event.target.closest("[data-user-open-uid]");
+    if (openButton) {
+      toggleUserDetails(openButton.dataset.userOpenUid);
+      return;
+    }
+
+    const userRow = event.target.closest(".admin-user-row[data-user-row-uid]");
+    if (userRow) toggleUserDetails(userRow.dataset.userRowUid);
   });
 
   prepareAdminAuthentication();
