@@ -1457,7 +1457,6 @@ export function initializeAdmin() {
           '<thead><tr>',
             '<th scope="col">USER</th>',
             '<th scope="col">MAJOR</th>',
-            '<th scope="col">STATUS</th>',
             '<th scope="col">VERIFICATION</th>',
           '</tr></thead>',
           '<tbody>',
@@ -1477,8 +1476,6 @@ export function initializeAdmin() {
                     '</span>',
                   '</button></td>',
                   '<td class="admin-user-major">', escapeHtml(user.major || "Not provided"), '</td>',
-                  '<td><span class="admin-user-status', user.disabled ? ' is-banned' : '', '">',
-                    user.disabled ? "Banned" : "Active", '</span></td>',
                   '<td><span class="admin-user-verification', user.emailVerified ? ' is-verified' : '', '">',
                     user.emailVerified ? "Verified" : "Unverified", '</span></td>',
                 '</tr>'

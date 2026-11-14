@@ -292,23 +292,18 @@
 
 #admin-panel-users .admin-user-table th:first-child,
 #admin-panel-users .admin-user-table td:first-child {
-  width: 43%;
+  width: 48%;
   padding-left: 24px;
 }
 
 #admin-panel-users .admin-user-table th:nth-child(2),
 #admin-panel-users .admin-user-table td:nth-child(2) {
-  width: 25%;
-}
-
-#admin-panel-users .admin-user-table th:nth-child(3),
-#admin-panel-users .admin-user-table td:nth-child(3) {
-  width: 15%;
+  width: 30%;
 }
 
 #admin-panel-users .admin-user-table th:last-child,
 #admin-panel-users .admin-user-table td:last-child {
-  width: 17%;
+  width: 22%;
   padding-right: 22px;
   text-align: left;
 }
@@ -754,11 +749,9 @@
   #admin-panel-users .admin-user-table th:nth-child(2),
   #admin-panel-users .admin-user-table td:nth-child(2) { display: none; }
   #admin-panel-users .admin-user-table th:first-child,
-  #admin-panel-users .admin-user-table td:first-child { width: 55%; }
-  #admin-panel-users .admin-user-table th:nth-child(3),
-  #admin-panel-users .admin-user-table td:nth-child(3) { width: 20%; }
+  #admin-panel-users .admin-user-table td:first-child { width: 70%; }
   #admin-panel-users .admin-user-table th:last-child,
-  #admin-panel-users .admin-user-table td:last-child { width: 25%; }
+  #admin-panel-users .admin-user-table td:last-child { width: 30%; }
   .admin-user-avatar { width: 38px; height: 38px; flex-basis: 38px; }
   #admin-panel-users .admin-user-open { gap: 9px; }
   #admin-panel-users .admin-user-table th { padding: 15px 10px; font-size: 9px; }
@@ -781,11 +774,9 @@
   .admin-user-filter { padding: 0 12px; min-height: 35px; font-size: 10px; }
   .admin-users-sort-wrap { width: 100%; justify-content: flex-end; }
   #admin-panel-users .admin-user-table th:first-child,
-  #admin-panel-users .admin-user-table td:first-child { width: 52%; }
-  #admin-panel-users .admin-user-table th:nth-child(3),
-  #admin-panel-users .admin-user-table td:nth-child(3) { width: 23%; }
+  #admin-panel-users .admin-user-table td:first-child { width: 64%; }
   #admin-panel-users .admin-user-table th:last-child,
-  #admin-panel-users .admin-user-table td:last-child { width: 25%; }
+  #admin-panel-users .admin-user-table td:last-child { width: 36%; }
   #admin-panel-users .admin-user-table td { padding: 14px 6px; }
   #admin-panel-users .admin-user-table th { padding: 12px 6px; font-size: 8px; }
   #admin-panel-users .admin-user-table th:first-child,
