@@ -62,7 +62,7 @@
 }
 
 .admin-users-hero h2 {
-  margin: 0 0 12px;
+  margin: 0;
   color: #171717;
   font-size: clamp(31px, 4.2vw, 50px);
   font-weight: 700;
