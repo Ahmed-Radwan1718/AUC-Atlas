@@ -3,7 +3,6 @@ import { FieldValue, Timestamp, type DocumentReference, type DocumentData } from
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { firebaseAuth, firestore } from "./firebase";
 import { allowedMime, maxMaterialBytes, safeFileName } from "./materialFiles";
-import { consumeRateLimit } from "./security";
 import { serializeMaterialData } from "./materials";
 
 export class MaterialUploadError extends Error {
@@ -92,13 +91,6 @@ export async function authorizeMaterial(user: DecodedIdToken, body: Record<strin
   if (!courseCode || !professor || !semester || !materialType || !title || !fileType ||
     !Number.isSafeInteger(fileSize) || fileSize <= 0 || fileSize > maxBytes)
     throw new MaterialUploadError("Choose a supported course-material file up to 25MB.",400);
-  // Shared Firestore rate limit applies to authorization issuance, not downloads.
-  await consumeRateLimit({
-    scope:"material-upload-authorization-user",identifier:profile.uid,
-    maxAttempts:10,windowMs:60*60*1000,
-    message:"Too many upload attempts. You can request up to 10 upload authorizations per hour."
-  });
-
   const {publicKey,privateKey} = imageKitKeys();
   const authorizationId = randomBytes(18).toString("hex");
   const filePath = materialFolder + "/" + authorizationId + "." + ext(fileName);

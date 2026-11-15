@@ -240,16 +240,17 @@ test("registration changes an upload from pending quota to registered quota",asy
   await app.authorize(2048);
 });
 
-test("hourly authorization rate limit applies even if a client cancels requests",async()=>{
+test("upload authorizations are not capped hourly after completed or cancelled requests",async()=>{
   const app=harness();
-  for(let i=0;i<10;i++){
+  for(let i=0;i<12;i++){
     const auth=await app.authorize();
     await app.cancelMaterial(app.user,{authorizationId:auth.authorizationId});
   }
-  await assert.rejects(app.authorize(),{statusCode:429});
-  assert.equal(app.rateLimits.length,11);
-  assert.equal(app.rateLimits[0].maxAttempts,10);
-  assert.equal(app.rateLimits[0].windowMs,60*60*1000);
+  // A 13th authorization succeeds without hitting the former 10/hour cap.
+  const next=await app.authorize();
+  assert.ok(next.authorizationId);
+  assert.equal(app.collection("materialUploadAuthorizations").size,13);
+  assert.equal(app.rateLimits.length,0);
 });
 
 test("client only sends signed V2 parameters and no V1 signature fields",()=>{
