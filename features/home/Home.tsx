@@ -20,6 +20,7 @@ type CourseMaterial = {
 type Overview = {
   reviewsLocked: boolean;
   reviewCount: number | null;
+  materialCount: number;
   lowestRatedProfessors: RankedProfessor[];
   topReviewedProfessors: RankedProfessor[];
   latestMaterials: CourseMaterial[];
@@ -287,11 +288,11 @@ export default function Home() {
       <section className="home-stats-section" aria-labelledby="home-stats-title">
         <div className="home-section-head">
           <div><h2 id="home-stats-title">AUC Atlas by the numbers</h2></div>
-          <p>Live counts from the professors, courses, reviews, and visits during the current month.</p>
+          <p>Live counts of professors, study materials, student reviews, and visits this month.</p>
         </div>
         <div className="home-stats-grid">
           <article className="home-stat"><AnimatedCount value={professors.length}/><span>Professors listed</span></article>
-          <article className="home-stat"><AnimatedCount value={courses.length}/><span>Courses available</span></article>
+          <article className="home-stat"><AnimatedCount value={overview ? overview.materialCount : null} initial="—"/><span>Materials available</span></article>
           <article className="home-stat"><AnimatedCount value={overview ? overview.reviewCount : null} initial="—"/><span>{overview?.reviewsLocked ? "Student reviews · sign in to view" : "Student reviews"}</span></article>
           <article className="home-stat"><AnimatedCount value={visits} initial="—"/><span>Visits this month</span></article>
         </div>

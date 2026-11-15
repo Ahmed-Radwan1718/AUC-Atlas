@@ -40,13 +40,14 @@ function runRoute(file: string, authenticated: boolean) {
   });
   const db = {
     collection(name:string) {
+      let statusFilter = "";
       if(name==="professorReviews")reviewReads++;
       else if(name==="courseMaterials")materialReads++;
       else throw Error("Unexpected collection: "+name);
       const query = {
-        count(){return {get:async()=>({data:()=>({count:name==="professorReviews"?2:1})})};},
+        count(){return {get:async()=>({data:()=>({count:name==="professorReviews"?2:statusFilter==="rejected"?0:1})})};},
         select(..._fields:string[]){return {get:async()=>snapshot(name)};},
-        where(..._args:any[]){return this;},
+        where(field:string,_operator:string,value:string){if(field==="status")statusFilter=value;return this;},
         orderBy(..._args:any[]){return this;},
         limit(_count:number){return this;},
         get:async()=>snapshot(name)
