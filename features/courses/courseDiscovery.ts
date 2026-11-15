@@ -369,8 +369,8 @@ const href = courseCode
         docx: "doc.png",
         xls: "xls.png",
         xlsx: "xls.png",
-        ppt: "ppt.png",
-        pptx: "ppt.png",
+        ppt: "PPTX.svg",
+        pptx: "PPTX.svg",
         png: "png.png",
         jpg: "jpg.png",
         jpeg: "jpg.png"

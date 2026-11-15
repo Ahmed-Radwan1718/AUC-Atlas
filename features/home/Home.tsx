@@ -207,8 +207,8 @@ function getMaterialIcon(material: CourseMaterial): { icon: string | null; fallb
     else if (fileType.includes("png")) extension = "png";
   }
   const icons: Record<string,string> = {
-    pdf: "pdf.png", doc: "doc.png", docx: "doc.png", ppt: "ppt.png",
-    pptx: "ppt.png", xls: "xls.png", xlsx: "xls.png",
+    pdf: "pdf.png", doc: "doc.png", docx: "doc.png", ppt: "PPTX.svg",
+    pptx: "PPTX.svg", xls: "xls.png", xlsx: "xls.png",
     jpg: "jpg.png", jpeg: "jpg.png", png: "png.png"
   };
   return { icon: icons[extension] || null, fallback: (extension || "FILE").slice(0, 5).toUpperCase() };
