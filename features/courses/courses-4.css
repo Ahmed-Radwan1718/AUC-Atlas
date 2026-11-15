@@ -1121,19 +1121,24 @@
       background-color: transparent;
     }
 
-    .course-material-downloads .course-material-action-menu > summary {
+    .course-material-downloads .course-material-report-trigger {
       border: 0;
       border-radius: 10px;
       background: transparent;
     }
 
     .course-material-downloads .course-material-compact-download:hover,
-    .course-material-downloads .course-material-compact-download:focus-visible,
-    .course-material-downloads .course-material-action-menu > summary:hover,
-    .course-material-downloads .course-material-action-menu > summary:focus-visible,
-    .course-material-downloads .course-material-action-menu[open] > summary {
+    .course-material-downloads .course-material-compact-download:focus-visible {
       border: 0;
       background-color: rgba(192, 154, 92, 0.10);
+      box-shadow: none;
+    }
+
+    .course-material-downloads .course-material-report-trigger:hover,
+    .course-material-downloads .course-material-report-trigger:focus-visible {
+      border: 0;
+      background-color: rgba(159, 47, 47, 0.07);
+      color: #9f2f2f;
       box-shadow: none;
     }
 

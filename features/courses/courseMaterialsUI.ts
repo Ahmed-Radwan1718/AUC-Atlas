@@ -393,32 +393,29 @@ function renderCourseMaterials(materials) {
           `
           : "";
 
-      const menuMarkup =
+      // Reuse the existing [data-report-material] delegated click handler,
+      // which opens the report panel for this individual file immediately.
+      const reportMarkup =
         fileView.safeMaterialId
           ? `
-            <details
-              class="course-material-action-menu"
+            <button
+              class="course-material-report-trigger"
+              type="button"
+              data-report-material="${fileView.safeMaterialId}"
+              data-report-label="${fileView.safeMaterialLabel}"
+              aria-label="Report ${fileView.fileName}"
+              title="Report file"
             >
-              <summary
-                aria-label="More actions for ${fileView.fileName}"
-                title="More actions"
-              >⋮</summary>
-
-              <div
-                class="course-material-action-menu-panel"
-              >
-                <button
-                  class="course-material-report-button"
-                  type="button"
-                  data-report-material="${fileView.safeMaterialId}"
-                  data-report-label="${fileView.safeMaterialLabel}"
-                >Report</button>
-              </div>
-            </details>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true" focusable="false">
+                <path d="M4 22V4m0 0c4-4 8 4 12 0v12c-4 4-8-4-12 0"></path>
+              </svg>
+            </button>
           `
           : "";
 
-      return downloadMarkup + menuMarkup;
+      return downloadMarkup + reportMarkup;
     }
 
     function buildPreviewMain(
