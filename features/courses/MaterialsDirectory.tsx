@@ -94,10 +94,13 @@ function FileRow({ file, child = false }: { file: Material; child?: boolean }) {
 
   const isPowerPoint = /\.(ppt|pptx)$/i.test(file.fileName?.trim() || "") ||
     /(?:powerpoint|presentation)/i.test(file.fileType || "");
+  const isWord = /\.(doc|docx)$/i.test(file.fileName?.trim() || "") ||
+    /(?:word|msword|wordprocessing)/i.test(file.fileType || "");
 
   return <div className={"material-finder-file" + (child ? " is-child" : "")}>
     <span className="material-finder-file-icon">{isPowerPoint ?
       <img className="material-finder-powerpoint-icon" src="/PPTX.svg" alt="" aria-hidden="true" /> :
+      isWord ? <img className="material-finder-word-icon" src="/MSWord.svg" alt="" aria-hidden="true" /> :
       <DocumentIcon/>}</span>
     <div className="material-finder-file-copy">
       <a className="material-finder-file-name" href={inlineUrl(file.downloadUrl)}
