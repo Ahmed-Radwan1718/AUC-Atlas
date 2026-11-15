@@ -109,4 +109,5 @@ export const professorRecords3: Professor[] = [
     { id: "karim-wissa", name: "Karim Wissa", department: "Center for Learning and Teaching", displayDepartment: "CLT", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "karim_wissa@aucegypt.edu", image: "user.png" },
     { id: "hani-sewilam", name: "Hani Sewilam", department: "Biological, Chemical and Global Health Sciences", displayDepartment: "BCGH", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "G-M", email: "sewilam@aucegypt.edu", image: "user.png" },
     { id: "yorgun-kwagne-marcel", name: "Yorgun Kwagne Marcel", department: "Academy of Liberal Arts", displayDepartment: "ALA", filterDepartment: "Humanities", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "yorgun.marcel@aucegypt.edu", image: "user.png" },
+    { id: "tamer-el-idreesy", name: "Tamer El-Idreesy", department: "Chemistry", displayDepartment: "CHEM", filterDepartment: "Sciences", status: "No ratings yet", course: "Courses coming soon", group: "N-Z", email: "", image: "user.png" },
 ];
