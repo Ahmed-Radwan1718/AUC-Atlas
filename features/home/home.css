@@ -418,16 +418,48 @@
 
     .home-stat {
       min-width: 0;
-      min-height: 170px;
-      padding: 28px;
+      min-height: 214px;
+      padding: 26px 28px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 26px;
+      align-items: flex-start;
+      gap: 16px;
     }
 
     .home-stat + .home-stat {
       border-left: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .home-stat--professors {
+      --home-stat-icon-bg: #e9effc;
+      --home-stat-icon-color: #365e9e;
+    }
+
+    .home-stat--materials {
+      --home-stat-icon-bg: #eee8fa;
+      --home-stat-icon-color: #7652a0;
+    }
+
+    .home-stat--reviews {
+      --home-stat-icon-bg: #fbefda;
+      --home-stat-icon-color: #9b6a20;
+    }
+
+    .home-stat--visits {
+      --home-stat-icon-bg: #e2f3e9;
+      --home-stat-icon-color: #2d7d5e;
+    }
+
+    .home-stat-icon {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--home-stat-icon-bg);
+      color: var(--home-stat-icon-color);
     }
 
     .home-stat strong {
@@ -438,13 +470,24 @@
       line-height: 0.9;
     }
 
-    .home-stat span {
-      color: rgba(23, 23, 23, 0.54);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      line-height: 1.5;
+    .home-stat-label {
+      color: rgba(23, 23, 23, 0.67);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: 0.055em;
+      line-height: 1.4;
       text-transform: uppercase;
+    }
+
+    .home-stat-label-note {
+      display: block;
+      margin-top: 3px;
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: normal;
+      line-height: 1.4;
+      text-transform: none;
     }
 
     .home-latest-grid {
@@ -978,8 +1021,30 @@
       }
 
       .home-stat {
-        min-height: 142px;
-        padding: 24px;
+        min-height: 104px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr) auto;
+        align-items: center;
+        column-gap: 14px;
+      }
+
+      .home-stat-icon {
+        width: 40px;
+        height: 40px;
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .home-stat-label {
+        grid-column: 2;
+        grid-row: 1;
+      }
+
+      .home-stat strong {
+        grid-column: 3;
+        grid-row: 1;
+        font-size: clamp(32px, 9vw, 44px);
       }
 
       .home-latest-card,
