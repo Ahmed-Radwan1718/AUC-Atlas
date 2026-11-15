@@ -309,7 +309,7 @@ function renderCourseMaterials(materials) {
           ? `
             <img
               class="course-material-file-icon-image"
-              src="/pdf.png"
+              src="/PDF.svg"
               alt=""
               aria-hidden="true"
             >

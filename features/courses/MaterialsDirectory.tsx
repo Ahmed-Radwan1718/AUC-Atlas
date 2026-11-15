@@ -92,13 +92,17 @@ function FileRow({ file, child = false }: { file: Material; child?: boolean }) {
     sizeLabel(file.size), formatDate(file.createdAt)
   ].filter(Boolean).join(" · ");
 
+  const isPdf = /\.pdf$/i.test(file.fileName?.trim() || "") ||
+    /(?:application\/pdf|\bpdf\b)/i.test(file.fileType || "");
   const isPowerPoint = /\.(ppt|pptx)$/i.test(file.fileName?.trim() || "") ||
     /(?:powerpoint|presentation)/i.test(file.fileType || "");
   const isWord = /\.(doc|docx)$/i.test(file.fileName?.trim() || "") ||
     /(?:word|msword|wordprocessing)/i.test(file.fileType || "");
 
   return <div className={"material-finder-file" + (child ? " is-child" : "")}>
-    <span className="material-finder-file-icon">{isPowerPoint ?
+    <span className="material-finder-file-icon">{isPdf ?
+      <img className="material-finder-pdf-icon" src="/PDF.svg" alt="" aria-hidden="true" /> :
+      isPowerPoint ?
       <img className="material-finder-powerpoint-icon" src="/PPTX.svg" alt="" aria-hidden="true" /> :
       isWord ? <img className="material-finder-word-icon" src="/MSWord.svg" alt="" aria-hidden="true" /> :
       <DocumentIcon/>}</span>

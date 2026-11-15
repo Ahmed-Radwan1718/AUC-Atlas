@@ -364,7 +364,7 @@ const href = courseCode
           material.fileType
         );
       const fileIconMap = {
-        pdf: "pdf.png",
+        pdf: "PDF.svg",
         doc: "MSWord.svg",
         docx: "MSWord.svg",
         xls: "xls.png",
