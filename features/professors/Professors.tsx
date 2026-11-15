@@ -10,6 +10,7 @@ import "./professors-ui-3.css";
 type RatedProfessor = Professor & { reviewCount: number; averageRating: number };
 type RatingSummary = { reviewCount?: number; averageRating?: number };
 type CardSnapshot = { element: HTMLAnchorElement; rect: DOMRect };
+type AvoidFilter = "avoid" | "not-avoid" | null;
 
 const department = (item: Professor): string =>
   !item.department || item.department.trim().toLowerCase() === "department coming soon"
@@ -28,6 +29,12 @@ function initialProfessors(): RatedProfessor[] {
 }
 const departments = [...new Set(professors.map(department))].filter(x => x !== "Other").sort((a,b)=>a.localeCompare(b));
 const ratingChoices = [1,2,3,4,5];
+// Match the homepage "Professors to AVOID" threshold: rated 2.0 or below.
+// Unrated professors have no avoid classification.
+const avoidStatus = (item: RatedProfessor): AvoidFilter =>
+  item.reviewCount > 0 && Number.isFinite(item.averageRating) && item.averageRating > 0
+    ? item.averageRating <= 2 ? "avoid" : "not-avoid"
+    : null;
 
 export default function Professors() {
   const [items, setItems] = useState<RatedProfessor[]>(initialProfessors);
@@ -37,8 +44,10 @@ export default function Professors() {
   const [query, setQuery] = useState("");
   const [departmentOpen, setDepartmentOpen] = useState(false);
   const [ratingOpen, setRatingOpen] = useState(false);
+  const [avoidOpen, setAvoidOpen] = useState(false);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
+  const [selectedAvoid, setSelectedAvoid] = useState<AvoidFilter>(null);
   const [visibleLimit, setVisibleLimit] = useState(30);
   const gridRef = useRef<HTMLElement | null>(null);
   const previousCardsRef = useRef<Map<string, CardSnapshot> | null>(null);
@@ -102,9 +111,10 @@ export default function Professors() {
     ].join(" "));
     return (!query || searchable.includes(normalize(query)))
       && (!selectedDepartments.length || selectedDepartments.includes(department(item)))
-      && (!selectedRatings.length || selectedRatings.includes(ratingStatus(item.averageRating)));
+      && (!selectedRatings.length || selectedRatings.includes(ratingStatus(item.averageRating)))
+      && (!selectedAvoid || avoidStatus(item) === selectedAvoid);
   // Sort strictly by average rating (highest first). Equal ratings retain source order.
-  }).sort((a,b) => b.averageRating - a.averageRating), [items,query,selectedDepartments,selectedRatings]);
+  }).sort((a,b) => b.averageRating - a.averageRating), [items,query,selectedDepartments,selectedRatings,selectedAvoid]);
 
   // FLIP: measure old positions, let React reflow, then animate the difference.
   // Reading positions while an old animation is active lets rapid typing
@@ -218,6 +228,12 @@ export default function Professors() {
       setVisibleLimit(30);
     });
   }
+  function toggleAvoid(value: Exclude<AvoidFilter, null>) {
+    updateWithFluidLayout(() => {
+      setSelectedAvoid(current => current === value ? null : value);
+      setVisibleLimit(30);
+    });
+  }
   return (
     <main className="professors-page">
       <div className="professors-inner">
@@ -251,6 +267,24 @@ export default function Professors() {
                     <span>{choice}</span>
                   </label>;
                 })}
+              </div>
+            </div>
+            <div className={`filter-item ${avoidOpen ? "open" : ""}`} hidden={reviewsLocked || failed}>
+              <button className="filter-toggle" type="button" aria-expanded={avoidOpen}
+                aria-controls="avoid-filter-options" onClick={() => setAvoidOpen(x => !x)}>
+                <span>Avoid Status</span><span className="chevron">⌄</span>
+              </button>
+              <div className="filter-content" id="avoid-filter-options">
+                <label>
+                  <input type="checkbox" data-filter-group="avoid" value="avoid"
+                    checked={selectedAvoid === "avoid"} onChange={() => toggleAvoid("avoid")} />
+                  Avoid
+                </label>
+                <label>
+                  <input type="checkbox" data-filter-group="avoid" value="not-avoid"
+                    checked={selectedAvoid === "not-avoid"} onChange={() => toggleAvoid("not-avoid")} />
+                  Not Avoid
+                </label>
               </div>
             </div>
           </aside>
