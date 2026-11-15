@@ -406,11 +406,8 @@ function renderCourseMaterials(materials) {
               aria-label="Report ${fileView.fileName}"
               title="Report file"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                aria-hidden="true" focusable="false">
-                <path d="M4 22V4m0 0c4-4 8 4 12 0v12c-4 4-8-4-12 0"></path>
-              </svg>
+              <img class="course-material-report-icon" src="/flags.png"
+                alt="" aria-hidden="true">
             </button>
           `
           : "";
