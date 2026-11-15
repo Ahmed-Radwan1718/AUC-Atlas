@@ -331,7 +331,7 @@ function renderCourseMaterials(materials) {
               ? `
                 <img
                   class="course-material-file-icon-image"
-                  src="/ppt.png"
+                  src="/PPTX.svg"
                   alt=""
                   aria-hidden="true"
                 >
