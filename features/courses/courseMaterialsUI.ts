@@ -320,7 +320,7 @@ function renderCourseMaterials(materials) {
             ? `
               <img
                 class="course-material-file-icon-image"
-                src="/doc.png"
+                src="/MSWord.svg"
                 alt=""
                 aria-hidden="true"
               >
