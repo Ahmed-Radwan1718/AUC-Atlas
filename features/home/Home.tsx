@@ -63,6 +63,39 @@ function AnimatedCount({ value, initial = "0" }: { value: number | null; initial
   }, [value]);
   return <strong ref={ref}>{text}</strong>;
 }
+type HomeStatKind = "professors" | "materials" | "reviews" | "visits";
+
+function HomeStatIcon({ kind }: { kind: HomeStatKind }) {
+  const shape = {
+    professors: <>
+      <path d="m2 10 10-5 10 5-10 5-10-5Z"/>
+      <path d="M6 12v5c3.5 2.7 8.5 2.7 12 0v-5"/>
+      <path d="M22 10v6"/>
+    </>,
+    materials: <>
+      <path d="M6 3h9l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/>
+      <path d="M15 3v5h4"/>
+      <path d="M9 12h6M9 16h6"/>
+      <path d="M2 7v13a3 3 0 0 0 3 3h12"/>
+    </>,
+    reviews: <>
+      <path d="M20 16a3 3 0 0 1-3 3H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v9Z"/>
+      <path d="M8 10h9M8 14h6"/>
+    </>,
+    visits: <>
+      <path d="M5 20v-5M11 20v-9M17 20V5"/>
+      <path d="M3 20h17"/>
+    </>
+  }[kind];
+
+  return <span className="home-stat-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {shape}
+    </svg>
+  </span>;
+}
+
 type RatedProfessor = {
   professor: (typeof professors)[number];
   average: number;
@@ -291,10 +324,28 @@ export default function Home() {
           <p>Live counts of professors, study materials, student reviews, and visits this month.</p>
         </div>
         <div className="home-stats-grid">
-          <article className="home-stat"><AnimatedCount value={professors.length}/><span>Professors listed</span></article>
-          <article className="home-stat"><AnimatedCount value={overview ? overview.materialCount : null} initial="—"/><span>Materials available</span></article>
-          <article className="home-stat"><AnimatedCount value={overview ? overview.reviewCount : null} initial="—"/><span>{overview?.reviewsLocked ? "Student reviews · sign in to view" : "Student reviews"}</span></article>
-          <article className="home-stat"><AnimatedCount value={visits} initial="—"/><span>Visits this month</span></article>
+          <article className="home-stat home-stat--professors">
+            <HomeStatIcon kind="professors"/>
+            <AnimatedCount value={professors.length}/>
+            <span className="home-stat-label">Professors listed</span>
+          </article>
+          <article className="home-stat home-stat--materials">
+            <HomeStatIcon kind="materials"/>
+            <AnimatedCount value={overview ? overview.materialCount : null} initial="—"/>
+            <span className="home-stat-label">Materials available</span>
+          </article>
+          <article className="home-stat home-stat--reviews">
+            <HomeStatIcon kind="reviews"/>
+            <AnimatedCount value={overview ? overview.reviewCount : null} initial="—"/>
+            <span className="home-stat-label">Student reviews
+              {overview?.reviewsLocked && <small className="home-stat-label-note">Sign in to view</small>}
+            </span>
+          </article>
+          <article className="home-stat home-stat--visits">
+            <HomeStatIcon kind="visits"/>
+            <AnimatedCount value={visits} initial="—"/>
+            <span className="home-stat-label">Visits<small className="home-stat-label-note">This month</small></span>
+          </article>
         </div>
       </section>
       <section className="home-content-section" aria-labelledby="home-latest-title">
