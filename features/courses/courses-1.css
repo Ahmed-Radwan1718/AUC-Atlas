@@ -724,13 +724,6 @@
       color: #9a7030;
     }
 
-    .course-professor-link:hover strong,
-    .course-professor-link:focus-visible strong {
-      text-decoration: underline;
-      text-decoration-color: rgba(192, 154, 92, 0.7);
-      text-underline-offset: 3px;
-    }
-
     .course-professor-link:focus-visible {
       outline: 2px solid rgba(192, 154, 92, 0.8);
       outline-offset: 4px;
