@@ -1231,9 +1231,11 @@
         transform 0.2s ease;
     }
 
-    .course-material-report-trigger svg {
-      width: 19px;
-      height: 19px;
+    .course-material-report-trigger .course-material-report-icon {
+      display: block;
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
       pointer-events: none;
     }
 
