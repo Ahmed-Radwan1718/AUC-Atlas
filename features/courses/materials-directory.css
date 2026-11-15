@@ -362,7 +362,8 @@
   color: #797268;
 }
 .material-finder-file-icon svg { width: 20px; height: 20px; }
-.material-finder-file-icon .material-finder-powerpoint-icon { display: block; width: 28px; height: 28px; object-fit: contain; }
+.material-finder-file-icon .material-finder-powerpoint-icon,
+.material-finder-file-icon .material-finder-word-icon { display: block; width: 28px; height: 28px; object-fit: contain; }
 .material-finder-file-copy {
   display: flex;
   flex-direction: column;
