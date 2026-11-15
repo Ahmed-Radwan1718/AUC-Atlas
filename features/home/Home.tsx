@@ -207,7 +207,7 @@ function getMaterialIcon(material: CourseMaterial): { icon: string | null; fallb
     else if (fileType.includes("png")) extension = "png";
   }
   const icons: Record<string,string> = {
-    pdf: "pdf.png", doc: "MSWord.svg", docx: "MSWord.svg", ppt: "PPTX.svg",
+    pdf: "PDF.svg", doc: "MSWord.svg", docx: "MSWord.svg", ppt: "PPTX.svg",
     pptx: "PPTX.svg", xls: "xls.png", xlsx: "xls.png",
     jpg: "jpg.png", jpeg: "jpg.png", png: "png.png"
   };
