@@ -155,6 +155,27 @@
       font-weight: 400;
     }
 
+    /* Keep Chrome/Safari autofill from tinting the material title field blue. */
+    #quick-material-title:-webkit-autofill,
+    #quick-material-title:-webkit-autofill:hover,
+    #quick-material-title:-webkit-autofill:active {
+      -webkit-text-fill-color: #171717;
+      caret-color: #171717;
+      -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+      box-shadow: 0 0 0 1000px #ffffff inset;
+    }
+
+    #quick-material-title:-webkit-autofill:focus {
+      -webkit-text-fill-color: #171717;
+      caret-color: #171717;
+      -webkit-box-shadow:
+        0 0 0 1000px #ffffff inset,
+        0 0 0 4px rgba(192, 154, 92, 0.12);
+      box-shadow:
+        0 0 0 1000px #ffffff inset,
+        0 0 0 4px rgba(192, 154, 92, 0.12);
+    }
+
     .quick-material-upload-body .material-choice-button {
       padding-right: 27px;
     }
