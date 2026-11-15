@@ -78,8 +78,11 @@ export async function GET(request: NextRequest) {
     // Public homepage statistics and course-material previews remain available.
     // Professor review counts, rankings, and individual review metadata are
     // only queried for verified AUC Atlas sessions.
-    const [materialCount, latestMaterialData, ratings, latestReviewData] = await Promise.all([
-      db.collection("courseMaterials").where("status", "==", "approved").count().get(),
+    const [allMaterials, rejectedMaterials, latestMaterialData, ratings, latestReviewData] = await Promise.all([
+      // One courseMaterials document represents one file, including files in bundles.
+      // Count all non-rejected records so older uploads without a status are included.
+      db.collection("courseMaterials").count().get(),
+      db.collection("courseMaterials").where("status", "==", "rejected").count().get(),
       latestMaterials(3),
       user ? getProfessorRatingSnapshot() : Promise.resolve(null),
       user ? latestReviews(3) : Promise.resolve([])
@@ -91,7 +94,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       reviewsLocked: !user,
       reviewCount: ratings ? ratings.reviewCount : null,
-      materialCount: Number(materialCount.data().count || 0),
+      materialCount: Math.max(0, Number(allMaterials.data().count || 0) - Number(rejectedMaterials.data().count || 0)),
       latestReviews: latestReviewData,
       latestMaterials: latestMaterialData,
       topReviewedProfessors: rankings.slice(0, 12),
