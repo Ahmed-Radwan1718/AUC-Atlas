@@ -712,35 +712,6 @@
       gap: 14px;
     }
 
-    .course-material-report-button {
-      padding: 6px 0;
-      border: 0;
-      background: transparent;
-      color: rgba(23, 23, 23, 0.46);
-      font: inherit;
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      line-height: 1.2;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition:
-        color 0.2s ease,
-        opacity 0.2s ease;
-    }
-
-    .course-material-report-button:hover,
-    .course-material-report-button:focus-visible {
-      color: #9f2f2f;
-      outline: none;
-    }
-
-    .course-material-report-button:disabled {
-      color: rgba(23, 23, 23, 0.38);
-      cursor: default;
-      opacity: 0.72;
-    }
-
     .course-material-download-button {
       min-height: 38px;
       padding: 0 12px 0 15px;
@@ -1032,32 +1003,10 @@
       overflow: hidden;
     }
 
-    .course-material-action-menu[open]
-      .course-material-action-menu-panel {
-      animation:
-        courseMaterialMenuIn
-        0.2s
-        cubic-bezier(0.22, 1, 0.36, 1)
-        both;
-      transform-origin: top right;
-    }
-
-    @keyframes courseMaterialMenuIn {
-      from {
-        opacity: 0;
-        transform: translateY(-5px) scale(0.94);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
     .course-material-group-summary,
     .course-material-row-main,
     .course-material-compact-download,
-    .course-material-action-menu > summary,
+    .course-material-report-trigger,
     .course-material-show-more {
       transition:
         transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
@@ -1069,7 +1018,7 @@
     .course-material-group-summary:active,
     button.course-material-row-main:active,
     .course-material-compact-download:active,
-    .course-material-action-menu > summary:active,
+    .course-material-report-trigger:active,
     .course-material-show-more:active {
       transform: scale(0.975);
     }
@@ -1082,11 +1031,10 @@
       .course-materials-list,
       .course-material-row,
       .course-material-group,
-      .course-material-action-menu-panel,
-      .course-material-group-summary,
+            .course-material-group-summary,
       .course-material-row-main,
       .course-material-compact-download,
-      .course-material-action-menu > summary,
+      .course-material-report-trigger,
       .course-material-show-more {
         animation: none !important;
         transition: none !important;
@@ -1263,30 +1211,44 @@
       transform: translateY(-1px);
     }
 
-    .course-material-action-menu {
-      position: relative;
-      flex: 0 0 auto;
-    }
-
-    .course-material-action-menu > summary {
-      position: relative;
+    .course-material-report-trigger {
       width: 36px;
       height: 36px;
+      flex: 0 0 36px;
+      padding: 0;
       border: 1px solid rgba(23, 23, 23, 0.1);
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.72);
       color: rgba(23, 23, 23, 0.54);
-      font-size: 0;
-      line-height: 1;
       cursor: pointer;
-      list-style: none;
       display: grid;
       place-items: center;
-      user-select: none;
       transition:
         border-color 0.2s ease,
         background 0.2s ease,
         color 0.2s ease,
         box-shadow 0.2s ease,
         transform 0.2s ease;
+    }
+
+    .course-material-report-trigger svg {
+      width: 19px;
+      height: 19px;
+      pointer-events: none;
+    }
+
+    .course-material-report-trigger:hover {
+      border-color: rgba(159, 47, 47, 0.28);
+      background: rgba(159, 47, 47, 0.07);
+      color: #9f2f2f;
+    }
+
+    .course-material-report-trigger:focus-visible {
+      outline: 2px solid #9f2f2f;
+      outline-offset: 2px;
+    }
+
+    .course-material-report-trigger:disabled {
+      opacity: 0.5;
+      cursor: default;
     }
