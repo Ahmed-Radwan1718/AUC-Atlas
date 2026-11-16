@@ -39,13 +39,10 @@ function scoreMaterial(query: string, data: DocumentData) {
 async function materialIndex(): Promise<IndexedMaterial[]> {
   if (cache.expiresAt > Date.now()) return cache.materials;
   const collection = firestore().collection("courseMaterials");
-  let snapshot;
-  try {
-    snapshot = await collection.where("status", "==", "approved")
-      .orderBy("createdAt", "desc").limit(100).get();
-  } catch {
-    snapshot = await collection.orderBy("createdAt", "desc").limit(100).get();
-  }
+  // Use the same composite index as homepage previews. If it is unavailable,
+  // surface the query failure instead of reading unfiltered materials.
+  const snapshot = await collection.where("status", "==", "approved")
+    .orderBy("createdAt", "desc").limit(100).get();
   const materials: IndexedMaterial[] = snapshot.docs.flatMap(doc => {
     const data = doc.data();
     if (clean(data.status, 40).toLowerCase() !== "approved") return [];
