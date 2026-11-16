@@ -26,12 +26,6 @@ export default function HomeTest() {
       )}
 
       <div className="campus-bottom-controls">
-        <div className="campus-stage-hint" aria-hidden="true">
-          <span aria-hidden="true">↔</span> DRAG TO ORBIT
-          <span className="campus-hint-divider">/</span>
-          SCROLL TO ZOOM
-        </div>
-
         <div className="campus-building-grid" role="group" aria-label="Focus on an academic building">
           {schools.map(school => (
             <button
