@@ -367,9 +367,8 @@ const positions: Record<SchoolId, number> = {
   business: 8.1
 };
 
-function CameraDirector({ selected, controls }: { selected: SchoolId | null; controls: React.RefObject<any> }) {
+function CameraDirector({ selected, controls, cameraMotion }: { selected: SchoolId | null; controls: React.RefObject<any>; cameraMotion: React.RefObject<boolean> }) {
   const compact = useThree(state => state.size.width < 760);
-  const moving = useRef(true);
   // Use the whole viewport. The overview is tighter on desktop, while portrait
   // screens pull back enough to retain all three buildings before selection.
   const goal = useMemo(
@@ -386,16 +385,18 @@ function CameraDirector({ selected, controls }: { selected: SchoolId | null; con
     () => new Vector3(selected ? positions[selected] : 0, 2.1, 0),
     [selected]
   );
-  useEffect(() => { moving.current = true; }, [selected]);
+  // Only selection changes should move the camera automatically. Mouse/trackpad
+  // navigation must cancel the animation so manual zoom stays where the user left it.
+  useEffect(() => { cameraMotion.current = true; }, [selected, compact, cameraMotion]);
   useFrame(({ camera }, delta) => {
-    if (!moving.current) return;
+    if (!cameraMotion.current) return;
     const t = 1 - Math.exp(-4 * Math.min(delta, 0.05));
     camera.position.lerp(goal, t);
     if (controls.current) {
       controls.current.target.lerp(target, t);
       controls.current.update();
       if (camera.position.distanceTo(goal) < 0.025 && controls.current.target.distanceTo(target) < 0.025) {
-        moving.current = false;
+        cameraMotion.current = false;
       }
     }
   });
@@ -433,6 +434,7 @@ function School({
 
 function World({ selected, onSelect }: CampusSceneProps) {
   const controls = useRef<any>(null);
+  const cameraMotion = useRef(true);
   return (
     <>
       <color attach="background" args={["#f7f4ee"]} />
@@ -468,15 +470,16 @@ function World({ selected, onSelect }: CampusSceneProps) {
         enableDamping
         dampingFactor={0.08}
         minDistance={15}
-        maxDistance={42}
+        maxDistance={54}
         minPolarAngle={0.60}
         maxPolarAngle={1.34}
         minAzimuthAngle={-0.8}
         maxAzimuthAngle={0.8}
         rotateSpeed={0.42}
         zoomSpeed={0.75}
+        onStart={() => { cameraMotion.current = false; }}
       />
-      <CameraDirector selected={selected} controls={controls} />
+      <CameraDirector selected={selected} controls={controls} cameraMotion={cameraMotion} />
     </>
   );
 }
