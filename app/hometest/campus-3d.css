@@ -88,29 +88,6 @@ body:has(.campus-home) .site-footer {
   gap: 15px;
   pointer-events: none;
 }
-.campus-stage-hint {
-  padding: 9px 16px;
-  color: #776953;
-  border: 1px solid rgba(23, 23, 23, .09);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .81);
-  box-shadow: 0 10px 24px rgba(52, 42, 33, .05);
-  backdrop-filter: blur(13px);
-  -webkit-backdrop-filter: blur(13px);
-  white-space: nowrap;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: .12em;
-}
-.campus-stage-hint > span:first-child {
-  margin-right: 6px;
-  font-size: 15px;
-  vertical-align: -1px;
-}
-.campus-hint-divider {
-  margin: 0 10px;
-  opacity: .4;
-}
 .campus-building-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -239,10 +216,6 @@ body:has(.campus-home) .site-footer {
   }
   .campus-building-details strong {
     font-size: 13px;
-  }
-  .campus-stage-hint {
-    font-size: 8px;
-    letter-spacing: .07em;
   }
 }
 @media (prefers-reduced-motion: reduce) {
