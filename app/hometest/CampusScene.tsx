@@ -259,6 +259,7 @@ function Engineering({ active }: { active: boolean }) {
       {/* Inscription on the real lintel; this is world-anchored, not a floating UI label. */}
       <Html
         transform
+        center
         position={[0, 4.98, 2.607]}
         distanceFactor={2.3}
         style={{ pointerEvents: "none", userSelect: "none" }}
