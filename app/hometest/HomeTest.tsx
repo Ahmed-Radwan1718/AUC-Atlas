@@ -173,7 +173,7 @@ export default function HomeTest() {
   const [searchOpen,setSearchOpen]=useState(false);
   const [showAllMajors,setShowAllMajors]=useState(false);
   const [pageTransition,setPageTransition]=useState(0);
-  const [compactIndex,setCompactIndex]=useState(false);
+  
   const searchRef=useRef<HTMLDivElement>(null);
   const activeRegion=view.type==="world"?null:availableRegions.find(r=>r.id===view.regionId)||null;
   const major=view.type==="major"||view.type==="course"?view.major:null;
@@ -188,7 +188,7 @@ export default function HomeTest() {
 
   useEffect(()=>{if(searchOpen)searchRef.current?.querySelector<HTMLInputElement>("input")?.focus();},[searchOpen]);
   useEffect(()=>{const handler=(e:KeyboardEvent)=>{if(e.key==="Escape"){setSearchOpen(false);if(view.type==="course")goBack();}};document.addEventListener("keydown",handler);return()=>document.removeEventListener("keydown",handler);},[view]);
-  function navigate(next:View){setView(next);setPageTransition(n=>n+1);setCompactIndex(false);}
+  function navigate(next:View){setView(next);setPageTransition(n=>n+1);}
   function openRegion(region:Region){navigate({type:"region",regionId:region.id});}
   function openMajor(regionId:string,selectedMajor:string){navigate({type:"major",regionId,major:selectedMajor,groupIndex:0,page:0});}
   function selectGroup(index:number){if(!major||!activeRegion)return;navigate({type:"major",regionId:activeRegion.id,major,groupIndex:index,page:0});}
@@ -239,6 +239,15 @@ export default function HomeTest() {
             <span>DEGREE PATH / {activeRegion.short}</span>
             <h2>{major}</h2>
             <p>Follow course landmarks from the published Atlas degree plan.</p>
+          </div>
+          <div className="am-degree-group-control">
+            <label htmlFor="am-requirement-group">REQUIREMENT CHAPTER</label>
+            <select id="am-requirement-group" value={selectedGroup?.index ?? 0}
+              onChange={event=>selectGroup(Number(event.target.value))}
+              aria-label="Choose an area of degree requirements">
+              {groups.map(group=><option value={group.index} key={group.index}>{group.title||group.scope||"Degree requirements"}</option>)}
+            </select>
+            <span>{entries.length} courses in this chapter · {pageNum+1} of {maxPages}</span>
           </div>
           <div className="am-trail" aria-hidden="true">
             <svg viewBox="0 0 1000 580" preserveAspectRatio="none"><path d="M210 148C400 75 610 117 710 165S700 313 490 285 225 380 430 463 750 460 765 520" stroke="#6b4928" strokeWidth="4" strokeDasharray="7 12" fill="none" opacity=".55"/></svg>
