@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { courses } from "../../data/courses";
 import { professors } from "../../data/professors";
-import { getCourseUrl, getProfessorProfileUrl, normalizeCourseCode, escapeMaterialText, recordCourseView } from "./courseDiscovery";
+import { getCourseUrl, getProfessorProfileUrl, normalizeCourseCode, escapeMaterialText } from "./courseDiscovery";
 import { setupCourseMaterialsAccess } from "./courseMaterialsUI";
 import { summarizeCoursePrerequisite } from "./prerequisiteDisplay";
 
@@ -204,7 +204,6 @@ function renderCoursePrerequisites(value) {
     if (prerequisiteRow) prerequisiteRow.hidden = !hasDisplayedPrerequisite;
     if (detailsGrid) detailsGrid.hidden = !hasDisplayedPrerequisite;
 
-    recordCourseView(selectedCourse.code);
     loadCourseProfessors(selectedCourse);
     setupCourseMaterialsAccess(selectedCourse);
 
