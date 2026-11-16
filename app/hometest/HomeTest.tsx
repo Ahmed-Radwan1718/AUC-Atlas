@@ -19,11 +19,6 @@ export default function HomeTest() {
         <CampusScene selected={selected} onSelect={setSelected} />
       </div>
 
-      <div className="campus-legend" aria-hidden="true">
-        <span className="campus-legend-dot" />
-        THE CAMPUS <span className="campus-legend-divider">/</span> THREE ACADEMIC SCHOOLS
-      </div>
-
       {selected && (
         <button type="button" className="campus-reset" onClick={() => setSelected(null)}>
           <span aria-hidden="true">↖</span> ALL THREE BUILDINGS
