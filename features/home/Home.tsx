@@ -242,7 +242,7 @@ function getMaterialIcon(material: CourseMaterial): { icon: string | null; fallb
   }
   const icons: Record<string,string> = {
     pdf: "PDF.svg", doc: "MSWord.svg", docx: "MSWord.svg", ppt: "PPTX.svg",
-    pptx: "PPTX.svg", xls: "xls.png", xlsx: "xls.png",
+    pptx: "PPTX.svg", xls: "Excel.svg", xlsx: "Excel.svg",
     jpg: "jpg.png", jpeg: "jpg.png", png: "png.png"
   };
   return { icon: icons[extension] || null, fallback: (extension || "FILE").slice(0, 5).toUpperCase() };
