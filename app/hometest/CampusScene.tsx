@@ -317,7 +317,7 @@ function Engineering({ active }: { active: boolean }) {
 // Business: restrained stone architecture with a repeating monumental arch rhythm.
 function Business({ active }: { active: boolean }) {
   return (
-    <group position={[14.5, 0, -4.2]} rotation={[0, buildingRotations.business, 0]}>
+    <group position={[-11.5, 0, 13.7]} rotation={[0, buildingRotations.business, 0]}>
       <SchoolBase active={active} />
       <Block at={[0, 2.06, -0.32]} size={[6.7, 3.83, 3.66]} material={mat.limestone} />
       <Block at={[-2.6, 2.41, -1.61]} size={[1.54, 4.61, 1.56]} material={mat.sandstone} />
@@ -349,7 +349,7 @@ function Business({ active }: { active: boolean }) {
 // procedural geometry and the existing campus materials.
 function Library({ active }: { active: boolean }) {
   return (
-    <group position={[-11.5, 0, 13.7]} rotation={[0, buildingRotations.library, 0]}>
+    <group position={[14.5, 0, -4.2]} rotation={[0, buildingRotations.library, 0]}>
       <Block at={[0, 0.07, 0]} size={[10.8, 0.14, 6.8]} material={active ? mat.focus : mat.concrete} />
 
       {/* Deep limestone structure and raised parapet. */}
@@ -443,8 +443,8 @@ function CampusGround() {
 
       {/* Campus entrance promenade and the connection to SSE's entrance steps. */}
       <CampusWalkway from={[0, 19]} to={[0, 6.4]} width={2.65} />
-      {/* Library sits off the promenade, approached along a separate stone path. */}
-      <CampusWalkway from={[-1.3, 16.4]} to={[-11.5, 16.4]} width={2.15} />
+      {/* Business now sits off the promenade, with its rotated entrance facing it. */}
+      <CampusWalkway from={[-1.3, 13.7]} to={[-9.0, 13.7]} width={2.15} />
       <mesh position={[0, 0.073, 9.65]} rotation={[-Math.PI / 2, 0, 0]} material={mat.path} receiveShadow>
         <circleGeometry args={[2.8, 48]} />
       </mesh>
@@ -453,13 +453,13 @@ function CampusGround() {
       <CampusWalkway from={[-1.85, 9.65]} to={[-8.1, 5.0]} width={2.05} />
       <CampusWalkway from={[-8.1, 5.0]} to={[-14.5, -0.95]} width={2.05} />
       <CampusWalkway from={[1.85, 9.65]} to={[8.1, 5.0]} width={2.05} />
-      <CampusWalkway from={[8.1, 5.0]} to={[14.5, -0.95]} width={2.05} />
+      <CampusWalkway from={[8.1, 5.0]} to={[11.15, -4.2]} width={2.05} />
 
       {/* Relocate the existing landscape elements around, not onto, the paths. */}
       {[
-        [-3.2, 13.6], [3.2, 13.6],
+        [-4.2, 11.5], [3.2, 13.6],
         [-10.5, 7.1], [10.5, 7.1],
-        [-17.8, -0.2], [17.8, -0.2]
+        [-17.8, -0.2], [19.6, 1.3]
       ].map(([x, z]) => (
         <group key={x + ":" + z}>
           <Block at={[x, 0.07, z]} size={[0.45, 0.14, 0.45]} material={mat.limestone} />
@@ -482,8 +482,8 @@ const buildingRotations: Record<SchoolId, number> = {
 const positions: Record<SchoolId, [number, number]> = {
   humanities: [-14.5, -4.2],
   engineering: [0, 3.4],
-  business: [14.5, -4.2],
-  library: [-11.5, 13.7]
+  business: [-11.5, 13.7],
+  library: [14.5, -4.2]
 };
 
 function CameraDirector({ selected, controls, cameraMotion }: { selected: SchoolId | null; controls: React.RefObject<any>; cameraMotion: React.RefObject<boolean> }) {
