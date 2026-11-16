@@ -15,7 +15,7 @@ export default function HomeTest() {
 
       {selected && (
         <button type="button" className="campus-reset" onClick={() => setSelected(null)}>
-          <span aria-hidden="true">↖</span> ALL THREE BUILDINGS
+          <span aria-hidden="true">↖</span> ALL FOUR BUILDINGS
         </button>
       )}
 
