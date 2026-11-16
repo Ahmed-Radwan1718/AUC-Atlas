@@ -131,6 +131,11 @@
 .am-course-pagination button{width:29px;height:29px;border:0;background:transparent;font-size:27px;line-height:1;color:#805b2c}
 .am-course-pagination button:disabled{opacity:.25;cursor:default}
 
+.am-degree-group-control{position:absolute;z-index:5;left:4.3%;bottom:10%;width:clamp(202px,23%,330px);padding:16px 14px 17px;background:rgba(232,204,162,.85);border:1px solid rgba(95,63,36,.38);box-shadow:0 7px 20px rgba(64,39,15,.12)}
+.am-degree-group-control label{display:block;color:#79562a;letter-spacing:.14em;font-size:9px;font-weight:800;margin-bottom:9px}
+.am-degree-group-control select{width:100%;max-width:100%;background:#f5e3c0;border:1px solid rgba(100,69,35,.4);padding:11px 9px;border-radius:3px;color:#45311e;font-family:Georgia,"Times New Roman",serif;font-size:14px;text-overflow:ellipsis}
+.am-degree-group-control>span{display:block;margin-top:9px;font-size:10px;color:#775f3d;line-height:1.4}
+
 /* Course sheet floats over dimmed map artwork, modeled on antique scrolls */
 .am-scroll{
   position:absolute;z-index:6;inset:10% 12% 10% 31%;overflow:auto;
@@ -250,6 +255,10 @@
   .am-scroll-metadata b{font-size:11px}
   .am-scroll-links a{font-size:9px}
   .am-more-major{right:7%;bottom:6%}
+  .am-degree-group-control{top:30%;bottom:auto;left:4%;width:92%;padding:9px 11px}
+  .am-degree-group-control label{font-size:8px;margin-bottom:4px}
+  .am-degree-group-control select{padding:7px;font-size:12px}
+  .am-degree-group-control>span{display:none}
   .am-course-pagination{bottom:2%}
   .am-search-sheet,.am-contents{padding:37px 20px}
   .am-search-sheet h2,.am-contents h2{font-size:34px}
