@@ -1340,7 +1340,7 @@ function getAccountReviewProfessorUrl(professorId) {
         const extensionLabel = fileExtension ? fileExtension.slice(0, 5).toUpperCase() : "FILE";
         const fileIconMap = {
           pdf: "PDF.svg", doc: "MSWord.svg", docx: "MSWord.svg",
-          xls: "xls.png", xlsx: "xls.png", ppt: "PPTX.svg",
+          xls: "Excel.svg", xlsx: "Excel.svg", ppt: "PPTX.svg",
           pptx: "PPTX.svg", png: "png.png", jpg: "jpg.png", jpeg: "jpg.png"
         };
         const fileIconUrl = fileIconMap[fileExtension] || "";
