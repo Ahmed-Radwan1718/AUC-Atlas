@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
 import {
   BoxGeometry, DataTexture, LinearFilter, MeshStandardMaterial,
@@ -368,15 +368,22 @@ const positions: Record<SchoolId, number> = {
 };
 
 function CameraDirector({ selected, controls }: { selected: SchoolId | null; controls: React.RefObject<any> }) {
+  const compact = useThree(state => state.size.width < 760);
   const moving = useRef(true);
+  // Use the whole viewport. The overview is tighter on desktop, while portrait
+  // screens pull back enough to retain all three buildings before selection.
   const goal = useMemo(
     () => selected
-      ? new Vector3(positions[selected] + 5.9, 9.9, 16.9)
-      : new Vector3(12.5, 15.4, 30.5),
-    [selected]
+      ? compact
+        ? new Vector3(positions[selected] + 5.2, 9.6, 18.5)
+        : new Vector3(positions[selected] + 3.7, 7.7, 13.5)
+      : compact
+        ? new Vector3(11.5, 15.3, 38.5)
+        : new Vector3(7.6, 11, 23.4),
+    [selected, compact]
   );
   const target = useMemo(
-    () => new Vector3(selected ? positions[selected] : 0, 2.15, 0),
+    () => new Vector3(selected ? positions[selected] : 0, 2.1, 0),
     [selected]
   );
   useEffect(() => { moving.current = true; }, [selected]);
@@ -479,7 +486,7 @@ export default function CampusScene(props: CampusSceneProps) {
     <Canvas
       shadows
       dpr={[1, 1.65]}
-      camera={{ position: [12.5, 15.4, 30.5], fov: 42, near: 0.1, far: 110 }}
+      camera={{ position: [7.6, 11, 23.4], fov: 42, near: 0.1, far: 110 }}
       gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
       onPointerMissed={() => props.onSelect(null)}
       fallback={<div className="campus-webgl-fallback">3D preview is unavailable in this browser. Select a school below to inspect the campus model.</div>}
