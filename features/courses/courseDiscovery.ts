@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { courses } from "../../data/courses";
+import { searchCatalogCourses } from "./courseSearch";
 // Catalog discovery behavior ported directly from the original AUC Atlas runtime.
 function escapeMaterialText(value) {
     return String(value || "").replace(/[&<>"']/g, function (character) {
@@ -477,14 +478,6 @@ const href = courseCode
     }
   }
 
-  function courseMatches(course) {
-    const query = getCourseSearchQuery();
-    const selectedSubjects = getCheckedSubjects();
-    const searchableText = normalize([course.code, course.title, course.subject, course.department, course.level].join(" "));
-
-    return (!query || searchableText.includes(query)) && (!selectedSubjects.length || selectedSubjects.includes(course.subject));
-  }
-
   function setCoursesSearchState(hasActiveSearch) {
     const dropdown = document.getElementById(
       "course-search-dropdown"
@@ -537,7 +530,7 @@ const href = courseCode
       return;
     }
 
-    const visibleCourses = courses.filter(courseMatches);
+    const visibleCourses = searchCatalogCourses(courses, query, selectedSubjects);
 
     if (count) {
       count.textContent =
@@ -576,7 +569,7 @@ const href = courseCode
     if (!visibleCourses.length) {
       grid.innerHTML = `
         <p class="courses-empty">
-          No courses found. Try a course code, title, department, or broader keyword.
+          No close matches found. Try a course code, an abbreviation like calc 2, or another keyword.
         </p>
       `;
     }
@@ -584,10 +577,10 @@ const href = courseCode
 
   const courseSearchSuggestions = [
     "Search Computer Science",
-    "Search Calculus II",
-    "Search CSCE 1101",
+    "Search calc 2",
+    "Search CSCE1101",
     "Search Business",
-    "Search 3000 Level",
+    "Search diff eq",
     "Search Senior Project"
   ];
 
