@@ -57,13 +57,10 @@ async function latestReviews(limit: number) {
 async function latestMaterials(limit: number) {
   const collection = firestore().collection("courseMaterials");
   const safeLimit = Math.max(1, Math.min(12, Math.floor(Number(limit) || 3)));
-  let snapshot;
-  try {
-    snapshot = await collection.where("status", "==", "approved")
-      .orderBy("createdAt", "desc").limit(safeLimit).get();
-  } catch {
-    snapshot = await collection.orderBy("createdAt", "desc").limit(20).get();
-  }
+  // The (status ASC, createdAt DESC) index lets Firestore return only the
+  // three newest approved documents. Never fall back to a 20-document scan.
+  const snapshot = await collection.where("status", "==", "approved")
+    .orderBy("createdAt", "desc").limit(safeLimit).get();
   return snapshot.docs.filter(doc => clean(doc.data().status, 40).toLowerCase() === "approved")
     .map(serializeMaterial)
     .sort((a, b) => timestampMillis(b.createdAt) - timestampMillis(a.createdAt))
