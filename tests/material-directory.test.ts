@@ -25,53 +25,62 @@ const demo=(index:number, overrides:Record<string,any>={})=>({
   }
 });
 function harness({authorized=true,files=[]}:{authorized?:boolean;files?:Row[]}={}) {
-  const sorted=[...files].sort((a,b)=>
+  const sorted=[...files].filter(row=>row.data.createdAt).sort((a,b)=>
     b.data.createdAt.getTime()-a.data.createdAt.getTime() ||
     b.id.localeCompare(a.id));
   const ids=new Map(sorted.map(row=>[row.id,row]));
-  let reads=0,verified=0,rateLimitCalls=0;
+  let reads=0,cursorReads=0,verified=0,rateLimitCalls=0;
+  const queriedCodes:string[]=[];
+  const requestedLimits:number[]=[];
   const module:{exports:Record<string,any>}={exports:{}};
-  const snapshots=sorted.map(row=>({
+
+  const snapshot=(row:Row)=>({
     id:row.id,exists:true,data:()=>({...row.data}),
     get:(key:string)=>row.data[key]
-  }));
+  });
+  const query=(rows:Row[],afterId:string|null=null):any=>({
+    orderBy(field:string,direction:string){
+      assert.equal(field,"createdAt");
+      assert.equal(direction,"desc");
+      return this;
+    },
+    startAfter(doc:{id:string}){
+      return query(rows,doc.id);
+    },
+    limit(amount:number){
+      requestedLimits.push(amount);
+      return {
+        async get(){
+          const index=afterId===null?0:rows.findIndex(row=>row.id===afterId)+1;
+          assert.ok(index>=0,"Cursor must refer to a document in the queried course");
+          const docs=rows.slice(index,index+amount).map(snapshot);
+          reads+=docs.length;
+          return {docs};
+        }
+      };
+    }
+  });
   const db={
     collection(name:string) {
       assert.equal(name,"courseMaterials");
-      reads++;
       return {
         doc(id:string){
           return {get:async()=>{
+            cursorReads++;
+            reads++;
             const data=ids.get(id)?.data;
             return {
-              exists:Boolean(data),
-              id,
+              exists:Boolean(data),id,
               data:()=>data,
               get:(key:string)=>data?.[key]
             };
           }};
         },
-        orderBy(field:string,direction:string){
-          assert.equal(field,"createdAt");
-          assert.equal(direction,"desc");
-          let afterId:string|null=null;
-          return {
-            startAfter(doc:{id:string}){
-              afterId=doc.id;
-              return this;
-            },
-            async get(){return {docs:snapshots};},
-            limit(amount:number){
-              return {
-                async get(){
-                  const index=afterId===null?0:snapshots.findIndex(row=>row.id===afterId)+1;
-                  const result=snapshots.slice(index,index+amount);
-                  reads+=result.length;
-                  return {docs:result};
-                }
-              };
-            }
-          };
+        where(field:string,operator:string,code:string){
+          assert.equal(field,"courseCode");
+          assert.equal(operator,"==");
+          queriedCodes.push(code);
+          return query(sorted.filter(row=>row.data.courseCode===code));
         }
       };
     }
@@ -95,7 +104,7 @@ function harness({authorized=true,files=[]}:{authorized?:boolean;files?:Row[]}={
       if(id==="../../../server/materials")return {
         serializeMaterialData:(id:string,data:Record<string,any>)=>({
           id,title:data.title,courseCode:data.courseCode,
-          courseTitle:data.courseTitle,materialType:data.materialType,
+          courseTitle:data.courseTitle,materialType:data.materialType||data.type||data.category,
           semester:data.semester,professor:data.professor,fileName:data.fileName,
           downloadUrl:"/api/course-material-download?id="+id
         })
@@ -111,12 +120,20 @@ function harness({authorized=true,files=[]}:{authorized?:boolean;files?:Row[]}={
     const query=new URLSearchParams(params);
     return await module.exports.GET({nextUrl:{searchParams:query}});
   };
-  return {get,get reads(){return reads;},get verified(){return verified;},get rateLimitCalls(){return rateLimitCalls;}};
+  return {
+    get,
+    get reads(){return reads;},
+    get cursorReads(){return cursorReads;},
+    get queriedCodes(){return [...queriedCodes];},
+    get requestedLimits(){return [...requestedLimits];},
+    get verified(){return verified;},
+    get rateLimitCalls(){return rateLimitCalls;}
+  };
 }
 
 test("an unsigned visitor cannot enumerate files or query Firestore",async()=>{
   const app=harness({authorized:false,files:[demo(1)]});
-  const result=await app.get("q=MATH");
+  const result=await app.get("courseCode=MATH%202010&q=MATH");
   assert.equal(result.status,401);
   assert.equal(result.body.materialsLocked,true);
   assert.equal(app.reads,0);
@@ -125,7 +142,7 @@ test("an unsigned visitor cannot enumerate files or query Firestore",async()=>{
 
 test("verified students receive private, downloadable file results without uploader identities",async()=>{
   const app=harness({files:[demo(1)]});
-  const result=await app.get("");
+  const result=await app.get("courseCode=MATH%202010");
   assert.equal(result.status,200);
   assert.equal(result.headers["Cache-Control"],"private, no-store");
   assert.equal(result.body.materials.length,1);
@@ -138,13 +155,13 @@ test("verified students receive private, downloadable file results without uploa
 
 test("paginated directory continues without skipping or duplicating material",async()=>{
   const app=harness({files:Array.from({length:55},(_,i)=>demo(i))});
-  const one=await app.get("");
+  const one=await app.get("courseCode=MATH%202010");
   assert.equal(one.body.materials.length,24);
   assert.equal(one.body.hasMore,true);
   assert.ok(one.body.nextCursor);
-  const two=await app.get("cursor="+encodeURIComponent(one.body.nextCursor));
+  const two=await app.get("courseCode=MATH%202010&cursor="+encodeURIComponent(one.body.nextCursor));
   assert.equal(two.body.materials.length,24);
-  const three=await app.get("cursor="+encodeURIComponent(two.body.nextCursor));
+  const three=await app.get("courseCode=MATH%202010&cursor="+encodeURIComponent(two.body.nextCursor));
   assert.equal(three.body.materials.length,7);
   assert.equal(three.body.hasMore,false);
   const ids=[...one.body.materials,...two.body.materials,...three.body.materials].map((x:any)=>x.id);
@@ -157,18 +174,18 @@ test("searches titles, course codes, professors, and filters material type and s
     demo(2,{title:"Lecture 2",materialType:"Slides"}),
     demo(3,{title:"Practice 2",materialType:"Practice sheet",semester:"Fall 2026"})
   ]});
-  const result=await app.get("q=practice&type=Practice%20sheet&semester=Spring%202026");
+  const result=await app.get("courseCode=MATH%202010&q=practice&type=Practice%20sheet&semester=Spring%202026");
   assert.deepEqual(Array.from(result.body.materials).map((x:any)=>x.id),["file-0001"]);
   assert.equal(result.body.hasMore,false);
-  const professor=await app.get("q=example");
+  const professor=await app.get("courseCode=MATH%202010&q=example");
   assert.deepEqual(Array.from(professor.body.materials).map((x:any)=>x.id),["file-0001"]);
-  const course=await app.get("q=math%202010");
+  const course=await app.get("courseCode=MATH%202010&q=math%202010");
   assert.equal(course.body.materials.length,3);
 });
 
 test("rejected files never appear, even when matching the search",async()=>{
   const app=harness({files:[demo(1,{status:"rejected"}),demo(2)]});
-  const result=await app.get("");
+  const result=await app.get("courseCode=MATH%202010");
   assert.deepEqual(Array.from(result.body.materials).map((x:any)=>x.id),["file-0002"]);
 });
 
@@ -176,10 +193,10 @@ test("sparse searches can continue beyond the bounded scan window",async()=>{
   const files=Array.from({length:320},(_,i)=>demo(i));
   files[0].data.title="Needle material";
   const app=harness({files});
-  const one=await app.get("q=needle");
+  const one=await app.get("courseCode=MATH%202010&q=needle");
   assert.equal(one.body.materials.length,0);
   assert.equal(one.body.hasMore,true);
-  const two=await app.get("q=needle&cursor="+one.body.nextCursor);
+  const two=await app.get("courseCode=MATH%202010&q=needle&cursor="+one.body.nextCursor);
   assert.equal(two.body.materials.length,1);
   assert.equal(two.body.materials[0].title,"Needle material");
   assert.equal(two.body.hasMore,false);
@@ -187,7 +204,7 @@ test("sparse searches can continue beyond the bounded scan window",async()=>{
 
 test("invalid cursor is rejected instead of querying arbitrary documents",async()=>{
   const app=harness({files:[demo(1)]});
-  const result=await app.get("cursor=../users");
+  const result=await app.get("courseCode=MATH%202010&cursor=../users");
   assert.equal(result.status,400);
 });
 
@@ -204,7 +221,7 @@ test("the Courses landing and existing course detail routes remain available",()
   assert.match(component,/initializeCourses\(courseSlug\)/);
   assert.match(component,/id="course-search-input"/);
   assert.match(component,/id="courses-home-content"/);
-  assert.match(component,/id="course-popular-grid"/);
+  assert.match(component,/id="course-browse-grid"/);
   assert.match(component,/id="course-recent-materials"/);
   assert.match(component,/id="course-materials-list"/);
   assert.match(component,/id="course-upload-start"/);
@@ -222,4 +239,59 @@ test("course selection is an exact filter, not a fuzzy match with another course
   assert.deepEqual(Array.from(results.body.materials).map((file:any)=>file.id),["file-0001"]);
   const all=await app.get("courseCode=MACT%201121");
   assert.equal(all.body.materials.length,2);
+});
+
+test("the directory requires a selected course and never performs a global scan",async()=>{
+  const app=harness({files:[demo(1)]});
+  const response=await app.get("");
+  assert.equal(response.status,400);
+  assert.equal(app.reads,0);
+  assert.deepEqual(app.queriedCodes,[]);
+  assert.equal(app.verified,0);
+});
+
+test("course filtering happens in Firestore before any document is billed",async()=>{
+  const unrelated=Array.from({length:320},(_,i)=>demo(1000+i,{courseCode:"ECON 2011"}));
+  const app=harness({files:[...unrelated,demo(1),demo(2),demo(3)]});
+  const response=await app.get("courseCode=math%202010");
+  assert.equal(response.status,200);
+  assert.equal(response.body.materials.length,3);
+  assert.deepEqual(app.queriedCodes,["MATH 2010"]);
+  assert.equal(app.reads,3);
+  assert.ok(app.requestedLimits.every(limit=>limit<=25));
+});
+
+test("a full page fetches only 25 docs and preserves its lookahead for the next page",async()=>{
+  const app=harness({files:Array.from({length:80},(_,i)=>demo(i))});
+  const first=await app.get("courseCode=MATH%202010");
+  assert.equal(first.body.materials.length,24);
+  assert.equal(first.body.hasMore,true);
+  assert.equal(app.reads,25);
+  assert.deepEqual(app.requestedLimits,[25]);
+
+  const second=await app.get("courseCode=MATH%202010&cursor="+first.body.nextCursor);
+  assert.equal(second.body.materials.length,24);
+  assert.equal(second.body.hasMore,true);
+  assert.equal(second.body.materials[0].id,"file-0055");
+  assert.equal(app.cursorReads,1);
+  assert.ok(app.requestedLimits.every(limit=>limit<=25));
+});
+
+test("cursor cannot reference a document in another course",async()=>{
+  const app=harness({files:[demo(1),demo(2,{courseCode:"PHYS 1011"})]});
+  const response=await app.get("courseCode=MATH%202010&cursor=file-0002");
+  assert.equal(response.status,400);
+  assert.equal(app.queriedCodes.length,0);
+  assert.equal(app.cursorReads,1);
+});
+
+test("legacy material type and missing approval status still match",async()=>{
+  const app=harness({files:[
+    demo(1,{status:undefined,materialType:undefined,type:"Past exam"}),
+    demo(2,{materialType:undefined,category:"Past exam",semester:"Spring 2026"}),
+    demo(3,{status:"rejected",materialType:"Past exam"})
+  ]});
+  const response=await app.get("courseCode=MATH%202010&type=Past%20exam");
+  assert.deepEqual(Array.from(response.body.materials).map((material:any)=>material.id),
+    ["file-0002","file-0001"]);
 });
