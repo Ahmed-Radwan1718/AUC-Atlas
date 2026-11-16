@@ -172,7 +172,7 @@ function SchoolBase({ active }: { active: boolean }) {
 // Humanities: a sandstone courtyard composition with a colonnaded arcade.
 function Humanities({ active }: { active: boolean }) {
   return (
-    <group position={[-8.1, 0, -0.65]}>
+    <group position={[-14.5, 0, -4.2]}>
       <SchoolBase active={active} />
       <Block at={[0, 1.84, 0.15]} size={[6.7, 3.45, 3.8]} material={mat.limestone} />
       <Block at={[-2.63, 2.55, -1.48]} size={[1.5, 4.95, 1.55]} material={mat.sandstone} />
@@ -232,7 +232,7 @@ function SSESideWindow({ x, y, z = 2.16 }: { x: number; y: number; z?: number })
 
 function Engineering({ active }: { active: boolean }) {
   return (
-    <group position={[0, 0, -0.92]}>
+    <group position={[0, 0, 3.4]}>
       <SchoolBase active={active} />
 
       {/* Deep main block.  The flank wings step forward as in the photograph. */}
@@ -317,7 +317,7 @@ function Engineering({ active }: { active: boolean }) {
 // Business: restrained stone architecture with a repeating monumental arch rhythm.
 function Business({ active }: { active: boolean }) {
   return (
-    <group position={[8.1, 0, -0.65]}>
+    <group position={[14.5, 0, -4.2]}>
       <SchoolBase active={active} />
       <Block at={[0, 2.06, -0.32]} size={[6.7, 3.83, 3.66]} material={mat.limestone} />
       <Block at={[-2.6, 2.41, -1.61]} size={[1.54, 4.61, 1.56]} material={mat.sandstone} />
@@ -343,46 +343,87 @@ function Business({ active }: { active: boolean }) {
   );
 }
 
+// Walkways are real flat scene geometry, meeting at a shared plaza rather
+// than joining the buildings into one continuous frontage.
+function CampusWalkway({
+  from, to, width = 2.1
+}: {
+  from: [number, number];
+  to: [number, number];
+  width?: number;
+}) {
+  const dx = to[0] - from[0];
+  const dz = to[1] - from[1];
+  return (
+    <Block
+      at={[(from[0] + to[0]) / 2, 0.035, (from[1] + to[1]) / 2]}
+      size={[width, 0.065, Math.hypot(dx, dz)]}
+      rotation={[0, Math.atan2(dx, dz), 0]}
+      material={mat.path}
+    />
+  );
+}
+
 function CampusGround() {
   return (
     <group>
       <mesh position={[0, -0.04, 0]} rotation={[-Math.PI / 2, 0, 0]} material={mat.ground} receiveShadow>
         <planeGeometry args={[200, 200]} />
       </mesh>
-      <Block at={[0, 0.025, 3.67]} size={[25.3, 0.05, 1.3]} material={mat.path} />
-      <Block at={[0, 0.03, -4.22]} size={[25.3, 0.04, 0.32]} material={mat.concrete} />
-      {[-11.83, -4.33, 4.33, 11.83].map((x) => (
-        <group key={x}>
-          <Block at={[x, 0.07, 3.64]} size={[0.45, 0.14, 1.3]} material={mat.limestone} />
-          <Cypress at={[x, 0.17, 4.25]} height={1.13} />
+
+      {/* Campus entrance promenade and the connection to SSE's entrance steps. */}
+      <CampusWalkway from={[0, 19]} to={[0, 6.4]} width={2.65} />
+      <mesh position={[0, 0.073, 9.65]} rotation={[-Math.PI / 2, 0, 0]} material={mat.path} receiveShadow>
+        <circleGeometry args={[2.8, 48]} />
+      </mesh>
+
+      {/* Paths split naturally towards the two buildings further back. */}
+      <CampusWalkway from={[-1.85, 9.65]} to={[-8.1, 5.0]} width={2.05} />
+      <CampusWalkway from={[-8.1, 5.0]} to={[-14.5, -0.95]} width={2.05} />
+      <CampusWalkway from={[1.85, 9.65]} to={[8.1, 5.0]} width={2.05} />
+      <CampusWalkway from={[8.1, 5.0]} to={[14.5, -0.95]} width={2.05} />
+
+      {/* Relocate the existing landscape elements around, not onto, the paths. */}
+      {[
+        [-3.2, 13.6], [3.2, 13.6],
+        [-10.5, 7.1], [10.5, 7.1],
+        [-17.8, -0.2], [17.8, -0.2]
+      ].map(([x, z]) => (
+        <group key={x + ":" + z}>
+          <Block at={[x, 0.07, z]} size={[0.45, 0.14, 0.45]} material={mat.limestone} />
+          <Cypress at={[x, 0.17, z]} height={1.13} />
         </group>
       ))}
     </group>
   );
 }
 
-const positions: Record<SchoolId, number> = {
-  humanities: -8.1,
-  engineering: 0,
-  business: 8.1
+const positions: Record<SchoolId, [number, number]> = {
+  humanities: [-14.5, -4.2],
+  engineering: [0, 3.4],
+  business: [14.5, -4.2]
 };
 
 function CameraDirector({ selected, controls, cameraMotion }: { selected: SchoolId | null; controls: React.RefObject<any>; cameraMotion: React.RefObject<boolean> }) {
   const compact = useThree(state => state.size.width < 760);
-  // Use the whole viewport. The overview is tighter on desktop, while portrait
-  // screens pull back enough to retain all three buildings before selection.
+  // Keep the existing focus animation and manual zoom behavior. Only the
+  // destination coordinates change to match the new triangular campus.
   const goal = useMemo(
     () => selected
       ? compact
-        ? new Vector3(positions[selected] + 5.2, 9.6, 18.5)
-        : new Vector3(positions[selected] + 3.7, 7.7, 13.5)
+        ? new Vector3(positions[selected][0] + 5.2, 9.6, positions[selected][1] + 18.5)
+        : new Vector3(positions[selected][0] + 3.7, 7.7, positions[selected][1] + 13.5)
       : compact
-        ? new Vector3(11.5, 15.3, 38.5)
-        : new Vector3(7.6, 11, 23.4),
+        ? new Vector3(14, 23, 67)
+        : new Vector3(10, 16.2, 37),
     [selected, compact]
   );
   const target = useMemo(
-    () => new Vector3(selected ? positions[selected] : 0, 2.1, 0),
+    () => new Vector3(
+      selected ? positions[selected][0] : 0,
+      2.1,
+      selected ? positions[selected][1] : 1.3
+    ),
     [selected]
   );
   // Only selection changes should move the camera automatically. Mouse/trackpad
@@ -423,7 +464,7 @@ function School({
     >
       {children}
       {(hovered || selected === id) && (
-        <mesh position={[positions[id], 0.16, -0.65]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh position={[positions[id][0], 0.16, positions[id][1]]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[7.48, 6.08]} />
           <meshBasicMaterial color="#c09a5c" transparent opacity={0.12} depthWrite={false} />
         </mesh>
@@ -438,7 +479,7 @@ function World({ selected, onSelect }: CampusSceneProps) {
   return (
     <>
       <color attach="background" args={["#f7f4ee"]} />
-      <fog attach="fog" args={["#f7f4ee", 35, 70]} />
+      <fog attach="fog" args={["#f7f4ee", 55, 125]} />
       <ambientLight intensity={1.15} />
       <hemisphereLight color="#ffffff" groundColor="#c1b29c" intensity={1.8} />
       <directionalLight
@@ -470,7 +511,7 @@ function World({ selected, onSelect }: CampusSceneProps) {
         enableDamping
         dampingFactor={0.08}
         minDistance={15}
-        maxDistance={54}
+        maxDistance={85}
         minPolarAngle={0.60}
         maxPolarAngle={1.34}
         minAzimuthAngle={-0.8}
@@ -489,7 +530,7 @@ export default function CampusScene(props: CampusSceneProps) {
     <Canvas
       shadows
       dpr={[1, 1.65]}
-      camera={{ position: [7.6, 11, 23.4], fov: 42, near: 0.1, far: 110 }}
+      camera={{ position: [10, 16.2, 37], fov: 42, near: 0.1, far: 155 }}
       gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
       onPointerMissed={() => props.onSelect(null)}
       fallback={<div className="campus-webgl-fallback">3D preview is unavailable in this browser. Select a school below to inspect the campus model.</div>}
