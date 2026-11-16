@@ -108,7 +108,14 @@ function closeMaterialChoiceMenus(activeChoice) {
       optionButton.setAttribute("role", "option");
       optionButton.setAttribute("aria-selected", "false");
       optionButton.hidden = true;
-      optionButton.addEventListener("click", function () {
+      // Keep the search field focused until the click commits the choice.
+      // Otherwise desktop focusout can hide the menu before click fires.
+      optionButton.addEventListener("mousedown", function (event) {
+        event.preventDefault();
+      });
+      optionButton.addEventListener("click", function (event) {
+        // Prevent activation of the native select through its wrapping label.
+        event.preventDefault();
         selectMatchingOption(option);
       });
 
@@ -133,7 +140,14 @@ function closeMaterialChoiceMenus(activeChoice) {
             return name.includes(term);
           });
         option.hidden = !matches;
-        if (matches) matchCount += 1;
+        if (matches) {
+          // A short stagger softens the appearance without delaying long lists.
+          option.style.setProperty(
+            "--material-option-delay",
+            Math.min(matchCount, 7) * 20 + "ms"
+          );
+          matchCount += 1;
+        }
       });
 
       empty.hidden = !terms.length || matchCount > 0;
