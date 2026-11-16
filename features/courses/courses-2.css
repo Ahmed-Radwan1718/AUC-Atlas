@@ -38,10 +38,6 @@
       transform: translateY(0) scale(1);
     }
 
-    .material-professor-search-choice:not(.open) .material-choice-menu {
-      display: none;
-    }
-
     .material-professor-search-choice .material-professor-search-input {
       width: 100%;
     }
