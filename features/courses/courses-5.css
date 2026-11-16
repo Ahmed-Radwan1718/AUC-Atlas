@@ -231,10 +231,32 @@
         visibility 0s;
     }
 
+    /* The professor and semester menus now stay mounted while collapsing, so
+       their existing height/fade transitions can run on open and close. */
+    .quick-material-upload-body .material-professor-search-choice .material-choice-option:not([hidden]) {
+      animation: materialSearchOptionReveal 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: var(--material-option-delay, 0ms);
+    }
+
+    @keyframes materialSearchOptionReveal {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .quick-material-upload-body .material-choice-menu,
       .quick-material-upload-dialog .material-choice-menu {
         transition: none;
+      }
+
+      .quick-material-upload-body .material-professor-search-choice .material-choice-option:not([hidden]) {
+        animation: none;
       }
     }
 
