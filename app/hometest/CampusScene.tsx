@@ -474,9 +474,9 @@ function CampusGround() {
 // Rotate the entire model (including its foundation and entrance) in place.
 const buildingRotations: Record<SchoolId, number> = {
   humanities: 0,
-  engineering: Math.PI / 12, // 15° counterclockwise
-  business: Math.PI / 12, // 15° counterclockwise
-  library: -Math.PI / 12 // 15° clockwise
+  engineering: Math.PI / 2, // 90° counterclockwise
+  business: Math.PI / 2, // 90° counterclockwise
+  library: -Math.PI / 2 // 90° clockwise
 };
 
 const positions: Record<SchoolId, [number, number]> = {
