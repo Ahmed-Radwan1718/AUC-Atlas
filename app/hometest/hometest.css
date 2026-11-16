@@ -63,7 +63,7 @@
 
 /* Shared section rhythm */
 .ht-section { padding: 34px 0 112px; scroll-margin-top: 135px; }
-.ht-section-heading { display:flex; align-items:end; justify-content:space-between; gap: 38px; margin-bottom: 31px; }
+.ht-section-heading { display:flex; align-items:flex-end; justify-content:space-between; gap: 38px; margin-bottom: 31px; }
 .ht-section-kicker { display:block; margin-bottom:14px; font-size:10px; color:#ad8b56; letter-spacing:.17em; font-weight:800; }
 .ht-section-heading h2 { font-size:clamp(33px,4.3vw,56px); line-height:1.02; font-weight:700; letter-spacing:-.055em; text-transform:uppercase; }
 .ht-section-heading > p { max-width:330px; margin-bottom:2px; color:var(--ht-muted); font-size:14px; line-height:1.7; }
@@ -75,7 +75,7 @@
 .ht-explore-top,.ht-explore-bottom { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
 .ht-shortcut-icon,.ht-tool-icon { display:grid;place-items:center;width:56px;height:56px; flex:0 0 auto; border-radius:17px; background:rgba(192,154,92,.13); color:#a47f44; }
 .ht-shortcut-num { color:rgba(23,23,23,.34);font-size:11px;font-weight:800;letter-spacing:.1em; }
-.ht-explore-bottom { align-items:end; }
+.ht-explore-bottom { align-items:flex-end; }
 .ht-explore-card h3 { margin:0; font-size:23px;letter-spacing:-.035em;line-height:1.2; }
 .ht-explore-card p { margin-top:8px;color:var(--ht-muted);font-size:12px;line-height:1.5; }
 .ht-card-arrow { display:grid;place-items:center; flex:0 0 auto; width:37px;height:37px; border:1px solid var(--ht-line); border-radius:50%; color:var(--ht-ink); transition:background .2s,color .2s,transform .2s; }
@@ -130,7 +130,7 @@
 .ht-tool-overline { color:#aa8854;font-size:9px;font-weight:800;letter-spacing:.14em; }
 .ht-tool-copy h3 { font-size:24px;letter-spacing:-.04em;margin-top:9px; }
 .ht-tool-copy p { max-width:280px;color:var(--ht-muted);font-size:12px;line-height:1.65;margin-top:8px; }
-.ht-tool-card .ht-card-arrow { align-self:end; }
+.ht-tool-card .ht-card-arrow { align-self:flex-end; }
 
 /* Bottom statistics are deliberately quiet. */
 .ht-stats { padding-top:6px;padding-bottom:104px; }
