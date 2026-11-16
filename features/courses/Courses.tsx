@@ -43,21 +43,21 @@ const markup = `
             </div>
 
             <div class="courses-home-content" id="courses-home-content">
-              <section class="course-home-section" aria-labelledby="popular-courses-title">
+              <section class="course-home-section" aria-labelledby="browse-courses-title">
                 <div class="course-section-heading course-popular-heading">
                   <div>
-                    <h2 id="popular-courses-title">Popular courses</h2>
+                    <h2 id="browse-courses-title">Browse courses</h2>
                   </div>
 
                   <p>
-                    Quick access to the foundational courses students search for most across AUC.
+                    Explore courses from across AUC's departments.
                   </p>
                 </div>
 
                 <div
                   class="course-popular-grid"
-                  id="course-popular-grid"
-                  aria-label="Popular courses"
+                  id="course-browse-grid"
+                  aria-label="Browse courses"
                 ></div>
               </section>
 
