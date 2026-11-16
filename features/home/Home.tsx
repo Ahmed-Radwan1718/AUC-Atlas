@@ -325,21 +325,33 @@ export default function Home() {
         </div>
         <div className="home-stats-grid">
           <article className="home-stat">
-            <div className="home-stat-value">\n              <HomeStatIcon kind="professors"/>\n              <AnimatedCount value={professors.length}/>\n            </div>
+            <div className="home-stat-value">
+              <HomeStatIcon kind="professors"/>
+              <AnimatedCount value={professors.length}/>
+            </div>
             <span className="home-stat-label">Professors listed</span>
           </article>
           <article className="home-stat">
-            <div className="home-stat-value">\n              <HomeStatIcon kind="materials"/>\n              <AnimatedCount value={overview ? overview.materialCount : null} initial="—"/>\n            </div>
+            <div className="home-stat-value">
+              <HomeStatIcon kind="materials"/>
+              <AnimatedCount value={overview ? overview.materialCount : null} initial="—"/>
+            </div>
             <span className="home-stat-label">Materials available</span>
           </article>
           <article className="home-stat">
-            <div className="home-stat-value">\n              <HomeStatIcon kind="reviews"/>\n              <AnimatedCount value={overview ? overview.reviewCount : null} initial="—"/>\n            </div>
+            <div className="home-stat-value">
+              <HomeStatIcon kind="reviews"/>
+              <AnimatedCount value={overview ? overview.reviewCount : null} initial="—"/>
+            </div>
             <span className="home-stat-label">Student reviews
               {overview?.reviewsLocked && <small className="home-stat-label-note">Sign in to view</small>}
             </span>
           </article>
           <article className="home-stat">
-            <div className="home-stat-value">\n              <HomeStatIcon kind="visits"/>\n              <AnimatedCount value={visits} initial="—"/>\n            </div>
+            <div className="home-stat-value">
+              <HomeStatIcon kind="visits"/>
+              <AnimatedCount value={visits} initial="—"/>
+            </div>
             <span className="home-stat-label">Visits<small className="home-stat-label-note">This month</small></span>
           </article>
         </div>
