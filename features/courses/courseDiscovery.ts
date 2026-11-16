@@ -134,18 +134,6 @@ function normalize(value) {
     });
   }
 
-  const fallbackPopularCourseCodes = [
-    "MACT 1121",
-    "CSCE 1001",
-    "PHYS 1011",
-    "CHEM 1005",
-    "ACCT 2001",
-    "ECON 2011",
-    "MKTG 2101",
-    "BADM 2001"
-  ];
-  const recordedCourseViews = new Set();
-
   function getCourseByCode(courseCode) {
     const normalizedCode = normalizeCourseCode(courseCode);
 
@@ -154,30 +142,41 @@ function normalize(value) {
     });
   }
 
-  function getPopularCoursesForDisplay(courseCodes) {
-    const seenCodes = new Set();
 
-    return courseCodes
-      .map(getCourseByCode)
-      .filter(function (course) {
-        if (!course) {
-          return false;
-        }
-
-        const normalizedCode = normalizeCourseCode(course.code);
-
-        if (seenCodes.has(normalizedCode)) {
-          return false;
-        }
-
-        seenCodes.add(normalizedCode);
-        return true;
-      })
-      .slice(0, 8);
+  // The catalog is local data: no Firestore query or popularity tracking needed.
+  // Pick courses from different departments so discovery is not dominated by one subject.
+  function shuffled(items) {
+    const result = items.slice();
+    for (let index = result.length - 1; index > 0; index--) {
+      const pick = Math.floor(Math.random() * (index + 1));
+      [result[index], result[pick]] = [result[pick], result[index]];
+    }
+    return result;
   }
 
-  function renderPopularCourseCards(root, popularCourses) {
-    root.innerHTML = popularCourses.map(function (course) {
+  function selectBrowseCourses() {
+    const byDepartment = new Map();
+    courses.forEach(function (course) {
+      const department = course.department || course.subject || course.code;
+      if (!byDepartment.has(department)) byDepartment.set(department, []);
+      byDepartment.get(department).push(course);
+    });
+
+    const selected = shuffled([...byDepartment.values()]).slice(0, 8)
+      .map(function (departmentCourses) {
+        return departmentCourses[Math.floor(Math.random() * departmentCourses.length)];
+      });
+
+    if (selected.length >= 8) return selected;
+
+    const selectedCodes = new Set(selected.map(function (course) { return course.code; }));
+    return selected.concat(shuffled(courses.filter(function (course) {
+      return !selectedCodes.has(course.code);
+    })).slice(0, 8 - selected.length));
+  }
+
+  function renderBrowseCourseCards(root, browseCourses) {
+    root.innerHTML = browseCourses.map(function (course) {
       return `
 <a
   class="course-feature-card"
@@ -196,110 +195,11 @@ function normalize(value) {
     }).join("");
   }
 
-  async function renderPopularCourses() {
-    const root = document.getElementById("course-popular-grid");
-
-    if (!root) {
-      return;
-    }
-
-    renderPopularCourseCards(
-      root,
-      getPopularCoursesForDisplay(fallbackPopularCourseCodes)
-    );
-
-    try {
-      const response = await fetch(
-        "/api/course-popularity",
-        {
-          method: "GET",
-          credentials: "same-origin"
-        }
-      );
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-          "Could not load popular courses."
-        );
-      }
-
-      const rankedCourseCodes =
-        Array.isArray(data.popularCourses)
-          ? data.popularCourses
-              .map(function (item) {
-                return normalizeCourseCode(
-                  item && item.courseCode
-                );
-              })
-              .filter(Boolean)
-          : [];
-
-      renderPopularCourseCards(
-        root,
-        getPopularCoursesForDisplay(
-          rankedCourseCodes.concat(
-            fallbackPopularCourseCodes
-          )
-        )
-      );
-    } catch (error) {
-      // Keep the fallback courses visible if popularity data is unavailable.
-    }
-  }
-
-  async function recordCourseView(courseCode) {
-    const normalizedCode = normalizeCourseCode(courseCode);
-
-    if (
-      !normalizedCode ||
-      recordedCourseViews.has(normalizedCode)
-    ) {
-      return;
-    }
-
-    const storageKey =
-      "aucAtlasCourseView:" + normalizedCode;
-
-    try {
-      if (window.sessionStorage.getItem(storageKey) === "1") {
-        recordedCourseViews.add(normalizedCode);
-        return;
-      }
-    } catch (error) {
-      // In-memory tracking still prevents duplicate counts on this page.
-    }
-
-    recordedCourseViews.add(normalizedCode);
-
-    try {
-      const response = await fetch(
-        "/api/course-popularity",
-        {
-          method: "POST",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            courseCode: normalizedCode
-          })
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Could not record the course view.");
-      }
-
-      try {
-        window.sessionStorage.setItem(storageKey, "1");
-      } catch (error) {
-        // The view was recorded even if browser storage is unavailable.
-      }
-    } catch (error) {
-      recordedCourseViews.delete(normalizedCode);
-    }
+  function renderBrowseCourses() {
+    const root = document.getElementById("course-browse-grid");
+    if (!root) return;
+    // Called once during catalog initialization, keeping cards stable on the page.
+    renderBrowseCourseCards(root, selectBrowseCourses());
   }
 
   function renderRecentMaterialSkeletons() {
@@ -716,9 +616,9 @@ export function initializeCatalog() {
     if(searchBox&&!searchBox.contains(event.target))setCoursesSearchState(false);
   });
   renderSubjectFilters();
-  renderPopularCourses();
+  renderBrowseCourses();
   loadRecentMaterials();
   animateCourseSearchPlaceholder();
   renderCourses();
 }
-export { normalizeCourseCode, getCourseUrl, getCourseByCode, getSelectedCourseCode, getProfessorProfileUrl, recordCourseView, escapeMaterialText, getMaterialFileExtension, formatMaterialUploadDate, loadRecentMaterials };
+export { normalizeCourseCode, getCourseUrl, getCourseByCode, getSelectedCourseCode, getProfessorProfileUrl, escapeMaterialText, getMaterialFileExtension, formatMaterialUploadDate, loadRecentMaterials };
