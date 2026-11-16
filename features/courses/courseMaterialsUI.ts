@@ -336,14 +336,25 @@ function renderCourseMaterials(materials) {
                   aria-hidden="true"
                 >
               `
-              : `
-                <span
-                  class="course-material-file-icon"
-                  aria-hidden="true"
-                >
-                  <strong>${extensionLabel}</strong>
-                </span>
-              `;
+              : ["xls", "xlsx"].includes(
+                  extension
+                )
+                ? `
+                  <img
+                    class="course-material-file-icon-image"
+                    src="/Excel.svg"
+                    alt=""
+                    aria-hidden="true"
+                  >
+                `
+                : `
+                  <span
+                    class="course-material-file-icon"
+                    aria-hidden="true"
+                  >
+                    <strong>${extensionLabel}</strong>
+                  </span>
+                `;
 
       const previewDataAttributes = [
         'data-download-url="' +
