@@ -16,17 +16,6 @@ export default function HomeTest() {
   return (
     <main className="campus-home">
       <div className="campus-shell">
-        <section className="campus-intro" aria-labelledby="campus-heading">
-          <div className="campus-intro-copy">
-            <p className="campus-eyebrow"><span className="campus-eyebrow-dot" /> THE AUC ATLAS / 3D EXPERIMENT</p>
-            <h1 id="campus-heading">A new perspective<br />on <span>AUC.</span></h1>
-          </div>
-          <p className="campus-intro-aside">
-            Three academic buildings.<br />
-            One campus to explore.
-          </p>
-        </section>
-
         <section className="campus-exhibit" aria-label="Interactive 3D model of three AUC academic buildings">
           <div className="campus-exhibit-rail">
             <span>THE CAMPUS / THREE ACADEMIC SCHOOLS</span>
