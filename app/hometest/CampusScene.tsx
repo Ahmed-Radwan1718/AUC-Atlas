@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Html, OrbitControls } from "@react-three/drei";
 import {
-  BoxGeometry, MeshStandardMaterial, Vector3,
+  BoxGeometry, DataTexture, LinearFilter, MeshStandardMaterial,
+  RGBAFormat, RepeatWrapping, SRGBColorSpace, Vector3,
   type Material
 } from "three";
 
@@ -19,6 +20,44 @@ type CampusSceneProps = {
 // Shared geometry and materials avoid hundreds of redundant GPU allocations.
 // Every building is assembled in code: no downloads or external model assets.
 const cube = new BoxGeometry(1, 1, 1);
+
+// Procedural limestone masonry inspired by the real SSE facade.
+// A single small repeating GPU texture gives the long stone wings visible,
+// irregular banding without hundreds of expensive individual stone meshes.
+function createSSEStoneTexture() {
+  const side = 256;
+  const pixels = new Uint8Array(side * side * 4);
+  const palette = [
+    [164, 153, 136], [185, 172, 150], [151, 141, 125],
+    [195, 180, 155], [170, 159, 142], [207, 192, 164],
+    [149, 139, 127], [177, 163, 141]
+  ];
+  for (let y = 0; y < side; y++) {
+    const row = Math.floor(y / 16);
+    const stagger = (row % 2) * 16;
+    for (let x = 0; x < side; x++) {
+      const shifted = (x + stagger) % side;
+      const column = Math.floor(shifted / 32);
+      const stone = palette[(row * 3 + column * 5 + (row * column) % 7) % palette.length];
+      const grain = ((x * 17 + y * 23 + row * 7) % 15) - 7;
+      const grout = y % 16 === 0 || shifted % 32 === 0;
+      const index = (y * side + x) * 4;
+      for (let channel = 0; channel < 3; channel++) {
+        pixels[index + channel] = Math.max(0, Math.min(255, stone[channel] + grain - (grout ? 30 : 0)));
+      }
+      pixels[index + 3] = 255;
+    }
+  }
+  const texture = new DataTexture(pixels, side, side, RGBAFormat);
+  texture.colorSpace = SRGBColorSpace;
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.repeat.set(1.5, 1.2);
+  texture.minFilter = LinearFilter;
+  texture.magFilter = LinearFilter;
+  texture.needsUpdate = true;
+  return texture;
+}
 const mat = {
   limestone: new MeshStandardMaterial({ color: "#c8b38e", roughness: 0.91 }),
   limestoneLight: new MeshStandardMaterial({ color: "#e2d0b0", roughness: 0.92 }),
@@ -35,7 +74,10 @@ const mat = {
   green: new MeshStandardMaterial({ color: "#72806b", roughness: 1 }),
   greenDark: new MeshStandardMaterial({ color: "#505f4c", roughness: 1 }),
   ground: new MeshStandardMaterial({ color: "#e9e3d7", roughness: 1 }),
-  focus: new MeshStandardMaterial({ color: "#c09a5c", roughness: 0.76 })
+  focus: new MeshStandardMaterial({ color: "#c09a5c", roughness: 0.76 }),
+  sseStone: new MeshStandardMaterial({ map: createSSEStoneTexture(), roughness: 0.94 }),
+  sseBlue: new MeshStandardMaterial({ color: "#213a7b", roughness: 0.6, metalness: 0.08 }),
+  sseWindow: new MeshStandardMaterial({ color: "#30495c", roughness: 0.19, metalness: 0.26 })
 };
 
 function Block({
@@ -154,31 +196,119 @@ function Humanities({ active }: { active: boolean }) {
   );
 }
 
-// Sciences & Engineering: precise glass grid, limestone fins and a raised atrium.
+// SSE: modeled from the supplied photograph of the actual Sciences & Engineering
+// building, with its patterned stone wings, recessed blue vertical bays,
+// upper school-name lintel, shaded entrance and broad monumental steps.
+// It is an architectural likeness rather than a survey-accurate digital twin.
+function SSEBay({ x }: { x: number }) {
+  return (
+    <group position={[x, 0, 2.01]}>
+      {/* Tall window and deep cobalt spandrel blocks, repeated four times. */}
+      <Block at={[0, 4.17, 0.025]} size={[0.67, 0.83, 0.13]} material={mat.recess} />
+      <Block at={[0, 4.18, 0.099]} size={[0.57, 0.72, 0.055]} material={mat.sseWindow} />
+      <Block at={[0, 3.68, 0.14]} size={[0.76, 0.49, 0.10]} material={mat.sseBlue} />
+      <Block at={[0, 2.84, 0.025]} size={[0.67, 0.88, 0.13]} material={mat.recess} />
+      <Block at={[0, 2.86, 0.099]} size={[0.57, 0.77, 0.055]} material={mat.sseWindow} />
+      <Block at={[0, 2.27, 0.14]} size={[0.76, 0.57, 0.10]} material={mat.sseBlue} />
+      <Block at={[0, 1.67, 0.023]} size={[0.67, 0.48, 0.12]} material={mat.recess} />
+      <Block at={[0, 1.67, 0.095]} size={[0.57, 0.38, 0.055]} material={mat.sseWindow} />
+      <Block at={[0, 4.19, 0.16]} size={[0.036, 0.73, 0.04]} material={mat.sandstoneDark} />
+      <Block at={[0, 2.86, 0.16]} size={[0.036, 0.79, 0.04]} material={mat.sandstoneDark} />
+    </group>
+  );
+}
+
+function SSESideWindow({ x, y, z = 2.16 }: { x: number; y: number; z?: number }) {
+  return (
+    <group>
+      <Block at={[x, y, z]} size={[0.56, 0.78, 0.09]} material={mat.recess} />
+      <Block at={[x, y, z + 0.06]} size={[0.49, 0.7, 0.045]} material={mat.sseWindow} />
+      <Block at={[x, y, z + 0.10]} size={[0.035, 0.72, 0.055]} material={mat.sandstoneDark} />
+      <Block at={[x, y - 0.04, z + 0.10]} size={[0.52, 0.035, 0.05]} material={mat.sandstoneDark} />
+      <Block at={[x, y - 0.45, z + 0.10]} size={[0.71, 0.11, 0.26]} material={mat.limestoneLight} />
+    </group>
+  );
+}
+
 function Engineering({ active }: { active: boolean }) {
   return (
     <group position={[0, 0, -0.92]}>
       <SchoolBase active={active} />
-      <Block at={[0, 2.06, -0.23]} size={[6.63, 3.86, 3.45]} material={mat.limestone} />
-      <Block at={[-2.75, 2.85, -1.45]} size={[1.35, 5.45, 2.19]} material={mat.sandstone} />
-      <Block at={[0.46, 2.06, 1.54]} size={[4.78, 3.23, 0.12]} material={mat.recess} />
-      <Block at={[0.46, 2.08, 1.64]} size={[4.51, 3.07, 0.08]} material={mat.glass} />
-      {[-1.86, -1.09, -0.32, 0.45, 1.22, 1.99, 2.76].map((x) => (
-        <Block key={x} at={[x, 2.07, 1.75]} size={[0.095, 3.17, 0.24]} material={mat.limestoneLight} />
+
+      {/* Deep main block.  The flank wings step forward as in the photograph. */}
+      <Block at={[0, 2.52, -0.28]} size={[6.75, 4.92, 3.82]} material={mat.sseStone} />
+      <Block at={[-2.8, 2.73, -0.26]} size={[1.6, 5.4, 4.58]} material={mat.sseStone} />
+      <Block at={[2.82, 2.9, -0.38]} size={[1.56, 5.76, 4.79]} material={mat.sseStone} />
+
+      {/* Rear inner wall and pale stone piers behind the four blue panel stacks. */}
+      <Block at={[0.1, 2.82, 1.89]} size={[4.36, 4.62, 0.22]} material={mat.limestoneLight} />
+      {[-2.1, -1.09, -0.08, 0.93, 1.94].map((x) => (
+        <Block key={"pier-" + x} at={[x, 2.83, 2.08]} size={[0.29, 4.53, 0.3]} material={mat.carved} />
       ))}
-      {[1.13, 2.13, 3.13].map((y) => (
-        <Block key={y} at={[0.46, y, 1.75]} size={[4.78, 0.09, 0.2]} material={mat.bronze} />
+      {[-1.59, -0.58, 0.43, 1.44].map((x) => <SSEBay key={x} x={x} />)}
+
+      {/* The striking recessed school entrance and its continuous lintel. */}
+      <Block at={[0, 0.89, 2.08]} size={[2.07, 1.42, 0.1]} material={mat.recess} />
+      <Block at={[0, 0.84, 2.16]} size={[1.88, 1.29, 0.055]} material={mat.sseWindow} />
+      <Block at={[0, 0.85, 2.22]} size={[0.06, 1.27, 0.055]} material={mat.sandstoneDark} />
+      <Block at={[0, 1.64, 2.22]} size={[3.65, 0.15, 0.56]} material={mat.limestone} />
+      <Block at={[0, 4.97, 2.26]} size={[4.72, 0.64, 0.66]} material={mat.carved} />
+      <Block at={[0, 5.34, 1.89]} size={[4.95, 0.22, 1.45]} material={mat.sseStone} />
+      <Block at={[0, 5.47, 1.88]} size={[5.1, 0.13, 1.5]} material={mat.limestone} />
+
+      {/* Inscription on the real lintel; this is world-anchored, not a floating UI label. */}
+      <Html
+        transform
+        position={[0, 4.98, 2.607]}
+        distanceFactor={2.3}
+        style={{ pointerEvents: "none", userSelect: "none" }}
+      >
+        <div style={{
+          width: "630px",
+          color: "#645d52",
+          fontFamily: "Arial, sans-serif",
+          fontSize: "19px",
+          fontWeight: 600,
+          letterSpacing: "2.1px",
+          textAlign: "center",
+          whiteSpace: "nowrap",
+          lineHeight: 1
+        }}>
+          SCHOOL OF SCIENCES AND ENGINEERING
+        </div>
+      </Html>
+
+      {/* Left wing: balconies and a shadowed ground-floor colonnade. */}
+      <Block at={[-2.81, 3.36, 2.05]} size={[1.46, 0.21, 0.38]} material={mat.carved} />
+      <Block at={[-2.81, 2.03, 2.08]} size={[1.46, 0.2, 0.43]} material={mat.carved} />
+      {[2.65, 3.96].map((y) => (
+        <group key={"balcony-"+y}>
+          <Block at={[-2.81, y, 2.126]} size={[1.13, 0.77, 0.05]} material={mat.recess} />
+          <Block at={[-2.81, y - 0.34, 2.19]} size={[1.43, 0.14, 0.33]} material={mat.sandstoneDark} />
+          <Block at={[-2.81, y - 0.12, 2.31]} size={[1.44, 0.06, 0.1]} material={mat.recess} />
+        </group>
       ))}
-      <Block at={[0, 4.16, -0.2]} size={[6.95, 0.19, 3.74]} material={mat.sandstone} />
-      <Block at={[0, 4.32, -0.2]} size={[6.9, 0.09, 3.7]} material={mat.carved} />
-      <Block at={[-2.75, 5.65, -1.45]} size={[1.54, 0.24, 2.32]} material={mat.carved} />
-      <Window at={[-2.74, 4.13, -0.3]} wide={0.59} tall={1.08} />
-      <Window at={[-2.74, 2.7, -0.3]} wide={0.59} tall={1.05} />
-      <Block at={[0.45, 0.49, 2.2]} size={[5.9, 0.16, 1.08]} material={mat.carved} />
-      <Block at={[0.46, 0.29, 2.29]} size={[4.7, 0.19, 0.6]} material={mat.path} />
-      <Block at={[2.86, 2.1, 0.9]} size={[0.38, 3.2, 1.1]} material={mat.sandstone} />
-      <Cypress at={[-3.5, 0.18, 2.64]} height={1.36} />
-      <Cypress at={[3.52, 0.18, 2.69]} height={1.35} />
+      <Block at={[-2.8, 0.94, 2.12]} size={[1.17, 1.36, 0.08]} material={mat.recess} />
+      <Block at={[-2.8, 1.73, 2.23]} size={[1.53, 0.16, 0.41]} material={mat.carved} />
+
+      {/* Right facade: offset stonework and narrow, dark recessed windows. */}
+      {[1.33, 2.73, 4.13].map((y) => (
+        <SSESideWindow key={"right-" + y} x={2.96} y={y} z={2.095} />
+      ))}
+      <Block at={[2.81, 5.84, -0.4]} size={[1.74, 0.19, 4.95]} material={mat.carved} />
+      <Block at={[-2.8, 5.49, -0.26]} size={[1.78, 0.19, 4.76]} material={mat.carved} />
+      {/* Stone bands and the outer architectural frame add depth at low zoom. */}
+      {[1.91, 3.31, 4.67].map((y) => (
+        <Block key={"band-" + y} at={[2.82, y, 2.14]} size={[1.49, 0.055, 0.16]} material={mat.sandstoneDark} />
+      ))}
+      <Block at={[2.08, 2.86, 2.02]} size={[0.24, 4.77, 0.28]} material={mat.sandstone} />
+      <Block at={[-2.18, 2.86, 2.02]} size={[0.24, 4.77, 0.28]} material={mat.sandstone} />
+
+      {/* Wide shallow steps and the entry landing photographed at AUC. */}
+      <Block at={[0.24, 0.51, 2.44]} size={[5.7, 0.22, 0.75]} material={mat.carved} />
+      <Block at={[0.24, 0.405, 2.70]} size={[5.8, 0.15, 0.7]} material={mat.limestoneLight} />
+      <Block at={[0.24, 0.31, 2.91]} size={[5.94, 0.16, 0.60]} material={mat.carved} />
+      <Block at={[0.24, 0.225, 3.11]} size={[6.05, 0.14, 0.48]} material={mat.limestoneLight} />
     </group>
   );
 }
