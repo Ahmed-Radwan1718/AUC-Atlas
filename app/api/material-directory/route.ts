@@ -24,7 +24,7 @@ const normalize = (value: unknown) => clean(value,500).toLowerCase().replace(/[^
 
 function matchesMaterial(data: Record<string,unknown>, terms: string[], type: string, semester: string, courseCode: string) {
   if (clean(data.status,40).toLowerCase() === "rejected") return false;
-  if (courseCode && normalize(data.courseCode) !== courseCode) return false;
+  if (courseCode && normalize(data.courseCode) !== normalize(courseCode)) return false;
   if (type && normalize(data.materialType || data.type || data.category) !== type) return false;
   if (semester && normalize(data.semester) !== semester) return false;
   if (!terms.length) return true;
