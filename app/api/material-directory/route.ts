@@ -67,10 +67,6 @@ export async function GET(request: NextRequest) {
     });
 
     const collection = firestore().collection("courseMaterials");
-    // Type/semester may be stored under legacy field names, and older uploads
-    // can lack a status. Preserve those records by filtering after the course query.
-    const baseQuery = collection.where("courseCode", "==", courseCode)
-      .orderBy("createdAt", "desc");
     let after: QueryDocumentSnapshot | null = null;
     if (cursor) {
       const snapshot = await collection.doc(cursor).get();
@@ -81,6 +77,11 @@ export async function GET(request: NextRequest) {
         }, { status: 400, headers });
       after = snapshot as QueryDocumentSnapshot;
     }
+
+    // Type/semester may be stored under legacy field names, and older uploads
+    // can lack a status. Preserve those records by filtering after the course query.
+    const baseQuery = collection.where("courseCode", "==", courseCode)
+      .orderBy("createdAt", "desc");
 
     const materials: ReturnType<typeof serializeMaterialData>[] = [];
     let scanned = 0;
@@ -94,7 +95,10 @@ export async function GET(request: NextRequest) {
         maxScannedPerPage - scanned);
       const query = after ? baseQuery.startAfter(after) : baseQuery;
       const snapshot = await query.limit(limit).get();
-      if (!snapshot.docs.length) break;
+      if (!snapshot.docs.length) {
+        hasMore = false;
+        break;
+      }
 
       let consumed = 0;
       for (const doc of snapshot.docs) {
