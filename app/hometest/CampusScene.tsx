@@ -232,7 +232,7 @@ function SSESideWindow({ x, y, z = 2.16 }: { x: number; y: number; z?: number })
 
 function Engineering({ active }: { active: boolean }) {
   return (
-    <group position={[0, 0, 3.4]}>
+    <group position={[0, 0, 3.4]} rotation={[0, buildingRotations.engineering, 0]}>
       <SchoolBase active={active} />
 
       {/* Deep main block.  The flank wings step forward as in the photograph. */}
@@ -317,7 +317,7 @@ function Engineering({ active }: { active: boolean }) {
 // Business: restrained stone architecture with a repeating monumental arch rhythm.
 function Business({ active }: { active: boolean }) {
   return (
-    <group position={[14.5, 0, -4.2]}>
+    <group position={[14.5, 0, -4.2]} rotation={[0, buildingRotations.business, 0]}>
       <SchoolBase active={active} />
       <Block at={[0, 2.06, -0.32]} size={[6.7, 3.83, 3.66]} material={mat.limestone} />
       <Block at={[-2.6, 2.41, -1.61]} size={[1.54, 4.61, 1.56]} material={mat.sandstone} />
@@ -349,7 +349,7 @@ function Business({ active }: { active: boolean }) {
 // procedural geometry and the existing campus materials.
 function Library({ active }: { active: boolean }) {
   return (
-    <group position={[-11.5, 0, 13.7]}>
+    <group position={[-11.5, 0, 13.7]} rotation={[0, buildingRotations.library, 0]}>
       <Block at={[0, 0.07, 0]} size={[10.8, 0.14, 6.8]} material={active ? mat.focus : mat.concrete} />
 
       {/* Deep limestone structure and raised parapet. */}
@@ -470,6 +470,15 @@ function CampusGround() {
   );
 }
 
+// Positive Y rotation appears counterclockwise from above (X right, -Z up).
+// Rotate the entire model (including its foundation and entrance) in place.
+const buildingRotations: Record<SchoolId, number> = {
+  humanities: 0,
+  engineering: Math.PI / 2, // 90° counterclockwise
+  business: Math.PI / 2, // 90° counterclockwise
+  library: -Math.PI / 2 // 90° clockwise
+};
+
 const positions: Record<SchoolId, [number, number]> = {
   humanities: [-14.5, -4.2],
   engineering: [0, 3.4],
@@ -537,7 +546,7 @@ function School({
     >
       {children}
       {(hovered || selected === id) && (
-        <mesh position={[positions[id][0], 0.16, positions[id][1]]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh position={[positions[id][0], 0.16, positions[id][1]]} rotation={[-Math.PI / 2, 0, buildingRotations[id]]}>
           <planeGeometry args={id === "library" ? [10.5, 6.6] : [7.48, 6.08]} />
           <meshBasicMaterial color="#c09a5c" transparent opacity={0.12} depthWrite={false} />
         </mesh>
