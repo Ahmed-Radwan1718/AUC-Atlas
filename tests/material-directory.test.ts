@@ -38,7 +38,7 @@ function harness({authorized=true,files=[]}:{authorized?:boolean;files?:Row[]}={
     id:row.id,exists:true,data:()=>({...row.data}),
     get:(key:string)=>row.data[key]
   });
-  const query=(rows:Row[],afterId:string|null=null)=>({
+  const query=(rows:Row[],afterId:string|null=null):any=>({
     orderBy(field:string,direction:string){
       assert.equal(field,"createdAt");
       assert.equal(direction,"desc");
