@@ -11,6 +11,7 @@ import {
 import styles from "./newhome.module.css";
 import MajorWheel from "./major-wheel";
 import type { SchoolId } from "./wheel-data";
+import NightBloom, { FacadeLights, WindowHalo } from "./night-bloom";
 
 /**
  * AUC Atlas — original four-building architectural diorama.
@@ -180,12 +181,12 @@ type BuildingHoverMotion = {
 const BuildingHoverContext = createContext<{current: BuildingHoverMotion} | null>(null);
 const DAY_GLASS = new Color("#688a97");
 const DAY_GLASS_HOVER = new Color("#9ac3cc");
-const NIGHT_GLASS = new Color("#f1b76d");
-const NIGHT_GLASS_HOVER = new Color("#ffe0a1");
+const NIGHT_GLASS = new Color("#9c6539");
+const NIGHT_GLASS_HOVER = new Color("#ce9b5c");
 const ARCH_DAY = new Color("#6f96a4");
 const ARCH_DAY_HOVER = new Color("#abd0d7");
-const ARCH_NIGHT = new Color("#e5ac61");
-const ARCH_NIGHT_HOVER = new Color("#ffdfaa");
+const ARCH_NIGHT = new Color("#a97144");
+const ARCH_NIGHT_HOVER = new Color("#cf9b61");
 
 function hoverWave(state: BuildingHoverMotion | null, height: number, x: number) {
   if (!state || state.progress < 0.001) return 0;
@@ -218,7 +219,7 @@ function ArchedPane({position,width=4,height=11,night=0}:{
   },[width,height]);
   const hover=useContext(BuildingHoverContext);
   const glass=useRef<MeshStandardMaterial>(null);
-  const intensity=0.06+night*1.5;
+  const intensity=0.02+night*4.5;
   useFrame((_,delta)=>{
     if (!glass.current) return;
     const wave=hoverWave(hover?.current ?? null, position[1]+height*0.5, position[0]);
@@ -229,16 +230,18 @@ function ArchedPane({position,width=4,height=11,night=0}:{
     );
     glass.current.emissiveIntensity=MathUtils.damp(
       glass.current.emissiveIntensity,
-      intensity+wave*(night>0.5?1.15:0.18),12,delta
+      intensity+wave*(night>0.5?1.25:0.18),12,delta
     );
   });
   return <group position={position}>
     <mesh position={[0,0,-0.12]}>
       <shapeGeometry args={[outline]}/>
-      <meshStandardMaterial ref={glass} color={night>0.5?"#e5ac61":"#6f96a4"}
-        emissive={night>0.5?"#f6bd76":"#a4cbda"} emissiveIntensity={intensity}
-        metalness={0.15} roughness={0.19} side={DoubleSide}/>
+      <meshStandardMaterial ref={glass} color={night>0.5?"#a97144":"#6f96a4"}
+        emissive={night>0.5?"#ffad45":"#a4cbda"} emissiveIntensity={intensity}
+        metalness={0.07} roughness={0.23} side={DoubleSide}/>
     </mesh>
+    <WindowHalo position={[0,height*0.48,0.22]}
+      width={width*1.85} height={height*1.35} brightness={night}/>
     <Block position={[0,height-width/2,0.02]} size={[width+0.36,0.16,0.19]} color="#c3a889"/>
     <mesh position={[0,height-width/2,0.08]} castShadow>
       <torusGeometry args={[width/2+0.1,0.24,8,28,Math.PI]}/>
@@ -257,7 +260,7 @@ function Window({position,width=2.1,height=3.8,night=0,brightness=1}:{
   const glass=useRef<MeshStandardMaterial>(null);
   const glow=night*brightness;
   const isNight=glow>0.5;
-  const baseIntensity=0.06+glow*1.55;
+  const baseIntensity=0.025+glow*4.25;
   useFrame((_,delta)=>{
     if (!glass.current) return;
     const wave=hoverWave(hover?.current ?? null,position[1],position[0]);
@@ -268,17 +271,19 @@ function Window({position,width=2.1,height=3.8,night=0,brightness=1}:{
     );
     glass.current.emissiveIntensity=MathUtils.damp(
       glass.current.emissiveIntensity,
-      baseIntensity+wave*(isNight?1.25:0.19),12,delta
+      baseIntensity+wave*(isNight?1.1:0.19),12,delta
     );
   });
   return <group position={position}>
     <Block position={[0,0,-0.2]} size={[width+0.48,height+0.48,0.36]} color="#cab291"/>
     <mesh position={[0,0,0]} castShadow receiveShadow>
       <boxGeometry args={[width,height,0.12]}/>
-      <meshStandardMaterial ref={glass} color={isNight?"#f1b76d":"#688a97"}
-        emissive={isNight?"#f8bd73":"#a4cbda"}
-        emissiveIntensity={baseIntensity} roughness={0.23} metalness={0.19}/>
+      <meshStandardMaterial ref={glass} color={isNight?"#9c6539":"#688a97"}
+        emissive={isNight?"#ffad45":"#a4cbda"}
+        emissiveIntensity={baseIntensity} roughness={0.24} metalness={0.08}/>
     </mesh>
+    <WindowHalo position={[0,0,0.31]}
+      width={width*2.5} height={height*1.9} brightness={glow}/>
     <Block position={[0,0,0.11]} size={[0.1,height,0.1]} color="#6b6762"/>
     <Block position={[0,0,0.12]} size={[width,0.10,0.1]} color="#6b6762"/>
     <Block position={[0,-height/2-0.22,0.15]} size={[width+0.6,0.25,0.48]} color="#f8ecda"/>
@@ -470,6 +475,8 @@ function Library({night}: {night:number}){
       </group>))}
     <GlowLight position={[-12,0,24]} night={night}/>
     <GlowLight position={[12,0,24]} night={night}/>
+    <FacadeLights night={night} positions={[[-12,11,19],[12,11,19]]}
+      intensity={108} range={29}/>
   </group>;
 }
 function Business({night}: {night:number}){
@@ -496,6 +503,8 @@ function Business({night}: {night:number}){
     <Steps front={13.3} wide={22} levels={4}/>
     {[-15,15].map(x=><Hedge key={x} position={[x,1.15,16]}
       size={[3.2,1.4,10]}/>)}
+    <FacadeLights night={night} positions={[[-10,9,16.5],[10,9,16.5]]}
+      intensity={105} range={28}/>
   </group>;
 }
 function Humanities({night}:{night:number}){
@@ -523,14 +532,20 @@ function Humanities({night}:{night:number}){
       <group key={z+":"+y} position={[27.7,0,z]} rotation={[0,Math.PI/2,0]}>
         <Window position={[0,y,0]} width={2.5} height={3.2} night={night}/>
       </group>))}
+    <FacadeLights night={night} positions={[[-16,8,13],[16,8,13]]}
+      intensity={104} range={28}/>
   </group>;
 }
 function SSE({night}:{night:number}){
   return <group>
     <Block position={[0,0.5,0]} size={[39,1,31]} color="#b8b7aa"/>
     <Block position={[0,9.8,0]} size={[36.5,18.6,29]} color="#dbd2c4"/>
-    <Block position={[-4.9,9.6,15.3]} size={[24.5,17.5,0.18]} color={night>0.5?"#d9ac77":"#7a9caa"}
-      emissive="#ffc786" emissiveIntensity={0.1+night*1.15} roughness={0.21} metalness={0.3}/>
+    <Block position={[-4.9,9.6,15.3]} size={[24.5,17.5,0.18]}
+      color={night>0.5?"#91603b":"#7a9caa"}
+      emissive={night>0.5?"#ffb24e":"#a0c3d4"}
+      emissiveIntensity={0.02+night*3.25} roughness={0.21} metalness={0.12}/>
+    <WindowHalo position={[-4.9,9.6,15.65]}
+      width={30} height={24} brightness={night*0.85}/>
     {Array.from({length:7},(_,i)=>
       <Block key={"m"+i} position={[-16.4+i*3.8,9.6,15.48]}
         size={[0.21,18.1,0.26]} color="#54656b" metalness={0.65}/>)}
@@ -553,6 +568,8 @@ function SSE({night}:{night:number}){
       </group>))}
     <Steps front={15.5} wide={20} levels={4}/>
     {[-17,17].map(x=><Hedge key={x} position={[x,1.1,16.2]} size={[3.1,1.1,7]}/>)}
+    <FacadeLights night={night} positions={[[-10,9,18],[10,9,18]]}
+      intensity={106} range={30}/>
   </group>;
 }
 
@@ -777,6 +794,7 @@ export default function NewHomePage(){
         fallback={<div className={styles.fallback}>This preview needs WebGL.</div>}>
         <AdaptiveCamera/>
         <Campus light={celestial} onSelect={setSelectedSchool}/>
+        <NightBloom enabled={celestial.altitude < -3}/>
       </Canvas>
     </div>
     <div className={styles.instruction}>Drag to orbit · Scroll to zoom · Click a building</div>
