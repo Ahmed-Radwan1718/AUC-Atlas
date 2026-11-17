@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Sky, Stars } from "@react-three/drei";
 import {
-  ACESFilmicToneMapping, CatmullRomCurve3, DoubleSide, Mesh,
+  ACESFilmicToneMapping, CatmullRomCurve3, Color, DoubleSide, MathUtils, Mesh,
+  MeshBasicMaterial, MeshStandardMaterial, PointLight, Group,
   PCFSoftShadowMap, Shape, Vector3, BufferGeometry, Float32BufferAttribute, OrthographicCamera,
 } from "three";
 import styles from "./newhome.module.css";
@@ -167,6 +168,33 @@ const BUILDINGS: {id: BuildingId; name: string; description: string; location: P
   {id:"sse", name:"School of Sciences & Engineering", description:"Engineering, computer science, sciences and technology.", location:SITE_POSITIONS.sse},
   {id:"humanities", name:"Humanities & Social Sciences", description:"Arts, languages, politics, psychology and the social sciences.", location:SITE_POSITIONS.humanities},
 ];
+
+// Hover animation state lives in the 3D scene rather than React state: no
+// React rerendering per frame and no interference with OrbitControls.
+// Progress drives a small rise, ground-level selection ring and window wave.
+type BuildingHoverMotion = {
+  target: number;
+  progress: number;
+  elapsed: number;
+};
+const BuildingHoverContext = createContext<{current: BuildingHoverMotion} | null>(null);
+const DAY_GLASS = new Color("#688a97");
+const DAY_GLASS_HOVER = new Color("#9ac3cc");
+const NIGHT_GLASS = new Color("#f1b76d");
+const NIGHT_GLASS_HOVER = new Color("#ffe0a1");
+const ARCH_DAY = new Color("#6f96a4");
+const ARCH_DAY_HOVER = new Color("#abd0d7");
+const ARCH_NIGHT = new Color("#e5ac61");
+const ARCH_NIGHT_HOVER = new Color("#ffdfaa");
+
+function hoverWave(state: BuildingHoverMotion | null, height: number, x: number) {
+  if (!state || state.progress < 0.001) return 0;
+  // Floors brighten from the bottom up, with a slight lateral stagger.
+  const delay = 0.06 + MathUtils.clamp(height / 31, 0, 1) * 0.30 +
+    Math.abs(x) * 0.004;
+  return state.progress * MathUtils.smoothstep(state.elapsed, delay, delay + 0.26);
+}
+
 function Block({position,size,color="#e1d1b7",emissive,emissiveIntensity=0,roughness=0.85,metalness=0,cast=true}:{
   position:Position;size:Position;color?:string;emissive?:string;emissiveIntensity?:number;roughness?:number;metalness?:number;cast?:boolean;
 }){
@@ -188,12 +216,28 @@ function ArchedPane({position,width=4,height=11,night=0}:{
     s.lineTo(-r,0);
     return s;
   },[width,height]);
+  const hover=useContext(BuildingHoverContext);
+  const glass=useRef<MeshStandardMaterial>(null);
   const intensity=0.06+night*1.5;
+  useFrame((_,delta)=>{
+    if (!glass.current) return;
+    const wave=hoverWave(hover?.current ?? null, position[1]+height*0.5, position[0]);
+    glass.current.color.lerpColors(
+      night>0.5 ? ARCH_NIGHT : ARCH_DAY,
+      night>0.5 ? ARCH_NIGHT_HOVER : ARCH_DAY_HOVER,
+      wave
+    );
+    glass.current.emissiveIntensity=MathUtils.damp(
+      glass.current.emissiveIntensity,
+      intensity+wave*(night>0.5?1.15:0.18),12,delta
+    );
+  });
   return <group position={position}>
     <mesh position={[0,0,-0.12]}>
       <shapeGeometry args={[outline]}/>
-      <meshStandardMaterial color={night>0.5?"#e5ac61":"#6f96a4"}
-        emissive="#f6bd76" emissiveIntensity={intensity} metalness={0.15} roughness={0.19} side={DoubleSide}/>
+      <meshStandardMaterial ref={glass} color={night>0.5?"#e5ac61":"#6f96a4"}
+        emissive={night>0.5?"#f6bd76":"#a4cbda"} emissiveIntensity={intensity}
+        metalness={0.15} roughness={0.19} side={DoubleSide}/>
     </mesh>
     <Block position={[0,height-width/2,0.02]} size={[width+0.36,0.16,0.19]} color="#c3a889"/>
     <mesh position={[0,height-width/2,0.08]} castShadow>
@@ -209,11 +253,32 @@ function ArchedPane({position,width=4,height=11,night=0}:{
 function Window({position,width=2.1,height=3.8,night=0,brightness=1}:{
   position:Position;width?:number;height?:number;night:number;brightness?:number;
 }){
+  const hover=useContext(BuildingHoverContext);
+  const glass=useRef<MeshStandardMaterial>(null);
   const glow=night*brightness;
+  const isNight=glow>0.5;
+  const baseIntensity=0.06+glow*1.55;
+  useFrame((_,delta)=>{
+    if (!glass.current) return;
+    const wave=hoverWave(hover?.current ?? null,position[1],position[0]);
+    glass.current.color.lerpColors(
+      isNight ? NIGHT_GLASS : DAY_GLASS,
+      isNight ? NIGHT_GLASS_HOVER : DAY_GLASS_HOVER,
+      wave
+    );
+    glass.current.emissiveIntensity=MathUtils.damp(
+      glass.current.emissiveIntensity,
+      baseIntensity+wave*(isNight?1.25:0.19),12,delta
+    );
+  });
   return <group position={position}>
     <Block position={[0,0,-0.2]} size={[width+0.48,height+0.48,0.36]} color="#cab291"/>
-    <Block position={[0,0,0]} size={[width,height,0.12]} color={glow>0.5?"#f1b76d":"#688a97"}
-      emissive="#f8bd73" emissiveIntensity={0.06+glow*1.55} roughness={0.23} metalness={0.19}/>
+    <mesh position={[0,0,0]} castShadow receiveShadow>
+      <boxGeometry args={[width,height,0.12]}/>
+      <meshStandardMaterial ref={glass} color={isNight?"#f1b76d":"#688a97"}
+        emissive={isNight?"#f8bd73":"#a4cbda"}
+        emissiveIntensity={baseIntensity} roughness={0.23} metalness={0.19}/>
+    </mesh>
     <Block position={[0,0,0.11]} size={[0.1,height,0.1]} color="#6b6762"/>
     <Block position={[0,0,0.12]} size={[width,0.10,0.1]} color="#6b6762"/>
     <Block position={[0,-height/2-0.22,0.15]} size={[width+0.6,0.25,0.48]} color="#f8ecda"/>
@@ -290,9 +355,70 @@ function Building({children,id,position,onSelect}:{
   position:Position;
   onSelect:(id:SchoolId)=>void;
 }){
-  return <group position={position}
-    onClick={(event)=>{event.stopPropagation();onSelect(id);}}>
-    {children}
+  const moving=useRef<Group>(null);
+  const selectionRing=useRef<Mesh>(null);
+  const ringMaterial=useRef<MeshBasicMaterial>(null);
+  const highlight=useRef<PointLight>(null);
+  const motion=useRef<BuildingHoverMotion>({target:0,progress:0,elapsed:0});
+  const reduceMotion=useRef(false);
+
+  useEffect(()=>{
+    const media=window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync=()=>{reduceMotion.current=media.matches;};
+    sync();
+    media.addEventListener("change",sync);
+    return ()=>media.removeEventListener("change",sync);
+  },[]);
+
+  useFrame((_,delta)=>{
+    const state=motion.current;
+    const dt=Math.min(delta,0.05);
+    if(state.target>0) state.elapsed+=dt;
+    state.progress=MathUtils.damp(state.progress,state.target,
+      reduceMotion.current?60:8,dt);
+    if(state.progress<0.0001 && !state.target)state.progress=0;
+    const strength=reduceMotion.current ? 0 : state.progress;
+    if(moving.current) moving.current.position.y=strength*0.75;
+    if(selectionRing.current)
+      selectionRing.current.scale.setScalar(0.94+strength*0.07);
+    if(ringMaterial.current)
+      ringMaterial.current.opacity=strength*0.48;
+    if(highlight.current)
+      highlight.current.intensity=strength*23;
+  });
+
+  // The ring stays on the ground while only the actual building rises.
+  const radius=id==="library"?37:id==="humanities"?35:id==="sse"?30:28;
+  return <group position={position}>
+    <mesh ref={selectionRing} rotation={[-Math.PI/2,0,0]} position={[0,0.27,0]}
+      raycast={()=>null} renderOrder={4}>
+      <ringGeometry args={[radius-0.52,radius,88]}/>
+      <meshBasicMaterial ref={ringMaterial} color="#f0c381" transparent
+        opacity={0} depthWrite={false} toneMapped={false} side={DoubleSide}/>
+    </mesh>
+    <pointLight ref={highlight} position={[0,14,21]}
+      color="#ffd8a0" intensity={0} distance={48} decay={2}/>
+    <BuildingHoverContext.Provider value={motion}>
+      <group ref={moving}
+        onPointerOver={(event)=>{
+          event.stopPropagation();
+          if(motion.current.target!==1){
+            motion.current.target=1;
+            motion.current.elapsed=0;
+          }
+        }}
+        onPointerOut={(event)=>{
+          event.stopPropagation();
+          motion.current.target=0;
+        }}
+        onClick={(event)=>{
+          event.stopPropagation();
+          motion.current.target=0;
+          onSelect(id);
+        }}>
+        {children}
+      </group>
+    </BuildingHoverContext.Provider>
   </group>;
 }
 function Library({night}: {night:number}){
