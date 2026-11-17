@@ -54,9 +54,9 @@ export function WindowHalo({
     <planeGeometry args={[width, height]}/>
     <meshBasicMaterial
       map={HALO_TEXTURE}
-      color="#ffad46"
+      color="#ffbb69"
       transparent
-      opacity={Math.min(0.68, brightness * 0.56)}
+      opacity={Math.min(0.11, brightness * 0.085)}
       depthWrite={false}
       depthTest
       toneMapped={false}
@@ -70,7 +70,7 @@ export function WindowHalo({
 // illumination while the rest of the campus keeps its nighttime palette.
 // Just two unshadowed point lights per building, rather than one per window.
 export function FacadeLights({
-  night, positions, intensity = 95, range = 27,
+  night, positions, intensity = 24, range = 19,
 }: {
   night: number;
   positions: Vector3Tuple[];
@@ -80,13 +80,13 @@ export function FacadeLights({
   if (night < 0.02) return null;
   return <>
     {positions.map((p,i)=><pointLight key={i} position={p}
-      color="#ffb85e" intensity={night * intensity}
+      color="#ffc078" intensity={night * intensity}
       distance={range} decay={2} />)}
   </>;
 }
 
 /**
- * HDR bloom on the emissive windows only:
+ * Restrained HDR bloom focused on bright emissive windows:
  * - the high threshold leaves stone, roads, moon, and UI unaffected
  * - warm HDR emissive window pixels generate a photographic soft halo
  * - the effect is disabled during the day
@@ -99,9 +99,9 @@ export default function NightBloom({enabled}: {enabled: boolean}) {
     composer.setPixelRatio(gl.getPixelRatio());
     const bloom = new UnrealBloomPass(
       new Vector2(size.width, size.height),
-      1.12, // strength
-      0.73, // softness/radius
-      1.12, // threshold: normal architecture stays below this value
+      0.26, // subtle bloom, not a campus-wide orange fog
+      0.27, // tight softness, limited to individual windows
+      1.95, // suppress spill from non-emissive stone and walkways
     );
     const render = new RenderPass(scene, camera);
     composer.addPass(render);
