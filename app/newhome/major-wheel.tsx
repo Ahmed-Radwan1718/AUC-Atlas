@@ -208,8 +208,6 @@ export default function MajorWheel({ school, onClose }: WheelProps) {
             />)}
             <circle cx={C} cy={C} r={INNER - 6} fill="#0c1829"
               stroke="#e5c38c" strokeOpacity=".65" strokeWidth="2.5"/>
-            <circle cx={C} cy={C} r={INNER - 16}
-              fill="none" stroke="#bd9864" strokeOpacity=".25" strokeWidth="1"/>
           </svg>
 
           {pageItems.map((item, i) => {
@@ -224,7 +222,6 @@ export default function MajorWheel({ school, onClose }: WheelProps) {
               onPointerEnter={() => setHovered(i)}
               onFocus={() => setHovered(i)}
               onClick={() => select(item)}>
-              <span className={styles.optionCode}>{String(page * PER_PAGE + i + 1).padStart(2, "0")}</span>
               <span className={styles.optionText}>{item.short}</span>
             </button>;
           })}
