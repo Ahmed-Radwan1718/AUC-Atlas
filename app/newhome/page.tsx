@@ -5,7 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html, OrbitControls, Sky, Stars } from "@react-three/drei";
 import {
   ACESFilmicToneMapping, CatmullRomCurve3, Color, DoubleSide, MathUtils, Mesh,
-  MeshBasicMaterial, MeshStandardMaterial, PointLight, Group,
+  MeshStandardMaterial, PointLight, Group,
   PCFSoftShadowMap, Shape, Vector3, BufferGeometry, Float32BufferAttribute, OrthographicCamera,
 } from "three";
 import styles from "./newhome.module.css";
@@ -361,8 +361,6 @@ function Building({children,id,position,onSelect}:{
   onSelect:(id:SchoolId)=>void;
 }){
   const moving=useRef<Group>(null);
-  const selectionRing=useRef<Mesh>(null);
-  const ringMaterial=useRef<MeshBasicMaterial>(null);
   const highlight=useRef<PointLight>(null);
   const motion=useRef<BuildingHoverMotion>({target:0,progress:0,elapsed:0});
   const reduceMotion=useRef(false);
@@ -384,10 +382,6 @@ function Building({children,id,position,onSelect}:{
     if(state.progress<0.0001 && !state.target)state.progress=0;
     const strength=reduceMotion.current ? 0 : state.progress;
     if(moving.current) moving.current.position.y=strength*0.75;
-    if(selectionRing.current)
-      selectionRing.current.scale.setScalar(0.94+strength*0.07);
-    if(ringMaterial.current)
-      ringMaterial.current.opacity=strength*0.48;
     if(highlight.current)
       highlight.current.intensity=strength*23;
   });
@@ -398,15 +392,7 @@ function Building({children,id,position,onSelect}:{
     library:36, business:34, sse:32, humanities:27,
   };
   const name=BUILDINGS.find(item=>item.id===id)?.name ?? id;
-  // The ring stays on the ground while only the actual building rises.
-  const radius=id==="library"?37:id==="humanities"?35:id==="sse"?30:28;
   return <group position={position}>
-    <mesh ref={selectionRing} rotation={[-Math.PI/2,0,0]} position={[0,0.27,0]}
-      raycast={()=>null} renderOrder={4}>
-      <ringGeometry args={[radius-0.52,radius,88]}/>
-      <meshBasicMaterial ref={ringMaterial} color="#f0c381" transparent
-        opacity={0} depthWrite={false} toneMapped={false} side={DoubleSide}/>
-    </mesh>
     <pointLight ref={highlight} position={[0,14,21]}
       color="#ffd8a0" intensity={0} distance={48} decay={2}/>
     <BuildingHoverContext.Provider value={motion}>
