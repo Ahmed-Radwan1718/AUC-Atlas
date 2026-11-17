@@ -8,6 +8,8 @@ import {
   PCFSoftShadowMap, Shape, Vector3, BufferGeometry, Float32BufferAttribute, OrthographicCamera,
 } from "three";
 import styles from "./newhome.module.css";
+import MajorWheel from "./major-wheel";
+import type { SchoolId } from "./wheel-data";
 
 /**
  * AUC Atlas — original four-building architectural diorama.
@@ -282,10 +284,16 @@ function Hedge({position,size}:{
 }){
   return <Block position={position} size={size} color="#527443"/>;
 }
-function Building({children,position}:{
-  children:React.ReactNode;position:Position;
+function Building({children,id,position,onSelect}:{
+  children:React.ReactNode;
+  id:SchoolId;
+  position:Position;
+  onSelect:(id:SchoolId)=>void;
 }){
-  return <group position={position}>{children}</group>;
+  return <group position={position}
+    onClick={(event)=>{event.stopPropagation();onSelect(id);}}>
+    {children}
+  </group>;
 }
 function Library({night}: {night:number}){
   return <group>
@@ -528,7 +536,7 @@ function AdaptiveCamera(){
   },[camera,size.width,size.height]);
   return null;
 }
-function Campus({light}:{light:SceneLight}){
+function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}){
   const brightness=Math.max(0,Math.min(1,(9-light.altitude)/15));
   const night=brightness;
   const atNight=light.altitude < -5;
@@ -601,7 +609,8 @@ function Campus({light}:{light:SceneLight}){
       <GlowLight key={i} position={p} night={night}/>
     )}
     {BUILDINGS.map(building=>
-      <Building key={building.id} position={building.location}>
+      <Building key={building.id} id={building.id} position={building.location}
+        onSelect={onSelect}>
         {building.id==="business"&&<Business night={night}/>}
         {building.id==="library"&&<Library night={night}/>}
         {building.id==="sse"&&<SSE night={night}/>}
@@ -617,6 +626,7 @@ function Campus({light}:{light:SceneLight}){
 
 export default function NewHomePage(){
   const [clock,setClock]=useState(()=>new Date());
+  const [selectedSchool,setSelectedSchool]=useState<SchoolId|null>(null);
   useEffect(()=>{
     const timer=window.setInterval(()=>setClock(new Date()),60_000);
     return ()=>window.clearInterval(timer);
@@ -629,10 +639,12 @@ export default function NewHomePage(){
         onCreated={({gl})=>{gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.18;gl.shadowMap.type=PCFSoftShadowMap;}}
         fallback={<div className={styles.fallback}>This preview needs WebGL.</div>}>
         <AdaptiveCamera/>
-        <Campus light={celestial}/>
+        <Campus light={celestial} onSelect={setSelectedSchool}/>
       </Canvas>
     </div>
-    <div className={styles.instruction}>Drag to orbit · Scroll to zoom</div>
+    <div className={styles.instruction}>Drag to orbit · Scroll to zoom · Click a building</div>
+    {selectedSchool && <MajorWheel key={selectedSchool} school={selectedSchool}
+      onClose={()=>setSelectedSchool(null)}/>}
     <div className={styles.signature}>Experimental concept · Original architecture</div>
   </main>;
 }
