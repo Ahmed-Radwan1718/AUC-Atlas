@@ -41,9 +41,9 @@ test("Five clickable building scenes include separate Engineering and Sciences",
 });
 
 test("night sky remains free of oversized zoom-out star artifacts", () => {
-  assert.doesNotMatch(campus, /<Stars\\b/);
-  assert.doesNotMatch(campus, /Sky, Stars/);
-  assert.match(campus, /minZoom=\\{minZoom\\} maxZoom=\\{maxZoom\\}/);
-  assert.match(campus, /const minZoom=Math\\.max\\(1\\.05,fitZoom\\*0\\.72\\)/);
-  assert.match(campus, /function campusFitZoom\\(/);
+  assert.ok(!campus.includes("<Stars "));
+  assert.ok(!campus.includes("Sky, Stars"));
+  assert.ok(campus.includes("minZoom={minZoom} maxZoom={maxZoom}"));
+  assert.ok(campus.includes("const minZoom=Math.max(1.05,fitZoom*0.72)"));
+  assert.ok(campus.includes("function campusFitZoom("));
 });
