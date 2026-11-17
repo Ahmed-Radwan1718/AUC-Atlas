@@ -177,9 +177,9 @@ function majorCourses(major:string) {
     title:group.title || "Degree requirements",
     courses:(group.items||[]).flatMap(item=>{
       if(typeof item!=="string")return [];
-      const matches=item.match(/\\b[A-Z]{3,5}\\s+\\d{4}[A-Z]?\\b/g) || [];
+      const matches=item.match(/\b[A-Z]{3,5}\s+\d{4}[A-Z]?\b/g) || [];
       return matches.flatMap(match=>{
-        const code=match.replace(/\\s+/g," ").trim().toUpperCase();
+        const code=match.replace(/\s+/g," ").trim().toUpperCase();
         if(seen.has(code)) return [];
         seen.add(code);
         const entry=courseByCode.get(code);
@@ -553,7 +553,6 @@ export default function NewHomePage(){
   const [selected,setSelected]=useState<BuildingId|null>(null);
   const [major,setMajor]=useState<string|null>(null);
   const [hovered,setHovered]=useState<BuildingId|null>(null);
-  const [previewError,setPreviewError]=useState(false);
   useEffect(()=>{
     const timer=window.setInterval(()=>setClock(new Date()),60_000);
     return ()=>window.clearInterval(timer);
@@ -568,15 +567,13 @@ export default function NewHomePage(){
   const timeLabel=celestial.altitude< -6?"Night":celestial.altitude<5?"Twilight":"Daylight";
   return <main className={styles.campusPage}>
     <div className={styles.scene} aria-label="Interactive three-dimensional university campus with four original buildings">
-      {!previewError?
       <Canvas shadows orthographic camera={{position:[104,99,132],zoom:5.0,near:0.1,far:600}}
         dpr={[1,1.75]} gl={{antialias:true,alpha:false,powerPreference:"high-performance"}}
         onCreated={({gl})=>{gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.18;gl.shadowMap.type=PCFSoftShadowMap;}}
         onPointerMissed={()=>{setSelected(null);setMajor(null);}}
         fallback={<div className={styles.fallback}>This preview needs WebGL.</div>}>
         <Campus light={celestial} onSelect={(id)=>{setSelected(id);setMajor(null);}} onHover={setHovered}/>
-      </Canvas>:
-      <p className={styles.fallback}>3D preview unavailable. Try a browser with hardware acceleration enabled.</p>}
+      </Canvas>
     </div>
     <header className={styles.overlayHead}>
       <span className={styles.eyebrow}>AUC ATLAS · INTERACTIVE CAMPUS</span>
