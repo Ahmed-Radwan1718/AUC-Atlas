@@ -39,3 +39,11 @@ test("Five clickable building scenes include separate Engineering and Sciences",
   assert.ok(campus.includes('id:"engineering",size:'));
   assert.doesNotMatch(campus, /building\.id==="sse"|SITE_POSITIONS\.sse/);
 });
+
+test("night sky remains free of oversized zoom-out star artifacts", () => {
+  assert.doesNotMatch(campus, /<Stars\\b/);
+  assert.doesNotMatch(campus, /Sky, Stars/);
+  assert.match(campus, /minZoom=\\{minZoom\\} maxZoom=\\{maxZoom\\}/);
+  assert.match(campus, /const minZoom=Math\\.max\\(1\\.05,fitZoom\\*0\\.72\\)/);
+  assert.match(campus, /function campusFitZoom\\(/);
+});

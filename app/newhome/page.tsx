@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html, OrbitControls, Sky, Stars } from "@react-three/drei";
+import { Html, OrbitControls, Sky } from "@react-three/drei";
 import {
   ACESFilmicToneMapping, CatmullRomCurve3, Color, DoubleSide, MathUtils, Mesh,
   MeshStandardMaterial, PointLight, Group,
@@ -772,18 +772,27 @@ const WALKWAY_LIGHTS: Position[] = [
   [-106,0,-50],[104,0,-50],[-106,0,116],[104,0,116],
 ];
 
+function campusFitZoom(width: number, height: number) {
+  return Math.max(1.15, Math.min(width / 355, height / 315));
+}
 function AdaptiveCamera(){
   const {camera,size}=useThree();
   useEffect(()=>{
     if(camera instanceof OrthographicCamera) {
-      // Fit all five buildings, including the new north-central Sciences wing.
-      camera.zoom=Math.max(1.15,Math.min(size.width/355,size.height/315));
+      // Fit all five buildings, including the north-central Sciences wing.
+      camera.zoom=campusFitZoom(size.width,size.height);
       camera.updateProjectionMatrix();
     }
   },[camera,size.width,size.height]);
   return null;
 }
 function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}){
+  const {size}=useThree();
+  const fitZoom=campusFitZoom(size.width,size.height);
+  // OrbitControls uses minZoom/maxZoom for orthographic cameras, not
+  // minDistance/maxDistance. Prevent the campus shrinking to a speck.
+  const minZoom=Math.max(1.05,fitZoom*0.72);
+  const maxZoom=Math.max(5,fitZoom*2.5);
   const brightness=Math.max(0,Math.min(1,(9-light.altitude)/15));
   const night=brightness;
   const atNight=light.altitude < -5;
@@ -793,7 +802,8 @@ function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}
     <color attach="background" args={[atNight?"#0b1730":"#c9d6df"]}/>
     {!atNight&&<Sky sunPosition={light.sun} turbidity={4} rayleigh={1.65}
       mieCoefficient={0.008} mieDirectionalG={0.8}/>}
-    {atNight&&<Stars radius={240} depth={50} count={600} factor={2.2} saturation={0} fade/>}
+    {/* Leave the night sky clean: the finite 3D star shell becomes a giant
+        ring of overexposed sprites and square bloom patches when zoomed out. */}
     <hemisphereLight args={[atNight?"#8f9ac8":"#fff7e8","#9f9b94",atNight?0.85:1.1]}/>
     <ambientLight intensity={atNight?0.27:0.62}/>
     <directionalLight position={spot} intensity={atNight?1.05:2.7*ambient}
@@ -870,7 +880,8 @@ function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}
       </Building>
     )}
     <OrbitControls makeDefault target={[0,9,-4]} enableDamping
-      dampingFactor={0.08} minDistance={90} maxDistance={380}
+      dampingFactor={0.08} minZoom={minZoom} maxZoom={maxZoom}
+      minDistance={90} maxDistance={380}
       maxPolarAngle={1.42} minPolarAngle={0.6}
       enablePan={true} panSpeed={0.6} rotateSpeed={0.38} zoomSpeed={0.7}/>
   </>;
