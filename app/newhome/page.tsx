@@ -10,6 +10,7 @@ import {
 } from "three";
 import styles from "./newhome.module.css";
 import MajorWheel from "./major-wheel";
+import CampusGrass from "./grass";
 import type { SchoolId } from "./wheel-data";
 import NightBloom, { FacadeLights, WindowHalo } from "./night-bloom";
 
@@ -758,6 +759,10 @@ const BUILDING_PLOTS: {id:BuildingId;size:Position}[] = [
   {id:"library",size:[68,0.2,50]},
   {id:"humanities",size:[74,0.2,39]},
 ];
+const LAWN_CLEARINGS = BUILDING_PLOTS.map(plot => ({
+  position: SITE_POSITIONS[plot.id],
+  size: plot.size,
+}));
 
 const WALKWAY_LIGHTS: Position[] = [
   [-69,0,-57],[-44,0,-57],[-19,0,-57],[19,0,-57],[44,0,-57],[68,0,-57],
@@ -796,7 +801,9 @@ function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}
       shadow-mapSize={[2048,2048]} shadow-camera-left={-185}
       shadow-camera-right={185} shadow-camera-top={185} shadow-camera-bottom={-185}
       shadow-camera-near={1} shadow-camera-far={490} shadow-bias={-0.0002}/>
-    {/* Shadow-catching ground is transparent: no visible rectangle or platform edge. */}
+    <CampusGrass night={night} paths={ROAD_SEGMENTS}
+      plots={LAWN_CLEARINGS} plazaZ={PLAZA_Z}/>
+    {/* Existing transparent ground retains soft contact shadows across the grass. */}
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-0.38,0]} receiveShadow>
       <planeGeometry args={[2000,2000]}/>
       <shadowMaterial color="#1d2538" transparent opacity={0.28} depthWrite={false}/>
