@@ -797,9 +797,7 @@ export default function NewHomePage(){
         <NightBloom enabled={celestial.altitude < -3}/>
       </Canvas>
     </div>
-    <div className={styles.instruction}>Drag to orbit · Scroll to zoom · Click a building</div>
     {selectedSchool && <MajorWheel key={selectedSchool} school={selectedSchool}
       onClose={()=>setSelectedSchool(null)}/>}
-    <div className={styles.signature}>Experimental concept · Original architecture</div>
   </main>;
 }
