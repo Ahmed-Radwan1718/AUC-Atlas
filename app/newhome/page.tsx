@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Canvas, ThreeEvent } from "@react-three/fiber";
+import { Canvas, ThreeEvent, useThree } from "@react-three/fiber";
 import { OrbitControls, Sky, Stars } from "@react-three/drei";
 import {
   ACESFilmicToneMapping, CatmullRomCurve3, DoubleSide, Mesh,
-  PCFSoftShadowMap, Shape, Vector3, BufferGeometry, Float32BufferAttribute,
+  PCFSoftShadowMap, Shape, Vector3, BufferGeometry, Float32BufferAttribute, OrthographicCamera,
 } from "three";
 import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
 import { courses } from "../../data/courses";
@@ -470,6 +470,16 @@ const walk1:Position[]=[[-50,0,0],[-32,0,11],[-16,0,21],[0,0,32]];
 const walk2:Position[]=[[51,0,0],[33,0,5],[17,0,20],[0,0,32]];
 const walk3:Position[]=[[0,0,33],[15,0,42],[30,0,49]];
 const walk4:Position[]=[[0,0,33],[-12,0,49],[-31,0,74]];
+function AdaptiveCamera(){
+  const {camera,size}=useThree();
+  useEffect(()=>{
+    if(camera instanceof OrthographicCamera) {
+      camera.zoom=Math.max(1.75,Math.min(size.width/188,size.height/121));
+      camera.updateProjectionMatrix();
+    }
+  },[camera,size.width,size.height]);
+  return null;
+}
 function Campus({light,onSelect,onHover}:{
   light:SceneLight;onSelect:(id:BuildingId)=>void;onHover:(id:BuildingId|null)=>void;
 }){
@@ -572,6 +582,7 @@ export default function NewHomePage(){
         onCreated={({gl})=>{gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.18;gl.shadowMap.type=PCFSoftShadowMap;}}
         onPointerMissed={()=>{setSelected(null);setMajor(null);}}
         fallback={<div className={styles.fallback}>This preview needs WebGL.</div>}>
+        <AdaptiveCamera/>
         <Campus light={celestial} onSelect={(id)=>{setSelected(id);setMajor(null);}} onHover={setHovered}/>
       </Canvas>
     </div>
