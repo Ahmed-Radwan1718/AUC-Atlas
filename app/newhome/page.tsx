@@ -559,7 +559,6 @@ function Campus({light,onSelect,onHover}:{
 
 export default function NewHomePage(){
   const [clock,setClock]=useState(()=>new Date());
-  const [previewHour,setPreviewHour]=useState<number|null>(null);
   const [selected,setSelected]=useState<BuildingId|null>(null);
   const [major,setMajor]=useState<string|null>(null);
   const [hovered,setHovered]=useState<BuildingId|null>(null);
@@ -567,14 +566,10 @@ export default function NewHomePage(){
     const timer=window.setInterval(()=>setClock(new Date()),60_000);
     return ()=>window.clearInterval(timer);
   },[]);
-  const cairo=cairoParts(clock);
-  const moment=previewHour===null?clock:new Date(clock.getTime()+(previewHour-cairo.decimalHour)*3_600_000);
-  const local=cairoParts(moment);
-  const celestial=useMemo(()=>celestialState(moment),[moment.getTime()]);
+  const celestial=useMemo(()=>celestialState(clock),[clock.getTime()]);
   const chosen=BUILDINGS.find(b=>b.id===selected);
   const groupList=major ? majorCourses(major) : [];
   const hover=BUILDINGS.find(b=>b.id===hovered);
-  const timeLabel=celestial.altitude< -6?"Night":celestial.altitude<5?"Twilight":"Daylight";
   return <main className={styles.campusPage}>
     <div className={styles.scene} aria-label="Interactive three-dimensional university campus with four original buildings">
       <Canvas shadows orthographic camera={{position:[104,99,132],zoom:5.0,near:0.1,far:600}}
@@ -627,20 +622,6 @@ export default function NewHomePage(){
         {chosen.id!=="library"&&<small>Select a major to see course requirements and available materials.</small>}
       </>}
     </section>}
-    <section className={styles.clockPanel} aria-label="Cairo daylight control">
-      <div className={styles.clockTop}>
-        <div><span className={styles.eyebrow}>CAIRO · {previewHour===null?"LIVE":"PREVIEW"}</span>
-          <strong>{local.time}</strong><small>{timeLabel} · {phaseName(celestial.phase)}</small>
-        </div>
-        {previewHour!==null&&<button onClick={()=>setPreviewHour(null)}>Live time</button>}
-      </div>
-      <label className={styles.sliderLabel} htmlFor="campus-time">Explore time of day</label>
-      <input id="campus-time" aria-label="Preview Cairo time of day" type="range"
-        min={0} max={23.75} step={0.25}
-        value={previewHour??cairo.decimalHour}
-        onChange={e=>setPreviewHour(Number(e.target.value))}/>
-      <div className={styles.ticks}><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
-    </section>
     <div className={styles.instruction}>Drag to orbit · Scroll to zoom · Click a building</div>
     <div className={styles.signature}>Experimental concept · Original architecture</div>
   </main>;
