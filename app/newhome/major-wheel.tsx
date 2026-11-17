@@ -239,16 +239,13 @@ export default function MajorWheel({ school, onClose }: WheelProps) {
             <span className={styles.hubHint}>OPEN ↗</span>
           </button>
         </div>
-        <p className={styles.focusName} aria-live="polite">{current?.name}</p>
         <div className={styles.pagination} aria-label="Wheel pages">
           {totalPages > 1 && <button type="button"
             onClick={() => setNextPage(-1)} aria-label="Previous majors">←</button>}
-          <span>{items.length} {school === "library" ? "RESOURCES" : "MAJORS"}
-            {totalPages > 1 ? " · " + (page + 1) + " / " + totalPages : ""}</span>
+          <span>{items.length} {school === "library" ? "RESOURCES" : "MAJORS"}</span>
           {totalPages > 1 && <button type="button"
             onClick={() => setNextPage(1)} aria-label="More majors">→</button>}
         </div>
-        <p className={styles.help}>Hover to preview · Click to select · Esc to return</p>
       </div>}
   </div>;
 }
