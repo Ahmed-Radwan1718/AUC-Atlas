@@ -20,7 +20,12 @@ type CourseGroup = {
   subgroups?: { title?: string; items?: unknown[] }[];
 };
 type DegreePlan = { note?: string; groups?: CourseGroup[] };
-type WheelProps = { school: SchoolId; onClose: () => void };
+type WheelProps = {
+  school: SchoolId;
+  closing: boolean;
+  onClose: () => void;
+  onExited: () => void;
+};
 
 function point(angle: number, radius: number) {
   const rad = (angle * Math.PI) / 180;
@@ -121,7 +126,7 @@ function CourseBrowser({ major, onBack }: { major: string; onBack: () => void })
   </section>;
 }
 
-export default function MajorWheel({ school, onClose }: WheelProps) {
+export default function MajorWheel({ school, closing, onClose, onExited }: WheelProps) {
   const items = SCHOOL_ITEMS[school];
   const schoolName = SCHOOL_NAMES[school];
   const [page, setPage] = useState(0);
@@ -171,8 +176,11 @@ export default function MajorWheel({ school, onClose }: WheelProps) {
     }
     setMajor(item.name);
   }
-  return <div className={styles.overlay} role="dialog" aria-modal="true"
-      aria-labelledby={titleId}>
+  return <div className={styles.overlay + (closing ? " " + styles.closing : "")}
+      role="dialog" aria-modal="true" aria-labelledby={titleId}
+      onAnimationEnd={event => {
+        if (closing && event.target === event.currentTarget) onExited();
+      }}>
     <button type="button" className={styles.backdrop} onClick={onClose}
       tabIndex={-1} aria-label="Close major selector"/>
     <div className={styles.heading}>
@@ -203,6 +211,7 @@ export default function MajorWheel({ school, onClose }: WheelProps) {
               stroke={hovered === i ? "#a77a3d" : "#d9c6a8"}
               strokeWidth={hovered === i ? "2.5" : "1.5"}
               className={styles.slice}
+              style={{ animationDelay: (0.12 + i * 0.045) + "s" }}
               onPointerEnter={() => setHovered(i)}
               onClick={() => select(item)}
             />)}
@@ -216,7 +225,8 @@ export default function MajorWheel({ school, onClose }: WheelProps) {
             return <button type="button" key={item.name}
               className={styles.option + (pageItems.length <= 7 ? " " + styles.roomyOption : "") + (isActive ? " " + styles.activeOption : "")}
               style={{ left: center.x / 520 * 100 + "%",
-                top: center.y / 520 * 100 + "%" }}
+                top: center.y / 520 * 100 + "%",
+                animationDelay: (0.22 + i * 0.045) + "s" }}
               aria-label={item.name}
               aria-current={isActive ? "true" : undefined}
               onPointerEnter={() => setHovered(i)}

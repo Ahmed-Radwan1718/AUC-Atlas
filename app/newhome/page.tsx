@@ -747,17 +747,38 @@ function Campus({onSelect}:{onSelect:(id:SchoolId)=>void}){
 
 export default function NewHomePage(){
   const [selectedSchool,setSelectedSchool]=useState<SchoolId|null>(null);
+  const [closingWheel,setClosingWheel]=useState(false);
+
+  function openWheel(id: SchoolId) {
+    setClosingWheel(false);
+    setSelectedSchool(id);
+  }
+  function closeWheel() {
+    // Reduced motion should never be held behind a disappearing overlay.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setSelectedSchool(null);
+      setClosingWheel(false);
+    } else {
+      setClosingWheel(true);
+    }
+  }
+  function finishClosingWheel() {
+    setSelectedSchool(null);
+    setClosingWheel(false);
+  }
+
   return <main className={styles.campusPage}>
-    <div className={styles.scene} aria-label="Interactive three-dimensional university campus with five original buildings">
+    <div className={styles.scene + (selectedSchool && !closingWheel ? " " + styles.sceneFocused : "")}
+      aria-label="Interactive three-dimensional university campus with five original buildings">
       <Canvas shadows orthographic camera={{position:[152,138,190],zoom:3.5,near:0.1,far:800}}
         dpr={[1,1.75]} gl={{antialias:true,alpha:false,powerPreference:"high-performance"}}
         onCreated={({gl})=>{gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.18;gl.shadowMap.type=PCFSoftShadowMap;}}
         fallback={<div className={styles.fallback}>This preview needs WebGL.</div>}>
         <AdaptiveCamera/>
-        <Campus onSelect={setSelectedSchool}/>
+        <Campus onSelect={openWheel}/>
       </Canvas>
     </div>
     {selectedSchool && <MajorWheel key={selectedSchool} school={selectedSchool}
-      onClose={()=>setSelectedSchool(null)}/>}
+      closing={closingWheel} onClose={closeWheel} onExited={finishClosingWheel}/>}
   </main>;
 }
