@@ -545,7 +545,6 @@ function World({ selected, onSelect }: CampusSceneProps) {
         maxDistance={110}
         minPolarAngle={0.60}
         maxPolarAngle={1.34}
-        // Unlimited azimuth: orbit freely through 360° to inspect all facades.
         rotateSpeed={0.42}
         zoomSpeed={0.75}
         onStart={() => { cameraMotion.current = false; }}
