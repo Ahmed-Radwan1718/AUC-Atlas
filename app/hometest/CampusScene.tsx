@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html, OrbitControls } from "@react-three/drei";
+import { Environment, Html, OrbitControls, Sky } from "@react-three/drei";
 import LibraryBuilding from "./LibraryBuilding";
 import {
   BoxGeometry, DataTexture, LinearFilter, MeshStandardMaterial,
@@ -59,6 +59,35 @@ function createSSEStoneTexture() {
   texture.needsUpdate = true;
   return texture;
 }
+// Soft, granular earth prevents the entire campus from appearing as an
+// unlit white studio floor. No paths, foundations or landscaping are moved.
+function createGroundTexture() {
+  const side = 256;
+  const pixels = new Uint8Array(side * side * 4);
+  for (let y = 0; y < side; y++) {
+    for (let x = 0; x < side; x++) {
+      const macro = Math.sin(x * 0.045 + Math.cos(y * 0.033)) * 3.6 +
+        Math.sin(y * 0.059 + x * 0.013) * 2.5;
+      const grain = ((x * 31 + y * 17 + (x * y) % 43) % 17) - 8;
+      const i = (y * side + x) * 4;
+      pixels[i] = Math.max(0, Math.min(255, 217 + macro + grain));
+      pixels[i + 1] = Math.max(0, Math.min(255, 206 + macro + grain));
+      pixels[i + 2] = Math.max(0, Math.min(255, 189 + macro + grain));
+      pixels[i + 3] = 255;
+    }
+  }
+  const texture = new DataTexture(pixels, side, side, RGBAFormat);
+  texture.colorSpace = SRGBColorSpace;
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.repeat.set(26, 26);
+  texture.generateMipmaps = true;
+  texture.minFilter = LinearFilter;
+  texture.magFilter = LinearFilter;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 const mat = {
   limestone: new MeshStandardMaterial({ color: "#c8b38e", roughness: 0.91 }),
   limestoneLight: new MeshStandardMaterial({ color: "#e2d0b0", roughness: 0.92 }),
@@ -74,7 +103,7 @@ const mat = {
   path: new MeshStandardMaterial({ color: "#d4c5ad", roughness: 1 }),
   green: new MeshStandardMaterial({ color: "#72806b", roughness: 1 }),
   greenDark: new MeshStandardMaterial({ color: "#505f4c", roughness: 1 }),
-  ground: new MeshStandardMaterial({ color: "#e9e3d7", roughness: 1 }),
+  ground: new MeshStandardMaterial({ map: createGroundTexture(), roughness: 1 }),
   focus: new MeshStandardMaterial({ color: "#c09a5c", roughness: 0.76 }),
   sseStone: new MeshStandardMaterial({ map: createSSEStoneTexture(), roughness: 0.94 }),
   sseBlue: new MeshStandardMaterial({ color: "#213a7b", roughness: 0.6, metalness: 0.08 }),
@@ -501,27 +530,64 @@ function School({
   );
 }
 
+// Warm sunlight, soft shadows and ACES exposure retain facade contrast
+// rather than washing the limestone and glazing out to cream and white.
+const sunPosition: Vec3 = [-25, 38, 22];
+function Exposure() {
+  const gl = useThree((state) => state.gl);
+  useEffect(() => {
+    const prior = gl.toneMappingExposure;
+    gl.toneMappingExposure = 0.93;
+    return () => { gl.toneMappingExposure = prior; };
+  }, [gl]);
+  return null;
+}
+
 function World({ selected, onSelect }: CampusSceneProps) {
   const controls = useRef<any>(null);
   const cameraMotion = useRef(true);
   return (
     <>
-      <color attach="background" args={["#f7f4ee"]} />
-      <fog attach="fog" args={["#f7f4ee", 55, 125]} />
-      <ambientLight intensity={1.15} />
-      <hemisphereLight color="#ffffff" groundColor="#c1b29c" intensity={1.8} />
+      <color attach="background" args={["#dae8ef"]} />
+      <fog attach="fog" args={["#dce5e5", 85, 155]} />
+      {/* Physically motivated blue daylight and a small GPU-generated
+          environment map for reflective glass; no remote HDR files. */}
+      <Sky
+        distance={450000}
+        sunPosition={sunPosition}
+        turbidity={7}
+        rayleigh={1.8}
+        mieCoefficient={0.005}
+        mieDirectionalG={0.8}
+      />
+      <Environment frames={1} resolution={128} background={false}>
+        <Sky
+          distance={450000}
+          sunPosition={sunPosition}
+          turbidity={7}
+          rayleigh={1.8}
+          mieCoefficient={0.005}
+          mieDirectionalG={0.8}
+        />
+      </Environment>
+      <Exposure />
+      <ambientLight intensity={0.4} />
+      <hemisphereLight color="#e8f1fc" groundColor="#9e8c74" intensity={1.0} />
       <directionalLight
-        position={[-10, 18, 12]}
-        intensity={2.7}
+        position={sunPosition}
+        color="#fff1d9"
+        intensity={2.8}
         castShadow
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-22}
-        shadow-camera-right={22}
-        shadow-camera-top={18}
-        shadow-camera-bottom={-18}
+        shadow-camera-left={-31}
+        shadow-camera-right={31}
+        shadow-camera-top={32}
+        shadow-camera-bottom={-31}
         shadow-camera-near={0.1}
-        shadow-camera-far={55}
+        shadow-camera-far={100}
         shadow-bias={-0.0002}
+        shadow-normalBias={0.018}
+        shadow-radius={3}
       />
       <CampusGround />
       <School id="humanities" selected={selected} onSelect={onSelect}>
