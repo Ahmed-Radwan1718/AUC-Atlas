@@ -196,8 +196,6 @@ export default function MajorWheel({ school, onClose }: WheelProps) {
                 <stop offset="1" stopColor="#fcf0d9" stopOpacity=".26" />
               </radialGradient>
             </defs>
-            <circle cx={C} cy={C} r={OUTER + 4}
-              fill="none" stroke="#e6c79b" strokeOpacity=".6" strokeWidth="1.5" />
             {pageItems.map((item, i) => <path key={item.name}
               d={slicePath(i, pageItems.length)}
               fill={hovered === i ? "#d7af76" : "rgba(60,77,97,.81)"}
