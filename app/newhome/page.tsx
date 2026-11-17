@@ -489,7 +489,7 @@ function Campus({light,onSelect,onHover}:{
   const ambient=Math.max(0.42,Math.min(1,0.4+light.altitude/35));
   const spot=light.altitude>0?light.sun:[-80,110,-80] as Position;
   return <>
-    <color attach="background" args={[atNight?"#6878a6":"#c9d6df"]}/>
+    <color attach="background" args={[atNight?"#0b1730":"#c9d6df"]}/>
     {!atNight&&<Sky sunPosition={light.sun} turbidity={4} rayleigh={1.65}
       mieCoefficient={0.008} mieDirectionalG={0.8}/>}
     {atNight&&<Stars radius={240} depth={50} count={600} factor={2.2} saturation={0} fade/>}
