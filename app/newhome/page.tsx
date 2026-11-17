@@ -409,7 +409,18 @@ function Building({children,id,position,onSelect}:{
         }}
         onPointerOut={(event)=>{
           event.stopPropagation();
-          motion.current.target=0;
+          // Changing from a wall to one of its windows is still inside
+          // this building. Do not restart the hover animation on every mesh.
+          const stillInside=event.intersections.some(hit=>{
+            let object=hit.object;
+            while(object){
+              if(object===moving.current)return true;
+              if(!object.parent)break;
+              object=object.parent;
+            }
+            return false;
+          });
+          if(!stillInside)motion.current.target=0;
         }}
         onClick={(event)=>{
           event.stopPropagation();
