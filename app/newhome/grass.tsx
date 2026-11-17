@@ -31,7 +31,12 @@ const LAWN_ZONES: LawnZone[] = [
   { center: [92, 85], size: [108, 77], radius: 15 },  // Humanities
   { center: [0, -53], size: [188, 66], radius: 12 },  // North promenade gardens
   { center: [0, -97], size: [35, 62], radius: 10 },   // Sciences link
+  // Join the lawns in the previously bare gaps from Sciences to the two north schools.
+  { center: [-55, -103], size: [82, 58], radius: 12 }, // Sciences–Business green
+  { center: [55, -103], size: [82, 58], radius: 12 },  // Sciences–Engineering green
   { center: [0, 43], size: [197, 125], radius: 16 },  // Central and south greens
+  // Fill the unplanted strips behind the south walkway, between the lower buildings.
+  { center: [0, 111], size: [190, 40], radius: 12 },  // South connector garden
 ];
 
 function insideAnyLawnZone(x: number, z: number) {

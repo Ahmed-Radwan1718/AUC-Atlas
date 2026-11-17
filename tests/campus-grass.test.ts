@@ -34,3 +34,14 @@ test("grass uses GPU instancing, wind, realistic lighting and reduced motion", (
   assert.doesNotMatch(source, /Math\.random\(\)/);
   assert.doesNotMatch(source, /emissiveIntensity:/);
 });
+
+test("landscaped connectors fill gaps between school lawns without a giant field", () => {
+  // Two north connector gardens join Sciences to Business and Engineering.
+  assert.ok(source.includes('center: [-55, -103], size: [82, 58], radius: 12'));
+  assert.ok(source.includes('center: [55, -103], size: [82, 58], radius: 12'));
+  // Lower campus grass reaches the rear of the south pedestrian promenade.
+  assert.ok(source.includes('center: [0, 111], size: [190, 40], radius: 12'));
+  assert.match(source, /if \(!insideAnyLawnZone\(x, z\)\) return false;/);
+  assert.match(source, /if \(x \* x \+ \(z - plazaZ\) \*\* 2 < 22\.5 \*\* 2\) return false;/);
+  assert.doesNotMatch(source, /PlaneGeometry\(2000,/);
+});
