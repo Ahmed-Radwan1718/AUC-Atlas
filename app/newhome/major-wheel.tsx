@@ -229,9 +229,7 @@ export default function MajorWheel({ school, onClose }: WheelProps) {
           <button type="button" className={styles.hub}
             onClick={() => { if (current) select(current); }}
             aria-label={"Open " + (current?.name || "selected major")}>
-            <span className={styles.hubIcon} aria-hidden="true">{school === "library" ? "✦" : "✧"}</span>
             <strong>{current?.short || "Select"}</strong>
-            <span className={styles.hubHint}>OPEN ↗</span>
           </button>
         </div>
         <div className={styles.pagination} aria-label="Wheel pages">
