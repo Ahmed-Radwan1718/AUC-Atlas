@@ -314,10 +314,41 @@ function GlowLight({position,night=0}:{
     {night>0.45&&<pointLight position={[0,1.15,0]} intensity={night*6} color="#ffbf7d" distance={9} decay={2}/>}
   </group>;
 }
+// Small landscape fixtures and soft ground halos are attached to each tree.
+// Only selected trees cast actual point light, keeping the nighttime campus
+// warm and readable without the heavy overexposure of the earlier bloom pass.
+function TreeUplight({night,wide=false,actualLight=false}:{
+  night:number;wide?:boolean;actualLight?:boolean;
+}){
+  const left=wide?-1.35:-0.85;
+  const right=wide?1.35:0.85;
+  return <group>
+    {[left,right].map((x,i)=>
+      <group key={i} position={[x,0,wide?0.7:0.55]}>
+        <Block position={[0,0.13,0]} size={[0.42,0.26,0.42]} color="#8c7b68"/>
+        {night>0.03&&<mesh position={[0,0.28,0]} rotation={[-Math.PI/2,0,0]}
+          raycast={()=>null}>
+          <circleGeometry args={[0.16,12]}/>
+          <meshBasicMaterial color="#ffd29a" toneMapped={false}/>
+        </mesh>}
+      </group>
+    )}
+    {night>0.03&&<group position={[0,0.20,0]} rotation={[-Math.PI/2,0,0]}>
+      <WindowHalo position={[0,0,0.05]}
+        width={wide?9:5.3} height={wide?9:5.3} brightness={night*0.62}/>
+    </group>}
+    {actualLight&&night>0.03&&<pointLight
+      position={[0.25,1.05,1.15]} color="#ffc27a"
+      intensity={night*(wide?17:12)} distance={wide?12:9}
+      decay={2} />}
+  </group>;
+}
+
 function RoundTree({position,scale=1,night=0}:{
   position:Position;scale?:number;night:number;
 }){
   return <group position={position} scale={scale}>
+    <TreeUplight night={night} wide actualLight/>
     <mesh position={[0,1.8,0]} castShadow>
       <cylinderGeometry args={[0.26,0.37,3.7,7]}/>
       <meshStandardMaterial color="#7b6150" roughness={1}/>
@@ -326,26 +357,29 @@ function RoundTree({position,scale=1,night=0}:{
       <mesh key={i} position={[v[0],v[1],v[2]]} castShadow>
         <icosahedronGeometry args={[v[3],1]}/>
         <meshStandardMaterial color={i%2===0?"#506d48":"#628451"} roughness={1}
-          emissive="#9e9c51" emissiveIntensity={night*0.045}/>
+          emissive="#b68945" emissiveIntensity={night*0.34}/>
       </mesh>
     )}
   </group>;
 }
-function Cypress({position,scale=1}:{
-  position:Position;scale?:number;
+function Cypress({position,scale=1,night=0,actualLight=false}:{
+  position:Position;scale?:number;night?:number;actualLight?:boolean;
 }){
   return <group position={position} scale={scale}>
+    <TreeUplight night={night} actualLight={actualLight}/>
     <mesh position={[0,0.8,0]} castShadow>
       <cylinderGeometry args={[0.17,0.24,1.6,7]}/>
       <meshStandardMaterial color="#715c47"/>
     </mesh>
     <mesh position={[0,3.2,0]} castShadow>
       <coneGeometry args={[1.25,5.8,7]}/>
-      <meshStandardMaterial color="#3b6253" roughness={0.98}/>
+      <meshStandardMaterial color="#3b6253" roughness={0.98}
+        emissive="#bd8b4b" emissiveIntensity={night*0.33}/>
     </mesh>
     <mesh position={[0,4.3,0]} castShadow>
       <coneGeometry args={[0.82,3.6,7]}/>
-      <meshStandardMaterial color="#49765d" roughness={0.98}/>
+      <meshStandardMaterial color="#49765d" roughness={0.98}
+        emissive="#d39a55" emissiveIntensity={night*0.30}/>
     </mesh>
   </group>;
 }
@@ -750,7 +784,8 @@ function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}
       [131,0,79],[132,0,108],[53,0,72],[53,0,130],
       [-33,0,-7],[33,0,-7],[-34,0,49],[34,0,49],
     ].map((p,i)=>
-      <Cypress key={i} position={p as Position} scale={i%3===0?0.97:0.8}/>
+      <Cypress key={i} position={p as Position} scale={i%3===0?0.97:0.8}
+        night={night} actualLight={i>=16||i%4===0}/>
     )}
     {[[-43,0,18],[46,0,19],[-49,0,65],[47,0,66]].map((p,i)=>
       <RoundTree key={i} position={p as Position} night={night} scale={0.68}/>
