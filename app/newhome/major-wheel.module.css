@@ -1,0 +1,374 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: #f7f3ed;
+  background: rgba(7, 16, 31, .79);
+  backdrop-filter: blur(9px) saturate(75%);
+  -webkit-backdrop-filter: blur(9px) saturate(75%);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  animation: fadeIn .22s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+.heading {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 2;
+  padding: 23px 50px 0;
+  text-align: center;
+}
+.eyebrow {
+  display: block;
+  color: #c9a676;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .2em;
+}
+.heading h2 {
+  margin: 7px 0 4px;
+  color: #f5e8d4;
+  font-size: clamp(20px, 3vw, 31px);
+  line-height: 1.15;
+  font-weight: 690;
+  letter-spacing: -.035em;
+}
+.heading p {
+  margin: 0;
+  color: rgba(241, 236, 228, .66);
+  font-size: 12px;
+}
+.close {
+  position: absolute;
+  z-index: 5;
+  top: 23px;
+  right: clamp(16px, 4.5vw, 75px);
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(237, 226, 210, .29);
+  border-radius: 50%;
+  background: rgba(36, 48, 66, .7);
+  color: #f9eddb;
+  font: 300 29px/1 Arial, sans-serif;
+  cursor: pointer;
+}
+.close:hover, .close:focus-visible {
+  background: #ae8451;
+  border-color: #f2dfc3;
+}
+.wheelStage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: min(650px, 78svh);
+  padding: 14px 12px 14px;
+  gap: 2px;
+}
+.wheel {
+  position: relative;
+  width: min(67svh, 540px, 90vw);
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  border-radius: 50%;
+  filter: drop-shadow(0 20px 33px rgba(0,0,0,.24));
+}
+.wheelShape {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 1px rgba(255, 239, 214, .25));
+}
+.slice {
+  transition: fill .16s ease, stroke .16s ease, fill-opacity .16s ease;
+  cursor: pointer;
+}
+.option {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  width: 17.7%;
+  min-height: 52px;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #f9f5ef;
+  cursor: pointer;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(2, 12, 28, .7);
+}
+.optionCode {
+  font-size: clamp(7px, 1.3vw, 9px);
+  font-weight: 750;
+  color: rgba(244, 220, 184, .67);
+  letter-spacing: .14em;
+}
+.optionText {
+  display: block;
+  max-width: 100%;
+  font-size: clamp(8px, 1.05vw, 11px);
+  line-height: 1.22;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.activeOption {
+  color: #202e3d;
+  text-shadow: none;
+}
+.activeOption .optionCode { color: #5c4227; }
+.option:focus-visible { outline: 2px solid #ffdb9d; outline-offset: 3px; }
+.hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 37%;
+  height: 37%;
+  transform: translate(-50%,-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  padding: 9px;
+  color: #fff6e9;
+  text-align: center;
+  pointer-events: none;
+}
+.hubIcon {
+  font-size: clamp(13px, 2.6vw, 21px);
+  color: #e8c18a;
+}
+.hub strong {
+  display: block;
+  max-width: 100%;
+  font-size: clamp(10px, 1.8vw, 15px);
+  font-weight: 750;
+  line-height: 1.3;
+  letter-spacing: -.012em;
+  overflow-wrap: anywhere;
+}
+.hubHint {
+  color: #bda88b;
+  font-size: clamp(6px, 1vw, 8px);
+  font-weight: 760;
+  letter-spacing: .17em;
+}
+.pagination {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 42px;
+  color: #e3c59b;
+  font-size: 10px;
+  letter-spacing: .17em;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+.pagination button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(230,199,155,.43);
+  border-radius: 50%;
+  background: rgba(36,51,67,.88);
+  color: #f2d8af;
+  cursor: pointer;
+  font-size: 18px;
+}
+.pagination button:hover, .pagination button:focus-visible {
+  background: #c49c64;
+  color: #172336;
+}
+.help {
+  margin: 0;
+  color: rgba(228, 232, 240, .47);
+  font-size: 10px;
+  letter-spacing: .02em;
+}
+
+/* After choosing a major: use a dark course browser, never the retired
+   white "Explore Building" card. All content stays on /newhome. */
+.courseBrowser {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: min(860px, calc(100% - 38px));
+  max-height: min(77svh, 830px);
+  margin: clamp(24px, 5vh, 48px) auto 35px;
+  padding: 0;
+  border: 1px solid rgba(226, 197, 156, .24);
+  border-radius: 20px;
+  background: rgba(20, 33, 50, .96);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .36);
+  animation: slideIn .2s ease-out;
+  overflow: hidden;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.courseHeader {
+  flex-shrink: 0;
+  padding: 26px 32px 21px;
+  border-bottom: 1px solid rgba(244, 235, 215, .11);
+}
+.back {
+  margin: 0 0 19px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f0c997;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.back:hover, .back:focus-visible { text-decoration: underline; }
+.back span { margin-right: 5px; }
+.courseHeader h2 {
+  margin: 9px 0 8px;
+  font-size: clamp(23px, 3vw, 32px);
+  font-weight: 700;
+  letter-spacing: -.04em;
+}
+.courseHeader p {
+  max-width: 700px;
+  margin: 0;
+  color: rgba(232, 236, 241, .68);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.courseScroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 32px 30px;
+  scrollbar-color: #9d835e #1b2d40;
+}
+.group {
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(244, 235, 215, .13);
+}
+.group h3 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: #edc791;
+}
+.group .description {
+  margin: 0 0 12px;
+  color: rgba(232, 236, 241, .65);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.subheading {
+  margin: 15px 0 5px;
+  font-size: 11px;
+  font-weight: 750;
+  color: #b0bfd1;
+}
+.courseRow {
+  display: grid;
+  grid-template-columns: minmax(85px, 105px) minmax(0, 1fr) 15px;
+  gap: 15px;
+  align-items: center;
+  padding: 10px 7px;
+  border-radius: 7px;
+  color: #f0e9de;
+  text-decoration: none;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.courseRow:nth-of-type(even) { background: rgba(242, 231, 209, .035); }
+.courseRow:hover, .courseRow:focus-visible { background: rgba(204, 163, 107, .18); }
+.courseRow strong {
+  color: #e0b679;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.courseArrow { color: #e5bf88; }
+.courseNote {
+  margin: 8px 6px;
+  color: #a9b6c2;
+  line-height: 1.55;
+  font-size: 11px;
+}
+.empty {
+  padding: 40px 0;
+  color: #c9d0d9;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.empty a { display: block; margin-top: 16px; color: #f3cb95; }
+.browseAll {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding: 14px 15px;
+  border: 1px solid rgba(224, 180, 120, .3);
+  border-radius: 10px;
+  color: #f0cc98;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+}
+.browseAll:hover { background: rgba(235, 189, 123, .12); }
+
+@media (max-width: 650px) {
+  .heading { padding: 66px 44px 0; }
+  .heading h2 { font-size: 19px; }
+  .heading p { font-size: 11px; }
+  .close { top: 16px; right: 15px; }
+  .wheelStage { min-height: 0; flex: 1; justify-content: flex-start; padding-top: 18px; }
+  .wheel { width: min(94vw, 61svh); }
+  .option { gap: 3px; width: 18.4%; min-height: 33px; }
+  .optionText { font-size: clamp(8px, 2.25vw, 10px); }
+  .optionCode { font-size: 7px; }
+  .hub { gap: 4px; }
+  .hub strong { font-size: clamp(9px, 2.9vw, 12px); }
+  .hubHint { font-size: 6px; letter-spacing: .08em; }
+  .pagination { gap: 11px; font-size: 9px; }
+  .help { font-size: 9px; }
+  .courseBrowser { margin-top: 18px; max-height: 73svh; }
+  .courseHeader { padding: 20px 19px 16px; }
+  .courseScroll { padding: 5px 14px 20px; }
+  .courseRow { grid-template-columns: 83px minmax(0,1fr) 12px; gap: 8px; padding: 9px 5px; }
+}
+@media (max-height: 650px) and (min-width: 651px) {
+  .heading { padding-top: 10px; }
+  .wheelStage { min-height: 0; padding-top: 6px; }
+  .wheel { width: min(67svh, 465px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay, .courseBrowser { animation: none; }
+  .slice { transition: none; }
+}
