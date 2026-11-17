@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Instance, Instances, OrbitControls, Sky, Stars } from "@react-three/drei";
+import { Environment, Lightformer, Instance, Instances, OrbitControls, Sky, Stars } from "@react-three/drei";
 import {
   Material,
   MeshPhysicalMaterial,
@@ -453,6 +453,18 @@ function Scene({ light }: { light: SceneLight }) {
           <meshBasicMaterial color={light.illuminated < 0.1 ? "#525a67" : "#e9e9dc"} />
         </mesh>
       )}
+      {/* Local HDR-style reflection capture. The sky and large area lights
+          give the curtain wall real reflections without a third-party HDR file. */}
+      <Environment key={night ? "night" : "day"} resolution={256} frames={1}>
+        <color attach="background" args={[night ? "#101e32" : "#b7d4e5"]} />
+        <Lightformer form="rect" intensity={night ? 0.3 : 1.9}
+          color={night ? "#a7b5cf" : "#e9f4ff"}
+          position={[-60, 55, -20]} scale={[100, 75, 1]} />
+        <Lightformer form="rect" intensity={night ? 0.85 : 1.3}
+          color={night ? "#f8c68b" : "#ffe6ba"}
+          position={[55, 40, 45]} rotation={[0, -Math.PI / 4, 0]}
+          scale={[130, 45, 1]} />
+      </Environment>
       <hemisphereLight
         args={[night ? "#6c7d9c" : "#e2edfa", "#927b60", night ? 0.36 : 0.74 + 0.25 * daylight]}
       />
@@ -477,6 +489,9 @@ function Scene({ light }: { light: SceneLight }) {
         <planeGeometry args={[450, 450]} />
         <meshStandardMaterial color={night ? "#5c5b56" : "#c7b89d"} roughness={1} />
       </mesh>
+      {night && [-32, -17, -2, 13].map((x) =>
+        <pointLight key={x} position={[x, 8, -20]} color="#ffd6a0" intensity={24} distance={25} decay={2} />
+      )}
       <LibraryBuilding night={night} />
       <OrbitControls
         makeDefault
@@ -580,6 +595,8 @@ export default function NewHomePage() {
 
       <aside className={styles.sources}>
         Geometry: <a href="https://doi.org/10.1108/ARCH-01-2026-0068" target="_blank" rel="noopener noreferrer">El-Khouly et al. (2026), Table 2</a>
+        <span> · </span>
+        Materials: <a href="https://polyhaven.com/a/old_sandstone_02" target="_blank" rel="noopener noreferrer">Poly Haven CC0</a>
         <span> · </span>
         Facade reference: <a href="https://www.perkinseastman.com/projects/the-american-university-in-cairo-library/" target="_blank" rel="noopener noreferrer">Perkins Eastman</a>
       </aside>
