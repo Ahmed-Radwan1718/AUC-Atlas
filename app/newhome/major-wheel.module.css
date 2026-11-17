@@ -125,12 +125,6 @@
   text-align: center;
   text-shadow: 0 1px 3px rgba(2, 12, 28, .7);
 }
-.optionCode {
-  font-size: clamp(7px, 1.3vw, 9px);
-  font-weight: 750;
-  color: rgba(244, 220, 184, .67);
-  letter-spacing: .14em;
-}
 .optionText {
   display: block;
   max-width: 100%;
@@ -143,7 +137,6 @@
   color: #202e3d;
   text-shadow: none;
 }
-.activeOption .optionCode { color: #5c4227; }
 .option:focus-visible { outline: 2px solid #ffdb9d; outline-offset: 3px; }
 .hub {
   position: absolute;
@@ -366,7 +359,6 @@
   .wheel { width: min(94vw, 61svh); }
   .option { gap: 3px; width: 18.4%; min-height: 33px; }
   .optionText { font-size: clamp(8px, 2.25vw, 10px); }
-  .optionCode { font-size: 7px; }
   .hub { gap: 4px; }
   .hub strong { font-size: clamp(9px, 2.9vw, 12px); }
   .hubHint { font-size: 6px; letter-spacing: .08em; }
