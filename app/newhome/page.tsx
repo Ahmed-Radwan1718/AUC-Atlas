@@ -581,11 +581,6 @@ export default function NewHomePage(){
         <Campus light={celestial} onSelect={(id)=>{setSelected(id);setMajor(null);}} onHover={setHovered}/>
       </Canvas>
     </div>
-    <header className={styles.overlayHead}>
-      <span className={styles.eyebrow}>AUC ATLAS · INTERACTIVE CAMPUS</span>
-      <h1>Explore your campus.</h1>
-      <p>Four schools. One place for your courses and materials.</p>
-    </header>
     {hover&&!selected&&<div className={styles.hoverTag} aria-live="polite">
       <span className={styles.hoverDot}/>{hover.name} <span>· click to explore</span>
     </div>}
