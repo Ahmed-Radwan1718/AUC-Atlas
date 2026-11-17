@@ -553,7 +553,7 @@ function World({ selected, onSelect }: CampusSceneProps) {
       {/* Physically motivated blue daylight and a small GPU-generated
           environment map for reflective glass; no remote HDR files. */}
       <Sky
-        distance={450000}
+        distance={500}
         sunPosition={sunPosition}
         turbidity={7}
         rayleigh={1.8}
@@ -562,7 +562,7 @@ function World({ selected, onSelect }: CampusSceneProps) {
       />
       <Environment frames={1} resolution={128} background={false}>
         <Sky
-          distance={450000}
+          distance={500}
           sunPosition={sunPosition}
           turbidity={7}
           rayleigh={1.8}
@@ -625,7 +625,7 @@ export default function CampusScene(props: CampusSceneProps) {
     <Canvas
       shadows
       dpr={[1, 1.65]}
-      camera={{ position: [12, 19, 47], fov: 42, near: 0.1, far: 155 }}
+      camera={{ position: [12, 19, 47], fov: 42, near: 0.1, far: 900 }}
       gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
       onPointerMissed={() => props.onSelect(null)}
       fallback={<div className="campus-webgl-fallback">3D preview is unavailable in this browser. Select a school below to inspect the campus model.</div>}
