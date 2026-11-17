@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Canvas, ThreeEvent, useThree } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Sky, Stars } from "@react-three/drei";
 import {
   ACESFilmicToneMapping, CatmullRomCurve3, DoubleSide, Mesh,
@@ -282,16 +282,10 @@ function Hedge({position,size}:{
 }){
   return <Block position={position} size={size} color="#527443"/>;
 }
-function Building({children,id,position,hover}:{
-  children:React.ReactNode;id:BuildingId;position:Position;
-  hover:(id:BuildingId|null)=>void;
+function Building({children,position}:{
+  children:React.ReactNode;position:Position;
 }){
-  return <group position={position}
-    onPointerOver={(event:ThreeEvent<PointerEvent>)=>{event.stopPropagation();hover(id);}}
-    onPointerOut={(event:ThreeEvent<PointerEvent>)=>{event.stopPropagation();hover(null);}}
->
-    {children}
-  </group>;
+  return <group position={position}>{children}</group>;
 }
 function Library({night}: {night:number}){
   return <group>
@@ -534,9 +528,7 @@ function AdaptiveCamera(){
   },[camera,size.width,size.height]);
   return null;
 }
-function Campus({light,onHover}:{
-  light:SceneLight;onHover:(id:BuildingId|null)=>void;
-}){
+function Campus({light}:{light:SceneLight}){
   const brightness=Math.max(0,Math.min(1,(9-light.altitude)/15));
   const night=brightness;
   const atNight=light.altitude < -5;
@@ -609,8 +601,7 @@ function Campus({light,onHover}:{
       <GlowLight key={i} position={p} night={night}/>
     )}
     {BUILDINGS.map(building=>
-      <Building key={building.id} id={building.id} position={building.location}
-        hover={onHover}>
+      <Building key={building.id} position={building.location}>
         {building.id==="business"&&<Business night={night}/>}
         {building.id==="library"&&<Library night={night}/>}
         {building.id==="sse"&&<SSE night={night}/>}
@@ -626,13 +617,11 @@ function Campus({light,onHover}:{
 
 export default function NewHomePage(){
   const [clock,setClock]=useState(()=>new Date());
-  const [hovered,setHovered]=useState<BuildingId|null>(null);
   useEffect(()=>{
     const timer=window.setInterval(()=>setClock(new Date()),60_000);
     return ()=>window.clearInterval(timer);
   },[]);
   const celestial=useMemo(()=>celestialState(clock),[clock.getTime()]);
-  const hover=BUILDINGS.find(b=>b.id===hovered);
   return <main className={styles.campusPage}>
     <div className={styles.scene} aria-label="Interactive three-dimensional university campus with four original buildings">
       <Canvas shadows orthographic camera={{position:[152,138,190],zoom:3.5,near:0.1,far:800}}
@@ -640,12 +629,9 @@ export default function NewHomePage(){
         onCreated={({gl})=>{gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.18;gl.shadowMap.type=PCFSoftShadowMap;}}
         fallback={<div className={styles.fallback}>This preview needs WebGL.</div>}>
         <AdaptiveCamera/>
-        <Campus light={celestial} onHover={setHovered}/>
+        <Campus light={celestial}/>
       </Canvas>
     </div>
-    {hover&&<div className={styles.hoverTag} aria-live="polite">
-      <span className={styles.hoverDot}/>{hover.name}
-    </div>}
     <div className={styles.instruction}>Drag to orbit · Scroll to zoom</div>
     <div className={styles.signature}>Experimental concept · Original architecture</div>
   </main>;
