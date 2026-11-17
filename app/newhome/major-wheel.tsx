@@ -198,16 +198,16 @@ export default function MajorWheel({ school, onClose }: WheelProps) {
             </defs>
             {pageItems.map((item, i) => <path key={item.name}
               d={slicePath(i, pageItems.length)}
-              fill={hovered === i ? "#d7af76" : "rgba(60,77,97,.81)"}
-              fillOpacity={hovered === i ? ".9" : "1"}
-              stroke={hovered === i ? "#f2d9b0" : "rgba(230,237,245,.26)"}
+              fill={hovered === i ? "#d7af76" : "#ffffff"}
+              fillOpacity="1"
+              stroke={hovered === i ? "#a77a3d" : "#d9c6a8"}
               strokeWidth={hovered === i ? "2.5" : "1.5"}
               className={styles.slice}
               onPointerEnter={() => setHovered(i)}
               onClick={() => select(item)}
             />)}
-            <circle cx={C} cy={C} r={INNER - 6} fill="#0c1829"
-              stroke="#e5c38c" strokeOpacity=".65" strokeWidth="2.5"/>
+            <circle cx={C} cy={C} r={INNER - 6} fill="#ffffff"
+              stroke="#c5a06a" strokeOpacity="1" strokeWidth="2.5"/>
           </svg>
 
           {pageItems.map((item, i) => {

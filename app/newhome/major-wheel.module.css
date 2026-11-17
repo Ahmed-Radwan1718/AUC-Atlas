@@ -8,10 +8,10 @@
   align-items: center;
   overflow-y: auto;
   overscroll-behavior: contain;
-  color: #f7f3ed;
-  background: rgba(7, 16, 31, .79);
-  backdrop-filter: blur(9px) saturate(75%);
-  -webkit-backdrop-filter: blur(9px) saturate(75%);
+  color: #2e2923;
+  background: rgba(250, 248, 243, .86);
+  backdrop-filter: blur(12px) saturate(70%);
+  -webkit-backdrop-filter: blur(12px) saturate(70%);
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   animation: fadeIn .22s ease-out;
 }
@@ -37,14 +37,14 @@
 }
 .eyebrow {
   display: block;
-  color: #c9a676;
+  color: #a77a3d;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .2em;
 }
 .heading h2 {
   margin: 7px 0 4px;
-  color: #f5e8d4;
+  color: #28251f;
   font-size: clamp(20px, 3vw, 31px);
   line-height: 1.15;
   font-weight: 690;
@@ -52,7 +52,7 @@
 }
 .heading p {
   margin: 0;
-  color: rgba(241, 236, 228, .66);
+  color: #6e665b;
   font-size: 12px;
 }
 .close {
@@ -64,16 +64,17 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  border: 1px solid rgba(237, 226, 210, .29);
+  border: 1px solid #c9a875;
   border-radius: 50%;
-  background: rgba(36, 48, 66, .7);
-  color: #f9eddb;
+  background: #ffffff;
+  color: #a77a3d;
   font: 300 29px/1 Arial, sans-serif;
   cursor: pointer;
 }
 .close:hover, .close:focus-visible {
-  background: #ae8451;
-  border-color: #f2dfc3;
+  background: #cba66f;
+  border-color: #b58b52;
+  color: #2d2519;
 }
 .wheelStage {
   position: relative;
@@ -93,13 +94,13 @@
   aspect-ratio: 1;
   flex-shrink: 0;
   border-radius: 50%;
-  filter: drop-shadow(0 20px 33px rgba(0,0,0,.24));
+  filter: drop-shadow(0 18px 34px rgba(108, 82, 43, .14));
 }
 .wheelShape {
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 0 1px rgba(255, 239, 214, .25));
+  filter: drop-shadow(0 0 1px rgba(168, 126, 70, .22));
 }
 .slice {
   transition: fill .16s ease, stroke .16s ease, fill-opacity .16s ease;
@@ -120,10 +121,10 @@
   border: 0;
   border-radius: 10px;
   background: transparent;
-  color: #f9f5ef;
+  color: #312a21;
   cursor: pointer;
   text-align: center;
-  text-shadow: 0 1px 3px rgba(2, 12, 28, .7);
+  text-shadow: none;
 }
 .roomyOption {
   width: 23%;
@@ -140,10 +141,10 @@
   overflow-wrap: anywhere;
 }
 .activeOption {
-  color: #202e3d;
+  color: #251d13;
   text-shadow: none;
 }
-.option:focus-visible { outline: 2px solid #ffdb9d; outline-offset: 3px; }
+.option:focus-visible { outline: 2px solid #b38a51; outline-offset: 3px; }
 .hub {
   position: absolute;
   left: 50%;
@@ -158,14 +159,14 @@
   align-items: center;
   gap: 9px;
   padding: 9px;
-  color: #fff6e9;
+  color: #2e2923;
   text-align: center;
   border: 0;
   background: transparent;
   cursor: pointer;
 }
-.hub:hover strong, .hub:focus-visible strong { color: #f6d5a8; }
-.hub:focus-visible { outline: 2px solid #f3d2a6; outline-offset: -9px; }
+.hub:hover strong, .hub:focus-visible strong { color: #a27435; }
+.hub:focus-visible { outline: 2px solid #b38a51; outline-offset: -9px; }
 .hub strong {
   display: block;
   max-width: 100%;
@@ -179,7 +180,7 @@
   min-height: 17px;
   max-width: 90vw;
   margin: 6px 0 0;
-  color: #f6dfbe;
+  color: #946c36;
   text-align: center;
   font-size: clamp(11px, 1.45vw, 14px);
   font-weight: 700;
@@ -192,7 +193,7 @@
   justify-content: center;
   gap: 18px;
   min-height: 42px;
-  color: #e3c59b;
+  color: #946c36;
   font-size: 10px;
   letter-spacing: .17em;
   font-weight: 750;
@@ -201,39 +202,40 @@
 .pagination button {
   width: 34px;
   height: 34px;
-  border: 1px solid rgba(230,199,155,.43);
+  border: 1px solid #ccb18c;
   border-radius: 50%;
-  background: rgba(36,51,67,.88);
-  color: #f2d8af;
+  background: #ffffff;
+  color: #946c36;
   cursor: pointer;
   font-size: 18px;
 }
 .pagination button:hover, .pagination button:focus-visible {
-  background: #c49c64;
-  color: #172336;
+  background: #cba66f;
+  color: #2d2519;
 }
 .help {
   margin: 0;
-  color: rgba(228, 232, 240, .47);
+  color: #877b6c;
   font-size: 10px;
   letter-spacing: .02em;
 }
 
-/* After choosing a major: use a dark course browser, never the retired
-   white "Explore Building" card. All content stays on /newhome. */
+/* After choosing a major, keep the course browser in the same white-and-gold
+   palette as the major wheel. All content stays on /newhome. */
 .courseBrowser {
   position: relative;
   z-index: 2;
+  color: #302b24;
   display: flex;
   flex-direction: column;
   width: min(860px, calc(100% - 38px));
   max-height: min(77svh, 830px);
   margin: clamp(24px, 5vh, 48px) auto 35px;
   padding: 0;
-  border: 1px solid rgba(226, 197, 156, .24);
+  border: 1px solid #e1d2bc;
   border-radius: 20px;
-  background: rgba(20, 33, 50, .96);
-  box-shadow: 0 30px 90px rgba(0, 0, 0, .36);
+  background: #ffffff;
+  box-shadow: 0 26px 74px rgba(98, 74, 42, .17);
   animation: slideIn .2s ease-out;
   overflow: hidden;
 }
@@ -244,14 +246,14 @@
 .courseHeader {
   flex-shrink: 0;
   padding: 26px 32px 21px;
-  border-bottom: 1px solid rgba(244, 235, 215, .11);
+  border-bottom: 1px solid #e9dfd0;
 }
 .back {
   margin: 0 0 19px;
   padding: 0;
   border: 0;
   background: transparent;
-  color: #f0c997;
+  color: #956d35;
   font: inherit;
   font-size: 12px;
   font-weight: 700;
@@ -268,7 +270,7 @@
 .courseHeader p {
   max-width: 700px;
   margin: 0;
-  color: rgba(232, 236, 241, .68);
+  color: #696157;
   font-size: 12px;
   line-height: 1.55;
 }
@@ -276,20 +278,20 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 4px 32px 30px;
-  scrollbar-color: #9d835e #1b2d40;
+  scrollbar-color: #c4a16f #f8f4ee;
 }
 .group {
   padding: 18px 0;
-  border-bottom: 1px solid rgba(244, 235, 215, .13);
+  border-bottom: 1px solid #eadfce;
 }
 .group h3 {
   margin: 0 0 10px;
   font-size: 13px;
-  color: #edc791;
+  color: #98703a;
 }
 .group .description {
   margin: 0 0 12px;
-  color: rgba(232, 236, 241, .65);
+  color: #71695e;
   font-size: 11px;
   line-height: 1.6;
 }
@@ -297,7 +299,7 @@
   margin: 15px 0 5px;
   font-size: 11px;
   font-weight: 750;
-  color: #b0bfd1;
+  color: #766b5c;
 }
 .courseRow {
   display: grid;
@@ -306,45 +308,45 @@
   align-items: center;
   padding: 10px 7px;
   border-radius: 7px;
-  color: #f0e9de;
+  color: #342f28;
   text-decoration: none;
   font-size: 11px;
   line-height: 1.45;
 }
-.courseRow:nth-of-type(even) { background: rgba(242, 231, 209, .035); }
-.courseRow:hover, .courseRow:focus-visible { background: rgba(204, 163, 107, .18); }
+.courseRow:nth-of-type(even) { background: #faf7f1; }
+.courseRow:hover, .courseRow:focus-visible { background: #f5ead9; }
 .courseRow strong {
-  color: #e0b679;
+  color: #a4773b;
   font-size: 11px;
   white-space: nowrap;
 }
-.courseArrow { color: #e5bf88; }
+.courseArrow { color: #a4773b; }
 .courseNote {
   margin: 8px 6px;
-  color: #a9b6c2;
+  color: #71685e;
   line-height: 1.55;
   font-size: 11px;
 }
 .empty {
   padding: 40px 0;
-  color: #c9d0d9;
+  color: #6c6459;
   font-size: 13px;
   line-height: 1.6;
 }
-.empty a { display: block; margin-top: 16px; color: #f3cb95; }
+.empty a { display: block; margin-top: 16px; color: #996c36; }
 .browseAll {
   display: flex;
   justify-content: space-between;
   margin-top: 24px;
   padding: 14px 15px;
-  border: 1px solid rgba(224, 180, 120, .3);
+  border: 1px solid #d9b887;
   border-radius: 10px;
-  color: #f0cc98;
+  color: #956d35;
   text-decoration: none;
   font-size: 12px;
   font-weight: 700;
 }
-.browseAll:hover { background: rgba(235, 189, 123, .12); }
+.browseAll:hover { background: #faf1e3; }
 
 @media (max-width: 650px) {
   .heading { padding: 66px 44px 0; }
