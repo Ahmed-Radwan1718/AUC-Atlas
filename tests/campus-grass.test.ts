@@ -12,6 +12,12 @@ test("campus lawn fills the space around all five buildings without covering rou
   assert.match(source, /plot\.size\[0\]/);
   assert.match(source, /plazaZ/);
   assert.match(source, /isLawn\(px, pz, paths, plots, plazaZ\)/);
+  assert.match(source, /const LAWN_ZONES:/);
+  assert.match(source, /insideAnyLawnZone\(x, z\)/);
+  assert.match(source, /makeTerrainGeometry\(paths, plots, plazaZ\)/);
+  assert.match(source, /isLawn\(x \+ step, z \+ step, paths, plots, plazaZ\)/);
+  assert.doesNotMatch(source, /PlaneGeometry\(2000, 2000/);
+  assert.doesNotMatch(source, /for \(let z = -215/);
 });
 
 test("grass uses GPU instancing, wind, realistic lighting and reduced motion", () => {

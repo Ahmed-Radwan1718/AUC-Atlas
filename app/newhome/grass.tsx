@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import {
   BufferGeometry, Color, DoubleSide, Float32BufferAttribute,
-  InstancedMesh, MathUtils, MeshStandardMaterial, Object3D, PlaneGeometry,
+  InstancedMesh, MathUtils, MeshStandardMaterial, Object3D,
 } from "three";
 
 type Position = [number, number, number];
@@ -18,6 +18,30 @@ type GrassProps = {
 };
 
 type Tuft = { x: number; z: number; turn: number; spread: number; height: number; shade: number };
+type LawnZone = { center: [number, number]; size: [number, number]; radius: number };
+
+// Localized lawn areas around the five buildings and the interior courtyard.
+// The rounded, overlapping zones produce a connected campus landscape rather
+// than a huge rectangular green plane disappearing into the horizon.
+const LAWN_ZONES: LawnZone[] = [
+  { center: [-94, -77], size: [88, 78], radius: 13 },  // Business
+  { center: [92, -77], size: [88, 78], radius: 13 },   // Engineering
+  { center: [0, -129], size: [86, 65], radius: 13 },   // Sciences
+  { center: [-94, 85], size: [106, 82], radius: 15 }, // Library
+  { center: [92, 85], size: [108, 77], radius: 15 },  // Humanities
+  { center: [0, -53], size: [188, 66], radius: 12 },  // North promenade gardens
+  { center: [0, -97], size: [35, 62], radius: 10 },   // Sciences link
+  { center: [0, 43], size: [197, 125], radius: 16 },  // Central and south greens
+];
+
+function insideAnyLawnZone(x: number, z: number) {
+  return LAWN_ZONES.some(({ center, size, radius }) => {
+    // Signed distance to a rounded rectangle in the horizontal X/Z plane.
+    const dx = Math.abs(x - center[0]) - size[0] / 2 + radius;
+    const dz = Math.abs(z - center[1]) - size[1] / 2 + radius;
+    return Math.hypot(Math.max(dx, 0), Math.max(dz, 0)) <= radius;
+  });
+}
 
 // A deterministic seed avoids SSR hydration differences and layout jitter.
 function seededRandom() {
@@ -38,6 +62,7 @@ function distanceToSegmentSquared(x: number, z: number, a: Position, b: Position
 
 // Keep grass off buildings, stone plot platforms, the main plaza, and walkways.
 function isLawn(x: number, z: number, paths: Path[], plots: Plot[], plazaZ: number) {
+  if (!insideAnyLawnZone(x, z)) return false;
   if (x * x + (z - plazaZ) ** 2 < 22.5 ** 2) return false;
   for (const plot of plots) {
     if (Math.abs(x - plot.position[0]) < plot.size[0] / 2 + 1.7 &&
@@ -57,10 +82,10 @@ function isLawn(x: number, z: number, paths: Path[], plots: Plot[], plazaZ: numb
 function createTufts(paths: Path[], plots: Plot[], plazaZ: number): Tuft[] {
   const rand = seededRandom();
   const tufts: Tuft[] = [];
-  // A broad but finite planted area: one instanced draw call, not one React node per blade.
-  // Denser tufts read as a continuous lawn from the overhead camera, not dots.
-  for (let z = -215; z <= 195; z += 3.1) {
-    for (let x = -220; x <= 220; x += 3.1) {
+  // Tufts only occupy the same compact footprint as the lawn ground mesh.
+  // Their GPU wind animation is retained; nothing grows beyond the campus.
+  for (let z = -164; z <= 130; z += 3.1) {
+    for (let x = -150; x <= 150; x += 3.1) {
       const px = x + (rand() - 0.5) * 2.35;
       const pz = z + (rand() - 0.5) * 2.35;
       const turn = rand() * Math.PI * 2;
@@ -110,17 +135,42 @@ function makeTuftGeometry() {
   return geometry;
 }
 
-function makeTerrainGeometry() {
-  const geometry = new PlaneGeometry(2000, 2000, 96, 96);
-  const positions = geometry.getAttribute("position");
+function makeTerrainGeometry(paths: Path[], plots: Plot[], plazaZ: number) {
+  // Build only visible lawn cells, using the exact same exclusion mask as
+  // grass blades. This avoids painting grass under walkways, buildings or plaza.
+  const geometry = new BufferGeometry();
+  const positions: number[] = [];
   const colors: number[] = [];
-  for (let i = 0; i < positions.count; i++) {
-    const x = positions.getX(i), z = positions.getY(i);
-    const mottling = Math.sin(x * 0.034) * Math.cos(z * 0.045) * 0.09 +
-      Math.sin(x * 0.087 + z * 0.021) * 0.045;
-    colors.push(0.90 + mottling, 0.96 + mottling, 0.87 + mottling);
+  const indices: number[] = [];
+  const step = 2.5;
+  const y = -0.36; // Above the shadow catcher, below raised stone walkways.
+  const vertexColor = (x: number, z: number) => {
+    const variation = Math.sin(x * 0.034) * Math.cos(z * 0.045) * 0.065 +
+      Math.sin(x * 0.087 + z * 0.021) * 0.035;
+    colors.push(0.91 + variation, 0.96 + variation, 0.89 + variation);
+  };
+  for (let z = -165; z < 132.5; z += step) {
+    for (let x = -150; x < 152.5; x += step) {
+      // All corners must be valid: lawn does not bridge across pavement.
+      if (!isLawn(x, z, paths, plots, plazaZ) ||
+          !isLawn(x + step, z, paths, plots, plazaZ) ||
+          !isLawn(x, z + step, paths, plots, plazaZ) ||
+          !isLawn(x + step, z + step, paths, plots, plazaZ)) continue;
+      const base = positions.length / 3;
+      positions.push(x, y, z, x, y, z + step,
+        x + step, y, z, x + step, y, z + step);
+      vertexColor(x, z);
+      vertexColor(x, z + step);
+      vertexColor(x + step, z);
+      vertexColor(x + step, z + step);
+      indices.push(base, base + 1, base + 2,
+        base + 1, base + 3, base + 2);
+    }
   }
+  geometry.setIndex(indices);
+  geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
   geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
+  geometry.computeVertexNormals();
   return geometry;
 }
 
@@ -128,7 +178,10 @@ export default function CampusGrass({ night, paths, plots, plazaZ }: GrassProps)
   const meshRef = useRef<InstancedMesh>(null);
   const tufts = useMemo(() => createTufts(paths, plots, plazaZ), [paths, plots, plazaZ]);
   const tuftGeometry = useMemo(makeTuftGeometry, []);
-  const terrainGeometry = useMemo(makeTerrainGeometry, []);
+  const terrainGeometry = useMemo(
+    () => makeTerrainGeometry(paths, plots, plazaZ),
+    [paths, plots, plazaZ]
+  );
   const wind = useMemo(() => ({
     time: { value: 0 },
     motion: { value: 1 },
@@ -222,9 +275,8 @@ export default function CampusGrass({ night, paths, plots, plazaZ }: GrassProps)
   });
 
   return <>
-    {/* The continuous, matte lawn remains unlit by emissions at night. */}
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.425, 0]}
-      geometry={terrainGeometry} receiveShadow raycast={() => null}>
+    {/* Clipped lawn: only landscaped campus patches, no infinite green world. */}
+    <mesh geometry={terrainGeometry} receiveShadow raycast={() => null}>
       <meshStandardMaterial color={terrainColor} vertexColors roughness={1} metalness={0}/>
     </mesh>
     {/* Per-blade GPU wind gives the fields slow waves and a little swirling motion. */}
