@@ -152,11 +152,20 @@ function phaseName(phase: number) {
 
 
 type BuildingId = "library" | "business" | "sse" | "humanities";
-const BUILDINGS: {id: BuildingId; name: string; description: string; location: [number, number, number]}[] = [
-  {id:"library", name:"Library", description:"Explore all courses, study resources and uploaded materials.", location:[0,0,0]},
-  {id:"business", name:"School of Business", description:"Business, economics, accounting, finance and related majors.", location:[-50,0,-32]},
-  {id:"sse", name:"School of Sciences & Engineering", description:"Engineering, computer science, sciences and technology.", location:[51,0,-32]},
-  {id:"humanities", name:"Humanities & Social Sciences", description:"Arts, languages, politics, psychology and the social sciences.", location:[34,0,40]},
+// The site uses four independent precincts arranged around a connected walkway network.
+// Entrance elevations face +Z; the walkway stubs terminate immediately in front of them.
+const SITE_POSITIONS: Record<BuildingId, Position> = {
+  business: [-94,0,-77],
+  sse: [92,0,-77],
+  library: [-94,0,85],
+  humanities: [92,0,85],
+};
+const PLAZA_Z = 20;
+const BUILDINGS: {id: BuildingId; name: string; description: string; location: Position}[] = [
+  {id:"library", name:"Library", description:"Explore all courses, study resources and uploaded materials.", location:SITE_POSITIONS.library},
+  {id:"business", name:"School of Business", description:"Business, economics, accounting, finance and related majors.", location:SITE_POSITIONS.business},
+  {id:"sse", name:"School of Sciences & Engineering", description:"Engineering, computer science, sciences and technology.", location:SITE_POSITIONS.sse},
+  {id:"humanities", name:"Humanities & Social Sciences", description:"Arts, languages, politics, psychology and the social sciences.", location:SITE_POSITIONS.humanities},
 ];
 const CATEGORY: Record<BuildingId, string[]> = {
   library: ["Browse all courses", "Student materials", "Professors"],
@@ -441,8 +450,8 @@ function SSE({night}:{night:number}){
   </group>;
 }
 
-function Pathway({points,width=7,color="#ddd1c3"}:{
-  points:Position[];width?:number;color?:string;
+function Pathway({points,width=7,color="#ddd1c3",height=0.15}:{
+  points:Position[];width?:number;color?:string;height?:number;
 }){
   const geometry=useMemo(()=>{
     const curve=new CatmullRomCurve3(points.map(p=>new Vector3(...p)),false,"catmullrom",0.25);
@@ -453,28 +462,106 @@ function Pathway({points,width=7,color="#ddd1c3"}:{
       const t=i/segments, p=curve.getPoint(t), tangent=curve.getTangent(t);
       const length=Math.hypot(tangent.x,tangent.z)||1;
       const dx=-tangent.z/length*width/2, dz=tangent.x/length*width/2;
-      vertices.push(p.x+dx,0.15,p.z+dz,p.x-dx,0.15,p.z-dz);
+      vertices.push(p.x+dx,height,p.z+dz,p.x-dx,height,p.z-dz);
       if(i<segments){const a=i*2;indices.push(a,a+2,a+1,a+1,a+2,a+3);}
     }
     const g=new BufferGeometry();
     g.setAttribute("position",new Float32BufferAttribute(vertices,3));
     g.setIndex(indices);g.computeVertexNormals();
     return g;
-  },[points,width]);
+  },[points,width,height]);
   useEffect(()=>()=>geometry.dispose(),[geometry]);
   return <mesh geometry={geometry} receiveShadow>
     <meshStandardMaterial color={color} roughness={0.98} side={DoubleSide}/>
   </mesh>;
 }
-const walk1:Position[]=[[-50,0,0],[-32,0,11],[-16,0,21],[0,0,32]];
-const walk2:Position[]=[[51,0,0],[33,0,5],[17,0,20],[0,0,32]];
-const walk3:Position[]=[[0,0,33],[15,0,42],[30,0,49]];
-const walk4:Position[]=[[0,0,33],[-12,0,49],[-31,0,74]];
+
+const ROAD_SEGMENTS: {name:string;points:Position[];width:number}[] = [
+  {name:"north-arcade-promenade",points:[[-94,0,-50],[92,0,-50]],width:10},
+  {name:"south-garden-promenade",points:[[-94,0,116],[92,0,116]],width:10},
+  {name:"central-avenue-north",points:[[0,0,-50],[0,0,0]],width:10},
+  {name:"central-avenue-south",points:[[0,0,40],[0,0,116]],width:10},
+  {name:"business-entrance",points:[[-94,0,-62],[-94,0,-50]],width:8},
+  {name:"sse-entrance",points:[[92,0,-60],[92,0,-50]],width:8},
+  {name:"library-entrance",points:[[-94,0,108],[-94,0,116]],width:9},
+  {name:"humanities-entrance",points:[[92,0,97],[92,0,116]],width:9},
+];
+
+function Promenade({points,width}: {points:Position[];width:number}) {
+  const horizontal=Math.abs(points[1][0]-points[0][0]) >
+    Math.abs(points[1][2]-points[0][2]);
+  return <>
+    {/* Stone curbs, lighter inset pavers, and parallel inlaid borders.
+        These are walkways, not car lanes: no center traffic markings. */}
+    <Pathway points={points} width={width+2} height={0.13} color="#b8a48a"/>
+    <Pathway points={points} width={width} height={0.155} color="#e4d8c4"/>
+    {[-1,1].map(side=>{
+      const inset=(width/2-0.9)*side;
+      const shifted=points.map(p=>[p[0]+(horizontal?0:inset),0,
+        p[2]+(horizontal?inset:0)] as Position);
+      return <Pathway key={side} points={shifted} width={0.17}
+        height={0.179} color="#c7b394"/>;
+    })}
+  </>;
+}
+
+function CampusWalkways(){
+  return <>
+    {/* An H-shaped system of formal campus promenades; every branch joins
+        an actual school entrance and none crosses a building footprint. */}
+    {ROAD_SEGMENTS.map(segment=>
+      <Promenade key={segment.name} points={segment.points} width={segment.width}/>
+    )}
+    {/* Hand-laid stone joints at regular intervals soften the long avenues. */}
+    {[-50,116].flatMap(z=>
+      Array.from({length:14},(_,i)=>
+        <Block key={"joint-x-"+z+"-"+i}
+          position={[-85+i*13.0,0.186,z]}
+          size={[0.18,0.015,9.4]} color="#c3ae90" cast={false}/>
+      )
+    )}
+    {[-38,-25,-12,53,66,79,92,105].map(z=>
+      <Block key={"joint-z-"+z} position={[0,0.186,z]}
+        size={[9.4,0.015,0.18]} color="#c3ae90" cast={false}/>
+    )}
+    {/* Rounded intersection pavers indicate pedestrian junctions. */}
+    {[-94,0,92].flatMap(x=>[-50,116].map(z=>
+      <group key={"junction-"+x+"-"+z}>
+        <mesh rotation={[-Math.PI/2,0,0]} position={[x,0.188,z]}>
+          <circleGeometry args={[5.0,36]}/>
+          <meshStandardMaterial color="#eadac0" roughness={0.95}/>
+        </mesh>
+        <mesh rotation={[-Math.PI/2,0,0]} position={[x,0.194,z]}>
+          <ringGeometry args={[4.15,4.28,36]}/>
+          <meshStandardMaterial color="#c0a88a" roughness={0.95} side={DoubleSide}/>
+        </mesh>
+      </group>
+    ))}
+  </>;
+}
+
+// Low, continuous, pale sandstone precincts anchor each building in the
+// environment. They connect directly to the paths rather than floating in space.
+const BUILDING_PLOTS: {id:BuildingId;size:Position}[] = [
+  {id:"business",size:[57,0.2,46]},
+  {id:"sse",size:[57,0.2,49]},
+  {id:"library",size:[68,0.2,50]},
+  {id:"humanities",size:[74,0.2,39]},
+];
+
+const WALKWAY_LIGHTS: Position[] = [
+  [-69,0,-57],[-44,0,-57],[-19,0,-57],[19,0,-57],[44,0,-57],[68,0,-57],
+  [-69,0,123],[-44,0,123],[-19,0,123],[19,0,123],[44,0,123],[68,0,123],
+  [-8,0,-35],[8,0,-18],[-8,0,55],[8,0,73],[-8,0,91],[8,0,106],
+  [-106,0,-50],[104,0,-50],[-106,0,116],[104,0,116],
+];
+
 function AdaptiveCamera(){
   const {camera,size}=useThree();
   useEffect(()=>{
     if(camera instanceof OrthographicCamera) {
-      camera.zoom=Math.max(1.75,Math.min(size.width/188,size.height/121));
+      // Accommodate all four separated buildings and their wider circulation system.
+       camera.zoom=Math.max(1.15,Math.min(size.width/335,size.height/245));
       camera.updateProjectionMatrix();
     }
   },[camera,size.width,size.height]);
@@ -497,61 +584,74 @@ function Campus({light,onSelect,onHover}:{
     <ambientLight intensity={atNight?0.55:0.62}/>
     <directionalLight position={spot} intensity={atNight?1.8:2.7*ambient}
       color={atNight?"#b8c8f6":"#fff3db"} castShadow
-      shadow-mapSize={[2048,2048]} shadow-camera-left={-130}
-      shadow-camera-right={130} shadow-camera-top={130} shadow-camera-bottom={-130}
-      shadow-camera-near={1} shadow-camera-far={380} shadow-bias={-0.0002}/>
+      shadow-mapSize={[2048,2048]} shadow-camera-left={-185}
+      shadow-camera-right={185} shadow-camera-top={185} shadow-camera-bottom={-185}
+      shadow-camera-near={1} shadow-camera-far={490} shadow-bias={-0.0002}/>
     {/* Shadow-catching ground is transparent: no visible rectangle or platform edge. */}
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-0.38,0]} receiveShadow>
       <planeGeometry args={[2000,2000]}/>
       <shadowMaterial color="#1d2538" transparent opacity={0.28} depthWrite={false}/>
     </mesh>
-    <Pathway points={walk1} width={8.5}/>
-    <Pathway points={walk2} width={8.5}/>
-    <Pathway points={walk3} width={8.5}/>
-    <Pathway points={walk4} width={8.5}/>
-    <mesh rotation={[-Math.PI/2,0,0]} position={[0,0.17,32]} receiveShadow>
-      <circleGeometry args={[15.3,64]}/>
-      <meshStandardMaterial color="#e9d9c8" roughness={0.96}/>
+    {BUILDING_PLOTS.map(plot=>
+      <group key={"plot-"+plot.id}>
+        <Block position={[SITE_POSITIONS[plot.id][0],-0.06,SITE_POSITIONS[plot.id][2]]}
+          size={plot.size} color="#c6b296" cast={false}/>
+        <Block position={[SITE_POSITIONS[plot.id][0],0.06,SITE_POSITIONS[plot.id][2]]}
+          size={[plot.size[0]-1.2,0.16,plot.size[2]-1.2]} color="#e9ddc8" cast={false}/>
+      </group>
+    )}
+    <CampusWalkways/>
+    {/* A planted circular plaza at the main avenue's central junction. */}
+    <mesh rotation={[-Math.PI/2,0,0]} position={[0,0.176,PLAZA_Z]} receiveShadow>
+      <circleGeometry args={[20,72]}/>
+      <meshStandardMaterial color="#d0b99a" roughness={0.96}/>
     </mesh>
-    {[9.5,12.8,14.5].map(r=><mesh key={r} rotation={[-Math.PI/2,0,0]} position={[0,0.21,32]}>
-      <torusGeometry args={[r,0.16,6,70]}/>
-      <meshStandardMaterial color="#bdb6aa" roughness={0.9}/>
-    </mesh>)}
-    <mesh rotation={[-Math.PI/2,0,0]} position={[0,0.23,32]}>
-      <circleGeometry args={[6.4,48]}/>
-      <meshStandardMaterial color="#7b9666"/>
+    <mesh rotation={[-Math.PI/2,0,0]} position={[0,0.194,PLAZA_Z]} receiveShadow>
+      <circleGeometry args={[18.7,72]}/>
+      <meshStandardMaterial color="#e9dccc" roughness={0.96}/>
     </mesh>
-    <mesh rotation={[-Math.PI/2,0,0]} position={[0,0.26,32]}>
-      <ringGeometry args={[5.7,6.4,48]}/>
-      <meshStandardMaterial color="#4b7648" side={DoubleSide}/>
+    {[8.2,15.7,18.2].map(r=>
+      <mesh key={r} rotation={[-Math.PI/2,0,0]} position={[0,0.211,PLAZA_Z]}>
+        <ringGeometry args={[r,r+0.16,72]}/>
+        <meshStandardMaterial color="#bcaa93" roughness={0.9} side={DoubleSide}/>
+      </mesh>
+    )}
+    <mesh rotation={[-Math.PI/2,0,0]} position={[0,0.235,PLAZA_Z]}>
+      <circleGeometry args={[7.1,48]}/>
+      <meshStandardMaterial color="#789463"/>
     </mesh>
-    <RoundTree position={[0,0,32]} night={night} scale={0.95}/>
+    <mesh rotation={[-Math.PI/2,0,0]} position={[0,0.247,PLAZA_Z]}>
+      <ringGeometry args={[6.55,7.15,48]}/>
+      <meshStandardMaterial color="#477047" side={DoubleSide}/>
+    </mesh>
+    <RoundTree position={[0,0,PLAZA_Z]} night={night} scale={0.95}/>
+    {/* Trees outside building footprints, circulation, and entrances. */}
     {[
-      [-74,0,-22],[-31,0,-31],[72,0,-27],[71,0,-48],
-      [52,0,20],[66,0,26],[-69,0,13],[-34,0,17],
-      [2,0,-39],[-12,0,51],[40,0,71],
-    ].map((p,i)=><Cypress key={i} position={p as Position} scale={i%3===0?0.9:0.7}/>)}
-    {[[-26,0,30],[-16,0,62],[56,0,67]].map((p,i)=>
-      <RoundTree key={i} position={p as Position} night={night} scale={0.68}/>)}
-    {[
-      [-29,0,16],[-17,0,24],[17,0,24],[30,0,12],
-      [-12,0,44],[16,0,43],[34,0,48],
-      [-57,0,-8],[-42,0,1],[56,0,6],
-    ].map((p,i)=><GlowLight key={i} position={p as Position} night={night}/>)}
-    <Building id="business" position={[-50,0,-32]} select={onSelect} hover={onHover}>
-      <Business night={night}/>
-    </Building>
-    <Building id="library" position={[0,0,0]} select={onSelect} hover={onHover}>
-      <Library night={night}/>
-    </Building>
-    <Building id="sse" position={[51,0,-32]} select={onSelect} hover={onHover}>
-      <SSE night={night}/>
-    </Building>
-    <Building id="humanities" position={[34,0,40]} select={onSelect} hover={onHover}>
-      <Humanities night={night}/>
-    </Building>
-    <OrbitControls makeDefault target={[0,9,13]} enableDamping
-      dampingFactor={0.08} minDistance={85} maxDistance={240}
+      [-128,0,-88],[-128,0,-60],[-63,0,-101],[-55,0,-67],
+      [127,0,-92],[129,0,-57],[59,0,-99],[56,0,-66],
+      [-129,0,79],[-129,0,106],[-61,0,70],[-61,0,129],
+      [131,0,79],[132,0,108],[53,0,72],[53,0,130],
+      [-33,0,-7],[33,0,-7],[-34,0,49],[34,0,49],
+    ].map((p,i)=>
+      <Cypress key={i} position={p as Position} scale={i%3===0?0.97:0.8}/>
+    )}
+    {[[-43,0,18],[46,0,19],[-49,0,65],[47,0,66]].map((p,i)=>
+      <RoundTree key={i} position={p as Position} night={night} scale={0.68}/>
+    )}
+    {WALKWAY_LIGHTS.map((p,i)=>
+      <GlowLight key={i} position={p} night={night}/>
+    )}
+    {BUILDINGS.map(building=>
+      <Building key={building.id} id={building.id} position={building.location}
+        select={onSelect} hover={onHover}>
+        {building.id==="business"&&<Business night={night}/>}
+        {building.id==="library"&&<Library night={night}/>}
+        {building.id==="sse"&&<SSE night={night}/>}
+        {building.id==="humanities"&&<Humanities night={night}/>}
+      </Building>
+    )}
+    <OrbitControls makeDefault target={[0,9,PLAZA_Z]} enableDamping
+      dampingFactor={0.08} minDistance={90} maxDistance={380}
       maxPolarAngle={1.42} minPolarAngle={0.6}
       enablePan={true} panSpeed={0.6} rotateSpeed={0.38} zoomSpeed={0.7}/>
   </>;
@@ -572,7 +672,7 @@ export default function NewHomePage(){
   const hover=BUILDINGS.find(b=>b.id===hovered);
   return <main className={styles.campusPage}>
     <div className={styles.scene} aria-label="Interactive three-dimensional university campus with four original buildings">
-      <Canvas shadows orthographic camera={{position:[104,99,132],zoom:5.0,near:0.1,far:600}}
+      <Canvas shadows orthographic camera={{position:[152,138,190],zoom:3.5,near:0.1,far:800}}
         dpr={[1,1.75]} gl={{antialias:true,alpha:false,powerPreference:"high-performance"}}
         onCreated={({gl})=>{gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.18;gl.shadowMap.type=PCFSoftShadowMap;}}
         onPointerMissed={()=>{setSelected(null);setMajor(null);}}
