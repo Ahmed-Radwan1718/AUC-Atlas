@@ -219,7 +219,7 @@ function ArchedPane({position,width=4,height=11,night=0}:{
   },[width,height]);
   const hover=useContext(BuildingHoverContext);
   const glass=useRef<MeshStandardMaterial>(null);
-  const intensity=0.02+night*4.5;
+  const intensity=0.02+night*2.15;
   useFrame((_,delta)=>{
     if (!glass.current) return;
     const wave=hoverWave(hover?.current ?? null, position[1]+height*0.5, position[0]);
@@ -230,7 +230,7 @@ function ArchedPane({position,width=4,height=11,night=0}:{
     );
     glass.current.emissiveIntensity=MathUtils.damp(
       glass.current.emissiveIntensity,
-      intensity+wave*(night>0.5?1.25:0.18),12,delta
+      intensity+wave*(night>0.5?0.42:0.18),12,delta
     );
   });
   return <group position={position}>
@@ -241,7 +241,7 @@ function ArchedPane({position,width=4,height=11,night=0}:{
         metalness={0.07} roughness={0.23} side={DoubleSide}/>
     </mesh>
     <WindowHalo position={[0,height*0.48,0.22]}
-      width={width*1.85} height={height*1.35} brightness={night}/>
+      width={width*1.4} height={height*1.22} brightness={night}/>
     <Block position={[0,height-width/2,0.02]} size={[width+0.36,0.16,0.19]} color="#c3a889"/>
     <mesh position={[0,height-width/2,0.08]} castShadow>
       <torusGeometry args={[width/2+0.1,0.24,8,28,Math.PI]}/>
@@ -260,7 +260,7 @@ function Window({position,width=2.1,height=3.8,night=0,brightness=1}:{
   const glass=useRef<MeshStandardMaterial>(null);
   const glow=night*brightness;
   const isNight=glow>0.5;
-  const baseIntensity=0.025+glow*4.25;
+  const baseIntensity=0.025+glow*2.35;
   useFrame((_,delta)=>{
     if (!glass.current) return;
     const wave=hoverWave(hover?.current ?? null,position[1],position[0]);
@@ -271,7 +271,7 @@ function Window({position,width=2.1,height=3.8,night=0,brightness=1}:{
     );
     glass.current.emissiveIntensity=MathUtils.damp(
       glass.current.emissiveIntensity,
-      baseIntensity+wave*(isNight?1.1:0.19),12,delta
+      baseIntensity+wave*(isNight?0.45:0.19),12,delta
     );
   });
   return <group position={position}>
@@ -283,7 +283,7 @@ function Window({position,width=2.1,height=3.8,night=0,brightness=1}:{
         emissiveIntensity={baseIntensity} roughness={0.24} metalness={0.08}/>
     </mesh>
     <WindowHalo position={[0,0,0.31]}
-      width={width*2.5} height={height*1.9} brightness={glow}/>
+      width={width*1.65} height={height*1.48} brightness={glow}/>
     <Block position={[0,0,0.11]} size={[0.1,height,0.1]} color="#6b6762"/>
     <Block position={[0,0,0.12]} size={[width,0.10,0.1]} color="#6b6762"/>
     <Block position={[0,-height/2-0.22,0.15]} size={[width+0.6,0.25,0.48]} color="#f8ecda"/>
@@ -476,7 +476,7 @@ function Library({night}: {night:number}){
     <GlowLight position={[-12,0,24]} night={night}/>
     <GlowLight position={[12,0,24]} night={night}/>
     <FacadeLights night={night} positions={[[-12,11,19],[12,11,19]]}
-      intensity={108} range={29}/>
+      intensity={24} range={20}/>
   </group>;
 }
 function Business({night}: {night:number}){
@@ -504,7 +504,7 @@ function Business({night}: {night:number}){
     {[-15,15].map(x=><Hedge key={x} position={[x,1.15,16]}
       size={[3.2,1.4,10]}/>)}
     <FacadeLights night={night} positions={[[-10,9,16.5],[10,9,16.5]]}
-      intensity={105} range={28}/>
+      intensity={23} range={19}/>
   </group>;
 }
 function Humanities({night}:{night:number}){
@@ -533,7 +533,7 @@ function Humanities({night}:{night:number}){
         <Window position={[0,y,0]} width={2.5} height={3.2} night={night}/>
       </group>))}
     <FacadeLights night={night} positions={[[-16,8,13],[16,8,13]]}
-      intensity={104} range={28}/>
+      intensity={24} range={19}/>
   </group>;
 }
 function SSE({night}:{night:number}){
@@ -543,9 +543,9 @@ function SSE({night}:{night:number}){
     <Block position={[-4.9,9.6,15.3]} size={[24.5,17.5,0.18]}
       color={night>0.5?"#91603b":"#7a9caa"}
       emissive={night>0.5?"#ffb24e":"#a0c3d4"}
-      emissiveIntensity={0.02+night*3.25} roughness={0.21} metalness={0.12}/>
+      emissiveIntensity={0.02+night*2.15} roughness={0.21} metalness={0.12}/>
     <WindowHalo position={[-4.9,9.6,15.65]}
-      width={30} height={24} brightness={night*0.85}/>
+      width={27} height={20} brightness={night*0.62}/>
     {Array.from({length:7},(_,i)=>
       <Block key={"m"+i} position={[-16.4+i*3.8,9.6,15.48]}
         size={[0.21,18.1,0.26]} color="#54656b" metalness={0.65}/>)}
@@ -569,7 +569,7 @@ function SSE({night}:{night:number}){
     <Steps front={15.5} wide={20} levels={4}/>
     {[-17,17].map(x=><Hedge key={x} position={[x,1.1,16.2]} size={[3.1,1.1,7]}/>)}
     <FacadeLights night={night} positions={[[-10,9,18],[10,9,18]]}
-      intensity={106} range={30}/>
+      intensity={26} range={21}/>
   </group>;
 }
 
@@ -701,9 +701,9 @@ function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}
     {!atNight&&<Sky sunPosition={light.sun} turbidity={4} rayleigh={1.65}
       mieCoefficient={0.008} mieDirectionalG={0.8}/>}
     {atNight&&<Stars radius={240} depth={50} count={600} factor={2.2} saturation={0} fade/>}
-    <hemisphereLight args={[atNight?"#8f9ac8":"#fff7e8","#9f9b94",atNight?1.45:1.1]}/>
-    <ambientLight intensity={atNight?0.55:0.62}/>
-    <directionalLight position={spot} intensity={atNight?1.8:2.7*ambient}
+    <hemisphereLight args={[atNight?"#8f9ac8":"#fff7e8","#9f9b94",atNight?0.85:1.1]}/>
+    <ambientLight intensity={atNight?0.27:0.62}/>
+    <directionalLight position={spot} intensity={atNight?1.05:2.7*ambient}
       color={atNight?"#b8c8f6":"#fff3db"} castShadow
       shadow-mapSize={[2048,2048]} shadow-camera-left={-185}
       shadow-camera-right={185} shadow-camera-top={185} shadow-camera-bottom={-185}
