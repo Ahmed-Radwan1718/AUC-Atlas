@@ -253,3 +253,60 @@
     transition-duration:0.01ms!important;
   }
 }
+
+
+/* Building -> major -> degree requirements, isolated to this route */
+.majorList button {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  padding:12px 0;
+  border:0;
+  border-bottom:1px solid #e8e7e3;
+  color:#415469;
+  text-align:left;
+  background:transparent;
+  font-family:inherit;font-weight:650;font-size:12px;line-height:1.4;
+  cursor:pointer;
+  transition:color 150ms ease;
+}
+.majorList button:hover,.majorList button:focus-visible {color:#ae7f4b;}
+.majorList button span:last-child {color:#b18e65;}
+.detail {max-height:min(68vh,620px);overflow-y:auto;overscroll-behavior:contain;}
+.detail .back {
+  display:inline-block;
+  margin:8px 0 2px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#a27e51;
+  font-size:11px;
+  font-weight:750;
+  cursor:pointer;
+}
+.courseGroups {margin-top:20px;}
+.courseGroups h3 {
+  margin:18px 0 6px;
+  color:#8b765a;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:0.03em;
+}
+.courseGroups a {
+  display:grid;
+  grid-template-columns:80px minmax(0,1fr) 12px;
+  gap:9px;
+  align-items:center;
+  padding:11px 0;
+  border-bottom:1px solid #eeeae5;
+  color:#415469;
+  font-size:11px;
+  line-height:1.5;
+  text-decoration:none;
+}
+.courseGroups a:hover {color:#aa8151;}
+.courseGroups a strong {font-size:10px;white-space:nowrap;color:#946c41;}
+.courseGroups a span:last-child {color:#ae8454;}
+.courseGroups a span:nth-child(2) {min-width:0;}
