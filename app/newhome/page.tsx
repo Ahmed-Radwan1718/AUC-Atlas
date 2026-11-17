@@ -11,6 +11,7 @@ import {
 import styles from "./newhome.module.css";
 import MajorWheel from "./major-wheel";
 import CampusGrass from "./grass";
+import Fountain from "./fountain";
 import type { SchoolId } from "./wheel-data";
 import NightBloom, { FacadeLights, WindowHalo } from "./night-bloom";
 
@@ -842,15 +843,8 @@ function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}
         <meshStandardMaterial color="#bcaa93" roughness={0.9} side={DoubleSide}/>
       </mesh>
     )}
-    <mesh rotation={[-Math.PI/2,0,0]} position={[0,0.235,PLAZA_Z]}>
-      <circleGeometry args={[7.1,48]}/>
-      <meshStandardMaterial color="#789463"/>
-    </mesh>
-    <mesh rotation={[-Math.PI/2,0,0]} position={[0,0.247,PLAZA_Z]}>
-      <ringGeometry args={[6.55,7.15,48]}/>
-      <meshStandardMaterial color="#477047" side={DoubleSide}/>
-    </mesh>
-    <RoundTree position={[0,0,PLAZA_Z]} night={night} scale={0.95}/>
+    {/* An animated fountain replaces the old planter and tree in the plaza. */}
+    <Fountain position={[0,0,PLAZA_Z]} night={night}/>
     {/* Trees outside building footprints, circulation, and entrances. */}
     {[
       [-128,0,-88],[-128,0,-60],[-63,0,-101],[-55,0,-67],
