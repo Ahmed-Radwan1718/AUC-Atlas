@@ -504,7 +504,6 @@ function Campus({light,onSelect,onHover}:{
       <planeGeometry args={[390,330]}/>
       <meshStandardMaterial color={atNight?"#a2a6c0":"#eee9dc"} roughness={1}/>
     </mesh>
-    <Block position={[0,-0.11,18]} size={[184,0.24,154]} color={atNight?"#b1b2bf":"#e9e2d3"} cast={false}/>
     <Pathway points={walk1} width={8.5}/>
     <Pathway points={walk2} width={8.5}/>
     <Pathway points={walk3} width={8.5}/>
