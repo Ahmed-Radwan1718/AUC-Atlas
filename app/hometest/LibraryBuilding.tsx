@@ -5,14 +5,11 @@ import {
   BoxGeometry,
   DataTexture,
   LinearFilter,
-  LinearMipmapLinearFilter,
-  MeshPhysicalMaterial,
   MeshStandardMaterial,
   Object3D,
   RGBAFormat,
   RepeatWrapping,
   SRGBColorSpace,
-  Vector2,
   type InstancedMesh,
   type Material
 } from "three";
@@ -30,146 +27,53 @@ const WIDTH = 7.9;
 const LENGTH = 16.6;
 const HEIGHT = 7.55;
 
-// Procedural material maps: coloration, fine relief and roughness are generated
-// once, deterministically, with no external texture downloads. This changes
-// surface response only; the library's geometry, window pattern and massing stay
-// exactly as modeled in the previous reference-based build.
-const textureSize = 512;
-const clampByte = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
-
-function noise(x: number, y: number) {
-  let n = (Math.imul(x, 374761393) + Math.imul(y, 668265263)) | 0;
-  n = Math.imul(n ^ (n >>> 13), 1274126177);
-  return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
-}
-
-function textureFromPixels(data: Uint8Array, side: number, color: boolean, repeatX: number, repeatY: number) {
-  const texture = new DataTexture(data, side, side, RGBAFormat);
-  if (color) texture.colorSpace = SRGBColorSpace;
+function createLimestoneTexture() {
+  const side = 256;
+  const pixels = new Uint8Array(side * side * 4);
+  for (let y = 0; y < side; y++) {
+    const course = Math.floor(y / 24);
+    for (let x = 0; x < side; x++) {
+      const offset = (course % 2) * 29;
+      const column = Math.floor((x + offset) / 58);
+      const seed = (course * 37 + column * 53) % 23;
+      const noise = (x * 13 + y * 17 + course * 11) % 13;
+      const grout = y % 24 < 2 || (x + offset) % 58 < 2;
+      const value = seed - 11 + noise - 6 - (grout ? 23 : 0);
+      const index = (y * side + x) * 4;
+      pixels[index] = Math.max(0, Math.min(255, 204 + value));
+      pixels[index + 1] = Math.max(0, Math.min(255, 184 + value));
+      pixels[index + 2] = Math.max(0, Math.min(255, 154 + value));
+      pixels[index + 3] = 255;
+    }
+  }
+  const texture = new DataTexture(pixels, side, side, RGBAFormat);
+  texture.colorSpace = SRGBColorSpace;
   texture.wrapS = RepeatWrapping;
   texture.wrapT = RepeatWrapping;
-  texture.repeat.set(repeatX, repeatY);
-  texture.generateMipmaps = true;
-  texture.minFilter = LinearMipmapLinearFilter;
+  texture.repeat.set(2.2, 1.7);
+  texture.minFilter = LinearFilter;
   texture.magFilter = LinearFilter;
-  texture.anisotropy = 4;
   texture.needsUpdate = true;
   return texture;
 }
 
-function createStoneMaps() {
-  const side = textureSize;
-  const color = new Uint8Array(side * side * 4);
-  const normal = new Uint8Array(side * side * 4);
-  const rough = new Uint8Array(side * side * 4);
-  const height = new Float32Array(side * side);
-
-  for (let y = 0; y < side; y++) {
-    const course = Math.floor(y / 68);
-    const stagger = (course % 2) * 48;
-    for (let x = 0; x < side; x++) {
-      const grain = noise(x, y) - 0.5;
-      const largeGrain = noise(Math.floor(x / 17), Math.floor(y / 13)) - 0.5;
-      const verticalVeins = Math.sin(x * 0.25 + 1.7 * Math.sin(y * 0.019)) * 0.42;
-      const mineralFleck = noise(Math.floor(x / 5), Math.floor(y / 6)) - 0.5;
-      const joints = y % 68 < 2 || (x + stagger) % 102 < 2;
-      const tonal = 19 * largeGrain + 17 * grain + 8 * mineralFleck + 6 * verticalVeins - (joints ? 20 : 0);
-      const i = y * side + x;
-      const p = i * 4;
-      color[p] = clampByte(214 + tonal);
-      color[p + 1] = clampByte(199 + tonal * 0.9);
-      color[p + 2] = clampByte(176 + tonal * 0.85);
-      color[p + 3] = 255;
-      // The relief is subtle: a sandstone surface, not extruded bricks.
-      height[i] = largeGrain * 0.7 + grain * 0.5 + verticalVeins * 0.16 - (joints ? 1.3 : 0);
-      const r = clampByte(226 + mineralFleck * 17 + grain * 12);
-      rough[p] = r;
-      rough[p + 1] = r;
-      rough[p + 2] = r;
-      rough[p + 3] = 255;
-    }
-  }
-  for (let y = 0; y < side; y++) {
-    for (let x = 0; x < side; x++) {
-      const i = y * side + x;
-      const l = height[y * side + (x + side - 1) % side];
-      const r = height[y * side + (x + 1) % side];
-      const d = height[((y + side - 1) % side) * side + x];
-      const u = height[((y + 1) % side) * side + x];
-      const nx = (l - r) * 0.52;
-      const ny = (d - u) * 0.52;
-      const inv = 1 / Math.hypot(nx, ny, 1);
-      const p = i * 4;
-      normal[p] = clampByte(127.5 + nx * inv * 127.5);
-      normal[p + 1] = clampByte(127.5 + ny * inv * 127.5);
-      normal[p + 2] = clampByte(127.5 + inv * 127.5);
-      normal[p + 3] = 255;
-    }
-  }
-  return {
-    color: textureFromPixels(color, side, true, 2.0, 1.7),
-    normal: textureFromPixels(normal, side, false, 2.0, 1.7),
-    rough: textureFromPixels(rough, side, false, 2.0, 1.7)
-  };
-}
-
-function createGlassMap() {
-  const side = 256;
-  const bytes = new Uint8Array(side * side * 4);
-  for (let y = 0; y < side; y++) {
-    for (let x = 0; x < side; x++) {
-      const vertical = y / (side - 1);
-      const cloud = Math.sin(x * 0.027 + vertical * 4.1) * Math.sin(y * 0.037 - x * 0.012);
-      const tint = 11 * cloud + 8 * (noise(Math.floor(x / 13), Math.floor(y / 13)) - 0.5);
-      const idx = (y * side + x) * 4;
-      bytes[idx] = clampByte(94 + tint + 12 * vertical);
-      bytes[idx + 1] = clampByte(126 + tint + 7 * vertical);
-      bytes[idx + 2] = clampByte(145 + tint);
-      bytes[idx + 3] = 255;
-    }
-  }
-  return textureFromPixels(bytes, side, true, 1.25, 1.1);
-}
-
-const stoneMaps = createStoneMaps();
-const glassMap = createGlassMap();
-const stoneParams = {
-  map: stoneMaps.color,
-  normalMap: stoneMaps.normal,
-  roughnessMap: stoneMaps.rough,
-  normalScale: new Vector2(0.34, 0.34)
-};
-
+const stoneTexture = createLimestoneTexture();
 const surface = {
-  limestone: new MeshStandardMaterial({ ...stoneParams, roughness: 0.96 }),
-  stoneLight: new MeshStandardMaterial({ ...stoneParams, color: "#f7f0df", roughness: 0.95 }),
-  stoneMid: new MeshStandardMaterial({ ...stoneParams, color: "#d9c8b3", roughness: 0.95 }),
-  stoneDeep: new MeshStandardMaterial({ ...stoneParams, color: "#b9a08c", roughness: 0.95 }),
-  roof: new MeshStandardMaterial({ ...stoneParams, color: "#eee7dd", roughness: 0.99, normalScale: new Vector2(0.16, 0.16) }),
-  dark: new MeshStandardMaterial({ color: "#283235", roughness: 0.78 }),
-  glass: new MeshPhysicalMaterial({
-    map: glassMap,
-    color: "#f3fcff",
-    roughness: 0.12,
-    metalness: 0.08,
-    clearcoat: 1,
-    clearcoatRoughness: 0.075,
-    envMapIntensity: 1.05,
-    transparent: true,
-    opacity: 0.93,
-    depthWrite: false
+  limestone: new MeshStandardMaterial({ map: stoneTexture, roughness: 0.96 }),
+  stoneLight: new MeshStandardMaterial({ color: "#e4d3b4", roughness: 0.94 }),
+  stoneMid: new MeshStandardMaterial({ color: "#bea584", roughness: 0.96 }),
+  stoneDeep: new MeshStandardMaterial({ color: "#8d755b", roughness: 0.96 }),
+  roof: new MeshStandardMaterial({ color: "#c8bca9", roughness: 0.97 }),
+  dark: new MeshStandardMaterial({ color: "#202b2e", roughness: 0.83 }),
+  glass: new MeshStandardMaterial({
+    color: "#5b808e", metalness: 0.27, roughness: 0.21,
+    transparent: true, opacity: 0.83
   }),
-  glassDark: new MeshPhysicalMaterial({
-    map: glassMap,
-    color: "#d6e7eb",
-    metalness: 0.14,
-    roughness: 0.13,
-    clearcoat: 1,
-    clearcoatRoughness: 0.065,
-    envMapIntensity: 1.25
+  glassDark: new MeshStandardMaterial({
+    color: "#385967", metalness: 0.33, roughness: 0.2
   }),
-  steel: new MeshStandardMaterial({ color: "#354244", metalness: 0.72, roughness: 0.33 }),
-  bronze: new MeshStandardMaterial({ color: "#80694e", metalness: 0.55, roughness: 0.44 }),
+  steel: new MeshStandardMaterial({ color: "#344448", metalness: 0.6, roughness: 0.42 }),
+  bronze: new MeshStandardMaterial({ color: "#796449", metalness: 0.34, roughness: 0.61 }),
   lit: new MeshStandardMaterial({ color: "#e4c793", roughness: 0.85 }),
   highlight: new MeshStandardMaterial({ color: "#c09a5c", roughness: 0.8 })
 };
