@@ -153,12 +153,14 @@ function phaseName(phase: number) {
 
 
 
-type BuildingId = "library" | "business" | "sse" | "humanities";
-// The site uses four independent precincts arranged around a connected walkway network.
-// Entrance elevations face +Z; the walkway stubs terminate immediately in front of them.
+type BuildingId = SchoolId;
+// Five precincts share one connected pedestrian network. Engineering stays on
+// the east side of the north promenade; a glass-fronted Sciences building
+// occupies the new north-central precinct. All entrances face +Z.
 const SITE_POSITIONS: Record<BuildingId, Position> = {
   business: [-94,0,-77],
-  sse: [92,0,-77],
+  engineering: [92,0,-77],
+  sciences: [0,0,-129],
   library: [-94,0,85],
   humanities: [92,0,85],
 };
@@ -166,7 +168,8 @@ const PLAZA_Z = 20;
 const BUILDINGS: {id: BuildingId; name: string; description: string; location: Position}[] = [
   {id:"library", name:"Library", description:"Explore all courses, study resources and uploaded materials.", location:SITE_POSITIONS.library},
   {id:"business", name:"School of Business", description:"Business, economics, accounting, finance and related majors.", location:SITE_POSITIONS.business},
-  {id:"sse", name:"School of Sciences & Engineering", description:"Engineering, computer science, sciences and technology.", location:SITE_POSITIONS.sse},
+  {id:"engineering", name:"Engineering", description:"Explore engineering majors.", location:SITE_POSITIONS.engineering},
+  {id:"sciences", name:"Sciences", description:"Explore natural, mathematical and computational sciences.", location:SITE_POSITIONS.sciences},
   {id:"humanities", name:"Humanities & Social Sciences", description:"Arts, languages, politics, psychology and the social sciences.", location:SITE_POSITIONS.humanities},
 ];
 
@@ -423,7 +426,7 @@ function Building({children,id,position,onSelect}:{
   // Screen-facing labels remain visible from any orbit angle and rise with
   // the model on hover. They are non-interactive, preserving building clicks.
   const labelHeight:Record<SchoolId,number>={
-    library:36, business:34, sse:32, humanities:27,
+    library:36, business:34, engineering:32, sciences:30, humanities:27,
   };
   const name=BUILDINGS.find(item=>item.id===id)?.name ?? id;
   return <group position={position}>
@@ -566,7 +569,7 @@ function Humanities({night}:{night:number}){
       intensity={24} range={19}/>
   </group>;
 }
-function SSE({night}:{night:number}){
+function Engineering({night}:{night:number}){
   return <group>
     <Block position={[0,0.5,0]} size={[39,1,31]} color="#b8b7aa"/>
     <Block position={[0,9.8,0]} size={[36.5,18.6,29]} color="#dbd2c4"/>
@@ -592,6 +595,12 @@ function SSE({night}:{night:number}){
     <Block position={[0,23.8,-4]} size={[34,0.6,24]} color="#eee8da"/>
     <Block position={[-7,25,-3]} size={[18,2.3,14]} color="#c7ced0"/>
     <Block position={[-7,26.2,-3]} size={[19,0.4,14.5]} color="#e5e8e5"/>
+    {/* Exposed steel portal beams accentuate the engineering building's
+        angular, technical facade, in contrast with the Sciences glass atrium. */}
+    {[-17.5,17.5].map(x=><Block key={x} position={[x,11.9,16]}
+      size={[1.45,20.5,2.7]} color="#9da9ad" metalness={0.32}/>)}
+    <Block position={[0,22.0,16]} size={[37.5,0.95,3.0]}
+      color="#91a0a8" metalness={0.27}/>
     {[16.8,11.3,5.8].map(z=>[5.3,11.5,17.6].map(y=>
       <group key={z+":"+y} position={[18.5,0,z]} rotation={[0,Math.PI/2,0]}>
         <Window position={[0,y,0]} width={3.1} height={4.2} night={night}/>
@@ -600,6 +609,52 @@ function SSE({night}:{night:number}){
     {[-17,17].map(x=><Hedge key={x} position={[x,1.1,16.2]} size={[3.1,1.1,7]}/>)}
     <FacadeLights night={night} positions={[[-10,9,18],[10,9,18]]}
       intensity={26} range={21}/>
+  </group>;
+}
+
+function Sciences({night}:{night:number}){
+  return <group>
+    {/* Distinct glass-heavy research pavilion with a full-height glazed atrium. */}
+    <Block position={[0,0.45,0]} size={[43,0.9,32]} color="#c3c9c5"/>
+    <Block position={[0,10.4,-1]} size={[40,19.7,28]} color="#d8e3df"/>
+    <Block position={[0,10.5,13.3]} size={[36.5,19,0.45]} color="#c4d5d5"/>
+    <Block position={[0,10.6,13.65]} size={[35.2,18.2,0.22]}
+      color={night>0.5?"#99714c":"#628b9f"}
+      emissive={night>0.5?"#ffc17a":"#a7d3e0"}
+      emissiveIntensity={0.04+night*1.75} roughness={0.18} metalness={0.12}/>
+    <WindowHalo position={[0,10.6,14.0]} width={38} height={21}
+      brightness={night*0.55}/>
+    {[-15,-10,-5,0,5,10,15].map(x=>
+      <Block key={"mullion-"+x} position={[x,10.6,13.85]}
+        size={[0.27,18.5,0.42]} color="#d5dedc" metalness={0.28}/>)}
+    {[4.7,10.4,16.1].map(y=>
+      <Block key={"floor-"+y} position={[0,y,13.91]} size={[35.4,0.32,0.48]}
+        color="#d8e3df"/>)}
+    {/* Framed central entrance and shallow cantilevered entrance canopy. */}
+    <Block position={[0,4.8,14.0]} size={[10.5,9.6,1.1]} color="#e9eee7"/>
+    <Block position={[0,4.35,14.69]} size={[8,8.1,0.3]}
+      color={night>0.5?"#8b704f":"#426f85"}
+      emissive="#9bc4d1" emissiveIntensity={night*0.62} roughness={0.2}/>
+    <Block position={[0,9.75,15.0]} size={[14.4,0.65,3.8]} color="#f2f0e8"/>
+    {[-4,4].map(x=><Block key={x} position={[x,4.2,14.9]}
+      size={[0.18,7.8,0.22]} color="#c6d1d3"/>)}
+    {/* A long glazed upper laboratory ribbon is visible from the side. */}
+    {[-9,-3,3,9].map(z=>[6,12,18].map(y=>
+      <group key={z+":"+y} position={[20.2,0,z]} rotation={[0,Math.PI/2,0]}>
+        <Window position={[0,y,0]} width={3.2} height={4.6} night={night}/>
+      </group>))}
+    <Block position={[0,20.6,-1]} size={[43,1.55,31]} color="#f0f0e6"/>
+    <Block position={[0,21.55,-1]} size={[44,0.4,31.8]} color="#f6f3ec"/>
+    <Block position={[0,23.1,-5.7]} size={[29,2.5,13]} color="#d4e0dd"/>
+    <Block position={[0,24.55,-5.7]} size={[29.7,0.5,13.6]} color="#8cb1bd"
+      emissive="#a6cfdb" emissiveIntensity={night*0.25} roughness={0.2}/>
+    {[-10,-5,0,5,10].map(x=><Block key={"skylight-"+x}
+      position={[x,24.9,-5.7]} size={[0.19,0.26,13.6]} color="#e2e7e3"/>)}
+    <Steps front={16.3} wide={15} levels={4}/>
+    {[-17.8,17.8].map(x=><Hedge key={x}
+      position={[x,1.1,16.7]} size={[2.6,1.2,6]}/>)}
+    <FacadeLights night={night} positions={[[-11,10,17],[11,10,17]]}
+      intensity={24} range={21}/>
   </group>;
 }
 
@@ -635,7 +690,8 @@ const ROAD_SEGMENTS: {name:string;points:Position[];width:number}[] = [
   {name:"central-avenue-north",points:[[0,0,-50],[0,0,0]],width:10},
   {name:"central-avenue-south",points:[[0,0,40],[0,0,116]],width:10},
   {name:"business-entrance",points:[[-94,0,-62],[-94,0,-50]],width:8},
-  {name:"sse-entrance",points:[[92,0,-60],[92,0,-50]],width:8},
+  {name:"engineering-entrance",points:[[92,0,-60],[92,0,-50]],width:8},
+  {name:"sciences-entrance",points:[[0,0,-107],[0,0,-50]],width:9},
   {name:"library-entrance",points:[[-94,0,108],[-94,0,116]],width:9},
   {name:"humanities-entrance",points:[[92,0,97],[92,0,116]],width:9},
 ];
@@ -660,7 +716,7 @@ function Promenade({points,width}: {points:Position[];width:number}) {
 
 function CampusWalkways(){
   return <>
-    {/* An H-shaped system of formal campus promenades; every branch joins
+    {/* Formal campus promenades and the north sciences connector; each joins
         an actual school entrance and none crosses a building footprint. */}
     {ROAD_SEGMENTS.map(segment=>
       <Promenade key={segment.name} points={segment.points} width={segment.width}/>
@@ -673,7 +729,7 @@ function CampusWalkways(){
           size={[0.18,0.015,9.4]} color="#c3ae90" cast={false}/>
       )
     )}
-    {[-38,-25,-12,53,66,79,92,105].map(z=>
+    {[-99,-87,-75,-63,-38,-25,-12,53,66,79,92,105].map(z=>
       <Block key={"joint-z-"+z} position={[0,0.186,z]}
         size={[9.4,0.015,0.18]} color="#c3ae90" cast={false}/>
     )}
@@ -697,7 +753,8 @@ function CampusWalkways(){
 // environment. They connect directly to the paths rather than floating in space.
 const BUILDING_PLOTS: {id:BuildingId;size:Position}[] = [
   {id:"business",size:[57,0.2,46]},
-  {id:"sse",size:[57,0.2,49]},
+  {id:"engineering",size:[57,0.2,49]},
+  {id:"sciences",size:[54,0.2,43]},
   {id:"library",size:[68,0.2,50]},
   {id:"humanities",size:[74,0.2,39]},
 ];
@@ -705,6 +762,7 @@ const BUILDING_PLOTS: {id:BuildingId;size:Position}[] = [
 const WALKWAY_LIGHTS: Position[] = [
   [-69,0,-57],[-44,0,-57],[-19,0,-57],[19,0,-57],[44,0,-57],[68,0,-57],
   [-69,0,123],[-44,0,123],[-19,0,123],[19,0,123],[44,0,123],[68,0,123],
+  [-8,0,-101],[8,0,-83],[-8,0,-65],
   [-8,0,-35],[8,0,-18],[-8,0,55],[8,0,73],[-8,0,91],[8,0,106],
   [-106,0,-50],[104,0,-50],[-106,0,116],[104,0,116],
 ];
@@ -713,8 +771,8 @@ function AdaptiveCamera(){
   const {camera,size}=useThree();
   useEffect(()=>{
     if(camera instanceof OrthographicCamera) {
-      // Accommodate all four separated buildings and their wider circulation system.
-       camera.zoom=Math.max(1.15,Math.min(size.width/335,size.height/245));
+      // Fit all five buildings, including the new north-central Sciences wing.
+      camera.zoom=Math.max(1.15,Math.min(size.width/355,size.height/315));
       camera.updateProjectionMatrix();
     }
   },[camera,size.width,size.height]);
@@ -782,6 +840,7 @@ function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}
       [127,0,-92],[129,0,-57],[59,0,-99],[56,0,-66],
       [-129,0,79],[-129,0,106],[-61,0,70],[-61,0,129],
       [131,0,79],[132,0,108],[53,0,72],[53,0,130],
+      [-39,0,-136],[39,0,-136],
       [-33,0,-7],[33,0,-7],[-34,0,49],[34,0,49],
     ].map((p,i)=>
       <Cypress key={i} position={p as Position} scale={i%3===0?0.97:0.8}
@@ -798,11 +857,12 @@ function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}
         onSelect={onSelect}>
         {building.id==="business"&&<Business night={night}/>}
         {building.id==="library"&&<Library night={night}/>}
-        {building.id==="sse"&&<SSE night={night}/>}
+        {building.id==="engineering"&&<Engineering night={night}/>}
+        {building.id==="sciences"&&<Sciences night={night}/>}
         {building.id==="humanities"&&<Humanities night={night}/>}
       </Building>
     )}
-    <OrbitControls makeDefault target={[0,9,PLAZA_Z]} enableDamping
+    <OrbitControls makeDefault target={[0,9,-4]} enableDamping
       dampingFactor={0.08} minDistance={90} maxDistance={380}
       maxPolarAngle={1.42} minPolarAngle={0.6}
       enablePan={true} panSpeed={0.6} rotateSpeed={0.38} zoomSpeed={0.7}/>
@@ -818,7 +878,7 @@ export default function NewHomePage(){
   },[]);
   const celestial=useMemo(()=>celestialState(clock),[clock.getTime()]);
   return <main className={styles.campusPage}>
-    <div className={styles.scene} aria-label="Interactive three-dimensional university campus with four original buildings">
+    <div className={styles.scene} aria-label="Interactive three-dimensional university campus with five original buildings">
       <Canvas shadows orthographic camera={{position:[152,138,190],zoom:3.5,near:0.1,far:800}}
         dpr={[1,1.75]} gl={{antialias:true,alpha:false,powerPreference:"high-performance"}}
         onCreated={({gl})=>{gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.18;gl.shadowMap.type=PCFSoftShadowMap;}}

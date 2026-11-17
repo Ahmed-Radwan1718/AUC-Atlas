@@ -1,11 +1,12 @@
-export type SchoolId = "library" | "business" | "sse" | "humanities";
+export type SchoolId = "library" | "business" | "engineering" | "sciences" | "humanities";
 export type WheelItem = { name: string; short: string; href?: string };
 
 // The school assignments use names already present in AUC Atlas's degree-plan
 // catalog. Compact wedge labels only shorten the visible display name.
 export const SCHOOL_NAMES: Record<SchoolId, string> = {
   business: "School of Business",
-  sse: "Sciences & Engineering",
+  engineering: "Engineering",
+  sciences: "Sciences",
   humanities: "Humanities & Social Sciences",
   library: "AUC Library",
 };
@@ -17,20 +18,24 @@ export const SCHOOL_ITEMS: Record<SchoolId, WheelItem[]> = {
     { name: "Accounting", short: "Accounting" },
     { name: "Management of Information and Communication Technology", short: "ICT Mgmt." },
   ],
-  sse: [
+  // These are navigation groupings within AUC's School of Sciences and Engineering.
+  // Each group fits on one wheel page (eight majors maximum).
+  engineering: [
     { name: "Mechanical Engineering", short: "Mechanical Engineering" },
-    { name: "Computer Science", short: "Computer Science" },
     { name: "Computer Engineering", short: "Computer Engineering" },
     { name: "Electronics and Communications Engineering", short: "Electronics and Communications Engineering" },
     { name: "Construction Engineering", short: "Construction Engineering" },
     { name: "Petroleum Engineering", short: "Petroleum Engineering" },
+    { name: "Architecture", short: "Architecture" },
+  ],
+  sciences: [
+    { name: "Computer Science", short: "Computer Science" },
     { name: "Data Science", short: "Data Science" },
     { name: "Mathematics", short: "Mathematics" },
     { name: "Physics", short: "Physics" },
     { name: "Chemistry", short: "Chemistry" },
     { name: "Biology", short: "Biology" },
-    { name: "Architecture", short: "Architecture" },
-    { name: "Actuarial Science", short: "Actuarial Sci." },
+    { name: "Actuarial Science", short: "Actuarial Science" },
   ],
   humanities: [
     { name: "Political Science", short: "Political Science" },

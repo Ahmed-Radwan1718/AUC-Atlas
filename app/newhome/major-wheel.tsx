@@ -214,7 +214,7 @@ export default function MajorWheel({ school, onClose }: WheelProps) {
             const center = point(i * (360 / pageItems.length), LABEL_RADIUS);
             const isActive = hovered === i;
             return <button type="button" key={item.name}
-              className={styles.option + (isActive ? " " + styles.activeOption : "")}
+              className={styles.option + (pageItems.length <= 7 ? " " + styles.roomyOption : "") + (isActive ? " " + styles.activeOption : "")}
               style={{ left: center.x / 520 * 100 + "%",
                 top: center.y / 520 * 100 + "%" }}
               aria-label={item.name}

@@ -125,6 +125,12 @@
   text-align: center;
   text-shadow: 0 1px 3px rgba(2, 12, 28, .7);
 }
+.roomyOption {
+  width: 23%;
+}
+.roomyOption .optionText {
+  font-size: clamp(10px, 1.25vw, 13px);
+}
 .optionText {
   display: block;
   max-width: 100%;
@@ -348,6 +354,8 @@
   .wheelStage { min-height: 0; flex: 1; justify-content: flex-start; padding-top: 18px; }
   .wheel { width: min(94vw, 61svh); }
   .option { gap: 3px; width: 18.4%; min-height: 33px; }
+  .roomyOption { width: 23%; }
+  .roomyOption .optionText { font-size: clamp(9px, 2.35vw, 12px); }
   .optionText { font-size: clamp(8px, 2.25vw, 10px); }
   .hub { gap: 4px; }
   .hub strong { font-size: clamp(9px, 2.9vw, 12px); }
