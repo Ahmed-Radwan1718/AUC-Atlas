@@ -4,11 +4,18 @@ import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Instance, Instances, OrbitControls, Sky, Stars } from "@react-three/drei";
 import {
-  DataTexture,
   Material,
   MeshPhysicalMaterial,
   MeshStandardMaterial,
   RepeatWrapping,
+  Shape,
+  Path,
+  ExtrudeGeometry,
+  TextureLoader,
+  Texture,
+  DoubleSide,
+  ACESFilmicToneMapping,
+  PCFSoftShadowMap,
   SRGBColorSpace,
 } from "three";
 import styles from "./newhome.module.css";
@@ -163,176 +170,260 @@ function phaseName(phase: number) {
   return "Waning crescent";
 }
 
-function stoneTexture() {
-  // Tiny deterministic mottled material. All texture data is local to /newhome.
-  const width = 128;
-  const data = new Uint8Array(width * width * 4);
-  let seed = 746311;
-  for (let index = 0; index < width * width; index++) {
-    seed = (1664525 * seed + 1013904223) >>> 0;
-    const grain = (seed / 4294967295 - 0.5) * 30;
-    const band = Math.sin(Math.floor(index / width) * 0.31) * 5;
-    data[index * 4] = Math.max(0, Math.min(255, 220 + grain + band));
-    data[index * 4 + 1] = Math.max(0, Math.min(255, 202 + grain + band));
-    data[index * 4 + 2] = Math.max(0, Math.min(255, 172 + grain + band));
-    data[index * 4 + 3] = 255;
-  }
-  const texture = new DataTexture(data, width, width);
-  texture.colorSpace = SRGBColorSpace;
-  texture.wrapS = RepeatWrapping;
-  texture.wrapT = RepeatWrapping;
-  texture.repeat.set(3, 2);
-  texture.needsUpdate = true;
-  return texture;
+
+/** CC0 photographic material maps: polyhaven.com/a/old_sandstone_02
+ * and polyhaven.com/a/stone_tile_wall. Image delivery is CDN-backed;
+ * if the network is unavailable, the scene falls back to stone PBR colors. */
+const PBR_ROOT = "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/";
+
+function Solid({ position, size, material, cast = true }: {
+  position: Position; size: Size; material: Material; cast?: boolean;
+}) {
+  return <mesh position={position} material={material} castShadow={cast} receiveShadow>
+    <boxGeometry args={size} />
+  </mesh>;
 }
 
-function Solid({
-  position, size, material, cast = true,
-}: {
-  position: Position;
-  size: Size;
-  material: Material;
-  cast?: boolean;
+function elevationGeometry(width: number, columns: number) {
+  const s = new Shape();
+  const height = 23.5;
+  s.moveTo(-width / 2, 0);
+  s.lineTo(width / 2, 0);
+  s.lineTo(width / 2, height);
+  s.lineTo(-width / 2, height);
+  s.closePath();
+  const bay = width / columns;
+  for (let col = 0; col < columns; col++) {
+    const x = -width / 2 + bay * (col + 0.5);
+    for (let row = 0; row < 7; row++) {
+      const topRow = row === 6;
+      const bottom = topRow ? 22.25 : 0.8 + row * 3.35;
+      const top = bottom + (topRow ? 0.55 : 2.22);
+      const half = bay * (topRow ? 0.23 : 0.355);
+      const hole = new Path();
+      hole.moveTo(x - half, bottom);
+      hole.lineTo(x - half, top);
+      hole.lineTo(x + half, top);
+      hole.lineTo(x + half, bottom);
+      hole.closePath();
+      s.holes.push(hole);
+    }
+  }
+  const geometry = new ExtrudeGeometry(s, {
+    depth: 1.6, steps: 1, bevelEnabled: true,
+    bevelSize: 0.06, bevelThickness: 0.06, bevelSegments: 2,
+  });
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function PiercedFacade({ position, width, columns, material }: {
+  position: Position; width: number; columns: number; material: Material;
 }) {
-  return (
-    <mesh position={position} material={material} castShadow={cast} receiveShadow>
-      <boxGeometry args={size} />
-    </mesh>
-  );
+  const geometry = useMemo(() => elevationGeometry(width, columns), [width, columns]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <mesh position={position} geometry={geometry}
+    material={material} castShadow receiveShadow />;
 }
 
 function LibraryBuilding({ night }: { night: boolean }) {
-  const texture = useMemo(stoneTexture, []);
-  const materials = useMemo(() => ({
-    stone: new MeshStandardMaterial({ color: "#fff1d6", map: texture, roughness: 0.92 }),
-    darkStone: new MeshStandardMaterial({ color: "#89745c", roughness: 0.9 }),
-    trim: new MeshStandardMaterial({ color: "#dac6a6", roughness: 0.9 }),
-    roof: new MeshStandardMaterial({ color: "#cabba5", roughness: 0.96 }),
+  const m = useMemo(() => ({
+    screen: new MeshStandardMaterial({ color: "#e0c7a3", roughness: 0.9 }),
+    stone: new MeshStandardMaterial({ color: "#dcc5a6", roughness: 0.88 }),
+    darkStone: new MeshStandardMaterial({ color: "#917463", roughness: 0.87 }),
+    roof: new MeshStandardMaterial({ color: "#bba78b", roughness: 0.95 }),
+    shadow: new MeshStandardMaterial({ color: "#71685a", roughness: 0.92 }),
+    paving: new MeshStandardMaterial({ color: "#d6c8b0", roughness: 0.94 }),
+    frame: new MeshStandardMaterial({ color: "#33454b", metalness: 0.7, roughness: 0.3 }),
     glass: new MeshPhysicalMaterial({
-      color: "#3f6571", roughness: 0.14, metalness: 0.43, clearcoat: 0.7, clearcoatRoughness: 0.14,
+      color: "#7291a0", roughness: 0.13, metalness: 0.3, clearcoat: 0.9,
+      transparent: true, opacity: 0.76, side: DoubleSide, depthWrite: false,
     }),
-    litGlass: new MeshPhysicalMaterial({
-      color: night ? "#c3a270" : "#557681",
-      roughness: 0.18, metalness: 0.2, clearcoat: 0.45,
-      emissive: night ? "#94744b" : "#000000", emissiveIntensity: night ? 0.32 : 0,
+    reflection: new MeshPhysicalMaterial({
+      color: "#accbd3", roughness: 0.07, metalness: 0.2, clearcoat: 1,
+      transparent: true, opacity: 0.12, side: DoubleSide, depthWrite: false,
     }),
-    frame: new MeshStandardMaterial({ color: "#393e40", roughness: 0.36, metalness: 0.6 }),
-    paving: new MeshStandardMaterial({ color: "#dbcbb1", roughness: 0.94 }),
-  }), [texture, night]);
+    interior: new MeshStandardMaterial({
+      color: "#7b6655", roughness: 0.8, emissive: "#eab76d",
+      emissiveIntensity: 0.1,
+    }),
+  }), []);
 
-  useEffect(() => () => {
-    Object.values(materials).forEach((material) => material.dispose());
-  }, [materials]);
-  useEffect(() => () => { texture.dispose(); }, [texture]);
+  useEffect(() => {
+    m.interior.emissiveIntensity = night ? 1.05 : 0.12;
+    m.glass.color.set(night ? "#a4937a" : "#7291a0");
+  }, [m, night]);
 
-  const longBays = 28;
-  const shortBays = 12;
-  const longStep = 90 / longBays;
-  const shortStep = 43 / shortBays;
+  useEffect(() => {
+    const loader = new TextureLoader();
+    let alive = true;
+    const loaded: Texture[] = [];
+    const load = (name: string, tiling: [number, number], target: MeshStandardMaterial,
+      kind: "map" | "normalMap") => {
+      loader.load(PBR_ROOT + name, (texture) => {
+        if (!alive) { texture.dispose(); return; }
+        texture.wrapS = RepeatWrapping;
+        texture.wrapT = RepeatWrapping;
+        texture.repeat.set(tiling[0], tiling[1]);
+        texture.anisotropy = 8;
+        if (kind === "map") texture.colorSpace = SRGBColorSpace;
+        texture.needsUpdate = true;
+        target[kind] = texture;
+        if (kind === "normalMap") target.normalScale.set(0.22, 0.22);
+        target.needsUpdate = true;
+        loaded.push(texture);
+      }, undefined, () => { /* Retain fallback if CDN cannot be reached. */ });
+    };
+    load("old_sandstone_02/old_sandstone_02_diff_2k.jpg", [0.21, 0.21], m.screen, "map");
+    load("old_sandstone_02/old_sandstone_02_nor_gl_2k.jpg", [0.21, 0.21], m.screen, "normalMap");
+    load("stone_tile_wall/stone_tile_wall_diff_2k.jpg", [3, 2], m.stone, "map");
+    load("stone_tile_wall/stone_tile_wall_nor_gl_2k.jpg", [3, 2], m.stone, "normalMap");
+    return () => {
+      alive = false;
+      loaded.forEach((texture) => texture.dispose());
+    };
+  }, [m]);
+  useEffect(() => () => Object.values(m).forEach((mat) => mat.dispose()), [m]);
 
   return (
-    // Table 2 specifies a 45° NE orientation. X = east, Z = north for the sun.
     <group rotation={[0, -Math.PI / 4, 0]}>
-      {/* 90 m × 43 m structural envelope, garden/plaza and three upper levels. */}
-      <Solid position={[0, 0.5, 0]} size={[90, 1, 43]} material={materials.darkStone} />
-      <Solid position={[0, 11.5, 0]} size={[88, 21, 41]} material={materials.trim} />
-      <Solid position={[0, 23.05, 0]} size={[91, 1.45, 44]} material={materials.roof} />
-      <Solid position={[0, 23.95, 0]} size={[93, 0.55, 46]} material={materials.stone} />
-
-      {/* Long plaza-facing facade: deeply recessed mashrabiya-inspired grid. */}
-      <Solid position={[0, 11.9, 21.54]} size={[89.4, 21.6, 0.2]} material={materials.glass} />
-      <Instances limit={160} material={materials.stone} castShadow receiveShadow>
-        <boxGeometry args={[1, 1, 1]} />
-        {Array.from({ length: longBays + 1 }, (_, i) => {
-          const x = -45 + i * longStep;
-          // The entrance tower interrupts the regular facade.
-          if (x > 7 && x < 20) return null;
-          return <Instance key={"plaza-pier-" + i} position={[x, 12.1, 22.35]}
-            scale={[0.75, 22.1, 1.6]} />;
-        })}
-        {Array.from({ length: 6 }, (_, i) =>
-          <Instance key={"plaza-beam-" + i} position={[-0.1, 1.7 + i * 4.15, 22.35]}
-            scale={[89.7, 0.77, 1.6]} />
-        )}
-      </Instances>
-      {/* Recessed central entrance slot, vertical glass and stone portal. */}
-      <Solid position={[13.5, 12.5, 23.08]} size={[12, 25, 3.4]} material={materials.darkStone} />
-      <Solid position={[13.5, 12.2, 24.86]} size={[7.8, 21.9, 0.18]} material={materials.litGlass} />
-      <Solid position={[13.5, 12.2, 25.02]} size={[0.17, 22, 0.18]} material={materials.frame} />
-      <Solid position={[13.5, 6.7, 25.05]} size={[8.1, 0.22, 0.22]} material={materials.frame} />
-      <Solid position={[13.5, 15.2, 25.05]} size={[8.1, 0.22, 0.22]} material={materials.frame} />
-      <Solid position={[8.1, 12.7, 25.05]} size={[1.1, 25, 0.6]} material={materials.darkStone} />
-      <Solid position={[18.9, 12.7, 25.05]} size={[1.1, 25, 0.6]} material={materials.darkStone} />
-      <Solid position={[13.5, 25.0, 24.8]} size={[12.8, 1.1, 4.8]} material={materials.darkStone} />
-
-      {/* Covered colonnade and tall glazing on the opposite long elevation. */}
-      <Solid position={[0, 11.4, -21.45]} size={[78, 21.2, 0.2]} material={materials.litGlass} />
-      <Solid position={[-39.5, 11.5, -21.6]} size={[11, 22.5, 1.6]} material={materials.stone} />
-      <Solid position={[39.5, 11.5, -21.6]} size={[11, 22.5, 1.6]} material={materials.stone} />
-      <Solid position={[0, 23.8, -24.8]} size={[84, 1.15, 9]} material={materials.roof} />
-      <Instances limit={100} material={materials.trim} castShadow receiveShadow>
-        <boxGeometry args={[1, 1, 1]} />
-        {Array.from({ length: 23 }, (_, i) =>
-          <Instance key={"glass-pier-" + i} position={[-37 + i * 3.36, 11.3, -24.2]}
-            scale={[0.66, 22.2, 0.94]} />
-        )}
-        {Array.from({ length: 5 }, (_, i) =>
-          <Instance key={"glass-spandrel-" + i} position={[0, 3.5 + i * 4.4, -23.1]}
-            scale={[78, 0.43, 0.75]} />
-        )}
-      </Instances>
-      <Instances limit={30} material={materials.frame} castShadow receiveShadow>
-        <boxGeometry args={[1, 1, 1]} />
-        {Array.from({ length: 22 }, (_, i) =>
-          <Instance key={"mullion-" + i} position={[-36.6 + i * 3.36, 11, -21.81]}
-            scale={[0.08, 20, 0.18]} />
-        )}
-      </Instances>
-
-      {/* The short-end facades and shadowed recessed openings. */}
-      <Solid position={[-45, 11.5, 0]} size={[0.2, 22, 42.8]} material={materials.glass} />
-      <Solid position={[45, 11.5, 0]} size={[0.2, 22, 42.8]} material={materials.glass} />
-      <Instances limit={190} material={materials.stone} castShadow receiveShadow>
-        <boxGeometry args={[1, 1, 1]} />
-        {[-45.6, 45.6].flatMap((x, side) => [
-          ...Array.from({ length: shortBays + 1 }, (_, i) =>
-            <Instance key={"end-pier-" + side + "-" + i}
-              position={[x, 11.7, -21.5 + i * shortStep]}
-              scale={[1.25, 22.2, 0.72]} />
-          ),
-          ...Array.from({ length: 6 }, (_, i) =>
-            <Instance key={"end-beam-" + side + "-" + i}
-              position={[x, 1.7 + i * 4.15, 0]}
-              scale={[1.25, 0.77, 43]} />
-          ),
-        ])}
-      </Instances>
-
-      {/* Entrance plinth and the unusually deep shaded approach. */}
-      <Solid position={[13, 1.35, 28]} size={[23, 2.1, 14]} material={materials.trim} />
-      {Array.from({ length: 10 }, (_, i) =>
-        <Solid key={"entry-step-" + i}
-          position={[13, 0.16 + i * 0.125, 39 - i * 0.82]}
-          size={[24, 0.26 + i * 0.25, 0.86]} material={materials.stone} />
+      {/* The original placeholder block is replaced by separate structural layers,
+          so the 1.6-meter-deep screen opens into a real glass setback. */}
+      <Solid position={[0, 0.6, 0]} size={[90, 1.2, 43]} material={m.darkStone} />
+      {[5.7, 11, 16.4, 21.6].map((y) =>
+        <Solid key={"slab-" + y} position={[0, y, -1]}
+          size={[87, 0.42, 39]} material={m.roof} />
       )}
-      <Solid position={[13.5, 3.6, 28]} size={[16, 0.6, 13]} material={materials.roof} />
-      {[-7, 7].map((offset) =>
-        <Solid key={offset} position={[13.5 + offset, 2.7, 32.8]}
-          size={[0.9, 5.4, 0.9]} material={materials.stone} />
+      {/* Stone and glazing behind genuinely perforated long eastern facade. */}
+      <Solid position={[0, 12.3, 18.6]} size={[88.3, 22.4, 0.3]}
+        material={m.interior} />
+      <Solid position={[0, 12.3, 21.4]} size={[87.9, 22.4, 0.12]}
+        material={m.glass} cast={false} />
+      <PiercedFacade position={[-18.5, 1.1, 21.5]} width={53} columns={24}
+        material={m.screen} />
+      <PiercedFacade position={[32.5, 1.1, 21.5]} width={25} columns={11}
+        material={m.screen} />
+
+      {/* Real-life landmark: recessed, full-height monumental entrance framed
+          in darker stone, rather than a tiny rectangular front door. */}
+      <Solid position={[14, 13.75, 22.6]} size={[12.7, 27.5, 5.3]}
+        material={m.darkStone} />
+      <Solid position={[14, 12.5, 25.35]} size={[8.5, 23.2, 0.17]}
+        material={m.glass} cast={false} />
+      {[-5.0, 5.0].map((x) =>
+        <Solid key={"portal-pier" + x} position={[14 + x, 13.7, 25.6]}
+          size={[1.2, 27.4, 1.0]} material={m.stone} />
+      )}
+      <Solid position={[14, 27, 25.6]} size={[11.8, 1.25, 1.0]}
+        material={m.stone} />
+      {[-3.1, -1.5, 0, 1.5, 3.1].map((x) =>
+        <Solid key={"entrance-mullion" + x} position={[14 + x, 12.4, 25.52]}
+          size={[0.085, 22.5, 0.15]} material={m.frame} />
+      )}
+      {[5.2, 10, 14.8, 19.6].map((y) =>
+        <Solid key={"entrance-transom" + y} position={[14, y, 25.55]}
+          size={[8.4, 0.1, 0.14]} material={m.frame} />
       )}
 
-      {/* Roofline, parapets, skylight and discrete service masses. */}
-      <Solid position={[0, 24.6, 21]} size={[92, 1.7, 1.6]} material={materials.stone} />
-      <Solid position={[0, 24.6, -21]} size={[92, 1.7, 1.6]} material={materials.stone} />
-      <Solid position={[-45, 24.6, 0]} size={[1.4, 1.7, 42]} material={materials.stone} />
-      <Solid position={[45, 24.6, 0]} size={[1.4, 1.7, 42]} material={materials.stone} />
-      <Solid position={[-15, 25.1, -1]} size={[31, 1.5, 11]} material={materials.glass} />
-      <Solid position={[-15, 26.1, -1]} size={[31.9, 0.38, 11.9]} material={materials.frame} />
-      <Solid position={[30, 25.4, 4]} size={[12, 1.9, 10]} material={materials.roof} />
+      {/* The opposite elevation is an expansive three-story reading-room
+          curtain wall with a substantial projecting roof and stone columns. */}
+      <Solid position={[-7, 12.2, -21.2]} size={[74, 22.8, 0.28]}
+        material={m.interior} />
+      <Solid position={[-7, 12.2, -21.55]} size={[74, 22.8, 0.13]}
+        material={m.glass} cast={false} />
+      <Solid position={[-7, 12.2, -21.72]} size={[74, 22.8, 0.08]}
+        material={m.reflection} cast={false} />
+      <Solid position={[-7, 25, -24.8]} size={[76.5, 2.3, 12.5]}
+        material={m.stone} />
+      <Solid position={[-7, 23.75, -26.2]} size={[76, 0.28, 8.4]}
+        material={m.roof} />
+      <Instances limit={28} material={m.stone} castShadow receiveShadow>
+        <boxGeometry args={[1, 1, 1]} />
+        {Array.from({ length: 18 }, (_, i) =>
+          <Instance key={i} position={[-42 + i * 4.06, 12.2, -24.1]}
+            scale={[1.1, 24.4, 1.7]} />
+        )}
+      </Instances>
+      <Instances limit={55} material={m.frame} castShadow receiveShadow>
+        <boxGeometry args={[1, 1, 1]} />
+        {Array.from({ length: 18 }, (_, i) =>
+          <Instance key={"m" + i} position={[-40 + i * 4.06, 12.1, -21.79]}
+            scale={[0.085, 21.3, 0.13]} />
+        )}
+        {[5, 10, 15, 20].map((y) =>
+          <Instance key={"t" + y} position={[-7, y, -21.8]}
+            scale={[73.5, 0.12, 0.13]} />
+        )}
+      </Instances>
+      {/* Interior silhouette visible through reflective glass. */}
+      {[-34, -22, -10, 2, 14].map((x) =>
+        [7, 12.5, 18].map((y) =>
+          <Solid key={"shelf" + x + ":" + y} position={[x, y, -19.4]}
+            size={[4.3, 2.5, 0.7]} material={m.interior} />
+        )
+      )}
 
-      {/* No other buildings: a limited stone forecourt only. */}
-      <Solid position={[0, -0.18, 38]} size={[112, 0.35, 38]}
-        material={materials.paving} cast={false} />
+      {/* Horizontally banded stone mass on the glass elevation's far end. */}
+      <Solid position={[37, 13.2, -22]} size={[16, 26.4, 2.8]}
+        material={m.darkStone} />
+      {Array.from({ length: 22 }, (_, i) =>
+        <Solid key={"stripe" + i} position={[37, 0.7 + i * 1.18, -23.5]}
+          size={[16.4, i % 2 ? 0.35 : 0.58, 0.15]}
+          material={i % 2 ? m.roof : m.stone} />
+      )}
+      {[30.7, 34.5, 38.4].map((x) =>
+        <Solid key={"slot" + x} position={[x, 14, -23.67]}
+          size={[0.85, 10, 0.13]} material={m.frame} />
+      )}
+
+      {/* Side elevations, recessed dark glazing and thick vertical fins. */}
+      {[-44.4, 44.4].map((x) =>
+        <Solid key={"side" + x} position={[x, 12.2, 0]}
+          size={[0.4, 23, 42.5]} material={m.stone} />
+      )}
+      {[-45, 45].map((x) =>
+        [-17, -9, -1, 7, 15].map((z) =>
+          <Solid key={"sidefin" + x + "," + z}
+            position={[x, 12.2, z]} size={[1.1, 23, 1.2]}
+            material={m.stone} />
+        )
+      )}
+
+      {/* Broad stepped entry and the deep, coffered portico. */}
+      <Solid position={[14, 2.1, 30]} size={[19, 0.75, 11]}
+        material={m.stone} />
+      {Array.from({ length: 15 }, (_, i) =>
+        <Solid key={"step" + i} position={[14, 0.17 + i * 0.13, 42 - i * 0.65]}
+          size={[19, 0.35, 0.7]} material={m.stone} />
+      )}
+      <Solid position={[14, 5.2, 32.8]} size={[20, 0.8, 12.7]}
+        material={m.roof} />
+      {[-8, 8].map((x) =>
+        <Solid key={"portico" + x} position={[14 + x, 2.5, 37]}
+          size={[1.2, 5, 1.2]} material={m.stone} />
+      )}
+      {Array.from({ length: 11 }, (_, i) =>
+        <Solid key={"coffer" + i} position={[5 + i * 1.8, 4.75, 32.6]}
+          size={[0.18, 0.17, 10]} material={m.darkStone} />
+      )}
+
+      {/* Roof level, parapets, and modest raised service mass. */}
+      <Solid position={[0, 24.1, 0]} size={[90, 1.2, 43]}
+        material={m.roof} />
+      {[-21, 21].map((z) =>
+        <Solid key={"parapet" + z} position={[0, 25.2, z]}
+          size={[91, 1.5, 1.4]} material={m.stone} />
+      )}
+      {[-44.6, 44.6].map((x) =>
+        <Solid key={"parapet2" + x} position={[x, 25.2, 0]}
+          size={[1.1, 1.5, 41]} material={m.stone} />
+      )}
+      <Solid position={[-20, 26.5, 0]} size={[19, 3.5, 10]}
+        material={m.darkStone} />
+
+      {/* Only the library and immediate ground plane. */}
+      <Solid position={[0, -0.18, 27]} size={[117, 0.33, 84]}
+        material={m.paving} cast={false} />
     </group>
   );
 }
@@ -371,7 +462,7 @@ function Scene({ light }: { light: SceneLight }) {
         intensity={lightPower}
         color={twilight ? "#ffcc9a" : "#fff6e5"}
         castShadow={light.altitude > 0}
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[4096, 4096]}
         shadow-camera-left={-90}
         shadow-camera-right={90}
         shadow-camera-top={90}
@@ -427,7 +518,12 @@ export default function NewHomePage() {
         <Canvas
           shadows
           camera={{ position: [78, 58, 82], fov: 47, near: 0.5, far: 750 }}
-          dpr={[1, 1.65]}
+          dpr={[1, 1.85]}
+          onCreated={({ gl }) => {
+            gl.toneMapping = ACESFilmicToneMapping;
+            gl.toneMappingExposure = 1.15;
+            gl.shadowMap.type = PCFSoftShadowMap;
+          }}
           gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
           fallback={<p className={styles.fallback}>WebGL is required for the 3D library preview.</p>}
         >
@@ -438,11 +534,11 @@ export default function NewHomePage() {
       <section className={styles.intro} aria-label="Building information">
         <span className={styles.kicker}>AUC ATLAS · CAMPUS EXPERIMENT 01</span>
         <h1>AUC Library</h1>
-        <p>A source-informed, interactive 3D reconstruction of the New Cairo Library.</p>
+        <p>Interactive architectural reconstruction based on the Library's actual exterior.</p>
         <div className={styles.meta}>
           <span>90 × 43 m footprint</span><span>Five levels</span><span>45° NE</span>
         </div>
-        <p className={styles.experimental}>First-pass geometry. Facade details and roof forms are still being calibrated against photographs and architectural drawings.</p>
+        <p className={styles.experimental}>In progress: deep facade openings, photographic stone materials, and glass detail. Not an official BIM model or photogrammetry scan.</p>
       </section>
 
       <div className={styles.dragTip} aria-hidden="true">Drag to orbit <span>·</span> Scroll to zoom</div>
