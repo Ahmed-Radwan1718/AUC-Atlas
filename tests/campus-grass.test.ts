@@ -21,7 +21,10 @@ test("grass uses GPU instancing, wind, realistic lighting and reduced motion", (
   assert.match(source, /uGrassMotion/);
   assert.match(source, /prefers-reduced-motion: reduce/);
   assert.match(source, /MeshStandardMaterial/);
-  assert.match(source, /new Color\("#23362d"\)/);
+  assert.match(source, /new Color\("#688069"\)/);
+  assert.match(source, /new Color\("#849a7a"\)/);
+  assert.match(source, /z \+= 3\.1/);
+  assert.match(source, /const widths = \[0\.22, 0\.17, 0\.096, 0\.008\]/);
   assert.doesNotMatch(source, /Math\.random\(\)/);
   assert.doesNotMatch(source, /emissiveIntensity:/);
 });

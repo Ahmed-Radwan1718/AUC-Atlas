@@ -58,10 +58,11 @@ function createTufts(paths: Path[], plots: Plot[], plazaZ: number): Tuft[] {
   const rand = seededRandom();
   const tufts: Tuft[] = [];
   // A broad but finite planted area: one instanced draw call, not one React node per blade.
-  for (let z = -215; z <= 195; z += 3.8) {
-    for (let x = -220; x <= 220; x += 3.8) {
-      const px = x + (rand() - 0.5) * 2.9;
-      const pz = z + (rand() - 0.5) * 2.9;
+  // Denser tufts read as a continuous lawn from the overhead camera, not dots.
+  for (let z = -215; z <= 195; z += 3.1) {
+    for (let x = -220; x <= 220; x += 3.1) {
+      const px = x + (rand() - 0.5) * 2.35;
+      const pz = z + (rand() - 0.5) * 2.35;
       const turn = rand() * Math.PI * 2;
       const spread = 0.74 + rand() * 0.62;
       const height = 0.75 + rand() * 0.64;
@@ -79,7 +80,7 @@ function makeTuftGeometry() {
   const geometry = new BufferGeometry();
   const positions: number[] = [], colors: number[] = [], indices: number[] = [];
   const levels = [0, 0.36, 0.77, 1.25];
-  const widths = [0.15, 0.115, 0.067, 0.006];
+  const widths = [0.22, 0.17, 0.096, 0.008];
   for (let blade = 0; blade < 3; blade++) {
     const angle = blade * Math.PI * 2 / 3;
     const sideX = Math.cos(angle), sideZ = Math.sin(angle);
@@ -115,9 +116,9 @@ function makeTerrainGeometry() {
   const colors: number[] = [];
   for (let i = 0; i < positions.count; i++) {
     const x = positions.getX(i), z = positions.getY(i);
-    const mottling = Math.sin(x * 0.034) * Math.cos(z * 0.045) * 0.055 +
-      Math.sin(x * 0.087 + z * 0.021) * 0.027;
-    colors.push(0.93 + mottling, 0.97 + mottling, 0.89 + mottling);
+    const mottling = Math.sin(x * 0.034) * Math.cos(z * 0.045) * 0.09 +
+      Math.sin(x * 0.087 + z * 0.021) * 0.045;
+    colors.push(0.90 + mottling, 0.96 + mottling, 0.87 + mottling);
   }
   geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
   return geometry;
@@ -168,12 +169,16 @@ export default function CampusGrass({ night, paths, plots, plazaZ }: GrassProps)
     return result;
   }, [wind]);
 
+  // The previous night albedo was nearly black (#23362d), so physically lit
+  // grass vanished into the scene even with moonlight. Keep its night albedo
+  // muted and desaturated, but reflective enough to catch existing ambient,
+  // moon-directional and nearby fixture lights. No emissive glow is added.
   const transition = MathUtils.smoothstep(night, 0, 1);
   const terrainColor = useMemo(() =>
-    new Color("#6f9459").lerp(new Color("#23362d"), transition),
+    new Color("#6f9459").lerp(new Color("#688069"), transition),
   [transition]);
   const bladeColor = useMemo(() =>
-    new Color("#7ea467").lerp(new Color("#3c5545"), transition),
+    new Color("#7ea467").lerp(new Color("#849a7a"), transition),
   [transition]);
 
   useLayoutEffect(() => {
