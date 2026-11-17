@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
+import LibraryBuilding from "./LibraryBuilding";
 import {
   BoxGeometry, DataTexture, LinearFilter, MeshStandardMaterial,
   RGBAFormat, RepeatWrapping, SRGBColorSpace, Vector3,
@@ -343,72 +344,13 @@ function Business({ active }: { active: boolean }) {
   );
 }
 
-// AUC Main Library: a three-story glass reading room behind tall limestone
-// columns, with deep canopy and square mashrabiya-inspired stone screens.
-// These forms follow the architect's exterior reference photos, using only
-// procedural geometry and the existing campus materials.
+// AUC Main Library model rebuilt from the four elevations and five-level
+// architectural drawings published in the July 2026 Archnet-IJAR study.
+// Rotation and position are kept here so the campus selection map stays stable.
 function Library({ active }: { active: boolean }) {
   return (
     <group position={[14.5, 0, -4.2]} rotation={[0, buildingRotations.library, 0]}>
-      <Block at={[0, 0.07, 0]} size={[10.8, 0.14, 6.8]} material={active ? mat.focus : mat.concrete} />
-
-      {/* Deep limestone structure and raised parapet. */}
-      <Block at={[0, 2.64, -0.38]} size={[10.1, 4.98, 4.04]} material={mat.limestone} />
-      <Block at={[0, 5.15, -0.38]} size={[10.35, 0.29, 4.4]} material={mat.carved} />
-      <Block at={[0, 5.4, -0.38]} size={[10.3, 0.18, 4.36]} material={mat.sandstone} />
-      <Block at={[-3.6, 2.67, 1.77]} size={[2.75, 4.78, 0.17]} material={mat.recess} />
-      <Block at={[3.62, 2.67, 1.77]} size={[2.75, 4.78, 0.17]} material={mat.recess} />
-
-      {/* A tall, continuously glazed atrium with dark metal mullions. */}
-      <Block at={[0, 2.72, 1.79]} size={[4.7, 4.64, 0.13]} material={mat.recess} />
-      <Block at={[0, 2.72, 1.89]} size={[4.53, 4.46, 0.045]} material={mat.glassLight} />
-      {[-1.86, -0.93, 0, 0.93, 1.86].map(x => (
-        <Block key={"glass-pier-" + x} at={[x, 2.72, 1.98]} size={[0.085, 4.6, 0.17]} material={mat.sandstoneDark} />
-      ))}
-      {[1.43, 2.47, 3.51, 4.57].map(y => (
-        <Block key={"glass-floor-" + y} at={[0, y, 1.99]} size={[4.67, 0.075, 0.16]} material={mat.sandstoneDark} />
-      ))}
-
-      {/* Deep entrance threshold, door and broad AUC-style limestone steps. */}
-      <Block at={[0, 0.96, 2.08]} size={[1.76, 1.43, 0.09]} material={mat.glass} />
-      <Block at={[0, 0.97, 2.19]} size={[0.055, 1.41, 0.06]} material={mat.sandstoneDark} />
-      <Block at={[0, 0.41, 2.62]} size={[5.9, 0.19, 0.9]} material={mat.carved} />
-      <Block at={[0, 0.3, 2.91]} size={[6.02, 0.17, 0.81]} material={mat.limestoneLight} />
-      <Block at={[0, 0.205, 3.21]} size={[6.17, 0.14, 0.76]} material={mat.path} />
-
-      {/* The monumental shaded colonnade and projecting library roof. */}
-      <Block at={[0, 5.28, 2.29]} size={[5.45, 0.28, 1.4]} material={mat.carved} />
-      <Block at={[0, 5.46, 2.24]} size={[5.52, 0.14, 1.46]} material={mat.sandstone} />
-      {[-2.29, -0.77, 0.77, 2.29].map(x => (
-        <Block key={"library-column-" + x} at={[x, 2.87, 2.14]} size={[0.25, 4.67, 0.38]} material={mat.carved} />
-      ))}
-
-      {/* Repeating square-screen apertures in the exterior limestone wings. */}
-      {[-3.61, 3.62].map(side => (
-        <group key={"screen-" + side}>
-          {Array.from({ length: 7 }, (_, i) => (
-            <Block
-              key={"vertical-" + i}
-              at={[side - 1.28 + i * 0.425, 2.64, 1.91]}
-              size={[0.12, 4.63, 0.24]}
-              material={mat.limestoneLight}
-            />
-          ))}
-          {Array.from({ length: 10 }, (_, i) => (
-            <Block
-              key={"horizontal-" + i}
-              at={[side, 0.35 + i * 0.5, 1.92]}
-              size={[2.7, 0.125, 0.24]}
-              material={mat.limestoneLight}
-            />
-          ))}
-        </group>
-      ))}
-
-      {/* Roof returns and a darker stone side volume. */}
-      <Block at={[-4.78, 3.05, -0.7]} size={[0.41, 4.78, 3.9]} material={mat.sandstone} />
-      <Block at={[4.78, 3.05, -0.7]} size={[0.41, 4.78, 3.9]} material={mat.sandstone} />
-      <Block at={[0, 0.13, 3.19]} size={[10.3, 0.055, 0.4]} material={mat.path} />
+      <LibraryBuilding active={active} />
     </group>
   );
 }
@@ -453,7 +395,7 @@ function CampusGround() {
       <CampusWalkway from={[-1.85, 9.65]} to={[-8.1, 5.0]} width={2.05} />
       <CampusWalkway from={[-8.1, 5.0]} to={[-14.5, -0.95]} width={2.05} />
       <CampusWalkway from={[1.85, 9.65]} to={[8.1, 5.0]} width={2.05} />
-      <CampusWalkway from={[8.1, 5.0]} to={[11.15, -4.2]} width={2.05} />
+      <CampusWalkway from={[8.1, 5.0]} to={[11.15, -0.05]} width={2.05} />
 
       {/* Relocate the existing landscape elements around, not onto, the paths. */}
       {[
@@ -491,7 +433,11 @@ function CameraDirector({ selected, controls, cameraMotion }: { selected: School
   // Keep the existing focus animation and manual zoom behavior. Only the
   // destination coordinates change to match the new triangular campus.
   const goal = useMemo(
-    () => selected
+    () => selected === "library"
+      ? compact
+        ? new Vector3(positions.library[0] + 10, 13.5, positions.library[1] + 28)
+        : new Vector3(positions.library[0] + 8.2, 11.8, positions.library[1] + 23)
+      : selected
       ? compact
         ? new Vector3(positions[selected][0] + 5.2, 9.6, positions[selected][1] + 18.5)
         : new Vector3(positions[selected][0] + 3.7, 7.7, positions[selected][1] + 13.5)
@@ -547,7 +493,7 @@ function School({
       {children}
       {(hovered || selected === id) && (
         <mesh position={[positions[id][0], 0.16, positions[id][1]]} rotation={[-Math.PI / 2, 0, buildingRotations[id]]}>
-          <planeGeometry args={id === "library" ? [10.5, 6.6] : [7.48, 6.08]} />
+          <planeGeometry args={id === "library" ? [7.95, 16.7] : [7.48, 6.08]} />
           <meshBasicMaterial color="#c09a5c" transparent opacity={0.12} depthWrite={false} />
         </mesh>
       )}
