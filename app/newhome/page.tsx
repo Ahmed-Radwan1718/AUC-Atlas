@@ -7,8 +7,6 @@ import {
   ACESFilmicToneMapping, CatmullRomCurve3, DoubleSide, Mesh,
   PCFSoftShadowMap, Shape, Vector3, BufferGeometry, Float32BufferAttribute, OrthographicCamera,
 } from "three";
-import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
-import { courses } from "../../data/courses";
 import styles from "./newhome.module.css";
 
 /**
@@ -167,37 +165,6 @@ const BUILDINGS: {id: BuildingId; name: string; description: string; location: P
   {id:"sse", name:"School of Sciences & Engineering", description:"Engineering, computer science, sciences and technology.", location:SITE_POSITIONS.sse},
   {id:"humanities", name:"Humanities & Social Sciences", description:"Arts, languages, politics, psychology and the social sciences.", location:SITE_POSITIONS.humanities},
 ];
-const CATEGORY: Record<BuildingId, string[]> = {
-  library: ["Browse all courses", "Student materials", "Professors"],
-  business: ["Business and Entrepreneurship", "Business in Finance", "Business in Marketing", "Accounting", "Economics", "Actuarial Science"],
-  sse: ["Mechanical Engineering", "Computer Science", "Computer Engineering", "Electronics and Communications Engineering", "Architecture", "Data Science", "Construction Engineering", "Physics", "Chemistry", "Biology", "Mathematics", "Petroleum Engineering"],
-  humanities: ["Political Science", "Psychology", "English and Comparative Literature", "History", "Sociology", "Anthropology", "Philosophy", "Visual Arts", "Film", "Theatre", "Arabic Studies", "Egyptology", "Music"],
-};
-const TOOLS: Record<string,string> = {
-  "Browse all courses":"/courses", "Student materials":"/courses", "Professors":"/professors"
-};
-type DegreeGroup = {title?:string;items?:string[]};
-const degreePlans = DEGREE_REQUIREMENTS as Record<string,{groups?:DegreeGroup[]}>;
-const courseByCode = new Map(courses.map(c=>[c.code.toUpperCase(),c]));
-function majorCourses(major:string) {
-  const groups=degreePlans[major]?.groups || [];
-  const seen=new Set<string>();
-  return groups.map(group=>({
-    title:group.title || "Degree requirements",
-    courses:(group.items||[]).flatMap(item=>{
-      if(typeof item!=="string")return [];
-      const matches=item.match(/\b[A-Z]{3,5}\s+\d{4}[A-Z]?\b/g) || [];
-      return matches.flatMap(match=>{
-        const code=match.replace(/\s+/g," ").trim().toUpperCase();
-        if(seen.has(code)) return [];
-        seen.add(code);
-        const entry=courseByCode.get(code);
-        return [{code,name:entry?.title || item.slice(0,110)}];
-      });
-    }),
-  })).filter(group=>group.courses.length>0);
-}
-
 function Block({position,size,color="#e1d1b7",emissive,emissiveIntensity=0,roughness=0.85,metalness=0,cast=true}:{
   position:Position;size:Position;color?:string;emissive?:string;emissiveIntensity?:number;roughness?:number;metalness?:number;cast?:boolean;
 }){
@@ -315,14 +282,14 @@ function Hedge({position,size}:{
 }){
   return <Block position={position} size={size} color="#527443"/>;
 }
-function Building({children,id,position,select,hover}:{
-  children:React.ReactNode;id:BuildingId;position:Position;select:(id:BuildingId)=>void;
+function Building({children,id,position,hover}:{
+  children:React.ReactNode;id:BuildingId;position:Position;
   hover:(id:BuildingId|null)=>void;
 }){
   return <group position={position}
-    onPointerOver={(event:ThreeEvent<PointerEvent>)=>{event.stopPropagation();hover(id);document.body.style.cursor="pointer";}}
-    onPointerOut={(event:ThreeEvent<PointerEvent>)=>{event.stopPropagation();hover(null);document.body.style.cursor="";}}
-    onClick={(event:ThreeEvent<MouseEvent>)=>{event.stopPropagation();select(id);}}>
+    onPointerOver={(event:ThreeEvent<PointerEvent>)=>{event.stopPropagation();hover(id);}}
+    onPointerOut={(event:ThreeEvent<PointerEvent>)=>{event.stopPropagation();hover(null);}}
+>
     {children}
   </group>;
 }
@@ -567,8 +534,8 @@ function AdaptiveCamera(){
   },[camera,size.width,size.height]);
   return null;
 }
-function Campus({light,onSelect,onHover}:{
-  light:SceneLight;onSelect:(id:BuildingId)=>void;onHover:(id:BuildingId|null)=>void;
+function Campus({light,onHover}:{
+  light:SceneLight;onHover:(id:BuildingId|null)=>void;
 }){
   const brightness=Math.max(0,Math.min(1,(9-light.altitude)/15));
   const night=brightness;
@@ -643,7 +610,7 @@ function Campus({light,onSelect,onHover}:{
     )}
     {BUILDINGS.map(building=>
       <Building key={building.id} id={building.id} position={building.location}
-        select={onSelect} hover={onHover}>
+        hover={onHover}>
         {building.id==="business"&&<Business night={night}/>}
         {building.id==="library"&&<Library night={night}/>}
         {building.id==="sse"&&<SSE night={night}/>}
@@ -659,65 +626,27 @@ function Campus({light,onSelect,onHover}:{
 
 export default function NewHomePage(){
   const [clock,setClock]=useState(()=>new Date());
-  const [selected,setSelected]=useState<BuildingId|null>(null);
-  const [major,setMajor]=useState<string|null>(null);
   const [hovered,setHovered]=useState<BuildingId|null>(null);
   useEffect(()=>{
     const timer=window.setInterval(()=>setClock(new Date()),60_000);
     return ()=>window.clearInterval(timer);
   },[]);
   const celestial=useMemo(()=>celestialState(clock),[clock.getTime()]);
-  const chosen=BUILDINGS.find(b=>b.id===selected);
-  const groupList=major ? majorCourses(major) : [];
   const hover=BUILDINGS.find(b=>b.id===hovered);
   return <main className={styles.campusPage}>
     <div className={styles.scene} aria-label="Interactive three-dimensional university campus with four original buildings">
       <Canvas shadows orthographic camera={{position:[152,138,190],zoom:3.5,near:0.1,far:800}}
         dpr={[1,1.75]} gl={{antialias:true,alpha:false,powerPreference:"high-performance"}}
         onCreated={({gl})=>{gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.18;gl.shadowMap.type=PCFSoftShadowMap;}}
-        onPointerMissed={()=>{setSelected(null);setMajor(null);}}
         fallback={<div className={styles.fallback}>This preview needs WebGL.</div>}>
         <AdaptiveCamera/>
-        <Campus light={celestial} onSelect={(id)=>{setSelected(id);setMajor(null);}} onHover={setHovered}/>
+        <Campus light={celestial} onHover={setHovered}/>
       </Canvas>
     </div>
-    {hover&&!selected&&<div className={styles.hoverTag} aria-live="polite">
-      <span className={styles.hoverDot}/>{hover.name} <span>· click to explore</span>
+    {hover&&<div className={styles.hoverTag} aria-live="polite">
+      <span className={styles.hoverDot}/>{hover.name}
     </div>}
-    {chosen&&<section className={styles.detail} aria-label={chosen.name+" menu"}>
-      <button className={styles.close} onClick={()=>{setSelected(null);setMajor(null);}} aria-label="Close building menu">×</button>
-      <span className={styles.eyebrow}>EXPLORE BUILDING</span>
-      {major ? <>
-        <button className={styles.back} onClick={()=>setMajor(null)}>← Back to majors</button>
-        <h2>{major}</h2>
-        <p>Required and elective course options listed in the AUC Atlas degree plans. Confirm your catalog year and elective choices.</p>
-        <div className={styles.courseGroups}>
-          {groupList.length?groupList.map((group,i)=>
-            <div key={group.title+i}>
-              <h3>{group.title}</h3>
-              {group.courses.map(course=>
-                <a key={course.code} href={"/courses/"+encodeURIComponent(course.code.toLowerCase().replace(/[^a-z0-9]+/g,"-"))+"#course-materials-access"}>
-                  <strong>{course.code}</strong><span>{course.name}</span><span aria-hidden="true">↗</span>
-                </a>
-              )}
-            </div>
-          ):<p>We don't yet have an indexed degree plan for this major. <a href="/courses">Browse all courses</a>.</p>}
-        </div>
-      </>:<>
-        <h2>{chosen.name}</h2>
-        <p>{chosen.description}</p>
-        <div className={styles.majorList}>
-          {CATEGORY[chosen.id].map(option=>TOOLS[option]?
-            <a key={option} href={TOOLS[option]}><span>{option}</span><span aria-hidden="true">↗</span></a>:
-            <button key={option} onClick={()=>setMajor(option)}>
-              <span>{option}</span><span aria-hidden="true">→</span>
-            </button>
-          )}
-        </div>
-        {chosen.id!=="library"&&<small>Select a major to see course requirements and available materials.</small>}
-      </>}
-    </section>}
-    <div className={styles.instruction}>Drag to orbit · Scroll to zoom · Click a building</div>
+    <div className={styles.instruction}>Drag to orbit · Scroll to zoom</div>
     <div className={styles.signature}>Experimental concept · Original architecture</div>
   </main>;
 }
