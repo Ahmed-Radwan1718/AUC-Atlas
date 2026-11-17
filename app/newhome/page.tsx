@@ -13,147 +13,15 @@ import MajorWheel from "./major-wheel";
 import CampusGrass from "./grass";
 import Fountain from "./fountain";
 import type { SchoolId } from "./wheel-data";
-import NightBloom, { FacadeLights, WindowHalo } from "./night-bloom";
+import { FacadeLights, WindowHalo } from "./night-bloom";
 
 /**
- * AUC Atlas — original four-building architectural diorama.
- * Custom-designed buildings (not representations of actual AUC footprints).
- * Isolated within /newhome. Cairo solar position is computed below.
+ * AUC Atlas — original architectural campus diorama.
+ * Five custom-designed buildings (not representations of actual AUC footprints).
+ * The scene stays in a fixed, welcoming daylight mode regardless of local time.
  */
-const LAT = 30 + 1 / 60 + 12 / 3600;
-const LON = 31 + 30 / 60 + 1 / 3600;
-const DEG = Math.PI / 180;
 type Position = [number, number, number];
-type SceneLight = {
-  sun: Position; moon: Position; altitude: number; moonAltitude: number;
-  illuminated: number; phase: number;
-};
-
-function positiveAngle(degrees: number) {
-  return ((degrees % 360) + 360) % 360;
-}
-
-function skyCoordinates(rightAscension: number, declination: number, jd: number) {
-  const t = (jd - 2451545) / 36525;
-  const sidereal = positiveAngle(
-    280.46061837 + 360.98564736629 * (jd - 2451545) +
-    0.000387933 * t * t - (t * t * t) / 38710000 + LON
-  ) * DEG;
-  const hourAngle = sidereal - rightAscension;
-  const latitude = LAT * DEG;
-  const altitude = Math.asin(
-    Math.sin(latitude) * Math.sin(declination) +
-    Math.cos(latitude) * Math.cos(declination) * Math.cos(hourAngle)
-  );
-  // Azimuth clockwise from geographic north.
-  const azimuth = Math.atan2(
-    Math.sin(hourAngle),
-    Math.cos(hourAngle) * Math.sin(latitude) -
-    Math.tan(declination) * Math.cos(latitude)
-  ) + Math.PI;
-  const distance = 145;
-  return {
-    altitude,
-    position: [
-      distance * Math.cos(altitude) * Math.sin(azimuth),
-      distance * Math.sin(altitude),
-      distance * Math.cos(altitude) * Math.cos(azimuth),
-    ] as Position,
-  };
-}
-
-function celestialState(date: Date): SceneLight {
-  const jd = date.getTime() / 86400000 + 2440587.5;
-  const t = (jd - 2451545) / 36525;
-  const meanLongitude = positiveAngle(280.46646 + t * (36000.76983 + 0.0003032 * t));
-  const anomaly = positiveAngle(357.52911 + t * (35999.05029 - 0.0001537 * t));
-  const m = anomaly * DEG;
-  const correction =
-    (1.914602 - t * (0.004817 + 0.000014 * t)) * Math.sin(m) +
-    (0.019993 - 0.000101 * t) * Math.sin(2 * m) +
-    0.000289 * Math.sin(3 * m);
-  const omega = (125.04 - 1934.136 * t) * DEG;
-  const solarLongitude = (meanLongitude + correction - 0.00569 - 0.00478 * Math.sin(omega)) * DEG;
-  const obliquity =
-    (23 + (26 + (21.448 - t * (46.815 + t * (0.00059 - 0.001813 * t))) / 60) / 60 +
-    0.00256 * Math.cos(omega)) * DEG;
-  const solarRA = Math.atan2(Math.cos(obliquity) * Math.sin(solarLongitude), Math.cos(solarLongitude));
-  const solarDec = Math.asin(Math.sin(obliquity) * Math.sin(solarLongitude));
-  const sun = skyCoordinates(solarRA, solarDec, jd);
-
-  // Low-precision lunar orbit: actual sky position, not a decorative fixed moon.
-  const d = jd - 2451543.5;
-  const node = positiveAngle(125.1228 - 0.0529538083 * d) * DEG;
-  const inclination = 5.1454 * DEG;
-  const periapsis = positiveAngle(318.0634 + 0.1643573223 * d) * DEG;
-  const lunarM = positiveAngle(115.3654 + 13.0649929509 * d) * DEG;
-  const eccentricity = 0.0549;
-  const eccentricAnomaly = lunarM +
-    eccentricity * Math.sin(lunarM) * (1 + eccentricity * Math.cos(lunarM));
-  const xv = 60.2666 * (Math.cos(eccentricAnomaly) - eccentricity);
-  const yv = 60.2666 * Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(eccentricAnomaly);
-  const trueAnomaly = Math.atan2(yv, xv);
-  const r = Math.sqrt(xv * xv + yv * yv);
-  const argument = trueAnomaly + periapsis;
-  const x = r * (Math.cos(node) * Math.cos(argument) -
-    Math.sin(node) * Math.sin(argument) * Math.cos(inclination));
-  const y = r * (Math.sin(node) * Math.cos(argument) +
-    Math.cos(node) * Math.sin(argument) * Math.cos(inclination));
-  const z = r * Math.sin(argument) * Math.sin(inclination);
-  const lunarRA = Math.atan2(y * Math.cos(obliquity) - z * Math.sin(obliquity), x);
-  const lunarDec = Math.atan2(
-    y * Math.sin(obliquity) + z * Math.cos(obliquity),
-    Math.sqrt(x * x + (y * Math.cos(obliquity) - z * Math.sin(obliquity)) ** 2)
-  );
-  const moon = skyCoordinates(lunarRA, lunarDec, jd);
-
-  // Synodic phase referenced to the 6 January 2000 new moon (approximation).
-  const synodic = 29.530588853;
-  const daysSinceNew = (date.getTime() - Date.UTC(2000, 0, 6, 18, 14)) / 86400000;
-  const phase = ((daysSinceNew / synodic) % 1 + 1) % 1;
-  return {
-    sun: sun.position,
-    moon: moon.position,
-    altitude: sun.altitude / DEG,
-    moonAltitude: moon.altitude / DEG,
-    illuminated: (1 - Math.cos(2 * Math.PI * phase)) / 2,
-    phase,
-  };
-}
-
-function cairoParts(date: Date) {
-  const fields = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Africa/Cairo",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  }).formatToParts(date);
-  const value = (part: string) => fields.find((item) => item.type === part)?.value || "";
-  const hour = Number(value("hour"));
-  const minute = Number(value("minute"));
-  return {
-    time: value("hour") + ":" + value("minute"),
-    day: value("weekday") + ", " + value("day") + " " + value("month"),
-    decimalHour: hour + minute / 60,
-  };
-}
-
-function phaseName(phase: number) {
-  if (phase < 0.035 || phase > 0.965) return "New moon";
-  if (phase < 0.215) return "Waxing crescent";
-  if (phase < 0.285) return "First quarter";
-  if (phase < 0.465) return "Waxing gibbous";
-  if (phase < 0.535) return "Full moon";
-  if (phase < 0.715) return "Waning gibbous";
-  if (phase < 0.785) return "Last quarter";
-  return "Waning crescent";
-}
-
-
-
+const DAYLIGHT_SUN: Position = [-80, 135, 90];
 
 type BuildingId = SchoolId;
 // Five precincts share one connected pedestrian network. Engineering stays on
@@ -787,28 +655,24 @@ function AdaptiveCamera(){
   },[camera,size.width,size.height]);
   return null;
 }
-function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}){
+function Campus({onSelect}:{onSelect:(id:SchoolId)=>void}){
   const {size}=useThree();
   const fitZoom=campusFitZoom(size.width,size.height);
   // OrbitControls uses minZoom/maxZoom for orthographic cameras, not
   // minDistance/maxDistance. Prevent the campus shrinking to a speck.
   const minZoom=Math.max(1.05,fitZoom*0.72);
   const maxZoom=Math.max(5,fitZoom*2.5);
-  const brightness=Math.max(0,Math.min(1,(9-light.altitude)/15));
-  const night=brightness;
-  const atNight=light.altitude < -5;
-  const ambient=Math.max(0.42,Math.min(1,0.4+light.altitude/35));
-  const spot=light.altitude>0?light.sun:[-80,110,-80] as Position;
+  // Building glass, grass, and fountain all use their daylight palettes.
+  // Water and wind animations continue independently of the time of day.
+  const night=0;
   return <>
-    <color attach="background" args={[atNight?"#0b1730":"#c9d6df"]}/>
-    {!atNight&&<Sky sunPosition={light.sun} turbidity={4} rayleigh={1.65}
-      mieCoefficient={0.008} mieDirectionalG={0.8}/>}
-    {/* Leave the night sky clean: the finite 3D star shell becomes a giant
-        ring of overexposed sprites and square bloom patches when zoomed out. */}
-    <hemisphereLight args={[atNight?"#8f9ac8":"#fff7e8","#9f9b94",atNight?0.85:1.1]}/>
-    <ambientLight intensity={atNight?0.27:0.62}/>
-    <directionalLight position={spot} intensity={atNight?1.05:2.7*ambient}
-      color={atNight?"#b8c8f6":"#fff3db"} castShadow
+    <color attach="background" args={["#c9dce8"]}/>
+    <Sky sunPosition={DAYLIGHT_SUN} turbidity={3.2} rayleigh={1.65}
+      mieCoefficient={0.008} mieDirectionalG={0.8}/>
+    <hemisphereLight args={["#fff7e8","#a6aa9d",1.2]}/>
+    <ambientLight intensity={0.65}/>
+    <directionalLight position={DAYLIGHT_SUN} intensity={2.5}
+      color="#fff3db" castShadow
       shadow-mapSize={[2048,2048]} shadow-camera-left={-185}
       shadow-camera-right={185} shadow-camera-top={185} shadow-camera-bottom={-185}
       shadow-camera-near={1} shadow-camera-far={490} shadow-bias={-0.0002}/>
@@ -882,13 +746,7 @@ function Campus({light,onSelect}:{light:SceneLight;onSelect:(id:SchoolId)=>void}
 }
 
 export default function NewHomePage(){
-  const [clock,setClock]=useState(()=>new Date());
   const [selectedSchool,setSelectedSchool]=useState<SchoolId|null>(null);
-  useEffect(()=>{
-    const timer=window.setInterval(()=>setClock(new Date()),60_000);
-    return ()=>window.clearInterval(timer);
-  },[]);
-  const celestial=useMemo(()=>celestialState(clock),[clock.getTime()]);
   return <main className={styles.campusPage}>
     <div className={styles.scene} aria-label="Interactive three-dimensional university campus with five original buildings">
       <Canvas shadows orthographic camera={{position:[152,138,190],zoom:3.5,near:0.1,far:800}}
@@ -896,8 +754,7 @@ export default function NewHomePage(){
         onCreated={({gl})=>{gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.18;gl.shadowMap.type=PCFSoftShadowMap;}}
         fallback={<div className={styles.fallback}>This preview needs WebGL.</div>}>
         <AdaptiveCamera/>
-        <Campus light={celestial} onSelect={setSelectedSchool}/>
-        <NightBloom enabled={celestial.altitude < -3}/>
+        <Campus onSelect={setSelectedSchool}/>
       </Canvas>
     </div>
     {selectedSchool && <MajorWheel key={selectedSchool} school={selectedSchool}
