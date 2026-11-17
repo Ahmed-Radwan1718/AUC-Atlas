@@ -500,9 +500,10 @@ function Campus({light,onSelect,onHover}:{
       shadow-mapSize={[2048,2048]} shadow-camera-left={-130}
       shadow-camera-right={130} shadow-camera-top={130} shadow-camera-bottom={-130}
       shadow-camera-near={1} shadow-camera-far={380} shadow-bias={-0.0002}/>
+    {/* Shadow-catching ground is transparent: no visible rectangle or platform edge. */}
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-0.38,0]} receiveShadow>
-      <planeGeometry args={[390,330]}/>
-      <meshStandardMaterial color={atNight?"#a2a6c0":"#eee9dc"} roughness={1}/>
+      <planeGeometry args={[2000,2000]}/>
+      <shadowMaterial color="#1d2538" transparent opacity={0.28} depthWrite={false}/>
     </mesh>
     <Pathway points={walk1} width={8.5}/>
     <Pathway points={walk2} width={8.5}/>
