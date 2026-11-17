@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Sky, Stars } from "@react-three/drei";
+import { Html, OrbitControls, Sky, Stars } from "@react-three/drei";
 import {
   ACESFilmicToneMapping, CatmullRomCurve3, Color, DoubleSide, MathUtils, Mesh,
   MeshBasicMaterial, MeshStandardMaterial, PointLight, Group,
@@ -392,6 +392,12 @@ function Building({children,id,position,onSelect}:{
       highlight.current.intensity=strength*23;
   });
 
+  // Screen-facing labels remain visible from any orbit angle and rise with
+  // the model on hover. They are non-interactive, preserving building clicks.
+  const labelHeight:Record<SchoolId,number>={
+    library:36, business:34, sse:32, humanities:27,
+  };
+  const name=BUILDINGS.find(item=>item.id===id)?.name ?? id;
   // The ring stays on the ground while only the actual building rises.
   const radius=id==="library"?37:id==="humanities"?35:id==="sse"?30:28;
   return <group position={position}>
@@ -433,6 +439,10 @@ function Building({children,id,position,onSelect}:{
           onSelect(id);
         }}>
         {children}
+        <Html center position={[0,labelHeight[id],0]}
+          style={{pointerEvents:"none",userSelect:"none"}} zIndexRange={[3,1]}>
+          <div className={styles.buildingName}>{name}</div>
+        </Html>
       </group>
     </BuildingHoverContext.Provider>
   </group>;
