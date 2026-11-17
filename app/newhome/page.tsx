@@ -7,6 +7,8 @@ import {
   ACESFilmicToneMapping, CatmullRomCurve3, DoubleSide, Mesh,
   PCFSoftShadowMap, Shape, Vector3, BufferGeometry, Float32BufferAttribute,
 } from "three";
+import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
+import { courses } from "../../data/courses";
 import styles from "./newhome.module.css";
 
 /**
@@ -158,13 +160,34 @@ const BUILDINGS: {id: BuildingId; name: string; description: string; location: [
 ];
 const CATEGORY: Record<BuildingId, string[]> = {
   library: ["Browse all courses", "Student materials", "Professors"],
-  business: ["Business Administration", "Accounting", "Economics", "Finance"],
-  sse: ["Mechanical Engineering", "Computer Science", "Computer Engineering", "Architecture", "Physics"],
-  humanities: ["Political Science", "Psychology", "English", "History", "Sociology"],
+  business: ["Business and Entrepreneurship", "Business in Finance", "Business in Marketing", "Accounting", "Economics", "Actuarial Science"],
+  sse: ["Mechanical Engineering", "Computer Science", "Computer Engineering", "Electronics and Communications Engineering", "Architecture", "Data Science", "Construction Engineering", "Physics", "Chemistry", "Biology", "Mathematics", "Petroleum Engineering"],
+  humanities: ["Political Science", "Psychology", "English and Comparative Literature", "History", "Sociology", "Anthropology", "Philosophy", "Visual Arts", "Film", "Theatre", "Arabic Studies", "Egyptology", "Music"],
 };
 const TOOLS: Record<string,string> = {
   "Browse all courses":"/courses", "Student materials":"/courses", "Professors":"/professors"
 };
+type DegreeGroup = {title?:string;items?:string[]};
+const degreePlans = DEGREE_REQUIREMENTS as Record<string,{groups?:DegreeGroup[]}>;
+const courseByCode = new Map(courses.map(c=>[c.code.toUpperCase(),c]));
+function majorCourses(major:string) {
+  const groups=degreePlans[major]?.groups || [];
+  const seen=new Set<string>();
+  return groups.map(group=>({
+    title:group.title || "Degree requirements",
+    courses:(group.items||[]).flatMap(item=>{
+      if(typeof item!=="string")return [];
+      const matches=item.match(/\\b[A-Z]{3,5}\\s+\\d{4}[A-Z]?\\b/g) || [];
+      return matches.flatMap(match=>{
+        const code=match.replace(/\\s+/g," ").trim().toUpperCase();
+        if(seen.has(code)) return [];
+        seen.add(code);
+        const entry=courseByCode.get(code);
+        return [{code,name:entry?.title || item.slice(0,110)}];
+      });
+    }),
+  })).filter(group=>group.courses.length>0);
+}
 
 function Block({position,size,color="#e1d1b7",emissive,emissiveIntensity=0,roughness=0.85,metalness=0,cast=true}:{
   position:Position;size:Position;color?:string;emissive?:string;emissiveIntensity?:number;roughness?:number;metalness?:number;cast?:boolean;
@@ -528,6 +551,7 @@ export default function NewHomePage(){
   const [clock,setClock]=useState(()=>new Date());
   const [previewHour,setPreviewHour]=useState<number|null>(null);
   const [selected,setSelected]=useState<BuildingId|null>(null);
+  const [major,setMajor]=useState<string|null>(null);
   const [hovered,setHovered]=useState<BuildingId|null>(null);
   const [previewError,setPreviewError]=useState(false);
   useEffect(()=>{
@@ -539,6 +563,7 @@ export default function NewHomePage(){
   const local=cairoParts(moment);
   const celestial=useMemo(()=>celestialState(moment),[moment.getTime()]);
   const chosen=BUILDINGS.find(b=>b.id===selected);
+  const groupList=major ? majorCourses(major) : [];
   const hover=BUILDINGS.find(b=>b.id===hovered);
   const timeLabel=celestial.altitude< -6?"Night":celestial.altitude<5?"Twilight":"Daylight";
   return <main className={styles.campusPage}>
@@ -547,9 +572,9 @@ export default function NewHomePage(){
       <Canvas shadows orthographic camera={{position:[104,99,132],zoom:5.0,near:0.1,far:600}}
         dpr={[1,1.75]} gl={{antialias:true,alpha:false,powerPreference:"high-performance"}}
         onCreated={({gl})=>{gl.toneMapping=ACESFilmicToneMapping;gl.toneMappingExposure=1.18;gl.shadowMap.type=PCFSoftShadowMap;}}
-        onPointerMissed={()=>setSelected(null)}
+        onPointerMissed={()=>{setSelected(null);setMajor(null);}}
         fallback={<div className={styles.fallback}>This preview needs WebGL.</div>}>
-        <Campus light={celestial} onSelect={setSelected} onHover={setHovered}/>
+        <Campus light={celestial} onSelect={(id)=>{setSelected(id);setMajor(null);}} onHover={setHovered}/>
       </Canvas>:
       <p className={styles.fallback}>3D preview unavailable. Try a browser with hardware acceleration enabled.</p>}
     </div>
@@ -562,18 +587,37 @@ export default function NewHomePage(){
       <span className={styles.hoverDot}/>{hover.name} <span>· click to explore</span>
     </div>}
     {chosen&&<section className={styles.detail} aria-label={chosen.name+" menu"}>
-      <button className={styles.close} onClick={()=>setSelected(null)} aria-label="Close building menu">×</button>
+      <button className={styles.close} onClick={()=>{setSelected(null);setMajor(null);}} aria-label="Close building menu">×</button>
       <span className={styles.eyebrow}>EXPLORE BUILDING</span>
-      <h2>{chosen.name}</h2>
-      <p>{chosen.description}</p>
-      <div className={styles.majorList}>
-        {CATEGORY[chosen.id].map(major=>
-          <a key={major} href={TOOLS[major] || "/courses?major="+encodeURIComponent(major)}>
-            <span>{major}</span><span aria-hidden="true">↗</span>
-          </a>
-        )}
-      </div>
-      <small>Course pathways are being connected to the existing directory.</small>
+      {major ? <>
+        <button className={styles.back} onClick={()=>setMajor(null)}>← Back to majors</button>
+        <h2>{major}</h2>
+        <p>Required and elective course options listed in the AUC Atlas degree plans. Confirm your catalog year and elective choices.</p>
+        <div className={styles.courseGroups}>
+          {groupList.length?groupList.map((group,i)=>
+            <div key={group.title+i}>
+              <h3>{group.title}</h3>
+              {group.courses.map(course=>
+                <a key={course.code} href={"/courses/"+encodeURIComponent(course.code.toLowerCase().replace(/[^a-z0-9]+/g,"-"))+"#course-materials-access"}>
+                  <strong>{course.code}</strong><span>{course.name}</span><span aria-hidden="true">↗</span>
+                </a>
+              )}
+            </div>
+          ):<p>We don't yet have an indexed degree plan for this major. <a href="/courses">Browse all courses</a>.</p>}
+        </div>
+      </>:<>
+        <h2>{chosen.name}</h2>
+        <p>{chosen.description}</p>
+        <div className={styles.majorList}>
+          {CATEGORY[chosen.id].map(option=>TOOLS[option]?
+            <a key={option} href={TOOLS[option]}><span>{option}</span><span aria-hidden="true">↗</span></a>:
+            <button key={option} onClick={()=>setMajor(option)}>
+              <span>{option}</span><span aria-hidden="true">→</span>
+            </button>
+          )}
+        </div>
+        {chosen.id!=="library"&&<small>Select a major to see course requirements and available materials.</small>}
+      </>}
     </section>}
     <section className={styles.clockPanel} aria-label="Cairo daylight control">
       <div className={styles.clockTop}>
