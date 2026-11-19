@@ -13,9 +13,13 @@ vm.runInNewContext(compiled, { exports: output, module: { exports: output },
   Date, Intl, Map, Set, Number, Array, String }, { filename: "mechanicalCourseRecommendations.ts" });
 const {
   enrollmentYearFromAucId, cairoAcademicTerm, completedMechanicalCourses,
-  recommendMechanicalCourses, MECHANICAL_TERM_PLAN
+  recommendMechanicalCourses, MECHANICAL_TERM_PLAN, MECHANICAL_CORE_AND_ELECTIVE_OPTIONS
 } = output;
-const catalog = MECHANICAL_TERM_PLAN.flat().map((code: string) => ({ code, title: code + " title" }));
+const allCodes = [...new Set([
+  ...MECHANICAL_TERM_PLAN.flat(),
+  ...MECHANICAL_CORE_AND_ELECTIVE_OPTIONS.map((item: any) => item.code)
+])];
+const catalog = allCodes.map((code: string) => ({ code, title: code + " title" }));
 const fall2026 = new Date("2026-11-19T12:00:00Z");
 
 test("infers enrollment year only from a valid 900-prefixed ID", () => {
@@ -65,6 +69,52 @@ test("manually completed course is never recommended again", () => {
   assert.ok(result);
   assert.equal(result.usedSavedProgress, true);
   assert.ok(!result.courses.some((course: any) => course.code === "MENG 3207"));
+});
+
+
+
+test("credits include labs, rhetoric, core and major courses in one 15-18 hour load", () => {
+  const values = [
+    ["900262111", 15, 6], // 1st semester: freshman core + maths/chemistry/engineering
+    ["900252111", 16, 6], // Fall 2026: third semester
+    ["900242111", 16, 6], // Fall 2026: fifth semester
+    ["900232111", 17, 6]  // Fall 2026: seventh semester
+  ] as const;
+  for (const [aucId, expectedCredits, expectedCourses] of values) {
+    const result = recommendMechanicalCourses({ aucId, catalog, today: fall2026 });
+    assert.ok(result);
+    assert.equal(result.totalCredits, expectedCredits, aucId);
+    assert.equal(result.courses.length, expectedCourses, aucId);
+    assert.ok(result.totalCredits >= 15 && result.totalCredits <= 18, aucId);
+    assert.equal(result.totalCredits,
+      result.courses.reduce((sum: number, item: any) => sum + item.credits, 0));
+  }
+});
+
+test("freshmen see mandatory writing and seminar together with major requirements", () => {
+  const first = recommendMechanicalCourses({ aucId: "900262111", catalog, today: fall2026 });
+  assert.ok(first);
+  assert.ok(first.courses.some((x: any) => x.code === "RHET 1010" && x.kind === "core"));
+  assert.ok(first.courses.some((x: any) => x.code === "CORE 1010" && x.kind === "core"));
+  assert.equal(first.courses.find((x: any) => x.code === "CHEM 1015").credits, 1);
+});
+
+test("core electives are identified as options and never counted as required major courses", () => {
+  const second = recommendMechanicalCourses({ aucId: "900262111",
+    catalog, today: new Date("2027-03-19T12:00:00Z") });
+  assert.ok(second);
+  assert.equal(second.totalCredits, 17);
+  assert.ok(second.courses.some((x: any) => x.code === "RHET 1020" && x.kind === "core"));
+  assert.ok(second.courses.some((x: any) => x.code === "CORE 1130" && x.kind === "core-option"));
+  assert.ok(second.courses.every((x: any) => x.credits >= 1));
+});
+
+test("credits are capped at 18 rather than capped at four courses", () => {
+  const cohort = recommendMechanicalCourses({ aucId: "900232111", catalog,
+    today: new Date("2027-03-19T12:00:00Z") });
+  assert.ok(cohort);
+  assert.ok(cohort.courses.length > 4);
+  assert.ok(cohort.totalCredits <= 18);
 });
 
 test("never invents a course not present in the catalog", () => {
