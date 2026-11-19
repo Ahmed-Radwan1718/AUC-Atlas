@@ -64,8 +64,7 @@ export const MECHANICAL_CORE_AND_ELECTIVE_OPTIONS: readonly {
   { code: "MENG 4440", semester: 9, kind: "concentration-option" },
   { code: "MENG 4226", semester: 9, kind: "concentration-option" },
   { code: "MENG 4227", semester: 9, kind: "concentration-option" },
-  { code: "MENG 4551", semester: 10, kind: "concentration-option" },
-  { code: "MENG 4756", semester: 10, kind: "concentration-option" }
+  { code: "MENG 4551", semester: 10, kind: "concentration-option" }
 ];
 
 /** One-credit labs and two/four-credit requirements must not be counted as 3. */
