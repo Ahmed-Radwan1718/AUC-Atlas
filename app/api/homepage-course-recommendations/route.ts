@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       completedCodes: completed,
       hasSavedProgress: keys.length > 0,
       catalog: courses,
-      limit: 4
+      limit: 8
     });
 
     if (!recommendation) return respond({ status: "invalid-id", courses: [] });
