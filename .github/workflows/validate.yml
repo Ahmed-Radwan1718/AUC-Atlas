@@ -28,6 +28,7 @@ jobs:
       - run: npm run test:professor-emails
       - run: npm run test:auc-id
       - run: npm run test:prerequisites
+      - run: npm run test:mechanical-recommendations
       - run: npm run test:course-search
       - run: npm run typecheck
       - run: npm run build
@@ -41,7 +42,7 @@ jobs:
             if curl -fsS http://127.0.0.1:3000/ >/dev/null; then break; fi
             sleep 1
           done
-          for route in / /professors /professors/eslam-badr /courses /courses/chem-1005 /gpa-calculator /degree-progression /terms /privacy /login /signup /forgot-password /accounts /admin /faq; do
+          for route in / /homepagenew /professors /professors/eslam-badr /courses /courses/chem-1005 /gpa-calculator /degree-progression /terms /privacy /login /signup /forgot-password /accounts /admin /faq; do
             echo "Checking $route"
             curl --fail --silent --show-error --location "http://127.0.0.1:3000$route" > /dev/null || {
               cat /tmp/atlas-next.log
