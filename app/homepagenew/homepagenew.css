@@ -316,6 +316,19 @@
   gap: 13px;
   min-width: 0;
   padding: 18px 0;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 160ms ease;
+}
+
+a.homepagenew-professor-item:hover {
+  background: #fbf9f6;
+}
+
+a.homepagenew-professor-item:focus-visible {
+  outline: 2px solid #171717;
+  outline-offset: 2px;
 }
 
 .homepagenew-professor-item + .homepagenew-professor-item {
@@ -337,6 +350,13 @@
 .homepagenew-professor-avatar svg {
   width: 26px;
   height: 26px;
+}
+
+.homepagenew-professor-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .homepagenew-professor-identity {
@@ -417,4 +437,61 @@
     height: 42px;
     flex-basis: 42px;
   }
+}
+
+
+/* No sample names are shown after the real-data connection. */
+.homepagenew-professor-notice {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 100px;
+  color: #625e56;
+  font-size: 14px;
+}
+
+.homepagenew-professor-notice a {
+  color: #171717;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: #c09a5c;
+  text-underline-offset: 4px;
+}
+
+.homepagenew-professor-group-empty {
+  margin: 0;
+  padding: 17px 0 24px;
+  color: #80786e;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.homepagenew-professor-loading {
+  pointer-events: none;
+}
+
+.homepagenew-professor-loading .homepagenew-professor-avatar,
+.homepagenew-professor-loading-name,
+.homepagenew-professor-loading-course {
+  background-image: linear-gradient(105deg, #eee8df 30%, #f8f5f0 50%, #eee8df 70%);
+  background-size: 220% 100%;
+  animation: homepagenew-skeleton-shimmer 1.8s linear infinite;
+}
+
+.homepagenew-professor-loading-name,
+.homepagenew-professor-loading-course {
+  display: block;
+  height: 13px;
+  border-radius: 4px;
+}
+
+.homepagenew-professor-loading-name { width: 124px; max-width: 80%; }
+.homepagenew-professor-loading-course { width: 75px; height: 11px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .homepagenew-professor-loading .homepagenew-professor-avatar,
+  .homepagenew-professor-loading-name,
+  .homepagenew-professor-loading-course { animation: none; }
+  .homepagenew-professor-item { transition: none; }
 }
