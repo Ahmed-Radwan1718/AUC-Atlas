@@ -29,6 +29,7 @@ jobs:
       - run: npm run test:auc-id
       - run: npm run test:prerequisites
       - run: npm run test:mechanical-recommendations
+      - run: npm run test:next-semester-professors
       - run: npm run test:course-search
       - run: npm run typecheck
       - run: npm run build
@@ -73,6 +74,7 @@ jobs:
           node -e 'const xml=require("fs").readFileSync("/tmp/atlas-sitemap.xml","utf8"); const urls=xml.split("<loc>").slice(1).map(s=>s.split("</loc>")[0]); const root="https://aucatlas.com"; const required=[root+"/",root+"/faq",root+"/professors/eslam-badr",root+"/courses/chem-1005"]; const forbidden=["/admin","/accounts","/login","/signup","/forgot-password"]; if (urls.length<1500 || new Set(urls).size!==urls.length || required.some(u=>!urls.includes(u)) || urls.some(u=>u.endsWith(".html") || forbidden.some(p=>u===root+p || u.startsWith(root+p+"/")))) {console.error("Sitemap validation failed:",urls.length); process.exit(1)}'
 
           check_status 200 http://127.0.0.1:3000/api/me
+          check_status 200 http://127.0.0.1:3000/api/homepage-professor-recommendations
           check_status 401 http://127.0.0.1:3000/api/academic-progress
           check_status 401 http://127.0.0.1:3000/api/course-materials
           check_status 401 http://127.0.0.1:3000/api/material-directory
