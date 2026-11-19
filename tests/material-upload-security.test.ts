@@ -26,6 +26,8 @@ const request = (fileSize = 1024) => ({
 function harness(seed: {
   stored?: Stored[];
   authorizations?: Stored[];
+  adminUids?: string;
+  adminFileLimitBytes?: string;
 } = {}) {
   const collections = new Map<string,Map<string,Stored>>();
   const collection = (name:string) => {
@@ -113,6 +115,8 @@ function harness(seed: {
         IMAGEKIT_PUBLIC_KEY:"public_test_key",
         IMAGEKIT_PRIVATE_KEY:"private_test_key",
         IMAGEKIT_URL_ENDPOINT:"https://ik.imagekit.io/test",
+        ADMIN_UIDS:seed.adminUids || "",
+        COURSE_MATERIAL_ADMIN_MAX_FILE_BYTES:seed.adminFileLimitBytes || "",
       }
     },
     require(id:string) {
@@ -201,6 +205,50 @@ test("configured server file size limit cannot exceed 12.5 MB",()=>{
   assert.equal(configuredLimit(String(100*1024*1024)),maxSize);
   assert.equal(configuredLimit("invalid"),maxSize);
   assert.equal(configuredLimit(String(5*1024*1024)),5*1024*1024);
+});
+
+test("only exact UIDs in ADMIN_UIDS bypass standard file and storage quotas",async()=>{
+  const admin=harness({
+    adminUids:"other-uid, student\nthird-uid",
+    stored:[{size:250*1024*1024,status:"approved"}]
+  });
+  const auth=await admin.authorize(50*1024*1024);
+  assert.equal(auth.limits.isAdmin,true);
+  assert.equal(auth.limits.maxFileBytes,100*1024*1024);
+  assert.equal(auth.limits.userQuotaBytes,null);
+  await assert.rejects(admin.authorize(100*1024*1024+1),{statusCode:400});
+
+  // A matching substring, wrong UID, or custom claim never grants the exception.
+  const normal=harness({adminUids:"student-extra, other-uid"});
+  await assert.rejects(normal.authorize(maxSize+1),{statusCode:400});
+  const standard=await normal.authorize(maxSize);
+  assert.equal(standard.limits.isAdmin,false);
+  assert.equal(standard.limits.userQuotaBytes,250*1024*1024);
+});
+
+test("admin registration accepts an authorized file above 12.5 MB",async()=>{
+  const admin=harness({adminUids:"student"});
+  const size=20*1024*1024;
+  const auth=await admin.authorize(size);
+  const id="abcdef0123456789abcdef01";
+  Object.assign(admin.uploaded,{
+    fileId:id,filePath:auth.imagekitFilePath,name:auth.imagekitFilePath.split("/").pop(),
+    size,mime:"application/pdf",isPrivateFile:true
+  });
+  const result=await admin.registerMaterial(admin.user,{
+    uploadAuthorizationId:auth.authorizationId,
+    imagekitFilePath:auth.imagekitFilePath,imagekitFileId:id
+  });
+  assert.equal(result.material.size,size);
+});
+
+test("admin file limit can be lowered but not raised beyond 100 MB",async()=>{
+  const lower=harness({adminUids:"student",adminFileLimitBytes:String(30*1024*1024)});
+  assert.equal((await lower.authorize(30*1024*1024)).limits.maxFileBytes,30*1024*1024);
+  await assert.rejects(lower.authorize(30*1024*1024+1),{statusCode:400});
+  const upper=harness({adminUids:"student",adminFileLimitBytes:String(1024*1024*1024)});
+  assert.equal((await upper.authorize(100*1024*1024)).limits.maxFileBytes,100*1024*1024);
+  await assert.rejects(upper.authorize(100*1024*1024+1),{statusCode:400});
 });
 
 test("only two active authorizations may exist per student",async()=>{

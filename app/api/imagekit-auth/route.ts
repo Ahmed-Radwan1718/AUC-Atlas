@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { optionalSessionUser } from "../../../server/session";
-import { authorizeMaterial, cancelMaterial, MaterialUploadError, verifiedMaterialUser } from "../../../server/materialUpload";
+import { authorizeMaterial, cancelMaterial, materialUploadLimitsForUid, MaterialUploadError, verifiedMaterialUser } from "../../../server/materialUpload";
 import { RateLimitError } from "../../../server/security";
 
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
+
+// The frontend reads only the authenticated user's effective limits.
+// Never send configured admin UID lists or storage credentials to the client.
+export async function GET(request:NextRequest){
+  const headers={"Cache-Control":"no-store"};
+  const user=await optionalSessionUser(request);
+  if(!user)return NextResponse.json({error:"Sign in to upload course materials."},{status:401,headers});
+  try{
+    await verifiedMaterialUser(user);
+    return NextResponse.json({limits:materialUploadLimitsForUid(user.uid)},{headers});
+  }catch(error){
+    return NextResponse.json({error:error instanceof Error?error.message:"Could not load upload limits."},
+      {status:error instanceof MaterialUploadError?error.statusCode:500,headers});
+  }
+}
 
 export async function POST(request:NextRequest){
   const headers={"Cache-Control":"no-store"};
