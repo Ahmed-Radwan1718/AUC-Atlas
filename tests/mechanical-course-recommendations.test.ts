@@ -117,6 +117,29 @@ test("credits are capped at 18 rather than capped at four courses", () => {
   assert.ok(cohort.totalCredits <= 18);
 });
 
+test("spring semesters also include core or elective credits without exceeding 18", () => {
+  const cases = [
+    ["900252111", 16], // Semester 4
+    ["900242111", 18], // Semester 6
+    ["900232111", 16]  // Semester 8
+  ] as const;
+  for (const [aucId, expectedCredits] of cases) {
+    const actual = recommendMechanicalCourses({
+      aucId, catalog, today: new Date("2027-03-19T12:00:00Z")
+    });
+    assert.ok(actual);
+    assert.equal(actual.totalCredits, expectedCredits, aucId);
+    assert.ok(actual.courses.some((x: any) => x.kind !== "major"), aucId);
+  }
+});
+
+test("only fifteen credits of concentration examples are proposed across the pathway", () => {
+  const chosen = MECHANICAL_CORE_AND_ELECTIVE_OPTIONS
+    .filter((x: any) => x.kind === "concentration-option");
+  assert.equal(chosen.length, 5);
+  assert.equal(chosen.length * 3, 15);
+});
+
 test("never invents a course not present in the catalog", () => {
   const result = recommendMechanicalCourses({ aucId: "900242111", catalog: [], today: fall2026 });
   assert.ok(result);
