@@ -142,7 +142,7 @@ export default function Header() {
 
             </button>
             <div className={`floating-account-menu ${accountOpen ? "is-open" : ""}`}
-              id="floating-account-menu" hidden={!accountOpen}>
+              id="floating-account-menu" hidden={!isNewHomepage && !accountOpen}>
               {sessionReady && !user && <a href="/login" className="floating-account-menu-link" id="floating-login-link" onClick={() => setAccountOpen(false)}>
                 <img src="/user.png" alt=""/><span>Login</span>
               </a>}
