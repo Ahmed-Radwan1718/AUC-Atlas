@@ -44,7 +44,8 @@ export async function GET(request: NextRequest) {
       aucId: profileData.aucId || profileData.aucIdLookupKey,
       completedCodes: completed,
       hasSavedProgress: keys.length > 0,
-      catalog: courses
+      catalog: courses,
+      limit: 4
     });
 
     if (!recommendation) return respond({ status: "invalid-id", courses: [] });
