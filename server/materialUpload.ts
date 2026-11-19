@@ -46,6 +46,26 @@ const maxQuota = () => {
   const value = Number(process.env.COURSE_MATERIAL_USER_QUOTA_BYTES);
   return Number.isSafeInteger(value) && value > 0 ? Math.min(value, 5*1024*1024*1024) : 250*1024*1024;
 };
+// Only UIDs explicitly listed in the server-side ADMIN_UIDS environment variable
+// receive elevated upload limits. Custom claims and browser-supplied roles do not apply.
+export function isUploadAdminUid(uid: string): boolean {
+  const value = String(uid || "").trim();
+  return Boolean(value) && String(process.env.ADMIN_UIDS || "")
+    .split(/[\s,]+/).some(configuredUid => configuredUid === value);
+}
+const maxAdminFileBytes = () => {
+  const ceiling = 100 * 1024 * 1024;
+  const setting = Number(process.env.COURSE_MATERIAL_ADMIN_MAX_FILE_BYTES);
+  return Number.isSafeInteger(setting) && setting > 0 ? Math.min(setting,ceiling) : ceiling;
+};
+export function materialUploadLimitsForUid(uid: string) {
+  const isAdmin = isUploadAdminUid(uid);
+  return {
+    isAdmin,
+    maxFileBytes: isAdmin ? maxAdminFileBytes() : maxMaterialBytes(),
+    userQuotaBytes: isAdmin ? null : maxQuota()
+  };
+}
 const authTtl = () => {
   const value = Number(process.env.COURSE_MATERIAL_UPLOAD_AUTH_TTL_SECONDS);
   return Number.isSafeInteger(value) && value > 0 ? Math.min(value, 1800) : 900;
@@ -87,10 +107,11 @@ export async function authorizeMaterial(user: DecodedIdToken, body: Record<strin
   const fileName = safeFileName(body.fileName);
   const fileType = mimeFor(fileName);
   const fileSize = Number(body.fileSize);
-  const maxBytes = maxMaterialBytes();
+  const limits = materialUploadLimitsForUid(profile.uid);
   if (!courseCode || !professor || !semester || !materialType || !title || !fileType ||
-    !Number.isSafeInteger(fileSize) || fileSize <= 0 || fileSize > maxBytes)
-    throw new MaterialUploadError("Choose a supported course-material file up to 12.5MB.",400);
+    !Number.isSafeInteger(fileSize) || fileSize <= 0 || fileSize > limits.maxFileBytes)
+    throw new MaterialUploadError("Choose a supported course-material file up to " +
+      (limits.maxFileBytes / (1024 * 1024)).toLocaleString("en-US") + "MB.",400);
   const {publicKey,privateKey} = imageKitKeys();
   const authorizationId = randomBytes(18).toString("hex");
   const filePath = materialFolder + "/" + authorizationId + "." + ext(fileName);
@@ -123,7 +144,7 @@ export async function authorizeMaterial(user: DecodedIdToken, body: Record<strin
         sum+Math.max(0,Number(data.size)||0);
     },0);
     const pendingBytes = pending.reduce((sum,data) => sum+Math.max(0,Number(data.fileSize)||0),0);
-    if(storedBytes+pendingBytes+fileSize>maxQuota())
+    if(limits.userQuotaBytes !== null && storedBytes+pendingBytes+fileSize>limits.userQuotaBytes)
       throw new MaterialUploadError("Your storage quota, including pending uploads, has been reached.",413);
 
     // Serializes concurrent authorizations for the same user; avoids query
@@ -143,7 +164,7 @@ export async function authorizeMaterial(user: DecodedIdToken, body: Record<strin
   return {
     authorizationId,storageKey:filePath,imagekitFilePath:filePath,
     ...signed,fileType,expiresAt:date.toISOString(),
-    limits:{maxFileBytes:maxBytes,userQuotaBytes:maxQuota()}
+    limits
   };
 }
 function expiryMillis(value: unknown): number {
@@ -231,7 +252,7 @@ export async function registerMaterial(user:DecodedIdToken,body:Record<string,un
   const storageKey=clean(authorized.storageKey,100);
   if(authorized.storageProvider!=="imagekit" || submittedPath!==storageKey ||
     !expectedMime || mimeFor(fileName)!==expectedMime || !Number.isSafeInteger(fileSize) ||
-    fileSize<=0 || fileSize>maxMaterialBytes())
+    fileSize<=0 || fileSize>materialUploadLimitsForUid(user.uid).maxFileBytes)
     throw new MaterialUploadError("Could not verify this upload authorization.",400);
   const file=await fileMetadata(fileId);
   const samePath=file.filePath===storageKey;
