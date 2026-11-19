@@ -12,12 +12,17 @@ export type DegreeRequirementPlan = {
     subgroups?: Array<{ items?: string[] }>;
   }>;
 };
-export type CourseSuggestion = { code: string; title: string; semester: number };
+export type SuggestionKind = "major" | "core" | "core-option" | "concentration-option";
+export type CourseSuggestion = {
+  code: string; title: string; semester: number; credits: number; kind: SuggestionKind;
+};
 export type MechanicalRecommendation = {
   term: string;
   semester: number;
   upcoming: boolean;
   usedSavedProgress: boolean;
+  totalCredits: number;
+  targetCredits: number;
   courses: CourseSuggestion[];
 };
 
@@ -33,6 +38,53 @@ export const MECHANICAL_TERM_PLAN: readonly (readonly string[])[] = [
   ["MENG 4980", "MENG 4950"],
   ["MENG 4981"]
 ];
+
+/**
+ * AUC's university Core Curriculum is separate from the Engineering Core.
+ * Required freshman courses are identifiable; named elective choices below
+ * are only ONE example in an approved requirement category, never an assumed
+ * enrollment. These categories must not double-count major requirements.
+ * Sources: AUC Core Curriculum Requirements and AUC 2024-25 catalog.
+ */
+export const MECHANICAL_CORE_AND_ELECTIVE_OPTIONS: readonly {
+  code: string; semester: number; kind: SuggestionKind;
+}[] = [
+  { code: "CORE 1010", semester: 1, kind: "core" },
+  { code: "RHET 1010", semester: 1, kind: "core" },
+  { code: "RHET 1020", semester: 2, kind: "core" },
+  { code: "SCI 1020", semester: 2, kind: "core" },
+  { code: "CORE 1130", semester: 2, kind: "core-option" }, // Cultural Foundations
+  { code: "PHIL 2100", semester: 3, kind: "core" },
+  { code: "PSYC 1000", semester: 4, kind: "core-option" }, // Humanities and Social Sciences
+  { code: "PSYC 3022", semester: 4, kind: "core-option" }, // Egypt Studies
+  { code: "ANTH 2005", semester: 6, kind: "core-option" }, // Arab World Studies
+  { code: "CORE 2096", semester: 7, kind: "core-option" }, // Global Studies
+  { code: "MENG 4553", semester: 8, kind: "concentration-option" },
+  { code: "ANTH 4020", semester: 9, kind: "core-option" }, // Outside-major capstone
+  { code: "MENG 4440", semester: 9, kind: "concentration-option" },
+  { code: "MENG 4226", semester: 9, kind: "concentration-option" },
+  { code: "MENG 4227", semester: 9, kind: "concentration-option" },
+  { code: "MENG 4551", semester: 10, kind: "concentration-option" },
+  { code: "MENG 4756", semester: 10, kind: "concentration-option" }
+];
+
+/** One-credit labs and two/four-credit requirements must not be counted as 3. */
+export const MECHANICAL_CREDIT_OVERRIDES: Readonly<Record<string, number>> = {
+  "CHEM 1015": 1,
+  "ENGR 1005": 2,
+  "PHYS 1012": 1,
+  "PHYS 1022": 1,
+  "MENG 2202": 1,
+  "MENG 2505": 1,
+  "PHYS 2216": 2,
+  "PHYS 2217": 1,
+  "MENG 3217": 1,
+  "MENG 3446": 2,
+  "MENG 4606": 4,
+  "MENG 4950": 1,
+  "MENG 4980": 1,
+  "MENG 4981": 2
+};
 
 /**
  * Prerequisite choices are the Mechanical Engineering track's normal path.
@@ -74,7 +126,15 @@ const PREREQUISITES: Readonly<Record<string, readonly string[]>> = {
   "MENG 4606": ["ENGR 3202", "MENG 3602"],
   "MENG 4980": ["MENG 3446", "MENG 3605", "MENG 3705"],
   "MENG 4981": ["MENG 4980"],
-  "MENG 4950": ["ENGR 1005", "ENGR 2102", "ENGR 2104", "ENGR 3202", "ENGR 3212", "ENGR 3222"]
+  "MENG 4950": ["ENGR 1005", "ENGR 2102", "ENGR 2104", "ENGR 3202", "ENGR 3212", "ENGR 3222"],
+  "RHET 1020": ["RHET 1010"],
+  "PHIL 2100": ["RHET 1010"],
+  "MENG 4553": ["MENG 3505", "ENGR 3202"],
+  "MENG 4440": ["ENGR 3202"],
+  "MENG 4226": ["MENG 3209"],
+  "MENG 4227": ["MENG 3209"],
+  "MENG 4551": ["MENG 2505", "MENG 3506"],
+  "MENG 4756": ["MENG 3705"]
 };
 
 export function enrollmentYearFromAucId(value: unknown, currentYear: number): number | null {
@@ -139,39 +199,68 @@ export function recommendMechanicalCourses(input: {
       : (current.year - enrolled) * 2
   ));
   const catalog = new Map(input.catalog.map(course => [course.code.toUpperCase(), course]));
-  const all = MECHANICAL_TERM_PLAN.flatMap((codes, index) =>
-    codes.map((code, order) => ({ code, semester: index + 1, order }))
+  const major = MECHANICAL_TERM_PLAN.flatMap((codes, index) =>
+    codes.map((code, order) => ({
+      code, semester: index + 1, order, kind: "major" as SuggestionKind
+    }))
   );
-  // Never display a phantom course when the source catalog does not contain it.
-  const plan = all.filter(course => catalog.has(course.code));
+  const extras = MECHANICAL_CORE_AND_ELECTIVE_OPTIONS.map((entry, order) => ({
+    ...entry, order: 100 + order
+  }));
+  const plan = [...major, ...extras].filter(course => catalog.has(course.code));
   const manual = Boolean(input.hasSavedProgress && input.completedCodes?.size);
   const completed = manual
     ? new Set(input.completedCodes)
-    : new Set(plan.filter(course => course.semester < semester).map(course => course.code));
+    : new Set(major.filter(course => course.semester < semester).map(course => course.code));
 
-  // MACT 1121 belongs to preparatory mathematics rather than the mechanical
-  // degree checklist. Progress checkboxes cannot explicitly confirm it.
+  // For elective Core categories, no actual completed-course record exists in
+  // Degree Progression. Infer earlier terms, never claim this as verified.
+  for (const course of extras) {
+    if (course.semester < semester) completed.add(course.code);
+  }
   if (manual && semester >= 2) completed.add("MACT 1121");
 
-  const eligible = plan.filter(course => {
+  const candidates = plan.filter(course => {
     if (completed.has(course.code)) return false;
-    if (course.semester > semester + (manual ? 1 : 0)) return false;
+    // Do not invent future-term elective enrollment. Manual progress can
+    // unlock some major courses early; elective options stay term-scoped.
+    const allowed = course.kind === "major"
+      ? course.semester <= semester + (manual ? 1 : 0)
+      : course.semester === semester;
+    if (!allowed) return false;
     return (PREREQUISITES[course.code] || []).every(code => completed.has(code));
   });
 
-  eligible.sort((a, b) => {
-    const score = (item: { semester: number }) =>
-      item.semester <= semester ? semester - item.semester : 3 * (item.semester - semester);
-    return score(a) - score(b) || a.semester - b.semester || a.order - b.order;
-  });
+  const priorities = (item: { kind: SuggestionKind; semester: number; order: number }) => {
+    if (item.semester < semester) return 2; // uncompleted major backlog
+    if (item.semester > semester) return 5;
+    if (item.kind === "core") return 0;
+    if (item.kind === "major") return 1;
+    if (item.kind === "core-option") return 3;
+    return 4;
+  };
+  candidates.sort((a, b) =>
+    priorities(a) - priorities(b) || a.semester - b.semester || a.order - b.order
+  );
 
-  const limit = Math.max(1, Math.min(6, Math.floor(input.limit ?? 6)));
-  const selected = eligible.slice(0, limit).map(course => ({
-    code: course.code,
-    title: catalog.get(course.code)!.title,
-    semester: course.semester
-  }));
+  const maxCredits = 18;
+  const targetCredits = 15;
+  const maxCourses = Math.max(1, Math.min(9, Math.floor(input.limit ?? 8)));
+  let totalCredits = 0;
+  const selected: CourseSuggestion[] = [];
+  for (const candidate of candidates) {
+    const credits = MECHANICAL_CREDIT_OVERRIDES[candidate.code] ?? 3;
+    if (selected.length >= maxCourses || totalCredits + credits > maxCredits) continue;
+    selected.push({
+      code: candidate.code,
+      title: catalog.get(candidate.code)!.title,
+      credits, semester: candidate.semester, kind: candidate.kind
+    });
+    totalCredits += credits;
+  }
 
-  return { term: current.label, semester, upcoming: current.upcoming,
-    usedSavedProgress: manual, courses: selected };
+  return {
+    term: current.label, semester, upcoming: current.upcoming,
+    usedSavedProgress: manual, totalCredits, targetCredits, courses: selected
+  };
 }
