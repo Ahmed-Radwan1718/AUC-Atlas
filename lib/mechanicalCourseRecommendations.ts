@@ -56,11 +56,11 @@ export const MECHANICAL_CORE_AND_ELECTIVE_OPTIONS: readonly {
   { code: "CORE 1130", semester: 2, kind: "core-option" }, // Cultural Foundations
   { code: "PHIL 2100", semester: 3, kind: "core" },
   { code: "PSYC 1000", semester: 4, kind: "core-option" }, // Humanities and Social Sciences
-  { code: "PSYC 3022", semester: 4, kind: "core-option" }, // Egypt Studies
+  { code: "EGPT 2020", semester: 4, kind: "core-option" }, // Egypt Studies
   { code: "ANTH 2005", semester: 6, kind: "core-option" }, // Arab World Studies
   { code: "CORE 2096", semester: 7, kind: "core-option" }, // Global Studies
   { code: "MENG 4553", semester: 8, kind: "concentration-option" },
-  { code: "ANTH 4020", semester: 9, kind: "core-option" }, // Outside-major capstone
+  { code: "HIST 4216", semester: 9, kind: "core-option" }, // Outside-major capstone
   { code: "MENG 4440", semester: 9, kind: "concentration-option" },
   { code: "MENG 4226", semester: 9, kind: "concentration-option" },
   { code: "MENG 4227", semester: 9, kind: "concentration-option" },
