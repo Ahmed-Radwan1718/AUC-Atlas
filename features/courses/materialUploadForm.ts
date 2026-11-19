@@ -500,7 +500,7 @@ function slugifyMaterialValue(value) {
           function (file) {
             return (
               file.size >
-              25 * 1024 * 1024
+              12.5 * 1024 * 1024
             );
           }
         );
@@ -508,7 +508,7 @@ function slugifyMaterialValue(value) {
         if (oversizedFile) {
           setMaterialUploadStatus(
             oversizedFile.name +
-              " is above the 25MB upload limit.",
+              " is above the 12.5MB upload limit.",
             "error",
             form
           );
