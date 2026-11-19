@@ -70,9 +70,17 @@ security headers are already configured in `next.config.ts`.
 - A student may have at most **two unexpired, unconsumed upload authorizations**.
   Authorizations are reserved atomically with a per-user limit document, so parallel
   requests cannot bypass the concurrent-upload check.
-- Each course-material file is limited to **12.5 MB (13,107,200 bytes)**. A smaller
+- Standard students have a **12.5 MB (13,107,200 bytes)** per-file limit. A smaller
   value can be configured with `COURSE_MATERIAL_MAX_FILE_BYTES`, but a higher
-  value cannot override the per-file ceiling.
+  value cannot override the student ceiling.
+- Signed-in users whose exact Firebase Auth UID appears in the server-only Vercel
+  `ADMIN_UIDS` environment variable (UIDs separated by commas or whitespace)
+  are exempt from the standard per-file and 250 MB total storage quota.
+  Their files are instead capped at **100 MB** (104,857,600 bytes) per upload, or
+  a smaller `COURSE_MATERIAL_ADMIN_MAX_FILE_BYTES` setting. This is a provider/safety
+  boundary, not an unlimited file-size promise. Admin privileges granted only
+  through Firebase custom claims do **not** grant this upload exception.
+  The existing two-active-upload authorization control still applies to everyone.
 - The student's **250 MB default storage quota includes registered course materials
   and pending upload sizes**. Five minutes of grace after token expiry remain
   reserved while a successful upload can still be registered.
