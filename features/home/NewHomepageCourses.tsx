@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react";
 
-type SuggestedCourse = { code: string; title: string; semester: number };
+type SuggestedCourse = {
+  code: string; title: string; semester: number; credits: number;
+  kind: "major" | "core" | "core-option" | "concentration-option";
+};
 type SuggestionsResponse = {
   status: "loading" | "ready" | "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "error";
   term?: string;
   upcoming?: boolean;
   usedSavedProgress?: boolean;
+  totalCredits?: number;
   courses: SuggestedCourse[];
 };
 
@@ -57,7 +61,7 @@ export default function NewHomepageCourses() {
       <div className="homepagenew-courses-heading">
         <h1 id="homepagenew-courses-title">{ready && result.upcoming ? "Next Semester" : "Your Courses"}</h1>
         {ready && <span className="homepagenew-courses-preview">
-          {result.term} · Suggested
+          {result.term} · {result.totalCredits ?? 0} cr. · Suggested
         </span>}
       </div>
 
@@ -71,15 +75,23 @@ export default function NewHomepageCourses() {
                 )}
               </div>
               <div className="homepagenew-course-info">
-                <span className="homepagenew-course-code">{course.code}</span>
+                <div className="homepagenew-course-code-row">
+                  <span className="homepagenew-course-code">{course.code}</span>
+                  <span className="homepagenew-course-credit">{course.credits} cr.</span>
+                </div>
                 <span className="homepagenew-course-name">{course.title}</span>
+                {(course.kind === "core-option" || course.kind === "concentration-option") && (
+                  <span className="homepagenew-course-option-label">
+                    {course.kind === "core-option" ? "Core option" : "Concentration option"}
+                  </span>
+                )}
               </div>
             </a>
           ))}
         </div>
       ) : result.status === "loading" ? (
         <div className="homepagenew-courses-grid" aria-hidden="true">
-          {Array.from({ length: 4 }, (_, index) => (
+          {Array.from({ length: 6 }, (_, index) => (
             <div className="homepagenew-course-card homepagenew-course-loading" key={index}>
               <div className="homepagenew-course-cover" />
               <div className="homepagenew-course-info">
