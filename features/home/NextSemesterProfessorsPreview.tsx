@@ -1,48 +1,68 @@
-type PreviewProfessor = {
-  name: string;
-  course: string;
-  rating: string;
-  reviews: number;
+"use client";
+
+import { useEffect, useState } from "react";
+
+type RatedProfessor = {
+  professorId: string;
+  professorName: string;
+  courseCode: string;
+  image: string;
+  averageRating: number;
+  reviewCount: number;
 };
-
-const recommended: PreviewProfessor[] = [
-  { name: "Professor A", course: "MENG 3601", rating: "4.8", reviews: 43 },
-  { name: "Professor B", course: "MENG 3209", rating: "4.6", reviews: 29 },
-];
-
-const cautioned: PreviewProfessor[] = [
-  { name: "Professor C", course: "MENG 3601", rating: "1.9", reviews: 31 },
-  { name: "Professor D", course: "MENG 3506", rating: "2.3", reviews: 26 },
-];
+type RecommendationResponse = {
+  status: "loading" | "ready" | "sign-in" | "select-major"
+    | "unsupported-major" | "invalid-id" | "error";
+  term?: string;
+  predictedCourses?: string[];
+  consider: RatedProfessor[];
+  avoid: RatedProfessor[];
+};
+const initial: RecommendationResponse = {
+  status: "loading", consider: [], avoid: []
+};
 
 function PersonPlaceholder() {
   return (
-    <div className="homepagenew-professor-avatar" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
-        strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="8" r="3.5" />
-        <path d="M5 20c0-4 3.1-6 7-6s7 2 7 6" />
-      </svg>
-    </div>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M5 20c0-4 3.1-6 7-6s7 2 7 6" />
+    </svg>
   );
 }
 
-function Rating({ professor }: { professor: PreviewProfessor }) {
+function ProfessorAvatar({ professor }: { professor: RatedProfessor }) {
+  const [failed, setFailed] = useState(false);
   return (
-    <div className="homepagenew-professor-rating">
-      <div className="homepagenew-professor-rating-score">
+    <span className="homepagenew-professor-avatar" aria-hidden="true">
+      {professor.image && professor.image !== "/user.png" && !failed
+        ? <img src={professor.image} alt="" loading="lazy"
+            referrerPolicy="no-referrer" onError={() => setFailed(true)} />
+        : <PersonPlaceholder />}
+    </span>
+  );
+}
+
+function Rating({ professor }: { professor: RatedProfessor }) {
+  return (
+    <span className="homepagenew-professor-rating">
+      <span className="homepagenew-professor-rating-score">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="m12 2.5 2.9 5.88 6.5.95-4.7 4.57 1.11 6.48L12 17.32l-5.81 3.06 1.11-6.48-4.7-4.57 6.5-.95L12 2.5Z" />
         </svg>
-        <strong>{professor.rating}</strong>
-      </div>
-      <span>{professor.reviews} reviews</span>
-    </div>
+        <strong>{professor.averageRating.toFixed(1)}</strong>
+      </span>
+      <span>{professor.reviewCount} course reviews</span>
+    </span>
   );
 }
 
-function ProfessorGroup({ label, tone, professors }: {
-  label: string; tone: "consider" | "avoid"; professors: PreviewProfessor[];
+function ProfessorGroup({ label, tone, professors, loading }: {
+  label: string;
+  tone: "consider" | "avoid";
+  professors: RatedProfessor[];
+  loading: boolean;
 }) {
   return (
     <div className="homepagenew-professor-panel">
@@ -64,32 +84,97 @@ function ProfessorGroup({ label, tone, professors }: {
         {label}
       </h3>
       <div className="homepagenew-professor-list">
-        {professors.map(professor => (
-          <div className="homepagenew-professor-item" key={professor.name}>
-            <PersonPlaceholder />
-            <div className="homepagenew-professor-identity">
-              <strong>{professor.name}</strong>
-              <span>{professor.course}</span>
-            </div>
-            <Rating professor={professor} />
+        {loading ? (
+          <div className="homepagenew-professor-item homepagenew-professor-loading"
+            aria-hidden="true">
+            <span className="homepagenew-professor-avatar" />
+            <span className="homepagenew-professor-identity">
+              <span className="homepagenew-professor-loading-name" />
+              <span className="homepagenew-professor-loading-course" />
+            </span>
           </div>
-        ))}
+        ) : professors.length ? professors.map(professor => (
+          <a className="homepagenew-professor-item"
+            href={"/professors/" + encodeURIComponent(professor.professorId)}
+            key={professor.professorId + ":" + professor.courseCode}
+            aria-label={professor.professorName + ", " + professor.courseCode +
+              ", " + professor.averageRating.toFixed(1) + " out of 5 from " +
+              professor.reviewCount + " course reviews"}>
+            <ProfessorAvatar professor={professor} />
+            <span className="homepagenew-professor-identity">
+              <strong>{professor.professorName}</strong>
+              <span>{professor.courseCode}</span>
+            </span>
+            <Rating professor={professor} />
+          </a>
+        )) : (
+          <p className="homepagenew-professor-group-empty">
+            {tone === "consider"
+              ? "No highly rated professors with enough reviews for these courses yet."
+              : "No low-rated professors with enough reviews for these courses yet."}
+          </p>
+        )}
       </div>
     </div>
   );
 }
 
 export default function NextSemesterProfessorsPreview() {
+  const [result, setResult] = useState<RecommendationResponse>(initial);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/homepage-professor-recommendations", {
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+      signal: controller.signal
+    }).then(async response => {
+      if (!response.ok) throw Error("Could not load next-semester professors");
+      return response.json() as Promise<RecommendationResponse>;
+    }).then(data => {
+      if (!controller.signal.aborted) setResult(data);
+    }).catch(() => {
+      if (!controller.signal.aborted) {
+        setResult({ status: "error", consider: [], avoid: [] });
+      }
+    });
+    return () => controller.abort();
+  }, []);
+
+  const ready = result.status === "ready";
+  const notice = {
+    "sign-in": { label: "Sign in to see next-semester professors", href: "/login" },
+    "select-major": { label: "Choose your major in Account", href: "/accounts" },
+    "unsupported-major": { label: "Suggestions for your major are coming soon", href: "/professors" },
+    "invalid-id": { label: "Check your AUC ID in Account", href: "/accounts" },
+    "error": { label: "Could not load next-semester professors", href: "/professors" }
+  }[result.status as "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "error"];
+
   return (
-    <section className="homepagenew-professors" aria-labelledby="homepagenew-professors-title">
+    <section className="homepagenew-professors"
+      aria-labelledby="homepagenew-professors-title" aria-busy={result.status === "loading"}>
       <div className="homepagenew-professors-heading">
         <h2 id="homepagenew-professors-title">Professors for Next Semester</h2>
-        <span>Spring 2027 · Layout preview</span>
+        {ready && <span>{result.term} · Based on past course reviews</span>}
       </div>
-      <div className="homepagenew-professor-grid">
-        <ProfessorGroup label="Professors to Consider" tone="consider" professors={recommended} />
-        <ProfessorGroup label="Professors to Avoid" tone="avoid" professors={cautioned} />
-      </div>
+      {ready && !(result.predictedCourses?.length) ? (
+        <div className="homepagenew-professor-notice">
+          <span>No next-semester courses could be projected from your degree progress.</span>
+          <a href="/degree-progression">Degree Progression</a>
+        </div>
+      ) : ready || result.status === "loading" ? (
+        <div className="homepagenew-professor-grid">
+          <ProfessorGroup label="Professors to Consider" tone="consider"
+            professors={result.consider} loading={!ready} />
+          <ProfessorGroup label="Professors to Avoid" tone="avoid"
+            professors={result.avoid} loading={!ready} />
+        </div>
+      ) : notice ? (
+        <div className="homepagenew-professor-notice">
+          <a href={notice.href}>{notice.label}</a>
+        </div>
+      ) : null}
     </section>
   );
 }
