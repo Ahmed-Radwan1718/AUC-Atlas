@@ -56,13 +56,12 @@
 
 .homepagenew-course-card:hover,
 .homepagenew-course-card:focus-visible {
-  border-color: #c09a5c;
   box-shadow: 0 12px 28px rgba(42, 32, 20, 0.08);
   transform: translateY(-3px);
 }
 
 .homepagenew-course-card:focus-visible {
-  outline: 2px solid #c09a5c;
+  outline: 2px solid #171717;
   outline-offset: 3px;
 }
 
