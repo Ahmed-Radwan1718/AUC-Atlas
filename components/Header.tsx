@@ -16,6 +16,7 @@ const navLinks = [
 const newHomeNavLinks = [
   { href: "/courses", label: "Courses" },
   { href: "/professors", label: "Professors" },
+  { href: "/gpa-calculator", label: "GPA Calculator" },
 ];
 
 function clearSignedInFlags() {
