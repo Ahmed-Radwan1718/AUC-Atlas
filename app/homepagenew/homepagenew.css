@@ -90,11 +90,33 @@
   padding: 18px 18px 22px;
 }
 
+.homepagenew-course-code-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
 .homepagenew-course-code {
   color: #a27d46;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
+}
+
+.homepagenew-course-credit {
+  color: #888078;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.homepagenew-course-option-label {
+  margin-top: auto;
+  color: #8c8275;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .homepagenew-course-name {
