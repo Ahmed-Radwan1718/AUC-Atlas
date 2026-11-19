@@ -21,7 +21,7 @@ export type MechanicalRecommendation = {
   courses: CourseSuggestion[];
 };
 
-const TERM_PLAN: readonly (readonly string[])[] = [
+export const MECHANICAL_TERM_PLAN: readonly (readonly string[])[] = [
   ["MACT 1121", "CHEM 1005", "CHEM 1015", "ENGR 1005"],
   ["MACT 1122", "PHYS 1011", "PHYS 1012", "MENG 2505"],
   ["MACT 2123", "MACT 2141", "PHYS 1021", "PHYS 1022", "ENGR 2102"],
@@ -139,7 +139,7 @@ export function recommendMechanicalCourses(input: {
       : (current.year - enrolled) * 2
   ));
   const catalog = new Map(input.catalog.map(course => [course.code.toUpperCase(), course]));
-  const all = TERM_PLAN.flatMap((codes, index) =>
+  const all = MECHANICAL_TERM_PLAN.flatMap((codes, index) =>
     codes.map((code, order) => ({ code, semester: index + 1, order }))
   );
   // Never display a phantom course when the source catalog does not contain it.
