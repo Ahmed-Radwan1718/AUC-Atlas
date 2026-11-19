@@ -13,6 +13,10 @@ const navLinks = [
   { href: "/courses", label: "Courses" },
   { href: "/gpa-calculator", label: "GPA Calculator" },
 ];
+const newHomeNavLinks = [
+  { href: "/courses", label: "Courses" },
+  { href: "/professors", label: "Professors" },
+];
 
 function clearSignedInFlags() {
   try {
@@ -26,6 +30,8 @@ function clearSignedInFlags() {
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const isNewHomepage = pathname === "/homepagenew";
+  const activeNavLinks = isNewHomepage ? newHomeNavLinks : navLinks;
   const widgetRef = useRef<HTMLDivElement>(null);
   const [navOpen, setNavOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -100,15 +106,22 @@ export default function Header() {
 
   return (
     <>
-      <header className="site-header">
-        <a href="/" className="site-header-logo">
+      <header className={isNewHomepage ? "site-header site-header--homepagenew" : "site-header"}>
+        <a href={isNewHomepage ? "/homepagenew" : "/"} className="site-header-logo">
           <span className="site-header-logo-auc">AUC</span>
           <span className="site-header-logo-atlas">Atlas</span>
         </a>
         <nav className="site-header-nav" aria-label="Main navigation">
-          {navLinks.map(({ href, label }) => <a href={href} key={href}>{label}</a>)}
+          {activeNavLinks.map(({ href, label }) => <a href={href} key={href}>{label}</a>)}
         </nav>
         <div className="site-header-actions">
+          {isNewHomepage && <a className="site-header-new-search" href="/#atlas-search-input" aria-label="Search AUC Atlas">
+            <svg viewBox="0 0 24 24" width="21" height="21" fill="none"
+              stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="10.8" cy="10.8" r="6.5"/>
+              <path d="m16 16 4.3 4.3"/>
+            </svg>
+          </a>}
           <div className="floating-account-widget" id="floating-account-widget" ref={widgetRef}>
             <button className="floating-account-button" id="floating-account-button"
               type="button" aria-label="Open account menu" aria-expanded={accountOpen}
@@ -117,8 +130,15 @@ export default function Header() {
                 setNavOpen(false);
                 setAccountOpen(value => !value);
               }}>
-              <img src={user?.photoURL || "/user.png"} alt={user?.photoURL ? "Account profile photo" : "Account"}
-                id="floating-account-photo" className={user?.photoURL ? "has-profile-photo" : ""}/>
+              {isNewHomepage && !user?.photoURL
+                ? <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="8" r="3.5"/>
+                    <path d="M5 20c0-3.8 3.1-6 7-6s7 2.2 7 6"/>
+                  </svg>
+                : <img src={user?.photoURL || "/user.png"} alt={user?.photoURL ? "Account profile photo" : "Account"}
+                    id="floating-account-photo" className={user?.photoURL ? "has-profile-photo" : ""}/>}
+
             </button>
             <div className={`floating-account-menu ${accountOpen ? "is-open" : ""}`}
               id="floating-account-menu" hidden={!accountOpen}>
@@ -152,7 +172,7 @@ export default function Header() {
         onClick={event => { if (event.target === event.currentTarget) setNavOpen(false); }}>
         <div className="nav-menu-panel nav-menu-main active">
           <div className="nav-menu-links">
-            {navLinks.map(({ href, label }) => <a href={href} className="nav-menu-link" key={href} onClick={() => setNavOpen(false)}>{label}</a>)}
+            {activeNavLinks.map(({ href, label }) => <a href={href} className="nav-menu-link" key={href} onClick={() => setNavOpen(false)}>{label}</a>)}
           </div>
         </div>
       </div>
