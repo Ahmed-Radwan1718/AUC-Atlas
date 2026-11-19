@@ -70,6 +70,9 @@ security headers are already configured in `next.config.ts`.
 - A student may have at most **two unexpired, unconsumed upload authorizations**.
   Authorizations are reserved atomically with a per-user limit document, so parallel
   requests cannot bypass the concurrent-upload check.
+- Each course-material file is limited to **12.5 MB (13,107,200 bytes)**. A smaller
+  value can be configured with `COURSE_MATERIAL_MAX_FILE_BYTES`, but a higher
+  value cannot override the per-file ceiling.
 - The student's **250 MB default storage quota includes registered course materials
   and pending upload sizes**. Five minutes of grace after token expiry remain
   reserved while a successful upload can still be registered.

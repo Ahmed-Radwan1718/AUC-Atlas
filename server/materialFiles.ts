@@ -112,7 +112,8 @@ export function safeFileName(input:unknown){
 }
 export function maxMaterialBytes():number {
   const setting=Number(process.env.COURSE_MATERIAL_MAX_FILE_BYTES);
-  return Number.isSafeInteger(setting)&&setting>0?Math.min(setting,100*1024*1024):25*1024*1024;
+  const maximum = 12.5 * 1024 * 1024;
+  return Number.isSafeInteger(setting)&&setting>0?Math.min(setting,maximum):maximum;
 }
 
 

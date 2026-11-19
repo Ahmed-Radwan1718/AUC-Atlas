@@ -90,7 +90,7 @@ export async function authorizeMaterial(user: DecodedIdToken, body: Record<strin
   const maxBytes = maxMaterialBytes();
   if (!courseCode || !professor || !semester || !materialType || !title || !fileType ||
     !Number.isSafeInteger(fileSize) || fileSize <= 0 || fileSize > maxBytes)
-    throw new MaterialUploadError("Choose a supported course-material file up to 25MB.",400);
+    throw new MaterialUploadError("Choose a supported course-material file up to 12.5MB.",400);
   const {publicKey,privateKey} = imageKitKeys();
   const authorizationId = randomBytes(18).toString("hex");
   const filePath = materialFolder + "/" + authorizationId + "." + ext(fileName);

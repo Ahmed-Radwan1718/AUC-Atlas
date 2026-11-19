@@ -16,7 +16,7 @@ const source = ts.transpileModule(
 ).outputText;
 
 type Stored = Record<string,unknown>;
-const maxSize = 25 * 1024 * 1024;
+const maxSize = 12.5 * 1024 * 1024;
 const request = (fileSize = 1024) => ({
   courseCode:"MATH 2010",courseTitle:"Calculus 2",professor:"AUC Professor",
   semester:"Fall 2026",materialType:"Past exam",title:"Midterm 2",
@@ -174,6 +174,33 @@ test("signed V2 JWT binds destination, privacy, overwrite controls and file size
     ["fileName","folder","isPrivateFile","useUniqueFileName","overwriteFile","checks","token"].sort()
   );
   assert.ok(payload.exp>payload.iat && payload.exp-payload.iat<=1800);
+});
+
+test("12.5 MB file size boundary is enforced during authorization",async()=>{
+  const app=harness();
+  const accepted=await app.authorize(maxSize);
+  assert.equal(accepted.limits.maxFileBytes,maxSize);
+  await assert.rejects(app.authorize(maxSize+1),{statusCode:400});
+});
+
+test("configured server file size limit cannot exceed 12.5 MB",()=>{
+  const fileSource=ts.transpileModule(
+    readFileSync(path.resolve(directory,"../server/materialFiles.ts"),"utf8"),
+    {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}
+  ).outputText;
+  function configuredLimit(value?:string):number {
+    const module:{exports:Record<string,any>}={exports:{}};
+    vm.runInNewContext(fileSource,{
+      module,exports:module.exports,
+      require:(id:string)=>require(id),
+      process:{env:value===undefined?{}:{COURSE_MATERIAL_MAX_FILE_BYTES:value}}
+    },{filename:"materialFiles.ts"});
+    return module.exports.maxMaterialBytes();
+  }
+  assert.equal(configuredLimit(),maxSize);
+  assert.equal(configuredLimit(String(100*1024*1024)),maxSize);
+  assert.equal(configuredLimit("invalid"),maxSize);
+  assert.equal(configuredLimit(String(5*1024*1024)),5*1024*1024);
 });
 
 test("only two active authorizations may exist per student",async()=>{

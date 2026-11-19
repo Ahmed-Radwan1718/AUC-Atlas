@@ -155,7 +155,7 @@ const dialogsMarkup = `
             <span class="material-file-copy">
               <strong>Choose files or drag them here</strong>
               <small>PDF, Word, PowerPoint, Excel, JPG or PNG</small>
-              <small class="material-file-limit">Maximum 25 MB per file</small>
+              <small class="material-file-limit">Maximum 12.5 MB per file</small>
             </span>
           </span>
         </label>
