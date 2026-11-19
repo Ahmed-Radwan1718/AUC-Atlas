@@ -137,7 +137,7 @@ export default function HomeNew() {
       <header className="cinema-topbar">
         <a className="cinema-wordmark" href="/" aria-label="AUC Atlas main homepage">
           <span className="cinema-wordmark-icon">A</span>
-          <span>AUC <strong>ATLAS</strong><small>THE CAMPUS, REIMAGINED</small></span>
+          <span>AUC <strong>ATLAS</strong><small>THE ATLAS, REIMAGINED</small></span>
         </a>
         <span className="cinema-topbar-center">AN INTERACTIVE CAMPUS EXPERIENCE <span> / CONCEPT 01</span></span>
         <a className="cinema-topbar-shortcut" href="/courses">Find materials <span aria-hidden="true">↗</span></a>
@@ -147,11 +147,11 @@ export default function HomeNew() {
         <section className="cinema-hero" aria-labelledby="cinema-heading">
           <div className="cinema-hero-rule"><span/> A DIFFERENT WAY TO EXPLORE</div>
           <h1 id="cinema-heading">Your campus.<br/><em>Your atlas.</em></h1>
-          <p>Five destinations. Every major, course and resource.<br/>Choose a building to begin your journey.</p>
-          <span className="cinema-hero-guide">EXPLORE THE CAMPUS <span aria-hidden="true">↘</span></span>
+          <p>A photographic 3D building scan. Five academic destinations.<br/>Choose a school to explore your courses and materials.</p>
+          <span className="cinema-hero-guide">EXPLORE THE 3D EXPERIMENT <span aria-hidden="true">↘</span></span>
         </section>
         <div className="cinema-campus-index">
-          <span className="cinema-campus-index-left">NEW CAIRO, EGYPT <span> / </span> AUC ATLAS</span>
+          <span className="cinema-campus-index-left">AUC ATLAS <span> / </span> REAL 3D PROTOTYPE</span>
           <nav className="cinema-campus-nav" aria-label="Choose a campus building">
             {CAMPUS_DESTINATIONS.map(item => (
               <button type="button" key={item.id} className="cinema-campus-nav-item"
@@ -162,7 +162,7 @@ export default function HomeNew() {
               </button>
             ))}
           </nav>
-          <span className="cinema-campus-index-right">SELECT TO ENTER</span>
+          <span className="cinema-campus-index-right">SELECT A SCHOOL</span>
         </div>
       </>}
 
@@ -177,7 +177,7 @@ export default function HomeNew() {
           <div className="cinema-interior-head">
             <button className="cinema-back" type="button" onClick={goBack}
               disabled={phase === "leaving"}>
-              <span aria-hidden="true">←</span> {major ? "All disciplines" : "Back to campus"}
+              <span aria-hidden="true">←</span> {major ? "All disciplines" : "Back to the scene"}
             </button>
             <span className="cinema-interior-location">AUC ATLAS <span>/</span> {destination.name.toUpperCase()}</span>
           </div>
@@ -246,6 +246,7 @@ export default function HomeNew() {
         </section>
       )}
 
+      <div className="cinema-asset-credit">Photogrammetry demo: model by <a href="https://huggingface.co/datasets/Matt1up/drone-building-scans" target="_blank" rel="noopener noreferrer">Matt1up</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a> · Not an AUC building</div>
       <footer className="cinema-footnote">
         <span>INTERACTIVE CONCEPT / ARCHITECTURAL STUDY</span>
         <span>{reducedMotion ? "MOTION REDUCED" : "MOVE TO EXPLORE • SELECT A DESTINATION"}</span>
