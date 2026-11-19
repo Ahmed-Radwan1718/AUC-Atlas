@@ -410,6 +410,28 @@ function slugifyMaterialValue(value) {
     setupMaterialChoiceMenus(form);
     setupMaterialFilePicker(form);
 
+    // Read effective limits from the authenticated server session; never trust a
+    // browser-side UID or a claimed admin role to grant a larger upload.
+    let maxUploadFileBytes = 12.5 * 1024 * 1024;
+    let maxUploadLabel = "12.5 MB";
+    const limitsReady = fetch("/api/imagekit-auth", {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: { Accept: "application/json" }
+    }).then(async function (response) {
+      if (!response.ok) return;
+      const data = await response.json();
+      const value = Number(data && data.limits && data.limits.maxFileBytes);
+      if (!Number.isSafeInteger(value) || value <= 0 || value > 100 * 1024 * 1024) return;
+      maxUploadFileBytes = value;
+      maxUploadLabel = (value / (1024 * 1024)).toLocaleString("en-US") + " MB";
+      const label = form.querySelector(".material-file-limit");
+      if (label) label.textContent = "Maximum " + maxUploadLabel + " per file";
+    }).catch(function () {
+      // Keep the standard student limit when limits cannot be retrieved.
+    });
+
     form.addEventListener(
       "submit",
       async function (event) {
@@ -496,19 +518,17 @@ function slugifyMaterialValue(value) {
           return;
         }
 
+        await limitsReady;
         const oversizedFile = files.find(
           function (file) {
-            return (
-              file.size >
-              12.5 * 1024 * 1024
-            );
+            return file.size > maxUploadFileBytes;
           }
         );
 
         if (oversizedFile) {
           setMaterialUploadStatus(
             oversizedFile.name +
-              " is above the 12.5MB upload limit.",
+              " is above the " + maxUploadLabel + " upload limit.",
             "error",
             form
           );
