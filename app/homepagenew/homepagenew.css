@@ -196,8 +196,16 @@
   pointer-events: none;
 }
 
+/* Soft warm shimmer: only the placeholders move, never the card itself. */
+.homepagenew-course-loading .homepagenew-course-cover,
+.homepagenew-course-loading .homepagenew-loading-code,
+.homepagenew-course-loading .homepagenew-loading-title {
+  background-size: 220% 100%;
+  animation: homepagenew-skeleton-shimmer 1.8s linear infinite;
+}
+
 .homepagenew-course-loading .homepagenew-course-cover {
-  background: #ece6dc;
+  background-image: linear-gradient(105deg, #ece6dc 30%, #f7f3ec 50%, #ece6dc 70%);
 }
 
 .homepagenew-loading-code,
@@ -205,14 +213,27 @@
   display: block;
   height: 12px;
   border-radius: 3px;
-  background: #e7e3dc;
+  background-image: linear-gradient(105deg, #e7e3dc 30%, #f4f1eb 50%, #e7e3dc 70%);
 }
 
 .homepagenew-loading-code { width: 88px; }
 .homepagenew-loading-title { width: 78%; height: 16px; }
 
+.homepagenew-course-loading:nth-child(2n) .homepagenew-course-cover,
+.homepagenew-course-loading:nth-child(2n) .homepagenew-loading-code,
+.homepagenew-course-loading:nth-child(2n) .homepagenew-loading-title {
+  animation-delay: -0.35s;
+}
+
+@keyframes homepagenew-skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .homepagenew-course-loading {
+  .homepagenew-course-loading .homepagenew-course-cover,
+  .homepagenew-course-loading .homepagenew-loading-code,
+  .homepagenew-course-loading .homepagenew-loading-title {
     animation: none;
   }
 }
