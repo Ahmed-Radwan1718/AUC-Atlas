@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import "./footer.css";
 
-const hiddenPages = new Set(["accounts", "degree-progression", "login", "signup", "forgot-password", "reset-password"]);
+const hiddenPages = new Set(["accounts", "degree-progression", "login", "signup", "forgot-password", "reset-password", "homepagenew"]);
 
 export default function Footer() {
   const pathname = usePathname();
