@@ -220,8 +220,17 @@
 
 /* Next-semester professor layout preview. Static demo; no ranking data yet. */
 .homepagenew-professors {
-  margin-top: 92px;
+  margin-top: 46px;
   width: 100%;
+}
+
+.homepagenew-professors::before {
+  content: "";
+  display: block;
+  width: min(78%, 820px);
+  height: 1px;
+  margin: 0 auto 45px;
+  background: #ded8ce;
 }
 
 .homepagenew-professors-heading {
@@ -368,7 +377,8 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  .homepagenew-professors { margin-top: 72px; }
+  .homepagenew-professors { margin-top: 36px; }
+  .homepagenew-professors::before { margin-bottom: 36px; }
 }
 
 @media (max-width: 480px) {
