@@ -1,0 +1,104 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+type SuggestedCourse = { code: string; title: string; semester: number };
+type SuggestionsResponse = {
+  status: "loading" | "ready" | "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "error";
+  term?: string;
+  upcoming?: boolean;
+  usedSavedProgress?: boolean;
+  courses: SuggestedCourse[];
+};
+
+// Intentionally blank until course-specific images are supplied by the owner.
+const courseImages: Record<string, string> = {};
+
+function courseHref(code: string) {
+  return "/courses/" + code.toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+const empty: SuggestionsResponse = { status: "loading", courses: [] };
+
+export default function NewHomepageCourses() {
+  const [result, setResult] = useState<SuggestionsResponse>(empty);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/homepage-course-recommendations", {
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+      signal: controller.signal
+    }).then(async response => {
+      if (!response.ok) throw Error("Could not load courses");
+      return response.json() as Promise<SuggestionsResponse>;
+    }).then(data => {
+      if (!controller.signal.aborted) setResult(data);
+    }).catch(() => {
+      if (!controller.signal.aborted) setResult({ status: "error", courses: [] });
+    });
+    return () => controller.abort();
+  }, []);
+
+  const ready = result.status === "ready";
+  const message = {
+    "sign-in": { label: "Sign in to see your courses", href: "/login" },
+    "select-major": { label: "Choose your major in Account", href: "/accounts" },
+    "unsupported-major": { label: "Course suggestions for your major are coming soon", href: "/courses" },
+    "invalid-id": { label: "Check your AUC ID in Account", href: "/accounts" },
+    error: { label: "Could not load your courses", href: "/courses" }
+  }[result.status as "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "error"];
+
+  return (
+    <section className="homepagenew-courses" aria-labelledby="homepagenew-courses-title"
+      aria-busy={result.status === "loading"}>
+      <div className="homepagenew-courses-heading">
+        <h1 id="homepagenew-courses-title">{ready && result.upcoming ? "Next Semester" : "Your Courses"}</h1>
+        {ready && <span className="homepagenew-courses-preview">
+          {result.term} · Suggested
+        </span>}
+      </div>
+
+      {ready && result.courses.length > 0 ? (
+        <div className="homepagenew-courses-grid">
+          {result.courses.map(course => (
+            <a className="homepagenew-course-card" href={courseHref(course.code)} key={course.code}>
+              <div className="homepagenew-course-cover" aria-hidden="true">
+                {courseImages[course.code] && (
+                  <img src={courseImages[course.code]} alt="" loading="lazy" />
+                )}
+              </div>
+              <div className="homepagenew-course-info">
+                <span className="homepagenew-course-code">{course.code}</span>
+                <span className="homepagenew-course-name">{course.title}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : result.status === "loading" ? (
+        <div className="homepagenew-courses-grid" aria-hidden="true">
+          {Array.from({ length: 4 }, (_, index) => (
+            <div className="homepagenew-course-card homepagenew-course-loading" key={index}>
+              <div className="homepagenew-course-cover" />
+              <div className="homepagenew-course-info">
+                <span className="homepagenew-loading-code" />
+                <span className="homepagenew-loading-title" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : ready ? (
+        <div className="homepagenew-course-empty">
+          <span>No eligible courses found from your saved progress.</span>
+          <a href="/degree-progression">Degree Progression</a>
+        </div>
+      ) : message ? (
+        <div className="homepagenew-course-empty">
+          <a href={message.href}>{message.label}</a>
+        </div>
+      ) : null}
+    </section>
+  );
+}
