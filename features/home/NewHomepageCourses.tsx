@@ -15,8 +15,10 @@ type SuggestionsResponse = {
   courses: SuggestedCourse[];
 };
 
-// Intentionally blank until course-specific images are supplied by the owner.
-const courseImages: Record<string, string> = {};
+// Course artwork supplied by the site owner. Other cards use neutral placeholders.
+const courseImages: Record<string, string> = {
+  "MENG 3207": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795125999/ptpmp9nnloiinajlqq34.png",
+};
 
 function courseHref(code: string) {
   return "/courses/" + code.toLowerCase().trim()
