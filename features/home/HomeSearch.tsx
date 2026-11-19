@@ -22,6 +22,7 @@ type Material = {
 type MaterialState = { loading: boolean; locked: boolean; materials: Material[] };
 
 type ReviewCount = number | "locked" | null;
+export type SearchScope = "all" | "materials" | "professors";
 
 function normalize(value: unknown): string {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -109,7 +110,7 @@ function SearchResultLink({
   );
 }
 
-export default function HomeSearch() {
+export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -153,17 +154,30 @@ export default function HomeSearch() {
     }));
     return [professorResults, courseResults, materials];
   }, [query, materialState.materials]);
-  const allResults = groupedResults.flat();
-  const status = !allResults.length && materialState.loading ? "Searching course materials..."
-    : !allResults.length && materialState.locked ? "No professor or course matches. Log in with your verified AUC email to search course materials."
-    : !allResults.length ? "No matches found. Try a professor name, course code, course title, or material title."
-    : materialState.loading ? "Searching course materials..."
-    : materialState.locked ? "Log in with your verified AUC email to include course materials." : "";
-  const isLoading = open && materialState.loading && query.length >= 2;
+  // The new search-first homepage can narrow the existing autocomplete without
+  // changing the original homepage's default all-results behavior.
+  const filteredResults = useMemo(() => groupedResults.map((items, index) =>
+    scope === "all" || (scope === "professors" ? index === 0 : index !== 0) ? items : []
+  ), [groupedResults, scope]);
+  const allResults = filteredResults.flat();
+  const materialLoading = scope !== "professors" && materialState.loading;
+  const materialsLocked = scope !== "professors" && materialState.locked;
+  const noMatches = scope === "professors"
+    ? "No matching professors. Try a different name or department."
+    : scope === "materials"
+      ? "No matching courses or materials. Try a course code or title."
+      : "No matches found. Try a professor name, course code, course title, or material title.";
+  const status = !allResults.length && materialLoading ? "Searching course materials..."
+    : !allResults.length && materialsLocked
+      ? "No matching courses. Sign in with a verified AUC email to search uploaded files."
+    : !allResults.length ? noMatches
+    : materialLoading ? "Searching course materials..."
+    : materialsLocked ? "Sign in with a verified AUC email to include uploaded files." : "";
+  const isLoading = open && materialLoading && query.length >= 2;
   const visible = open && !dismissed && query.length >= 2;
 
   useEffect(() => {
-    if (query.length < 2) return;
+    if (query.length < 2 || scope === "professors") return;
     let cancelled = false;
     const timeout = window.setTimeout(async () => {
       try {
@@ -180,7 +194,9 @@ export default function HomeSearch() {
       }
     }, 650);
     return () => { cancelled = true; window.clearTimeout(timeout); };
-  }, [query, searchRevision]);
+  }, [query, searchRevision, scope]);
+
+  useEffect(() => { setActiveIndex(-1); }, [scope]);
 
   useEffect(() => {
     function onOutsideClick(event: MouseEvent) {
@@ -234,11 +250,14 @@ export default function HomeSearch() {
     }
   }
   let rowIndex = -1;
+  const placeholder = scope === "professors" ? "Search a professor or department"
+    : scope === "materials" ? "Search a course, topic, or file"
+    : "Search a course, material, or professor";
   return (
     <form className={`atlas-search ${isLoading ? "is-searching" : ""}`}
       id="atlas-search-form" role="search" autoComplete="off" noValidate ref={formRef} onSubmit={submit}>
       <input id="atlas-search-input" name="q" type="search" ref={inputRef}
-        placeholder="Search a professor, course, or material" aria-label="Search AUC Atlas"
+        placeholder={placeholder} aria-label={placeholder}
         aria-controls="atlas-search-results" aria-expanded={visible}
         aria-autocomplete="list" autoComplete="off" spellCheck={false}
         value={text} onChange={event => handleInput(event.target.value)}
@@ -249,7 +268,7 @@ export default function HomeSearch() {
         hidden={!visible} ref={resultsRef}>
         <div id="atlas-search-results-list">
           {(["Professors", "Courses", "Course materials"] as const).map((label, sectionIndex) => {
-            const items = groupedResults[sectionIndex];
+            const items = filteredResults[sectionIndex];
             if (!items.length) return null;
             return <section className="atlas-search-result-section" key={label}>
               <h2>{label}<span>{items.length}</span></h2>
