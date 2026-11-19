@@ -116,13 +116,6 @@ export default function Header() {
           {activeNavLinks.map(({ href, label }) => <a href={href} key={href}>{label}</a>)}
         </nav>
         <div className="site-header-actions">
-          {isNewHomepage && <a className="site-header-new-search" href="/#atlas-search-input" aria-label="Search AUC Atlas">
-            <svg viewBox="0 0 24 24" width="21" height="21" fill="none"
-              stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="10.8" cy="10.8" r="6.5"/>
-              <path d="m16 16 4.3 4.3"/>
-            </svg>
-          </a>}
           <div className="floating-account-widget" id="floating-account-widget" ref={widgetRef}>
             <button className="floating-account-button" id="floating-account-button"
               type="button" aria-label="Open account menu" aria-expanded={accountOpen}
