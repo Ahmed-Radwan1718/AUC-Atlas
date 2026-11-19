@@ -148,3 +148,49 @@
     transform: none;
   }
 }
+
+
+/* Course recommendations load without showing invented enrollment data. */
+.homepagenew-course-empty {
+  min-height: 168px;
+  border-top: 1px solid #ded8ce;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: #615d55;
+  font-size: 15px;
+}
+
+.homepagenew-course-empty a {
+  color: #171717;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: #c09a5c;
+  text-underline-offset: 4px;
+}
+
+.homepagenew-course-loading {
+  pointer-events: none;
+}
+
+.homepagenew-course-loading .homepagenew-course-cover {
+  background: #ece6dc;
+}
+
+.homepagenew-loading-code,
+.homepagenew-loading-title {
+  display: block;
+  height: 12px;
+  border-radius: 3px;
+  background: #e7e3dc;
+}
+
+.homepagenew-loading-code { width: 88px; }
+.homepagenew-loading-title { width: 78%; height: 16px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .homepagenew-course-loading {
+    animation: none;
+  }
+}
