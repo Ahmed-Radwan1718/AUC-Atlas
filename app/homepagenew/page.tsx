@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import NewHomepageCourses from "../../features/home/NewHomepageCourses";
 import NextSemesterProfessorsPreview from "../../features/home/NextSemesterProfessorsPreview";
+import NewHomepageMaterials from "../../features/home/NewHomepageMaterials";
 import "./homepagenew.css";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export default function NewHomePage() {
     <main className="homepagenew-main">
       <NewHomepageCourses />
       <NextSemesterProfessorsPreview />
+      <NewHomepageMaterials />
     </main>
   );
 }
