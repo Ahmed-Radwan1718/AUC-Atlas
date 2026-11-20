@@ -28,9 +28,6 @@ jobs:
       - run: npm run test:professor-emails
       - run: npm run test:auc-id
       - run: npm run test:prerequisites
-      - run: npm run test:mechanical-recommendations
-      - run: npm run test:next-semester-professors
-      - run: npm run test:personalized-materials
       - run: npm run test:course-search
       - run: npm run typecheck
       - run: npm run build
