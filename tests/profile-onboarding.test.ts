@@ -23,6 +23,10 @@ test("enrollment terms are academic seasons and cannot be in the future", () => 
   assert.equal(isValidEnrollmentTerm("Fall 2027", now), false);
   assert.equal(isValidEnrollmentTerm("Summer 2025", now), false);
   assert.equal(isValidEnrollmentTerm("Spring 1999", now), false);
+  assert.equal(isValidEnrollmentTerm("Spring 2020", now), true);
+  assert.equal(isValidEnrollmentTerm("Fall 2020", now), true);
+  assert.equal(isValidEnrollmentTerm("Fall 2019", now), false);
+  assert.equal(terms.at(-1), "Spring 2020");
   assert.deepEqual(Array.from(enrollmentTermOptions(new Date("2026-04-15T12:00:00Z"))).slice(0, 2),
     ["Spring 2026", "Fall 2025"]);
 });

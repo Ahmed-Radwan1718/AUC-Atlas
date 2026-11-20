@@ -3,7 +3,7 @@
  * current numbered semester. This is a saved user preference; do not infer it
  * as confirmed solely from the AUC ID.
  */
-const FIRST_SUPPORTED_YEAR = 2000;
+const FIRST_SUPPORTED_YEAR = 2020;
 
 function cairoYearMonth(now: Date): { year: number; month: number } {
   const parts = new Intl.DateTimeFormat("en-US", {
