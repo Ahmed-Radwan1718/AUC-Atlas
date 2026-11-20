@@ -670,6 +670,9 @@
     /* Keep long student feedback from stretching the review card grid. */
     .professor-review-note-preview {
       min-width: 0;
+      display: grid;
+      align-content: start;
+      gap: 1px;
     }
 
     .professor-review-note {
@@ -685,21 +688,37 @@
       overflow: hidden;
     }
 
+    /* Fade the entire fifth line, not just the final few letters. */
     .professor-review-note.is-truncated {
-      -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
-      mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
+      -webkit-mask-image: linear-gradient(
+        to bottom,
+        #000 0%,
+        #000 70%,
+        rgba(0, 0, 0, 0.48) 80%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to bottom,
+        #000 0%,
+        #000 70%,
+        rgba(0, 0, 0, 0.48) 80%,
+        transparent 100%
+      );
     }
 
     .professor-review-read-more {
-      margin-top: 7px;
-      padding: 3px 0;
+      justify-self: start;
+      margin: 0;
+      padding: 0;
       border: 0;
       background: transparent;
-      color: #a47e40;
+      color: rgba(23, 23, 23, 0.5);
       font: inherit;
       font-size: 12px;
-      font-weight: 700;
-      line-height: 1.4;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: normal;
+      text-transform: none;
       cursor: pointer;
       transition: color 0.2s ease;
     }
@@ -709,11 +728,11 @@
     }
 
     .professor-review-read-more:hover {
-      color: #171717;
+      color: rgba(23, 23, 23, 0.78);
     }
 
     .professor-review-read-more:focus-visible {
-      outline: 2px solid #a47e40;
+      outline: 2px solid rgba(23, 23, 23, 0.55);
       outline-offset: 3px;
       border-radius: 4px;
     }
