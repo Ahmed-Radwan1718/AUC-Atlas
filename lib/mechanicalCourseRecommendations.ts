@@ -231,7 +231,11 @@ export function recommendMechanicalCourses(input: {
     : new Set(major.filter(course => course.semester < semester).map(course => course.code));
 
   // University Core checkboxes aren't part of Mechanical Degree Progression.
-  // Don't treat first-year mandatory courses as future-semester backlogs.
+  // Provisionally infer earlier required freshman courses solely to satisfy
+  // sequenced prerequisites, never to claim verified Core completion.
+  for (const course of extras) {
+    if (course.semester < semester) completed.add(course.code);
+  }
   if (manual && semester >= 2) completed.add("MACT 1121");
 
   const candidates = plan.filter(course => {
