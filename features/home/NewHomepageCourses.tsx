@@ -18,6 +18,7 @@ type SuggestionsResponse = {
 // Course artwork supplied by the site owner. Other cards use neutral placeholders.
 const courseImages: Record<string, string> = {
   "MENG 3207": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795125999/ptpmp9nnloiinajlqq34.png",
+  "MENG 3217": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795174452/f259a808-6214-41f0-a7ca-e35fc35633d8.png",
 };
 
 function courseHref(code: string) {
