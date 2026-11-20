@@ -156,7 +156,7 @@ export default function NextSemesterProfessorsPreview() {
       aria-labelledby="homepagenew-professors-title" aria-busy={result.status === "loading"}>
       <div className="homepagenew-professors-heading">
         <h2 id="homepagenew-professors-title">Professors for Next Semester</h2>
-        {ready && <span>{result.term} · Based on past course reviews</span>}
+        {ready && <span>{result.term}</span>}
       </div>
       {ready && !(result.predictedCourses?.length) ? (
         <div className="homepagenew-professor-notice">
