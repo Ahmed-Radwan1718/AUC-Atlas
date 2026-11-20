@@ -63,8 +63,29 @@ test("universal Core credits stay in shared requirements", () => {
   assert.equal(new Set(all.map((x: any) => x.code)).size, all.length);
 });
 
-test("no imaginary semester 3 plan while courses are still being defined", () => {
-  assert.equal(mechanical.getMechanicalSemesterPlan(3), null);
+test("MENG semester 3 includes four named courses and two Core category slots (16 credits)", () => {
+  const plan = mechanical.getMechanicalSemesterPlan(3);
+  assert.ok(plan);
+  assert.deepEqual(plain(plan.courses.map((c: any) => [c.code, c.title, c.credits])), [
+    ["ENGR 2104", "Dynamics", 3],
+    ["MACT 2123", "Calculus III", 3],
+    ["PHYS 1021", "Physics II", 3],
+    ["PHYS 1022", "Physics II Lab", 1]
+  ]);
+  assert.deepEqual(plain(plan.coreCategories.map((c: any) => [c.categoryId, c.title, c.credits])), [
+    ["arab-world-studies", "Arab World Studies Core", 3],
+    ["cultural-explorations", "Cultural Explorations Core", 3]
+  ]);
+  assert.deepEqual(plain(plan.requirements.map((r: any) => r.kind === "core-category" ? r.title : r.code)), [
+    "ENGR 2104", "MACT 2123", "PHYS 1021", "PHYS 1022",
+    "Arab World Studies Core", "Cultural Explorations Core"
+  ]);
+  assert.equal(plan.totalCredits, 16);
+  assert.equal(plan.courses.reduce((sum: number, c: any) => sum + c.credits, 0), 10);
+});
+
+test("no invented semester 4 plan while later requirements are being defined", () => {
+  assert.equal(mechanical.getMechanicalSemesterPlan(4), null);
   assert.equal(mechanical.getMechanicalSemesterPlan(0), null);
 });
 
@@ -79,4 +100,20 @@ test("outstanding semester 1 courses carry into semester 2, with completed exclu
     ["RHET 1020", "due"], ["MACT 1122", "due"], ["ENGR 2102", "due"],
     ["MENG 2505", "due"], ["LALT 1020", "due"]
   ]);
+});
+
+test("semester 3 recommendations include named courses but do not invent Core course codes", () => {
+  const previouslyCompleted = mechanical.MECHANICAL_ENGINEERING_EARLY_SEMESTERS
+    .filter((semester: any) => semester.semester < 3)
+    .flatMap((semester: any) => semester.courses.map((course: any) => course.code));
+  const suggested = mechanical.recommendMechanicalEarlyCourses({
+    semester: 3, completedCodes: previouslyCompleted
+  });
+  assert.deepEqual(plain(suggested.map((course: any) => [course.code, course.timing])), [
+    ["ENGR 2104", "due"],
+    ["MACT 2123", "due"],
+    ["PHYS 1021", "due"],
+    ["PHYS 1022", "due"]
+  ]);
+  assert.equal(suggested.some((course: any) => course.kind === "core-category"), false);
 });
