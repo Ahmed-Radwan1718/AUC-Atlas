@@ -7,13 +7,14 @@ type SuggestedCourse = {
   kind: "major" | "core";
 };
 type SuggestionsResponse = {
-  status: "loading" | "ready" | "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "error";
+  status: "loading" | "ready" | "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "plan-pending" | "error";
   term?: string;
+  semester?: number;
   upcoming?: boolean;
   usedSavedProgress?: boolean;
   totalCredits?: number;
   courses: SuggestedCourse[];
-  requirements?: { id: string; label: string; timing: string }[];
+  requirements?: { id: string; label: string; timing: string; credits: number }[];
 };
 
 // Course artwork supplied by the site owner. Other cards use neutral placeholders.
@@ -54,11 +55,12 @@ export default function NewHomepageCourses() {
   const ready = result.status === "ready";
   const message = {
     "sign-in": { label: "Sign in to see your courses", href: "/login" },
-    "select-major": { label: "Choose your major in Account", href: "/accounts" },
+    "select-major": { label: "Choose your major and enrollment term in Account", href: "/accounts" },
     "unsupported-major": { label: "Course suggestions for your major are coming soon", href: "/courses" },
     "invalid-id": { label: "Check your AUC ID in Account", href: "/accounts" },
+    "plan-pending": { label: "Semester " + (result.semester ?? "") + " course plan is coming soon", href: "/degree-progression" },
     error: { label: "Could not load your courses", href: "/courses" }
-  }[result.status as "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "error"];
+  }[result.status as "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "plan-pending" | "error"];
 
   return (
     <section className="homepagenew-courses" aria-labelledby="homepagenew-courses-title"
@@ -70,8 +72,9 @@ export default function NewHomepageCourses() {
         </span>}
       </div>
 
-      {ready && result.courses.length > 0 ? (
-        <div className="homepagenew-courses-grid">
+      {ready && (result.courses.length > 0 || Boolean(result.requirements?.length)) ? (
+        <div className="homepagenew-course-recommendations">
+          {result.courses.length > 0 && <div className="homepagenew-courses-grid">
           {result.courses.map(course => (
             <a className="homepagenew-course-card" href={courseHref(course.code)} key={course.code}>
               <div className="homepagenew-course-cover" aria-hidden="true">
@@ -89,6 +92,20 @@ export default function NewHomepageCourses() {
               </div>
             </a>
           ))}
+          </div>}
+          {Boolean(result.requirements?.length) && (
+            <div className="homepagenew-core-requirements">
+              <span className="homepagenew-core-requirements-title">Core curriculum choices</span>
+              <div className="homepagenew-core-requirements-list">
+                {result.requirements?.map(requirement => (
+                  <div className="homepagenew-core-requirement" key={requirement.id}>
+                    <span>{requirement.label}</span>
+                    <span>{requirement.credits} cr.</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       ) : result.status === "loading" ? (
         <div className="homepagenew-courses-grid" aria-hidden="true">
@@ -104,7 +121,7 @@ export default function NewHomepageCourses() {
         </div>
       ) : ready ? (
         <div className="homepagenew-course-empty">
-          <span>No eligible courses found from your saved progress.</span>
+          <span>No remaining recommended courses for this semester.</span>
           <a href="/degree-progression">Degree Progression</a>
         </div>
       ) : message ? (
