@@ -113,25 +113,6 @@ export default function NewHomepageCourses() {
         </div>
       ) : null}
 
-      {ready && Boolean(result.requirements?.length) && (
-        <div className="homepagenew-core-categories" aria-labelledby="homepagenew-core-categories-title">
-          <div className="homepagenew-core-categories-heading">
-            <h2 id="homepagenew-core-categories-title">Other Requirements</h2>
-            <p>Choose a course that fulfills each category. These are planning reminders, not enrolled courses.</p>
-          </div>
-          <div className="homepagenew-core-categories-grid">
-            {result.requirements!.map(requirement => (
-              <div className="homepagenew-core-category" key={requirement.id}>
-                <span className="homepagenew-core-category-name">{requirement.label}</span>
-                <span className="homepagenew-core-category-timing">{requirement.timing}</span>
-              </div>
-            ))}
-          </div>
-          <p className="homepagenew-core-categories-note">
-            Category electives are not included in the credit total above.
-          </p>
-        </div>
-      )}
     </section>
   );
 }
