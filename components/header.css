@@ -578,19 +578,6 @@
   pointer-events: none;
 }
 
-.site-header--homepagenew .site-header-logo::after {
-  display: none;
-}
-
-.site-header--homepagenew .site-header-logo:hover .site-header-logo-auc,
-.site-header--homepagenew .site-header-logo:hover .site-header-logo-atlas,
-.site-header--homepagenew .site-header-logo:focus-visible .site-header-logo-auc,
-.site-header--homepagenew .site-header-logo:focus-visible .site-header-logo-atlas {
-  opacity: 1;
-  filter: none;
-  transform: none;
-}
-
 .site-header--homepagenew .site-header-nav {
   grid-column: 2;
   gap: 32px;
