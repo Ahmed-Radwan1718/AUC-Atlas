@@ -172,6 +172,49 @@
 }
 
 
+.homepagenew-course-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.homepagenew-core-requirements {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.homepagenew-core-requirements-title {
+  color: #746e66;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.homepagenew-core-requirements-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.homepagenew-core-requirement {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px 14px;
+  border: 1px solid #e5dfd5;
+  border-radius: 10px;
+  background: #fff;
+  color: #171717;
+  font-size: 13px;
+}
+
+.homepagenew-core-requirement span:last-child {
+  color: #9b794b;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
 /* Course recommendations load without showing invented enrollment data. */
 .homepagenew-course-empty {
   min-height: 168px;
