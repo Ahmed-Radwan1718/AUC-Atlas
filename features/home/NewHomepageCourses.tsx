@@ -63,7 +63,7 @@ export default function NewHomepageCourses() {
       <div className="homepagenew-courses-heading">
         <h1 id="homepagenew-courses-title">{ready && result.upcoming ? "Next Semester" : "Your Courses"}</h1>
         {ready && <span className="homepagenew-courses-preview">
-          {result.term} · {result.totalCredits ?? 0} cr. · Suggested
+          {result.term} · {result.totalCredits ?? 0} cr.
         </span>}
       </div>
 
