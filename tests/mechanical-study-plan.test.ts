@@ -106,8 +106,24 @@ test("MENG semester 4 has six courses plus Humanities and Social Sciences Core (
   assert.equal(plan.totalCredits, 16);
 });
 
+test("MENG semester 5 includes six specified courses totaling 16 credits", () => {
+  const plan = mechanical.getMechanicalSemesterPlan(5);
+  assert.ok(plan);
+  assert.deepEqual(plain(plan.courses.map((c: any) => [c.code, c.title, c.credits])), [
+    ["MENG 3207", "Engineering Materials", 3],
+    ["MENG 3217", "Mechanical and Structural Behavior of Engineering Materials Lab", 1],
+    ["ENGR 3202", "Engineering Analysis and Computation I", 3],
+    ["MENG 3505", "Mechanics of Materials", 3],
+    ["MENG 3601", "Fundamentals of Thermodynamics", 3],
+    ["MACT 3224", "Probability and Statistics", 3]
+  ]);
+  assert.deepEqual(plain(plan.coreCategories), []);
+  assert.equal(plan.requirements.length, 6);
+  assert.equal(plan.totalCredits, 16);
+});
+
 test("later semesters remain undefined until their courses are supplied", () => {
-  assert.equal(mechanical.getMechanicalSemesterPlan(5), null);
+  assert.equal(mechanical.getMechanicalSemesterPlan(6), null);
   assert.equal(mechanical.getMechanicalSemesterPlan(0), null);
 });
 
@@ -155,4 +171,20 @@ test("semester 4 suggestions show only outstanding named courses, not a fabricat
     ["PHYS 2217", "due"]
   ]);
   assert.equal(suggested.some((course: any) => course.kind === "core-category"), false);
+});
+
+test("semester 5 recommendations retain order and skip completed courses", () => {
+  const earlierCourses = mechanical.MECHANICAL_ENGINEERING_EARLY_SEMESTERS
+    .filter((plan: any) => plan.semester < 5)
+    .flatMap((plan: any) => plan.courses.map((course: any) => course.code));
+  const suggested = mechanical.recommendMechanicalEarlyCourses({
+    semester: 5, completedCodes: [...earlierCourses, "MENG 3207"]
+  });
+  assert.deepEqual(plain(suggested.map((course: any) => [course.code, course.timing])), [
+    ["MENG 3217", "due"],
+    ["ENGR 3202", "due"],
+    ["MENG 3505", "due"],
+    ["MENG 3601", "due"],
+    ["MACT 3224", "due"]
+  ]);
 });

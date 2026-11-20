@@ -2,7 +2,7 @@ import { UNIVERSAL_CORE_REQUIREMENTS } from "./universalCore";
 
 /**
  * MENG semester-by-semester study plan, supplied incrementally.
- * Only semesters 1–4 are defined so far. Do not treat later
+ * Only semesters 1–5 are defined so far. Do not treat later
  * semesters as empty/complete until their requirements are supplied.
  * Universal Core course credits live in universalCore.ts, not duplicated here.
  */
@@ -52,7 +52,13 @@ const additionalCourses: readonly MechanicalStudyCourse[] = [
   { code: "MENG 2601", title: "Fluid Mechanics Fundamentals", credits: 3, kind: "major", recommendedSemester: 4 },
   { code: "MENG 2202", title: "Computational Thinking and Programming Lab", credits: 1, kind: "major", recommendedSemester: 4 },
   { code: "PHYS 2216", title: "Fundamentals of Circuits and Electronics", credits: 2, kind: "major", recommendedSemester: 4 },
-  { code: "PHYS 2217", title: "Circuits and Electronics Lab", credits: 1, kind: "major", recommendedSemester: 4 }
+  { code: "PHYS 2217", title: "Circuits and Electronics Lab", credits: 1, kind: "major", recommendedSemester: 4 },
+  { code: "MENG 3207", title: "Engineering Materials", credits: 3, kind: "major", recommendedSemester: 5 },
+  { code: "MENG 3217", title: "Mechanical and Structural Behavior of Engineering Materials Lab", credits: 1, kind: "major", recommendedSemester: 5 },
+  { code: "ENGR 3202", title: "Engineering Analysis and Computation I", credits: 3, kind: "major", recommendedSemester: 5 },
+  { code: "MENG 3505", title: "Mechanics of Materials", credits: 3, kind: "major", recommendedSemester: 5 },
+  { code: "MENG 3601", title: "Fundamentals of Thermodynamics", credits: 3, kind: "major", recommendedSemester: 5 },
+  { code: "MACT 3224", title: "Probability and Statistics", credits: 3, kind: "major", recommendedSemester: 5 }
 ];
 
 /** Titles for shared Core courses; their timing and credits remain universal. */
@@ -66,11 +72,12 @@ const universalCoreTitles: Readonly<Record<string, string>> = {
 };
 
 /** Ordered codes, keeping the same sequence the user supplied per semester. */
-const earlySemesterCourseCodes: Readonly<Record<1 | 2 | 3 | 4, readonly string[]>> = {
+const earlySemesterCourseCodes: Readonly<Record<1 | 2 | 3 | 4 | 5, readonly string[]>> = {
   1: ["CORE 1010", "RHET 1010", "MACT 1121", "PHYS 1011", "PHYS 1012", "SCI 1020", "ENGR 1005"],
   2: ["PHIL 2100", "CHEM 1005", "CHEM 1015", "RHET 1020", "MACT 1122", "ENGR 2102", "MENG 2505", "LALT 1020"],
   3: ["ENGR 2104", "MACT 2123", "PHYS 1021", "PHYS 1022"],
-  4: ["MACT 2141", "MENG 2112", "MENG 2601", "MENG 2202", "PHYS 2216", "PHYS 2217"]
+  4: ["MACT 2141", "MENG 2112", "MENG 2601", "MENG 2202", "PHYS 2216", "PHYS 2217"],
+  5: ["MENG 3207", "MENG 3217", "ENGR 3202", "MENG 3505", "MENG 3601", "MACT 3224"]
 };
 
 /**
@@ -78,7 +85,7 @@ const earlySemesterCourseCodes: Readonly<Record<1 | 2 | 3 | 4, readonly string[]
  * planned semester credits but must not be treated as specific registrations
  * or passed/failed courses until a student picks an eligible class.
  */
-const semesterCoreCategories: Readonly<Partial<Record<1 | 2 | 3 | 4, readonly MechanicalCoreCategorySlot[]>>> = {
+const semesterCoreCategories: Readonly<Partial<Record<1 | 2 | 3 | 4 | 5, readonly MechanicalCoreCategorySlot[]>>> = {
   3: [
     { kind: "core-category", categoryId: "arab-world-studies", title: "Arab World Studies Core", credits: 3, recommendedSemester: 3 },
     { kind: "core-category", categoryId: "cultural-explorations", title: "Cultural Explorations Core", credits: 3, recommendedSemester: 3 }
@@ -99,7 +106,7 @@ const courseCatalog = new Map<string, MechanicalStudyCourse>([
   ...additionalCourses.map(course => [course.code, course] as const)
 ]);
 
-function plan(semester: 1 | 2 | 3 | 4): MechanicalSemesterPlan {
+function plan(semester: 1 | 2 | 3 | 4 | 5): MechanicalSemesterPlan {
   const courses = earlySemesterCourseCodes[semester].map(code => {
     const course = courseCatalog.get(code);
     if (!course) throw new Error("Undefined Mechanical Engineering course: " + code);
@@ -114,7 +121,7 @@ function plan(semester: 1 | 2 | 3 | 4): MechanicalSemesterPlan {
 }
 
 export const MECHANICAL_ENGINEERING_EARLY_SEMESTERS: readonly MechanicalSemesterPlan[] = [
-  plan(1), plan(2), plan(3), plan(4)
+  plan(1), plan(2), plan(3), plan(4), plan(5)
 ];
 
 /** Only explicitly supplied semesters have a plan so far. */
