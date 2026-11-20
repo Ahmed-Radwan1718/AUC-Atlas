@@ -30,6 +30,7 @@ jobs:
       - run: npm run test:prerequisites
       - run: npm run test:mechanical-recommendations
       - run: npm run test:next-semester-professors
+      - run: npm run test:personalized-materials
       - run: npm run test:course-search
       - run: npm run typecheck
       - run: npm run build
@@ -75,6 +76,7 @@ jobs:
 
           check_status 200 http://127.0.0.1:3000/api/me
           check_status 200 http://127.0.0.1:3000/api/homepage-professor-recommendations
+          check_status 200 http://127.0.0.1:3000/api/homepage-personalized-materials
           check_status 401 http://127.0.0.1:3000/api/academic-progress
           check_status 401 http://127.0.0.1:3000/api/course-materials
           check_status 401 http://127.0.0.1:3000/api/material-directory
