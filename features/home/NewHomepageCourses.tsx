@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 type SuggestedCourse = {
   code: string; title: string; semester: number; credits: number;
-  kind: "major" | "core" | "core-option" | "concentration-option";
+  kind: "major" | "core";
 };
 type SuggestionsResponse = {
   status: "loading" | "ready" | "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "error";
@@ -13,6 +13,7 @@ type SuggestionsResponse = {
   usedSavedProgress?: boolean;
   totalCredits?: number;
   courses: SuggestedCourse[];
+  requirements?: { id: string; label: string; timing: string }[];
 };
 
 // Course artwork supplied by the site owner. Other cards use neutral placeholders.
@@ -84,11 +85,7 @@ export default function NewHomepageCourses() {
                   <span className="homepagenew-course-credit">{course.credits} cr.</span>
                 </div>
                 <span className="homepagenew-course-name">{course.title}</span>
-                {(course.kind === "core-option" || course.kind === "concentration-option") && (
-                  <span className="homepagenew-course-option-label">
-                    {course.kind === "core-option" ? "Core option" : "Concentration option"}
-                  </span>
-                )}
+
               </div>
             </a>
           ))}
@@ -115,6 +112,26 @@ export default function NewHomepageCourses() {
           <a href={message.href}>{message.label}</a>
         </div>
       ) : null}
+
+      {ready && Boolean(result.requirements?.length) && (
+        <div className="homepagenew-core-categories" aria-labelledby="homepagenew-core-categories-title">
+          <div className="homepagenew-core-categories-heading">
+            <h2 id="homepagenew-core-categories-title">Other Requirements</h2>
+            <p>Choose a course that fulfills each category. These are planning reminders, not enrolled courses.</p>
+          </div>
+          <div className="homepagenew-core-categories-grid">
+            {result.requirements!.map(requirement => (
+              <div className="homepagenew-core-category" key={requirement.id}>
+                <span className="homepagenew-core-category-name">{requirement.label}</span>
+                <span className="homepagenew-core-category-timing">{requirement.timing}</span>
+              </div>
+            ))}
+          </div>
+          <p className="homepagenew-core-categories-note">
+            Category electives are not included in the credit total above.
+          </p>
+        </div>
+      )}
     </section>
   );
 }
