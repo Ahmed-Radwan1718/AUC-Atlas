@@ -162,7 +162,7 @@ test("Scientific and Philosophical Thinking remain flexible reminders through se
   for (const year of [2026, 2025]) {
     for (const spring of [false, true]) {
       const date = spring ? new Date("2027-03-19T12:00:00Z") : fall2026;
-      const enrollment = spring ? year - 1 : year;
+      const enrollment = year;
       const result = recommendMechanicalCourses({
         aucId: "900" + String(enrollment).slice(-2) + "2111",
         catalog, today: date
