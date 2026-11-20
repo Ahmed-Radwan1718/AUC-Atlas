@@ -116,7 +116,7 @@ test("RHET 1020 is assigned to semester two, never replaced with an elective", (
 });
 
 test("credits are capped at 18 rather than capped at four courses", () => {
-  const cohort = recommendMechanicalCourses({ aucId: "900232111", catalog,
+  const cohort = recommendMechanicalCourses({ aucId: "900242111", catalog,
     today: new Date("2027-03-19T12:00:00Z") });
   assert.ok(cohort);
   assert.ok(cohort.courses.length > 4);
