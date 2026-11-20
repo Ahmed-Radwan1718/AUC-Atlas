@@ -73,19 +73,19 @@ test("manually completed course is never recommended again", () => {
 
 
 
-test("credits include labs, rhetoric, core and major courses in one 15-18 hour load", () => {
-  const values = [
-    ["900262111", 15, 6], // 1st semester: freshman core + maths/chemistry/engineering
-    ["900252111", 16, 6], // Fall 2026: third semester
-    ["900242111", 16, 6], // Fall 2026: fifth semester
-    ["900232111", 17, 6]  // Fall 2026: seventh semester
+test("named course credits are exact; optional category credits are not fabricated", () => {
+  const cases = [
+    ["900262111", 15, 6], // CORE/RHET plus first-year engineering
+    ["900252111", 13, 5], // third semester required engineering only
+    ["900242111", 16, 6], // junior engineering incl. one-credit lab
+    ["900232111", 14, 5]  // senior engineering only
   ] as const;
-  for (const [aucId, expectedCredits, expectedCourses] of values) {
+  for (const [aucId, expectedCredits, expectedCourses] of cases) {
     const result = recommendMechanicalCourses({ aucId, catalog, today: fall2026 });
     assert.ok(result);
     assert.equal(result.totalCredits, expectedCredits, aucId);
     assert.equal(result.courses.length, expectedCourses, aucId);
-    assert.ok(result.totalCredits >= 15 && result.totalCredits <= 18, aucId);
+    assert.ok(result.totalCredits <= 18, aucId);
     assert.equal(result.totalCredits,
       result.courses.reduce((sum: number, item: any) => sum + item.credits, 0));
   }
@@ -99,13 +99,19 @@ test("freshmen see mandatory writing and seminar together with major requirement
   assert.equal(first.courses.find((x: any) => x.code === "CHEM 1015").credits, 1);
 });
 
-test("core electives are identified as options and never counted as required major courses", () => {
-  const second = recommendMechanicalCourses({ aucId: "900262111",
-    catalog, today: new Date("2027-03-19T12:00:00Z") });
+test("RHET 1020 is assigned to semester two, never replaced with an elective", () => {
+  const first = recommendMechanicalCourses({
+    aucId: "900262111", catalog, today: fall2026
+  });
+  const second = recommendMechanicalCourses({
+    aucId: "900262111", catalog, today: new Date("2027-03-19T12:00:00Z")
+  });
+  assert.ok(first);
   assert.ok(second);
-  assert.equal(second.totalCredits, 17);
+  assert.equal(second.totalCredits, 11);
   assert.ok(second.courses.some((x: any) => x.code === "RHET 1020" && x.kind === "core"));
-  assert.ok(second.courses.some((x: any) => x.code === "CORE 1130" && x.kind === "core-option"));
+  assert.ok(!first.courses.some((x: any) => x.code === "RHET 1020"));
+  assert.ok(!second.courses.some((x: any) => x.code === "CORE 1010" || x.code === "RHET 1010"));
   assert.ok(second.courses.every((x: any) => x.credits >= 1));
 });
 
@@ -117,11 +123,11 @@ test("credits are capped at 18 rather than capped at four courses", () => {
   assert.ok(cohort.totalCredits <= 18);
 });
 
-test("spring semesters also include core or elective credits without exceeding 18", () => {
+test("spring semesters name only required engineering courses and fixed writing", () => {
   const cases = [
-    ["900252111", 16], // Semester 4
-    ["900242111", 18], // Semester 6
-    ["900232111", 16]  // Semester 8
+    ["900252111", 10], // semester four
+    ["900242111", 15], // semester six
+    ["900232111", 13]  // semester eight
   ] as const;
   for (const [aucId, expectedCredits] of cases) {
     const actual = recommendMechanicalCourses({
@@ -129,15 +135,68 @@ test("spring semesters also include core or elective credits without exceeding 1
     });
     assert.ok(actual);
     assert.equal(actual.totalCredits, expectedCredits, aucId);
-    assert.ok(actual.courses.some((x: any) => x.kind !== "major"), aucId);
+    assert.ok(actual.courses.every((x: any) => x.kind === "major"), aucId);
   }
 });
 
-test("only fifteen credits of concentration examples are proposed across the pathway", () => {
-  const chosen = MECHANICAL_CORE_AND_ELECTIVE_OPTIONS
-    .filter((x: any) => x.kind === "concentration-option");
-  assert.equal(chosen.length, 5);
-  assert.equal(chosen.length * 3, 15);
+test("no random Core or concentration course is recommended", () => {
+  assert.deepEqual(Array.from(MECHANICAL_CORE_AND_ELECTIVE_OPTIONS,
+    (x: any) => x.code), ["CORE 1010", "RHET 1010", "RHET 1020"]);
+  const banned = new Set([
+    "SCI 1020", "PHIL 2100", "CORE 1130", "PSYC 1000", "EGPT 2020",
+    "ANTH 2005", "CORE 2096", "HIST 4216", "MENG 4553", "MENG 4440",
+    "MENG 4226", "MENG 4227", "MENG 4551"
+  ]);
+  for (let year = 2022; year <= 2026; year++) {
+    const result = recommendMechanicalCourses({
+      aucId: "900" + String(year).slice(-2) + "2111", catalog,
+      today: fall2026
+    });
+    assert.ok(result);
+    assert.ok(result.courses.every((x: any) => !banned.has(x.code)));
+    assert.ok(result.courses.every((x: any) => x.kind === "major" || x.kind === "core"));
+  }
+});
+
+test("Scientific and Philosophical Thinking remain flexible reminders through semesters 1–4", () => {
+  for (const year of [2026, 2025]) {
+    for (const spring of [false, true]) {
+      const date = spring ? new Date("2027-03-19T12:00:00Z") : fall2026;
+      const enrollment = spring ? year - 1 : year;
+      const result = recommendMechanicalCourses({
+        aucId: "900" + String(enrollment).slice(-2) + "2111",
+        catalog, today: date
+      });
+      assert.ok(result);
+      assert.ok(result.semester >= 1 && result.semester <= 4);
+      const labels: string[] = Array.from(result.requirements, (x: any) => x.label);
+      assert.ok(labels.includes("Scientific Thinking"));
+      assert.ok(labels.includes("Philosophical Thinking"));
+      assert.ok(labels.includes("Cultural Foundations"));
+      assert.ok(result.requirements.every((r: any) => r.timing));
+    }
+  }
+  const fifth = recommendMechanicalCourses({ aucId: "900242111", catalog, today: fall2026 });
+  assert.ok(fifth);
+  assert.ok(!fifth.requirements.some((x: any) => x.label === "Scientific Thinking"));
+  assert.ok(!fifth.requirements.some((x: any) => x.label === "Philosophical Thinking"));
+});
+
+test("secondary university Core and concentration electives display category names only", () => {
+  const byTerm = [
+    ["900252111", "2027-03-19", "Egypt Studies"],
+    ["900242111", "2026-11-19", "Arab World Studies"],
+    ["900242111", "2027-03-19", "Global Studies"],
+    ["900222111", "2027-03-19", "Concentration Electives"]
+  ] as const;
+  for (const [aucId, date, name] of byTerm) {
+    const result = recommendMechanicalCourses({
+      aucId, catalog, today: new Date(date + "T12:00:00Z")
+    });
+    assert.ok(result);
+    assert.ok(result.requirements.some((x: any) => x.label === name), name);
+    assert.ok(result.requirements.every((x: any) => !("code" in x) && !("credits" in x)));
+  }
 });
 
 test("never invents a course not present in the catalog", () => {
