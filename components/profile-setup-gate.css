@@ -1,0 +1,114 @@
+.atlas-profile-setup {
+  box-sizing: border-box;
+  width: min(520px, calc(100% - 32px));
+  max-width: none;
+  max-height: min(90dvh, 720px);
+  margin: auto;
+  padding: 0;
+  border: 1px solid rgba(23, 23, 23, .1);
+  border-radius: 22px;
+  background: #fffdf9;
+  color: #171717;
+  box-shadow: 0 32px 85px rgba(30, 24, 16, .24);
+  z-index: 5000;
+}
+.atlas-profile-setup::backdrop {
+  background: rgba(20, 19, 18, .46);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+body.atlas-profile-setup-open { overflow: hidden; }
+.atlas-profile-setup-form {
+  box-sizing: border-box;
+  max-height: min(90dvh, 720px);
+  padding: 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: inherit;
+}
+.atlas-profile-setup-kicker {
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: #ad854a;
+}
+.atlas-profile-setup h2 {
+  margin: 0;
+  font-size: clamp(24px, 4vw, 30px);
+  letter-spacing: -.035em;
+  line-height: 1.15;
+}
+.atlas-profile-setup-form > p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 13px;
+  color: rgba(23, 23, 23, .64);
+}
+.atlas-profile-setup-fields {
+  display: grid;
+  gap: 18px;
+  margin: 8px 0;
+}
+.atlas-profile-setup-field, .atlas-profile-setup-saved {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.atlas-profile-setup-field > span, .atlas-profile-setup-saved > span {
+  font-size: 12px;
+  color: #33302b;
+  font-weight: 700;
+}
+.atlas-profile-setup select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 12px;
+  border: 1px solid #d9d1c5;
+  border-radius: 10px;
+  background: #fff;
+  color: #171717;
+  font: inherit;
+  font-size: 14px;
+}
+.atlas-profile-setup select:focus-visible {
+  outline: 2px solid #ba9557;
+  outline-offset: 2px;
+}
+.atlas-profile-setup-saved strong {
+  display: block;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f7f4ee;
+  color: #171717;
+  font-size: 14px;
+}
+.atlas-profile-setup button[type="submit"] {
+  min-height: 48px;
+  border: 0;
+  border-radius: 11px;
+  background: #171717;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.atlas-profile-setup button[type="submit"]:hover:not(:disabled) { background: #3a3125; }
+.atlas-profile-setup button[type="submit"]:disabled { opacity: .5; cursor: not-allowed; }
+.atlas-profile-setup-form > .atlas-profile-setup-error {
+  color: #a32d2d;
+  font-weight: 600;
+}
+.atlas-profile-setup-form > .atlas-profile-setup-footnote {
+  font-size: 11px;
+  text-align: center;
+}
+@media (max-width: 600px) {
+  .atlas-profile-setup { border-radius: 16px; }
+  .atlas-profile-setup-form { padding: 24px 20px; }
+}

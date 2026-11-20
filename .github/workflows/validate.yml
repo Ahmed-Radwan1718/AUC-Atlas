@@ -28,6 +28,7 @@ jobs:
       - run: npm run test:professor-emails
       - run: npm run test:auc-id
       - run: npm run test:prerequisites
+      - run: npm run test:profile-onboarding
       - run: npm run test:universal-core
       - run: npm run test:course-search
       - run: npm run typecheck
