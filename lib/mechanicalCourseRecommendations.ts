@@ -12,7 +12,7 @@ export type DegreeRequirementPlan = {
     subgroups?: Array<{ items?: string[] }>;
   }>;
 };
-export type SuggestionKind = "major" | "core" | "core-option" | "concentration-option";
+export type SuggestionKind = "major" | "core";
 export type CourseSuggestion = {
   code: string; title: string; semester: number; credits: number; kind: SuggestionKind;
 };
@@ -24,6 +24,7 @@ export type MechanicalRecommendation = {
   totalCredits: number;
   targetCredits: number;
   courses: CourseSuggestion[];
+  requirements: MechanicalCategoryRequirement[];
 };
 
 export const MECHANICAL_TERM_PLAN: readonly (readonly string[])[] = [
@@ -40,31 +41,54 @@ export const MECHANICAL_TERM_PLAN: readonly (readonly string[])[] = [
 ];
 
 /**
- * AUC's university Core Curriculum is separate from the Engineering Core.
- * Required freshman courses are identifiable; named elective choices below
- * are only ONE example in an approved requirement category, never an assumed
- * enrollment. These categories must not double-count major requirements.
- * Sources: AUC Core Curriculum Requirements and AUC 2024-25 catalog.
+ * Recommend only actual required MENG/engineering courses and the three
+ * fixed freshman writing/seminar courses. Never select a random Core category
+ * elective or a specific concentration elective on the student's behalf.
  */
 export const MECHANICAL_CORE_AND_ELECTIVE_OPTIONS: readonly {
   code: string; semester: number; kind: SuggestionKind;
 }[] = [
   { code: "CORE 1010", semester: 1, kind: "core" },
   { code: "RHET 1010", semester: 1, kind: "core" },
-  { code: "RHET 1020", semester: 2, kind: "core" },
-  { code: "SCI 1020", semester: 2, kind: "core" },
-  { code: "CORE 1130", semester: 2, kind: "core-option" }, // Cultural Foundations
-  { code: "PHIL 2100", semester: 3, kind: "core" },
-  { code: "PSYC 1000", semester: 4, kind: "core-option" }, // Humanities and Social Sciences
-  { code: "EGPT 2020", semester: 4, kind: "core-option" }, // Egypt Studies
-  { code: "ANTH 2005", semester: 6, kind: "core-option" }, // Arab World Studies
-  { code: "CORE 2096", semester: 7, kind: "core-option" }, // Global Studies
-  { code: "MENG 4553", semester: 8, kind: "concentration-option" },
-  { code: "HIST 4216", semester: 9, kind: "core-option" }, // Outside-major capstone
-  { code: "MENG 4440", semester: 9, kind: "concentration-option" },
-  { code: "MENG 4226", semester: 9, kind: "concentration-option" },
-  { code: "MENG 4227", semester: 9, kind: "concentration-option" },
-  { code: "MENG 4551", semester: 10, kind: "concentration-option" }
+  { code: "RHET 1020", semester: 2, kind: "core" }
+];
+
+export type MechanicalCategoryRequirement = {
+  id: string;
+  label: string;
+  timing: string;
+};
+
+/**
+ * Categories are planning reminders, not recommended classes or claims about
+ * what the student still needs to take. Core category completion is not
+ * recorded by the Mechanical Engineering Degree Progression checkboxes.
+ * Freshman requirements may be completed across semesters 1–4 for engineers.
+ * Other timings below are suggested planning windows, not registration rules.
+ */
+export const MECHANICAL_CATEGORY_REQUIREMENTS: readonly (
+  MechanicalCategoryRequirement & { from: number; through: number }
+)[] = [
+  { id: "scientific-thinking", label: "Scientific Thinking",
+    from: 1, through: 4, timing: "Any semester 1–4" },
+  { id: "philosophical-thinking", label: "Philosophical Thinking",
+    from: 1, through: 4, timing: "Any semester 1–4" },
+  { id: "cultural-foundations", label: "Cultural Foundations",
+    from: 1, through: 4, timing: "Choose a course by semester 4" },
+  { id: "information-literacy", label: "Information Literacy",
+    from: 1, through: 4, timing: "Complete by semester 4" },
+  { id: "humanities-social-sciences", label: "Humanities and Social Sciences",
+    from: 4, through: 6, timing: "Plan by semester 6" },
+  { id: "egypt-studies", label: "Egypt Studies",
+    from: 4, through: 7, timing: "Choose an approved course" },
+  { id: "arab-world-studies", label: "Arab World Studies",
+    from: 5, through: 8, timing: "Choose an approved course" },
+  { id: "global-studies", label: "Global Studies",
+    from: 6, through: 9, timing: "Choose an approved course" },
+  { id: "concentration-electives", label: "Concentration Electives",
+    from: 8, through: 10, timing: "Plan 15 credits across concentrations" },
+  { id: "outside-major-capstone", label: "Outside-Major Capstone",
+    from: 9, through: 10, timing: "Choose an approved capstone option" }
 ];
 
 /** One-credit labs and two/four-credit requirements must not be counted as 3. */
@@ -127,13 +151,7 @@ const PREREQUISITES: Readonly<Record<string, readonly string[]>> = {
   "MENG 4981": ["MENG 4980"],
   "MENG 4950": ["ENGR 1005", "ENGR 2102", "ENGR 2104", "ENGR 3202", "ENGR 3212", "ENGR 3222"],
   "RHET 1020": ["RHET 1010"],
-  "PHIL 2100": ["RHET 1010"],
-  "MENG 4553": ["MENG 3505", "ENGR 3202"],
-  "MENG 4440": ["ENGR 3202"],
-  "MENG 4226": ["MENG 3209"],
-  "MENG 4227": ["MENG 3209"],
-  "MENG 4551": ["MENG 2505", "MENG 3506"],
-  "MENG 4756": ["MENG 3705"]
+
 };
 
 export function enrollmentYearFromAucId(value: unknown, currentYear: number): number | null {
@@ -212,17 +230,14 @@ export function recommendMechanicalCourses(input: {
     ? new Set(input.completedCodes)
     : new Set(major.filter(course => course.semester < semester).map(course => course.code));
 
-  // For elective Core categories, no actual completed-course record exists in
-  // Degree Progression. Infer earlier terms, never claim this as verified.
-  for (const course of extras) {
-    if (course.semester < semester) completed.add(course.code);
-  }
+  // University Core checkboxes aren't part of Mechanical Degree Progression.
+  // Don't treat first-year mandatory courses as future-semester backlogs.
   if (manual && semester >= 2) completed.add("MACT 1121");
 
   const candidates = plan.filter(course => {
     if (completed.has(course.code)) return false;
-    // Do not invent future-term elective enrollment. Manual progress can
-    // unlock some major courses early; elective options stay term-scoped.
+    // Required writing/seminar courses are tied to their first/second
+    // semester, while saved progress can unlock some future major courses.
     const allowed = course.kind === "major"
       ? course.semester <= semester + (manual ? 1 : 0)
       : course.semester === semester;
@@ -235,15 +250,14 @@ export function recommendMechanicalCourses(input: {
     if (item.semester > semester) return 5;
     if (item.kind === "core") return 0;
     if (item.kind === "major") return 1;
-    if (item.kind === "core-option") return 3;
-    return 4;
+    return 3;
   };
   candidates.sort((a, b) =>
     priorities(a) - priorities(b) || a.semester - b.semester || a.order - b.order
   );
 
   const maxCredits = 18;
-  const targetCredits = 15;
+  const targetCredits = 15; // Listed-course target; category electives are uncounted.
   const maxCourses = Math.max(1, Math.min(9, Math.floor(input.limit ?? 8)));
   let totalCredits = 0;
   const selected: CourseSuggestion[] = [];
@@ -260,6 +274,9 @@ export function recommendMechanicalCourses(input: {
 
   return {
     term: current.label, semester, upcoming: current.upcoming,
-    usedSavedProgress: manual, totalCredits, targetCredits, courses: selected
+    usedSavedProgress: manual, totalCredits, targetCredits, courses: selected,
+    requirements: MECHANICAL_CATEGORY_REQUIREMENTS
+      .filter(requirement => semester >= requirement.from && semester <= requirement.through)
+      .map(({ id, label, timing }) => ({ id, label, timing }))
   };
 }
