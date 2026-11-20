@@ -22,24 +22,36 @@ export type MechanicalSemesterPlan = {
 
 const additionalCourses: readonly MechanicalStudyCourse[] = [
   { code: "MACT 1121", title: "Calculus I", credits: 3, kind: "major", recommendedSemester: 1 },
-  { code: "CHEM 1005", title: "General Chemistry I", credits: 3, kind: "major", recommendedSemester: 1 },
-  { code: "CHEM 1015", title: "Chemistry Lab", credits: 1, kind: "major", recommendedSemester: 1 },
+  { code: "PHYS 1011", title: "Physics I", credits: 3, kind: "major", recommendedSemester: 1 },
+  { code: "PHYS 1012", title: "Physics I Lab", credits: 1, kind: "major", recommendedSemester: 1 },
   { code: "ENGR 1005", title: "Engineering Drawing", credits: 2, kind: "major", recommendedSemester: 1 },
+  { code: "CHEM 1005", title: "General Chemistry I", credits: 3, kind: "major", recommendedSemester: 2 },
+  { code: "CHEM 1015", title: "Chemistry I Lab", credits: 1, kind: "major", recommendedSemester: 2 },
   { code: "MACT 1122", title: "Calculus II", credits: 3, kind: "major", recommendedSemester: 2 },
-  { code: "PHYS 1011", title: "Physics I", credits: 3, kind: "major", recommendedSemester: 2 },
-  { code: "PHYS 1012", title: "Physics I Lab", credits: 1, kind: "major", recommendedSemester: 2 }
+  { code: "ENGR 2102", title: "Engineering Mechanics I (Statics)", credits: 3, kind: "major", recommendedSemester: 2 },
+  { code: "MENG 2505", title: "Mechanical Engineering Drawing", credits: 1, kind: "major", recommendedSemester: 2 }
 ];
+
+/** Titles for shared Core courses; their timing and credits remain universal. */
+const universalCoreTitles: Readonly<Record<string, string>> = {
+  "CORE 1010": "Freshman Seminar",
+  "RHET 1010": "Freshman Writing",
+  "SCI 1020": "Scientific Thinking",
+  "RHET 1020": "Research Writing",
+  "PHIL 2100": "Philosophical Thinking",
+  "LALT 1020": "Libraries and Learning Technologies"
+};
 
 /** Ordered codes, keeping the same sequence the user supplied per semester. */
 const earlySemesterCourseCodes: Readonly<Record<1 | 2, readonly string[]>> = {
-  1: ["CORE 1010", "RHET 1010", "SCI 1020", "MACT 1121", "CHEM 1005", "CHEM 1015", "ENGR 1005"],
-  2: ["RHET 1020", "PHIL 2100", "LALT 1020", "MACT 1122", "PHYS 1011", "PHYS 1012"]
+  1: ["CORE 1010", "RHET 1010", "MACT 1121", "PHYS 1011", "PHYS 1012", "SCI 1020", "ENGR 1005"],
+  2: ["PHIL 2100", "CHEM 1005", "CHEM 1015", "RHET 1020", "MACT 1122", "ENGR 2102", "MENG 2505", "LALT 1020"]
 };
 
 const courseCatalog = new Map<string, MechanicalStudyCourse>([
   ...UNIVERSAL_CORE_REQUIREMENTS.map(core => [core.code, {
     code: core.code,
-    title: core.code,
+    title: universalCoreTitles[core.code] || core.code,
     credits: core.credits,
     kind: "core" as const,
     recommendedSemester: core.preferredSemester
