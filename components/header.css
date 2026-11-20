@@ -623,10 +623,40 @@
 }
 
 .site-header--homepagenew .floating-account-button {
+  position: relative;
   width: 40px;
   height: 40px;
   color: #171717;
   border-radius: 10px;
+}
+
+/* Match the course skeleton's warm shimmer while the session/photo loads. */
+.site-header--homepagenew .floating-account-photo-skeleton {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(105deg, #e9e3d9 30%, #faf7f1 50%, #e9e3d9 70%);
+  background-size: 220% 100%;
+  animation: atlas-account-photo-shimmer 1.8s linear infinite;
+  pointer-events: none;
+}
+
+.site-header--homepagenew .floating-account-button img.is-photo-pending {
+  opacity: 0;
+}
+
+@keyframes atlas-account-photo-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header--homepagenew .floating-account-photo-skeleton {
+    animation: none;
+  }
 }
 
 /* Expand from the profile photo, then collapse back into it. */
