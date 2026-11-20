@@ -2,7 +2,7 @@ import { UNIVERSAL_CORE_REQUIREMENTS } from "./universalCore";
 
 /**
  * MENG semester-by-semester study plan, supplied incrementally.
- * Only semesters 1–3 are defined so far. Do not treat later
+ * Only semesters 1–4 are defined so far. Do not treat later
  * semesters as empty/complete until their requirements are supplied.
  * Universal Core course credits live in universalCore.ts, not duplicated here.
  */
@@ -17,10 +17,10 @@ export type MechanicalStudyCourse = {
 /** A Core category slot, not a particular registered course. */
 export type MechanicalCoreCategorySlot = {
   readonly kind: "core-category";
-  readonly categoryId: "arab-world-studies" | "cultural-explorations";
+  readonly categoryId: "arab-world-studies" | "cultural-explorations" | "humanities-and-social-sciences";
   readonly title: string;
   readonly credits: number;
-  readonly recommendedSemester: 3;
+  readonly recommendedSemester: 3 | 4;
 };
 
 export type MechanicalSemesterPlan = {
@@ -46,7 +46,13 @@ const additionalCourses: readonly MechanicalStudyCourse[] = [
   { code: "ENGR 2104", title: "Dynamics", credits: 3, kind: "major", recommendedSemester: 3 },
   { code: "MACT 2123", title: "Calculus III", credits: 3, kind: "major", recommendedSemester: 3 },
   { code: "PHYS 1021", title: "Physics II", credits: 3, kind: "major", recommendedSemester: 3 },
-  { code: "PHYS 1022", title: "Physics II Lab", credits: 1, kind: "major", recommendedSemester: 3 }
+  { code: "PHYS 1022", title: "Physics II Lab", credits: 1, kind: "major", recommendedSemester: 3 },
+  { code: "MACT 2141", title: "Differential Equations", credits: 3, kind: "major", recommendedSemester: 4 },
+  { code: "MENG 2112", title: "Strength of Materials", credits: 3, kind: "major", recommendedSemester: 4 },
+  { code: "MENG 2601", title: "Fluid Mechanics Fundamentals", credits: 3, kind: "major", recommendedSemester: 4 },
+  { code: "MENG 2202", title: "Computational Thinking and Programming Lab", credits: 1, kind: "major", recommendedSemester: 4 },
+  { code: "PHYS 2216", title: "Fundamentals of Circuits and Electronics", credits: 2, kind: "major", recommendedSemester: 4 },
+  { code: "PHYS 2217", title: "Circuits and Electronics Lab", credits: 1, kind: "major", recommendedSemester: 4 }
 ];
 
 /** Titles for shared Core courses; their timing and credits remain universal. */
@@ -60,10 +66,11 @@ const universalCoreTitles: Readonly<Record<string, string>> = {
 };
 
 /** Ordered codes, keeping the same sequence the user supplied per semester. */
-const earlySemesterCourseCodes: Readonly<Record<1 | 2 | 3, readonly string[]>> = {
+const earlySemesterCourseCodes: Readonly<Record<1 | 2 | 3 | 4, readonly string[]>> = {
   1: ["CORE 1010", "RHET 1010", "MACT 1121", "PHYS 1011", "PHYS 1012", "SCI 1020", "ENGR 1005"],
   2: ["PHIL 2100", "CHEM 1005", "CHEM 1015", "RHET 1020", "MACT 1122", "ENGR 2102", "MENG 2505", "LALT 1020"],
-  3: ["ENGR 2104", "MACT 2123", "PHYS 1021", "PHYS 1022"]
+  3: ["ENGR 2104", "MACT 2123", "PHYS 1021", "PHYS 1022"],
+  4: ["MACT 2141", "MENG 2112", "MENG 2601", "MENG 2202", "PHYS 2216", "PHYS 2217"]
 };
 
 /**
@@ -71,10 +78,13 @@ const earlySemesterCourseCodes: Readonly<Record<1 | 2 | 3, readonly string[]>> =
  * planned semester credits but must not be treated as specific registrations
  * or passed/failed courses until a student picks an eligible class.
  */
-const semesterCoreCategories: Readonly<Partial<Record<1 | 2 | 3, readonly MechanicalCoreCategorySlot[]>>> = {
+const semesterCoreCategories: Readonly<Partial<Record<1 | 2 | 3 | 4, readonly MechanicalCoreCategorySlot[]>>> = {
   3: [
     { kind: "core-category", categoryId: "arab-world-studies", title: "Arab World Studies Core", credits: 3, recommendedSemester: 3 },
     { kind: "core-category", categoryId: "cultural-explorations", title: "Cultural Explorations Core", credits: 3, recommendedSemester: 3 }
+  ],
+  4: [
+    { kind: "core-category", categoryId: "humanities-and-social-sciences", title: "Humanities and Social Sciences Core", credits: 3, recommendedSemester: 4 }
   ]
 };
 
@@ -89,7 +99,7 @@ const courseCatalog = new Map<string, MechanicalStudyCourse>([
   ...additionalCourses.map(course => [course.code, course] as const)
 ]);
 
-function plan(semester: 1 | 2 | 3): MechanicalSemesterPlan {
+function plan(semester: 1 | 2 | 3 | 4): MechanicalSemesterPlan {
   const courses = earlySemesterCourseCodes[semester].map(code => {
     const course = courseCatalog.get(code);
     if (!course) throw new Error("Undefined Mechanical Engineering course: " + code);
@@ -104,7 +114,7 @@ function plan(semester: 1 | 2 | 3): MechanicalSemesterPlan {
 }
 
 export const MECHANICAL_ENGINEERING_EARLY_SEMESTERS: readonly MechanicalSemesterPlan[] = [
-  plan(1), plan(2), plan(3)
+  plan(1), plan(2), plan(3), plan(4)
 ];
 
 /** Only explicitly supplied semesters have a plan so far. */
