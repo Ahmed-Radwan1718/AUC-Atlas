@@ -38,7 +38,13 @@ export default function Header() {
   const [accountOpen, setAccountOpen] = useState(false);
   const [user, setUser] = useState<AtlasUser | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
+  const [loadedPhotoUrl, setLoadedPhotoUrl] = useState<string | null>(null);
+  const [failedPhotoUrl, setFailedPhotoUrl] = useState<string | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
+  const photoUrl = user?.photoURL?.trim() || "";
+  const hasUsablePhoto = Boolean(photoUrl) && failedPhotoUrl !== photoUrl;
+  const showPhotoSkeleton = isNewHomepage &&
+    (!sessionReady || (hasUsablePhoto && loadedPhotoUrl !== photoUrl));
 
   const loadAccountState = useCallback(async () => {
     try {
@@ -124,14 +130,32 @@ export default function Header() {
                 setNavOpen(false);
                 setAccountOpen(value => !value);
               }}>
-              {isNewHomepage && !user?.photoURL
-                ? <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
-                    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="8" r="3.5"/>
-                    <path d="M5 20c0-3.8 3.1-6 7-6s7 2.2 7 6"/>
-                  </svg>
-                : <img src={user?.photoURL || "/user.png"} alt={user?.photoURL ? "Account profile photo" : "Account"}
-                    id="floating-account-photo" className={user?.photoURL ? "has-profile-photo" : ""}/>}
+              {isNewHomepage ? (
+                <>
+                  {showPhotoSkeleton && (
+                    <span className="floating-account-photo-skeleton" aria-hidden="true" />
+                  )}
+                  {hasUsablePhoto ? (
+                    <img src={photoUrl} alt="Account profile photo"
+                      id="floating-account-photo"
+                      className={`has-profile-photo${loadedPhotoUrl === photoUrl ? "" : " is-photo-pending"}`}
+                      onLoad={() => setLoadedPhotoUrl(photoUrl)}
+                      onError={() => setFailedPhotoUrl(photoUrl)} />
+                  ) : !showPhotoSkeleton ? (
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                      aria-hidden="true">
+                      <circle cx="12" cy="8" r="3.5"/>
+                      <path d="M5 20c0-3.8 3.1-6 7-6s7 2.2 7 6"/>
+                    </svg>
+                  ) : null}
+                </>
+              ) : (
+                <img src={photoUrl || "/user.png"}
+                  alt={photoUrl ? "Account profile photo" : "Account"}
+                  id="floating-account-photo"
+                  className={photoUrl ? "has-profile-photo" : ""} />
+              )}
 
             </button>
             <div className={`floating-account-menu ${accountOpen ? "is-open" : ""}`}
