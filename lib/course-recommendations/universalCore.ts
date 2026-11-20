@@ -10,15 +10,16 @@ export type UniversalCoreRequirement = {
   readonly code: string;
   readonly preferredSemester: EarlySemester;
   readonly suggestedSemesters: readonly EarlySemester[];
+  readonly credits: number;
 };
 
 export const UNIVERSAL_CORE_REQUIREMENTS: readonly UniversalCoreRequirement[] = [
-  { code: "CORE 1010", preferredSemester: 1, suggestedSemesters: [1] },
-  { code: "RHET 1010", preferredSemester: 1, suggestedSemesters: [1] },
-  { code: "SCI 1020", preferredSemester: 1, suggestedSemesters: [1, 2] },
-  { code: "RHET 1020", preferredSemester: 2, suggestedSemesters: [2] },
-  { code: "LALT 1020", preferredSemester: 2, suggestedSemesters: [2] },
-  { code: "PHIL 2100", preferredSemester: 2, suggestedSemesters: [1, 2] }
+  { code: "CORE 1010", preferredSemester: 1, suggestedSemesters: [1], credits: 3 },
+  { code: "RHET 1010", preferredSemester: 1, suggestedSemesters: [1], credits: 3 },
+  { code: "SCI 1020", preferredSemester: 1, suggestedSemesters: [1, 2], credits: 3 },
+  { code: "RHET 1020", preferredSemester: 2, suggestedSemesters: [2], credits: 3 },
+  { code: "LALT 1020", preferredSemester: 2, suggestedSemesters: [2], credits: 0 },
+  { code: "PHIL 2100", preferredSemester: 2, suggestedSemesters: [1, 2], credits: 3 }
 ];
 
 export type UniversalCoreRecommendation = UniversalCoreRequirement & {
@@ -28,8 +29,7 @@ export type UniversalCoreRecommendation = UniversalCoreRequirement & {
 /**
  * Returns incomplete Core courses due in the student's estimated semester,
  * with older unfinished requirements ahead of current-semester requirements.
- * Deliberately does not infer completed courses from an AUC ID, and assigns
- * neither credit hours nor prerequisites until those rules are defined.
+ * Deliberately does not infer completed courses from an AUC ID, and does not assume prerequisites have been met.
  */
 export function recommendUniversalCoreCourses(input: {
   semester: number;

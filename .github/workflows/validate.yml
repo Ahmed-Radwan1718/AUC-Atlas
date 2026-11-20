@@ -30,6 +30,7 @@ jobs:
       - run: npm run test:prerequisites
       - run: npm run test:profile-onboarding
       - run: npm run test:universal-core
+      - run: npm run test:mechanical-study-plan
       - run: npm run test:course-search
       - run: npm run typecheck
       - run: npm run build
