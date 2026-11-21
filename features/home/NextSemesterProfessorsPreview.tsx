@@ -12,8 +12,9 @@ type RatedProfessor = {
 };
 type RecommendationResponse = {
   status: "loading" | "ready" | "sign-in" | "select-major"
-    | "unsupported-major" | "invalid-id" | "error";
+    | "unsupported-major" | "plan-pending" | "invalid-id" | "error";
   term?: string;
+  semester?: number;
   predictedCourses?: string[];
   consider: RatedProfessor[];
   avoid: RatedProfessor[];
@@ -119,12 +120,17 @@ function ProfessorGroup({ label, tone, professors, loading }: {
   );
 }
 
-export default function NextSemesterProfessorsPreview() {
+export default function NextSemesterProfessorsPreview({
+  viewingSemester = null
+}: { viewingSemester?: number | null }) {
   const [result, setResult] = useState<RecommendationResponse>(initial);
 
   useEffect(() => {
     const controller = new AbortController();
-    void fetch("/api/homepage-professor-recommendations", {
+    setResult(initial);
+    const url = "/api/homepage-professor-recommendations" +
+      (viewingSemester === null ? "" : "?semester=" + (viewingSemester + 1));
+    void fetch(url, {
       credentials: "same-origin",
       cache: "no-store",
       headers: { Accept: "application/json" },
@@ -140,28 +146,42 @@ export default function NextSemesterProfessorsPreview() {
       }
     });
     return () => controller.abort();
-  }, []);
+  }, [viewingSemester]);
 
   const ready = result.status === "ready";
   const notice = {
     "sign-in": { label: "Sign in to see next-semester professors", href: "/login" },
     "select-major": { label: "Choose your major in Account", href: "/accounts" },
     "unsupported-major": { label: "Suggestions for your major are coming soon", href: "/professors" },
+    "plan-pending": {
+      label: "Semester " + (result.semester ?? "") +
+        " course plan has not been added yet. Professor suggestions will appear once its courses are available.",
+      href: ""
+    },
     "invalid-id": { label: "Check your AUC ID in Account", href: "/accounts" },
     "error": { label: "Could not load next-semester professors", href: "/professors" }
-  }[result.status as "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "error"];
+  }[result.status as "sign-in" | "select-major" | "unsupported-major" | "plan-pending" | "invalid-id" | "error"];
 
   return (
     <section className="homepagenew-professors"
       aria-labelledby="homepagenew-professors-title" aria-busy={result.status === "loading"}>
       <div className="homepagenew-professors-heading">
         <h2 id="homepagenew-professors-title">Professors for Next Semester</h2>
-        {ready && <span>{result.term}</span>}
+        {(ready || result.status === "plan-pending") && <span>{result.term}</span>}
       </div>
+      {ready && <p className="homepagenew-professor-context">
+        Based on reviews for the listed courses (at least 3 per professor and course).
+        Teaching assignments for the upcoming semester are not confirmed.
+      </p>}
       {ready && !(result.predictedCourses?.length) ? (
         <div className="homepagenew-professor-notice">
           <span>No next-semester courses could be projected from your degree progress.</span>
           <a href="/degree-progression">Degree Progression</a>
+        </div>
+      ) : ready && result.consider.length === 0 && result.avoid.length === 0 ? (
+        <div className="homepagenew-professor-notice">
+          <span>Not enough course-specific student reviews to recommend professors yet.</span>
+          <a href="/professors">Browse professors</a>
         </div>
       ) : ready || result.status === "loading" ? (
         <div className="homepagenew-professor-grid">
@@ -172,7 +192,7 @@ export default function NextSemesterProfessorsPreview() {
         </div>
       ) : notice ? (
         <div className="homepagenew-professor-notice">
-          <a href={notice.href}>{notice.label}</a>
+          {notice.href ? <a href={notice.href}>{notice.label}</a> : <span>{notice.label}</span>}
         </div>
       ) : null}
     </section>
