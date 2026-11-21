@@ -176,7 +176,7 @@ test("authenticated semester 1 students receive professor ratings for semester 2
   assert.equal(current.body.semester, 2);
   assert.equal(current.body.term, "Spring 2027");
   assert.deepEqual(current.body.predictedCourses,
-    mechanical.getNewHomepageMechanicalSemesterPlan(2).courses.map((c: any) => c.code));
+    plain(mechanical.getNewHomepageMechanicalSemesterPlan(2).courses.map((c: any) => c.code)));
   assert.equal(current.body.consider.length, 1);
   assert.equal(current.body.consider[0].professorId, "prof-good");
   assert.equal(current.body.consider[0].reviewCount, 3);
