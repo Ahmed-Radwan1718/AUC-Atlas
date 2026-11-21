@@ -44,11 +44,17 @@ test("degree checklist keys map back to course codes without guessing passes", (
     ["CHEM 1005", "MENG 2112", "MENG 4663"]);
 });
 
-test("homepage API reads saved enrollment and progress instead of a placeholder", () => {
+test("new homepage MENG courses are pending until manual semester lists are supplied", () => {
   const route = read("app/api/homepage-course-recommendations/route.ts");
+  const newHomepage = read("features/home/NewHomepageCourses.tsx");
+  const oldHomepage = read("app/page.tsx");
+
+  assert.match(newHomepage, /fetch\("\/api\/homepage-course-recommendations"/);
+  assert.match(oldHomepage, /import Home from "\.\.\/features\/home\/Home"/);
+  assert.match(route, /major !== "Mechanical Engineering"/);
   assert.match(route, /semesterFromEnrollment\(enrollmentTerm\)/);
-  assert.match(route, /getMechanicalSemesterPlan\(selected\.semester\)/);
-  assert.match(route, /completedCourseCodesFromChecklist\(checkedKeys, groups\)/);
-  assert.match(route, /plan\.coreCategories\.map/);
-  assert.doesNotMatch(route, /user\s*\?\s*\{ status: "unsupported-major"/);
+  assert.match(route, /status: "plan-pending"/);
+  assert.doesNotMatch(route, /getMechanicalSemesterPlan|recommendMechanicalEarlyCourses/);
+  assert.doesNotMatch(route, /completedCourseCodesFromChecklist|degreePlans1/);
+  assert.doesNotMatch(route, /savedTools|degree-progress|plan\.courses|plan\.coreCategories/);
 });
