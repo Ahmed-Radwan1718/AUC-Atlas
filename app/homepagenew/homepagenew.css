@@ -115,8 +115,8 @@
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
-.homepagenew-course-card:hover,
-.homepagenew-course-card:focus-visible {
+a.homepagenew-course-card:hover,
+aa.homepagenew-course-card:focus-visible {
   box-shadow: 0 12px 28px rgba(42, 32, 20, 0.08);
   transform: translateY(-3px);
 }
@@ -226,8 +226,8 @@
     transition: none;
   }
 
-  .homepagenew-course-card:hover,
-  .homepagenew-course-card:focus-visible {
+  a.homepagenew-course-card:hover,
+  a.homepagenew-course-card:focus-visible {
     transform: none;
   }
 }
@@ -239,41 +239,9 @@
   gap: 24px;
 }
 
-.homepagenew-core-requirements {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.homepagenew-core-requirements-title {
-  color: #746e66;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.homepagenew-core-requirements-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.homepagenew-core-requirement {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 12px 14px;
-  border: 1px solid #e5dfd5;
-  border-radius: 10px;
-  background: #fff;
-  color: #171717;
-  font-size: 13px;
-}
-
-.homepagenew-core-requirement span:last-child {
-  color: #9b794b;
-  white-space: nowrap;
-  font-weight: 600;
+/* Elective placeholders are full-size cards, not navigation links. */
+.homepagenew-course-elective {
+  cursor: default;
 }
 
 /* Course recommendations load without showing invented enrollment data. */
