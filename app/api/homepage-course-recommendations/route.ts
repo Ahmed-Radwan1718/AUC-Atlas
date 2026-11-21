@@ -38,13 +38,23 @@ export async function GET(request: NextRequest) {
     const selected = semesterFromEnrollment(enrollmentTerm);
     if (!selected) return response({ status: "select-major", courses: [] });
 
-    const term = selected.term + " · Semester " + selected.semester;
-    const plan = getNewHomepageMechanicalSemesterPlan(selected.semester);
+    // A selector can view any of the eight standard semesters without
+    // changing the student's saved enrollment or their actual current term.
+    const requested = request.nextUrl.searchParams.get("semester");
+    if (requested !== null && !/^[1-8]$/.test(requested)) {
+      return response({ status: "error", courses: [] }, 400);
+    }
+    const semester = requested === null ? selected.semester : Number(requested);
+    const viewingCurrent = semester === selected.semester;
+    const term = viewingCurrent
+      ? selected.term + " · Semester " + semester
+      : "Semester " + semester;
+    const plan = getNewHomepageMechanicalSemesterPlan(semester);
     if (!plan) {
       return response({
         status: "plan-pending",
         term,
-        semester: selected.semester,
+        semester,
         courses: []
       });
     }
@@ -52,10 +62,10 @@ export async function GET(request: NextRequest) {
     return response({
       status: "ready",
       term,
-      semester: selected.semester,
-      upcoming: selected.upcoming,
+      semester,
+      upcoming: viewingCurrent && selected.upcoming,
       totalCredits: plan.totalCredits,
-      courses: plan.courses.map(course => ({ ...course, semester: selected.semester })),
+      courses: plan.courses.map(course => ({ ...course, semester })),
       requirements: plan.requirements.map(requirement => ({
         ...requirement, timing: "due"
       }))

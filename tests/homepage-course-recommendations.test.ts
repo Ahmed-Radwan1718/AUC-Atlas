@@ -99,14 +99,103 @@ test("new homepage API uses fixed lists without the old course algorithm", () =>
   const newHomepage = read("features/home/NewHomepageCourses.tsx");
   const oldHomepage = read("app/page.tsx");
 
-  assert.match(newHomepage, /fetch\("\/api\/homepage-course-recommendations"/);
+  assert.match(newHomepage, /fetch\(url, \{/);
   assert.match(oldHomepage, /import Home from "\.\.\/features\/home\/Home"/);
   assert.match(route, /major !== "Mechanical Engineering"/);
   assert.match(route, /semesterFromEnrollment\(enrollmentTerm\)/);
-  assert.match(route, /getNewHomepageMechanicalSemesterPlan\(selected\.semester\)/);
+  assert.match(route, /getNewHomepageMechanicalSemesterPlan\(semester\)/);
   assert.match(route, /status: "ready"/);
   assert.match(route, /status: "plan-pending"/);
   assert.doesNotMatch(route, /getMechanicalSemesterPlan|recommendMechanicalEarlyCourses/);
   assert.doesNotMatch(route, /completedCourseCodesFromChecklist|degreePlans1/);
   assert.doesNotMatch(route, /savedTools|degree-progress/);
+});
+
+
+test("semester selector is available for semesters 1–8 only on the new homepage", () => {
+  const component = read("features/home/NewHomepageCourses.tsx");
+  const route = read("app/api/homepage-course-recommendations/route.ts");
+  const css = read("app/homepagenew/homepagenew.css");
+
+  assert.match(component, /const semesters = \[1, 2, 3, 4, 5, 6, 7, 8\]/);
+  assert.match(component, /selectedSemester === null \? "" : "\?semester=" \+ selectedSemester/);
+  assert.match(component, /aria-pressed=\{shownSemester === semester\}/);
+  assert.match(component, /setSelectedSemester\(semester\)/);
+  assert.match(component, /aria-label="Browse course semesters"/);
+  assert.match(css, /\.homepagenew-semester-button\.is-selected/);
+  assert.match(route, /request\.nextUrl\.searchParams\.get\("semester"\)/);
+  assert.match(route, /!\s*\/\^\[1-8\]\$\/\.test\(requested\)/);
+  assert.match(route, /viewingCurrent && selected\.upcoming/);
+  assert.doesNotMatch(read("app/page.tsx"), /NewHomepageCourses/);
+});
+
+test("switching semesters returns the fixed lists without changing saved student progress", async () => {
+  const routeJs = ts.transpileModule(read("app/api/homepage-course-recommendations/route.ts"), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+  }).outputText;
+  const exports: Record<string, any> = {};
+
+  vm.runInNewContext(routeJs, {
+    exports,
+    Number, String,
+    console,
+    require(id: string) {
+      switch (id) {
+        case "next/server":
+          return { NextResponse: { json: (body: any, options: any) =>
+            ({ body, statusCode: options?.status || 200 }) } };
+        case "../../../server/session":
+          return { optionalSessionUser: async () => ({ uid: "test-student" }) };
+        case "../../../server/firebase":
+          return { firestore: () => ({ collection: () => ({ doc: () => ({
+            get: async () => ({ data: () => ({
+              major: "Mechanical Engineering", enrollmentTerm: "Fall 2024"
+            }) })
+          }) }) }) };
+        case "../../../lib/enrollmentTerm":
+          return { isValidEnrollmentTerm: () => true };
+        case "../../../lib/course-recommendations/homepagePlanner":
+          return { semesterFromEnrollment: () =>
+            ({ semester: 5, term: "Fall 2026", upcoming: false }) };
+        case "../../../lib/course-recommendations/newHomepageMechanicalPlan":
+          return fixedPlans;
+        default:
+          throw Error("Unexpected import: " + id);
+      }
+    }
+  });
+
+  const lookup = async (query: string) => {
+    const result = await exports.GET({ nextUrl: { searchParams: new URLSearchParams(query) } });
+    return plain(result);
+  };
+
+  const current = await lookup("");
+  assert.equal(current.body.status, "plan-pending");
+  assert.equal(current.body.semester, 5);
+  assert.equal(current.body.term, "Fall 2026 · Semester 5");
+
+  const first = await lookup("semester=1");
+  assert.equal(first.statusCode, 200);
+  assert.equal(first.body.status, "ready");
+  assert.equal(first.body.semester, 1);
+  assert.equal(first.body.totalCredits, 18);
+  assert.deepEqual(first.body.courses.map((c: any) => c.code), [
+    "CORE 1010", "RHET 1010", "MACT 1121", "ENGR 1005",
+    "PHYS 1011", "PHYS 1012", "SCI 1020"
+  ]);
+  assert.equal(first.body.term, "Semester 1");
+
+  const second = await lookup("semester=2");
+  assert.equal(second.body.status, "ready");
+  assert.equal(second.body.totalCredits, 16);
+  assert.equal(second.body.requirements[0].label, "Cultural Foundations elective");
+
+  const notYetAdded = await lookup("semester=8");
+  assert.equal(notYetAdded.body.status, "plan-pending");
+  assert.equal(notYetAdded.body.semester, 8);
+
+  const invalid = await lookup("semester=9");
+  assert.equal(invalid.statusCode, 400);
+  assert.equal(invalid.body.status, "error");
 });
