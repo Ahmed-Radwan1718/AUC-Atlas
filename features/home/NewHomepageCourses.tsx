@@ -30,7 +30,6 @@ function courseHref(code: string) {
 }
 
 const empty: SuggestionsResponse = { status: "loading", courses: [] };
-const semesters = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 export default function NewHomepageCourses() {
   const [result, setResult] = useState<SuggestionsResponse>(empty);
@@ -81,29 +80,37 @@ export default function NewHomepageCourses() {
       aria-busy={isLoading}>
       <div className="homepagenew-courses-heading">
         <h1 id="homepagenew-courses-title">{ready && result.upcoming ? "Next Semester" : "Your Courses"}</h1>
-        {ready && <span className="homepagenew-courses-preview">
-          {result.term} · {result.totalCredits ?? 0} cr.
-        </span>}
-      </div>
-
-      {canBrowse && (
-        <div className="homepagenew-semester-selector" aria-label="Browse course semesters">
-          <span className="homepagenew-semester-label">Semester</span>
-          <div className="homepagenew-semester-options" role="group" aria-label="Choose semester">
-            {semesters.map(semester => (
-              <button type="button" key={semester}
-                className={"homepagenew-semester-button" +
-                  (shownSemester === semester ? " is-selected" : "")}
-                aria-pressed={shownSemester === semester}
-                onClick={() => {
-                  if (shownSemester !== semester) setSelectedSemester(semester);
-                }}>
-                Sem {semester}
+        <div className="homepagenew-courses-controls">
+          {ready && <span className="homepagenew-courses-preview">
+            {result.totalCredits ?? 0} credits
+          </span>}
+          {canBrowse && shownSemester && (
+            <nav className="homepagenew-semester-selector" aria-label="Browse course semesters">
+              <button type="button" className="homepagenew-semester-arrow"
+                aria-label="Previous semester" disabled={shownSemester <= 1}
+                onClick={() => setSelectedSemester(Math.max(1, shownSemester - 1))}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+                  aria-hidden="true">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
               </button>
-            ))}
-          </div>
+              <span className="homepagenew-semester-current" aria-live="polite">
+                Semester {shownSemester}
+              </span>
+              <button type="button" className="homepagenew-semester-arrow"
+                aria-label="Next semester" disabled={shownSemester >= 8}
+                onClick={() => setSelectedSemester(Math.min(8, shownSemester + 1))}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+                  aria-hidden="true">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+            </nav>
+          )}
         </div>
-      )}
+      </div>
 
       {ready && (result.courses.length > 0 || Boolean(result.requirements?.length)) ? (
         <div className="homepagenew-course-recommendations">
