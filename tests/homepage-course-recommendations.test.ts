@@ -117,12 +117,19 @@ test("semester selector is available for semesters 1–8 only on the new homepag
   const route = read("app/api/homepage-course-recommendations/route.ts");
   const css = read("app/homepagenew/homepagenew.css");
 
-  assert.match(component, /const semesters = \[1, 2, 3, 4, 5, 6, 7, 8\]/);
   assert.match(component, /selectedSemester === null \? "" : "\?semester=" \+ selectedSemester/);
-  assert.match(component, /aria-pressed=\{shownSemester === semester\}/);
-  assert.match(component, /setSelectedSemester\(semester\)/);
   assert.match(component, /aria-label="Browse course semesters"/);
-  assert.match(css, /\.homepagenew-semester-button\.is-selected/);
+  assert.match(component, /aria-label="Previous semester"/);
+  assert.match(component, /aria-label="Next semester"/);
+  assert.match(component, /disabled=\{shownSemester <= 1\}/);
+  assert.match(component, /disabled=\{shownSemester >= 8\}/);
+  assert.match(component, /setSelectedSemester\(Math\.max\(1, shownSemester - 1\)\)/);
+  assert.match(component, /setSelectedSemester\(Math\.min\(8, shownSemester \+ 1\)\)/);
+  assert.match(component, /homepagenew-semester-current/);
+  assert.doesNotMatch(component, /homepagenew-semester-button|semesters\.map/);
+  assert.match(css, /\.homepagenew-semester-arrow\s*\{/);
+  assert.match(css, /\.homepagenew-semester-arrow:disabled/);
+  assert.doesNotMatch(css.split(".homepagenew-course-empty {")[1]?.split("}")[0] ?? "", /border-top/);
   assert.match(route, /request\.nextUrl\.searchParams\.get\("semester"\)/);
   assert.match(route, /!\s*\/\^\[1-8\]\$\/\.test\(requested\)/);
   assert.match(route, /viewingCurrent && selected\.upcoming/);
