@@ -206,3 +206,12 @@ test("switching semesters returns the fixed lists without changing saved student
   assert.equal(invalid.statusCode, 400);
   assert.equal(invalid.body.status, "error");
 });
+
+
+test("new homepage uses the owner's artwork for the three first-semester core courses", () => {
+  const component = read("features/home/NewHomepageCourses.tsx");
+  assert.match(component, /"RHET 1010": "https:\/\/res\.cloudinary\.com\/dhtamisqn\/image\/upload\/v1795296035\/f24ae05e-04ea-486b-aa6c-0fc70cac4d15\.png"/);
+  assert.match(component, /"CORE 1010": "https:\/\/res\.cloudinary\.com\/dhtamisqn\/image\/upload\/v1795296122\/dad9afa5-55a0-48e3-a151-7b988e1971a2\.png"/);
+  assert.match(component, /"SCI 1020": "https:\/\/res\.cloudinary\.com\/dhtamisqn\/image\/upload\/v1795296249\/85863696-d96d-4a42-b645-2fbcb7aeb362\.png"/);
+  assert.match(component, /courseImages\[course\.code\]/);
+});
