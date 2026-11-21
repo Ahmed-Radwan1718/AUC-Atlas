@@ -30,13 +30,21 @@ function courseHref(code: string) {
 }
 
 const empty: SuggestionsResponse = { status: "loading", courses: [] };
+const semesters = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 export default function NewHomepageCourses() {
   const [result, setResult] = useState<SuggestionsResponse>(empty);
+  // null uses the student's calculated current semester on initial load.
+  const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [canBrowse, setCanBrowse] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
-    void fetch("/api/homepage-course-recommendations", {
+    setIsLoading(true);
+    const url = "/api/homepage-course-recommendations" +
+      (selectedSemester === null ? "" : "?semester=" + selectedSemester);
+    void fetch(url, {
       credentials: "same-origin",
       cache: "no-store",
       headers: { Accept: "application/json" },
@@ -45,32 +53,57 @@ export default function NewHomepageCourses() {
       if (!response.ok) throw Error("Could not load courses");
       return response.json() as Promise<SuggestionsResponse>;
     }).then(data => {
-      if (!controller.signal.aborted) setResult(data);
+      if (!controller.signal.aborted) {
+        setResult(data);
+        if (data.status === "ready" || data.status === "plan-pending") setCanBrowse(true);
+      }
     }).catch(() => {
       if (!controller.signal.aborted) setResult({ status: "error", courses: [] });
+    }).finally(() => {
+      if (!controller.signal.aborted) setIsLoading(false);
     });
     return () => controller.abort();
-  }, []);
+  }, [selectedSemester]);
 
-  const ready = result.status === "ready";
+  const shownSemester = selectedSemester ?? result.semester;
+  const ready = !isLoading && result.status === "ready";
   const message = {
     "sign-in": { label: "Sign in to see your courses", href: "/login" },
     "select-major": { label: "Choose your major and enrollment term in Account", href: "/accounts" },
     "unsupported-major": { label: "Course suggestions for your major are coming soon", href: "/courses" },
     "invalid-id": { label: "Check your AUC ID in Account", href: "/accounts" },
-    "plan-pending": { label: "Semester " + (result.semester ?? "") + " course plan is coming soon", href: "/degree-progression" },
+    "plan-pending": { label: "Semester " + (result.semester ?? "") + " course plan is coming soon", href: "" },
     error: { label: "Could not load your courses", href: "/courses" }
   }[result.status as "sign-in" | "select-major" | "unsupported-major" | "invalid-id" | "plan-pending" | "error"];
 
   return (
     <section className="homepagenew-courses" aria-labelledby="homepagenew-courses-title"
-      aria-busy={result.status === "loading"}>
+      aria-busy={isLoading}>
       <div className="homepagenew-courses-heading">
         <h1 id="homepagenew-courses-title">{ready && result.upcoming ? "Next Semester" : "Your Courses"}</h1>
         {ready && <span className="homepagenew-courses-preview">
           {result.term} · {result.totalCredits ?? 0} cr.
         </span>}
       </div>
+
+      {canBrowse && (
+        <div className="homepagenew-semester-selector" aria-label="Browse course semesters">
+          <span className="homepagenew-semester-label">Semester</span>
+          <div className="homepagenew-semester-options" role="group" aria-label="Choose semester">
+            {semesters.map(semester => (
+              <button type="button" key={semester}
+                className={"homepagenew-semester-button" +
+                  (shownSemester === semester ? " is-selected" : "")}
+                aria-pressed={shownSemester === semester}
+                onClick={() => {
+                  if (shownSemester !== semester) setSelectedSemester(semester);
+                }}>
+                Sem {semester}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {ready && (result.courses.length > 0 || Boolean(result.requirements?.length)) ? (
         <div className="homepagenew-course-recommendations">
@@ -107,7 +140,7 @@ export default function NewHomepageCourses() {
             </div>
           )}
         </div>
-      ) : result.status === "loading" ? (
+      ) : isLoading ? (
         <div className="homepagenew-courses-grid" aria-hidden="true">
           {Array.from({ length: 6 }, (_, index) => (
             <div className="homepagenew-course-card homepagenew-course-loading" key={index}>
@@ -126,7 +159,7 @@ export default function NewHomepageCourses() {
         </div>
       ) : message ? (
         <div className="homepagenew-course-empty">
-          <a href={message.href}>{message.label}</a>
+          {message.href ? <a href={message.href}>{message.label}</a> : <span>{message.label}</span>}
         </div>
       ) : null}
 
