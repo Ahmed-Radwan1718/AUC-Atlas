@@ -342,6 +342,13 @@ aa.homepagenew-course-card:focus-visible {
   font-weight: 600;
 }
 
+.homepagenew-professor-context {
+  margin: -12px 0 22px;
+  color: #80786e;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 .homepagenew-professor-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
