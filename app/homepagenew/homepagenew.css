@@ -13,9 +13,10 @@
 
 .homepagenew-courses-heading {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  flex-wrap: wrap;
+  gap: 16px;
   margin-bottom: 26px;
 }
 
@@ -28,88 +29,71 @@
   letter-spacing: -0.035em;
 }
 
-.homepagenew-courses-preview {
-  flex-shrink: 0;
-  color: #9b794b;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-/* Compact semester navigation for the new homepage only. */
-.homepagenew-semester-selector {
+.homepagenew-courses-controls {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin: -4px 0 26px;
+  gap: 20px;
+  margin-left: auto;
 }
 
-.homepagenew-semester-label {
-  color: #746e66;
-  font-size: 13px;
-  font-weight: 600;
+.homepagenew-courses-preview {
+  flex-shrink: 0;
+  color: #a17c48;
+  font-size: 11px;
+  font-weight: 500;
   white-space: nowrap;
 }
 
-.homepagenew-semester-options {
+/* Subtle, borderless semester navigation beside the heading. */
+.homepagenew-semester-selector {
   display: flex;
-  flex: 1 1 auto;
-  min-width: 0;
+  align-items: center;
   gap: 8px;
-  overflow-x: auto;
-  padding: 2px 2px 6px;
-  scrollbar-width: thin;
+  color: #746c62;
 }
 
-.homepagenew-semester-button {
-  flex: 0 0 auto;
-  min-width: 74px;
-  padding: 10px 14px;
-  border: 1px solid #e5dfd5;
-  border-radius: 9px;
-  background: #fff;
-  color: #615d55;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
+.homepagenew-semester-current {
+  min-width: 76px;
+  color: #746c62;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.homepagenew-semester-arrow {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #81776a;
   cursor: pointer;
-  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+  transition: color 150ms ease;
 }
 
-.homepagenew-semester-button:hover {
-  border-color: #bb9864;
-  background: #faf6f0;
+.homepagenew-semester-arrow svg {
+  width: 17px;
+  height: 17px;
 }
 
-.homepagenew-semester-button.is-selected {
-  background: #171717;
-  border-color: #171717;
-  color: #fff;
-}
-
-.homepagenew-semester-button:focus-visible {
+.homepagenew-semester-arrow:hover:not(:disabled) { color: #171717; }
+.homepagenew-semester-arrow:disabled { color: #d2c9bd; cursor: default; }
+.homepagenew-semester-arrow:focus-visible {
   outline: 2px solid #a27d46;
   outline-offset: 2px;
+  border-radius: 4px;
 }
 
-@media (max-width: 600px) {
-  .homepagenew-semester-selector {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  .homepagenew-semester-options { width: 100%; }
-
-  .homepagenew-semester-button {
-    min-width: 70px;
-    padding: 10px 12px;
-  }
+@media (max-width: 480px) {
+  .homepagenew-courses-controls { gap: 10px; }
+  .homepagenew-semester-selector { gap: 4px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .homepagenew-semester-button { transition: none; }
+  .homepagenew-semester-arrow { transition: none; }
 }
 
 .homepagenew-courses-grid {
@@ -295,7 +279,6 @@
 /* Course recommendations load without showing invented enrollment data. */
 .homepagenew-course-empty {
   min-height: 168px;
-  border-top: 1px solid #ded8ce;
   display: flex;
   align-items: center;
   gap: 12px;
