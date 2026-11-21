@@ -216,3 +216,21 @@ test("new homepage uses the owner's artwork for the three first-semester core co
   assert.match(component, /"ENGR 1005": "https:\/\/res\.cloudinary\.com\/dhtamisqn\/image\/upload\/v1795296570\/5fe0ffe7-5dc6-48ef-9170-b4bdd9e55c73\.png"/);
   assert.match(component, /courseImages\[course\.code\]/);
 });
+
+
+test("new homepage renders Cultural Foundations as a course-size non-clickable card", () => {
+  const component = read("features/home/NewHomepageCourses.tsx");
+  const css = read("app/homepagenew/homepagenew.css");
+
+  assert.match(component, /courseCardEntries\(result\)\.map/);
+  assert.match(component, /homepagenew-course-card homepagenew-course-elective/);
+  assert.match(component, /<span className="homepagenew-course-code">CORE ELECTIVE<\/span>/);
+  assert.match(component, /item\.requirement\.label/);
+  assert.match(component, /item\.requirement\.credits/);
+  assert.match(component, /zeroCreditIndex = result\.courses\.findIndex\(course => course\.credits === 0\)/);
+  assert.doesNotMatch(component, /homepagenew-core-requirements|homepagenew-core-requirement/);
+  assert.match(css, /\.homepagenew-course-elective/);
+  assert.match(css, /a\.homepagenew-course-card:hover/);
+  assert.doesNotMatch(css, /\.homepagenew-core-requirements/);
+  assert.equal(fixedPlans.getNewHomepageMechanicalSemesterPlan(2).totalCredits, 16);
+});
