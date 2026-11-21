@@ -175,8 +175,7 @@ export default function NextSemesterProfessorsPreview({
       </p>}
       {ready && !(result.predictedCourses?.length) ? (
         <div className="homepagenew-professor-notice">
-          <span>No next-semester courses could be projected from your degree progress.</span>
-          <a href="/degree-progression">Degree Progression</a>
+          <span>No courses have been listed for this semester yet.</span>
         </div>
       ) : ready && result.consider.length === 0 && result.avoid.length === 0 ? (
         <div className="homepagenew-professor-notice">
