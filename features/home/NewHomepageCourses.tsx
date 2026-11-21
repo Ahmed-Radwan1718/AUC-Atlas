@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import NewHomepageGraphicCover, { hasGraphicCourseCover } from "./NewHomepageGraphicCover";
 
 type SuggestedCourse = {
   code: string; title: string; semester: number; credits: number;
@@ -16,17 +15,6 @@ type SuggestionsResponse = {
   totalCredits?: number;
   courses: SuggestedCourse[];
   requirements?: { id: string; label: string; timing: string; credits: number }[];
-};
-
-// Preserve owner-supplied images; four pilot courses use designed vector covers first.
-const courseImages: Record<string, string> = {
-  "ENGR 1005": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795296570/5fe0ffe7-5dc6-48ef-9170-b4bdd9e55c73.png",
-  "RHET 1010": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795296035/f24ae05e-04ea-486b-aa6c-0fc70cac4d15.png",
-  "CORE 1010": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795296122/dad9afa5-55a0-48e3-a151-7b988e1971a2.png",
-  "SCI 1020": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795296249/85863696-d96d-4a42-b645-2fbcb7aeb362.png",
-  "ENGR 3212": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795175235/f46b454e-e868-4f34-ab07-f66805e29603.png",
-  "MENG 3207": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795174953/40375512-ed63-4a35-86d1-9eafdf48169c.png",
-  "MENG 3217": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795174452/f259a808-6214-41f0-a7ca-e35fc35633d8.png",
 };
 
 type CourseCardEntry =
@@ -137,15 +125,7 @@ export default function NewHomepageCourses() {
             {courseCardEntries(result).map(item => item.type === "course" ? (
               <a className="homepagenew-course-card" href={courseHref(item.course.code)}
                 key={item.course.code}>
-                {hasGraphicCourseCover(item.course.code) ? (
-                  <NewHomepageGraphicCover code={item.course.code} />
-                ) : (
-                  <div className="homepagenew-course-cover" aria-hidden="true">
-                    {courseImages[item.course.code] && (
-                      <img src={courseImages[item.course.code]} alt="" loading="lazy" />
-                    )}
-                  </div>
-                )}
+                <div className="homepagenew-course-cover" aria-hidden="true" />
                 <div className="homepagenew-course-info">
                   <div className="homepagenew-course-code-row">
                     <span className="homepagenew-course-code">{item.course.code}</span>
