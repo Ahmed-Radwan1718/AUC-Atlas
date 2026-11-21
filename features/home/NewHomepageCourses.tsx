@@ -38,7 +38,9 @@ function courseHref(code: string) {
 
 const empty: SuggestionsResponse = { status: "loading", courses: [] };
 
-export default function NewHomepageCourses() {
+export default function NewHomepageCourses({
+  onSemesterSelect
+}: { onSemesterSelect?: (semester: number) => void } = {}) {
   const [result, setResult] = useState<SuggestionsResponse>(empty);
   // null uses the student's calculated current semester on initial load.
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
@@ -70,6 +72,10 @@ export default function NewHomepageCourses() {
     });
     return () => controller.abort();
   }, [selectedSemester]);
+
+  useEffect(() => {
+    if (selectedSemester !== null) onSemesterSelect?.(selectedSemester);
+  }, [selectedSemester, onSemesterSelect]);
 
   const shownSemester = selectedSemester ?? result.semester;
   const ready = !isLoading && result.status === "ready";
