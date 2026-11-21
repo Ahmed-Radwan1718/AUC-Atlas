@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     // When browsing an earlier/later semester in the course selector, preview
     // the professor list for the semester immediately after it.
     const requested = request.nextUrl.searchParams.get("semester");
-    if (requested !== null && !/^[1-8]$/.test(requested)) {
+    if (requested !== null && !/^[1-9]$/.test(requested)) {
       return respond({ status: "error", consider: [], avoid: [] }, 400);
     }
     const target = requested === null
