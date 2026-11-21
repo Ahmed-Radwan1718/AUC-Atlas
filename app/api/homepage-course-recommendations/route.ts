@@ -3,6 +3,7 @@ import { firestore } from "../../../server/firebase";
 import { optionalSessionUser } from "../../../server/session";
 import { isValidEnrollmentTerm } from "../../../lib/enrollmentTerm";
 import { semesterFromEnrollment } from "../../../lib/course-recommendations/homepagePlanner";
+import { getNewHomepageMechanicalSemesterPlan } from "../../../lib/course-recommendations/newHomepageMechanicalPlan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,11 +13,10 @@ const response = (body: Record<string, unknown>, status = 200) =>
   NextResponse.json(body, { status, headers });
 
 /**
- * New homepage only: MENG courses are awaiting a manually supplied
- * semester-by-semester plan. Do not use the previous recommendation
- * algorithm or infer course completion from enrollment or saved progress.
- *
- * The legacy homepage and Degree Progression are unaffected.
+ * Course suggestions for /homepagenew are fixed owner-supplied MENG lists.
+ * Existing Degree Progression plans and the legacy homepage are unaffected.
+ * A student's enrollment determines which semester list to show, not which
+ * courses they have completed. Unspecified semesters remain pending.
  */
 export async function GET(request: NextRequest) {
   const user = await optionalSessionUser(request);
@@ -38,11 +38,27 @@ export async function GET(request: NextRequest) {
     const selected = semesterFromEnrollment(enrollmentTerm);
     if (!selected) return response({ status: "select-major", courses: [] });
 
+    const term = selected.term + " · Semester " + selected.semester;
+    const plan = getNewHomepageMechanicalSemesterPlan(selected.semester);
+    if (!plan) {
+      return response({
+        status: "plan-pending",
+        term,
+        semester: selected.semester,
+        courses: []
+      });
+    }
+
     return response({
-      status: "plan-pending",
-      term: selected.term + " · Semester " + selected.semester,
+      status: "ready",
+      term,
       semester: selected.semester,
-      courses: []
+      upcoming: selected.upcoming,
+      totalCredits: plan.totalCredits,
+      courses: plan.courses.map(course => ({ ...course, semester: selected.semester })),
+      requirements: plan.requirements.map(requirement => ({
+        ...requirement, timing: "due"
+      }))
     });
   } catch (error) {
     console.error("Homepage course recommendations failed", error);
