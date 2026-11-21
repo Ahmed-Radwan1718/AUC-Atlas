@@ -19,6 +19,7 @@ type SuggestionsResponse = {
 
 // Course artwork supplied by the site owner. Other cards use neutral placeholders.
 const courseImages: Record<string, string> = {
+  "ENGR 1005": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795296570/5fe0ffe7-5dc6-48ef-9170-b4bdd9e55c73.png",
   "RHET 1010": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795296035/f24ae05e-04ea-486b-aa6c-0fc70cac4d15.png",
   "CORE 1010": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795296122/dad9afa5-55a0-48e3-a151-7b988e1971a2.png",
   "SCI 1020": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795296249/85863696-d96d-4a42-b645-2fbcb7aeb362.png",
