@@ -249,7 +249,7 @@ test("four pilot courses use reusable, image-free academic graphic covers", () =
   assert.match(graphics, /theme === "foundation"/);
   assert.match(graphics, /theme === "writing"/);
   assert.match(graphics, /theme === "drafting"/);
-  assert.match(graphics, /homepagenew-graphic-inquiry|theme === "inquiry"/);
+  assert.match(graphics, /theme: "inquiry"/);
 
   // The graphic cover must win over existing photographs for these four codes.
   assert.match(page, /hasGraphicCourseCover\(item\.course\.code\) \?/);
@@ -259,7 +259,7 @@ test("four pilot courses use reusable, image-free academic graphic covers", () =
   // The implementation is limited to the new homepage and doesn't touch legacy UI.
   assert.doesNotMatch(read("app/page.tsx"), /NewHomepageGraphicCover/);
   for (const theme of ["foundation", "writing", "drafting", "inquiry"]) {
-    assert.match(css, new RegExp("\\\\.homepagenew-graphic-" + theme + "\\\\s*\\\\{"));
+    assert.ok(css.includes(".homepagenew-graphic-" + theme + " {"));
   }
-  assert.match(css, /\\.homepagenew-graphic-art svg/);
+  assert.ok(css.includes(".homepagenew-graphic-art svg"));
 });
