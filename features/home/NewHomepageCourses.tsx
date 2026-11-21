@@ -28,6 +28,20 @@ const courseImages: Record<string, string> = {
   "MENG 3217": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795174452/f259a808-6214-41f0-a7ca-e35fc35633d8.png",
 };
 
+type CourseCardEntry =
+  | { type: "course"; course: SuggestedCourse }
+  | { type: "elective"; requirement: NonNullable<SuggestionsResponse["requirements"]>[number] };
+
+/** Include elective choices in the same grid, before zero-credit courses. */
+function courseCardEntries(result: SuggestionsResponse): CourseCardEntry[] {
+  const courses: CourseCardEntry[] = result.courses.map(course => ({ type: "course", course }));
+  const electives: CourseCardEntry[] = (result.requirements ?? [])
+    .map(requirement => ({ type: "elective", requirement }));
+  const zeroCreditIndex = result.courses.findIndex(course => course.credits === 0);
+  const insertAt = zeroCreditIndex < 0 ? courses.length : zeroCreditIndex;
+  return [...courses.slice(0, insertAt), ...electives, ...courses.slice(insertAt)];
+}
+
 function courseHref(code: string) {
   return "/courses/" + code.toLowerCase().trim()
     .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -118,38 +132,37 @@ export default function NewHomepageCourses() {
 
       {ready && (result.courses.length > 0 || Boolean(result.requirements?.length)) ? (
         <div className="homepagenew-course-recommendations">
-          {result.courses.length > 0 && <div className="homepagenew-courses-grid">
-          {result.courses.map(course => (
-            <a className="homepagenew-course-card" href={courseHref(course.code)} key={course.code}>
-              <div className="homepagenew-course-cover" aria-hidden="true">
-                {courseImages[course.code] && (
-                  <img src={courseImages[course.code]} alt="" loading="lazy" />
-                )}
-              </div>
-              <div className="homepagenew-course-info">
-                <div className="homepagenew-course-code-row">
-                  <span className="homepagenew-course-code">{course.code}</span>
-                  <span className="homepagenew-course-credit">{course.credits} cr.</span>
+          <div className="homepagenew-courses-grid">
+            {courseCardEntries(result).map(item => item.type === "course" ? (
+              <a className="homepagenew-course-card" href={courseHref(item.course.code)}
+                key={item.course.code}>
+                <div className="homepagenew-course-cover" aria-hidden="true">
+                  {courseImages[item.course.code] && (
+                    <img src={courseImages[item.course.code]} alt="" loading="lazy" />
+                  )}
                 </div>
-                <span className="homepagenew-course-name">{course.title}</span>
-
-              </div>
-            </a>
-          ))}
-          </div>}
-          {Boolean(result.requirements?.length) && (
-            <div className="homepagenew-core-requirements">
-              <span className="homepagenew-core-requirements-title">Core curriculum choices</span>
-              <div className="homepagenew-core-requirements-list">
-                {result.requirements?.map(requirement => (
-                  <div className="homepagenew-core-requirement" key={requirement.id}>
-                    <span>{requirement.label}</span>
-                    <span>{requirement.credits} cr.</span>
+                <div className="homepagenew-course-info">
+                  <div className="homepagenew-course-code-row">
+                    <span className="homepagenew-course-code">{item.course.code}</span>
+                    <span className="homepagenew-course-credit">{item.course.credits} cr.</span>
                   </div>
-                ))}
+                  <span className="homepagenew-course-name">{item.course.title}</span>
+                </div>
+              </a>
+            ) : (
+              <div className="homepagenew-course-card homepagenew-course-elective"
+                key={"elective-" + item.requirement.id}>
+                <div className="homepagenew-course-cover" aria-hidden="true" />
+                <div className="homepagenew-course-info">
+                  <div className="homepagenew-course-code-row">
+                    <span className="homepagenew-course-code">CORE ELECTIVE</span>
+                    <span className="homepagenew-course-credit">{item.requirement.credits} cr.</span>
+                  </div>
+                  <span className="homepagenew-course-name">{item.requirement.label}</span>
+                </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
       ) : isLoading ? (
         <div className="homepagenew-courses-grid" aria-hidden="true">
