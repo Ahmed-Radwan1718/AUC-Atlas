@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import NewHomepageGraphicCover, { hasGraphicCourseCover } from "./NewHomepageGraphicCover";
 
 type SuggestedCourse = {
   code: string; title: string; semester: number; credits: number;
@@ -17,7 +18,7 @@ type SuggestionsResponse = {
   requirements?: { id: string; label: string; timing: string; credits: number }[];
 };
 
-// Course artwork supplied by the site owner. Other cards use neutral placeholders.
+// Preserve owner-supplied images; four pilot courses use designed vector covers first.
 const courseImages: Record<string, string> = {
   "ENGR 1005": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795296570/5fe0ffe7-5dc6-48ef-9170-b4bdd9e55c73.png",
   "RHET 1010": "https://res.cloudinary.com/dhtamisqn/image/upload/v1795296035/f24ae05e-04ea-486b-aa6c-0fc70cac4d15.png",
@@ -136,11 +137,15 @@ export default function NewHomepageCourses() {
             {courseCardEntries(result).map(item => item.type === "course" ? (
               <a className="homepagenew-course-card" href={courseHref(item.course.code)}
                 key={item.course.code}>
-                <div className="homepagenew-course-cover" aria-hidden="true">
-                  {courseImages[item.course.code] && (
-                    <img src={courseImages[item.course.code]} alt="" loading="lazy" />
-                  )}
-                </div>
+                {hasGraphicCourseCover(item.course.code) ? (
+                  <NewHomepageGraphicCover code={item.course.code} />
+                ) : (
+                  <div className="homepagenew-course-cover" aria-hidden="true">
+                    {courseImages[item.course.code] && (
+                      <img src={courseImages[item.course.code]} alt="" loading="lazy" />
+                    )}
+                  </div>
+                )}
                 <div className="homepagenew-course-info">
                   <div className="homepagenew-course-code-row">
                     <span className="homepagenew-course-code">{item.course.code}</span>
