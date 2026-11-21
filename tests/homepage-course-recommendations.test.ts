@@ -234,3 +234,32 @@ test("new homepage renders Cultural Foundations as a course-size non-clickable c
   assert.doesNotMatch(css, /\.homepagenew-core-requirements/);
   assert.equal(fixedPlans.getNewHomepageMechanicalSemesterPlan(2).totalCredits, 16);
 });
+
+
+test("four pilot courses use reusable, image-free academic graphic covers", () => {
+  const page = read("features/home/NewHomepageCourses.tsx");
+  const graphics = read("features/home/NewHomepageGraphicCover.tsx");
+  const css = read("app/homepagenew/homepagenew.css");
+
+  for (const code of ["CORE 1010", "RHET 1010", "ENGR 1005", "SCI 1020"]) {
+    assert.ok(graphics.includes('"' + code + '": {'), code + " needs its own cover definition");
+  }
+  assert.match(graphics, /export function hasGraphicCourseCover\(code: string\)/);
+  assert.match(graphics, /<CoverIllustration theme=\{design\.theme\} \/>/);
+  assert.match(graphics, /theme === "foundation"/);
+  assert.match(graphics, /theme === "writing"/);
+  assert.match(graphics, /theme === "drafting"/);
+  assert.match(graphics, /homepagenew-graphic-inquiry|theme === "inquiry"/);
+
+  // The graphic cover must win over existing photographs for these four codes.
+  assert.match(page, /hasGraphicCourseCover\(item\.course\.code\) \?/);
+  assert.match(page, /<NewHomepageGraphicCover code=\{item\.course\.code\} \/>/);
+  assert.match(page, /courseImages\[item\.course\.code\]/);
+
+  // The implementation is limited to the new homepage and doesn't touch legacy UI.
+  assert.doesNotMatch(read("app/page.tsx"), /NewHomepageGraphicCover/);
+  for (const theme of ["foundation", "writing", "drafting", "inquiry"]) {
+    assert.match(css, new RegExp("\\\\.homepagenew-graphic-" + theme + "\\\\s*\\\\{"));
+  }
+  assert.match(css, /\\.homepagenew-graphic-art svg/);
+});
