@@ -208,15 +208,21 @@ test("switching semesters returns the fixed lists without changing saved student
 });
 
 
-test("new homepage preserves owner-supplied image URLs for future use", () => {
-  const component = read("features/home/NewHomepageCourses.tsx");
-  assert.match(component, /"RHET 1010": "https:\/\/res\.cloudinary\.com\/dhtamisqn\/image\/upload\/v1795296035\/f24ae05e-04ea-486b-aa6c-0fc70cac4d15\.png"/);
-  assert.match(component, /"CORE 1010": "https:\/\/res\.cloudinary\.com\/dhtamisqn\/image\/upload\/v1795296122\/dad9afa5-55a0-48e3-a151-7b988e1971a2\.png"/);
-  assert.match(component, /"SCI 1020": "https:\/\/res\.cloudinary\.com\/dhtamisqn\/image\/upload\/v1795296249\/85863696-d96d-4a42-b645-2fbcb7aeb362\.png"/);
-  assert.match(component, /"ENGR 1005": "https:\/\/res\.cloudinary\.com\/dhtamisqn\/image\/upload\/v1795296570\/5fe0ffe7-5dc6-48ef-9170-b4bdd9e55c73\.png"/);
-  assert.match(component, /courseImages\[item\.course\.code\]/);
-});
+test("new homepage course covers stay blank until artwork is chosen", () => {
+  const page = read("features/home/NewHomepageCourses.tsx");
+  const css = read("app/homepagenew/homepagenew.css");
 
+  // All course cards (including electives) retain the same neutral cover space.
+  assert.match(page, /<div className="homepagenew-course-cover" aria-hidden="true" \/>/);
+  assert.match(page, /homepagenew-course-card homepagenew-course-elective/);
+  assert.match(css, /\.homepagenew-course-cover\s*\{/);
+  assert.match(css, /background: #ece6dc/);
+
+  // Neither custom photos nor graphical artwork should be rendered.
+  assert.doesNotMatch(page, /courseImages|<img|NewHomepageGraphicCover|hasGraphicCourseCover/);
+  assert.doesNotMatch(css, /homepagenew-graphic-cover|homepagenew-graphic-art/);
+  assert.doesNotMatch(read("app/page.tsx"), /NewHomepageGraphicCover/);
+});
 
 test("new homepage renders Cultural Foundations as a course-size non-clickable card", () => {
   const component = read("features/home/NewHomepageCourses.tsx");
@@ -236,30 +242,3 @@ test("new homepage renders Cultural Foundations as a course-size non-clickable c
 });
 
 
-test("four pilot courses use reusable, image-free academic graphic covers", () => {
-  const page = read("features/home/NewHomepageCourses.tsx");
-  const graphics = read("features/home/NewHomepageGraphicCover.tsx");
-  const css = read("app/homepagenew/homepagenew.css");
-
-  for (const code of ["CORE 1010", "RHET 1010", "ENGR 1005", "SCI 1020"]) {
-    assert.ok(graphics.includes('"' + code + '": {'), code + " needs its own cover definition");
-  }
-  assert.match(graphics, /export function hasGraphicCourseCover\(code: string\)/);
-  assert.match(graphics, /<CoverIllustration theme=\{design\.theme\} \/>/);
-  assert.match(graphics, /theme === "foundation"/);
-  assert.match(graphics, /theme === "writing"/);
-  assert.match(graphics, /theme === "drafting"/);
-  assert.match(graphics, /theme: "inquiry"/);
-
-  // The graphic cover must win over existing photographs for these four codes.
-  assert.match(page, /hasGraphicCourseCover\(item\.course\.code\) \?/);
-  assert.match(page, /<NewHomepageGraphicCover code=\{item\.course\.code\} \/>/);
-  assert.match(page, /courseImages\[item\.course\.code\]/);
-
-  // The implementation is limited to the new homepage and doesn't touch legacy UI.
-  assert.doesNotMatch(read("app/page.tsx"), /NewHomepageGraphicCover/);
-  for (const theme of ["foundation", "writing", "drafting", "inquiry"]) {
-    assert.ok(css.includes(".homepagenew-graphic-" + theme + " {"));
-  }
-  assert.ok(css.includes(".homepagenew-graphic-art svg"));
-});
