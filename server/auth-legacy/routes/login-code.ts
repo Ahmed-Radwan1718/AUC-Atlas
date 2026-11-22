@@ -339,12 +339,12 @@ async function requestLoginCode(
     if (
       !loginChallenge ||
       !loginChallenge.uid ||
-      loginChallenge.authMethod !== "password" ||
+      !["password", "passkey"].includes(loginChallenge.authMethod) ||
       !loginChallenge.twoFactor ||
       !loginChallenge.twoFactor.emailEnabled
     ) {
       throw createHttpError(
-        "Log in with your password again to receive an email verification code.",
+        "Log in with your password or passkey again to receive an email verification code.",
         403
       );
     }

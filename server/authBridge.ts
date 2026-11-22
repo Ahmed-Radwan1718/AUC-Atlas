@@ -31,6 +31,7 @@ const handlers: Record<string,() => LegacyHandler> = {
   "login-code": () => require("./auth-legacy/routes/login-code.ts").default,
   "verify-login-authenticator": () => require("./auth-legacy/routes/verify-login-authenticator.ts").default,
   "authenticator": () => require("./auth-legacy/routes/authenticator.ts").default,
+  "passkeys": () => require("./auth-legacy/routes/passkeys.ts").default,
   "sessions": () => require("./auth-legacy/routes/sessions.ts").default,
   "change-password": () => require("./auth-legacy/routes/change-password.ts").default,
   "delete-account": () => require("./auth-legacy/routes/delete-account.ts").default,

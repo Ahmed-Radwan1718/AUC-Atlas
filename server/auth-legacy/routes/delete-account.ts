@@ -504,6 +504,14 @@ export default async function handler(req: LegacyRequest, res: LegacyReply) {
         .catch(function () {})
     ]);
 
+    // Clean global credential indices before deleting the user's subcollections.
+    const passkeys = await userRef.collection("passkeys").get();
+    for (const passkey of passkeys.docs) {
+      const globalRef = db.collection("passkeyCredentials").doc(passkey.id);
+      const globalDoc = await globalRef.get();
+      if (globalDoc.exists && globalDoc.data()?.uid === decodedUser.uid)
+        await globalRef.delete();
+    }
     await deleteDocumentTree(userRef);
     await admin.auth().deleteUser(
       decodedUser.uid

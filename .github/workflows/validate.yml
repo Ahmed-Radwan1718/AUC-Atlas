@@ -25,6 +25,7 @@ jobs:
       - run: npm run test:discovery
       - run: npm run test:faq
       - run: npm run test:auth
+      - run: npm run test:passkeys
       - run: npm run test:professor-emails
       - run: npm run test:auc-id
       - run: npm run test:prerequisites

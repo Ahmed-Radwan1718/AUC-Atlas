@@ -5,6 +5,7 @@ import { courses } from "../../data/courses";
 import { professors } from "../../data/professors";
 import { populateReviewCourseSelect, setupReviewDependsField, setupReviewSearchSelect, setupReviewChoiceMenus, setupReviewCompactControls } from "../professors/reviewControls";
 import { getApp, getApps, initializeApp } from "firebase/app";
+import { startRegistration, browserSupportsWebAuthn } from "@simplewebauthn/browser";
 import {
   GoogleAuthProvider, getAuth, inMemoryPersistence, linkWithPopup, reload,
   setPersistence, signInWithCustomToken, signOut
@@ -421,6 +422,7 @@ export function initializeAccounts(){
       // data, but defer protected requests until the session is verified.
       if (!deferLoading && panelName === "security") {
         loadAccountLoginSessions();
+        loadAccountPasskeys();
       }
 
       if (!deferLoading && panelName === "reviews") {
@@ -447,6 +449,129 @@ export function initializeAccounts(){
 
       activateAccountPanel(panelName);
       return true;
+    }
+
+
+    const accountPasskeyList = document.getElementById("account-passkey-list");
+    const accountPasskeyAddButton = document.getElementById("account-passkey-add-button");
+    const accountPasskeyMessage = document.getElementById("account-passkey-message");
+
+    async function requestPasskey(action, payload) {
+      const response = await fetch("/api/passkeys", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "X-AUC-Security-Access": securityPanelAccessToken
+        },
+        body: JSON.stringify(Object.assign({ action: action }, payload || {}))
+      });
+      const data = await response.json().catch(function () { return {}; });
+      if (!response.ok || !data.success)
+        throw new Error(data.error || "Could not update passkeys.");
+      return data;
+    }
+
+    function renderAccountPasskeys(passkeys) {
+      if (!accountPasskeyList) return;
+      accountPasskeyList.replaceChildren();
+      if (!passkeys.length) {
+        const empty = document.createElement("p");
+        empty.className = "account-passkey-empty";
+        empty.textContent = "No passkeys added yet.";
+        accountPasskeyList.appendChild(empty);
+        return;
+      }
+
+      passkeys.forEach(function (passkey) {
+        const row = document.createElement("div");
+        row.className = "account-passkey-row";
+        const copy = document.createElement("div");
+        copy.className = "account-passkey-copy";
+        const title = document.createElement("strong");
+        title.textContent = passkey.backedUp ? "Synced passkey" : "Device passkey";
+        const subtitle = document.createElement("small");
+        const created = passkey.createdAt ? new Date(passkey.createdAt) : null;
+        subtitle.textContent = created && !Number.isNaN(created.getTime())
+          ? "Added " + created.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+          : "Registered passkey";
+        copy.append(title, subtitle);
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "account-two-factor-button account-passkey-remove";
+        remove.textContent = "Remove";
+        remove.setAttribute("aria-label", "Remove " + title.textContent);
+        remove.addEventListener("click", async function () {
+          if (!window.confirm("Remove this passkey from AUC Atlas? It will stop working for sign-in.")) return;
+          remove.disabled = true;
+          showMessage(accountPasskeyMessage, "", "");
+          try {
+            await requestPasskey("remove", { id: passkey.id });
+            showMessage(accountPasskeyMessage, "Passkey removed from AUC Atlas.", "success");
+            await loadAccountPasskeys();
+          } catch (error) {
+            showMessage(accountPasskeyMessage, error.message || "Could not remove passkey.", "error");
+          } finally {
+            remove.disabled = false;
+          }
+        });
+        row.append(copy, remove);
+        accountPasskeyList.appendChild(row);
+      });
+    }
+
+    async function loadAccountPasskeys() {
+      if (!accountPasskeyList || !accountCurrentUser) return;
+      try {
+        const response = await fetch("/api/passkeys", {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            "Accept": "application/json",
+            "X-AUC-Security-Access": securityPanelAccessToken
+          }
+        });
+        const data = await response.json().catch(function () { return {}; });
+        if (!response.ok || !data.success)
+          throw new Error(data.error || "Could not load passkeys.");
+        renderAccountPasskeys(Array.isArray(data.passkeys) ? data.passkeys : []);
+      } catch (error) {
+        accountPasskeyList.replaceChildren();
+        const paragraph = document.createElement("p");
+        paragraph.className = "account-passkey-empty";
+        paragraph.textContent = error.message || "Could not load passkeys.";
+        accountPasskeyList.appendChild(paragraph);
+      }
+    }
+
+    if (accountPasskeyAddButton) {
+      accountPasskeyAddButton.addEventListener("click", async function () {
+        accountPasskeyAddButton.disabled = true;
+        showMessage(accountPasskeyMessage, "", "");
+        try {
+          if (!window.isSecureContext || !browserSupportsWebAuthn())
+            throw new Error("Passkeys require a compatible browser on a secure HTTPS site.");
+          const begin = await requestPasskey("begin-registration");
+          // The native OS prompt decides whether iCloud Keychain is available.
+          const credential = await startRegistration({ optionsJSON: begin.options });
+          await requestPasskey("finish-registration", {
+            challengeId: begin.challengeId, response: credential
+          });
+          showMessage(accountPasskeyMessage, "Passkey saved to your account.", "success");
+          await loadAccountPasskeys();
+        } catch (error) {
+          const message = error && error.name === "NotAllowedError"
+            ? "Passkey setup was cancelled or unavailable."
+            : (error.message || "Could not add passkey.");
+          showMessage(accountPasskeyMessage, message, "error");
+        } finally {
+          accountPasskeyAddButton.disabled = false;
+        }
+      });
     }
 
     function showMessage(element, message, type) {

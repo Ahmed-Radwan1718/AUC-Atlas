@@ -2,6 +2,7 @@
 // Original AUC Atlas login, email-code, authenticator-recovery behavior.
 // This temporary compatibility module runs after the React page mounts.
 import { getApps, initializeApp } from "firebase/app";
+import { startAuthentication, browserSupportsWebAuthn } from "@simplewebauthn/browser";
 import {
   GoogleAuthProvider, getAuth, inMemoryPersistence,
   setPersistence, signInWithPopup, signOut
@@ -133,6 +134,43 @@ export function initializeLogin() {
           result.user || null
         );
       };
+
+    // Browser autofill can offer an iCloud Keychain passkey in the existing
+    // email field without adding or changing any visible login controls.
+    async function startConditionalPasskeyLogin() {
+      if (!browserSupportsWebAuthn() ||
+          typeof PublicKeyCredential === "undefined" ||
+          typeof PublicKeyCredential.isConditionalMediationAvailable !== "function" ||
+          !await PublicKeyCredential.isConditionalMediationAvailable()) return;
+      const beginResponse = await fetch("/api/passkeys", {
+        method: "POST", credentials: "same-origin", cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "begin-login" })
+      });
+      if (!beginResponse.ok) return;
+      const begin = await beginResponse.json();
+      if (!begin.options || !begin.challengeId) return;
+      const credential = await startAuthentication({
+        optionsJSON: begin.options,
+        useBrowserAutofill: true
+      });
+      const finishResponse = await fetch("/api/passkeys", {
+        method: "POST", credentials: "same-origin", cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "finish-login", challengeId: begin.challengeId,
+          response: credential
+        })
+      });
+      const result = await finishResponse.json();
+      if (!finishResponse.ok || !result.success) {
+        showMessage(result.error || "Passkey sign-in failed.", "error");
+        return;
+      }
+      await window.handleAucAtlasGoogleLoginResult(result);
+    }
+    // Errors (including dismissal) never block existing password/Google login.
+    void startConditionalPasskeyLogin().catch(function () {});
 
     function clearTwoFactorCodeInputs() {
       twoFactorCodeInputs.forEach(function (input) {
