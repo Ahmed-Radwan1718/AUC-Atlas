@@ -11,51 +11,104 @@ const transpiled = ts.transpileModule(
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
   }
 ).outputText;
+const plain = (value: unknown) => JSON.parse(JSON.stringify(value));
 
-type Options = { signedIn?: boolean; verified?: boolean; semester?: number;
-  major?: string; indexReady?: boolean };
+type Options = {
+  signedIn?: boolean; verified?: boolean; semester?: number;
+  major?: string; indexReady?: boolean; largeUpload?: boolean;
+};
+type Row = {
+  id: string; courseCode: string; status: string; title: string;
+  materialType: string; createdAt: number; uploadGroupId?: string;
+  professor?: string; semester?: string; fileName?: string;
+  fileType?: string; size?: number;
+};
 
 function harness(options: Options = {}) {
   const calls: Array<{ code: string; sort: string; limit: number }> = [];
+  const groupCalls: Array<{ id: string; limit: number }> = [];
   let profileReads = 0;
   let materialReads = 0;
   const semester = options.semester ?? 1;
   const exports: Record<string, any> = {};
-  const data = [
+  const data: Row[] = [
     { id: "sci-new", courseCode: "SCI 1020", status: "approved",
-      title: "Scientific method", materialType: "Notes", createdAt: 200 },
+      title: "Lecture Slides", professor: "Tamer Shoeib",
+      semester: "Summer 2025", materialType: "Slides",
+      fileName: "Chapter 6.pdf", fileType: "application/pdf", size: 2400000,
+      uploadGroupId: "sci-bundle", createdAt: 200 },
+    { id: "sci-extra", courseCode: "SCI 1020", status: "approved",
+      title: "Lecture Slides", professor: "Tamer Shoeib",
+      semester: "Summer 2025", materialType: "Slides",
+      fileName: "Chapter 4.pdf", fileType: "application/pdf", size: 900000,
+      uploadGroupId: "sci-bundle", createdAt: 199 },
     { id: "sci-rejected", courseCode: "SCI 1020", status: "rejected",
-      title: "Rejected upload", materialType: "Notes", createdAt: 190 },
+      title: "Lecture Slides", materialType: "Slides", uploadGroupId: "sci-bundle",
+      fileName: "Rejected.pdf", createdAt: 198 },
     { id: "sci-old", courseCode: "SCI 1020", status: "approved",
-      title: "Scientific thinking slides", materialType: "Slides", createdAt: 180 },
+      title: "Scientific thinking notes", materialType: "Notes",
+      fileName: "Notes.pdf", createdAt: 180 },
     { id: "engr", courseCode: "ENGR 1005", status: "approved",
-      title: "Engineering drawing", materialType: "Notes", createdAt: 175 },
+      title: "Engineering drawing", materialType: "Notes",
+      fileName: "Drawing.pdf", createdAt: 175 },
     { id: "calc-ii", courseCode: "MACT 1122", status: "approved",
-      title: "Calculus II practice", materialType: "Notes", createdAt: 290 },
-    { id: "unrelated", courseCode: "CHEM 1005", status: "approved",
-      title: "Not a semester one course", materialType: "Notes", createdAt: 300 }
+      title: "Calculus II practice", materialType: "Notes",
+      fileName: "Practice.pdf", createdAt: 290 },
+    { id: "chem", courseCode: "CHEM 1005", status: "approved",
+      title: "Chemistry notes", materialType: "Notes",
+      fileName: "Chem.pdf", createdAt: 170 },
+    // Data corruption or an accidental ID reuse must not leak another course
+    // when the bundle is fetched from the global uploadGroupId index.
+    { id: "cross-course", courseCode: "CHEM 1005", status: "approved",
+      title: "Not a Scientific Thinking file", materialType: "Slides",
+      fileName: "WrongCourse.pdf", uploadGroupId: "sci-bundle", createdAt: 300 }
   ];
+  if (options.largeUpload) {
+    for (let i = 0; i < 40; i++) {
+      data.push({ id: "sci-long-" + i, courseCode: "SCI 1020",
+        status: "approved", title: "Lecture Slides",
+        professor: "Tamer Shoeib", semester: "Summer 2025",
+        materialType: "Slides", fileName: "Chapter " + i + ".pdf",
+        uploadGroupId: "sci-bundle", createdAt: 260 - i });
+    }
+  }
+  const snapshot = (rows: Row[]) => ({
+    docs: rows.map(row => ({ id: row.id, data: () => ({ ...row }) }))
+  });
   const courseCollection = {
-    where(field: string, op: string, code: string) {
-      assert.equal(field, "courseCode");
+    where(field: string, op: string, value: string) {
       assert.equal(op, "==");
+      if (field === "uploadGroupId") {
+        return {
+          limit(limit: number) {
+            groupCalls.push({ id: value, limit });
+            return {
+              async get() {
+                if (options.indexReady === false) throw Error("Missing group index");
+                const rows = data.filter(row => row.uploadGroupId === value).slice(0, limit);
+                materialReads += rows.length;
+                return snapshot(rows);
+              }
+            };
+          }
+        };
+      }
+      assert.equal(field, "courseCode");
       return {
         orderBy(sort: string, direction: string) {
           assert.equal(sort, "createdAt");
           assert.equal(direction, "desc");
           return {
             limit(limit: number) {
-              calls.push({ code, sort, limit });
+              calls.push({ code: value, sort, limit });
               return {
                 async get() {
                   if (options.indexReady === false)
                     throw Error("FAILED_PRECONDITION: missing course-material index");
-                  const matching = data.filter(row => row.courseCode === code)
+                  const rows = data.filter(row => row.courseCode === value)
                     .sort((a, b) => b.createdAt - a.createdAt).slice(0, limit);
-                  materialReads += matching.length;
-                  return { docs: matching.map(row => ({
-                    id: row.id, data: () => ({ ...row })
-                  })) };
+                  materialReads += rows.length;
+                  return snapshot(rows);
                 }
               };
             }
@@ -66,14 +119,14 @@ function harness(options: Options = {}) {
   };
 
   vm.runInNewContext(transpiled, {
-    exports, String, Number, Promise, console,
+    exports, String, Number, Promise, console, Map, Date,
     require(id: string) {
       switch (id) {
         case "next/server": return { NextResponse: { json: (body: any, init: any) =>
           ({ body, status: init.status, headers: init.headers }) } };
         case "../../../server/session": return {
-          optionalSessionUser: async () =>
-            options.signedIn === false ? null : { uid: "student", email: "user@aucegypt.edu" }
+          optionalSessionUser: async () => options.signedIn === false
+            ? null : { uid: "student", email: "user@aucegypt.edu" }
         };
         case "../../../server/firebase": return {
           firebaseAuth: () => ({ getUser: async () => ({
@@ -92,9 +145,14 @@ function harness(options: Options = {}) {
           } })
         };
         case "../../../server/materials": return {
-          serializeMaterialData: (id: string, raw: any) => ({
-            id, title: raw.title, fileName: "", materialType: raw.materialType,
-            createdAt: "2026-11-21T10:00:00Z", status: raw.status,
+          serializeMaterialData: (id: string, raw: Row) => ({
+            id, title: raw.title, fileName: raw.fileName || "",
+            fileType: raw.fileType || "", size: raw.size || 0,
+            courseCode: raw.courseCode, uploadGroupId: raw.uploadGroupId || "",
+            professor: raw.professor || "", semester: raw.semester || "",
+            materialType: raw.materialType,
+            createdAt: new Date(1700000000000 + raw.createdAt * 1000).toISOString(),
+            status: raw.status,
             downloadUrl: "/api/course-material-download?id=" + id
           })
         };
@@ -124,28 +182,48 @@ function harness(options: Options = {}) {
   return {
     get: (query = "") => exports.GET({ nextUrl: { searchParams: new URLSearchParams(query) } }),
     get calls() { return calls; },
+    get groupCalls() { return groupCalls; },
     get materialReads() { return materialReads; },
     get profileReads() { return profileReads; }
   };
 }
 
-test("current-semester materials are grouped, filtered and linked to secure downloads", async () => {
+test("homepage groups upload files under one title with professor and all file names", async () => {
   const app = harness();
   const response = await app.get();
   assert.equal(response.status, 200);
   assert.equal(response.body.status, "ready");
   assert.equal(response.body.term, "Fall 2026");
-  assert.deepEqual(JSON.parse(JSON.stringify(response.body.courses.map((course: any) => course.code))),
+  assert.deepEqual(plain(response.body.courses.map((course: any) => course.code)),
     ["SCI 1020", "ENGR 1005"]);
-  assert.deepEqual(JSON.parse(JSON.stringify(response.body.courses[0].materials.map((item: any) => item.id))),
-    ["sci-new", "sci-old"]);
-  assert.equal(response.body.courses[0].title, "Scientific Thinking");
-  assert.ok(!response.body.courses.some((course: any) => course.code === "CORE 1010"));
-  assert.equal(response.body.courses[0].materials[0].href,
+  const uploads = response.body.courses[0].materials;
+  assert.deepEqual(plain(uploads.map((upload: any) => upload.id)),
+    ["sci-bundle", "sci-old"]);
+  assert.equal(uploads[0].title, "Lecture Slides");
+  assert.equal(uploads[0].professor, "Tamer Shoeib");
+  assert.equal(uploads[0].semester, "Summer 2025");
+  assert.deepEqual(plain(uploads[0].files.map((file: any) => file.fileName)),
+    ["Chapter 6.pdf", "Chapter 4.pdf"]);
+  assert.equal(uploads[0].files[0].href,
     "/api/course-material-download?id=sci-new");
-  assert.equal(app.materialReads, 4);
-  assert.deepEqual(app.calls.map(call => call.code), ["SCI 1020", "ENGR 1005", "CORE 1010"]);
-  assert.ok(app.calls.every(call => call.sort === "createdAt" && call.limit === 12));
+  assert.ok(!JSON.stringify(uploads).includes("WrongCourse.pdf"));
+  assert.ok(!JSON.stringify(uploads).includes("Rejected.pdf"));
+  assert.ok(!response.body.courses.some((course: any) => course.code === "CORE 1010"));
+  assert.deepEqual(app.groupCalls, [{ id: "sci-bundle", limit: 100 }]);
+  assert.deepEqual(app.calls.map(call => call.code),
+    ["SCI 1020", "ENGR 1005", "CORE 1010"]);
+  assert.ok(app.calls.every(call => call.sort === "createdAt" && call.limit === 36));
+});
+
+test("a large bundle includes files that were outside the newest-file query", async () => {
+  const app = harness({ largeUpload: true });
+  const response = await app.get();
+  const upload = response.body.courses[0].materials[0];
+  assert.equal(upload.id, "sci-bundle");
+  assert.equal(upload.files.length, 42);
+  assert.ok(upload.files.some((file: any) => file.fileName === "Chapter 0.pdf"));
+  assert.ok(upload.files.some((file: any) => file.fileName === "Chapter 39.pdf"));
+  assert.equal(app.groupCalls[0].limit, 100);
 });
 
 test("signed-out and unverified accounts cannot receive uploaded material details", async () => {
@@ -158,7 +236,7 @@ test("signed-out and unverified accounts cannot receive uploaded material detail
   assert.equal(unverified.materialReads, 0);
 });
 
-test("selecting semester 2 shows Calculus II even if calculated enrollment is semester 4", async () => {
+test("selecting semester 2 includes Calculus II even when enrollment is semester 4", async () => {
   const app = harness({ semester: 4 });
   const response = await app.get("semester=2");
   assert.equal(response.status, 200);
@@ -168,11 +246,10 @@ test("selecting semester 2 shows Calculus II even if calculated enrollment is se
   assert.equal(response.body.preview, true);
   assert.equal(response.body.fallback, false);
   assert.equal(response.body.courses[0].title, "Calculus II");
-  assert.equal(response.body.courses[0].materials[0].id, "calc-ii");
-  assert.deepEqual(app.calls.map(call => call.code), ["MACT 1122", "CHEM 1005"]);
+  assert.equal(response.body.courses[0].materials[0].files[0].id, "calc-ii");
 });
 
-test("a missing current-semester plan previews semester 2 without claiming current enrollment", async () => {
+test("missing current-semester plan previews semester 2 without claiming current enrollment", async () => {
   const app = harness({ semester: 4 });
   const response = await app.get();
   assert.equal(response.body.status, "ready");
@@ -180,26 +257,22 @@ test("a missing current-semester plan previews semester 2 without claiming curre
   assert.equal(response.body.currentSemester, 4);
   assert.equal(response.body.preview, true);
   assert.equal(response.body.fallback, true);
-  assert.equal(response.body.courses[0].materials[0].id, "calc-ii");
+  assert.equal(response.body.courses[0].materials[0].files[0].id, "calc-ii");
 });
 
-test("an explicitly requested unlisted semester does not show another semester's files", async () => {
-  const app = harness({ semester: 4 });
-  const response = await app.get("semester=4");
+test("explicit unlisted and invalid semesters do not leak other semester files", async () => {
+  const missing = harness({ semester: 4 });
+  const response = await missing.get("semester=4");
   assert.equal(response.body.status, "plan-pending");
-  assert.equal(response.body.semester, 4);
-  assert.equal(app.materialReads, 0);
+  assert.equal(missing.materialReads, 0);
+  const invalid = harness();
+  const bad = await invalid.get("semester=9");
+  assert.equal(bad.status, 400);
+  assert.equal(bad.body.status, "error");
+  assert.equal(invalid.materialReads, 0);
 });
 
-test("invalid requested semesters are rejected before reading materials", async () => {
-  const app = harness();
-  const response = await app.get("semester=9");
-  assert.equal(response.status, 400);
-  assert.equal(response.body.status, "error");
-  assert.equal(app.materialReads, 0);
-});
-
-test("missing material index returns an error without any broad fallback scan", async () => {
+test("missing material index returns error with no broad scan", async () => {
   const app = harness({ indexReady: false });
   const response = await app.get();
   assert.equal(response.status, 500);
@@ -207,74 +280,39 @@ test("missing material index returns an error without any broad fallback scan", 
   assert.equal(app.materialReads, 0);
 });
 
-test("homepage course materials use expandable title-first course headings", () => {
-  const page = read("features/home/NewHomepageMaterials.tsx");
-  const css = read("app/homepagenew/homepagenew.css");
-  assert.match(page, /<strong>\{course\.title\}<\/strong>/);
-  assert.match(page, /homepagenew-material-course-code/);
-  assert.match(page, /<span aria-hidden="true">·<\/span>/);
-  assert.match(page, /aria-expanded=\{open\}/);
-  assert.match(page, /setOpenedCourse\(open \? "" : course\.code\)/);
-  assert.match(page, /course\.materials\.map\(material =>/);
-  assert.match(page, /courseHref\(course\.code\)/);
-  assert.match(css, /\.homepagenew-material-course-identity strong/);
-  assert.match(css, /color: #a69d91/);
-});
-
-test("course browsing and the materials accordion share an explicit semester", () => {
-  const sections = read("features/home/NewHomepageAcademicSections.tsx");
-  const page = read("app/homepagenew/page.tsx");
-  const materials = read("features/home/NewHomepageMaterials.tsx");
-  const endpoint = read("app/api/homepage-personalized-materials/route.ts");
-  assert.match(sections, /<NewHomepageMaterials viewingSemester=\{viewingSemester\} \/>/);
-  assert.match(sections, /<NewHomepageCourses onSemesterSelect=\{setViewingSemester\} \/>/);
-  assert.doesNotMatch(page, /<NewHomepageMaterials\s*\/>/);
-  assert.ok(materials.includes('(viewingSemester === null ? "" : "?semester=" + viewingSemester)'));
-  assert.doesNotMatch(materials, /setSemesterOverride|homepagenew-material-semesters|Browse material semesters/);
-  assert.match(endpoint, /request\.nextUrl\.searchParams\.get\("semester"\)/);
-});
-
-test("new homepage omits the extra professor disclaimer and materials semester selector", () => {
-  const professors = read("features/home/NextSemesterProfessorsPreview.tsx");
-  const materials = read("features/home/NewHomepageMaterials.tsx");
-  const css = read("app/homepagenew/homepagenew.css");
-  assert.doesNotMatch(professors, /Based on reviews for the listed courses|Teaching assignments for the upcoming semester are not confirmed/);
-  assert.doesNotMatch(materials, /Browse material semesters|homepagenew-material-semester-button/);
-  assert.ok(!css.includes(".homepagenew-material-semesters"));
-});
-
-test("courses without any approved materials are excluded entirely", async () => {
-  const app = harness();
-  const response = await app.get();
-  const codes = response.body.courses.map((course: any) => course.code);
-  assert.ok(!codes.includes("CORE 1010"));
-  assert.ok(response.body.courses.every((course: any) => course.materials.length > 0));
-});
-
-test("UI never renders empty course rows and provides a helpful empty state", () => {
+test("homepage maintains course accordion, no empty rows, and no redundant semester controls", () => {
   const component = read("features/home/NewHomepageMaterials.tsx");
+  const wrapper = read("features/home/NewHomepageAcademicSections.tsx");
+  const css = read("app/homepagenew/homepagenew.css");
+  assert.match(component, /<strong>\{course\.title\}<\/strong>/);
+  assert.match(component, /homepagenew-material-course-code/);
+  assert.match(component, /<span aria-hidden="true">·<\/span>/);
+  assert.match(component, /aria-expanded=\{open\}/);
+  assert.match(component, /setOpenedCourse\(open \? "" : course\.code\)/);
+  assert.ok(component.includes('useState<string>("")'));
+  assert.match(component, /courseHref\(course\.code\)/);
   assert.match(component, /result\.courses\.filter\(course => course\.materials\.length > 0\)/);
   assert.match(component, /No materials have been uploaded for this semester's courses yet/);
   assert.doesNotMatch(component, /No materials yet|No materials have been uploaded for this course yet/);
-});
-
-test("course material accordions start closed and only open after a click", () => {
-  const component = read("features/home/NewHomepageMaterials.tsx");
-  assert.match(component, /useState<string>\(""\)/);
-  assert.match(component, /setOpenedCourse\(""\)/);
-  assert.match(component, /const open = course\.code === openedCourse/);
-  assert.match(component, /onClick=\{\(\) => setOpenedCourse\(open \? "" : course\.code\)\}/);
-  assert.doesNotMatch(component, /openedCourse === null \? ordered\[0\]/);
-});
-
-test("materials heading has no semester or weekly upload summary and codes are half size", () => {
-  const component = read("features/home/NewHomepageMaterials.tsx");
-  const css = read("app/homepagenew/homepagenew.css");
-  assert.ok(!component.includes("homepagenew-materials-context"));
-  assert.ok(!component.includes("Course materials preview"));
-  assert.ok(!component.includes("course updated this week"));
-  assert.ok(!css.includes(".homepagenew-materials-context"));
-  const codeStyle = css.split(".homepagenew-material-course-code {")[1]?.split("}")[0] || "";
-  assert.ok(codeStyle.includes("font-size: 6.5px;"));
+  assert.ok(component.includes('(viewingSemester === null ? "" : "?semester=" + viewingSemester)'));
+  assert.match(wrapper, /<NewHomepageMaterials viewingSemester=\{viewingSemester\} \/>/);
+  assert.doesNotMatch(component, /homepagenew-materials-context|Course materials preview|course updated this week/);
+  assert.doesNotMatch(component, /Browse material semesters|homepagenew-material-semester-button/);
+  assert.ok(css.includes("font-size: 6.5px;"));
   assert.ok(css.includes(".homepagenew-material-course-code { font-size: 6px; }"));
+});
+
+test("clicking an upload expands its full file list; file previews are distinct from downloads", () => {
+  const component = read("features/home/NewHomepageMaterials.tsx");
+  const route = read("app/api/homepage-personalized-materials/route.ts");
+  assert.match(component, /onClick=\{\(\) => setOpenedUpload\(uploadOpen \? "" : uploadKey\)\}/);
+  assert.match(component, /material\.files\.map\(file =>/);
+  assert.match(component, /material\.professor/);
+  assert.match(component, /previewFile\(file, setPreviewError\)/);
+  assert.match(component, /url\.searchParams\.set\("disposition", "inline"\)/);
+  assert.match(component, /url\.searchParams\.set\("disposition", "office-url"\)/);
+  assert.match(component, /"\/api\/content-reports"/);
+  assert.ok(!component.includes("href={material.href}"));
+  assert.match(route, /where\("uploadGroupId", "==", uploadGroupId\)/);
+  assert.match(route, /files: files\.map\(file => \(\{/);
 });

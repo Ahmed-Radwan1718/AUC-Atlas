@@ -10,9 +10,10 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const headers = { "Cache-Control": "private, no-store" };
-// Read only the newest indexed records for each current-semester course.
-// The extra candidates allow for rejected uploads without a broader scan.
-const MATERIAL_READ_LIMIT = 12;
+// Index-backed recent-file reads plus bounded lookups for complete selected bundles.
+const MATERIAL_READ_LIMIT = 36;
+const UPLOADS_PER_COURSE = 3;
+const UPLOAD_FILE_LIMIT = 100;
 const respond = (body: Record<string, unknown>, status = 200) =>
   NextResponse.json(body, { status, headers });
 
@@ -80,22 +81,66 @@ export async function GET(request: NextRequest) {
         .orderBy("createdAt", "desc")
         .limit(MATERIAL_READ_LIMIT).get();
 
-      const materials = snapshot.docs
-        .map(doc => serializeMaterialData(doc.id, doc.data()))
-        .filter(material => material.status !== "rejected")
-        .slice(0, 3)
-        .map(material => ({
-          id: material.id,
-          title: material.title || material.fileName || "Untitled material",
-          materialType: material.materialType || "Material",
-          createdAt: material.createdAt,
-          href: material.downloadUrl
-        }));
-      return { code: course.code, title: course.title, materials };
+      // The course page groups files by their uploadGroupId. Repeat that
+      // grouping here instead of treating each file as a separate upload.
+      type FileRecord = ReturnType<typeof serializeMaterialData>;
+      const byUpload = new Map<string, FileRecord[]>();
+      for (const doc of snapshot.docs) {
+        const file = serializeMaterialData(doc.id, doc.data());
+        if (file.status === "rejected") continue;
+        const groupKey = file.uploadGroupId || file.id;
+        if (!byUpload.has(groupKey)) byUpload.set(groupKey, []);
+        byUpload.get(groupKey)!.push(file);
+      }
+
+      const recentGroups = [...byUpload.entries()].slice(0, UPLOADS_PER_COURSE);
+      const materials = await Promise.all(recentGroups.map(async ([groupKey, initialFiles]) => {
+        let files = initialFiles;
+        const uploadGroupId = initialFiles[0]?.uploadGroupId;
+
+        // The first page of recent files could cut through a large upload.
+        // Fetch the full selected bundle, including older files outside
+        // the recent-material window, just as the course page presents it.
+        if (uploadGroupId && !uploadGroupId.startsWith("single-")) {
+          const completeUpload = await courseCollection
+            .where("uploadGroupId", "==", uploadGroupId)
+            .limit(UPLOAD_FILE_LIMIT).get();
+          files = completeUpload.docs
+            .map(doc => serializeMaterialData(doc.id, doc.data()))
+            .filter(file => file.status !== "rejected" &&
+              file.courseCode === course.code &&
+              file.uploadGroupId === uploadGroupId);
+        }
+
+        files.sort((a, b) => Date.parse(b.createdAt || "") - Date.parse(a.createdAt || ""));
+        const first = files[0];
+        if (!first) return null;
+
+        return {
+          id: groupKey,
+          title: first.title || "Course material",
+          materialType: first.materialType || "Material",
+          professor: first.professor || "Professor not listed",
+          semester: first.semester || "",
+          createdAt: first.createdAt,
+          files: files.map(file => ({
+            id: file.id,
+            fileName: file.fileName || file.title || "Course material",
+            fileType: file.fileType || "",
+            size: file.size || 0,
+            href: file.downloadUrl
+          }))
+        };
+      }));
+      return {
+        code: course.code, title: course.title,
+        materials: materials.filter((upload): upload is NonNullable<typeof upload> => Boolean(upload))
+      };
     }));
 
-    // Omit courses without approved uploads instead of rendering empty rows.
+    // Only show courses that have approved uploaded files.
     const coursesWithMaterials = courses.filter(course => course.materials.length > 0);
+
     return respond({
       status: "ready", term: current.term, semester,
       currentSemester: current.semester, preview, fallback,
