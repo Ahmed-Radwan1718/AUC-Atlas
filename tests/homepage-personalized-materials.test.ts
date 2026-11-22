@@ -257,3 +257,12 @@ test("UI never renders empty course rows and provides a helpful empty state", ()
   assert.match(component, /No materials have been uploaded for this semester's courses yet/);
   assert.doesNotMatch(component, /No materials yet|No materials have been uploaded for this course yet/);
 });
+
+test("course material accordions start closed and only open after a click", () => {
+  const component = read("features/home/NewHomepageMaterials.tsx");
+  assert.match(component, /useState<string>\(""\)/);
+  assert.match(component, /setOpenedCourse\(""\)/);
+  assert.match(component, /const open = course\.code === openedCourse/);
+  assert.match(component, /onClick=\{\(\) => setOpenedCourse\(open \? "" : course\.code\)\}/);
+  assert.doesNotMatch(component, /openedCourse === null \? ordered\[0\]/);
+});

@@ -106,14 +106,13 @@ export default function NewHomepageMaterials({
   viewingSemester = null
 }: { viewingSemester?: number | null }) {
   const [result, setResult] = useState<MaterialResponse>(initial);
-  // null expands the most recently updated course by default;
-  // the empty string allows students to collapse every course.
-  const [openedCourse, setOpenedCourse] = useState<string | null>(null);
+  // Start with every course collapsed; expand only when a student clicks it.
+  const [openedCourse, setOpenedCourse] = useState<string>("");
 
   useEffect(() => {
     const controller = new AbortController();
     setResult(initial);
-    setOpenedCourse(null);
+    setOpenedCourse("");
     const url = "/api/homepage-personalized-materials" +
       (viewingSemester === null ? "" : "?semester=" + viewingSemester);
     void fetch(url, {
@@ -141,7 +140,6 @@ export default function NewHomepageMaterials({
       Number(recentlyUpdated(a, now));
     return updateDifference || latestUpload(b) - latestUpload(a);
   });
-  const activeCourse = openedCourse === null ? ordered[0]?.code : openedCourse;
   const updatedCount = ordered.filter(course => recentlyUpdated(course, now)).length;
   const notice = {
     "sign-in": { label: "Sign in to see materials for your courses", href: "/login" },
@@ -180,7 +178,7 @@ export default function NewHomepageMaterials({
       ) : ready && ordered.length ? (
         <div className="homepagenew-material-course-list">
           {ordered.map(course => {
-            const open = course.code === activeCourse;
+            const open = course.code === openedCourse;
             const updated = recentlyUpdated(course, now);
             const panelId = "homepagenew-materials-" + course.code.toLowerCase().replace(/\s+/g, "-");
             return (
