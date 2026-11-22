@@ -9,6 +9,9 @@ type RatedProfessor = {
   image: string;
   averageRating: number;
   reviewCount: number;
+  ratingBasis: "course" | "overall";
+  courseReviewCount: number;
+  limitedEvidence: boolean;
 };
 type RecommendationResponse = {
   status: "loading" | "ready" | "sign-in" | "select-major"
@@ -54,7 +57,14 @@ function Rating({ professor }: { professor: RatedProfessor }) {
         </svg>
         <strong>{professor.averageRating.toFixed(1)}</strong>
       </span>
-      <span>{professor.reviewCount} course reviews</span>
+      <span>{professor.reviewCount} {professor.ratingBasis === "overall"
+        ? "overall reviews" : "course reviews"}</span>
+      {professor.limitedEvidence && (
+        <span className="homepagenew-professor-limited">
+          {professor.courseReviewCount} {professor.courseReviewCount === 1
+            ? "review" : "reviews"} for {professor.courseCode} · limited sample
+        </span>
+      )}
     </span>
   );
 }
@@ -100,7 +110,11 @@ function ProfessorGroup({ label, tone, professors, loading }: {
             key={professor.professorId + ":" + professor.courseCode}
             aria-label={professor.professorName + ", " + professor.courseCode +
               ", " + professor.averageRating.toFixed(1) + " out of 5 from " +
-              professor.reviewCount + " course reviews"}>
+              professor.reviewCount + (professor.ratingBasis === "overall"
+                ? " overall reviews" : " course reviews") +
+              (professor.limitedEvidence
+                ? ", limited sample of " + professor.courseReviewCount +
+                  " reviews for " + professor.courseCode : "")}>
             <ProfessorAvatar professor={professor} />
             <span className="homepagenew-professor-identity">
               <strong>{professor.professorName}</strong>
@@ -111,8 +125,8 @@ function ProfessorGroup({ label, tone, professors, loading }: {
         )) : (
           <p className="homepagenew-professor-group-empty">
             {tone === "consider"
-              ? "No highly rated professors with enough reviews for these courses yet."
-              : "No low-rated professors with enough reviews for these courses yet."}
+              ? "No professors with positive course-matched reviews found yet."
+              : "No professors have an average of 2.0 or below from at least 3 reviews for these courses."}
           </p>
         )}
       </div>
@@ -129,7 +143,7 @@ export default function NextSemesterProfessorsPreview({
     const controller = new AbortController();
     setResult(initial);
     const url = "/api/homepage-professor-recommendations" +
-      (viewingSemester === null ? "" : "?semester=" + (viewingSemester + 1));
+      (viewingSemester === null ? "" : "?semester=" + viewingSemester);
     void fetch(url, {
       credentials: "same-origin",
       cache: "no-store",
@@ -166,12 +180,15 @@ export default function NextSemesterProfessorsPreview({
     <section className="homepagenew-professors"
       aria-labelledby="homepagenew-professors-title" aria-busy={result.status === "loading"}>
       <div className="homepagenew-professors-heading">
-        <h2 id="homepagenew-professors-title">Professors for Next Semester</h2>
+        <h2 id="homepagenew-professors-title">{viewingSemester === null
+          ? "Professors for Next Semester"
+          : "Professors for Semester " + viewingSemester}</h2>
         {(ready || result.status === "plan-pending") && <span>{result.term}</span>}
       </div>
       {ready && <p className="homepagenew-professor-context">
-        Based on reviews for the listed courses (at least 3 per professor and course).
-        Teaching assignments for the upcoming semester are not confirmed.
+        Based on reviews for these courses. Ratings with fewer than 3 course reviews
+        are preliminary and may use the professor's overall rating.
+        Future teaching assignments are not confirmed.
       </p>}
       {ready && !(result.predictedCourses?.length) ? (
         <div className="homepagenew-professor-notice">
@@ -179,7 +196,7 @@ export default function NextSemesterProfessorsPreview({
         </div>
       ) : ready && result.consider.length === 0 && result.avoid.length === 0 ? (
         <div className="homepagenew-professor-notice">
-          <span>Not enough course-specific student reviews to recommend professors yet.</span>
+          <span>No professors with positive reviews for these courses have been found yet.</span>
           <a href="/professors">Browse professors</a>
         </div>
       ) : ready || result.status === "loading" ? (
