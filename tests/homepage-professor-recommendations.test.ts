@@ -237,7 +237,7 @@ test("new homepage professor section follows the course selector, without changi
   assert.match(courses, /onSemesterSelect\?\.\(selectedSemester\)/);
   assert.match(preview, /\(viewingSemester \+ 1\)/);
   assert.match(preview, /status === "plan-pending"/);
-  assert.match(preview, /Teaching assignments for the upcoming semester are not confirmed/);
-  assert.match(css, /\.homepagenew-professor-context/);
+  assert.doesNotMatch(preview, /Teaching assignments for the upcoming semester are not confirmed/);
+  assert.doesNotMatch(css, /\.homepagenew-professor-context/);
   assert.doesNotMatch(read("app/page.tsx"), /NewHomepageAcademicSections/);
 });
