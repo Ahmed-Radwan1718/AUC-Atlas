@@ -266,3 +266,15 @@ test("course material accordions start closed and only open after a click", () =
   assert.match(component, /onClick=\{\(\) => setOpenedCourse\(open \? "" : course\.code\)\}/);
   assert.doesNotMatch(component, /openedCourse === null \? ordered\[0\]/);
 });
+
+test("materials heading has no semester or weekly upload summary and codes are half size", () => {
+  const component = read("features/home/NewHomepageMaterials.tsx");
+  const css = read("app/homepagenew/homepagenew.css");
+  assert.ok(!component.includes("homepagenew-materials-context"));
+  assert.ok(!component.includes("Course materials preview"));
+  assert.ok(!component.includes("course updated this week"));
+  assert.ok(!css.includes(".homepagenew-materials-context"));
+  const codeStyle = css.split(".homepagenew-material-course-code {")[1]?.split("}")[0] || "";
+  assert.ok(codeStyle.includes("font-size: 6.5px;"));
+  assert.ok(css.includes(".homepagenew-material-course-code { font-size: 6px; }"));
+});

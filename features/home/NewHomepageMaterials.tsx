@@ -140,7 +140,6 @@ export default function NewHomepageMaterials({
       Number(recentlyUpdated(a, now));
     return updateDifference || latestUpload(b) - latestUpload(a);
   });
-  const updatedCount = ordered.filter(course => recentlyUpdated(course, now)).length;
   const notice = {
     "sign-in": { label: "Sign in to see materials for your courses", href: "/login" },
     "verify-email": { label: "Verify your AUC email to access course materials", href: "/accounts" },
@@ -158,21 +157,6 @@ export default function NewHomepageMaterials({
         <h2 id="homepagenew-materials-title">Your Course Materials</h2>
         <a href="/courses">View all</a>
       </div>
-      {ready && <div className="homepagenew-materials-context">
-        <span>{result.preview
-          ? "Semester " + result.semester + " · Course materials preview"
-          : result.term + " · Semester " + result.semester}</span>
-        <span>
-          {result.fallback
-            ? "Your calculated semester's course plan is not available yet"
-            : updatedCount
-              ? updatedCount + (updatedCount === 1
-                ? " course updated this week" : " courses updated this week")
-              : result.preview
-                ? "Materials from the selected semester"
-                : "Materials from your current-semester courses"}
-        </span>
-      </div>}
       {result.status === "loading" ? (
         <MaterialSkeleton />
       ) : ready && ordered.length ? (
