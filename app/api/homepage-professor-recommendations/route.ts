@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { firestore } from "../../../server/firebase";
 import { optionalSessionUser } from "../../../server/session";
 import { professors } from "../../../data/professors";
+import { getProfessorRatingSnapshot, homepageProfessorRankings } from "../../../server/professorRatingSummaries";
 import { isValidEnrollmentTerm } from "../../../lib/enrollmentTerm";
 import { semesterFromEnrollment } from "../../../lib/course-recommendations/homepagePlanner";
 import { getNewHomepageMechanicalSemesterPlan } from "../../../lib/course-recommendations/newHomepageMechanicalPlan";
@@ -78,7 +79,16 @@ export async function GET(request: NextRequest) {
         }).filter((item): item is CourseRating => item !== null);
       })
     ));
-    const rated = rankProfessorsForCourses(predictedCourses, found.flat(), professors);
+    // Overall ratings can corroborate a small course-specific sample, but
+    // never establish that someone teaches a course on their own.
+    // If the summary is unavailable, course-specific recommendations still work.
+    let overall = [] as ReturnType<typeof homepageProfessorRankings>;
+    try {
+      overall = homepageProfessorRankings(await getProfessorRatingSnapshot());
+    } catch (error) {
+      console.error("Professor overall ratings unavailable for homepage suggestions", error);
+    }
+    const rated = rankProfessorsForCourses(predictedCourses, found.flat(), professors, overall);
     return respond({
       status: "ready",
       semester: target.semester,
