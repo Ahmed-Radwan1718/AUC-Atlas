@@ -74,3 +74,23 @@ test("passkey authentication can complete existing email 2FA recovery", () => {
   const code = read("server/auth-legacy/routes/login-code.ts");
   assert.ok(code.includes('["password", "passkey"].includes(loginChallenge.authMethod)'));
 });
+
+test("passkey cards reuse Account Security design without changing other sections", () => {
+  const markup = read("features/accounts/accountsMarkup.ts");
+  const styles = read("features/accounts/accounts-3.css");
+  const runtime = read("features/accounts/accountRuntime.ts");
+  assert.ok(markup.includes("account-passkey-heading"));
+  assert.ok(markup.includes("account-passkey-card"));
+  assert.ok(markup.includes("account-passkey-add-copy"));
+  assert.ok(markup.includes("account-passkey-add-label"));
+  assert.ok(markup.includes("account-two-factor-icon account-passkey-icon"));
+  assert.ok(markup.includes("account-passkey-add-button"));
+  assert.ok(styles.includes(".account-passkey-row,"));
+  assert.ok(styles.includes(".account-passkey-add-row"));
+  assert.ok(styles.includes(".account-passkey-list[hidden]"));
+  assert.ok(runtime.includes('accountPasskeyList.hidden = passkeys.length === 0'));
+  assert.ok(runtime.includes('activeBadge.className = "account-two-factor-status enabled"'));
+  assert.ok(runtime.includes('addLabel.textContent = passkeys.length ? "Add another passkey" : "Add a passkey"'));
+  assert.ok(runtime.includes('requestPasskey("remove", { id: passkey.id })'));
+  assert.ok(runtime.includes('startRegistration({ optionsJSON: begin.options })'));
+});

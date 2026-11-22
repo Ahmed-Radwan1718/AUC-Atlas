@@ -474,36 +474,74 @@ export function initializeAccounts(){
       return data;
     }
 
+
+    function createAccountPasskeyIcon() {
+      const icon = document.createElement("span");
+      icon.className = "account-two-factor-icon account-passkey-icon";
+      icon.setAttribute("aria-hidden", "true");
+      const namespace = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(namespace, "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("fill", "none");
+      svg.setAttribute("stroke", "currentColor");
+      svg.setAttribute("stroke-width", "1.8");
+      svg.setAttribute("stroke-linecap", "round");
+      svg.setAttribute("stroke-linejoin", "round");
+      [
+        "M12 11a2 2 0 0 0-2 2c0 2.5-.1 5.6-1 8",
+        "M14 13c0 3-.2 6-1 8",
+        "M8 16c0 1.4-.1 2.8-.4 4",
+        "M16 16c-.1 1.7-.3 3.3-.7 4.9",
+        "M6 15v-2a6 6 0 0 1 12 0v3",
+        "M4 15v-2a8 8 0 0 1 16 0v3"
+      ].forEach(function (pathData) {
+        const path = document.createElementNS(namespace, "path");
+        path.setAttribute("d", pathData);
+        svg.appendChild(path);
+      });
+      icon.appendChild(svg);
+      return icon;
+    }
+
     function renderAccountPasskeys(passkeys) {
       if (!accountPasskeyList) return;
       accountPasskeyList.replaceChildren();
-      if (!passkeys.length) {
-        const empty = document.createElement("p");
-        empty.className = "account-passkey-empty";
-        empty.textContent = "No passkeys added yet.";
-        accountPasskeyList.appendChild(empty);
-        return;
+      accountPasskeyList.hidden = passkeys.length === 0;
+
+      const addLabel = document.getElementById("account-passkey-add-label");
+      if (addLabel) {
+        addLabel.textContent = passkeys.length ? "Add another passkey" : "Add a passkey";
       }
 
       passkeys.forEach(function (passkey) {
         const row = document.createElement("div");
         row.className = "account-passkey-row";
+
+        const icon = createAccountPasskeyIcon();
         const copy = document.createElement("div");
-        copy.className = "account-passkey-copy";
-        const title = document.createElement("strong");
-        title.textContent = passkey.backedUp ? "Synced passkey" : "Device passkey";
-        const subtitle = document.createElement("small");
+        copy.className = "account-two-factor-text account-passkey-copy";
+        const heading = document.createElement("h4");
+        const passkeyName = passkey.backedUp ? "Synced passkey" : "Device passkey";
+        heading.appendChild(document.createTextNode(passkeyName));
+        const activeBadge = document.createElement("span");
+        activeBadge.className = "account-two-factor-status enabled";
+        activeBadge.textContent = "Active";
+        heading.appendChild(activeBadge);
+
+        const subtitle = document.createElement("p");
         const created = passkey.createdAt ? new Date(passkey.createdAt) : null;
         subtitle.textContent = created && !Number.isNaN(created.getTime())
-          ? "Added " + created.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+          ? "Added " + created.toLocaleDateString("en-US", {
+            month: "short", day: "numeric", year: "numeric"
+          })
           : "Registered passkey";
-        copy.append(title, subtitle);
+        copy.append(heading, subtitle);
 
         const remove = document.createElement("button");
         remove.type = "button";
         remove.className = "account-two-factor-button account-passkey-remove";
         remove.textContent = "Remove";
-        remove.setAttribute("aria-label", "Remove " + title.textContent);
+        remove.setAttribute("aria-label", "Remove " + passkeyName);
         remove.addEventListener("click", async function () {
           if (!window.confirm("Remove this passkey from AUC Atlas? It will stop working for sign-in.")) return;
           remove.disabled = true;
@@ -518,7 +556,7 @@ export function initializeAccounts(){
             remove.disabled = false;
           }
         });
-        row.append(copy, remove);
+        row.append(icon, copy, remove);
         accountPasskeyList.appendChild(row);
       });
     }

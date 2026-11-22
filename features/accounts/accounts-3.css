@@ -694,28 +694,91 @@
       }
     }
   
-/* Only the existing Account Security panel gains passkey controls. */
-.account-passkey-section { display: grid; gap: 16px; }
-.account-passkey-list { display: grid; gap: 0; }
+
+/* Account Security passkeys — reuse the existing two-factor card language. */
+.account-passkey-section {
+  display: grid;
+  gap: 18px;
+  align-items: start;
+}
+.account-passkey-section .account-panel-subheader {
+  margin-bottom: 0;
+}
+.account-passkey-heading > div {
+  display: grid;
+  gap: 10px;
+}
+.account-passkey-card {
+  overflow: hidden;
+  border: 1px solid rgba(23, 23, 23, 0.1);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.72);
+}
+.account-passkey-list {
+  display: grid;
+}
+.account-passkey-list[hidden] {
+  display: none;
+}
+.account-passkey-row,
+.account-passkey-add-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  min-height: 116px;
+  padding: 20px;
+}
+.account-passkey-row {
+  border-bottom: 1px solid rgba(23, 23, 23, 0.09);
+}
+.account-passkey-icon svg {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+.account-passkey-copy,
+.account-passkey-add-copy {
+  min-width: 0;
+}
+.account-passkey-copy h4,
+.account-passkey-add-copy h4 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.account-passkey-copy .account-two-factor-status {
+  margin-left: 0;
+}
+.account-passkey-copy p {
+  font-size: 12px;
+}
 .account-passkey-empty {
   margin: 0;
+  padding: 18px 20px;
   color: #81796e;
   font-size: 13px;
   line-height: 1.6;
-}
-.account-passkey-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 0;
   border-bottom: 1px solid rgba(23, 23, 23, 0.09);
 }
-.account-passkey-copy { display: grid; gap: 5px; min-width: 0; }
-.account-passkey-copy strong { font-size: 14px; font-weight: 600; }
-.account-passkey-copy small { color: #827b70; font-size: 12px; }
-.account-passkey-add-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-.account-passkey-add-row > span { color: #827b70; font-size: 12px; line-height: 1.5; }
-.account-passkey-remove { flex: 0 0 auto; }
+.account-passkey-remove {
+  flex: 0 0 auto;
+}
 .account-passkey-add-row > button:disabled,
-.account-passkey-remove:disabled { opacity: .55; cursor: not-allowed; }
+.account-passkey-remove:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+@media (max-width: 700px) {
+  .account-passkey-row,
+  .account-passkey-add-row {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 12px;
+    padding: 18px;
+  }
+  .account-passkey-row > .account-two-factor-button,
+  .account-passkey-add-row > .account-two-factor-button {
+    grid-column: 2;
+  }
+}
