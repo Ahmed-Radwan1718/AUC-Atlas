@@ -94,10 +94,12 @@ export async function GET(request: NextRequest) {
       return { code: course.code, title: course.title, materials };
     }));
 
+    // Omit courses without approved uploads instead of rendering empty rows.
+    const coursesWithMaterials = courses.filter(course => course.materials.length > 0);
     return respond({
       status: "ready", term: current.term, semester,
       currentSemester: current.semester, preview, fallback,
-      upcoming: current.upcoming && !preview, courses
+      upcoming: current.upcoming && !preview, courses: coursesWithMaterials
     });
   } catch (error) {
     console.error("Homepage course materials failed", error);

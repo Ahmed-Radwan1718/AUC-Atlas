@@ -136,7 +136,7 @@ export default function NewHomepageMaterials({
   const ready = result.status === "ready";
   const now = Date.now();
   // Updated courses first; otherwise preserve the fixed semester course order.
-  const ordered = [...result.courses].sort((a, b) => {
+  const ordered = result.courses.filter(course => course.materials.length > 0).sort((a, b) => {
     const updateDifference = Number(recentlyUpdated(b, now)) -
       Number(recentlyUpdated(a, now));
     return updateDifference || latestUpload(b) - latestUpload(a);
@@ -201,11 +201,9 @@ export default function NewHomepageMaterials({
                     <span className="homepagenew-material-course-code">{course.code}</span>
                   </span>
                   <span className="homepagenew-material-course-trailing">
-                    {updated ? (
+                    {updated && (
                       <span className="homepagenew-material-new">New uploads</span>
-                    ) : !course.materials.length ? (
-                      <span className="homepagenew-material-course-muted">No materials yet</span>
-                    ) : null}
+                    )}
                     <svg className={open ? "is-open" : ""} viewBox="0 0 24 24"
                       fill="none" stroke="currentColor" strokeWidth="1.7"
                       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -214,8 +212,7 @@ export default function NewHomepageMaterials({
                   </span>
                 </button>
                 <div id={panelId} className="homepagenew-material-course-panel" hidden={!open}>
-                  {course.materials.length ? (
-                    <div className="homepagenew-material-course-items">
+                  <div className="homepagenew-material-course-items">
                       {course.materials.map(material => (
                         <a className="homepagenew-material-row" href={material.href}
                           key={material.id} target="_blank" rel="noopener noreferrer"
@@ -234,11 +231,6 @@ export default function NewHomepageMaterials({
                         </a>
                       ))}
                     </div>
-                  ) : (
-                    <p className="homepagenew-material-course-empty">
-                      No materials have been uploaded for this course yet.
-                    </p>
-                  )}
                   <a className="homepagenew-material-course-link" href={courseHref(course.code)}>
                     Browse all {course.code} materials
                     <span aria-hidden="true">→</span>
@@ -250,7 +242,7 @@ export default function NewHomepageMaterials({
         </div>
       ) : ready ? (
         <div className="homepagenew-material-empty">
-          <span>No courses are listed for your current semester yet.</span>
+          <span>No materials have been uploaded for this semester's courses yet.</span>
         </div>
       ) : notice ? (
         <div className="homepagenew-material-empty">

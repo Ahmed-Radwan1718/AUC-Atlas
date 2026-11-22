@@ -109,7 +109,8 @@ function harness(options: Options = {}) {
           getNewHomepageMechanicalSemesterPlan: (value: number) =>
             value === 1 ? { courses: [
               { code: "SCI 1020", title: "Scientific Thinking" },
-              { code: "ENGR 1005", title: "Engineering Drawing" }
+              { code: "ENGR 1005", title: "Engineering Drawing" },
+              { code: "CORE 1010", title: "Freshman Seminar" }
             ] } : value === 2 ? { courses: [
               { code: "MACT 1122", title: "Calculus II" },
               { code: "CHEM 1005", title: "General Chemistry I" }
@@ -139,10 +140,11 @@ test("current-semester materials are grouped, filtered and linked to secure down
   assert.deepEqual(JSON.parse(JSON.stringify(response.body.courses[0].materials.map((item: any) => item.id))),
     ["sci-new", "sci-old"]);
   assert.equal(response.body.courses[0].title, "Scientific Thinking");
+  assert.ok(!response.body.courses.some((course: any) => course.code === "CORE 1010"));
   assert.equal(response.body.courses[0].materials[0].href,
     "/api/course-material-download?id=sci-new");
   assert.equal(app.materialReads, 4);
-  assert.deepEqual(app.calls.map(call => call.code), ["SCI 1020", "ENGR 1005"]);
+  assert.deepEqual(app.calls.map(call => call.code), ["SCI 1020", "ENGR 1005", "CORE 1010"]);
   assert.ok(app.calls.every(call => call.sort === "createdAt" && call.limit === 12));
 });
 
@@ -239,4 +241,19 @@ test("new homepage omits the extra professor disclaimer and materials semester s
   assert.doesNotMatch(professors, /Based on reviews for the listed courses|Teaching assignments for the upcoming semester are not confirmed/);
   assert.doesNotMatch(materials, /Browse material semesters|homepagenew-material-semester-button/);
   assert.ok(!css.includes(".homepagenew-material-semesters"));
+});
+
+test("courses without any approved materials are excluded entirely", async () => {
+  const app = harness();
+  const response = await app.get();
+  const codes = response.body.courses.map((course: any) => course.code);
+  assert.ok(!codes.includes("CORE 1010"));
+  assert.ok(response.body.courses.every((course: any) => course.materials.length > 0));
+});
+
+test("UI never renders empty course rows and provides a helpful empty state", () => {
+  const component = read("features/home/NewHomepageMaterials.tsx");
+  assert.match(component, /result\.courses\.filter\(course => course\.materials\.length > 0\)/);
+  assert.match(component, /No materials have been uploaded for this semester's courses yet/);
+  assert.doesNotMatch(component, /No materials yet|No materials have been uploaded for this course yet/);
 });
