@@ -106,14 +106,6 @@ export default function NewHomepageMaterials({
   viewingSemester = null
 }: { viewingSemester?: number | null }) {
   const [result, setResult] = useState<MaterialResponse>(initial);
-  // Students may inspect another semester's materials without changing their
-  // recorded enrollment or the course and professor recommendations.
-  const [semesterOverride, setSemesterOverride] = useState<{
-    parentSemester: number | null;
-    semester: number;
-  } | null>(null);
-  const requestedSemester = semesterOverride?.parentSemester === viewingSemester
-    ? semesterOverride.semester : viewingSemester;
   // null expands the most recently updated course by default;
   // the empty string allows students to collapse every course.
   const [openedCourse, setOpenedCourse] = useState<string | null>(null);
@@ -123,7 +115,7 @@ export default function NewHomepageMaterials({
     setResult(initial);
     setOpenedCourse(null);
     const url = "/api/homepage-personalized-materials" +
-      (requestedSemester === null ? "" : "?semester=" + requestedSemester);
+      (viewingSemester === null ? "" : "?semester=" + viewingSemester);
     void fetch(url, {
       credentials: "same-origin", cache: "no-store",
       headers: { Accept: "application/json" },
@@ -139,7 +131,7 @@ export default function NewHomepageMaterials({
       }
     });
     return () => controller.abort();
-  }, [requestedSemester]);
+  }, [viewingSemester]);
 
   const ready = result.status === "ready";
   const now = Date.now();
@@ -168,19 +160,6 @@ export default function NewHomepageMaterials({
         <h2 id="homepagenew-materials-title">Your Course Materials</h2>
         <a href="/courses">View all</a>
       </div>
-      {(ready || result.status === "plan-pending") && (
-        <nav className="homepagenew-material-semesters" aria-label="Browse material semesters">
-          {[1, 2].map(semester => (
-            <button key={semester} type="button"
-              className={"homepagenew-material-semester-button" +
-                (semester === result.semester ? " is-selected" : "")}
-              aria-pressed={semester === result.semester}
-              onClick={() => setSemesterOverride({ parentSemester: viewingSemester, semester })}>
-              Semester {semester}
-            </button>
-          ))}
-        </nav>
-      )}
       {ready && <div className="homepagenew-materials-context">
         <span>{result.preview
           ? "Semester " + result.semester + " · Course materials preview"

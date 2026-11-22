@@ -227,8 +227,16 @@ test("course browsing and the materials accordion share an explicit semester", (
   assert.match(sections, /<NewHomepageMaterials viewingSemester=\{viewingSemester\} \/>/);
   assert.match(sections, /<NewHomepageCourses onSemesterSelect=\{setViewingSemester\} \/>/);
   assert.doesNotMatch(page, /<NewHomepageMaterials\s*\/>/);
-  assert.match(materials, /"\?semester=" \+ requestedSemester/);
-  assert.match(materials, /setSemesterOverride\(\{ parentSemester: viewingSemester, semester \}\)/);
-  assert.match(materials, /aria-label="Browse material semesters"/);
+  assert.ok(materials.includes('(viewingSemester === null ? "" : "?semester=" + viewingSemester)'));
+  assert.doesNotMatch(materials, /setSemesterOverride|homepagenew-material-semesters|Browse material semesters/);
   assert.match(endpoint, /request\.nextUrl\.searchParams\.get\("semester"\)/);
+});
+
+test("new homepage omits the extra professor disclaimer and materials semester selector", () => {
+  const professors = read("features/home/NextSemesterProfessorsPreview.tsx");
+  const materials = read("features/home/NewHomepageMaterials.tsx");
+  const css = read("app/homepagenew/homepagenew.css");
+  assert.doesNotMatch(professors, /Based on reviews for the listed courses|Teaching assignments for the upcoming semester are not confirmed/);
+  assert.doesNotMatch(materials, /Browse material semesters|homepagenew-material-semester-button/);
+  assert.ok(!css.includes(".homepagenew-material-semesters"));
 });

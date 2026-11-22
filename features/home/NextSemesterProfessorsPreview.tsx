@@ -169,10 +169,6 @@ export default function NextSemesterProfessorsPreview({
         <h2 id="homepagenew-professors-title">Professors for Next Semester</h2>
         {(ready || result.status === "plan-pending") && <span>{result.term}</span>}
       </div>
-      {ready && <p className="homepagenew-professor-context">
-        Based on reviews for the listed courses (at least 3 per professor and course).
-        Teaching assignments for the upcoming semester are not confirmed.
-      </p>}
       {ready && !(result.predictedCourses?.length) ? (
         <div className="homepagenew-professor-notice">
           <span>No courses have been listed for this semester yet.</span>
