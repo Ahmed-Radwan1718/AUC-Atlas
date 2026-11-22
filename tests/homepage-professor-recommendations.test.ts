@@ -40,7 +40,7 @@ test("semester preview advances real terms and respects summer enrollment previe
   }), null);
 });
 
-test("course-specific ratings require three valid, nonduplicated reviews", () => {
+test("positive matches are allowed with limited samples; avoid requires three course reviews", () => {
   const rows = [
     { id: "a", professorId: "prof-good", courseCode: "CHEM 1005", rating: 5 },
     { id: "b", professorId: "prof-good", courseCode: "CHEM 1005", rating: 4 },
@@ -61,14 +61,58 @@ test("course-specific ratings require three valid, nonduplicated reviews", () =>
   assert.equal(result.avoid.length, 1);
   assert.deepEqual(result.consider[0], {
     professorId: "prof-good", professorName: "Highly Rated", courseCode: "CHEM 1005",
-    image: "/good.png", averageRating: 4.67, reviewCount: 3
+    image: "/good.png", averageRating: 4.67, reviewCount: 3,
+    ratingBasis: "course", courseReviewCount: 3, limitedEvidence: false
   });
   assert.deepEqual(result.avoid[0], {
     professorId: "prof-low", professorName: "Lower Rated", courseCode: "CHEM 1005",
-    image: "/low.png", averageRating: 1.33, reviewCount: 3
+    image: "/low.png", averageRating: 1.33, reviewCount: 3,
+    ratingBasis: "course", courseReviewCount: 3, limitedEvidence: false
   });
   assert.deepEqual(plain(rankings.rankProfessorsForCourses(["MACT 1122"], rows, directory)),
     { consider: [], avoid: [] });
+});
+
+test("great overall ratings support a small verified course sample without inventing course teaching", () => {
+  const rows = [
+    { id: "1", professorId: "prof-good", courseCode: "CHEM 1005", rating: 5 },
+    { id: "2", professorId: "prof-low", courseCode: "CHEM 1005", rating: 1 },
+    { id: "3", professorId: "prof-thin", courseCode: "PHYS 1011", rating: 5 }
+  ];
+  const overall = [
+    { professorId: "prof-good", averageRating: 4.8, reviewCount: 17 },
+    { professorId: "prof-low", averageRating: 5, reviewCount: 20 },
+    { professorId: "prof-thin", averageRating: 5, reviewCount: 40 }
+  ];
+  const result = plain(rankings.rankProfessorsForCourses(["CHEM 1005"], rows, directory, overall));
+  assert.equal(result.consider.length, 1);
+  assert.deepEqual(result.consider[0], {
+    professorId: "prof-good", professorName: "Highly Rated",
+    courseCode: "CHEM 1005", image: "/good.png",
+    averageRating: 4.8, reviewCount: 17,
+    ratingBasis: "overall", courseReviewCount: 1, limitedEvidence: true
+  });
+  // Strong global ratings don't qualify a professor with no course-specific link.
+  assert.ok(!result.consider.some((p: any) => p.professorId === "prof-thin"));
+  // Never put a professor into "avoid" based on a lone bad review.
+  assert.equal(result.avoid.length, 0);
+
+  const withoutOverall = plain(rankings.rankProfessorsForCourses(["CHEM 1005"], rows, directory));
+  assert.equal(withoutOverall.consider[0].reviewCount, 1);
+  assert.equal(withoutOverall.consider[0].ratingBasis, "course");
+  assert.equal(withoutOverall.consider[0].limitedEvidence, true);
+});
+
+test("a good overall rating never hides three consistently poor reviews for the target course", () => {
+  const rows = [1, 2, 3].map(i => ({
+    id: "n" + i, professorId: "prof-low", courseCode: "CHEM 1005", rating: i === 1 ? 2 : 1
+  }));
+  const overall = [{ professorId: "prof-low", averageRating: 4.9, reviewCount: 60 }];
+  const result = plain(rankings.rankProfessorsForCourses(["CHEM 1005"], rows, directory, overall));
+  assert.equal(result.consider.length, 0);
+  assert.equal(result.avoid.length, 1);
+  assert.equal(result.avoid[0].ratingBasis, "course");
+  assert.equal(result.avoid[0].averageRating, 1.33);
 });
 
 type ReviewDoc = {
@@ -83,7 +127,8 @@ function routeHarness({
   signedIn = true,
   major = "Mechanical Engineering",
   enrollmentTerm = "Fall 2026",
-  rows = [] as ReviewDoc[]
+  rows = [] as ReviewDoc[],
+  overall = [] as { professorId: string; averageRating: number; reviewCount: number }[]
 } = {}) {
   let reviewsQueried = 0;
   let profileReads = 0;
@@ -134,6 +179,11 @@ function routeHarness({
           return { firestore: () => db };
         case "../../../server/session":
           return { optionalSessionUser: async () => signedIn ? { uid: "student-1" } : null };
+        case "../../../server/professorRatingSummaries":
+          return {
+            getProfessorRatingSnapshot: async () => ({ populated: true }),
+            homepageProfessorRankings: () => overall
+          };
         case "../../../data/professors":
           return { professors: directory };
         case "../../../lib/enrollmentTerm":
@@ -235,9 +285,13 @@ test("new homepage professor section follows the course selector, without changi
   assert.match(wrapper, /<NewHomepageCourses onSemesterSelect=\{setViewingSemester\} \/>/);
   assert.match(wrapper, /<NextSemesterProfessorsPreview viewingSemester=\{viewingSemester\} \/>/);
   assert.match(courses, /onSemesterSelect\?\.\(selectedSemester\)/);
-  assert.match(preview, /\(viewingSemester \+ 1\)/);
+  assert.match(preview, /"\?semester=" \+ viewingSemester/);
+  assert.doesNotMatch(preview, /viewingSemester \+ 1/);
+  assert.match(preview, /"Professors for Semester " \+ viewingSemester/);
   assert.match(preview, /status === "plan-pending"/);
-  assert.match(preview, /Teaching assignments for the upcoming semester are not confirmed/);
+  assert.match(preview, /Future teaching assignments are not confirmed/);
+  assert.match(preview, /professor\.ratingBasis === "overall"/);
+  assert.match(preview, /professor\.limitedEvidence/);
   assert.match(css, /\.homepagenew-professor-context/);
   assert.doesNotMatch(read("app/page.tsx"), /NewHomepageAcademicSections/);
 });
