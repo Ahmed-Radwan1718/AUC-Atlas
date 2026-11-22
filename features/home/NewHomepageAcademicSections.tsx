@@ -3,6 +3,7 @@
 import { useState } from "react";
 import NewHomepageCourses from "./NewHomepageCourses";
 import NextSemesterProfessorsPreview from "./NextSemesterProfessorsPreview";
+import NewHomepageMaterials from "./NewHomepageMaterials";
 
 /**
  * Keeps the next-semester professor preview in sync with the semester
@@ -15,6 +16,7 @@ export default function NewHomepageAcademicSections() {
     <>
       <NewHomepageCourses onSemesterSelect={setViewingSemester} />
       <NextSemesterProfessorsPreview viewingSemester={viewingSemester} />
+      <NewHomepageMaterials viewingSemester={viewingSemester} />
     </>
   );
 }

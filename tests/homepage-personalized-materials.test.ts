@@ -30,6 +30,8 @@ function harness(options: Options = {}) {
       title: "Scientific thinking slides", materialType: "Slides", createdAt: 180 },
     { id: "engr", courseCode: "ENGR 1005", status: "approved",
       title: "Engineering drawing", materialType: "Notes", createdAt: 175 },
+    { id: "calc-ii", courseCode: "MACT 1122", status: "approved",
+      title: "Calculus II practice", materialType: "Notes", createdAt: 290 },
     { id: "unrelated", courseCode: "CHEM 1005", status: "approved",
       title: "Not a semester one course", materialType: "Notes", createdAt: 300 }
   ];
@@ -108,6 +110,9 @@ function harness(options: Options = {}) {
             value === 1 ? { courses: [
               { code: "SCI 1020", title: "Scientific Thinking" },
               { code: "ENGR 1005", title: "Engineering Drawing" }
+            ] } : value === 2 ? { courses: [
+              { code: "MACT 1122", title: "Calculus II" },
+              { code: "CHEM 1005", title: "General Chemistry I" }
             ] } : null
         };
         default: throw Error("Unexpected import: " + id);
@@ -116,7 +121,7 @@ function harness(options: Options = {}) {
   });
 
   return {
-    get: () => exports.GET({}),
+    get: (query = "") => exports.GET({ nextUrl: { searchParams: new URLSearchParams(query) } }),
     get calls() { return calls; },
     get materialReads() { return materialReads; },
     get profileReads() { return profileReads; }
@@ -151,12 +156,45 @@ test("signed-out and unverified accounts cannot receive uploaded material detail
   assert.equal(unverified.materialReads, 0);
 });
 
-test("missing semester plans never leak materials from other semesters", async () => {
+test("selecting semester 2 shows Calculus II even if calculated enrollment is semester 3", async () => {
+  const app = harness({ semester: 3 });
+  const response = await app.get("semester=2");
+  assert.equal(response.status, 200);
+  assert.equal(response.body.status, "ready");
+  assert.equal(response.body.semester, 2);
+  assert.equal(response.body.currentSemester, 3);
+  assert.equal(response.body.preview, true);
+  assert.equal(response.body.fallback, false);
+  assert.equal(response.body.courses[0].title, "Calculus II");
+  assert.equal(response.body.courses[0].materials[0].id, "calc-ii");
+  assert.deepEqual(app.calls.map(call => call.code), ["MACT 1122", "CHEM 1005"]);
+});
+
+test("a missing current-semester plan previews semester 2 without claiming current enrollment", async () => {
   const app = harness({ semester: 3 });
   const response = await app.get();
+  assert.equal(response.body.status, "ready");
+  assert.equal(response.body.semester, 2);
+  assert.equal(response.body.currentSemester, 3);
+  assert.equal(response.body.preview, true);
+  assert.equal(response.body.fallback, true);
+  assert.equal(response.body.courses[0].materials[0].id, "calc-ii");
+});
+
+test("an explicitly requested unlisted semester does not show another semester's files", async () => {
+  const app = harness({ semester: 3 });
+  const response = await app.get("semester=3");
   assert.equal(response.body.status, "plan-pending");
+  assert.equal(response.body.semester, 3);
   assert.equal(app.materialReads, 0);
-  assert.equal(app.calls.length, 0);
+});
+
+test("invalid requested semesters are rejected before reading materials", async () => {
+  const app = harness();
+  const response = await app.get("semester=9");
+  assert.equal(response.status, 400);
+  assert.equal(response.body.status, "error");
+  assert.equal(app.materialReads, 0);
 });
 
 test("missing material index returns an error without any broad fallback scan", async () => {
@@ -179,4 +217,18 @@ test("homepage course materials use expandable title-first course headings", () 
   assert.match(page, /courseHref\(course\.code\)/);
   assert.match(css, /\.homepagenew-material-course-identity strong/);
   assert.match(css, /color: #a69d91/);
+});
+
+test("course browsing and the materials accordion share an explicit semester", () => {
+  const sections = read("features/home/NewHomepageAcademicSections.tsx");
+  const page = read("app/homepagenew/page.tsx");
+  const materials = read("features/home/NewHomepageMaterials.tsx");
+  const endpoint = read("app/api/homepage-personalized-materials/route.ts");
+  assert.match(sections, /<NewHomepageMaterials viewingSemester=\{viewingSemester\} \/>/);
+  assert.match(sections, /<NewHomepageCourses onSemesterSelect=\{setViewingSemester\} \/>/);
+  assert.doesNotMatch(page, /<NewHomepageMaterials\s*\/>/);
+  assert.match(materials, /"\?semester=" \+ requestedSemester/);
+  assert.match(materials, /setSemesterOverride\(\{ parentSemester: viewingSemester, semester \}\)/);
+  assert.match(materials, /aria-label="Browse material semesters"/);
+  assert.match(endpoint, /request\.nextUrl\.searchParams\.get\("semester"\)/);
 });

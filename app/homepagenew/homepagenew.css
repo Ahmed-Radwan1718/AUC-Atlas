@@ -983,3 +983,38 @@ a.homepagenew-material-row:focus-visible {
     animation: none;
   }
 }
+
+/* Small semester switcher for course-material browsing. */
+.homepagenew-material-semesters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 14px;
+}
+.homepagenew-material-semester-button {
+  border: 1px solid #e5dfd5;
+  border-radius: 7px;
+  background: transparent;
+  padding: 7px 12px;
+  color: #81786e;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.homepagenew-material-semester-button:hover {
+  background: #faf8f4;
+}
+.homepagenew-material-semester-button.is-selected {
+  color: #946e3c;
+  background: #f5eee4;
+  border-color: #d9c5a8;
+}
+.homepagenew-material-semester-button:focus-visible {
+  outline: 2px solid #a27d46;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .homepagenew-material-semester-button { transition: none; }
+}

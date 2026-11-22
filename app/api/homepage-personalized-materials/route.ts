@@ -17,9 +17,9 @@ const respond = (body: Record<string, unknown>, status = 200) =>
   NextResponse.json(body, { status, headers });
 
 /**
- * Only the student's calculated current semester determines these materials.
- * Browsing other semesters in "Your Courses" must not change this feed.
- * The fixed MENG plans currently cover semesters 1 and 2.
+ * The displayed semester can be browsed independently of saved enrollment.
+ * When the calculated semester has no fixed course list yet, preview the
+ * newest defined semester without claiming that it is current enrollment.
  */
 export async function GET(request: NextRequest) {
   const user = await optionalSessionUser(request);
@@ -45,13 +45,33 @@ export async function GET(request: NextRequest) {
 
     const current = semesterFromEnrollment(enrollmentTerm);
     if (!current) return respond({ status: "select-major", courses: [] });
-    const plan = getNewHomepageMechanicalSemesterPlan(current.semester);
+    const requested = request.nextUrl.searchParams.get("semester");
+    if (requested !== null && !/^[1-8]$/.test(requested)) {
+      return respond({ status: "error", courses: [] }, 400);
+    }
+
+    let semester = requested === null ? current.semester : Number(requested);
+    let plan = getNewHomepageMechanicalSemesterPlan(semester);
+    // A student can still browse real uploaded materials even if their own
+    // later-semester plan has not been authored yet.
+    const fallback = requested === null && !plan;
+    if (fallback) {
+      for (const candidate of [2, 1]) {
+        const available = getNewHomepageMechanicalSemesterPlan(candidate);
+        if (available) {
+          semester = candidate;
+          plan = available;
+          break;
+        }
+      }
+    }
     if (!plan) {
       return respond({
         status: "plan-pending", term: current.term,
-        semester: current.semester, courses: []
+        semester, courses: []
       });
     }
+    const preview = semester !== current.semester;
 
     const courseCollection = firestore().collection("courseMaterials");
     const courses = await Promise.all(plan.courses.map(async course => {
@@ -75,8 +95,9 @@ export async function GET(request: NextRequest) {
     }));
 
     return respond({
-      status: "ready", term: current.term, semester: current.semester,
-      upcoming: current.upcoming, courses
+      status: "ready", term: current.term, semester,
+      currentSemester: current.semester, preview, fallback,
+      upcoming: current.upcoming && !preview, courses
     });
   } catch (error) {
     console.error("Homepage course materials failed", error);
