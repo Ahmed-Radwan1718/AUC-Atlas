@@ -199,17 +199,24 @@ test("never invent suggestions when the upcoming plan or reviews are missing", a
   assert.deepEqual(empty.body.avoid, []);
 
   const before = app.reviewsQueried;
-  const missingPlan = await app.get("semester=3");
+  const third = await app.get("semester=3");
+  assert.equal(third.body.status, "ready");
+  assert.deepEqual(third.body.predictedCourses,
+    plain(mechanical.getNewHomepageMechanicalSemesterPlan(3).courses.map((c: any) => c.code)));
+  assert.equal(app.reviewsQueried, before + third.body.predictedCourses.length * 2);
+
+  const afterThird = app.reviewsQueried;
+  const missingPlan = await app.get("semester=4");
   assert.equal(missingPlan.body.status, "plan-pending");
-  assert.equal(missingPlan.body.semester, 3);
-  assert.equal(app.reviewsQueried, before);
+  assert.equal(missingPlan.body.semester, 4);
+  assert.equal(app.reviewsQueried, afterThird);
   const ninth = await app.get("semester=9");
   assert.equal(ninth.body.status, "plan-pending");
   assert.equal(ninth.body.semester, 9);
 
   const invalid = await app.get("semester=99");
   assert.equal(invalid.status, 400);
-  assert.equal(app.reviewsQueried, before);
+  assert.equal(app.reviewsQueried, afterThird);
 });
 
 test("professor ratings remain private to valid student sessions and supported majors", async () => {

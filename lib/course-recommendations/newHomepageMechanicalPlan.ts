@@ -5,7 +5,7 @@
  * degree progression, catalog prerequisites, previous planning algorithms,
  * or a student's saved completion checkboxes.
  *
- * Only semesters 1 and 2 have been provided. Later semesters remain pending.
+ * Only semesters 1, 2, and 3 have been provided. Later semesters remain pending.
  */
 export type NewHomepageMechanicalCourse = {
   readonly code: string;
@@ -62,6 +62,18 @@ const plans: readonly NewHomepageMechanicalPlan[] = [
     { code: "LALT 1020", title: "Libraries and Learning Technologies", credits: 0, kind: "core" }
   ], [
     { id: "cultural-foundations", label: "Cultural Foundations elective", credits: 3 }
+  ]),
+
+  // Semester 3 — 17 credits (five fixed courses and two core choices)
+  fixedPlan(3, [
+    { code: "MACT 2123", title: "Calculus III", credits: 3, kind: "major" },
+    { code: "ENGR 2102", title: "Engineering Mechanics I (Statics)", credits: 3, kind: "major" },
+    { code: "PHYS 1021", title: "Physics II", credits: 3, kind: "major" },
+    { code: "PHYS 1022", title: "Physics II Lab", credits: 1, kind: "major" },
+    { code: "MENG 2505", title: "Mechanical Engineering Drawing", credits: 1, kind: "major" }
+  ], [
+    { id: "humanities-social-sciences", label: "Humanities and Social Sciences (HU/SS)", credits: 3 },
+    { id: "egypt-studies", label: "Egypt Studies", credits: 3 }
   ])
 ];
 

@@ -158,13 +158,13 @@ test("signed-out and unverified accounts cannot receive uploaded material detail
   assert.equal(unverified.materialReads, 0);
 });
 
-test("selecting semester 2 shows Calculus II even if calculated enrollment is semester 3", async () => {
-  const app = harness({ semester: 3 });
+test("selecting semester 2 shows Calculus II even if calculated enrollment is semester 4", async () => {
+  const app = harness({ semester: 4 });
   const response = await app.get("semester=2");
   assert.equal(response.status, 200);
   assert.equal(response.body.status, "ready");
   assert.equal(response.body.semester, 2);
-  assert.equal(response.body.currentSemester, 3);
+  assert.equal(response.body.currentSemester, 4);
   assert.equal(response.body.preview, true);
   assert.equal(response.body.fallback, false);
   assert.equal(response.body.courses[0].title, "Calculus II");
@@ -173,21 +173,21 @@ test("selecting semester 2 shows Calculus II even if calculated enrollment is se
 });
 
 test("a missing current-semester plan previews semester 2 without claiming current enrollment", async () => {
-  const app = harness({ semester: 3 });
+  const app = harness({ semester: 4 });
   const response = await app.get();
   assert.equal(response.body.status, "ready");
   assert.equal(response.body.semester, 2);
-  assert.equal(response.body.currentSemester, 3);
+  assert.equal(response.body.currentSemester, 4);
   assert.equal(response.body.preview, true);
   assert.equal(response.body.fallback, true);
   assert.equal(response.body.courses[0].materials[0].id, "calc-ii");
 });
 
 test("an explicitly requested unlisted semester does not show another semester's files", async () => {
-  const app = harness({ semester: 3 });
-  const response = await app.get("semester=3");
+  const app = harness({ semester: 4 });
+  const response = await app.get("semester=4");
   assert.equal(response.body.status, "plan-pending");
-  assert.equal(response.body.semester, 3);
+  assert.equal(response.body.semester, 4);
   assert.equal(app.materialReads, 0);
 });
 
