@@ -10,7 +10,7 @@ const source = read("server/auth-legacy/routes/passkeys.ts");
 
 test("passkey server module has valid TypeScript and WebAuthn verification calls", () => {
   const parsed = ts.createSourceFile("passkeys.ts", source, ts.ScriptTarget.Latest, true);
-  assert.equal(parsed.parseDiagnostics.length, 0);
+  assert.equal((parsed as ts.SourceFile & { parseDiagnostics: readonly ts.Diagnostic[] }).parseDiagnostics.length, 0);
   assert.match(source, /generateRegistrationOptions/);
   assert.match(source, /verifyRegistrationResponse/);
   assert.match(source, /generateAuthenticationOptions/);
