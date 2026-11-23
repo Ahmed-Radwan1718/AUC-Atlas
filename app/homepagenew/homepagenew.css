@@ -192,9 +192,14 @@
 
 
 /* Degree progress: a read-only view of the existing saved degree tracker. */
-.new-homepage-degree {
+.new-homepage-degree-section {
   width: min(100%, 860px);
-  margin: 72px auto 0;
+  margin: 110px auto 0;
+}
+
+.new-homepage-degree {
+  width: 100%;
+  margin: 24px auto 0;
   padding: 38px 42px 36px;
   border: 1px solid #e7e5e0;
   border-radius: 24px;
@@ -242,7 +247,7 @@
 }
 
 .new-homepage-degree-body {
-  margin-top: 34px;
+  margin-top: 0;
 }
 
 .new-homepage-degree-summary {
@@ -314,7 +319,7 @@
 }
 
 .new-homepage-degree-empty {
-  margin-top: 28px;
+  margin-top: 0;
 }
 
 .new-homepage-degree-empty-title {
@@ -378,8 +383,12 @@
     gap: 25px;
   }
 
+  .new-homepage-degree-section {
+    margin-top: 72px;
+  }
+
   .new-homepage-degree {
-    margin-top: 48px;
+    margin-top: 20px;
     padding: 27px 22px 28px;
     border-radius: 19px;
   }
@@ -395,7 +404,7 @@
   }
 
   .new-homepage-degree-body {
-    margin-top: 28px;
+    margin-top: 0;
   }
 
   .new-homepage-degree-major p {
