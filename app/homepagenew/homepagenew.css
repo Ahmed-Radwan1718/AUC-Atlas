@@ -181,6 +181,11 @@
   font-size: 12px;
 }
 
+/* Keep course results to just their code and title. */
+.new-homepage .atlas-search-result:not(.atlas-search-result--professor) .atlas-search-result-copy small {
+  display: none;
+}
+
 .new-homepage .atlas-search-status {
   padding: 14px 20px;
   color: #666;
