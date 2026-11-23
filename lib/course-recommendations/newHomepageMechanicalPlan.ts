@@ -5,7 +5,7 @@
  * degree progression, catalog prerequisites, previous planning algorithms,
  * or a student's saved completion checkboxes.
  *
- * Only semesters 1, 2, and 3 have been provided. Later semesters remain pending.
+ * Only semesters 1, 2, 3, and 4 have been provided. Later semesters remain pending.
  */
 export type NewHomepageMechanicalCourse = {
   readonly code: string;
@@ -74,6 +74,17 @@ const plans: readonly NewHomepageMechanicalPlan[] = [
   ], [
     { id: "humanities-social-sciences", label: "Humanities and Social Sciences (HU/SS)", credits: 3 },
     { id: "egypt-studies", label: "Egypt Studies", credits: 3 }
+  ]),
+
+  // Semester 4 — Spring (16 credits)
+  fixedPlan(4, [
+    { code: "ENGR 2104", title: "Engineering Mechanics II (Dynamics)", credits: 3, kind: "major" },
+    { code: "MENG 2112", title: "Strength of Materials", credits: 3, kind: "major" },
+    { code: "PHYS 2216", title: "Fundamentals of Circuits and Electronics", credits: 2, kind: "major" },
+    { code: "PHYS 2217", title: "Circuits and Electronics Lab", credits: 1, kind: "major" },
+    { code: "MACT 2141", title: "Differential Equations", credits: 3, kind: "major" },
+    { code: "MACT 3224", title: "Probability and Statistics", credits: 3, kind: "major" },
+    { code: "MENG 2202", title: "Computational Thinking and Programming Lab", credits: 1, kind: "major" }
   ])
 ];
 

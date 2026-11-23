@@ -54,6 +54,9 @@ function harness(options: Options = {}) {
     { id: "calc-ii", courseCode: "MACT 1122", status: "approved",
       title: "Calculus II practice", materialType: "Notes",
       fileName: "Practice.pdf", createdAt: 290 },
+    { id: "dynamics", courseCode: "ENGR 2104", status: "approved",
+      title: "Dynamics practice", materialType: "Notes",
+      fileName: "Dynamics.pdf", createdAt: 292 },
     { id: "chem", courseCode: "CHEM 1005", status: "approved",
       title: "Chemistry notes", materialType: "Notes",
       fileName: "Chem.pdf", createdAt: 170 },
@@ -172,6 +175,14 @@ function harness(options: Options = {}) {
             ] } : value === 2 ? { courses: [
               { code: "MACT 1122", title: "Calculus II" },
               { code: "CHEM 1005", title: "General Chemistry I" }
+            ] } : value === 4 ? { courses: [
+              { code: "ENGR 2104", title: "Engineering Mechanics II (Dynamics)" },
+              { code: "MENG 2112", title: "Strength of Materials" },
+              { code: "PHYS 2216", title: "Fundamentals of Circuits and Electronics" },
+              { code: "PHYS 2217", title: "Circuits and Electronics Lab" },
+              { code: "MACT 2141", title: "Differential Equations" },
+              { code: "MACT 3224", title: "Probability and Statistics" },
+              { code: "MENG 2202", title: "Computational Thinking and Programming Lab" }
             ] } : null
         };
         default: throw Error("Unexpected import: " + id);
@@ -249,20 +260,33 @@ test("selecting semester 2 includes Calculus II even when enrollment is semester
   assert.equal(response.body.courses[0].materials[0].files[0].id, "calc-ii");
 });
 
-test("missing current-semester plan previews semester 2 without claiming current enrollment", async () => {
+test("semester 4 materials are available for its course codes", async () => {
   const app = harness({ semester: 4 });
+  const response = await app.get("semester=4");
+  assert.equal(response.body.status, "ready");
+  assert.equal(response.body.semester, 4);
+  assert.equal(response.body.preview, false);
+  assert.equal(response.body.courses[0].code, "ENGR 2104");
+  assert.equal(response.body.courses[0].materials[0].files[0].id, "dynamics");
+  assert.deepEqual(app.calls.map(call => call.code),
+    ["ENGR 2104", "MENG 2112", "PHYS 2216", "PHYS 2217",
+     "MACT 2141", "MACT 3224", "MENG 2202"]);
+});
+
+test("missing current-semester plan previews semester 2 without claiming current enrollment", async () => {
+  const app = harness({ semester: 5 });
   const response = await app.get();
   assert.equal(response.body.status, "ready");
   assert.equal(response.body.semester, 2);
-  assert.equal(response.body.currentSemester, 4);
+  assert.equal(response.body.currentSemester, 5);
   assert.equal(response.body.preview, true);
   assert.equal(response.body.fallback, true);
   assert.equal(response.body.courses[0].materials[0].files[0].id, "calc-ii");
 });
 
 test("explicit unlisted and invalid semesters do not leak other semester files", async () => {
-  const missing = harness({ semester: 4 });
-  const response = await missing.get("semester=4");
+  const missing = harness({ semester: 5 });
+  const response = await missing.get("semester=5");
   assert.equal(response.body.status, "plan-pending");
   assert.equal(missing.materialReads, 0);
   const invalid = harness();

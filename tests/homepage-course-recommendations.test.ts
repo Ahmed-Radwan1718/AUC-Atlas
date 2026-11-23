@@ -106,10 +106,27 @@ test("new homepage MENG semester 3 uses the supplied 17-credit plan", () => {
   assert.equal(plan.courses.length + plan.requirements.length, 7);
 });
 
-test("new homepage has no invented plans beyond the three supplied semesters", () => {
+test("new homepage MENG semester 4 uses the supplied Spring list (16 credits)", () => {
+  const plan = fixedPlans.getNewHomepageMechanicalSemesterPlan(4);
+  assert.ok(plan);
+  assert.deepEqual(plain(plan.courses.map((c: any) => [c.code, c.title, c.credits])), [
+    ["ENGR 2104", "Engineering Mechanics II (Dynamics)", 3],
+    ["MENG 2112", "Strength of Materials", 3],
+    ["PHYS 2216", "Fundamentals of Circuits and Electronics", 2],
+    ["PHYS 2217", "Circuits and Electronics Lab", 1],
+    ["MACT 2141", "Differential Equations", 3],
+    ["MACT 3224", "Probability and Statistics", 3],
+    ["MENG 2202", "Computational Thinking and Programming Lab", 1]
+  ]);
+  assert.deepEqual(plain(plan.requirements), []);
+  assert.equal(plan.totalCredits, 16);
+  assert.equal(plan.courses.length, 7);
+});
+
+test("new homepage has no invented plans beyond the four supplied semesters", () => {
   assert.equal(fixedPlans.getNewHomepageMechanicalSemesterPlan(0), null);
-  assert.equal(fixedPlans.getNewHomepageMechanicalSemesterPlan(4), null);
   assert.equal(fixedPlans.getNewHomepageMechanicalSemesterPlan(5), null);
+  assert.equal(fixedPlans.getNewHomepageMechanicalSemesterPlan(8), null);
 });
 
 test("new homepage API uses fixed lists without the old course algorithm", () => {
@@ -224,6 +241,16 @@ test("switching semesters returns the fixed lists without changing saved student
     ["MACT 2123", "ENGR 2102", "PHYS 1021", "PHYS 1022", "MENG 2505"]);
   assert.deepEqual(third.body.requirements.map((r: any) => r.label),
     ["Humanities and Social Sciences (HU/SS)", "Egypt Studies"]);
+
+  const fourth = await lookup("semester=4");
+  assert.equal(fourth.body.status, "ready");
+  assert.equal(fourth.body.semester, 4);
+  assert.equal(fourth.body.totalCredits, 16);
+  assert.deepEqual(fourth.body.courses.map((c: any) => c.code), [
+    "ENGR 2104", "MENG 2112", "PHYS 2216", "PHYS 2217",
+    "MACT 2141", "MACT 3224", "MENG 2202"
+  ]);
+  assert.deepEqual(fourth.body.requirements, []);
 
   const notYetAdded = await lookup("semester=8");
   assert.equal(notYetAdded.body.status, "plan-pending");
