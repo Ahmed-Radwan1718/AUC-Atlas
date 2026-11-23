@@ -10,6 +10,20 @@
       rgba(8, 21, 33, 0.045) 56%,
       transparent 76%
     ),
+    radial-gradient(
+      circle 410px at calc(50% - 690px) 850px,
+      rgba(8, 21, 33, 0.18) 0%,
+      rgba(8, 21, 33, 0.09) 34%,
+      rgba(8, 21, 33, 0.03) 58%,
+      transparent 76%
+    ),
+    radial-gradient(
+      circle 360px at calc(50% + 680px) 1240px,
+      rgba(8, 21, 33, 0.16) 0%,
+      rgba(8, 21, 33, 0.075) 35%,
+      rgba(8, 21, 33, 0.025) 58%,
+      transparent 76%
+    ),
     #f8f7f4;
   color: #171717;
 }
