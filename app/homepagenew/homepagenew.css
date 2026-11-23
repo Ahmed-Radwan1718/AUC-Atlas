@@ -423,7 +423,11 @@
   margin-top: 26px;
   border-bottom: 1px solid #e7e5e0;
   overflow-x: auto;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+}
+
+.new-homepage-semester-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .new-homepage-semester-tabs button {
