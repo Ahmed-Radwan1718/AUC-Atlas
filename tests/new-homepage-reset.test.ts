@@ -6,11 +6,28 @@ const root = new URL("../", import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), "utf8");
 const exists = (path: string) => existsSync(new URL(path, root));
 
-test("new homepage is blank, with no course, professor or material functionality", () => {
+test("new homepage shows Get Started with a courses-and-professors search", () => {
   const page = read("app/homepagenew/page.tsx");
-  assert.match(page, /return <main style=\{\{ minHeight: "100dvh" \}\} \/>/);
-  assert.doesNotMatch(page, /NewHomepage|NewHomepageAcademicSections|homepagenew\.css|fetch\(/);
-  assert.equal(exists("app/homepagenew/homepagenew.css"), false);
+  assert.match(page, /<h1\b[^>]*>Get Started<\/h1>/);
+  assert.match(page, /<HomeSearch scope="catalog"\s*\/>/);
+  assert.match(page, /import "\.\/homepagenew\.css"/);
+  assert.equal(exists("app/homepagenew/homepagenew.css"), true);
+  assert.doesNotMatch(page, /NewHomepageAcademicSections|NewHomepageCourses|NewHomepageMaterials|fetch\(/);
+});
+
+test("the catalog search includes courses and professors, not study materials", () => {
+  const search = read("features/home/HomeSearch.tsx");
+  assert.match(search, /export type SearchScope = [^\n]*"catalog"/);
+  assert.match(search, /const professorResults: SearchResult\[\] = professors\.map/);
+  assert.match(search, /const courseResults: SearchResult\[\] = courses\.map/);
+  assert.match(search, /\(scope === "catalog" && index !== 2\)/);
+  assert.match(search, /const searchesMaterials = scope === "all" \|\| scope === "materials"/);
+  assert.match(search, /if \(query\.length < 2 \|\| !searchesMaterials\) return/);
+  assert.match(search, /scope === "catalog" \? "Search courses or professors"/);
+  assert.match(search, /function HomeSearch\(\{ scope = "all" \}/);
+});
+
+test("retired personalized homepage modules are still removed", () => {
   for (const path of [
     "features/home/NewHomepageAcademicSections.tsx",
     "features/home/NewHomepageCourses.tsx",
