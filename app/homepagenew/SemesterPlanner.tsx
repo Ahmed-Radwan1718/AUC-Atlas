@@ -258,9 +258,6 @@ export default function SemesterPlanner() {
           <p className="new-homepage-semester-note">We couldn't load your saved plan. Refresh to try again.</p>
         ) : (
           <>
-            <div className="new-homepage-semester-meta">
-              <span>{selected?.courses.length || 0} planned {selected?.courses.length === 1 ? "course" : "courses"}</span>
-            </div>
             {selected?.courses.length ? (
               <div className="new-homepage-semester-courses">
                 {selected.courses.map(code => {
