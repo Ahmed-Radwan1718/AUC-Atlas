@@ -128,10 +128,13 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
     const professorResults: SearchResult[] = professors.map(professor => {
       const id = professor.id || "";
       const department = professor.displayDepartment || professor.department || "AUC";
-      const score = getMatchScore(query, professor.name, [
-        professor.name, professor.id, professor.department, professor.displayDepartment,
-        professor.filterDepartment, professor.course
-      ]);
+      // On /homepagenew, only professor names should produce professor results.
+      // Preserve the original homepage's broader matching behavior.
+      const professorSearchFields = scope === "catalog"
+        ? [professor.name]
+        : [professor.name, professor.id, professor.department, professor.displayDepartment,
+           professor.filterDepartment, professor.course];
+      const score = getMatchScore(query, professor.name, professorSearchFields);
       return { type: "Professor" as const, title: professor.name, department, professorId: id,
         photo: professor.image && (/^https?:\/\//.test(professor.image) || professor.image.startsWith("/"))
           ? professor.image : "/" + (professor.image || "user.png"),
@@ -153,7 +156,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
       score: Number(material.score || 0)
     }));
     return [professorResults, courseResults, materials];
-  }, [query, materialState.materials]);
+  }, [query, materialState.materials, scope]);
   // "catalog" searches only professors and courses on /homepagenew.
   // Other scopes retain their original search behavior.
   const searchesMaterials = scope === "all" || scope === "materials";
