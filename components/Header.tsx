@@ -14,7 +14,6 @@ const navLinks = [
   { href: "/gpa-calculator", label: "GPA Calculator" },
 ];
 const newHomeNavLinks = [
-  { href: "/courses", label: "Courses" },
   { href: "/professors", label: "Professors" },
   { href: "/gpa-calculator", label: "GPA Calculator" },
 ];
