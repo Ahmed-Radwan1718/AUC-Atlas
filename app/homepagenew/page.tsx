@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import HomeSearch from "../../features/home/HomeSearch";
 import DegreeProgressPreview from "./DegreeProgressPreview";
+import SemesterPlanner from "./SemesterPlanner";
 import "./homepagenew.css";
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function NewHomePage() {
         <HomeSearch scope="catalog" />
       </section>
       <DegreeProgressPreview />
+      <SemesterPlanner />
     </main>
   );
 }
