@@ -27,6 +27,16 @@ test("the catalog search includes courses and professors, not study materials", 
   assert.match(search, /function HomeSearch\(\{ scope = "all" \}/);
 });
 
+test("catalog professor results match names only, without department or course matches", () => {
+  const search = read("features/home/HomeSearch.tsx");
+  assert.match(search, /const professorSearchFields = scope === "catalog"\s*\? \[professor\.name\]/);
+  assert.match(search, /getMatchScore\(query, professor\.name, professorSearchFields\)/);
+  assert.match(search, /\[query, materialState\.materials, scope\]/);
+  // Broad department and course matching remains available to the original homepage.
+  assert.match(search, /professor\.id, professor\.department, professor\.displayDepartment/);
+  assert.match(search, /professor\.filterDepartment, professor\.course/);
+});
+
 test("retired personalized homepage modules are still removed", () => {
   for (const path of [
     "features/home/NewHomepageAcademicSections.tsx",
