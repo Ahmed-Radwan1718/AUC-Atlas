@@ -92,11 +92,6 @@ export default function DegreeProgressPreview() {
         <div>
           <h2 id="new-homepage-degree-title">Degree Progression</h2>
         </div>
-        {view.status === "ready" && (
-          <a href="/degree-progression" className="new-homepage-degree-link">
-            View requirements <span aria-hidden="true">↗</span>
-          </a>
-        )}
       </div>
 
       {view.status === "ready" ? (
@@ -104,7 +99,6 @@ export default function DegreeProgressPreview() {
           <div className="new-homepage-degree-summary">
             <div className="new-homepage-degree-major">
               <p>{view.major}</p>
-              <span>Based on the courses you have marked complete</span>
             </div>
             <div className="new-homepage-degree-percentage">
               <strong>{view.progress.percent}%</strong>
