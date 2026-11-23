@@ -115,12 +115,15 @@ test("new homepage MENG semester 4 uses the supplied Spring list (16 credits)", 
     ["PHYS 2216", "Fundamentals of Circuits and Electronics", 2],
     ["PHYS 2217", "Circuits and Electronics Lab", 1],
     ["MACT 2141", "Differential Equations", 3],
-    ["MACT 3224", "Probability and Statistics", 3],
     ["MENG 2202", "Computational Thinking and Programming Lab", 1]
   ]);
-  assert.deepEqual(plain(plan.requirements), []);
+  assert.deepEqual(plain(plan.requirements), [
+    { id: "arab-world-studies", label: "Arab World Studies", credits: 3 }
+  ]);
   assert.equal(plan.totalCredits, 16);
-  assert.equal(plan.courses.length, 7);
+  assert.equal(plan.courses.length, 6);
+  assert.equal(plan.courses.length + plan.requirements.length, 7);
+  assert.ok(!plan.courses.some((course: any) => course.code === "MACT 3224"));
 });
 
 test("new homepage has no invented plans beyond the four supplied semesters", () => {
@@ -248,9 +251,11 @@ test("switching semesters returns the fixed lists without changing saved student
   assert.equal(fourth.body.totalCredits, 16);
   assert.deepEqual(fourth.body.courses.map((c: any) => c.code), [
     "ENGR 2104", "MENG 2112", "PHYS 2216", "PHYS 2217",
-    "MACT 2141", "MACT 3224", "MENG 2202"
+    "MACT 2141", "MENG 2202"
   ]);
-  assert.deepEqual(fourth.body.requirements, []);
+  assert.deepEqual(fourth.body.requirements, [
+    { id: "arab-world-studies", label: "Arab World Studies", credits: 3, timing: "due" }
+  ]);
 
   const notYetAdded = await lookup("semester=8");
   assert.equal(notYetAdded.body.status, "plan-pending");

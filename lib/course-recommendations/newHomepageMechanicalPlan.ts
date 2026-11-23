@@ -83,8 +83,9 @@ const plans: readonly NewHomepageMechanicalPlan[] = [
     { code: "PHYS 2216", title: "Fundamentals of Circuits and Electronics", credits: 2, kind: "major" },
     { code: "PHYS 2217", title: "Circuits and Electronics Lab", credits: 1, kind: "major" },
     { code: "MACT 2141", title: "Differential Equations", credits: 3, kind: "major" },
-    { code: "MACT 3224", title: "Probability and Statistics", credits: 3, kind: "major" },
     { code: "MENG 2202", title: "Computational Thinking and Programming Lab", credits: 1, kind: "major" }
+  ], [
+    { id: "arab-world-studies", label: "Arab World Studies", credits: 3 }
   ])
 ];
 

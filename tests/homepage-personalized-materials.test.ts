@@ -181,7 +181,6 @@ function harness(options: Options = {}) {
               { code: "PHYS 2216", title: "Fundamentals of Circuits and Electronics" },
               { code: "PHYS 2217", title: "Circuits and Electronics Lab" },
               { code: "MACT 2141", title: "Differential Equations" },
-              { code: "MACT 3224", title: "Probability and Statistics" },
               { code: "MENG 2202", title: "Computational Thinking and Programming Lab" }
             ] } : null
         };
@@ -270,7 +269,7 @@ test("semester 4 materials are available for its course codes", async () => {
   assert.equal(response.body.courses[0].materials[0].files[0].id, "dynamics");
   assert.deepEqual(app.calls.map(call => call.code),
     ["ENGR 2104", "MENG 2112", "PHYS 2216", "PHYS 2217",
-     "MACT 2141", "MACT 3224", "MENG 2202"]);
+     "MACT 2141", "MENG 2202"]);
 });
 
 test("missing current-semester plan previews semester 2 without claiming current enrollment", async () => {
