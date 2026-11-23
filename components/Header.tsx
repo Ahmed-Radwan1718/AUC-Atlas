@@ -10,7 +10,6 @@ type SessionResponse = { signedIn?: boolean; user?: AtlasUser };
 
 const navLinks = [
   { href: "/professors", label: "Professors" },
-  { href: "/courses", label: "Courses" },
   { href: "/gpa-calculator", label: "GPA Calculator" },
 ];
 const newHomeNavLinks = [
