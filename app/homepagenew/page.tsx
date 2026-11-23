@@ -13,7 +13,7 @@ export default function NewHomePage() {
     <main className="new-homepage">
       <section className="new-homepage-hero" aria-labelledby="new-homepage-title">
         <h1 id="new-homepage-title">Get Started</h1>
-        <HomeSearch />
+        <HomeSearch scope="catalog" />
       </section>
     </main>
   );
