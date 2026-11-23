@@ -63,6 +63,9 @@ jobs:
               exit 1
             fi
           }
+          # /courses is a legacy entry point; the individual /courses/[slug] pages remain live.
+          check_status 307 http://127.0.0.1:3000/courses
+          curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3000/courses | grep -Fq 'http://127.0.0.1:3000/homepagenew'
           check_status 404 http://127.0.0.1:3000/missing-page-check
           curl --silent --show-error http://127.0.0.1:3000/missing-page-check | grep -Fq 'Ackk, page not found.'
           curl --fail --silent --show-error http://127.0.0.1:3000/terms | grep -Fq 'Acceptance and Legal Framework'
@@ -74,7 +77,7 @@ jobs:
           check_status 200 http://127.0.0.1:3000/robots.txt
           curl --fail --silent --show-error http://127.0.0.1:3000/sitemap.xml > /tmp/atlas-sitemap.xml
           curl --fail --silent --show-error http://127.0.0.1:3000/robots.txt | grep -Fq 'Sitemap: https://aucatlas.com/sitemap.xml'
-          node -e 'const xml=require("fs").readFileSync("/tmp/atlas-sitemap.xml","utf8"); const urls=xml.split("<loc>").slice(1).map(s=>s.split("</loc>")[0]); const root="https://aucatlas.com"; const required=[root+"/",root+"/faq",root+"/professors/eslam-badr",root+"/courses/chem-1005"]; const forbidden=["/admin","/accounts","/login","/signup","/forgot-password"]; if (urls.length<1500 || new Set(urls).size!==urls.length || required.some(u=>!urls.includes(u)) || urls.some(u=>u.endsWith(".html") || forbidden.some(p=>u===root+p || u.startsWith(root+p+"/")))) {console.error("Sitemap validation failed:",urls.length); process.exit(1)}'
+          node -e 'const xml=require("fs").readFileSync("/tmp/atlas-sitemap.xml","utf8"); const urls=xml.split("<loc>").slice(1).map(s=>s.split("</loc>")[0]); const root="https://aucatlas.com"; const required=[root+"/",root+"/faq",root+"/professors/eslam-badr",root+"/courses/chem-1005"]; const forbidden=["/admin","/accounts","/login","/signup","/forgot-password"]; if (urls.includes(root+"/courses") || urls.length<1500 || new Set(urls).size!==urls.length || required.some(u=>!urls.includes(u)) || urls.some(u=>u.endsWith(".html") || forbidden.some(p=>u===root+p || u.startsWith(root+p+"/")))) {console.error("Sitemap validation failed:",urls.length); process.exit(1)}'
 
           check_status 200 http://127.0.0.1:3000/api/me
           check_status 404 http://127.0.0.1:3000/api/homepage-course-recommendations
