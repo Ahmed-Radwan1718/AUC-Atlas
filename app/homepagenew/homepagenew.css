@@ -7,7 +7,7 @@
 }
 
 .new-homepage-hero {
-  width: min(100%, 740px);
+  width: min(100%, 860px);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
