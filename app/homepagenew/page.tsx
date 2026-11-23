@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
+import HomeSearch from "../../features/home/HomeSearch";
+import "./homepagenew.css";
 
 export const metadata: Metadata = {
-  title: "AUC Atlas",
+  title: "Get Started | AUC Atlas",
   robots: { index: false, follow: false },
 };
 
-// This experimental homepage is intentionally blank.
-// The original homepage at / remains unchanged.
+// The experimental homepage is isolated from the original homepage at /.
 export default function NewHomePage() {
-  return <main style={{ minHeight: "100dvh" }} />;
+  return (
+    <main className="new-homepage">
+      <section className="new-homepage-hero" aria-labelledby="new-homepage-title">
+        <h1 id="new-homepage-title">Get Started</h1>
+        <HomeSearch />
+      </section>
+    </main>
+  );
 }
