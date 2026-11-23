@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
+import vm from "node:vm";
+import ts from "typescript";
 
 const root = new URL("../", import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), "utf8");
@@ -50,6 +52,58 @@ test("retired personalized homepage modules are still removed", () => {
     "lib/course-recommendations/newHomepageMechanicalPlan.ts",
     "lib/course-recommendations/newHomepageProfessorRecommendations.ts"
   ]) assert.equal(exists(path), false, path);
+});
+
+test("degree progression preview uses saved major and credit totals on new homepage", () => {
+  const page = read("app/homepagenew/page.tsx");
+  const preview = read("app/homepagenew/DegreeProgressPreview.tsx");
+  const css = read("app/homepagenew/homepagenew.css");
+  assert.match(page, /<DegreeProgressPreview \/>/);
+  assert.match(preview, /from "\.\/degreeProgressSummary"/);
+  assert.match(preview, /fetch\(url,/);
+  assert.match(preview, /"\/api\/me"/);
+  assert.match(preview, /"\/api\/academic-progress"/);
+  assert.match(preview, /saved\.data\.degreeProgress\?\.major === major/);
+  assert.match(preview, /calculateDegreeProgress\(plan\.groups, completedKeys\)/);
+  assert.match(preview, /role="progressbar"/);
+  assert.match(preview, /aria-valuenow=\{view\.progress\.percent\}/);
+  assert.match(preview, /href="\/degree-progression"/);
+  assert.match(preview, /status: "signed-out"/);
+  assert.match(preview, /status: "no-major"/);
+  assert.doesNotMatch(preview, /\/api\/academic-progress.*method: "POST"/);
+  assert.match(css, /\.new-homepage-degree-track/);
+  assert.match(css, /\.new-homepage-degree-fill/);
+});
+
+test("degree progress totals respect saved keys, elective caps and duplicate elective options", () => {
+  const source = read("app/homepagenew/degreeProgressSummary.ts");
+  const compiled = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+  }).outputText;
+  const module = { exports: {} as Record<string, unknown> };
+  vm.runInNewContext(compiled, { module, exports: module.exports });
+  const calculate = module.exports.calculateDegreeProgress as (
+    groups: unknown[], keys: string[]
+  ) => { totalCredits: number; completedCredits: number; remainingCredits: number; percent: number };
+
+  const groups = [
+    { items: ["MATH 1001 - Intro (3 cr.)", "PHYS 1002 - Lab (1 cr.)"] },
+    {
+      creditGroup: "elective-cap", creditCap: 6,
+      items: ["CSCE 1001 - Programming (3 cr.)", "CSCE 1002 - Data (3 cr.)"],
+      subgroups: [{ items: ["CSCE 1001 - Programming (3 cr.)", "CSCE 1003 - Special (4 cr.)"] }]
+    }
+  ];
+  const zero = calculate(groups, []);
+  assert.equal(zero.totalCredits, 10);
+  assert.equal(zero.completedCredits, 0);
+  assert.equal(zero.percent, 0);
+
+  const saved = calculate(groups, ["0-0", "1-0", "1-0-0", "1-0-1"]);
+  assert.equal(saved.totalCredits, 10);
+  assert.equal(saved.completedCredits, 9); // Core 3 + capped electives 6, not 3 + 3 + 4.
+  assert.equal(saved.remainingCredits, 1);
+  assert.equal(saved.percent, 90);
 });
 
 test("course directory redirects while individual courses remain accessible", () => {
