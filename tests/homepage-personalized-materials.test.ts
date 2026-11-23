@@ -57,6 +57,9 @@ function harness(options: Options = {}) {
     { id: "dynamics", courseCode: "ENGR 2104", status: "approved",
       title: "Dynamics practice", materialType: "Notes",
       fileName: "Dynamics.pdf", createdAt: 292 },
+    { id: "economy", courseCode: "ENGR 3222", status: "approved",
+      title: "Engineering Economy notes", materialType: "Notes",
+      fileName: "Economy.pdf", createdAt: 293 },
     { id: "chem", courseCode: "CHEM 1005", status: "approved",
       title: "Chemistry notes", materialType: "Notes",
       fileName: "Chem.pdf", createdAt: 170 },
@@ -175,6 +178,13 @@ function harness(options: Options = {}) {
             ] } : value === 2 ? { courses: [
               { code: "MACT 1122", title: "Calculus II" },
               { code: "CHEM 1005", title: "General Chemistry I" }
+            ] } : value === 3 ? { courses: [
+              { code: "MACT 2123", title: "Calculus III" },
+              { code: "ENGR 2102", title: "Engineering Mechanics I (Statics)" },
+              { code: "PHYS 1021", title: "Physics II" },
+              { code: "PHYS 1022", title: "Physics II Lab" },
+              { code: "MENG 2505", title: "Mechanical Engineering Drawing" },
+              { code: "ENGR 3222", title: "Engineering Economy" }
             ] } : value === 4 ? { courses: [
               { code: "ENGR 2104", title: "Engineering Mechanics II (Dynamics)" },
               { code: "MENG 2112", title: "Strength of Materials" },
@@ -257,6 +267,19 @@ test("selecting semester 2 includes Calculus II even when enrollment is semester
   assert.equal(response.body.fallback, false);
   assert.equal(response.body.courses[0].title, "Calculus II");
   assert.equal(response.body.courses[0].materials[0].files[0].id, "calc-ii");
+});
+
+test("semester 3 materials include Engineering Economy and exclude Egypt Studies", async () => {
+  const app = harness({ semester: 3 });
+  const response = await app.get("semester=3");
+  assert.equal(response.body.status, "ready");
+  assert.equal(response.body.semester, 3);
+  assert.equal(response.body.preview, false);
+  assert.equal(response.body.courses[0].code, "ENGR 3222");
+  assert.equal(response.body.courses[0].materials[0].files[0].id, "economy");
+  assert.deepEqual(app.calls.map(call => call.code),
+    ["MACT 2123", "ENGR 2102", "PHYS 1021", "PHYS 1022",
+     "MENG 2505", "ENGR 3222"]);
 });
 
 test("semester 4 materials are available for its course codes", async () => {

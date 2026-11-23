@@ -96,13 +96,15 @@ test("new homepage MENG semester 3 uses the supplied 17-credit plan", () => {
     ["ENGR 2102", "Engineering Mechanics I (Statics)", 3],
     ["PHYS 1021", "Physics II", 3],
     ["PHYS 1022", "Physics II Lab", 1],
-    ["MENG 2505", "Mechanical Engineering Drawing", 1]
+    ["MENG 2505", "Mechanical Engineering Drawing", 1],
+    ["ENGR 3222", "Engineering Economy", 3]
   ]);
   assert.deepEqual(plain(plan.requirements), [
-    { id: "humanities-social-sciences", label: "Humanities and Social Sciences (HU/SS)", credits: 3 },
-    { id: "egypt-studies", label: "Egypt Studies", credits: 3 }
+    { id: "humanities-social-sciences", label: "Humanities and Social Sciences (HU/SS)", credits: 3 }
   ]);
   assert.equal(plan.totalCredits, 17);
+  assert.equal(plan.courses.length, 6);
+  assert.ok(!plan.requirements.some((r: any) => r.id === "egypt-studies"));
   assert.equal(plan.courses.length + plan.requirements.length, 7);
 });
 
@@ -241,9 +243,9 @@ test("switching semesters returns the fixed lists without changing saved student
   assert.equal(third.body.semester, 3);
   assert.equal(third.body.totalCredits, 17);
   assert.deepEqual(third.body.courses.map((c: any) => c.code),
-    ["MACT 2123", "ENGR 2102", "PHYS 1021", "PHYS 1022", "MENG 2505"]);
+    ["MACT 2123", "ENGR 2102", "PHYS 1021", "PHYS 1022", "MENG 2505", "ENGR 3222"]);
   assert.deepEqual(third.body.requirements.map((r: any) => r.label),
-    ["Humanities and Social Sciences (HU/SS)", "Egypt Studies"]);
+    ["Humanities and Social Sciences (HU/SS)"]);
 
   const fourth = await lookup("semester=4");
   assert.equal(fourth.body.status, "ready");

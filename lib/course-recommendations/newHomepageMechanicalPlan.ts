@@ -64,16 +64,16 @@ const plans: readonly NewHomepageMechanicalPlan[] = [
     { id: "cultural-foundations", label: "Cultural Foundations elective", credits: 3 }
   ]),
 
-  // Semester 3 — 17 credits (five fixed courses and two core choices)
+  // Semester 3 — 17 credits (six fixed courses and one HU/SS choice)
   fixedPlan(3, [
     { code: "MACT 2123", title: "Calculus III", credits: 3, kind: "major" },
     { code: "ENGR 2102", title: "Engineering Mechanics I (Statics)", credits: 3, kind: "major" },
     { code: "PHYS 1021", title: "Physics II", credits: 3, kind: "major" },
     { code: "PHYS 1022", title: "Physics II Lab", credits: 1, kind: "major" },
-    { code: "MENG 2505", title: "Mechanical Engineering Drawing", credits: 1, kind: "major" }
+    { code: "MENG 2505", title: "Mechanical Engineering Drawing", credits: 1, kind: "major" },
+    { code: "ENGR 3222", title: "Engineering Economy", credits: 3, kind: "major" }
   ], [
-    { id: "humanities-social-sciences", label: "Humanities and Social Sciences (HU/SS)", credits: 3 },
-    { id: "egypt-studies", label: "Egypt Studies", credits: 3 }
+    { id: "humanities-social-sciences", label: "Humanities and Social Sciences (HU/SS)", credits: 3 }
   ]),
 
   // Semester 4 — Spring (16 credits)
