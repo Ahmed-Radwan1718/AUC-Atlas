@@ -1,25 +1,23 @@
 /* Scoped exclusively to the experimental /homepagenew page. */
 .new-homepage {
   min-height: 100svh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 140px 24px 110px;
+  padding: clamp(140px, 19vh, 210px) 24px 104px;
   background: #f8f7f4;
   color: #171717;
 }
 
 .new-homepage-hero {
   width: min(100%, 740px);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 36px;
+  gap: 28px;
   text-align: center;
 }
 
 .new-homepage-hero h1 {
-  font-size: clamp(54px, 9vw, 96px);
+  font-size: clamp(54px, 8vw, 82px);
   font-weight: 700;
   letter-spacing: -0.065em;
   line-height: 1.04;
@@ -192,13 +190,232 @@
   font-size: 13px;
 }
 
+
+/* Degree progress: a read-only view of the existing saved degree tracker. */
+.new-homepage-degree {
+  width: min(100%, 860px);
+  margin: 72px auto 0;
+  padding: 38px 42px 36px;
+  border: 1px solid #e7e5e0;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 18px 50px rgba(34, 30, 23, 0.045);
+}
+
+.new-homepage-degree-head,
+.new-homepage-degree-summary,
+.new-homepage-degree-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.new-homepage-degree-eyebrow {
+  margin: 0 0 10px;
+  color: #ae8b53;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+}
+
+.new-homepage-degree-head h2 {
+  margin: 0;
+  font-size: clamp(23px, 3vw, 29px);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+
+.new-homepage-degree-link {
+  color: #5c5349;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.new-homepage-degree-link:hover,
+.new-homepage-degree-link:focus-visible {
+  color: #171717;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.new-homepage-degree-body {
+  margin-top: 34px;
+}
+
+.new-homepage-degree-summary {
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+.new-homepage-degree-major {
+  min-width: 0;
+}
+
+.new-homepage-degree-major p {
+  margin: 0 0 7px;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.new-homepage-degree-major span {
+  color: #77716b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.new-homepage-degree-percentage {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.new-homepage-degree-percentage strong {
+  font-size: clamp(40px, 6vw, 54px);
+  font-weight: 730;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.new-homepage-degree-percentage span {
+  color: #77716b;
+  font-size: 12px;
+}
+
+.new-homepage-degree-track {
+  height: 17px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #efede8;
+}
+
+.new-homepage-degree-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #cdae74, #b48c50);
+  transition: width 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.new-homepage-degree-foot {
+  margin-top: 14px;
+  color: #79736c;
+  font-size: 12px;
+}
+
+.new-homepage-degree-foot strong {
+  color: #34312d;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.new-homepage-degree-empty {
+  margin-top: 28px;
+}
+
+.new-homepage-degree-empty-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.new-homepage-degree-empty-copy,
+.new-homepage-degree-empty > p {
+  color: #77716b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.new-homepage-degree-empty .new-homepage-degree-track {
+  margin-top: 21px;
+}
+
+.new-homepage-degree-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #171717;
+  color: white;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.new-homepage-degree-cta:hover,
+.new-homepage-degree-cta:focus-visible {
+  background: #37332e;
+}
+
+.new-homepage-degree-loading {
+  width: min(270px, 65%);
+  height: 20px;
+  border-radius: 8px;
+  background: #efede8;
+  animation: new-homepage-degree-pulse 1.25s ease-in-out infinite alternate;
+}
+
+@keyframes new-homepage-degree-pulse {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
 @media (max-width: 600px) {
   .new-homepage {
-    padding: 125px 16px 80px;
+    padding: 128px 16px 70px;
   }
 
   .new-homepage-hero {
-    gap: 26px;
+    gap: 25px;
+  }
+
+  .new-homepage-degree {
+    margin-top: 48px;
+    padding: 27px 22px 28px;
+    border-radius: 19px;
+  }
+
+  .new-homepage-degree-head,
+  .new-homepage-degree-summary,
+  .new-homepage-degree-foot {
+    gap: 10px;
+  }
+
+  .new-homepage-degree-link {
+    font-size: 11px;
+  }
+
+  .new-homepage-degree-body {
+    margin-top: 28px;
+  }
+
+  .new-homepage-degree-major p {
+    font-size: 16px;
+  }
+
+  .new-homepage-degree-percentage {
+    align-items: end;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .new-homepage-degree-foot {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    font-size: 11px;
+  }
+
+  .new-homepage-degree-track {
+    height: 14px;
   }
 
   .new-homepage .atlas-search {
