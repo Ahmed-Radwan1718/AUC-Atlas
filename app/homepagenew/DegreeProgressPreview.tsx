@@ -87,13 +87,14 @@ export default function DegreeProgressPreview() {
   }, [revision]);
 
   return (
-    <section className="new-homepage-degree" aria-labelledby="new-homepage-degree-title">
+    <section className="new-homepage-degree-section" aria-labelledby="new-homepage-degree-title">
       <div className="new-homepage-degree-head">
         <div>
           <h2 id="new-homepage-degree-title">Degree Progression</h2>
         </div>
       </div>
 
+      <div className="new-homepage-degree">
       {view.status === "ready" ? (
         <div className="new-homepage-degree-body">
           <div className="new-homepage-degree-summary">
@@ -161,6 +162,7 @@ export default function DegreeProgressPreview() {
           )}
         </div>
       )}
+      </div>
     </section>
   );
 }
