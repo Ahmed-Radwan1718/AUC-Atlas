@@ -67,7 +67,8 @@ test("degree progression preview uses saved major and credit totals on new homep
   assert.match(preview, /calculateDegreeProgress\(plan\.groups, completedKeys\)/);
   assert.match(preview, /role="progressbar"/);
   assert.match(preview, /aria-valuenow=\{view\.progress\.percent\}/);
-  assert.doesNotMatch(preview, /View requirements|href="\\/degree-progression"/);
+  assert.doesNotMatch(preview, /View requirements/);
+  assert.doesNotMatch(preview, /href="\/degree-progression"/);
   assert.doesNotMatch(preview, /Based on the courses you have marked complete/);
   assert.match(preview, /status: "signed-out"/);
   assert.match(preview, /status: "no-major"/);
