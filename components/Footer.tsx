@@ -22,7 +22,6 @@ export default function Footer() {
             <h3>Explore</h3>
             <ul className="site-footer-links">
               <li><a href="/professors">Professors</a></li>
-              <li><a href="/courses">Courses</a></li>
               <li><a href="/gpa-calculator">GPA Calculator</a></li>
             </ul>
           </div>
