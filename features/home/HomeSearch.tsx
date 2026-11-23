@@ -22,7 +22,7 @@ type Material = {
 type MaterialState = { loading: boolean; locked: boolean; materials: Material[] };
 
 type ReviewCount = number | "locked" | null;
-export type SearchScope = "all" | "materials" | "professors";
+export type SearchScope = "all" | "materials" | "professors" | "catalog";
 
 function normalize(value: unknown): string {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -154,19 +154,26 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
     }));
     return [professorResults, courseResults, materials];
   }, [query, materialState.materials]);
-  // The new search-first homepage can narrow the existing autocomplete without
-  // changing the original homepage's default all-results behavior.
+  // "catalog" searches only professors and courses on /homepagenew.
+  // Other scopes retain their original search behavior.
+  const searchesMaterials = scope === "all" || scope === "materials";
   const filteredResults = useMemo(() => groupedResults.map((items, index) =>
-    scope === "all" || (scope === "professors" ? index === 0 : index !== 0) ? items : []
+    scope === "all" ||
+    (scope === "professors" && index === 0) ||
+    (scope === "materials" && index !== 0) ||
+    (scope === "catalog" && index !== 2)
+      ? items : []
   ), [groupedResults, scope]);
   const allResults = filteredResults.flat();
-  const materialLoading = scope !== "professors" && materialState.loading;
-  const materialsLocked = scope !== "professors" && materialState.locked;
+  const materialLoading = searchesMaterials && materialState.loading;
+  const materialsLocked = searchesMaterials && materialState.locked;
   const noMatches = scope === "professors"
     ? "No matching professors. Try a different name or department."
     : scope === "materials"
       ? "No matching courses or materials. Try a course code or title."
-      : "No matches found. Try a professor name, course code, course title, or material title.";
+      : scope === "catalog"
+        ? "No matches found. Try a professor name, course code, or course title."
+        : "No matches found. Try a professor name, course code, course title, or material title.";
   const status = !allResults.length && materialLoading ? "Searching course materials..."
     : !allResults.length && materialsLocked
       ? "No matching courses. Sign in with a verified AUC email to search uploaded files."
@@ -177,7 +184,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
   const visible = open && !dismissed && query.length >= 2;
 
   useEffect(() => {
-    if (query.length < 2 || scope === "professors") return;
+    if (query.length < 2 || !searchesMaterials) return;
     let cancelled = false;
     const timeout = window.setTimeout(async () => {
       try {
@@ -194,7 +201,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
       }
     }, 650);
     return () => { cancelled = true; window.clearTimeout(timeout); };
-  }, [query, searchRevision, scope]);
+  }, [query, searchRevision, searchesMaterials]);
 
   useEffect(() => { setActiveIndex(-1); }, [scope]);
 
@@ -219,7 +226,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
     setDismissed(false);
     setOpen(value.trim().length >= 2);
     setActiveIndex(-1);
-    setMaterialState({ loading: value.trim().length >= 2, locked: false, materials: [] });
+    setMaterialState({ loading: searchesMaterials && value.trim().length >= 2, locked: false, materials: [] });
   }
   function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -230,7 +237,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
     }
     setOpen(true); setDismissed(false);
     setActiveIndex(-1);
-    setMaterialState({ loading: true, locked: false, materials: [] });
+    setMaterialState({ loading: searchesMaterials, locked: false, materials: [] });
     setSearchRevision(previous => previous + 1);
   }
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -252,6 +259,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
   let rowIndex = -1;
   const placeholder = scope === "professors" ? "Search a professor or department"
     : scope === "materials" ? "Search a course, topic, or file"
+    : scope === "catalog" ? "Search courses or professors"
     : "Search a course, material, or professor";
   return (
     <form className={`atlas-search ${isLoading ? "is-searching" : ""}`}
