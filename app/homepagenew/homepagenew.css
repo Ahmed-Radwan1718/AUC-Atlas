@@ -1,0 +1,230 @@
+/* Scoped exclusively to the experimental /homepagenew page. */
+.new-homepage {
+  min-height: 100svh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 140px 24px 110px;
+  background: #f8f7f4;
+  color: #171717;
+}
+
+.new-homepage-hero {
+  width: min(100%, 740px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  text-align: center;
+}
+
+.new-homepage-hero h1 {
+  font-size: clamp(54px, 9vw, 96px);
+  font-weight: 700;
+  letter-spacing: -0.065em;
+  line-height: 1.04;
+}
+
+.new-homepage .atlas-search {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid #dededa;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.045);
+  text-align: left;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.new-homepage .atlas-search:focus-within {
+  border-color: #777;
+  box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.08);
+}
+
+.new-homepage .atlas-search input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #171717;
+  font: inherit;
+  font-size: 16px;
+}
+
+.new-homepage .atlas-search input::placeholder {
+  color: #848484;
+}
+
+.new-homepage .atlas-search button[type="submit"] {
+  flex-shrink: 0;
+  min-height: 48px;
+  padding: 0 25px;
+  border: 0;
+  border-radius: 12px;
+  background: #171717;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.new-homepage .atlas-search button[type="submit"]:hover,
+.new-homepage .atlas-search button[type="submit"]:focus-visible {
+  background: #393939;
+}
+
+.new-homepage .atlas-search-results {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  max-height: min(520px, 60vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid #e5e5e2;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+
+.new-homepage .atlas-search-results[hidden],
+.new-homepage .atlas-search-status[hidden] {
+  display: none;
+}
+
+.new-homepage .atlas-search-result-section {
+  padding: 10px;
+}
+
+.new-homepage .atlas-search-result-section + .atlas-search-result-section {
+  border-top: 1px solid #ededeb;
+}
+
+.new-homepage .atlas-search-result-section h2 {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  color: #757575;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.new-homepage .atlas-search-result {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 11px;
+  color: #171717;
+  text-decoration: none;
+  transition: background-color 120ms ease;
+}
+
+.new-homepage .atlas-search-result:hover,
+.new-homepage .atlas-search-result:focus-visible,
+.new-homepage .atlas-search-result.is-active {
+  background: #f3f3f1;
+  outline: none;
+}
+
+.new-homepage .atlas-search-result-avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #efefed;
+}
+
+.new-homepage .atlas-search-result-type {
+  flex: 0 0 70px;
+  color: #666;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.new-homepage .atlas-search-result-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.new-homepage .atlas-search-result-copy strong,
+.new-homepage .atlas-search-result-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.new-homepage .atlas-search-result-copy strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.new-homepage .atlas-search-result-copy small {
+  color: #777;
+  font-size: 12px;
+}
+
+.new-homepage .atlas-search-status {
+  padding: 14px 20px;
+  color: #666;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .new-homepage {
+    padding: 125px 16px 80px;
+  }
+
+  .new-homepage-hero {
+    gap: 26px;
+  }
+
+  .new-homepage .atlas-search {
+    padding: 6px;
+    border-radius: 15px;
+  }
+
+  .new-homepage .atlas-search input {
+    padding: 0 10px;
+    font-size: 14px;
+  }
+
+  .new-homepage .atlas-search button[type="submit"] {
+    min-height: 45px;
+    padding: 0 15px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  .new-homepage .atlas-search-result-type {
+    flex-basis: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .new-homepage *,
+  .new-homepage *::before,
+  .new-homepage *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
