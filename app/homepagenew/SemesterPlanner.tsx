@@ -259,7 +259,6 @@ export default function SemesterPlanner() {
         ) : (
           <>
             <div className="new-homepage-semester-meta">
-              <span>{selected?.name || "Semester"}</span>
               <span>{selected?.courses.length || 0} planned {selected?.courses.length === 1 ? "course" : "courses"}</span>
             </div>
             {selected?.courses.length ? (
