@@ -463,6 +463,7 @@
 }
 
 .new-homepage-semester-meta {
+  justify-content: flex-end;
   color: #79736c;
   font-size: 12px;
 }
