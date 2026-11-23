@@ -90,7 +90,6 @@ export default function DegreeProgressPreview() {
     <section className="new-homepage-degree" aria-labelledby="new-homepage-degree-title">
       <div className="new-homepage-degree-head">
         <div>
-          <p className="new-homepage-degree-eyebrow">YOUR ACADEMIC JOURNEY</p>
           <h2 id="new-homepage-degree-title">Degree Progression</h2>
         </div>
         {view.status === "ready" && (
