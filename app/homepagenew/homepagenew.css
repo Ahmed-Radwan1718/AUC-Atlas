@@ -2,7 +2,15 @@
 .new-homepage {
   min-height: 100svh;
   padding: clamp(140px, 19vh, 210px) 24px 104px;
-  background: #f8f7f4;
+  background:
+    radial-gradient(
+      circle 380px at calc(50% + 690px) 440px,
+      rgba(8, 21, 33, 0.24) 0%,
+      rgba(8, 21, 33, 0.12) 34%,
+      rgba(8, 21, 33, 0.045) 56%,
+      transparent 76%
+    ),
+    #f8f7f4;
   color: #171717;
 }
 
