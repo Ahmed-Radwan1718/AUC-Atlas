@@ -46,9 +46,10 @@ test("generated SEO metadata references canonical URLs and excludes private sect
   const sitemap = fromRoot("app/sitemap.ts");
   const robots = fromRoot("app/robots.ts");
   assert.ok(sitemap.includes('const ORIGIN = "https://aucatlas.com"'));
-  for (const route of ["/faq", "/privacy", "/terms", "/professors", "/courses"]) {
+  for (const route of ["/faq", "/privacy", "/terms", "/professors"]) {
     assert.ok(sitemap.includes('"' + route + '"'));
   }
+  assert.doesNotMatch(sitemap, /^\s*"\/courses",?\s*$/m, "Retired /courses directory must not be in sitemap");
   assert.ok(sitemap.includes("new Set<string>(publicPages)"), "Sitemap entries must be unique");
   assert.ok(sitemap.includes('"/professors/" + encodeURIComponent(professor.id)'));
   assert.ok(sitemap.includes('"/courses/" + encodeURIComponent(slug)'));
