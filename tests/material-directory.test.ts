@@ -208,21 +208,16 @@ test("invalid cursor is rejected instead of querying arbitrary documents",async(
   assert.equal(result.status,400);
 });
 
-test("the Courses landing and existing course detail routes remain available",()=>{
+test("retired Courses landing redirects, while course details and materials remain available",()=>{
   const home=read("app/courses/page.tsx");
   const detail=read("app/courses/[slug]/page.tsx");
   const navbar=read("components/Header.tsx");
   const component=read("features/courses/Courses.tsx");
-  assert.match(home,/import Courses from/);
-  assert.match(home,/return <Courses \/>/);
-  assert.doesNotMatch(home,/MaterialsDirectory/);
+  assert.match(home,/redirect\("\/homepagenew"\)/);
+  assert.doesNotMatch(home,/import Courses from/);
   assert.match(detail,/return <Courses courseSlug={slug}/);
-  assert.match(navbar,/href: "\/courses", label: "Courses"/);
+  assert.doesNotMatch(navbar,/href:\s*"\/courses"/);
   assert.match(component,/initializeCourses\(courseSlug\)/);
-  assert.match(component,/id="course-search-input"/);
-  assert.match(component,/id="courses-home-content"/);
-  assert.match(component,/id="course-browse-grid"/);
-  assert.match(component,/id="course-recent-materials"/);
   assert.match(component,/id="course-materials-list"/);
   assert.match(component,/id="course-upload-start"/);
   assert.match(component,/CourseDialogs/);
