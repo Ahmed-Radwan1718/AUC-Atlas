@@ -8,7 +8,6 @@ const ORIGIN = "https://aucatlas.com";
 const publicPages = [
   "/",
   "/professors",
-  "/courses",
   "/gpa-calculator",
   "/degree-progression",
   "/faq",
