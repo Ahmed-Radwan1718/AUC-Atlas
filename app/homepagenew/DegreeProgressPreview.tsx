@@ -128,7 +128,6 @@ export default function DegreeProgressPreview() {
             <>
               <div className="new-homepage-degree-loading" aria-hidden="true" />
               <div className="new-homepage-degree-track is-empty" aria-hidden="true" />
-              <p>Loading your saved degree progress...</p>
             </>
           ) : (
             <>
