@@ -52,6 +52,22 @@ test("retired personalized homepage modules are still removed", () => {
   ]) assert.equal(exists(path), false, path);
 });
 
+test("course directory redirects while individual courses remain accessible", () => {
+  const directoryPage = read("app/courses/page.tsx");
+  assert.match(directoryPage, /redirect\("\/homepagenew"\)/);
+  assert.doesNotMatch(directoryPage, /<Courses\b/);
+
+  const coursePage = read("app/courses/[slug]/page.tsx");
+  assert.match(coursePage, /<Courses courseSlug=\{slug\}/);
+  const search = read("features/home/HomeSearch.tsx");
+  assert.match(search, /"\/courses\/" \+ encodeURIComponent\(slug\(code\)\)/);
+
+  const header = read("components/Header.tsx");
+  const footer = read("components/Footer.tsx");
+  assert.doesNotMatch(header, /href:\s*"\/courses"/);
+  assert.doesNotMatch(footer, /href="\/courses"/);
+});
+
 test("the original homepage and its API are preserved", () => {
   assert.match(read("app/page.tsx"), /import Home from "\.\.\/features\/home\/Home"/);
   assert.match(read("features/home/Home.tsx"), /homepage-overview/);
