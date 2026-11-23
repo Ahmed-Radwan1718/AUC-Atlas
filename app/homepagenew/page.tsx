@@ -12,8 +12,7 @@ export const metadata: Metadata = {
 export default function NewHomePage() {
   return (
     <main className="new-homepage">
-      <section className="new-homepage-hero" aria-labelledby="new-homepage-title">
-        <h1 id="new-homepage-title">Get Started</h1>
+      <section className="new-homepage-hero" aria-label="Search courses and professors">
         <HomeSearch scope="catalog" />
       </section>
       <DegreeProgressPreview />
