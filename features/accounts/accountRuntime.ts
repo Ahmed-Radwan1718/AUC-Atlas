@@ -3,7 +3,7 @@
 // The new Next.js layout provides the header/footer and mounts this after hydration.
 import { courses } from "../../data/courses";
 import { professors } from "../../data/professors";
-import { populateReviewCourseSelect, setupReviewDependsField, setupReviewSearchSelect, setupReviewChoiceMenus, setupReviewCompactControls } from "../professors/reviewControls";
+import { populateReviewCourseSelect, setupReviewSearchSelect, setupReviewChoiceMenus, setupReviewCompactControls } from "../professors/reviewControls";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { startRegistration, browserSupportsWebAuthn } from "@simplewebauthn/browser";
 import {
@@ -898,7 +898,6 @@ function getAccountReviewProfessorUrl(professorId) {
       setupReviewChoiceMenus(accountReviewEditorForm);
       setupReviewSearchSelect(accountReviewEditorForm, "course");
       setupReviewSearchSelect(accountReviewEditorForm, "semester");
-      setupReviewDependsField(accountReviewEditorForm);
       setupReviewCompactControls(accountReviewEditorForm);
       accountReviewEditorForm.dataset.controlsReady = "true";
     }
@@ -1081,7 +1080,6 @@ function getAccountReviewProfessorUrl(professorId) {
       setAccountReviewEditorValue("semesterTaken", review.semesterTaken);
       setAccountReviewEditorValue("rating", review.rating);
       setAccountReviewEditorValue("recommendation", review.recommendation);
-      setAccountReviewEditorValue("recommendationReason", review.recommendationReason);
       setAccountReviewEditorValue("attendancePolicy", review.attendancePolicy);
       setAccountReviewEditorValue("workload", review.workload);
       setAccountReviewEditorValue("lectureUsefulness", review.lectureUsefulness);
@@ -1121,7 +1119,6 @@ function getAccountReviewProfessorUrl(professorId) {
         semesterTaken: String(formData.get("semesterTaken") || "").trim(),
         rating: Number(formData.get("rating") || 0),
         recommendation: String(formData.get("recommendation") || ""),
-        recommendationReason: String(formData.get("recommendationReason") || "").trim(),
         attendancePolicy: String(formData.get("attendancePolicy") || ""),
         workload: String(formData.get("workload") || ""),
         lectureUsefulness: String(formData.get("lectureUsefulness") || ""),
@@ -1154,8 +1151,8 @@ function getAccountReviewProfessorUrl(professorId) {
         return;
       }
 
-      if (payload.recommendation === "Depends" && !payload.recommendationReason) {
-        showMessage(accountReviewEditorMessage, "Please explain what the recommendation depends on.", "error");
+      if (payload.recommendation !== "Yes" && payload.recommendation !== "No") {
+        showMessage(accountReviewEditorMessage, "Please choose Yes or No for the recommendation.", "error");
         return;
       }
 
