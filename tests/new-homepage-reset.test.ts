@@ -145,3 +145,46 @@ test("semester course selection is a modal drawer with persistent multi-add resu
   assert.match(css, /\.new-homepage-course-drawer::backdrop/);
   assert.match(css, /width: min\(520px, 100vw\)/);
 });
+
+
+test("Professor Insights follows live planner state and uses protected course review reads", () => {
+  const planner = read("app/homepagenew/SemesterPlanner.tsx");
+  const insights = read("app/homepagenew/ProfessorInsights.tsx");
+  assert.match(planner, /<ProfessorInsights semesters=\{semesters\} current=\{currentSemester\(\)\} account=\{account\} \/>/);
+  assert.match(insights, /aria-label="Professor insights semester"/);
+  assert.match(insights, /\/api\/professor-reviews\?courseCode=/);
+  assert.match(insights, /response.status === 401/);
+  assert.match(insights, /not confirmed teaching assignments/);
+});
+
+test("course insights reject unrelated and duplicate reviews, avoid overclaiming small samples, and rank extremes", () => {
+  const source = read("app/homepagenew/professorInsightsSummary.ts");
+  const compiled = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+  }).outputText;
+  const module = { exports: {} as Record<string, unknown> };
+  vm.runInNewContext(compiled, { module, exports: module.exports });
+  type Insight = { professorId: string; category: string; averageRating: number; reviewCount: number; themes: string[] };
+  const summarize = module.exports.summarizeCourseProfessors as (reviews: unknown[], code: string) => Insight[];
+  const review = (id: string, professorId: string, rating: number, courseCode = "MENG 3209") =>
+    ({ id, professorId, professorName: professorId, rating, courseCode, lectureUsefulness: "Helpful" });
+  const reviews = [
+    review("a", "high", 5), review("b", "high", 5), review("c", "high", 4),
+    review("a", "high", 5), review("d", "high", 1, "MENG 3402"),
+    review("e", "low", 1), review("f", "low", 2), review("g", "low", 2),
+    review("h", "small", 1), review("i", "small", 1),
+    review("j", "bad", 0), review("k", "mid", 3), review("l", "mid", 3), review("m", "mid", 3)
+  ];
+  const result = summarize(reviews, "MENG3209");
+  assert.equal(result.length, 4);
+  assert.equal(result[0].professorId, "high");
+  assert.equal(result[0].reviewCount, 3);
+  assert.equal(result[0].category, "consider");
+  assert.equal(result[0].averageRating, 14 / 3);
+  assert.equal(result[0].themes[0], "Lectures: Helpful (3/3 responses)");
+  assert.equal(result[1].professorId, "low");
+  assert.equal(result[1].category, "caution");
+  assert.equal(result[2].category, "other");
+  assert.equal(result[3].category, "limited");
+  assert.equal(summarize([], "MENG 3209").length, 0);
+});
