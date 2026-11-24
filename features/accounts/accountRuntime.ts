@@ -404,7 +404,8 @@ export function initializeAccounts(){
       if (accountPageDescription) {
         accountPageDescription.textContent = isActivity
           ? "Manage the reviews and course materials you've shared with AUC Atlas."
-          : "Manage your details, degree progression, security, reviews, and uploaded materials.";
+          : "";
+        accountPageDescription.hidden = !isActivity;
       }
 
       sidebarLinks.forEach(function (link) {
