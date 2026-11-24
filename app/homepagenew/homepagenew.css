@@ -486,6 +486,16 @@
   justify-content: flex-end;
   color: #79736c;
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.new-homepage-semester-section .is-credit-warning {
+  color: #96504a;
+}
+
+.new-homepage-semester-course-info .new-homepage-semester-course-credits {
+  color: #365879;
+  font-size: 11px;
 }
 
 .new-homepage-semester-courses {
