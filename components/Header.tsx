@@ -29,7 +29,7 @@ function clearSignedInFlags() {
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const usesNewNavbar = pathname === "/homepagenew" || pathname === "/accounts" || pathname === "/degree-progression" || pathname === "/professors" || pathname.startsWith("/professors/");
+  const usesNewNavbar = pathname === "/" || pathname === "/accounts" || pathname === "/degree-progression" || pathname === "/professors" || pathname.startsWith("/professors/");
   const activeNavLinks = usesNewNavbar ? newHomeNavLinks : navLinks;
   const widgetRef = useRef<HTMLDivElement>(null);
   const [navOpen, setNavOpen] = useState(false);
@@ -112,7 +112,7 @@ export default function Header() {
   return (
     <>
       <header className={usesNewNavbar ? "site-header site-header--homepagenew" : "site-header"}>
-        <a href={usesNewNavbar ? "/homepagenew" : "/"} className="site-header-logo">
+        <a href="/" className="site-header-logo">
           <span className="site-header-logo-auc">AUC</span>
           <span className="site-header-logo-atlas">Atlas</span>
         </a>

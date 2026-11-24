@@ -1,4 +1,4 @@
-/* Scoped exclusively to the experimental /homepagenew page. */
+/* Scoped to the canonical homepage. */
 .new-homepage {
   min-height: 100svh;
   padding: clamp(140px, 19vh, 210px) 24px 104px;

@@ -65,7 +65,12 @@ jobs:
           }
           # /courses is a legacy entry point; the individual /courses/[slug] pages remain live.
           check_status 307 http://127.0.0.1:3000/courses
-          curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3000/courses | grep -Fq 'http://127.0.0.1:3000/homepagenew'
+          test "$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3000/courses)" = 'http://127.0.0.1:3000/'
+          check_status 308 http://127.0.0.1:3000/homepagenew
+          test "$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3000/homepagenew)" = 'http://127.0.0.1:3000/'
+          curl --fail --silent --show-error http://127.0.0.1:3000/ > /tmp/atlas-home.html
+          grep -Fq 'id="new-homepage-title"' /tmp/atlas-home.html
+          grep -Fq 'Get Started' /tmp/atlas-home.html
           check_status 404 http://127.0.0.1:3000/missing-page-check
           curl --silent --show-error http://127.0.0.1:3000/missing-page-check | grep -Fq 'Ackk, page not found.'
           curl --fail --silent --show-error http://127.0.0.1:3000/terms | grep -Fq 'Acceptance and Legal Framework'

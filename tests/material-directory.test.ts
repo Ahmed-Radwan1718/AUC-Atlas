@@ -213,7 +213,7 @@ test("retired Courses landing redirects, while course details and materials rema
   const detail=read("app/courses/[slug]/page.tsx");
   const navbar=read("components/Header.tsx");
   const component=read("features/courses/Courses.tsx");
-  assert.match(home,/redirect\("\/homepagenew"\)/);
+  assert.match(home,/redirect\("\/"\)/);
   assert.doesNotMatch(home,/import Courses from/);
   assert.match(detail,/return <Courses courseSlug={slug}/);
   assert.doesNotMatch(navbar,/href:\s*"\/courses"/);
