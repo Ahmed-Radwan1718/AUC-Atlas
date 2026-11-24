@@ -60,6 +60,30 @@ function ProfessorColumn({ label, category, insights }: {
   );
 }
 
+function ProfessorInsightsSkeleton() {
+  return (
+    <div className="new-homepage-insights-results" role="status" aria-label="Loading professor insights">
+      <div className="new-homepage-insights-grid" aria-hidden="true">
+        {(["consider", "caution"] as const).map(category => (
+          <div className="new-homepage-insights-column" key={category}>
+            <h3 className={"new-homepage-insights-column-label is-" + category}>
+              {category === "consider" ? "Consider" : "Avoid"}
+            </h3>
+            <div className="new-homepage-insights-row">
+              <span className="new-homepage-insights-avatar new-homepage-insights-skeleton-block" />
+              <span className="new-homepage-insights-person">
+                <span className="new-homepage-insights-skeleton-block new-homepage-insights-skeleton-line is-name" />
+                <span className="new-homepage-insights-skeleton-block new-homepage-insights-skeleton-line is-course" />
+                <span className="new-homepage-insights-skeleton-block new-homepage-insights-skeleton-line is-rating" />
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SemesterInsights({ codes }: { codes: readonly string[] }) {
   const [view, setView] = useState<ReviewView>({ status: "loading" });
   const [retry, setRetry] = useState(0);
@@ -107,7 +131,7 @@ function SemesterInsights({ codes }: { codes: readonly string[] }) {
     return () => controller.abort();
   }, [codes, retry]);
 
-  if (view.status === "loading") return <p className="new-homepage-insights-note" role="status">Loading course reviews…</p>;
+  if (view.status === "loading") return <ProfessorInsightsSkeleton />;
   if (view.status === "locked") return <p className="new-homepage-insights-note"><a href="/login">Sign in</a> with a verified AUC account to view reviews.</p>;
   if (view.status === "error") return <p className="new-homepage-insights-note" role="status">Couldn’t load reviews. <button type="button" onClick={() => setRetry(n => n + 1)}>Try again</button></p>;
   if (view.status !== "ready") return null;
@@ -146,7 +170,7 @@ export default function ProfessorInsights({ semesters, current, account }: {
           </option>)}
         </select>
       </div>
-      {account === "loading" ? <p className="new-homepage-insights-note" role="status">Loading your semester plan…</p> :
+      {account === "loading" ? <ProfessorInsightsSkeleton /> :
         account === "error" ? <p className="new-homepage-insights-note">Your semester plan couldn’t be loaded.</p> :
         account === "guest" ? <p className="new-homepage-insights-note"><a href="/login">Sign in</a> with a verified AUC account to see professor reviews.</p> :
         !selected.courses.length ? <p className="new-homepage-insights-note">Add courses to {selected.name} in Plan Your Semesters to see insights here.</p> :
