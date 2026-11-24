@@ -142,7 +142,7 @@ export default function ProfessorInsights({ semesters, current, account }: {
         <select aria-label="Professor insights semester" value={selected.name}
           onChange={event => setSemesterName(event.target.value)}>
           {choices.map(semester => <option key={semester.name} value={semester.name}>
-            {semester.name}{semester.name === current ? " (current)" : ""}
+            {semester.name}
           </option>)}
         </select>
       </div>
