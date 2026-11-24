@@ -297,3 +297,21 @@ test("degree progression is a standalone academic page, not an account panel", (
   assert.match(read("app/degree-progression/page.tsx"), /<DegreeProgression \/>/);
   assert.match(read("app/page.tsx"), /<DegreeProgressPreview \/>/);
 });
+
+test("semester removal confirms populated semesters and persists intentionally empty plans", () => {
+  const planner = read("app/homepagenew/SemesterPlanner.tsx");
+  const route = read("app/api/semester-plan/route.ts");
+  const css = read("app/homepagenew/homepagenew.css");
+  assert.match(planner, /className="new-homepage-semester-delete"/);
+  assert.match(planner, /onClick=\{requestDeleteSemester\}/);
+  assert.match(planner, /if \(!selected.courses.length\) \{\s*deleteSemester\(\)/);
+  assert.match(planner, /cancelDeleteRef.current\?\.focus/);
+  assert.match(planner, /semesters.filter\(semester => semester.name !== selected.name\)/);
+  assert.match(planner, /remaining\[Math.min\(index, remaining.length - 1\)\]/);
+  assert.match(planner, /markEdited\(remaining\)/);
+  assert.match(planner, /saved.hasSavedPlan \|\| saved.semesters.length/);
+  assert.match(planner, /semesters.length \? nextRegularSemester\(semesters\[semesters.length - 1\].name\) : currentSemester\(\)/);
+  assert.match(planner, /No semesters planned/);
+  assert.match(route, /hasSavedPlan: savedPlan !== null/);
+  assert.match(css, /\.new-homepage-semester-meta \{\s*justify-content: space-between/);
+});
