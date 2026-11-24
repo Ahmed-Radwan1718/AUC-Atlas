@@ -822,10 +822,7 @@ export function mountGpaCalculator() {
     }
 
     function markGpaPlanUnsaved() {
-      showGpaSaveMessage(
-        "You have unsaved changes.",
-        ""
-      );
+      showGpaSaveMessage("", "");
     }
 
     document.addEventListener("click", function (event) {
