@@ -8,14 +8,29 @@ import { monthlyVisits } from "../lib/monthlyVisits";
 type AtlasUser = { photoURL?: string };
 type SessionResponse = { signedIn?: boolean; user?: AtlasUser };
 
-const navLinks = [
-  { href: "/professors", label: "Professors" },
-  { href: "/gpa-calculator", label: "GPA Calculator" },
-];
-const newHomeNavLinks = [
-  { href: "/professors", label: "Professors" },
-  { href: "/gpa-calculator", label: "GPA Calculator" },
-];
+const drawerLinks = [
+  { href: "/", label: "Home", icon: "home" },
+  { href: "/professors", label: "Professors", icon: "professors" },
+  { href: "/gpa-calculator", label: "GPA calculator", icon: "calculator" },
+  { href: "/degree-progression", label: "Degree progression", icon: "progress" },
+  { href: "/#new-homepage-semester-title", label: "Semester planner", icon: "calendar" },
+] as const;
+
+type DrawerIconName = (typeof drawerLinks)[number]["icon"] | "help";
+
+function DrawerIcon({ name }: { name: DrawerIconName }) {
+  return (
+    <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor"
+      strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {name === "home" && <><path d="m3 10 9-7 9 7"/><path d="M5 9v11h5v-6h4v6h5V9"/></>}
+      {name === "professors" && <><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2"/></>}
+      {name === "calculator" && <><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M9 12h.01M15 12h.01M9 16h.01M15 16h.01" strokeWidth="2.2"/></>}
+      {name === "progress" && <path d="M4 4v16h16M8 16v-4m5 4V9m5 7V5"/>}
+      {name === "calendar" && <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01m4 0h.01"/></>}
+      {name === "help" && <><circle cx="12" cy="12" r="9"/><path d="M9.2 9a2.8 2.8 0 0 1 5.6 0c0 2-2.8 2.1-2.8 4m0 3h.01"/></>}
+    </svg>
+  );
+}
 
 function clearSignedInFlags() {
   try {
@@ -30,8 +45,9 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const usesNewNavbar = pathname === "/" || pathname === "/accounts" || pathname === "/degree-progression" || pathname === "/gpa-calculator" || pathname === "/faq" || pathname === "/privacy" || pathname === "/terms" || pathname === "/professors" || pathname.startsWith("/professors/");
-  const activeNavLinks = usesNewNavbar ? newHomeNavLinks : navLinks;
   const widgetRef = useRef<HTMLDivElement>(null);
+  const drawerRef = useRef<HTMLDialogElement>(null);
+  const [hash, setHash] = useState("");
   const [navOpen, setNavOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [user, setUser] = useState<AtlasUser | null>(null);
@@ -73,12 +89,34 @@ export default function Header() {
     setAccountOpen(false);
   }, [pathname]);
   useEffect(() => {
-    document.body.classList.toggle("nav-menu-open", navOpen);
-    return () => document.body.classList.remove("nav-menu-open");
+    const updateHash = () => setHash(window.location.hash);
+    updateHash();
+    window.addEventListener("hashchange", updateHash);
+    return () => window.removeEventListener("hashchange", updateHash);
+  }, [pathname]);
+
+  // Native modal semantics provide a focus trap and make the page behind inert.
+  // Keep the modal mounted during its exit animation before releasing focus.
+  useEffect(() => {
+    const drawer = drawerRef.current;
+    if (!drawer) return;
+    if (navOpen) {
+      if (!drawer.open) drawer.showModal();
+      return;
+    }
+    if (!drawer.open) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      drawer.close();
+      return;
+    }
+    const timeout = window.setTimeout(() => {
+      if (drawer.open) drawer.close();
+    }, 250);
+    return () => window.clearTimeout(timeout);
   }, [navOpen]);
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") { setNavOpen(false); setAccountOpen(false); }
+      if (event.key === "Escape") setAccountOpen(false);
     };
     const onPointerDown = (event: PointerEvent) => {
       if (widgetRef.current && !widgetRef.current.contains(event.target as Node)) {
@@ -112,13 +150,19 @@ export default function Header() {
   return (
     <>
       <header className={usesNewNavbar ? "site-header site-header--homepagenew" : "site-header"}>
-        <a href="/" className="site-header-logo">
+        <button className="hamburger-toggle" type="button"
+          aria-label="Open navigation menu" aria-haspopup="dialog"
+          aria-controls="atlas-navigation-drawer" aria-expanded={navOpen}
+          onClick={() => { setNavOpen(true); setAccountOpen(false); }}>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+            strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+            <path d="M3 6h18M3 12h18M3 18h18"/>
+          </svg>
+        </button>
+        <a href="/" className="site-header-logo" aria-label="AUC Atlas home">
           <span className="site-header-logo-auc">AUC</span>
           <span className="site-header-logo-atlas">Atlas</span>
         </a>
-        <nav className="site-header-nav" aria-label="Main navigation">
-          {activeNavLinks.map(({ href, label }) => <a href={href} key={href}>{label}</a>)}
-        </nav>
         <div className="site-header-actions">
           <div className="floating-account-widget" id="floating-account-widget" ref={widgetRef}>
             <button className="floating-account-button" id="floating-account-button"
@@ -179,19 +223,49 @@ export default function Header() {
             </div>
           </div>
         </div>
-        <button className="hamburger-toggle" type="button" aria-label="Open menu" aria-expanded={navOpen}
-          onClick={() => { setNavOpen(value => !value); setAccountOpen(false); }}>
-          <span/><span/><span/>
-        </button>
       </header>
-      <div className="nav-menu-overlay" aria-hidden={!navOpen}
+      <dialog ref={drawerRef} id="atlas-navigation-drawer"
+        className={`atlas-nav-drawer ${navOpen ? "is-open" : "is-closing"}`}
+        aria-labelledby="atlas-navigation-title"
+        onCancel={event => { event.preventDefault(); setNavOpen(false); }}
+        onClose={() => setNavOpen(false)}
         onClick={event => { if (event.target === event.currentTarget) setNavOpen(false); }}>
-        <div className="nav-menu-panel nav-menu-main active">
-          <div className="nav-menu-links">
-            {activeNavLinks.map(({ href, label }) => <a href={href} className="nav-menu-link" key={href} onClick={() => setNavOpen(false)}>{label}</a>)}
+        <div className="atlas-nav-panel">
+          <div className="atlas-nav-heading">
+            <h2 id="atlas-navigation-title">Explore Atlas</h2>
+            <button className="atlas-nav-close" type="button" aria-label="Close navigation menu"
+              onClick={() => setNavOpen(false)}>
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+                <path d="m6 6 12 12M18 6 6 18"/>
+              </svg>
+            </button>
           </div>
+          <nav className="atlas-nav-links" aria-label="Main navigation">
+            {drawerLinks.map(({ href, label, icon }) => {
+              const isCurrent = href === "/#new-homepage-semester-title"
+                ? pathname === "/" && hash === "#new-homepage-semester-title"
+                : href === "/"
+                  ? pathname === "/" && hash !== "#new-homepage-semester-title"
+                  : pathname === href || pathname.startsWith(href + "/");
+              return (
+                <a href={href} className="atlas-nav-link" key={href}
+                  aria-current={isCurrent ? "page" : undefined} onClick={() => setNavOpen(false)}>
+                  <DrawerIcon name={icon} />
+                  <span>{label}</span>
+                </a>
+              );
+            })}
+            <div className="atlas-nav-support">
+              <a href="/faq" className="atlas-nav-link" aria-current={pathname === "/faq" ? "page" : undefined}
+                onClick={() => setNavOpen(false)}>
+                <DrawerIcon name="help" />
+                <span>Help &amp; FAQ</span>
+              </a>
+            </div>
+          </nav>
         </div>
-      </div>
+      </dialog>
     </>
   );
 }
