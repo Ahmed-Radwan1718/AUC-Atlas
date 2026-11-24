@@ -12,33 +12,6 @@ const markup = `
         </div>
 
         <div class="degree-layout">
-          <aside class="account-sidebar">
-            <a class="account-sidebar-link" href="/accounts#details">
-              <span class="account-sidebar-icon account-details-icon" aria-hidden="true"></span>
-              <span>Account details</span>
-            </a>
-
-            <a class="account-sidebar-link" href="/accounts#security">
-              <span class="account-sidebar-icon account-security-icon" aria-hidden="true"></span>
-              <span>Security</span>
-            </a>
-
-            <a class="account-sidebar-link active" href="/degree-progression" aria-current="page">
-              <span class="account-sidebar-icon account-degree-icon" aria-hidden="true"></span>
-              <span>Degree progression</span>
-            </a>
-
-            <a class="account-sidebar-link" href="/accounts#reviews">
-              <span class="account-sidebar-icon account-reviews-icon" aria-hidden="true"></span>
-              <span>Activity history</span>
-            </a>
-
-            <button class="account-sidebar-link account-logout-link" type="button" id="degree-logout-sidebar">
-              <span class="account-logout-icon" aria-hidden="true"></span>
-              <span>Log out</span>
-            </button>
-          </aside>
-
           <section class="degree-content">
             <article class="degree-panel" id="degree-panel" aria-busy="true">
               <div class="degree-loading" id="degree-loading" role="status" aria-label="Loading degree progression">

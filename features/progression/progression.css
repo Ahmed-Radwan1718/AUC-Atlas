@@ -1,5 +1,4 @@
-/* Degree progression — same open workspace as /accounts and /homepagenew.
-   Every rule is scoped to this route; existing sidebar icon assets are retained. */
+/* Standalone degree progression — centered academic workspace matching the homepage. */
 .degree-page {
   --degree-bg: #f8f7f4;
   --degree-ink: #36383a;
@@ -17,31 +16,11 @@
     var(--degree-bg);
 }
 .degree-page .degree-section { min-height: 100svh; padding: clamp(140px, 19vh, 210px) 24px 104px; }
-.degree-page .degree-inner { width: 100%; max-width: 1120px; margin: 0 auto; }
+.degree-page .degree-inner { width: 100%; max-width: 860px; margin: 0 auto; }
 .degree-page .degree-header { margin: 0 0 44px; }
 .degree-page .degree-header h1 { font-size: clamp(23px, 3vw, 29px); font-weight: 700; letter-spacing: -.045em; line-height: 1.15; }
-.degree-page .degree-layout { display: grid; grid-template-columns: 224px minmax(0,1fr); gap: 36px; align-items: start; }
-.degree-page .account-sidebar { position: sticky; top: 104px; display: grid; gap: 4px; padding: 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
-.degree-page .account-sidebar-link {
-  position: relative; width: 100%; min-height: 44px; padding: 0 12px; border: 0; border-radius: 8px;
-  background: transparent; color: var(--degree-muted); font: 400 14px Arial,sans-serif; letter-spacing: 0;
-  text-transform: none; text-align: left; text-decoration: none; cursor: pointer; display: grid;
-  grid-template-columns: 19px minmax(0,1fr); gap: 12px; align-items: center;
-}
-.degree-page .account-sidebar-link:hover { background: rgba(54,88,121,.05); color: var(--degree-ink); }
-.degree-page .account-sidebar-link.active { background: rgba(54,88,121,.085); color: var(--degree-blue); font-weight: 600; }
-.degree-page .account-sidebar-link.active::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 2px; border-radius: 2px; background: var(--degree-blue); }
-.degree-page .account-sidebar-icon, .degree-page .account-logout-icon { width: 19px; height: 19px; display: block; color: inherit; background: currentColor; flex: 0 0 19px; }
-.degree-page .account-details-icon { -webkit-mask: url("/user.png") center / contain no-repeat; mask: url("/user.png") center / contain no-repeat; }
-.degree-page .account-security-icon { -webkit-mask: url("/security-icon.png") center / contain no-repeat; mask: url("/security-icon.png") center / contain no-repeat; }
-.degree-page .account-reviews-icon { -webkit-mask: url("/support-icon.png") center / contain no-repeat; mask: url("/support-icon.png") center / contain no-repeat; }
-.degree-page .account-degree-icon { position: relative; background: transparent; }
-.degree-page .account-degree-icon::before { content: ""; position: absolute; inset: 2px; border-left: 2px solid currentColor; border-bottom: 2px solid currentColor; border-radius: 0 0 0 3px; }
-.degree-page .account-degree-icon::after { content: ""; position: absolute; left: 6px; bottom: 5px; width: 3px; height: 8px; border-radius: 999px; background: currentColor; box-shadow: 5px -3px 0 currentColor, 10px -7px 0 currentColor; }
-.degree-page .account-logout-link { margin-top: 16px; color: var(--degree-red); }
-.degree-page .account-logout-link:hover { background: rgba(150,80,74,.07); color: var(--degree-red); }
-.degree-page .account-logout-icon { -webkit-mask: url("/logout-icon.png") center / contain no-repeat; mask: url("/logout-icon.png") center / contain no-repeat; }
-.degree-page .degree-content { min-width: 0; padding-left: 36px; border-left: 1px solid var(--degree-line); }
+.degree-page .degree-layout { display: block; }
+.degree-page .degree-content { min-width: 0; }
 .degree-page .degree-panel { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; min-width: 0; }
 .degree-page .degree-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 32px; }
 .degree-page .degree-panel h2 { margin: 0; font-size: 24px; line-height: 1.15; font-weight: 700; letter-spacing: -.045em; }
@@ -140,17 +119,10 @@
 .degree-page :is(a,button,input,summary):focus-visible { outline: 2px solid var(--degree-blue); outline-offset: 3px; }
 @media (max-width: 900px) {
   .degree-page .degree-section { padding: 128px 24px 70px; }
-  .degree-page .degree-layout { grid-template-columns: minmax(0,1fr); gap: 32px; }
-  .degree-page .account-sidebar { position: static; display: flex; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid var(--degree-line); }
-  .degree-page .account-sidebar-link { width: auto; }
-  .degree-page .account-logout-link { margin-top: 0; }
-  .degree-page .degree-content { padding-left: 0; border-left: 0; }
 }
 @media (max-width: 600px) {
   .degree-page .degree-section { padding-inline: 16px; }
   .degree-page .degree-header { margin-bottom: 26px; }
-  .degree-page .account-sidebar { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .degree-page .account-sidebar-link { min-width: 0; padding-inline: 9px; gap: 8px; font-size: 13px; }
   .degree-page .degree-panel-header { flex-wrap: wrap; gap: 14px; }
   .degree-page .degree-panel h2 { font-size: 23px; }
   .degree-page .degree-requirement-text { display: grid; gap: 3px; }
