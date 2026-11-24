@@ -422,11 +422,12 @@
   color: rgba(23, 23, 23, 0.54);
 }
 
+/* Match Edit's transparent hover treatment; keep the shared hover lift. */
 #account-panel-reviews .account-review-action-button.is-danger:hover,
 #account-panel-reviews .account-review-action-button.is-danger:focus-visible {
-  border-color: rgba(199, 54, 54, 0.22);
-  background: rgba(199, 54, 54, 0.08);
-  color: #b73030;
+  border-color: transparent;
+  background: transparent;
+  color: rgba(23, 23, 23, 0.72);
 }
 
 #account-panel-reviews .account-review-action-button:focus-visible,
