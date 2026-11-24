@@ -9,7 +9,6 @@ export function mountDegreeProgression() {
   if (!root || root.getAttribute("data-atlas-initialized") === "true") return;
   root.setAttribute("data-atlas-initialized", "true");
 
-    const logoutButton = document.getElementById("degree-logout-sidebar");
     const degreePanel = document.getElementById("degree-panel");
     const degreeLoading = document.getElementById("degree-loading");
     const degreeLiveContent = document.getElementById("degree-live-content");
@@ -680,24 +679,6 @@ export function mountDegreeProgression() {
         window.location.href = "/login";
       }
     }
-
-    logoutButton.addEventListener("click", async function () {
-      await fetch("/api/logout", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({})
-      }).catch(function () {});
-
-      try {
-        localStorage.removeItem("auc-atlas-signed-in");
-        localStorage.removeItem("aucAtlasSignedIn");
-        sessionStorage.removeItem("auc-atlas-signed-in");
-        sessionStorage.removeItem("aucAtlasSignedIn");
-      } catch (error) {}
-
-      window.location.href = "/login";
-    });
 
     requireSignedIn();
   
