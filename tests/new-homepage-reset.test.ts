@@ -278,3 +278,22 @@ test("the global header uses a centered logo and an accessible left navigation d
   assert.match(css, /@keyframes atlas-nav-slide-in\s*\{\s*from\s*\{\s*transform: translateX\(-100%\)/);
   assert.match(css, /prefers-reduced-motion: reduce/);
 });
+
+test("degree progression is a standalone academic page, not an account panel", () => {
+  const page = read("features/progression/DegreeProgression.tsx");
+  const runtime = read("features/progression/degreeRuntime.ts");
+  const css = read("features/progression/progression.css");
+  const account = read("features/accounts/accountsMarkup.ts");
+  const header = read("components/Header.tsx");
+  assert.doesNotMatch(page, /account-sidebar|degree-logout-sidebar/);
+  assert.doesNotMatch(runtime, /degree-logout-sidebar|logoutButton/);
+  assert.doesNotMatch(account, /degree-progression/);
+  assert.doesNotMatch(header, /floating-degree-link/);
+  assert.match(header, /href: "\/degree-progression", label: "Degree progression"/);
+  assert.match(css, /\.degree-page \.degree-inner \{ width: 100%; max-width: 860px;/);
+  assert.match(page, /id="degree-save-progress"/);
+  assert.match(page, /id="degree-loading"/);
+  assert.match(runtime, /"\/api\/academic-progress"/);
+  assert.match(read("app/degree-progression/page.tsx"), /<DegreeProgression \/>/);
+  assert.match(read("app/page.tsx"), /<DegreeProgressPreview \/>/);
+});
