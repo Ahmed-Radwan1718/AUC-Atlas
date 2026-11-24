@@ -10,6 +10,9 @@ export function mountDegreeProgression() {
   root.setAttribute("data-atlas-initialized", "true");
 
     const logoutButton = document.getElementById("degree-logout-sidebar");
+    const degreePanel = document.getElementById("degree-panel");
+    const degreeLoading = document.getElementById("degree-loading");
+    const degreeLiveContent = document.getElementById("degree-live-content");
     const degreeMajorName = document.getElementById("degree-major-name");
     const degreeMajorCopy = document.getElementById("degree-major-copy");
     const degreeCompletedCount = document.getElementById("degree-completed-count");
@@ -666,6 +669,9 @@ export function mountDegreeProgression() {
 
         renderDegreeProgression(data.user);
         await loadSavedDegreeProgress();
+        degreeLoading.hidden = true;
+        degreeLiveContent.hidden = false;
+        degreePanel.setAttribute("aria-busy", "false");
       } catch (error) {
         try {
           localStorage.setItem("auc-atlas-login-redirect", "/degree-progression");
