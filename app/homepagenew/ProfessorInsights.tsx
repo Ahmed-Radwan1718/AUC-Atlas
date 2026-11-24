@@ -114,7 +114,6 @@ function SemesterInsights({ codes }: { codes: readonly string[] }) {
 
   const consider = view.insights.filter(item => item.category === "consider");
   const avoid = view.insights.filter(item => item.category === "caution");
-  const others = view.insights.filter(item => item.category === "other" || item.category === "limited");
   return (
     <div className="new-homepage-insights-results">
       <div className="new-homepage-insights-grid">
@@ -123,14 +122,6 @@ function SemesterInsights({ codes }: { codes: readonly string[] }) {
       </div>
       {!view.insights.length && !view.failedCourses.length && <p className="new-homepage-insights-note">No professor ratings for these courses yet.</p>}
       {view.failedCourses.length > 0 && <p className="new-homepage-insights-note" role="status">Couldn’t load reviews for {view.failedCourses.join(", ")}. <button type="button" onClick={() => setRetry(n => n + 1)}>Try again</button></p>}
-      {others.length > 0 && (
-        <details className="new-homepage-insights-others">
-          <summary>See other reviewed professors ({others.length})</summary>
-          <div className="new-homepage-insights-people">
-            {others.map(insight => <ProfessorRow key={insight.courseCode + ":" + insight.professorId} insight={insight} />)}
-          </div>
-        </details>
-      )}
     </div>
   );
 }
