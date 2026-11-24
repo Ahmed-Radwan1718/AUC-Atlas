@@ -9,7 +9,7 @@ export default function PrivacyPage() {
   return (
     <>
       <main className="info-page" dangerouslySetInnerHTML={{ __html: privacyMarkup }} />
-      <LegalAccordion translate />
+      <LegalAccordion />
     </>
   );
 }
