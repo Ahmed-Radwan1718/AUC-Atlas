@@ -1,0 +1,79 @@
+/* Shared legal pages — matches the FAQ and Atlas homepage. */
+.info-page, .info-page * { margin: 0; padding: 0; box-sizing: border-box; }
+.info-page {
+  --legal-ink: #36383a;
+  --legal-muted: #77716b;
+  --legal-blue: #365879;
+  --legal-line: #e7e5e0;
+  --legal-bg: #f8f7f4;
+  min-height: 100svh;
+  padding: clamp(140px,19vh,210px) 24px 104px;
+  font-family: Arial, sans-serif;
+  color: var(--legal-ink);
+  background:
+    radial-gradient(circle 380px at calc(50% + 690px) 440px, rgba(54,88,121,.24), rgba(54,88,121,.12) 34%, rgba(54,88,121,.045) 56%, transparent 76%),
+    radial-gradient(circle 410px at calc(50% - 690px) 850px, rgba(54,88,121,.18), rgba(54,88,121,.09) 34%, transparent 76%),
+    var(--legal-bg);
+  overflow-x: clip;
+}
+.info-page .info-inner { width: 100%; max-width: 1120px; margin: 0 auto; }
+.info-page .info-header { margin: 0 0 36px; }
+.info-page .info-header h1 { color: var(--legal-ink); font-size: clamp(23px,3vw,29px); font-weight: 700; line-height: 1.15; letter-spacing: -.045em; text-transform: none; }
+.info-page .info-content { display: grid; gap: 0; border: 0; background: transparent; box-shadow: none; }
+.info-page .info-section { min-width: 0; border-bottom: 1px solid var(--legal-line); background: transparent; }
+.info-page .info-section:last-child { border-bottom: 0; }
+.info-page .info-section h2 { font: inherit; }
+.info-page .info-toggle {
+  width: 100%;
+  padding: 23px 0;
+  border: 0;
+  background: transparent;
+  color: var(--legal-ink);
+  font: 600 16px/1.45 Arial,sans-serif;
+  text-align: left;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 16px;
+  align-items: center;
+  gap: 24px;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+.info-page .info-toggle:hover,
+.info-page .info-toggle[aria-expanded="true"] { color: var(--legal-blue); }
+.info-page .info-toggle:focus-visible { outline: 2px solid var(--legal-blue); outline-offset: 4px; border-radius: 4px; }
+.info-page .info-toggle-icon { position: relative; display: block; width: 16px; height: 16px; color: var(--legal-blue); }
+.info-page .info-toggle-icon::before,
+.info-page .info-toggle-icon::after { content: ""; position: absolute; top: 50%; left: 50%; width: 12px; height: 1.5px; border-radius: 2px; background: currentColor; transform: translate(-50%,-50%); }
+.info-page .info-toggle-icon::after { transform: translate(-50%,-50%) rotate(90deg); transition: transform 250ms ease, opacity 250ms ease; }
+.info-page .info-toggle[aria-expanded="true"] .info-toggle-icon::after { transform: translate(-50%,-50%) rotate(0deg); opacity: 0; }
+.info-page .info-answer { padding: 0 40px 24px 0; overflow: hidden; }
+.info-page .info-answer[hidden] { display: none; }
+.info-page .info-answer p { max-width: 820px; color: var(--legal-muted); font-size: 14px; font-weight: 400; line-height: 1.7; }
+.info-page .info-answer a { color: var(--legal-blue); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.info-page .info-answer a:focus-visible { outline: 2px solid var(--legal-blue); outline-offset: 3px; }
+@media (max-width: 900px) {
+  .info-page { padding: 128px 24px 70px; }
+}
+@media (max-width: 600px) {
+  .info-page { padding-inline: 16px; }
+  .info-page .info-header { margin-bottom: 24px; }
+  .info-page .info-toggle { padding: 20px 0; gap: 16px; font-size: 15px; }
+  .info-page .info-answer { padding-right: 24px; padding-bottom: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .info-page .info-toggle, .info-page .info-toggle-icon::after { transition: none; }
+}
+@media (forced-colors: active) {
+  .info-page .info-toggle-icon::before, .info-page .info-toggle-icon::after { background: ButtonText; forced-color-adjust: none; }
+}
+
+/* Legal documents retain their revision dates, paragraph spacing and lists. */
+.info-page .info-updated { margin-top: 10px; color: var(--legal-muted); font-size: 13px; line-height: 1.6; }
+.info-page .info-answer { overflow-wrap: anywhere; }
+.info-page .info-answer ul { max-width: 820px; padding-left: 20px; list-style: disc outside; display: grid; gap: 8px; }
+.info-page .info-answer li { color: var(--legal-muted); font-size: 14px; font-weight: 400; line-height: 1.7; }
+.info-page .info-answer p + p,
+.info-page .info-answer p + ul,
+.info-page .info-answer ul + p,
+.info-page .info-answer ul + ul { margin-top: 14px; }
+.info-page .info-answer strong { color: var(--legal-ink); font-weight: 700; }

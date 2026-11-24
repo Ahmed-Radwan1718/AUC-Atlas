@@ -6,7 +6,7 @@ import { useEffect } from "react";
  * Keeps the original legal-page accordion behavior without inline scripts.
  * The legal prose itself is rendered on the server, not bundled into this client component.
  */
-export default function LegalAccordion({ translate = false }: { translate?: boolean }) {
+export default function LegalAccordion({ translate = true }: { translate?: boolean }) {
   useEffect(() => {
     const page = document.querySelector<HTMLElement>(".info-page");
     if (!page) return;
@@ -56,7 +56,7 @@ export default function LegalAccordion({ translate = false }: { translate?: bool
           ...(translate ? { transform: "translateY(0)" } : {})
         };
         const animation = answer.animate([start, end], {
-          duration: 440, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both"
+          duration: 250, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both"
         });
         animation.addEventListener("finish", () => animation.cancel(), { once: true });
         return;
@@ -77,7 +77,7 @@ export default function LegalAccordion({ translate = false }: { translate?: bool
         ...(translate ? { transform: "translateY(-6px)" } : {})
       };
       const animation = answer.animate([start, end], {
-        duration: 320, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "both"
+        duration: 250, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "both"
       });
       animation.addEventListener("finish", () => {
         if (toggle.getAttribute("aria-expanded") === "false") answer.hidden = true;
