@@ -13,27 +13,48 @@ type ReviewView = { status: "loading" | "locked" | "error" } |
 const courseByCode = new Map(courses.map(course => [course.code, course]));
 const professorById = new Map(professors.map(professor => [professor.id, professor]));
 
-function ProfessorCard({ insight }: { insight: ProfessorInsight }) {
+function ProfessorRow({ insight }: { insight: ProfessorInsight }) {
   const professor = professorById.get(insight.professorId);
+  const name = professor?.name || insight.professorName;
+  const photo = professor?.image?.trim() || "/user.png";
+  const content = (
+    <>
+      <img className="new-homepage-insights-avatar" src={photo} alt=""
+        width={44} height={44} loading="lazy" decoding="async"
+        onError={event => {
+          const image = event.currentTarget;
+          if (image.getAttribute("src") !== "/user.png") image.src = "/user.png";
+        }} />
+      <span className="new-homepage-insights-person">
+        <strong>{name}</strong>
+        <small>{insight.averageRating.toFixed(1)} / 5 · {insight.reviewCount} {insight.reviewCount === 1 ? "rating" : "ratings"}</small>
+        {insight.category === "limited" && <small>Limited reviews</small>}
+      </span>
+      {professor && <span className="new-homepage-insights-row-arrow" aria-hidden="true">›</span>}
+    </>
+  );
+  return professor ? (
+    <a className="new-homepage-insights-row" href={"/professors/" + encodeURIComponent(professor.id)}>
+      {content}
+    </a>
+  ) : <div className="new-homepage-insights-row">{content}</div>;
+}
+
+function ProfessorColumn({ label, category, insights }: {
+  label: string; category: "consider" | "caution"; insights: ProfessorInsight[];
+}) {
   return (
-    <article className="new-homepage-insights-card">
-      <p className={"new-homepage-insights-status is-" + insight.category}>
-        {insight.category === "consider" ? "Worth considering" :
-          insight.category === "caution" ? "Consider carefully" :
-          insight.category === "limited" ? "Limited reviews" : "Other reviewed professor"}
-      </p>
-      <div className="new-homepage-insights-card-head">
-        <h4>{professor?.name || insight.professorName}</h4>
-        <span className="new-homepage-insights-rating"><strong>{insight.averageRating.toFixed(1)}</strong><small> / 5</small></span>
-      </div>
-      <p className="new-homepage-insights-meta">{insight.reviewCount} course {insight.reviewCount === 1 ? "rating" : "ratings"}</p>
-      {insight.themes.length > 0 && (
-        <ul className="new-homepage-insights-themes">
-          {insight.themes.map(theme => <li key={theme}>{theme}</li>)}
-        </ul>
-      )}
-      {professor && <a href={"/professors/" + encodeURIComponent(professor.id)}>View reviews <span aria-hidden="true">↗</span></a>}
-    </article>
+    <div className="new-homepage-insights-column">
+      <h3 className={"new-homepage-insights-column-label is-" + category}
+        title="Based on course reviews, not confirmed teaching assignments">{label}</h3>
+      {insights.length ? (
+        <div className="new-homepage-insights-people">
+          {insights.map(insight => <ProfessorRow key={insight.professorId} insight={insight} />)}
+        </div>
+      ) : <p className="new-homepage-insights-empty">
+        {category === "consider" ? "No professors recommended" : "No professors flagged"}
+      </p>}
+    </div>
   );
 }
 
@@ -67,24 +88,23 @@ function CourseInsights({ code }: { code: string }) {
   if (view.status === "loading") return <p className="new-homepage-insights-note" role="status">Loading course reviews…</p>;
   if (view.status === "locked") return <p className="new-homepage-insights-note"><a href="/login">Sign in</a> with a verified AUC account to view reviews.</p>;
   if (view.status === "error") return <p className="new-homepage-insights-note" role="status">Couldn’t load reviews. <button type="button" onClick={() => setRetry(n => n + 1)}>Try again</button></p>;
-  if (view.status !== "ready" || !view.insights.length) return <p className="new-homepage-insights-note">No professor ratings for this course yet.</p>;
+  if (view.status !== "ready") return null;
 
-  const best = view.insights.find(item => item.category === "consider");
-  const caution = view.insights.find(item => item.category === "caution");
-  const featured = [best, caution].filter((item): item is ProfessorInsight => Boolean(item));
-  const others = view.insights.filter(item => !featured.includes(item));
+  const consider = view.insights.filter(item => item.category === "consider");
+  const avoid = view.insights.filter(item => item.category === "caution");
+  const others = view.insights.filter(item => item.category === "other" || item.category === "limited");
   return (
     <div className="new-homepage-insights-results">
-      {featured.length ? (
-        <div className="new-homepage-insights-grid">
-          {featured.map(insight => <ProfessorCard key={insight.professorId} insight={insight} />)}
-        </div>
-      ) : <p className="new-homepage-insights-note">No clear recommendation or caution based on the available ratings.</p>}
+      <div className="new-homepage-insights-grid">
+        <ProfessorColumn label="Consider" category="consider" insights={consider} />
+        <ProfessorColumn label="Avoid" category="caution" insights={avoid} />
+      </div>
+      {!view.insights.length && <p className="new-homepage-insights-note">No professor ratings for this course yet.</p>}
       {others.length > 0 && (
-        <details className="new-homepage-insights-others" open={!featured.length}>
-          <summary>{featured.length ? "See other reviewed professors" : "Reviewed professors"} ({others.length})</summary>
-          <div className="new-homepage-insights-grid">
-            {others.map(insight => <ProfessorCard key={insight.professorId} insight={insight} />)}
+        <details className="new-homepage-insights-others">
+          <summary>See other reviewed professors ({others.length})</summary>
+          <div className="new-homepage-insights-people">
+            {others.map(insight => <ProfessorRow key={insight.professorId} insight={insight} />)}
           </div>
         </details>
       )}
