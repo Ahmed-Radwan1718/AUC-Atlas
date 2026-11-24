@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { courses } from "../../../data/courses";
+import { SEMESTER_COURSE_LIMIT, semesterCreditViolation } from "../../../lib/semesterCredits";
 import { firestore } from "../../../server/firebase";
 import { optionalSessionUser } from "../../../server/session";
 import { consumeRateLimit, RateLimitError } from "../../../server/security";
@@ -24,7 +25,7 @@ function cleanPlan(value: unknown): Semester[] | null {
     const item = entry as Record<string, unknown>;
     const name = String(item.name ?? "").trim();
     if (!semesterNamePattern.test(name) || names.has(name)) return null;
-    if (!Array.isArray(item.courses) || item.courses.length > 20) return null;
+    if (!Array.isArray(item.courses) || item.courses.length > SEMESTER_COURSE_LIMIT) return null;
     names.add(name);
 
     const selected: string[] = [];
@@ -67,11 +68,17 @@ export async function POST(request: NextRequest) {
     if (!semesters) {
       return NextResponse.json({ error: "Invalid semester plan." }, { status: 400 });
     }
-    await firestore().collection("users").doc(user.uid)
-      .collection("savedTools").doc("semester-plan").set({
-        semesters,
-        updatedAt: FieldValue.serverTimestamp()
-      });
+    const db = firestore();
+    const ref = db.collection("users").doc(user.uid).collection("savedTools").doc("semester-plan");
+    const violation = await db.runTransaction(async tx => {
+      const existing = await tx.get(ref);
+      const previous = cleanPlan(existing.data()?.semesters) || [];
+      const error = semesterCreditViolation(semesters, previous);
+      if (error) return error;
+      tx.set(ref, { semesters, updatedAt: FieldValue.serverTimestamp() });
+      return null;
+    });
+    if (violation) return NextResponse.json({ error: violation }, { status: 400 });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({
