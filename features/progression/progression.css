@@ -161,3 +161,44 @@
 @media (prefers-reduced-motion: reduce) {
   .degree-page :is(.degree-progress-bar,.degree-group-fill,.degree-group-chevron) { transition: none; }
 }
+
+/* Loading placeholders mirror the actual degree layout, without interactive controls. */
+.degree-page [hidden] { display: none !important; }
+.degree-page .degree-loading .degree-requirement-group-head { cursor: default; }
+.degree-page .degree-skeleton {
+  display: block;
+  flex-shrink: 0;
+  max-width: 100%;
+  border-radius: 5px;
+  background: linear-gradient(105deg,#e9e6e1 30%,#f4f2ef 50%,#e9e6e1 70%);
+  background-size: 220% 100%;
+  animation: degree-skeleton-shimmer 1.8s linear infinite;
+}
+.degree-page .degree-skeleton-major { width: min(270px,55%); height: 26px; }
+.degree-page .degree-skeleton-save { width: 126px; height: 42px; border-radius: 10px; }
+.degree-page .degree-skeleton-label { width: 108px; height: 15px; }
+.degree-page .degree-skeleton-number { width: 90px; height: 34px; }
+.degree-page .degree-skeleton-percent { width: 52px; height: 29px; }
+.degree-page .degree-skeleton-track { grid-column: 1 / -1; height: 17px; border-radius: 999px; }
+.degree-page .degree-skeleton-remaining { grid-column: 1 / -1; width: 132px; height: 15px; }
+.degree-page .degree-skeleton-group-title { width: min(340px,80%); height: 21px; }
+.degree-page .degree-skeleton-chevron { width: 12px; height: 9px; }
+.degree-page .degree-skeleton-group-label { width: 144px; height: 14px; }
+.degree-page .degree-skeleton-group-percent { width: 25px; height: 14px; }
+.degree-page .degree-skeleton-group-track { height: 5px; border-radius: 999px; }
+.degree-page .degree-skeleton-circle { width: 17px; height: 17px; border-radius: 50%; }
+.degree-page .degree-skeleton-code { width: 76px; height: 14px; }
+.degree-page .degree-skeleton-course { width: var(--skeleton-course-width); max-width: 100%; height: 13px; }
+.degree-page .degree-skeleton-credit { width: 28px; height: 12px; }
+@keyframes degree-skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@media (max-width: 600px) {
+  .degree-page .degree-skeleton-track { height: 14px; }
+  .degree-page .degree-skeleton-major { width: min(210px,52%); height: 24px; }
+  .degree-page .degree-skeleton-save { width: 112px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .degree-page .degree-skeleton { animation: none; }
+}
