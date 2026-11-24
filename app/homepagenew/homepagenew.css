@@ -1239,9 +1239,18 @@ a.new-homepage-insights-row:hover .new-homepage-insights-row-arrow {
 
 .new-homepage-insights-others .new-homepage-insights-people { margin-top: 6px; }
 
-.new-homepage-insights-section :is(button, select, a, summary):focus-visible {
+.new-homepage-insights-section :is(button, a, summary):focus-visible {
   outline: 2px solid #365879;
   outline-offset: 3px;
+}
+
+.new-homepage-insights-head select:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.new-homepage-insights-head select:focus-visible {
+  border-color: #77716b;
 }
 
 @media (max-width: 600px) {
