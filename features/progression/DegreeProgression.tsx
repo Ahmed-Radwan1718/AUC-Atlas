@@ -40,10 +40,51 @@ const markup = `
           </aside>
 
           <section class="degree-content">
-            <article class="degree-panel">
+            <article class="degree-panel" id="degree-panel" aria-busy="true">
+              <div class="degree-loading" id="degree-loading" role="status" aria-label="Loading degree progression">
+                <div aria-hidden="true">
+                  <div class="degree-panel-header">
+                    <span class="degree-skeleton degree-skeleton-major"></span>
+                    <span class="degree-skeleton degree-skeleton-save"></span>
+                  </div>
+                  <div class="degree-summary-grid">
+                    <div class="degree-completed-summary">
+                      <span class="degree-skeleton degree-skeleton-label"></span>
+                      <span class="degree-skeleton degree-skeleton-number"></span>
+                    </div>
+                    <span class="degree-skeleton degree-skeleton-percent"></span>
+                    <span class="degree-skeleton degree-skeleton-track"></span>
+                    <span class="degree-skeleton degree-skeleton-remaining"></span>
+                  </div>
+                  <div class="degree-requirement-group">
+                    <div class="degree-requirement-group-head">
+                      <div class="degree-group-title-row">
+                        <span class="degree-skeleton degree-skeleton-group-title"></span>
+                        <span class="degree-skeleton degree-skeleton-chevron"></span>
+                      </div>
+                      <div class="degree-group-progress-copy">
+                        <span class="degree-skeleton degree-skeleton-group-label"></span>
+                        <span class="degree-skeleton degree-skeleton-group-percent"></span>
+                      </div>
+                      <span class="degree-skeleton degree-skeleton-group-track"></span>
+                    </div>
+                    <div class="degree-group-body">
+                      <div class="degree-requirement-list">
+                        <div class="degree-requirement-item"><span class="degree-skeleton degree-skeleton-circle"></span><div class="degree-requirement-text"><span class="degree-skeleton degree-skeleton-code"></span><span class="degree-skeleton degree-skeleton-course" style="--skeleton-course-width:140px"></span></div><span class="degree-skeleton degree-skeleton-credit"></span></div>
+                        <div class="degree-requirement-item"><span class="degree-skeleton degree-skeleton-circle"></span><div class="degree-requirement-text"><span class="degree-skeleton degree-skeleton-code"></span><span class="degree-skeleton degree-skeleton-course" style="--skeleton-course-width:210px"></span></div><span class="degree-skeleton degree-skeleton-credit"></span></div>
+                        <div class="degree-requirement-item"><span class="degree-skeleton degree-skeleton-circle"></span><div class="degree-requirement-text"><span class="degree-skeleton degree-skeleton-code"></span><span class="degree-skeleton degree-skeleton-course" style="--skeleton-course-width:260px"></span></div><span class="degree-skeleton degree-skeleton-credit"></span></div>
+                        <div class="degree-requirement-item"><span class="degree-skeleton degree-skeleton-circle"></span><div class="degree-requirement-text"><span class="degree-skeleton degree-skeleton-code"></span><span class="degree-skeleton degree-skeleton-course" style="--skeleton-course-width:190px"></span></div><span class="degree-skeleton degree-skeleton-credit"></span></div>
+                        <div class="degree-requirement-item"><span class="degree-skeleton degree-skeleton-circle"></span><div class="degree-requirement-text"><span class="degree-skeleton degree-skeleton-code"></span><span class="degree-skeleton degree-skeleton-course" style="--skeleton-course-width:235px"></span></div><span class="degree-skeleton degree-skeleton-credit"></span></div>
+                        <div class="degree-requirement-item"><span class="degree-skeleton degree-skeleton-circle"></span><div class="degree-requirement-text"><span class="degree-skeleton degree-skeleton-code"></span><span class="degree-skeleton degree-skeleton-course" style="--skeleton-course-width:165px"></span></div><span class="degree-skeleton degree-skeleton-credit"></span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="degree-live-content" hidden>
               <div class="degree-panel-header">
                 <div>
-                  <h2 id="degree-major-name">Loading requirements</h2>
+                  <h2 id="degree-major-name"></h2>
                   <p id="degree-major-copy" hidden></p>
                 </div>
 
@@ -81,13 +122,10 @@ const markup = `
               ></p>
 
               <div class="degree-requirements-grid" id="degree-requirements-root" aria-live="polite">
-                <div class="degree-empty-state">
-                  <h3>Loading requirements</h3>
-                  <p>Checking your saved account major.</p>
-                </div>
               </div>
 
               <p class="degree-note" id="degree-plan-note" hidden></p>
+              </div>
             </article>
           </section>
         </div>
