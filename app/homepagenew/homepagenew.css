@@ -876,8 +876,7 @@ html:has(.new-homepage-course-drawer[open]) {
   height: 28px;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: #f3f3f1;
+  background: transparent;
   font-size: 17px;
   line-height: 1;
 }
@@ -885,10 +884,6 @@ html:has(.new-homepage-course-drawer[open]) {
 .new-homepage-semester-suggestions > button:not([aria-disabled="true"]):hover,
 .new-homepage-semester-suggestions > button:not([aria-disabled="true"]):focus-visible {
   background: #f5f5f3;
-}
-
-.new-homepage-semester-suggestions > button.is-added > span:last-child {
-  background: #e8e8e5;
 }
 
 @media (max-width: 600px) {
