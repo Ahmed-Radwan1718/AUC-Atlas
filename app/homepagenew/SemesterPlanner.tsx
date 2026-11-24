@@ -78,6 +78,7 @@ function SemesterPlannerSkeleton() {
         </div>
         <div className="new-homepage-semester-content">
           <div className="new-homepage-semester-meta">
+            <span className="new-homepage-semester-skeleton-block is-delete" />
             <span className="new-homepage-semester-skeleton-block is-counter" />
           </div>
           <div className="new-homepage-semester-courses">
@@ -109,6 +110,8 @@ export default function SemesterPlanner() {
   const [major, setMajor] = useState("");
   const [completedKeys, setCompletedKeys] = useState<string[]>([]);
   const drawerRef = useRef<HTMLDialogElement>(null);
+  const deleteDialogRef = useRef<HTMLDialogElement>(null);
+  const cancelDeleteRef = useRef<HTMLButtonElement>(null);
   const closingDrawer = useRef(false);
   const [addedThisSession, setAddedThisSession] = useState<string[]>([]);
   const [query, setQuery] = useState("");
@@ -129,11 +132,11 @@ export default function SemesterPlanner() {
           return;
         }
         if (!response.ok) throw new Error("Could not load saved semesters.");
-        const saved = await response.json() as { semesters?: Semester[] };
+        const saved = await response.json() as { semesters?: Semester[]; hasSavedPlan?: boolean };
         if (!live) return;
-        if (Array.isArray(saved.semesters) && saved.semesters.length) {
+        if (Array.isArray(saved.semesters) && (saved.hasSavedPlan || saved.semesters.length)) {
           setSemesters(saved.semesters);
-          setActive(saved.semesters[0].name);
+          setActive(saved.semesters[0]?.name || "");
         }
         const [meResponse, progressResponse] = await Promise.all([
           fetch("/api/me", { credentials: "same-origin", cache: "no-store" }),
@@ -221,7 +224,7 @@ export default function SemesterPlanner() {
 
   const openCourseDrawer = () => {
     const drawer = drawerRef.current;
-    if (!drawer || drawer.open || !canEdit || semesterFull) return;
+    if (!drawer || drawer.open || !canEdit || !selected || semesterFull) return;
     setQuery("");
     setAddedThisSession([]);
     closingDrawer.current = false;
@@ -266,17 +269,49 @@ export default function SemesterPlanner() {
   };
 
   const removeCourse = (code: string) => {
+    if (!canEdit || !selected) return;
     markEdited(semesters.map(semester => semester.name === selected.name
       ? { ...semester, courses: semester.courses.filter(item => item !== code) }
       : semester));
   };
 
   const addSemester = () => {
-    if (semesters.length >= 16) return;
-    let name = nextRegularSemester(semesters[semesters.length - 1].name);
+    if (!canEdit || semesters.length >= 16) return;
+    let name = semesters.length ? nextRegularSemester(semesters[semesters.length - 1].name) : currentSemester();
     while (semesters.some(semester => semester.name === name)) name = nextRegularSemester(name);
     markEdited([...semesters, { name, courses: [] }]);
     setActive(name);
+  };
+
+  const deleteSemester = () => {
+    if (!canEdit || !selected) return;
+    const index = semesters.findIndex(semester => semester.name === selected.name);
+    if (index < 0) return;
+    const remaining = semesters.filter(semester => semester.name !== selected.name);
+    const nearest = remaining[Math.min(index, remaining.length - 1)];
+    deleteDialogRef.current?.close();
+    markEdited(remaining);
+    setActive(nearest?.name || "");
+    setAddedThisSession([]);
+    // The action disappears with the final semester, so restore focus to a
+    // remaining tab or to Add semester rather than leaving it on the document.
+    requestAnimationFrame(() => {
+      const tabs = document.querySelector(".new-homepage-semester-tabs");
+      tabs?.querySelector<HTMLButtonElement>('[aria-selected="true"]')?.focus({ preventScroll: true });
+      if (!nearest) tabs?.querySelector<HTMLButtonElement>(".new-homepage-semester-new")?.focus({ preventScroll: true });
+    });
+  };
+
+  const requestDeleteSemester = () => {
+    if (!canEdit || !selected) return;
+    if (!selected.courses.length) {
+      deleteSemester();
+      return;
+    }
+    const dialog = deleteDialogRef.current;
+    if (!dialog || dialog.open) return;
+    dialog.showModal();
+    cancelDeleteRef.current?.focus({ preventScroll: true });
   };
 
   return (
@@ -325,10 +360,16 @@ export default function SemesterPlanner() {
           <div className="new-homepage-semester-content" role="tabpanel" aria-label={selected?.name || "Semester"}>
             {account === "error" ? (
               <p className="new-homepage-semester-note">We couldn't load your saved plan. Refresh to try again.</p>
+            ) : !selected ? (
+              <p className="new-homepage-semester-note">No semesters planned. Add a semester to get started.</p>
             ) : (
               <>
-                <div className="new-homepage-semester-meta" role="status">
-                  <span className={creditSummary.overLimit || creditSummary.unknown.length ? "is-credit-warning" : ""}>{creditLabel}</span>
+                <div className="new-homepage-semester-meta">
+                  <button type="button" className="new-homepage-semester-delete"
+                    onClick={requestDeleteSemester} aria-label={"Delete " + selected.name}>
+                    Delete semester
+                  </button>
+                  <span role="status" className={creditSummary.overLimit || creditSummary.unknown.length ? "is-credit-warning" : ""}>{creditLabel}</span>
                 </div>
                 {creditSummary.overLimit && <p className="new-homepage-semester-note is-credit-warning">This semester exceeds the 21-credit limit. Remove courses before adding more.</p>}
                 {creditSummary.unknown.length > 0 && <p className="new-homepage-semester-note is-credit-warning">Credit values are missing for {creditSummary.unknown.join(", ")}. Remove these courses before adding more.</p>}
@@ -365,6 +406,23 @@ export default function SemesterPlanner() {
           <a href="/login">Sign in</a> to save your semester plan across devices.
         </p>
       )}
+      <dialog ref={deleteDialogRef} className="new-homepage-semester-delete-dialog"
+        aria-labelledby="semester-delete-title" aria-describedby="semester-delete-description"
+        onClick={event => {
+          if (event.target !== event.currentTarget) return;
+          const rect = event.currentTarget.getBoundingClientRect();
+          if (event.clientX < rect.left || event.clientX > rect.right ||
+              event.clientY < rect.top || event.clientY > rect.bottom) event.currentTarget.close();
+        }}>
+        <h2 id="semester-delete-title">Delete {selected?.name}?</h2>
+        <p id="semester-delete-description">This will remove the semester and its {selected?.courses.length || 0} planned {selected?.courses.length === 1 ? "course" : "courses"}.</p>
+        <div className="new-homepage-semester-delete-actions">
+          <button ref={cancelDeleteRef} type="button" className="new-homepage-semester-delete-cancel"
+            onClick={() => deleteDialogRef.current?.close()}>Cancel</button>
+          <button type="button" className="new-homepage-semester-delete-confirm"
+            onClick={deleteSemester}>Delete semester</button>
+        </div>
+      </dialog>
       <dialog ref={drawerRef} className="new-homepage-course-drawer"
         aria-labelledby="semester-course-drawer-title" aria-describedby="semester-course-drawer-semester"
         tabIndex={-1}
