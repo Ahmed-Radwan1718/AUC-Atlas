@@ -270,7 +270,7 @@
 }
 
 .new-homepage-degree-summary {
-  align-items: end;
+  align-items: baseline;
   margin-bottom: 20px;
 }
 
@@ -279,9 +279,10 @@
 }
 
 .new-homepage-degree-major p {
-  margin: 0 0 7px;
-  font-size: 18px;
-  font-weight: 650;
+  margin: 0;
+  color: #77716b;
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1.35;
 }
 
@@ -299,10 +300,10 @@
 }
 
 .new-homepage-degree-percentage strong {
-  font-size: clamp(40px, 6vw, 54px);
-  font-weight: 730;
+  font-size: 26px;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -941,14 +942,8 @@ html:has(.new-homepage-course-drawer[open]) {
     margin-top: 0;
   }
 
-  .new-homepage-degree-major p {
-    font-size: 16px;
-  }
-
   .new-homepage-degree-percentage {
-    align-items: end;
-    flex-direction: column;
-    gap: 2px;
+    gap: 4px;
   }
 
   .new-homepage-degree-foot {
