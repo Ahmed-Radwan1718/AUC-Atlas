@@ -306,9 +306,9 @@ export function buildProfileMarkup(professor: Professor): string {
               ${professorEmailMarkup}
             </div>
 
-            <div id="professor-teaches-row" hidden>
+            <div id="professor-teaches-row">
               <span>Teaches</span>
-              <span class="professor-profile-value professor-profile-course-list" id="professor-teaches-list"></span>
+              <span class="professor-profile-value professor-profile-course-list" id="professor-teaches-list" aria-busy="true" aria-label="Loading courses"><span class="professor-review-loading-line professor-profile-teaches-skeleton" aria-hidden="true"></span></span>
             </div>
           </div>
 
