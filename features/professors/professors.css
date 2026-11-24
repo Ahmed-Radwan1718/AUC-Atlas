@@ -15,13 +15,6 @@
     .professors-page {
       min-height: 100vh;
       padding: 126px 0 86px;
-      background:
-        linear-gradient(180deg, rgba(192, 154, 92, 0.14), rgba(247, 244, 238, 0) 360px),
-        #f7f4ee;
-    }
-
-    /* Match the new homepage's base canvas on individual professor profiles. */
-    .professors-page:has(.professor-profile-mode) {
       background: #f8f7f4;
     }
 
