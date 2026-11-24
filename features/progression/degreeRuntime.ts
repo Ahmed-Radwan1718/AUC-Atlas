@@ -2,6 +2,9 @@
 // Existing AUC Atlas interaction logic retained during the TypeScript migration.
 // The legacy DOM implementation is isolated so the new application uses no standalone JS files.
 import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
+import { courses } from "../../data/courses";
+
+const catalogCourseCodes = new Set(courses.map(course => course.code.toUpperCase()));
 
 export function mountDegreeProgression() {
   const root = document.querySelector("#degree-requirements-root");
@@ -13,6 +16,7 @@ export function mountDegreeProgression() {
     const degreeMajorCopy = document.getElementById("degree-major-copy");
     const degreeCompletedCount = document.getElementById("degree-completed-count");
     const degreeRemainingCount = document.getElementById("degree-remaining-count");
+    const degreeTotalCount = document.getElementById("degree-total-count");
     const degreeProgressPercent = document.getElementById("degree-progress-percent");
     const degreeProgressBar = document.getElementById("degree-progress-bar");
     const degreeRequirementsRoot = document.getElementById("degree-requirements-root");
@@ -35,8 +39,10 @@ export function mountDegreeProgression() {
     function resetDegreeProgressSummary() {
       degreeCompletedCount.textContent = "0";
       degreeRemainingCount.textContent = "0";
+      degreeTotalCount.textContent = "0";
       degreeProgressPercent.textContent = "0%";
       degreeProgressBar.style.width = "0%";
+      degreeProgressBar.parentElement.setAttribute("aria-valuenow", "0");
     }
 
     function renderDegreeEmptyState(title, message) {
@@ -111,16 +117,36 @@ export function mountDegreeProgression() {
                     data-degree-credit-cap="${Number(creditCap) || 0}"`
               : "";
 
+          const raw = String(item || "");
+          const creditMatch = raw.match(/\(([^()]*(?:cr\.?)[^()]*)\)\s*$/i);
+          const withoutCredits = creditMatch ? raw.slice(0, creditMatch.index).trim() : raw;
+          const parsed = withoutCredits.match(/^\s*([A-Z]{2,6}\s+\d{3,4}[A-Z]?)\s+-\s*(.*)$/i);
+          const code = parsed ? parsed[1].toUpperCase().replace(/\s+/g, " ") : "";
+          const title = parsed ? parsed[2] : withoutCredits;
+          const inputId = "degree-item-" + key;
+          const codeMarkup = code
+            ? (catalogCourseCodes.has(code)
+                ? `<a class="degree-course-code" href="/courses/${encodeURIComponent(code.toLowerCase().replace(/[^a-z0-9]+/g, "-"))}">${escapeDegreeHtml(code)}</a>`
+                : `<span class="degree-course-code">${escapeDegreeHtml(code)}</span>`)
+            : "";
+          const creditLabel = creditMatch ? creditMatch[1] : "";
+
           return `
-            <label class="degree-requirement-item">
+            <div class="degree-requirement-item">
               <input
+                id="${escapeDegreeHtml(inputId)}"
+                aria-label="${escapeDegreeHtml(raw)}"
                 type="checkbox"
                 data-degree-item="${escapeDegreeHtml(key)}"
                 data-degree-credits="${credits}"
                 data-degree-course-code="${escapeDegreeHtml(courseCode)}"${creditAttributes}
               >
-              <span class="degree-requirement-text">${escapeDegreeHtml(item)}</span>
-            </label>
+              <div class="degree-requirement-text">
+                ${codeMarkup}
+                <label class="degree-course-title" for="${escapeDegreeHtml(inputId)}">${escapeDegreeHtml(title)}</label>
+              </div>
+              <label class="degree-course-credits" for="${escapeDegreeHtml(inputId)}">${escapeDegreeHtml(creditLabel)}</label>
+            </div>
           `;
         })
         .join("");
@@ -184,17 +210,38 @@ export function mountDegreeProgression() {
           `
           : "";
 
-      return `
-        <article class="degree-requirement-group">
-          <div class="degree-requirement-group-head">
-            <span>${escapeDegreeHtml(group.scope)}</span>
-            <h3>${escapeDegreeHtml(group.title)}</h3>
-            ${group.description ? `<p>${escapeDegreeHtml(group.description)}</p>` : ""}
-          </div>
-
-          ${directItemsMarkup}
-          ${subgroupMarkup}
+      const hasItems = items.length || subgroups.some(subgroup => Array.isArray(subgroup.items) && subgroup.items.length);
+      const title = escapeDegreeHtml(group.title);
+      const description = group.description ? `<p class="degree-group-description">${escapeDegreeHtml(group.description)}</p>` : "";
+      // Keep explanatory, non-checkable requirements visible; each actual checklist expands independently.
+      if (!hasItems) return `
+        <article class="degree-requirement-group degree-info-group">
+          <h3>${title}</h3>
+          ${description}
         </article>
+      `;
+
+      return `
+        <details class="degree-requirement-group" data-degree-group="${groupIndex}" ${groupIndex === 0 ? "open" : ""}>
+          <summary class="degree-requirement-group-head">
+            <div class="degree-group-title-row">
+              <h3>${title}</h3>
+              <span class="degree-group-chevron" aria-hidden="true"></span>
+            </div>
+            <div class="degree-group-progress-copy">
+              <span class="degree-group-credit-label"></span>
+              <span class="degree-group-percent"></span>
+            </div>
+            <div class="degree-group-track" role="progressbar" aria-label="${title} progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="degree-group-fill"></div>
+            </div>
+          </summary>
+          <div class="degree-group-body">
+            ${description}
+            ${directItemsMarkup}
+            ${subgroupMarkup}
+          </div>
+        </details>
       `;
     }
 
@@ -314,10 +361,8 @@ export function mountDegreeProgression() {
         );
 
         totalCredits += creditCap;
-        completedCredits += Math.min(
-          selectedCredits,
-          creditCap
-        );
+        group.countedCredits = Math.min(selectedCredits, creditCap);
+        completedCredits += group.countedCredits;
       });
 
       const remainingCredits = Math.max(
@@ -349,6 +394,49 @@ export function mountDegreeProgression() {
 
       degreeProgressBar.style.width =
         percent + "%";
+      degreeTotalCount.textContent = formatDegreeCreditCount(totalCredits);
+      degreeProgressBar.parentElement.setAttribute("aria-valuenow", String(percent));
+
+      // A capped elective pool may span several top-level categories. Display
+      // the shared pool's progress in each participating group, but count it
+      // only once in the overall summary above.
+      const groupElements = Array.from(degreeRequirementsRoot.querySelectorAll("[data-degree-group]"));
+      const poolUsage = new Map();
+      groupElements.forEach(element => {
+        const pools = new Set(Array.from(element.querySelectorAll("[data-degree-credit-group]"), item => item.dataset.degreeCreditGroup));
+        pools.forEach(pool => poolUsage.set(pool, (poolUsage.get(pool) || 0) + 1));
+      });
+      groupElements.forEach(element => {
+        const groupItems = Array.from(element.querySelectorAll("[data-degree-item]"));
+        const pools = new Set();
+        let required = 0;
+        let completed = 0;
+        let shared = false;
+        groupItems.forEach(item => {
+          const pool = item.dataset.degreeCreditGroup;
+          if (pool) { pools.add(pool); return; }
+          const credits = Number(item.dataset.degreeCredits || 0);
+          required += credits;
+          if (item.checked) completed += credits;
+        });
+        pools.forEach(pool => {
+          const record = creditGroups[pool];
+          if (!record) return;
+          required += Math.max(0, Number(record.cap || 0));
+          completed += Number(record.countedCredits || 0);
+          if (poolUsage.get(pool) > 1) shared = true;
+        });
+        // Zero-credit/reference-only groups still show checklist completion.
+        const checked = groupItems.filter(item => item.checked).length;
+        const groupPercent = required ? Math.round(completed / required * 100) : Math.round(checked / groupItems.length * 100);
+        const creditLabel = required
+          ? formatDegreeCreditCount(completed) + " / " + formatDegreeCreditCount(required) + " credits completed" + (shared ? " · includes shared elective pool" : "")
+          : checked + " / " + groupItems.length + " items checked";
+        element.querySelector(".degree-group-credit-label").textContent = creditLabel;
+        element.querySelector(".degree-group-percent").textContent = groupPercent + "%";
+        element.querySelector(".degree-group-fill").style.width = groupPercent + "%";
+        element.querySelector(".degree-group-track").setAttribute("aria-valuenow", String(groupPercent));
+      });
     }
 
     async function loadSavedDegreeProgress() {
@@ -483,7 +571,7 @@ export function mountDegreeProgression() {
       } finally {
         degreeSaveButton.disabled = false;
         degreeSaveButton.textContent =
-          "Save Progress";
+          "Save progress";
       }
     }
 
@@ -501,12 +589,10 @@ export function mountDegreeProgression() {
 
       degreeMajorName.textContent =
         savedMajor ||
-        "No Major Selected";
+        "No major selected";
 
-      degreeMajorCopy.textContent =
-        majorPlan
-          ? "Requirements loaded for your saved major."
-          : "Requirements have not been added for this major yet.";
+      degreeMajorCopy.textContent = "";
+      degreeMajorCopy.hidden = true;
 
       if (!savedMajor) {
         degreeSaveButton.disabled = true;
