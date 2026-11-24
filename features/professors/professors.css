@@ -20,6 +20,11 @@
         #f7f4ee;
     }
 
+    /* Match the new homepage's base canvas on individual professor profiles. */
+    .professors-page:has(.professor-profile-mode) {
+      background: #f8f7f4;
+    }
+
     .professors-inner {
       width: min(1680px, calc(100% - 32px));
       margin: 0 auto;
