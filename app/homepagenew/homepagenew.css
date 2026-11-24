@@ -25,7 +25,7 @@
       transparent 76%
     ),
     #f8f7f4;
-  color: #171717;
+  color: #36383a;
 }
 
 .new-homepage-hero {
@@ -64,7 +64,7 @@
 
 .new-homepage .atlas-search:focus-within {
   border-color: #777;
-  box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.08);
+  box-shadow: 0 0 0 3px rgba(54, 56, 58, 0.08);
 }
 
 .new-homepage .atlas-search input {
@@ -75,7 +75,7 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: #171717;
+  color: #36383a;
   font: inherit;
   font-size: 16px;
 }
@@ -90,7 +90,7 @@
   padding: 0 25px;
   border: 0;
   border-radius: 12px;
-  background: #171717;
+  background: #36383a;
   color: #fff;
   font: inherit;
   font-size: 14px;
@@ -101,7 +101,7 @@
 
 .new-homepage .atlas-search button[type="submit"]:hover,
 .new-homepage .atlas-search button[type="submit"]:focus-visible {
-  background: #393939;
+  background: #4b4d4f;
 }
 
 .new-homepage .atlas-search-results {
@@ -151,7 +151,7 @@
   width: 100%;
   padding: 10px 12px;
   border-radius: 11px;
-  color: #171717;
+  color: #36383a;
   text-decoration: none;
   transition: background-color 120ms ease;
 }
@@ -260,7 +260,7 @@
 
 .new-homepage-degree-link:hover,
 .new-homepage-degree-link:focus-visible {
-  color: #171717;
+  color: #36383a;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -322,7 +322,7 @@
 .new-homepage-degree-fill {
   height: 100%;
   border-radius: inherit;
-  background: #171717;
+  background: #36383a;
   transition: width 800ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -367,7 +367,7 @@
   padding: 11px 16px;
   border: 0;
   border-radius: 10px;
-  background: #171717;
+  background: #36383a;
   color: white;
   font: inherit;
   font-size: 13px;
@@ -378,7 +378,7 @@
 
 .new-homepage-degree-cta:hover,
 .new-homepage-degree-cta:focus-visible {
-  background: #37332e;
+  background: #4b4d4f;
 }
 
 .new-homepage-degree-loading {
@@ -461,8 +461,8 @@
 }
 
 .new-homepage-semester-tabs button.is-active {
-  border-bottom-color: #171717;
-  color: #171717;
+  border-bottom-color: #36383a;
+  color: #36383a;
   font-weight: 650;
 }
 
@@ -572,7 +572,7 @@
 
 .new-homepage-semester-course-info a {
   width: fit-content;
-  color: #171717;
+  color: #36383a;
   font-size: 15px;
   font-weight: 650;
   text-decoration: none;
@@ -621,7 +621,7 @@
 }
 
 .new-homepage-semester-course-actions button:hover {
-  color: #171717;
+  color: #36383a;
 }
 
 .new-homepage-semester-note,
@@ -633,7 +633,7 @@
 }
 
 .new-homepage-semester-account-note a {
-  color: #171717;
+  color: #36383a;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -643,7 +643,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: #171717;
+  color: #36383a;
   font: inherit;
   font-size: 14px;
   font-weight: 650;
@@ -673,10 +673,10 @@ html:has(.new-homepage-course-drawer[open]) {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border: 1px solid rgba(23, 23, 23, 0.1);
+  border: 1px solid rgba(54, 56, 58, 0.1);
   border-radius: 24px 0 0 24px;
   background: #fff;
-  color: #171717;
+  color: #36383a;
   box-shadow: -20px 0 80px rgba(42, 32, 20, 0.16);
 }
 
@@ -727,7 +727,7 @@ html:has(.new-homepage-course-drawer[open]) {
   align-items: flex-start;
   gap: 16px;
   padding: 24px 24px 18px;
-  border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+  border-bottom: 1px solid rgba(54, 56, 58, 0.08);
   background: #fff;
 }
 
@@ -740,7 +740,7 @@ html:has(.new-homepage-course-drawer[open]) {
 
 .new-homepage-course-drawer-header p {
   margin: 5px 0 0;
-  color: rgba(23, 23, 23, 0.55);
+  color: rgba(54, 56, 58, 0.55);
   font-size: 12px;
   line-height: 1.4;
 }
@@ -762,10 +762,10 @@ html:has(.new-homepage-course-drawer[open]) {
   width: 100%;
   height: 43px;
   padding: 0 13px;
-  border: 1px solid rgba(23, 23, 23, 0.12);
+  border: 1px solid rgba(54, 56, 58, 0.12);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.86);
-  color: #171717;
+  color: #36383a;
   font: inherit;
   font-size: 13px;
   outline: none;
@@ -812,7 +812,7 @@ html:has(.new-homepage-course-drawer[open]) {
   display: grid;
   gap: 8px;
   padding: 12px 24px max(14px, env(safe-area-inset-bottom));
-  border-top: 1px solid rgba(23, 23, 23, 0.08);
+  border-top: 1px solid rgba(54, 56, 58, 0.08);
   background: #fff;
   box-shadow: 0 -8px 22px rgba(42, 32, 20, 0.035);
 }
@@ -822,7 +822,7 @@ html:has(.new-homepage-course-drawer[open]) {
   min-height: 46px;
   border: 0;
   border-radius: 999px;
-  background: #171717;
+  background: #36383a;
   color: #fff;
   font: inherit;
   font-size: 11px;
@@ -833,7 +833,7 @@ html:has(.new-homepage-course-drawer[open]) {
 }
 
 .new-homepage-course-drawer-done:hover {
-  background: #393939;
+  background: #4b4d4f;
 }
 
 .new-homepage-course-drawer-cancel {
@@ -842,7 +842,7 @@ html:has(.new-homepage-course-drawer[open]) {
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: rgba(23, 23, 23, 0.56);
+  color: rgba(54, 56, 58, 0.56);
   font: inherit;
   font-size: 12px;
   font-weight: 600;
@@ -850,8 +850,8 @@ html:has(.new-homepage-course-drawer[open]) {
 }
 
 .new-homepage-course-drawer-cancel:hover {
-  color: #171717;
-  background: rgba(23, 23, 23, 0.04);
+  color: #36383a;
+  background: rgba(54, 56, 58, 0.04);
 }
 
 .new-homepage-course-drawer button:focus-visible {
@@ -869,7 +869,7 @@ html:has(.new-homepage-course-drawer[open]) {
 }
 
 .new-homepage-semester-suggestions > button.is-added > span:last-child {
-  color: #171717;
+  color: #36383a;
 }
 
 @media (max-width: 640px) {
@@ -910,7 +910,7 @@ html:has(.new-homepage-course-drawer[open]) {
   border: 0;
   border-radius: 12px;
   background: transparent;
-  color: #171717;
+  color: #36383a;
   font: inherit;
   text-align: left;
   cursor: pointer;
