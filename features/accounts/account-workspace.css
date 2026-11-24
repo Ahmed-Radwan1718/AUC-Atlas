@@ -115,7 +115,7 @@
 .atlas-account-workspace :is(.account-passkey-card,.account-two-factor-card,.account-login-session-card,.account-empty-state) { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
 .atlas-account-workspace :is(.account-passkey-row,.account-passkey-add-row,.account-two-factor-card,.account-login-session-card) { padding: 18px 0; min-height: 0; border-bottom: 1px solid var(--account-line); }
 .atlas-account-workspace .account-passkey-empty { padding-inline: 0; color: var(--account-muted); border-color: var(--account-line); }
-.atlas-account-workspace .account-two-factor-icon { background: rgba(54,88,121,.06); color: var(--account-blue); border-color: transparent; }
+.atlas-account-workspace .account-two-factor-icon { background: transparent; color: var(--account-blue); border-color: transparent; }
 .atlas-account-workspace :is(.account-two-factor-text h4,.account-login-session-title h4,.account-empty-state h3) { color: var(--account-ink); font-size: 14px; letter-spacing: 0; text-transform: none; }
 .atlas-account-workspace :is(.account-two-factor-text p,.account-login-session-meta,.account-empty-state p) { color: var(--account-muted); }
 .atlas-account-workspace .account-two-factor-button:not(.is-danger) { border-color: var(--account-field-border); background: #fff; color: var(--account-ink); }
