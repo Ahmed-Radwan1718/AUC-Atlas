@@ -291,16 +291,17 @@ export default function SemesterPlanner() {
             )}
             {creditSummary.overLimit && <p className="new-homepage-semester-note is-credit-warning">This semester exceeds the 21-credit limit. Remove courses before adding more.</p>}
             {creditSummary.unknown.length > 0 && <p className="new-homepage-semester-note is-credit-warning">Credit values are missing for {creditSummary.unknown.join(", ")}. Remove these courses before adding more.</p>}
-            {selected?.courses.length ? (
-              <div className="new-homepage-semester-courses">
-                {selected.courses.map(code => {
+            {!selected?.courses.length && <p className="new-homepage-semester-note">No courses planned for this semester yet.</p>}
+            <div className="new-homepage-semester-courses">
+                {selected?.courses.map(code => {
                   const course = courseByCode.get(code);
+                  const credits = courseCredits(code);
                   return (
                     <div key={code} className="new-homepage-semester-course">
                       <div className="new-homepage-semester-course-info">
                         <a href={courseUrl(code)}>{code}</a>
                         <span>{course?.title || "Course"}</span>
-                        <span className="new-homepage-semester-course-credits">{courseCredits(code) === null ? "Credits unavailable" : courseCredits(code) + " cr."}</span>
+                        <span className="new-homepage-semester-course-credits">{credits === null ? "Credits unavailable" : credits + (credits === 1 ? " credit" : " credits")}</span>
                       </div>
                       <div className="new-homepage-semester-course-actions">
                         <button type="button" aria-label={"Remove " + code} title="Remove course"
@@ -309,12 +310,10 @@ export default function SemesterPlanner() {
                     </div>
                   );
                 })}
-              </div>
-            ) : <p className="new-homepage-semester-note">No courses planned for this semester yet.</p>}
-
-            <button type="button" className="new-homepage-semester-add-course"
-              disabled={!canEdit || semesterFull} aria-haspopup="dialog"
-              onClick={openCourseDrawer}>+ Add course</button>
+              <button type="button" className="new-homepage-semester-add-course"
+                disabled={!canEdit || semesterFull} aria-haspopup="dialog"
+                onClick={openCourseDrawer}>+ Add course</button>
+            </div>
           </>
         )}
       </div>
