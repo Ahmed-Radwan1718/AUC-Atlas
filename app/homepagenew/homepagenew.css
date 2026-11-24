@@ -504,10 +504,35 @@
   align-items: flex-start;
   justify-content: center;
   padding: 34px 16px 16px;
-  border: 1px solid #e7e5e0;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(186, 187, 184, 0.42);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
-  transition: background 160ms ease, border-color 160ms ease;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.62) 42%, rgba(225, 229, 232, 0.4) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 1px 0 1px rgba(255, 255, 255, 0.65);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.new-homepage-semester-course::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(125deg,
+    transparent 10%,
+    rgba(255, 255, 255, 0.12) 28%,
+    rgba(255, 255, 255, 0.72) 43%,
+    rgba(255, 255, 255, 0.26) 53%,
+    transparent 68%);
+  background-size: 180% 180%;
+  background-position: 32% 35%;
+  transition: background-position 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (max-width: 760px) {
@@ -516,9 +541,24 @@
   }
 }
 
-.new-homepage-semester-course:hover {
-  background: #ffffff;
-  border-color: #d8d6d1;
+.new-homepage-semester-course:hover,
+.new-homepage-semester-course:focus-within {
+  border-color: rgba(154, 158, 162, 0.55);
+  box-shadow: inset 0 1px 1px #fff,
+    inset 1px 0 1px rgba(255, 255, 255, 0.8),
+    0 4px 16px rgba(8, 21, 33, 0.045);
+}
+
+.new-homepage-semester-course:hover::before,
+.new-homepage-semester-course:focus-within::before {
+  background-position: 100% 65%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .new-homepage-semester-course,
+  .new-homepage-semester-course::before {
+    transition: none;
+  }
 }
 
 .new-homepage-semester-course-info {
