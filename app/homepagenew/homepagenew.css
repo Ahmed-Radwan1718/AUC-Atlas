@@ -1094,7 +1094,7 @@ html:has(.new-homepage-course-drawer[open]) {
   border: 1px solid #d4dce3;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.65);
-  color: #365879;
+  color: #36383a;
   font: inherit;
   font-size: 13px;
   cursor: pointer;
@@ -1121,10 +1121,22 @@ html:has(.new-homepage-course-drawer[open]) {
   border-bottom: 1px solid #e7e5e0;
   font-size: 14px;
   font-weight: 600;
+  color: #36383a;
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
 
-.new-homepage-insights-column-label.is-consider { color: #35664f; }
-.new-homepage-insights-column-label.is-caution { color: #96504a; }
+.new-homepage-insights-column-label::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+}
+
+.new-homepage-insights-column-label.is-consider::before { background: #35664f; }
+.new-homepage-insights-column-label.is-caution::before { background: #96504a; }
 
 .new-homepage-insights-people {
   display: flex;
@@ -1169,7 +1181,7 @@ html:has(.new-homepage-course-drawer[open]) {
 }
 
 .new-homepage-insights-person .new-homepage-insights-person-course {
-  color: #365879;
+  color: #77716b;
 }
 
 .new-homepage-insights-person small,
@@ -1232,9 +1244,14 @@ a.new-homepage-insights-row:hover .new-homepage-insights-row-arrow {
 
 .new-homepage-insights-others summary {
   width: fit-content;
-  color: #365879;
+  color: #77716b;
   font-size: 13px;
   cursor: pointer;
+}
+
+.new-homepage-insights-others summary:hover,
+.new-homepage-insights-others summary:focus-visible {
+  color: #365879;
 }
 
 .new-homepage-insights-others .new-homepage-insights-people { margin-top: 6px; }
