@@ -278,10 +278,10 @@
 
     .filters-heading {
       padding: 10px 14px 6px;
-      color: rgba(192, 154, 92, 0.84);
+      color: #365879;
       font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.14em;
+      font-weight: 600;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
     }
 
@@ -295,8 +295,8 @@
       color: rgba(23, 23, 23, 0.62);
       font-family: inherit;
       font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
+      font-weight: 500;
+      letter-spacing: 0.02em;
       text-transform: uppercase;
       cursor: pointer;
       display: flex;
@@ -306,7 +306,7 @@
 
     .filter-toggle:hover,
     .filter-item.open .filter-toggle {
-      background: rgba(192, 154, 92, 0.12);
+      background: rgba(54, 88, 121, 0.12);
       color: #171717;
     }
 
@@ -341,7 +341,7 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       scrollbar-width: thin;
-      scrollbar-color: rgba(192, 154, 92, 0.48) transparent;
+      scrollbar-color: rgba(54, 88, 121, 0.48) transparent;
     }
 
     .department-filter-content::-webkit-scrollbar {
@@ -354,7 +354,7 @@
 
     .department-filter-content::-webkit-scrollbar-thumb {
       border-radius: 999px;
-      background: rgba(192, 154, 92, 0.48);
+      background: rgba(54, 88, 121, 0.48);
     }
 
     .filter-item.open .chevron {
@@ -368,7 +368,7 @@
       border-radius: 14px;
       color: rgba(23, 23, 23, 0.62);
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 500;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -384,7 +384,7 @@
 
     .rating-filter-stars {
       min-width: 62px;
-      color: #c09a5c;
+      color: #365879;
       font-size: 13px;
       letter-spacing: 1px;
       line-height: 1;
@@ -399,7 +399,7 @@
 
     .filter-content label:hover,
     .filter-content label:has(input:checked) {
-      background: rgba(192, 154, 92, 0.12);
+      background: rgba(54, 88, 121, 0.12);
       color: #171717;
     }
 
