@@ -9,7 +9,7 @@ const markup = `
     <div class="gpa-inner">
       <header class="gpa-header">
         <div class="gpa-header-copy">
-          <h1>GPA Calculator.</h1>
+          <h1>GPA calculator</h1>
         </div>
 
       </header>
@@ -54,15 +54,28 @@ const markup = `
               </div>
             </div>
           </div>
+          <div class="gpa-add-semester-placeholder" id="gpa-add-semester-placeholder" aria-hidden="true"><span class="gpa-skeleton-shape gpa-skeleton-add"></span></div>
           <button class="gpa-add-semester" type="button" id="add-semester" hidden>
             <span class="gpa-add-semester-icon" aria-hidden="true">+</span>
             Add semester
           </button>
         </section>
 
-        <div class="gpa-sidebar">
+        <div class="gpa-sidebar" id="gpa-sidebar" aria-busy="true">
+        <div class="gpa-summary-loading" id="gpa-summary-loading" aria-hidden="true">
+          <span class="gpa-skeleton-shape gpa-skeleton-summary-label"></span>
+          <span class="gpa-skeleton-shape gpa-skeleton-summary-number"></span>
+          <span class="gpa-skeleton-shape gpa-skeleton-summary-caption"></span>
+          <div class="summary-items">
+            ${Array.from({ length: 3 }, () => `<div class="summary-item"><span class="gpa-skeleton-shape gpa-skeleton-summary-key"></span><span class="gpa-skeleton-shape gpa-skeleton-summary-value"></span></div>`).join("")}
+          </div>
+          <span class="gpa-skeleton-shape gpa-skeleton-summary-save"></span>
+          <span class="gpa-skeleton-shape gpa-skeleton-summary-reset"></span>
+        </div>
+        <div id="gpa-summary-content" hidden>
         <aside class="gpa-summary" aria-label="GPA overview">
-          <div class="summary-gpa" id="semester-gpa" aria-label="Overall GPA">0</div>
+          <p class="summary-label">Cumulative GPA</p>
+          <div class="summary-number"><div class="summary-gpa" id="semester-gpa" aria-label="Overall GPA">0</div><span class="summary-scale">/ 4.00</span></div>
           <p class="summary-caption">Across all graded courses</p>
           <div class="summary-items">
             <div class="summary-item">
@@ -84,6 +97,7 @@ const markup = `
           <button class="gpa-action reset-plan" type="button" id="reset-courses" disabled>Reset plan</button>
         </div>
         <span class="gpa-save-message" id="gpa-save-message" role="status" aria-live="polite"></span>
+        </div>
         </div>
       </div>
     </div>
