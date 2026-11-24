@@ -490,16 +490,30 @@
 
 .new-homepage-semester-courses {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
   margin-top: 14px;
 }
 
 .new-homepage-semester-course {
-  padding: 14px 18px;
+  position: relative;
+  box-sizing: border-box;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 34px 16px 16px;
   border: 1px solid #e7e5e0;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.72);
   transition: background 160ms ease, border-color 160ms ease;
+}
+
+@media (max-width: 760px) {
+  .new-homepage-semester-courses {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .new-homepage-semester-course:hover {
@@ -509,9 +523,11 @@
 
 .new-homepage-semester-course-info {
   display: flex;
+  width: 100%;
   min-width: 0;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  overflow-wrap: anywhere;
 }
 
 .new-homepage-semester-course-info a {
@@ -531,9 +547,13 @@
 .new-homepage-semester-course-info span {
   color: #77716b;
   font-size: 12px;
+  line-height: 1.45;
 }
 
 .new-homepage-semester-course-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
   display: flex;
   align-items: center;
   gap: 14px;
