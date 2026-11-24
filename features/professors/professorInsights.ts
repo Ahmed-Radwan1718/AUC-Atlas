@@ -476,6 +476,8 @@ function getReviewDateLabel(value) {
 
     const reviewedCourses = getReviewedProfessorCourses(reviews);
 
+    list.removeAttribute("aria-busy");
+    list.removeAttribute("aria-label");
     row.hidden = !reviewedCourses.length;
 
     if (!reviewedCourses.length) {
