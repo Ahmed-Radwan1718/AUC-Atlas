@@ -181,7 +181,6 @@ export const reviewFormFieldsMarkup = `
                   <option>Essential</option>
                   <option>Helpful</option>
                   <option>Skippable</option>
-                  <option>Not lecture-based</option>
                 </select>
               </div>
 
