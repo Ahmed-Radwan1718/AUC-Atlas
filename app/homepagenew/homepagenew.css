@@ -6,9 +6,9 @@
      Different radii and strengths keep the pattern organic without animation. */
   --home-glow-rgb: 54, 88, 121;
   background:
-    radial-gradient(circle 235px at 7% 190px,
+    radial-gradient(circle 265px at 7% 90px,
       rgba(var(--home-glow-rgb), .20), rgba(var(--home-glow-rgb), .08) 38%, transparent 82%),
-    radial-gradient(circle 440px at 86% 375px,
+    radial-gradient(circle 440px at 86% 285px,
       rgba(var(--home-glow-rgb), .33), rgba(var(--home-glow-rgb), .15) 32%, rgba(var(--home-glow-rgb), .045) 59%, transparent 84%),
     radial-gradient(circle 280px at 24% 475px,
       rgba(var(--home-glow-rgb), .14), rgba(var(--home-glow-rgb), .055) 36%, transparent 81%),
@@ -946,7 +946,7 @@ html:has(.new-homepage-course-drawer[open]) {
     padding: 128px 16px 70px;
     /* Smaller and quieter edge glows on narrow screens. */
     background:
-      radial-gradient(circle 175px at -8% 220px, rgba(var(--home-glow-rgb), .14), transparent 85%),
+      radial-gradient(circle 175px at -8% 75px, rgba(var(--home-glow-rgb), .14), transparent 85%),
       radial-gradient(circle 240px at 108% 440px, rgba(var(--home-glow-rgb), .20), rgba(var(--home-glow-rgb), .06) 45%, transparent 85%),
       radial-gradient(circle 195px at -5% 830px, rgba(var(--home-glow-rgb), .17), transparent 85%),
       radial-gradient(circle 170px at 103% 1110px, rgba(var(--home-glow-rgb), .12), transparent 85%),
