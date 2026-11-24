@@ -47,8 +47,9 @@ export async function GET(request: NextRequest) {
   try {
     const document = await firestore().collection("users").doc(user.uid)
       .collection("savedTools").doc("semester-plan").get();
-    const semesters = cleanPlan(document.data()?.semesters) || [];
-    return NextResponse.json({ semesters }, { headers: { "Cache-Control": "no-store" } });
+    const savedPlan = cleanPlan(document.data()?.semesters);
+    const semesters = savedPlan || [];
+    return NextResponse.json({ semesters, hasSavedPlan: savedPlan !== null }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return NextResponse.json({ error: "Could not load semester plan." }, { status: 500 });
   }
