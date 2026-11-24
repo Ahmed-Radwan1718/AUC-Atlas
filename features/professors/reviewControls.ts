@@ -41,31 +41,6 @@ function populateReviewCourseSelect(form) {
     }
   }
 
-  function setupReviewDependsField(form) {
-    const select = form.querySelector("#review-recommend");
-    const field = form.querySelector("[data-depends-reason]");
-    const input = form.querySelector("#review-recommend-reason");
-
-    if (!select || !field || field.dataset.dependsReady === "true") {
-      return;
-    }
-
-    field.dataset.dependsReady = "true";
-
-    function syncDependsField() {
-      const shouldShow = select.value === "Depends";
-
-      field.hidden = !shouldShow;
-
-      if (!shouldShow && input) {
-        input.value = "";
-      }
-    }
-
-    select.addEventListener("change", syncDependsField);
-    syncDependsField();
-  }
-
   function setupReviewSearchSelect(form, fieldType) {
     const select = form.querySelector("#review-" + fieldType);
     const input = form.querySelector("#review-" + fieldType + "-search");
@@ -569,4 +544,4 @@ export function setupReviewCompactControls(form) {
     updateAccordionCounts();
   }
 
-export { populateReviewCourseSelect, setupReviewDependsField, setupReviewSearchSelect, setupReviewChoiceMenus };
+export { populateReviewCourseSelect, setupReviewSearchSelect, setupReviewChoiceMenus };
