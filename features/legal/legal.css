@@ -44,7 +44,7 @@
 .info-page .info-toggle-icon { position: relative; display: block; width: 16px; height: 16px; color: var(--legal-blue); }
 .info-page .info-toggle-icon::before,
 .info-page .info-toggle-icon::after { content: ""; position: absolute; top: 50%; left: 50%; width: 12px; height: 1.5px; border-radius: 2px; background: currentColor; transform: translate(-50%,-50%); }
-.info-page .info-toggle-icon::after { transform: translate(-50%,-50%) rotate(90deg); transition: transform 250ms ease, opacity 250ms ease; }
+.info-page .info-toggle-icon::after { transform: translate(-50%,-50%) rotate(90deg); transition: transform 200ms ease, opacity 200ms ease; }
 .info-page .info-toggle[aria-expanded="true"] .info-toggle-icon::after { transform: translate(-50%,-50%) rotate(0deg); opacity: 0; }
 .info-page .info-answer { padding: 0 40px 24px 0; overflow: hidden; }
 .info-page .info-answer[hidden] { display: none; }
