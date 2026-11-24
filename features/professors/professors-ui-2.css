@@ -1317,3 +1317,37 @@
         animation: none;
       }
     }
+
+
+    /* Profile-only accent palette and the course list loading placeholder. */
+    .professor-profile-mode .professor-profile-info > div:not(.professor-profile-identity) > span:first-child {
+      color: #365879;
+    }
+
+    .professor-profile-mode #professor-teaches-row[hidden] {
+      display: none;
+    }
+
+    .professor-profile-mode .professor-profile-teaches-skeleton {
+      width: min(340px, 75%);
+      height: 12px;
+      margin: 3px 0;
+    }
+
+    .professor-profile-mode .professor-profile-course-link:hover {
+      border-color: rgba(54, 88, 121, 0.34);
+      background: rgba(54, 88, 121, 0.12);
+    }
+
+    .professor-profile-mode .professor-review-insights-header span,
+    .professor-profile-mode .professor-reviews-header span,
+    .professor-profile-mode .professor-review-rating,
+    .professor-profile-mode .professor-review-star.is-filled {
+      color: #365879;
+    }
+
+    .professor-profile-mode .professor-review-stat-details-toggle:focus-visible,
+    .professor-profile-mode .professor-review-stat-show-zeros:focus-visible,
+    .professor-profile-mode .professor-review-toggle:focus-visible {
+      outline-color: #365879;
+    }
