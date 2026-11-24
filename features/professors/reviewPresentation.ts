@@ -180,6 +180,8 @@ function renderProfessorReviewAccessMessage(locked) {
     ? 'Sign in with a verified AUC account to read professor reviews. <a href="/login">Sign in</a>'
     : "Professor reviews are temporarily unavailable. Please try again.";
   if (form) form.hidden = locked;
+  // The course list is derived from protected reviews; clear its loading state too.
+  renderProfessorCourses([]);
   for (const element of [list, stats]) {
     if (!element) continue;
     element.removeAttribute("aria-busy");
