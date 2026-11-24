@@ -1100,65 +1100,9 @@ html:has(.new-homepage-course-drawer[open]) {
   cursor: pointer;
 }
 
-.new-homepage-insights-intro {
-  margin: 12px 0 24px;
-  color: #77716b;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.new-homepage-insights-course {
-  border-bottom: 1px solid #e7e5e0;
-}
-
-.new-homepage-insights-course-toggle {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 0;
-  border: 0;
-  background: transparent;
-  color: #36383a;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.new-homepage-insights-course-toggle > span:first-child {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.new-homepage-insights-course-toggle strong {
-  font-size: 15px;
-  font-weight: 650;
-}
-
-.new-homepage-insights-course-toggle small {
-  color: #77716b;
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.new-homepage-insights-chevron {
-  flex: 0 0 7px;
-  height: 7px;
-  margin-right: 4px;
-  border-right: 1px solid #77716b;
-  border-bottom: 1px solid #77716b;
-  transform: rotate(45deg);
-  transition: transform 160ms ease;
-}
-
-.new-homepage-insights-course-toggle[aria-expanded="true"] .new-homepage-insights-chevron {
-  transform: rotate(225deg);
-}
-
 .new-homepage-insights-results {
-  padding: 4px 0 20px;
+  margin-top: 26px;
+  padding: 0 0 20px;
 }
 
 .new-homepage-insights-grid {
@@ -1224,6 +1168,10 @@ html:has(.new-homepage-course-drawer[open]) {
   line-height: 1.35;
 }
 
+.new-homepage-insights-person .new-homepage-insights-person-course {
+  color: #365879;
+}
+
 .new-homepage-insights-person small,
 .new-homepage-insights-empty {
   color: #77716b;
@@ -1262,11 +1210,6 @@ a.new-homepage-insights-row:hover .new-homepage-insights-row-arrow {
   text-underline-offset: 3px;
 }
 
-.new-homepage-insights-card a {
-  margin-top: auto;
-  padding-top: 8px;
-  align-self: flex-start;
-}
 
 .new-homepage-insights-note button {
   border: 0;
@@ -1275,18 +1218,13 @@ a.new-homepage-insights-row:hover .new-homepage-insights-row-arrow {
   cursor: pointer;
 }
 
-.new-homepage-insights-note,
-.new-homepage-insights-disclaimer {
+.new-homepage-insights-note {
   color: #77716b;
   font-size: 13px;
   line-height: 1.6;
   margin: 8px 0 16px;
 }
 
-.new-homepage-insights-disclaimer {
-  margin: 16px 0 0;
-  font-size: 12px;
-}
 
 .new-homepage-insights-others {
   margin-top: 14px;
@@ -1317,6 +1255,3 @@ a.new-homepage-insights-row:hover .new-homepage-insights-row-arrow {
   .new-homepage-insights-row-arrow { display: none; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .new-homepage-insights-chevron { transition: none; }
-}
