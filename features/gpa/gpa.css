@@ -486,7 +486,7 @@ body.gpa-dialog-open { overflow: hidden; }
 .gpa-page .grade-option::before { background: var(--gpa-blue); }
 .gpa-page .grade-option:is(:hover,.active,:focus-visible) { background: rgba(54,88,121,.07); color: var(--gpa-blue); }
 .gpa-page .grade-chevron { color: var(--gpa-muted); }
-.gpa-page .semester-course-footer { margin-top: 18px; padding-top: 14px; border-color: var(--gpa-line); }
+.gpa-page .semester-course-footer { margin-top: 18px; padding-top: 14px; border-top: 0; }
 .gpa-page .semester-gpa-value { font-weight: 600; letter-spacing: -.035em; }
 .gpa-page .gpa-action { min-height: 42px; padding: 0 17px; border-radius: 10px; font-weight: 600; }
 .gpa-page .gpa-action:hover:not(:disabled) { transform: none; border-color: var(--gpa-blue); }
@@ -528,11 +528,10 @@ body.gpa-dialog-open { overflow: hidden; }
 .gpa-page .gpa-skeleton-top { margin-bottom: 22px; min-height: 44px; }
 .gpa-page .gpa-skeleton-labels { padding: 0 0 9px; min-height: 24px; }
 .gpa-page .gpa-skeleton-rows { gap: 14px; }
-.gpa-page .gpa-skeleton-footer { margin-top: 18px; padding-top: 14px; min-height: 57px; border-color: var(--gpa-line); }
+.gpa-page .gpa-skeleton-footer { margin-top: 18px; padding-top: 14px; min-height: 57px; border-top: 0; }
 .gpa-page .gpa-skeleton-add { height: 14px; width: 92px; }
 .gpa-page .gpa-skeleton-summary-label { width: 104px; height: 13px; }
 .gpa-page .gpa-skeleton-summary-number { width: min(148px,100%); height: 56px; margin: 14px 0 8px; }
-.gpa-page .gpa-skeleton-summary-caption { width: min(160px,100%); height: 13px; }
 .gpa-page .gpa-skeleton-summary-key { width: 92px; height: 13px; }
 .gpa-page .gpa-skeleton-summary-value { width: 32px; height: 15px; }
 .gpa-page .gpa-skeleton-summary-save { height: 42px; width: 100%; border-radius: 10px; margin-top: 46px; }
