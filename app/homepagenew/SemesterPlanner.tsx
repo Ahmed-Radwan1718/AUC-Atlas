@@ -226,21 +226,6 @@ export default function SemesterPlanner() {
       : semester));
   };
 
-  const moveCourse = (code: string, target: string) => {
-    if (!selected || target === selected.name) return;
-    const destination = semesters.find(semester => semester.name === target);
-    if (!destination || destination.courses.length >= 20) return;
-    markEdited(semesters.map(semester => {
-      if (semester.name === selected.name) {
-        return { ...semester, courses: semester.courses.filter(item => item !== code) };
-      }
-      if (semester.name === target) {
-        return { ...semester, courses: [...semester.courses, code] };
-      }
-      return semester;
-    }));
-  };
-
   const addSemester = () => {
     if (semesters.length >= 16) return;
     let name = nextRegularSemester(semesters[semesters.length - 1].name);
@@ -303,16 +288,6 @@ export default function SemesterPlanner() {
                         <span>{course?.title || "Course"}</span>
                       </div>
                       <div className="new-homepage-semester-course-actions">
-                        <select
-                          aria-label={"Move " + code + " to another semester"}
-                          value={selected.name}
-                          disabled={!canEdit}
-                          onChange={event => moveCourse(code, event.target.value)}
-                        >
-                          {semesters.map(semester => (
-                            <option key={semester.name} value={semester.name}>{semester.name}</option>
-                          ))}
-                        </select>
                         <button type="button" aria-label={"Remove " + code} title="Remove course"
                           disabled={!canEdit} onClick={() => removeCourse(code)}>×</button>
                       </div>
