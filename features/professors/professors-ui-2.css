@@ -200,7 +200,7 @@
     }
 
     .professor-review-stat-value span:last-child {
-      color: #a67e3e;
+      color: #36383a;
       font-weight: 700;
     }
 
@@ -220,7 +220,7 @@
       width: var(--stat-width, 0%);
       height: 100%;
       border-radius: inherit;
-      background: #c09a5c;
+      background: #36383a;
       display: block;
       transform: scaleX(0);
       transform-origin: left center;
@@ -350,7 +350,7 @@
     }
 
     .professor-review-stat-answer-head span:last-child {
-      color: rgba(192, 154, 92, 0.96);
+      color: #36383a;
       text-align: right;
       white-space: nowrap;
     }
@@ -363,7 +363,7 @@
       width: var(--stat-width, 0%);
       height: 100%;
       border-radius: inherit;
-      background: rgba(192, 154, 92, 0.58);
+      background: rgba(54, 56, 58, 0.58);
       display: block;
     }
 
