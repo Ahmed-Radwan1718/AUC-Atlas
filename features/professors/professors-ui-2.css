@@ -477,6 +477,34 @@
       gap: 14px;
     }
 
+    /* Masonry for loaded reviews only. Keep loading and empty states in the
+       existing grid. Columns balance at natural card heights without gaps
+       caused by a taller neighboring card. */
+    .professor-reviews-list:has(> .professor-review-card) {
+      display: block;
+      column-width: 260px;
+      column-count: 3;
+      column-gap: 14px;
+      column-fill: balance;
+    }
+
+    .professor-reviews-list:has(> .professor-review-card):not(:has(> .professor-review-card:nth-child(3))) {
+      column-count: 2;
+    }
+
+    .professor-reviews-list:has(> .professor-review-card:only-child) {
+      column-count: 1;
+    }
+
+    .professor-reviews-list > .professor-review-card {
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      margin: 0 0 14px;
+    }
+
 
     /* Professor review loading follows the directory's quiet card skeletons. */
     .professor-review-loading-card {
@@ -667,7 +695,7 @@
     }
 
 
-    /* Keep long student feedback from stretching the review card grid. */
+    /* Keep long student feedback compact in the review masonry. */
     .professor-review-note-preview {
       min-width: 0;
       display: grid;
