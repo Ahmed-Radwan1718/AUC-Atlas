@@ -83,6 +83,8 @@
 .atlas-account-workspace .account-display-name-note { color: var(--account-muted); }
 .atlas-account-workspace .account-display-name-note:empty { display: none; }
 .atlas-account-workspace .account-divider { margin: 34px 0; background: var(--account-line); }
+/* Keep only the row divider beneath passkeys, not a second section line. */
+.atlas-account-workspace .account-passkey-section + .account-divider { height: 0; background: transparent; margin: 24px 0; }
 .atlas-account-workspace #account-details-form > .account-divider { margin: 12px 0 0; }
 .atlas-account-workspace #account-details-form > .account-panel-subheader { margin: 0; }
 .atlas-account-workspace .account-connected-grid { grid-template-columns: 1fr; gap: 0; }
