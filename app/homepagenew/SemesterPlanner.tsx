@@ -349,8 +349,6 @@ export default function SemesterPlanner() {
             <h2 id="semester-course-drawer-title">Add courses</h2>
             <p id="semester-course-drawer-semester">{selected?.name}</p>
           </div>
-          <button className="new-homepage-course-drawer-close" type="button"
-            aria-label="Close course drawer" onClick={closeCourseDrawer}>×</button>
         </header>
         <div className="new-homepage-course-drawer-body">
           <input id="semester-course-search" type="search" value={query}
@@ -381,7 +379,8 @@ export default function SemesterPlanner() {
           </div>
         </div>
         <footer className="new-homepage-course-drawer-footer">
-          <button type="button" onClick={closeCourseDrawer}>Done</button>
+          <button className="new-homepage-course-drawer-done" type="button" onClick={closeCourseDrawer}>Done</button>
+          <button className="new-homepage-course-drawer-cancel" type="button" onClick={closeCourseDrawer}>Cancel</button>
         </footer>
       </dialog>
     </section>

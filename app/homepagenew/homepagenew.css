@@ -679,23 +679,6 @@ html:has(.new-homepage-course-drawer[open]) {
   line-height: 1.4;
 }
 
-.new-homepage-course-drawer-close {
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(23, 23, 23, 0.1);
-  border-radius: 999px;
-  background: #fff;
-  color: #171717;
-  font-size: 21px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.new-homepage-course-drawer-close:hover {
-  background: rgba(23, 23, 23, 0.05);
-}
-
 .new-homepage-course-drawer-body {
   flex: 1 1 auto;
   min-height: 0;
@@ -745,13 +728,15 @@ html:has(.new-homepage-course-drawer[open]) {
 
 .new-homepage-course-drawer-footer {
   flex: 0 0 auto;
+  display: grid;
+  gap: 8px;
   padding: 12px 24px max(14px, env(safe-area-inset-bottom));
   border-top: 1px solid rgba(23, 23, 23, 0.08);
   background: #fff;
   box-shadow: 0 -8px 22px rgba(42, 32, 20, 0.035);
 }
 
-.new-homepage-course-drawer-footer button {
+.new-homepage-course-drawer-done {
   width: 100%;
   min-height: 46px;
   border: 0;
@@ -766,8 +751,26 @@ html:has(.new-homepage-course-drawer[open]) {
   cursor: pointer;
 }
 
-.new-homepage-course-drawer-footer button:hover {
+.new-homepage-course-drawer-done:hover {
   background: #393939;
+}
+
+.new-homepage-course-drawer-cancel {
+  min-height: 34px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(23, 23, 23, 0.56);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.new-homepage-course-drawer-cancel:hover {
+  color: #171717;
+  background: rgba(23, 23, 23, 0.04);
 }
 
 .new-homepage-course-drawer button:focus-visible {
@@ -796,11 +799,6 @@ html:has(.new-homepage-course-drawer[open]) {
 
   .new-homepage-course-drawer-header {
     padding: max(18px, env(safe-area-inset-top)) 18px 14px;
-  }
-
-  .new-homepage-course-drawer-close {
-    width: 40px;
-    height: 40px;
   }
 
   .new-homepage-course-drawer-body {
