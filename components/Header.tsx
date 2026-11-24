@@ -46,6 +46,7 @@ export default function Header() {
   const widgetRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDialogElement>(null);
   const [navOpen, setNavOpen] = useState(false);
+  const [homeScrolled, setHomeScrolled] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [user, setUser] = useState<AtlasUser | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
@@ -84,6 +85,15 @@ export default function Header() {
   useEffect(() => {
     setNavOpen(false);
     setAccountOpen(false);
+  }, [pathname]);
+
+  // At the top of the homepage, let its ambient background show through the header.
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const update = () => setHomeScrolled(window.scrollY > 12);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
   }, [pathname]);
 
   // Native modal semantics provide a focus trap and make the page behind inert.
@@ -140,7 +150,8 @@ export default function Header() {
 
   return (
     <>
-      <header className={usesNewNavbar ? "site-header site-header--homepagenew" : "site-header"}>
+      <header className={usesNewNavbar ? "site-header site-header--homepagenew" : "site-header"}
+        data-home-at-top={pathname === "/" && !homeScrolled ? "true" : undefined}>
         <button className="hamburger-toggle" type="button"
           aria-label="Open navigation menu" aria-haspopup="dialog"
           aria-controls="atlas-navigation-drawer" aria-expanded={navOpen}
