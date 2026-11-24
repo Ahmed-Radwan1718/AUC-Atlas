@@ -65,7 +65,6 @@ const markup = `
         <div class="gpa-summary-loading" id="gpa-summary-loading" aria-hidden="true">
           <span class="gpa-skeleton-shape gpa-skeleton-summary-label"></span>
           <span class="gpa-skeleton-shape gpa-skeleton-summary-number"></span>
-          <span class="gpa-skeleton-shape gpa-skeleton-summary-caption"></span>
           <div class="summary-items">
             ${Array.from({ length: 3 }, () => `<div class="summary-item"><span class="gpa-skeleton-shape gpa-skeleton-summary-key"></span><span class="gpa-skeleton-shape gpa-skeleton-summary-value"></span></div>`).join("")}
           </div>
@@ -76,7 +75,6 @@ const markup = `
         <aside class="gpa-summary" aria-label="GPA overview">
           <p class="summary-label">Cumulative GPA</p>
           <div class="summary-number"><div class="summary-gpa" id="semester-gpa" aria-label="Overall GPA">0</div><span class="summary-scale">/ 4.00</span></div>
-          <p class="summary-caption">Across all graded courses</p>
           <div class="summary-items">
             <div class="summary-item">
               <strong>Graded credits</strong>
