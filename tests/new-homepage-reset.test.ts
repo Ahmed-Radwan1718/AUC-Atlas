@@ -131,3 +131,17 @@ test("the original homepage and its API are preserved", () => {
   assert.equal(exists("features/home/home.css"), true);
   assert.equal(exists("features/home/HomeSearch.tsx"), true);
 });
+
+test("semester course selection is a modal drawer with persistent multi-add results", () => {
+  const planner = read("app/homepagenew/SemesterPlanner.tsx");
+  const css = read("app/homepagenew/homepagenew.css");
+  assert.match(planner, /<dialog ref=\{drawerRef\} className="new-homepage-course-drawer"/);
+  assert.match(planner, /drawer\.showModal\(\)/);
+  assert.match(planner, /onCancel=\{event => \{ event\.preventDefault\(\); closeCourseDrawer\(\);/);
+  assert.match(planner, /setAddedThisSession\(previous => \[\.\.\.previous, code\]\)/);
+  assert.match(planner, /!planned\.has\(code\) \|\| added\.has\(code\)/);
+  assert.match(planner, /onClick=\{closeCourseDrawer\}>Done<\/button>/);
+  assert.doesNotMatch(planner, /setAdding\(/);
+  assert.match(css, /\.new-homepage-course-drawer::backdrop/);
+  assert.match(css, /width: min\(520px, 100vw\)/);
+});

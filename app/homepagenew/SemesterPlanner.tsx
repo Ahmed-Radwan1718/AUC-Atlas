@@ -67,7 +67,9 @@ export default function SemesterPlanner() {
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [major, setMajor] = useState("");
   const [completedKeys, setCompletedKeys] = useState<string[]>([]);
-  const [adding, setAdding] = useState(false);
+  const drawerRef = useRef<HTMLDialogElement>(null);
+  const closingDrawer = useRef(false);
+  const [addedThisSession, setAddedThisSession] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [revision, setRevision] = useState(0);
   const latestRevision = useRef(0);
@@ -153,21 +155,56 @@ export default function SemesterPlanner() {
   );
   const availableCourses = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    if (!needle) return degreeOptions.filter(code => !planned.has(code))
-      .map(code => courseByCode.get(code)!).slice(0, 8);
+    const added = new Set(addedThisSession);
+    const canShow = (code: string) => !planned.has(code) || added.has(code);
+    if (!needle) return degreeOptions.filter(canShow)
+      .map(code => courseByCode.get(code)!);
     return courses.filter(course =>
-      !planned.has(course.code) &&
+      canShow(course.code) &&
       (course.code.toLowerCase().includes(needle) ||
         course.title.toLowerCase().includes(needle))
     ).sort((a, b) =>
       Number(b.code.toLowerCase().startsWith(needle)) -
       Number(a.code.toLowerCase().startsWith(needle)) ||
       a.code.localeCompare(b.code)
-    ).slice(0, 8);
-  }, [degreeOptions, planned, query]);
+    ).slice(0, 50);
+  }, [degreeOptions, planned, query, addedThisSession]);
 
   const selected = semesters.find(semester => semester.name === active) || semesters[0];
   const canEdit = account !== "loading" && account !== "error";
+  const semesterFull = (selected?.courses.length || 0) >= 20;
+
+  const openCourseDrawer = () => {
+    const drawer = drawerRef.current;
+    if (!drawer || drawer.open || !canEdit || semesterFull) return;
+    setQuery("");
+    setAddedThisSession([]);
+    closingDrawer.current = false;
+    drawer.showModal();
+    drawer.focus({ preventScroll: true });
+  };
+
+  const closeCourseDrawer = () => {
+    const drawer = drawerRef.current;
+    if (!drawer?.open || closingDrawer.current) return;
+    closingDrawer.current = true;
+    const finish = () => {
+      if (drawer.open) drawer.close();
+      drawer.classList.remove("is-closing");
+      closingDrawer.current = false;
+    };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !drawer.animate) {
+      finish();
+      return;
+    }
+    const startTransform = getComputedStyle(drawer).transform;
+    drawer.classList.add("is-closing");
+    const animation = drawer.animate(
+      [{ transform: startTransform }, { transform: "translateX(100%)" }],
+      { duration: 250, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "both" }
+    );
+    void animation.finished.then(() => { finish(); animation.cancel(); }, finish);
+  };
 
   const markEdited = (next: Semester[]) => {
     setSemesters(next);
@@ -177,11 +214,10 @@ export default function SemesterPlanner() {
   };
 
   const addCourse = (code: string) => {
-    if (!selected || planned.has(code) || selected.courses.length >= 20) return;
+    if (!canEdit || !selected || planned.has(code) || selected.courses.length >= 20) return;
     markEdited(semesters.map(semester => semester.name === selected.name
       ? { ...semester, courses: [...semester.courses, code] } : semester));
-    setQuery("");
-    setAdding(false);
+    setAddedThisSession(previous => [...previous, code]);
   };
 
   const removeCourse = (code: string) => {
@@ -211,7 +247,6 @@ export default function SemesterPlanner() {
     while (semesters.some(semester => semester.name === name)) name = nextRegularSemester(name);
     markEdited([...semesters, { name, courses: [] }]);
     setActive(name);
-    setAdding(false);
   };
 
   return (
@@ -241,7 +276,7 @@ export default function SemesterPlanner() {
             aria-selected={active === semester.name}
             className={active === semester.name ? "is-active" : ""}
             disabled={!canEdit}
-            onClick={() => { setActive(semester.name); setAdding(false); setQuery(""); }}
+            onClick={() => setActive(semester.name)}
           >
             {semester.name}
           </button>
@@ -288,39 +323,9 @@ export default function SemesterPlanner() {
               </div>
             ) : <p className="new-homepage-semester-note">No courses planned for this semester yet.</p>}
 
-            {adding ? (
-              <div className="new-homepage-semester-picker">
-                <div className="new-homepage-semester-picker-head">
-                  <label htmlFor="semester-course-search">Add a course to {selected?.name}</label>
-                  <button type="button" onClick={() => { setAdding(false); setQuery(""); }}>Cancel</button>
-                </div>
-                <input id="semester-course-search" autoFocus value={query}
-                  onChange={event => setQuery(event.target.value)}
-                  placeholder="Search by course code or name" />
-                {!query.trim() && degreeOptions.length > 0 && (
-                  <p className="new-homepage-semester-note">
-                    From your degree plan · Check prerequisites before enrolling
-                  </p>
-                )}
-                <div className="new-homepage-semester-suggestions">
-                  {availableCourses.map(course => (
-                    <button key={course.code} type="button" onClick={() => addCourse(course.code)}>
-                      <span><strong>{course.code}</strong><small>{course.title}</small></span>
-                      <span aria-hidden="true">+</span>
-                    </button>
-                  ))}
-                  {!availableCourses.length && (
-                    <p className="new-homepage-semester-note">
-                      {query.trim() ? "No matching unplanned courses." : "Type a course code or name to find courses."}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <button type="button" className="new-homepage-semester-add-course"
-                disabled={!canEdit || (selected?.courses.length || 0) >= 20}
-                onClick={() => setAdding(true)}>+ Add course</button>
-            )}
+            <button type="button" className="new-homepage-semester-add-course"
+              disabled={!canEdit || semesterFull} aria-haspopup="dialog"
+              onClick={openCourseDrawer}>+ Add course</button>
           </>
         )}
       </div>
@@ -329,6 +334,62 @@ export default function SemesterPlanner() {
           <a href="/login">Sign in</a> to save your semester plan across devices.
         </p>
       )}
+      <dialog ref={drawerRef} className="new-homepage-course-drawer"
+        aria-labelledby="semester-course-drawer-title" aria-describedby="semester-course-drawer-semester"
+        tabIndex={-1}
+        onCancel={event => { event.preventDefault(); closeCourseDrawer(); }}
+        onClick={event => {
+          if (event.target !== event.currentTarget) return;
+          const rect = event.currentTarget.getBoundingClientRect();
+          if (event.clientX < rect.left || event.clientX > rect.right ||
+              event.clientY < rect.top || event.clientY > rect.bottom) closeCourseDrawer();
+        }}>
+        <header className="new-homepage-course-drawer-header">
+          <div>
+            <h2 id="semester-course-drawer-title">Add courses</h2>
+            <p id="semester-course-drawer-semester">{selected?.name}</p>
+          </div>
+          <button className="new-homepage-course-drawer-close" type="button"
+            aria-label="Close course drawer" onClick={closeCourseDrawer}>×</button>
+        </header>
+        <div className="new-homepage-course-drawer-body">
+          <input id="semester-course-search" type="search" value={query}
+            onChange={event => setQuery(event.target.value)}
+            aria-label="Search by course code or name"
+            placeholder="Search by course code or name" autoComplete="off" />
+          {!query.trim() && degreeOptions.length > 0 && (
+            <p className="new-homepage-course-drawer-hint">
+              <strong>From your degree plan</strong>
+              <span>Check prerequisites before enrolling.</span>
+            </p>
+          )}
+          {semesterFull && <p className="new-homepage-semester-note" role="status">This semester has reached its 20-course limit.</p>}
+          <div className="new-homepage-semester-suggestions">
+            {availableCourses.map(course => {
+              const added = addedThisSession.includes(course.code);
+              const unavailable = added || semesterFull || !canEdit;
+              return (
+                <button key={course.code} type="button"
+                  aria-label={added ? course.code + " added" : "Add " + course.code}
+                  aria-disabled={unavailable}
+                  className={added ? "is-added" : ""}
+                  onClick={() => { if (!unavailable) addCourse(course.code); }}>
+                  <span><strong>{course.code}</strong><small>{course.title}</small></span>
+                  <span aria-hidden="true">{added ? "✓" : "+"}</span>
+                </button>
+              );
+            })}
+            {!availableCourses.length && (
+              <p className="new-homepage-semester-note">
+                {query.trim() ? "No matching unplanned courses." : "Type a course code or name to find courses."}
+              </p>
+            )}
+          </div>
+        </div>
+        <footer className="new-homepage-course-drawer-footer">
+          <button type="button" onClick={closeCourseDrawer}>Done</button>
+        </footer>
+      </dialog>
     </section>
   );
 }
