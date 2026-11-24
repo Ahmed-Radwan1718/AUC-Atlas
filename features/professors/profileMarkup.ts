@@ -159,7 +159,6 @@ export const reviewFormFieldsMarkup = `
                 <summary>
                   <span class="review-accordion-label">
                     <strong>Class experience</strong>
-                    <small>Attendance, workload, lectures &amp; office hours</small>
                   </span>
                   <span class="review-accordion-meta" data-review-count>0/4 answered</span>
                 </summary>
@@ -214,7 +213,6 @@ export const reviewFormFieldsMarkup = `
                 <summary>
                   <span class="review-accordion-label">
                     <strong>Grading &amp; advice</strong>
-                    <small>Exams, marking, feedback &amp; comments</small>
                   </span>
                   <span class="review-accordion-meta" data-review-count>0/4 answered</span>
                 </summary>
@@ -274,7 +272,6 @@ export const reviewFormFieldsMarkup = `
               <label class="review-anonymous-option">
                 <span class="review-anonymous-copy">
                   <strong>Post anonymously</strong>
-                  <small>Your name and profile photo won’t appear with this review.</small>
                 </span>
                 <input name="isAnonymous" type="checkbox" value="true">
               </label>
