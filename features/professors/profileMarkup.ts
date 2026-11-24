@@ -155,18 +155,13 @@ export const reviewFormFieldsMarkup = `
               </div>
               </section>
 
-              <details class="review-accordion" data-review-section="experience">
-                <summary>
-                  <span class="review-accordion-label">
-                    <strong>Class experience</strong>
-                  </span>
-                  <span class="review-accordion-meta" data-review-count>0/4 answered</span>
-                </summary>
-                <div class="review-accordion-body">
+              <section class="review-question-section" aria-labelledby="review-experience-heading">
+                <h3 id="review-experience-heading">Class experience</h3>
+                <div class="review-question-grid">
 
               <div class="review-field">
                 <label for="review-attendance">Attendance policy</label>
-                <select id="review-attendance" name="attendancePolicy">
+                <select id="review-attendance" data-review-inline name="attendancePolicy">
                   <option value="" selected>Choose attendance policy</option>
                   <option>Required</option>
                   <option>Sometimes checked</option>
@@ -177,7 +172,7 @@ export const reviewFormFieldsMarkup = `
 
               <div class="review-field">
                 <label for="review-workload">Workload</label>
-                <select id="review-workload" name="workload">
+                <select id="review-workload" data-review-inline name="workload">
                   <option value="" selected>Choose workload</option>
                   <option>Light</option>
                   <option>Moderate</option>
@@ -187,7 +182,7 @@ export const reviewFormFieldsMarkup = `
 
               <div class="review-field">
                 <label for="review-lecture">Lecture usefulness</label>
-                <select id="review-lecture" name="lectureUsefulness">
+                <select id="review-lecture" data-review-inline name="lectureUsefulness">
                   <option value="" selected>Choose lecture usefulness</option>
                   <option>Essential</option>
                   <option>Helpful</option>
@@ -198,7 +193,7 @@ export const reviewFormFieldsMarkup = `
 
               <div class="review-field">
                 <label for="review-office-hours">Office hours/help</label>
-                <select id="review-office-hours" name="officeHours">
+                <select id="review-office-hours" data-review-inline name="officeHours">
                   <option value="" selected>Choose an option</option>
                   <option>Helpful</option>
                   <option>Available but limited</option>
@@ -207,20 +202,15 @@ export const reviewFormFieldsMarkup = `
                 </select>
               </div>
                 </div>
-              </details>
+              </section>
 
-              <details class="review-accordion" data-review-section="grading">
-                <summary>
-                  <span class="review-accordion-label">
-                    <strong>Grading &amp; advice</strong>
-                  </span>
-                  <span class="review-accordion-meta" data-review-count>0/4 answered</span>
-                </summary>
-                <div class="review-accordion-body">
+              <section class="review-question-section" aria-labelledby="review-grading-heading">
+                <h3 id="review-grading-heading">Grading &amp; advice</h3>
+                <div class="review-question-grid">
 
               <div class="review-field">
                 <label for="review-grading-style">Grading style</label>
-                <select id="review-grading-style" name="gradingStyle">
+                <select id="review-grading-style" data-review-inline name="gradingStyle">
                   <option value="" selected>Choose grading style</option>
                   <option>Exams-heavy</option>
                   <option>Projects-heavy</option>
@@ -232,7 +222,7 @@ export const reviewFormFieldsMarkup = `
 
               <div class="review-field">
                 <label for="review-exam-difficulty">Exam difficulty</label>
-                <select id="review-exam-difficulty" name="examDifficulty">
+                <select id="review-exam-difficulty" data-review-inline name="examDifficulty">
                   <option value="" selected>Choose exam difficulty</option>
                   <option>Easier than class material</option>
                   <option>Matches class material</option>
@@ -243,7 +233,7 @@ export const reviewFormFieldsMarkup = `
 
               <div class="review-field">
                 <label for="review-transparency">Grading transparency</label>
-                <select id="review-transparency" name="gradingTransparency">
+                <select id="review-transparency" data-review-inline name="gradingTransparency">
                   <option value="" selected>Choose grading transparency</option>
                   <option>Rubric is clear</option>
                   <option>Somewhat clear</option>
@@ -253,7 +243,7 @@ export const reviewFormFieldsMarkup = `
 
               <div class="review-field">
                 <label for="review-feedback">Feedback quality</label>
-                <select id="review-feedback" name="feedbackQuality">
+                <select id="review-feedback" data-review-inline name="feedbackQuality">
                   <option value="" selected>Choose feedback quality</option>
                   <option>Helpful</option>
                   <option>Minimal</option>
@@ -267,7 +257,7 @@ export const reviewFormFieldsMarkup = `
                 <textarea id="review-note" name="studentNote" maxlength="5000"></textarea>
               </div>
                 </div>
-              </details>
+              </section>
 
               <label class="review-anonymous-option">
                 <span class="review-anonymous-copy">
