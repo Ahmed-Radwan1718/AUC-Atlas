@@ -9,10 +9,10 @@ const read = (path: string) => readFileSync(new URL(path, root), "utf8");
 const exists = (path: string) => existsSync(new URL(path, root));
 
 test("new homepage shows Get Started with a courses-and-professors search", () => {
-  const page = read("app/homepagenew/page.tsx");
+  const page = read("app/page.tsx");
   assert.match(page, /<h1\b[^>]*>Get Started<\/h1>/);
   assert.match(page, /<HomeSearch scope="catalog"\s*\/>/);
-  assert.match(page, /import "\.\/homepagenew\.css"/);
+  assert.match(page, /import "\.\/homepagenew\/homepagenew\.css"/);
   assert.equal(exists("app/homepagenew/homepagenew.css"), true);
   assert.doesNotMatch(page, /NewHomepageAcademicSections|NewHomepageCourses|NewHomepageMaterials|fetch\(/);
 });
@@ -55,7 +55,7 @@ test("retired personalized homepage modules are still removed", () => {
 });
 
 test("degree progression preview uses saved major and credit totals on new homepage", () => {
-  const page = read("app/homepagenew/page.tsx");
+  const page = read("app/page.tsx");
   const preview = read("app/homepagenew/DegreeProgressPreview.tsx");
   const css = read("app/homepagenew/homepagenew.css");
   assert.match(page, /<DegreeProgressPreview \/>/);
@@ -110,7 +110,7 @@ test("degree progress totals respect saved keys, elective caps and duplicate ele
 
 test("course directory redirects while individual courses remain accessible", () => {
   const directoryPage = read("app/courses/page.tsx");
-  assert.match(directoryPage, /redirect\("\/homepagenew"\)/);
+  assert.match(directoryPage, /redirect\("\/"\)/);
   assert.doesNotMatch(directoryPage, /<Courses\b/);
 
   const coursePage = read("app/courses/[slug]/page.tsx");
@@ -124,11 +124,17 @@ test("course directory redirects while individual courses remain accessible", ()
   assert.doesNotMatch(footer, /href="\/courses"/);
 });
 
-test("the original homepage and its API are preserved", () => {
-  assert.match(read("app/page.tsx"), /import Home from "\.\.\/features\/home\/Home"/);
-  assert.match(read("features/home/Home.tsx"), /homepage-overview/);
+test("the new homepage is canonical and the experimental URL redirects", () => {
+  const page = read("app/page.tsx");
+  assert.match(page, /<HomeSearch scope="catalog"\s*\/>/);
+  assert.match(page, /<SemesterPlanner\s*\/>/);
+  assert.match(page, /canonical: "https:\/\/aucatlas\.com\/"/);
+  assert.doesNotMatch(page, /index:\s*false|features\/home\/Home"/);
+  assert.match(read("app/homepagenew/page.tsx"), /permanentRedirect\("\/"\)/);
+  const header = read("components/Header.tsx");
+  assert.match(header, /usesNewNavbar = pathname === "\/"/);
+  assert.match(header, /href="\/" className="site-header-logo"/);
   assert.equal(exists("app/api/homepage-overview/route.ts"), true);
-  assert.equal(exists("features/home/home.css"), true);
   assert.equal(exists("features/home/HomeSearch.tsx"), true);
 });
 
