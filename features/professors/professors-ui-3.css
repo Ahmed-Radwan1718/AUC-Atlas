@@ -306,7 +306,7 @@
       width: 100%;
       min-height: 50px;
       margin: 0;
-      background: #171717;
+      background: #36383a;
       color: #fff;
       box-shadow: none;
     }
@@ -338,7 +338,7 @@
     }
 
     .review-drawer-footer .review-cancel-button:focus-visible {
-      outline: 2px solid #c09a5c;
+      outline: 2px solid #365879;
       outline-offset: 2px;
     }
 
@@ -383,7 +383,7 @@
       }
     }
 
-    /* Compact, progressive-disclosure layout for the professor review drawer. */
+    /* Continuous, single-click review form. */
     .review-drawer-body {
       gap: 12px;
       padding-top: 18px;
@@ -392,8 +392,8 @@
 
     .review-core-section {
       display: grid;
-      gap: 16px;
-      padding: 0 0 18px;
+      gap: 13px;
+      padding: 0 0 6px;
     }
 
     .review-core-section h3 {
@@ -472,7 +472,7 @@
     }
 
     .review-rating-star.is-active {
-      color: #c09a5c;
+      color: #365879;
     }
 
     .review-rating-star:hover {
@@ -481,8 +481,8 @@
 
     .review-rating-star:focus-visible,
     .review-recommend-options button:focus-visible,
-    .review-accordion summary:focus-visible {
-      outline: 2px solid #c09a5c;
+    .review-inline-options button:focus-visible {
+      outline: 2px solid #365879;
       outline-offset: 3px;
     }
 
@@ -506,82 +506,80 @@
     }
 
     .review-recommend-options button.is-active {
-      border-color: #c09a5c;
-      background: rgba(192, 154, 92, 0.13);
+      border-color: #365879;
+      background: rgba(54, 88, 121, 0.13);
       color: #171717;
     }
 
-    .review-accordion {
-      min-width: 0;
-      border-top: 1px solid rgba(23, 23, 23, 0.09);
-    }
-
-    .review-accordion summary {
-      min-height: 74px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 25px 14px 0;
-      position: relative;
-      cursor: pointer;
-      list-style: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .review-accordion summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .review-accordion summary::after {
-      content: "";
-      position: absolute;
-      right: 6px;
-      top: calc(50% - 5px);
-      width: 8px;
-      height: 8px;
-      border-right: 1.5px solid rgba(23, 23, 23, 0.6);
-      border-bottom: 1.5px solid rgba(23, 23, 23, 0.6);
-      transform: rotate(45deg);
-      transition: transform 0.2s ease;
-    }
-
-    .review-accordion[open] summary::after {
-      transform: translateY(4px) rotate(225deg);
-    }
-
-    .review-accordion-label {
-      flex: 1 1 auto;
+    .review-question-section {
       min-width: 0;
       display: grid;
-      gap: 5px;
+      gap: 14px;
+      padding: 16px 0 8px;
+      border-top: 1px solid rgba(54, 56, 58, 0.10);
     }
 
-    .review-accordion-label strong {
-      color: #171717;
+    .review-question-section h3 {
+      margin: 0;
+      color: #36383a;
       font-size: 14px;
-      line-height: 1.2;
       font-weight: 650;
+      line-height: 1.35;
     }
 
-    .review-accordion-label small {
-      font-size: 11px;
-      color: rgba(23, 23, 23, 0.52);
-      line-height: 1.3;
-    }
-
-    .review-accordion-meta {
-      flex: 0 0 auto;
-      color: rgba(23, 23, 23, 0.55);
-      font-size: 10px;
-      font-weight: 650;
-      white-space: nowrap;
-    }
-
-    .review-accordion-body {
+    .review-question-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
-      gap: 14px;
-      padding: 0 0 20px;
+      gap: 13px;
+    }
+
+    .review-inline-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .review-inline-options button {
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: 100%;
+      min-height: 36px;
+      padding: 8px 11px;
+      border: 1px solid rgba(54, 56, 58, 0.14);
+      border-radius: 8px;
+      background: #fff;
+      color: #36383a;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+      cursor: pointer;
+      transition: background-color 150ms ease, border-color 150ms ease;
+    }
+
+    .review-inline-options button:hover {
+      border-color: rgba(54, 88, 121, 0.45);
+      background: rgba(54, 88, 121, 0.045);
+    }
+
+    .review-inline-options button.is-active {
+      border-color: #365879;
+      background: rgba(54, 88, 121, 0.10);
+      color: #365879;
+    }
+
+    .review-inline-options button:focus-visible {
+      outline: 2px solid #365879;
+      outline-offset: 2px;
+    }
+
+    .review-question-grid textarea {
+      min-height: 78px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .review-inline-options button { transition: none; }
     }
 
     .review-drawer-body .review-anonymous-option {
@@ -604,14 +602,6 @@
         grid-template-columns: minmax(0, 1fr);
       }
 
-      .review-accordion summary {
-        flex-wrap: wrap;
-        row-gap: 6px;
-      }
-
-      .review-accordion-meta {
-        font-size: 10px;
-      }
 
       .review-rating-stars {
         gap: 3px;
@@ -644,8 +634,8 @@
     }
 
     .review-drawer-body .review-course-search-input:focus {
-      border-color: rgba(192, 154, 92, 0.55);
-      box-shadow: 0 0 0 3px rgba(192, 154, 92, 0.11);
+      border-color: rgba(54, 88, 121, 0.55);
+      box-shadow: 0 0 0 3px rgba(54, 88, 121, 0.11);
     }
 
     .review-course-suggestions {
@@ -678,7 +668,7 @@
 
     .review-course-suggestion:hover,
     .review-course-suggestion.is-active {
-      background: rgba(192, 154, 92, 0.13);
+      background: rgba(54, 88, 121, 0.13);
     }
 
     .review-course-no-results,
@@ -689,3 +679,14 @@
       line-height: 1.45;
     }
   
+    .review-drawer-body .review-anonymous-option input:checked {
+      border-color: #365879;
+      background: #365879;
+      box-shadow: none;
+    }
+
+    .review-drawer-body .review-anonymous-option input:focus-visible {
+      outline: 2px solid #365879;
+      outline-offset: 3px;
+      box-shadow: none;
+    }
