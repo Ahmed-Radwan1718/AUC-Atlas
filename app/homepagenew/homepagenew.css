@@ -489,12 +489,22 @@
 }
 
 .new-homepage-semester-courses {
+  display: grid;
+  gap: 10px;
   margin-top: 14px;
 }
 
 .new-homepage-semester-course {
-  padding: 16px 0;
-  border-bottom: 1px solid #e7e5e0;
+  padding: 14px 18px;
+  border: 1px solid #e7e5e0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.new-homepage-semester-course:hover {
+  background: #ffffff;
+  border-color: #d8d6d1;
 }
 
 .new-homepage-semester-course-info {
