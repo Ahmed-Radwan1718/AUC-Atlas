@@ -135,6 +135,7 @@
 .atlas-account-workspace #account-panel-reviews :is(.account-review-item,.account-upload-item):hover { background: transparent; }
 .atlas-account-workspace #account-panel-reviews :is(.account-review-meta,.account-upload-meta) span:first-child { color: var(--account-blue); }
 .atlas-account-workspace #account-panel-reviews .account-review-professor-photo { background: #ecebe7; border-radius: 12px; }
+.atlas-account-workspace #account-panel-reviews .account-review-professor-name:is(:hover,:focus-visible) { color: var(--account-blue); }
 .atlas-account-workspace #account-panel-details.is-loading .account-details-loading-state,
 .atlas-account-workspace #account-panel-security .account-security-loading-state { padding: 0; background: var(--account-bg); }
 .atlas-account-workspace .account-skeleton-shape { background: #e9e6e1; }
