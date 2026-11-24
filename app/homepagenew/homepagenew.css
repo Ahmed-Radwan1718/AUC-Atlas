@@ -681,16 +681,16 @@ html:has(.new-homepage-course-drawer[open]) {
 
 .new-homepage-course-drawer-body {
   flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   min-width: 0;
   padding: 18px 24px 22px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 
 .new-homepage-course-drawer-body input {
+  flex: 0 0 auto;
   display: block;
   box-sizing: border-box;
   width: 100%;
@@ -723,7 +723,22 @@ html:has(.new-homepage-course-drawer[open]) {
 }
 
 .new-homepage-semester-suggestions {
-  margin-top: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 3px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.new-homepage-semester-suggestions::-webkit-scrollbar {
+  display: none;
 }
 
 .new-homepage-course-drawer-footer {
@@ -820,24 +835,27 @@ html:has(.new-homepage-course-drawer[open]) {
 
 .new-homepage-semester-suggestions > button {
   display: flex;
+  flex: 0 0 auto;
   width: 100%;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 0;
+  padding: 15px 10px;
   border: 0;
-  border-bottom: 1px solid #e7e5e0;
+  border-radius: 12px;
   background: transparent;
   color: #171717;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: background-color 150ms ease;
 }
 
 .new-homepage-semester-suggestions > button > span:first-child {
   display: flex;
+  min-width: 0;
   flex-direction: column;
-  gap: 3px;
+  gap: 5px;
 }
 
 .new-homepage-semester-suggestions strong {
@@ -847,16 +865,30 @@ html:has(.new-homepage-course-drawer[open]) {
 .new-homepage-semester-suggestions small {
   color: #77716b;
   font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .new-homepage-semester-suggestions > button > span:last-child {
-  font-size: 20px;
+  display: flex;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f3f3f1;
+  font-size: 17px;
+  line-height: 1;
 }
 
-.new-homepage-semester-suggestions > button:not([aria-disabled="true"]):hover strong,
-.new-homepage-semester-suggestions > button:not([aria-disabled="true"]):focus-visible strong {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.new-homepage-semester-suggestions > button:not([aria-disabled="true"]):hover,
+.new-homepage-semester-suggestions > button:not([aria-disabled="true"]):focus-visible {
+  background: #f5f5f3;
+}
+
+.new-homepage-semester-suggestions > button.is-added > span:last-child {
+  background: #e8e8e5;
 }
 
 @media (max-width: 600px) {
