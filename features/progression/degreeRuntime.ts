@@ -2,9 +2,7 @@
 // Existing AUC Atlas interaction logic retained during the TypeScript migration.
 // The legacy DOM implementation is isolated so the new application uses no standalone JS files.
 import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
-import { courses } from "../../data/courses";
 
-const catalogCourseCodes = new Set(courses.map(course => course.code.toUpperCase()));
 
 export function mountDegreeProgression() {
   const root = document.querySelector("#degree-requirements-root");
@@ -125,9 +123,7 @@ export function mountDegreeProgression() {
           const title = parsed ? parsed[2] : withoutCredits;
           const inputId = "degree-item-" + key;
           const codeMarkup = code
-            ? (catalogCourseCodes.has(code)
-                ? `<a class="degree-course-code" href="/courses/${encodeURIComponent(code.toLowerCase().replace(/[^a-z0-9]+/g, "-"))}">${escapeDegreeHtml(code)}</a>`
-                : `<span class="degree-course-code">${escapeDegreeHtml(code)}</span>`)
+            ? `<span class="degree-course-code">${escapeDegreeHtml(code)}</span>`
             : "";
           const creditLabel = creditMatch ? creditMatch[1] : "";
 
