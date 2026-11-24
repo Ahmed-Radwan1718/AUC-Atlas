@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import ProfessorInsights from "./ProfessorInsights";
+import { SEMESTER_CREDIT_LIMIT, SEMESTER_COURSE_LIMIT, courseCredits, semesterCreditSummary, canAddSemesterCourse } from "../../lib/semesterCredits";
 import { courses } from "../../data/courses";
 import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
 import type { DegreeRequirementGroup } from "./degreeProgressSummary";
@@ -173,7 +174,11 @@ export default function SemesterPlanner() {
 
   const selected = semesters.find(semester => semester.name === active) || semesters[0];
   const canEdit = account !== "loading" && account !== "error";
-  const semesterFull = (selected?.courses.length || 0) >= 20;
+  const creditSummary = semesterCreditSummary(selected?.courses || []);
+  const semesterFull = creditSummary.overLimit || creditSummary.unknown.length > 0 ||
+    (selected?.courses.length || 0) >= SEMESTER_COURSE_LIMIT;
+  const creditLabel = creditSummary.total + (creditSummary.unknown.length ? "+" : "") +
+    " / " + SEMESTER_CREDIT_LIMIT + " credits";
 
   const openCourseDrawer = () => {
     const drawer = drawerRef.current;
@@ -215,7 +220,7 @@ export default function SemesterPlanner() {
   };
 
   const addCourse = (code: string) => {
-    if (!canEdit || !selected || planned.has(code) || selected.courses.length >= 20) return;
+    if (!canEdit || !selected || planned.has(code) || !canAddSemesterCourse(selected.courses, code)) return;
     markEdited(semesters.map(semester => semester.name === selected.name
       ? { ...semester, courses: [...semester.courses, code] } : semester));
     setAddedThisSession(previous => [...previous, code]);
@@ -279,6 +284,13 @@ export default function SemesterPlanner() {
           <p className="new-homepage-semester-note">We couldn't load your saved plan. Refresh to try again.</p>
         ) : (
           <>
+            {account !== "loading" && (
+              <div className="new-homepage-semester-meta" role="status">
+                <span className={creditSummary.overLimit || creditSummary.unknown.length ? "is-credit-warning" : ""}>{creditLabel}</span>
+              </div>
+            )}
+            {creditSummary.overLimit && <p className="new-homepage-semester-note is-credit-warning">This semester exceeds the 21-credit limit. Remove courses before adding more.</p>}
+            {creditSummary.unknown.length > 0 && <p className="new-homepage-semester-note is-credit-warning">Credit values are missing for {creditSummary.unknown.join(", ")}. Remove these courses before adding more.</p>}
             {selected?.courses.length ? (
               <div className="new-homepage-semester-courses">
                 {selected.courses.map(code => {
@@ -288,6 +300,7 @@ export default function SemesterPlanner() {
                       <div className="new-homepage-semester-course-info">
                         <a href={courseUrl(code)}>{code}</a>
                         <span>{course?.title || "Course"}</span>
+                        <span className="new-homepage-semester-course-credits">{courseCredits(code) === null ? "Credits unavailable" : courseCredits(code) + " cr."}</span>
                       </div>
                       <div className="new-homepage-semester-course-actions">
                         <button type="button" aria-label={"Remove " + code} title="Remove course"
@@ -323,7 +336,7 @@ export default function SemesterPlanner() {
         <header className="new-homepage-course-drawer-header">
           <div>
             <h2 id="semester-course-drawer-title">Add courses</h2>
-            <p id="semester-course-drawer-semester">{selected?.name}</p>
+            <p id="semester-course-drawer-semester">{selected?.name} · {creditLabel}</p>
           </div>
         </header>
         <div className="new-homepage-course-drawer-body">
@@ -331,18 +344,22 @@ export default function SemesterPlanner() {
             onChange={event => setQuery(event.target.value)}
             aria-label="Search by course code or name"
             placeholder="Search by course code or name" autoComplete="off" />
-          {semesterFull && <p className="new-homepage-semester-note" role="status">This semester has reached its 20-course limit.</p>}
+          {creditSummary.total >= SEMESTER_CREDIT_LIMIT && <p className="new-homepage-semester-note" role="status">21-credit limit reached. Only zero-credit courses can be added.</p>}
+          {semesterFull && <p className="new-homepage-semester-note" role="status">No more courses can be added to this semester.</p>}
           <div className="new-homepage-semester-suggestions">
             {availableCourses.map(course => {
               const added = addedThisSession.includes(course.code);
-              const unavailable = added || semesterFull || !canEdit;
+              const credits = courseCredits(course.code);
+              const unavailable = added || semesterFull || !canEdit || !selected ||
+                !canAddSemesterCourse(selected.courses, course.code);
               return (
                 <button key={course.code} type="button"
                   aria-label={added ? course.code + " added" : "Add " + course.code}
                   aria-disabled={unavailable}
+                  title={!added && unavailable ? (credits === null ? "Credit value unavailable" : "Cannot add within semester limits") : undefined}
                   className={added ? "is-added" : ""}
                   onClick={() => { if (!unavailable) addCourse(course.code); }}>
-                  <span><strong>{course.code}</strong><small>{course.title}</small></span>
+                  <span><strong>{course.code}</strong><small>{course.title} · {credits === null ? "Credits unavailable" : credits + " cr."}</small></span>
                   <span aria-hidden="true">{added ? "✓" : "+"}</span>
                 </button>
               );
