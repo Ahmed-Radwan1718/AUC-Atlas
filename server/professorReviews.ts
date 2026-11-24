@@ -11,7 +11,7 @@ export class ReviewError extends Error {
   }
 }
 const validChoices: Record<string, string[]> = {
-  recommendation: ["Yes", "Depends", "No"],
+  recommendation: ["Yes", "No"],
   attendancePolicy: ["Required", "Sometimes checked", "Not important", "Not sure"],
   workload: ["Light", "Moderate", "Heavy"],
   lectureUsefulness: ["Essential", "Helpful", "Attending means less work at home", "Skippable", "Not lecture-based"],
@@ -69,7 +69,7 @@ export function buildFields(payload: Payload, existing: Payload = {}): ReviewDat
     professorName:clean(existing.professorName||payload.professorName,120),
     courseCode,courseTaken:courseCode, semesterTaken:clean(get("semesterTaken"),60),
     isAnonymous:bool(get("isAnonymous")),rating:Number(get("rating")||0),
-    recommendation, recommendationReason:recommendation==="Depends"?note(get("recommendationReason"),5000):"",
+    recommendation, recommendationReason:"",
     attendancePolicy:selected(get("attendancePolicy"),"attendancePolicy"),
     workload:selected(get("workload"),"workload"),
     lectureUsefulness:selected(get("lectureUsefulness"),"lectureUsefulness"),
@@ -87,9 +87,7 @@ export function validateFields(value: ReviewData) {
   if(!value.semesterTaken) throw new ReviewError("Please enter the semester taken.",400);
   if(!Number.isInteger(value.rating)||Number(value.rating)<1||Number(value.rating)>5)
     throw new ReviewError("Please choose a star rating.",400);
-  if(!value.recommendation)throw new ReviewError("Please choose a recommendation.",400);
-  if(value.recommendation==="Depends"&&!value.recommendationReason)
-    throw new ReviewError("Please explain what it depends on.",400);
+  if(value.recommendation!=="Yes"&&value.recommendation!=="No")throw new ReviewError("Please choose Yes or No for the recommendation.",400);
 }
 export async function authorProfile(user:DecodedIdToken) {
   const record=await firebaseAuth().getUser(user.uid);
