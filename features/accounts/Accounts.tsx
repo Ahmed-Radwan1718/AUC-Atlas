@@ -12,8 +12,9 @@ import "../professors/professors-ui-1.css";
 import "../professors/professors-ui-2.css";
 import "../professors/professors-ui-3.css";
 import "./account-review-drawer.css";
+import "./account-workspace.css";
 
 export default function Accounts() {
   useEffect(() => { initializeAccounts(); }, []);
-  return <div dangerouslySetInnerHTML={{ __html: markup }} />;
+  return <div className="atlas-account-workspace" dangerouslySetInnerHTML={{ __html: markup }} />;
 }

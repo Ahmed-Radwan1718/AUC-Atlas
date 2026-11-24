@@ -1,0 +1,179 @@
+/* Account workspace — matches /homepagenew without altering the shared degree page. */
+.atlas-account-workspace {
+  --account-bg: #f8f7f4;
+  --account-ink: #36383a;
+  --account-muted: #77716b;
+  --account-blue: #365879;
+  --account-line: #e7e5e0;
+  --account-field-border: #dededa;
+  --account-green: #35664f;
+  --account-red: #96504a;
+  font-family: Arial, sans-serif;
+  color: var(--account-ink);
+}
+.atlas-account-workspace .account-page {
+  min-height: 100svh;
+  padding-top: 0;
+  background:
+    radial-gradient(circle 380px at calc(50% + 690px) 440px, rgba(54,88,121,.24), rgba(54,88,121,.12) 34%, rgba(54,88,121,.045) 56%, transparent 76%),
+    radial-gradient(circle 410px at calc(50% - 690px) 850px, rgba(54,88,121,.18), rgba(54,88,121,.09) 34%, transparent 76%),
+    var(--account-bg);
+}
+.atlas-account-workspace .account-section { min-height: 100svh; padding: clamp(140px, 19vh, 210px) 24px 104px; }
+.atlas-account-workspace .account-section-inner { max-width: 1120px; }
+.atlas-account-workspace .account-header { display: grid; gap: 12px; margin: 0 0 44px; }
+.atlas-account-workspace .account-header h1,
+.atlas-account-workspace .account-page.is-activity-view .account-header h1 {
+  font-size: clamp(23px, 3vw, 29px); font-weight: 700; letter-spacing: -.045em; line-height: 1.15; color: var(--account-ink); text-transform: none;
+}
+.atlas-account-workspace .account-header p { max-width: 680px; margin: 0; text-align: left; font-size: 14px; line-height: 1.6; color: var(--account-muted); }
+.atlas-account-workspace .account-layout { grid-template-columns: 224px minmax(0, 1fr); gap: 36px; }
+.atlas-account-workspace .account-sidebar,
+.atlas-account-workspace .account-panel {
+  border: 0; background: transparent; box-shadow: none; border-radius: 0; padding: 0;
+}
+.atlas-account-workspace .account-sidebar { top: 104px; gap: 4px; }
+.atlas-account-workspace .account-sidebar-link {
+  position: relative; min-height: 44px; padding: 0 12px; border-radius: 8px;
+  font-size: 14px; font-weight: 400; letter-spacing: 0; text-transform: none;
+  color: var(--account-muted); grid-template-columns: 19px minmax(0,1fr); gap: 12px;
+}
+.atlas-account-workspace .account-sidebar-link:hover { background: rgba(54,88,121,.05); color: var(--account-ink); }
+.atlas-account-workspace .account-sidebar-link.active { background: rgba(54,88,121,.085); color: var(--account-blue); font-weight: 600; }
+.atlas-account-workspace .account-sidebar-link.active::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 2px; border-radius: 2px; background: var(--account-blue); }
+.atlas-account-workspace .account-logout-link { color: var(--account-red); margin-top: 16px; }
+.atlas-account-workspace .account-logout-link:hover { color: var(--account-red); background: rgba(150,80,74,.07); }
+.atlas-account-workspace .account-content { padding-left: 36px; border-left: 1px solid var(--account-line); }
+.atlas-account-workspace .account-panel-header { margin-bottom: 30px; }
+.atlas-account-workspace .account-panel-header h2 { font-size: 24px; font-weight: 700; letter-spacing: -.045em; color: var(--account-ink); margin-bottom: 9px; }
+.atlas-account-workspace :is(.account-panel-header,.account-panel-subheader) p { color: var(--account-muted); font-size: 14px; line-height: 1.6; }
+.atlas-account-workspace .account-panel-subheader h3 { font-size: 21px; font-weight: 700; letter-spacing: -.035em; color: var(--account-ink); text-transform: none; }
+.atlas-account-workspace .account-panel-subheader p { margin-top: 6px; }
+.atlas-account-workspace .account-profile-photo-section { padding: 0 0 26px; gap: 22px; align-items: center; background: transparent; border: 0; border-bottom: 1px solid var(--account-line); border-radius: 0; }
+.atlas-account-workspace .account-profile-photo-preview-wrap { width: 88px; height: 88px; flex-basis: 88px; background: rgba(54,88,121,.09); }
+.atlas-account-workspace .account-profile-photo-initial { color: var(--account-blue); }
+.atlas-account-workspace .account-profile-photo-actions h3 { color: var(--account-ink); text-transform: none; font-size: 15px; font-weight: 600; }
+.atlas-account-workspace .account-profile-photo-actions p { color: var(--account-muted); font-size: 13px; }
+.atlas-account-workspace .account-profile-photo-button-row { gap: 16px; }
+.atlas-account-workspace .account-profile-photo-button-row button { min-height: 32px; padding: 0; border: 0; border-radius: 4px; background: transparent; font-size: 13px; letter-spacing: 0; text-transform: none; font-weight: 600; color: var(--account-blue); }
+.atlas-account-workspace .account-profile-photo-button-row .account-profile-photo-remove-button { color: var(--account-red); }
+.atlas-account-workspace .account-profile-photo-button-row button:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 3px; }
+.atlas-account-workspace #account-details-form { gap: 24px; }
+.atlas-account-workspace .account-details-grid { gap: 24px 20px; }
+.atlas-account-workspace .account-field label { color: var(--account-muted); font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; }
+.atlas-account-workspace :is(.account-field input,.account-field textarea,.custom-select-trigger,.account-review-editor-field input,.account-review-editor-field select,.account-review-editor-field textarea) {
+  min-height: 46px; padding-inline: 13px; border: 1px solid var(--account-field-border); border-radius: 10px; background: #fff; color: var(--account-ink); font-size: 14px; font-weight: 400;
+}
+.atlas-account-workspace .account-field input[readonly] { background: #efeeea; color: var(--account-muted); opacity: 1; border-color: var(--account-line); }
+.atlas-account-workspace .account-display-name-field input[readonly] { background: #fff; color: var(--account-ink); border-color: var(--account-field-border); }
+.atlas-account-workspace :is(.account-field input,.account-field textarea,.account-review-editor-field input,.account-review-editor-field textarea):focus {
+  border-color: var(--account-blue); box-shadow: 0 0 0 3px rgba(54,88,121,.10); outline: none;
+}
+.atlas-account-workspace .custom-select-value { color: var(--account-ink); }
+.atlas-account-workspace .custom-select-menu { border-radius: 12px; background: #fff; border-color: var(--account-line); box-shadow: 0 12px 36px rgba(0,0,0,.08); }
+.atlas-account-workspace .custom-select-option { border-radius: 8px; font-size: 13px; font-weight: 400; color: var(--account-ink); }
+.atlas-account-workspace .custom-select-option::before { background: var(--account-blue); }
+.atlas-account-workspace .custom-select-option:is(:hover,.active) { color: var(--account-blue); background: rgba(54,88,121,.07); }
+.atlas-account-workspace .account-display-name-row { position: relative; display: block; }
+.atlas-account-workspace .account-display-name-input-wrap input { padding-right: 84px; }
+.atlas-account-workspace .account-display-name-info-button { right: 46px; width: 32px; height: 32px; }
+.atlas-account-workspace .account-display-name-edit-button { position: absolute; right: 4px; top: 4px; width: 38px; height: 38px; border: 0; border-radius: 7px; background: transparent; }
+.atlas-account-workspace .account-display-name-edit-button img { filter: none; opacity: .75; width: 19px; height: 19px; }
+.atlas-account-workspace .account-display-name-edit-button:hover:not(:disabled) { background: rgba(54,88,121,.08); }
+.atlas-account-workspace .account-display-name-note { color: var(--account-muted); }
+.atlas-account-workspace .account-display-name-note:empty { display: none; }
+.atlas-account-workspace .account-divider { margin: 34px 0; background: var(--account-line); }
+.atlas-account-workspace #account-details-form > .account-divider { margin: 12px 0 0; }
+.atlas-account-workspace #account-details-form > .account-panel-subheader { margin: 0; }
+.atlas-account-workspace .account-connected-grid { grid-template-columns: 1fr; gap: 0; }
+.atlas-account-workspace .account-connected-account-card { grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 16px; min-height: 0; padding: 18px 0; border: 0; border-bottom: 1px solid var(--account-line); border-radius: 0; background: transparent; content-visibility: visible; }
+.atlas-account-workspace .account-connected-account-card:first-child { padding-top: 0; }
+.atlas-account-workspace .account-connected-account-main { gap: 6px; }
+.atlas-account-workspace .account-connected-title span { font-size: 14px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--account-ink); }
+.atlas-account-workspace .account-connected-account-main > strong { display: none; }
+.atlas-account-workspace .account-connected-account-main p { color: var(--account-muted); font-size: 13px; }
+.atlas-account-workspace .account-connected-actions { justify-items: end; }
+.atlas-account-workspace :is(.account-connected-badge,.account-connected-action-button).is-connected {
+  display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent; color: var(--account-green);
+  font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none; padding: 0; opacity: 1;
+}
+.atlas-account-workspace :is(.account-connected-badge,.account-connected-action-button).is-connected::before { content: ""; width: 6px; height: 6px; flex: 0 0 6px; border-radius: 50%; background: currentColor; }
+.atlas-account-workspace .account-connected-badge[hidden] { display: none; }
+.atlas-account-workspace .account-connected-action-button.is-connect { border-color: rgba(54,88,121,.24); background: rgba(54,88,121,.06); color: var(--account-blue); }
+.atlas-account-workspace .account-connected-action-button.is-connect:hover { background: rgba(54,88,121,.12); }
+.atlas-account-workspace :is(.account-primary-button,.account-secondary-button,.account-danger-button,.account-two-factor-button,.account-connected-action-button,.account-review-action-button,.account-login-session-revoke,.account-upload-download-button) { border-radius: 10px; font-size: 13px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.atlas-account-workspace .account-primary-button,
+.atlas-account-workspace #account-details-form .account-primary-button { min-height: 42px; padding: 0 17px; background: var(--account-ink); border-color: var(--account-ink); color: #fff; }
+.atlas-account-workspace .account-primary-button:hover:not(:disabled),
+.atlas-account-workspace #account-details-form .account-primary-button:hover:not(:disabled) { background: #4b4d4f; border-color: #4b4d4f; box-shadow: none; transform: none; }
+.atlas-account-workspace .account-secondary-button { background: #fff; border-color: var(--account-field-border); color: var(--account-ink); }
+.atlas-account-workspace .account-danger-button { background: rgba(150,80,74,.07); border-color: rgba(150,80,74,.23); color: var(--account-red); }
+.atlas-account-workspace .account-message { color: var(--account-muted); font-weight: 400; }
+.atlas-account-workspace .account-message.error { color: var(--account-red); }
+.atlas-account-workspace .account-message.success { color: var(--account-green); }
+.atlas-account-workspace #account-details-form .account-message:empty { margin: -24px 0 0; min-height: 0; }
+.atlas-account-workspace :is(.account-passkey-card,.account-two-factor-card,.account-login-session-card,.account-empty-state) { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.atlas-account-workspace :is(.account-passkey-row,.account-passkey-add-row,.account-two-factor-card,.account-login-session-card) { padding: 18px 0; min-height: 0; border-bottom: 1px solid var(--account-line); }
+.atlas-account-workspace .account-passkey-empty { padding-inline: 0; color: var(--account-muted); border-color: var(--account-line); }
+.atlas-account-workspace .account-two-factor-icon { background: rgba(54,88,121,.06); color: var(--account-blue); border-color: transparent; }
+.atlas-account-workspace :is(.account-two-factor-text h4,.account-login-session-title h4,.account-empty-state h3) { color: var(--account-ink); font-size: 14px; letter-spacing: 0; text-transform: none; }
+.atlas-account-workspace :is(.account-two-factor-text p,.account-login-session-meta,.account-empty-state p) { color: var(--account-muted); }
+.atlas-account-workspace .account-two-factor-button:not(.is-danger) { border-color: var(--account-field-border); background: #fff; color: var(--account-ink); }
+.atlas-account-workspace .account-two-factor-button:not(.is-danger):hover { background: rgba(54,88,121,.06); color: var(--account-blue); }
+.atlas-account-workspace #account-panel-reviews .account-activity-tabs { padding: 0; background: transparent; border: 0; border-bottom: 1px solid var(--account-line); border-radius: 0; box-shadow: none; gap: 20px; }
+.atlas-account-workspace #account-panel-reviews .account-activity-tab { border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 0 0 10px; background: transparent; color: var(--account-muted); font-size: 14px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.atlas-account-workspace #account-panel-reviews .account-activity-tab.active { background: transparent; border-bottom-color: var(--account-ink); color: var(--account-ink); font-weight: 600; }
+.atlas-account-workspace #account-panel-reviews .account-activity-tab:hover:not(.active) { background: transparent; color: var(--account-blue); }
+.atlas-account-workspace #account-panel-reviews .account-activity-tab.active .account-activity-count { background: rgba(54,88,121,.08); color: var(--account-blue); }
+.atlas-account-workspace #account-panel-reviews .account-activity-search input { border-radius: 10px; background: white; border-color: var(--account-field-border); color: var(--account-ink); }
+.atlas-account-workspace #account-panel-reviews .account-activity-search input:focus { border-color: var(--account-blue); box-shadow: 0 0 0 3px rgba(54,88,121,.10); }
+.atlas-account-workspace #account-panel-reviews .account-activity-order { color: var(--account-muted); letter-spacing: 0; text-transform: none; font-weight: 400; }
+.atlas-account-workspace #account-panel-reviews :is(.account-review-list,.account-upload-list) { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.atlas-account-workspace #account-panel-reviews :is(.account-review-item,.account-upload-item) { padding-inline: 0; }
+.atlas-account-workspace #account-panel-reviews :is(.account-review-item,.account-upload-item):hover { background: transparent; }
+.atlas-account-workspace #account-panel-reviews :is(.account-review-meta,.account-upload-meta) span:first-child { color: var(--account-blue); }
+.atlas-account-workspace #account-panel-reviews .account-review-professor-photo { background: #ecebe7; border-radius: 12px; }
+.atlas-account-workspace #account-panel-details.is-loading .account-details-loading-state,
+.atlas-account-workspace #account-panel-security .account-security-loading-state { padding: 0; background: var(--account-bg); }
+.atlas-account-workspace .account-skeleton-shape { background: #e9e6e1; }
+.atlas-account-workspace .account-skeleton-shape::after { background: linear-gradient(100deg, transparent 10%, #f4f2ef 50%, transparent 82%); }
+.atlas-account-workspace :is(.account-skeleton-profile,.account-skeleton-security-card,.account-skeleton-connected-card) { padding: 0; border: 0; background: transparent; border-radius: 0; }
+.atlas-account-workspace .account-skeleton-button { border-radius: 10px; }
+.atlas-account-workspace .account-skeleton-input { border-radius: 10px; height: 46px; }
+.atlas-account-workspace .account-skeleton-divider { background: var(--account-line); }
+.atlas-account-workspace :is(.account-review-editor-card,.account-authenticator-modal-card) { border-radius: 18px; background: #fff; color: var(--account-ink); }
+.atlas-account-workspace :is(.account-review-editor-header h2,.account-authenticator-modal-header h2,.security-access-header h2) { color: var(--account-ink); text-transform: none; letter-spacing: -.035em; }
+.atlas-account-workspace :is(.account-review-editor-header span,.account-review-editor-field label,.account-authenticator-code-field label,.security-access-field label,.security-access-eyebrow) { color: var(--account-muted); text-transform: none; letter-spacing: 0; }
+.atlas-account-workspace :is(.account-authenticator-code-input,.security-access-code-input):focus { border-color: var(--account-blue); box-shadow: 0 0 0 3px rgba(54,88,121,.1); }
+.atlas-account-workspace .security-access-submit { border-radius: 10px; background: var(--account-ink); color: #fff; text-transform: none; letter-spacing: 0; }
+.atlas-account-workspace :is(button,a,[tabindex]):focus-visible { outline: 2px solid var(--account-blue); outline-offset: 3px; }
+@media (max-width: 900px) {
+  .atlas-account-workspace .account-section { padding: 128px 24px 70px; }
+  .atlas-account-workspace .account-layout { grid-template-columns: minmax(0,1fr); gap: 32px; }
+  .atlas-account-workspace .account-sidebar { position: static; display: flex; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid var(--account-line); }
+  .atlas-account-workspace .account-sidebar-link { width: auto; padding-inline: 12px; }
+  .atlas-account-workspace .account-logout-link { margin-top: 0; }
+  .atlas-account-workspace .account-content { padding-left: 0; border-left: 0; }
+}
+@media (max-width: 760px) {
+  .atlas-account-workspace .account-details-grid, .atlas-account-workspace .account-skeleton-fields { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .atlas-account-workspace .account-section { padding-inline: 16px; }
+  .atlas-account-workspace .account-header { margin-bottom: 26px; }
+  .atlas-account-workspace .account-sidebar { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .atlas-account-workspace .account-sidebar-link { min-width: 0; padding-inline: 9px; gap: 8px; font-size: 13px; }
+  .atlas-account-workspace .account-profile-photo-section { flex-direction: row; gap: 14px; }
+  .atlas-account-workspace .account-profile-photo-preview-wrap { width: 72px; height: 72px; flex-basis: 72px; }
+  .atlas-account-workspace .account-profile-photo-actions { min-width: 0; width: auto; }
+  .atlas-account-workspace .account-profile-photo-button-row { width: auto; gap: 12px; }
+  .atlas-account-workspace .account-profile-photo-button-row > * { width: auto; flex: 0 1 auto; min-height: 44px; }
+  .atlas-account-workspace .account-display-name-edit-button { top: 1px; height: 44px; width: 44px; }
+  .atlas-account-workspace .account-display-name-info-button { right: 48px; width: 36px; height: 44px; }
+  .atlas-account-workspace .account-display-name-input-wrap input { padding-right: 94px; }
+  .atlas-account-workspace .account-connected-account-card { gap: 10px; }
+  .atlas-account-workspace .account-connected-account-main p { overflow-wrap: anywhere; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-account-workspace .account-panel.active { animation: none; }
+}

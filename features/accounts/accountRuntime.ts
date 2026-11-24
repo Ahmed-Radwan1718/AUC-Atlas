@@ -401,7 +401,7 @@ export function initializeAccounts(){
       const deferLoading = Boolean(options && options.deferLoading);
       const isActivity = panelName === "reviews";
       if (accountPage) accountPage.classList.toggle("is-activity-view", isActivity);
-      if (accountPageTitle) accountPageTitle.textContent = isActivity ? "Activity History" : "My Account";
+      if (accountPageTitle) accountPageTitle.textContent = isActivity ? "Activity history" : "My account";
       if (accountPageDescription) {
         accountPageDescription.textContent = isActivity
           ? "Manage the reviews and course materials you've shared with AUC Atlas."
