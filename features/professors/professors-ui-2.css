@@ -642,7 +642,7 @@
       align-self: center;
       transform: translateY(-2px);
       flex: 0 0 auto;
-      color: #c09a5c;
+      color: #365879;
       font-size: 20px;
       font-weight: 900;
       line-height: 1;
@@ -662,7 +662,7 @@
     }
 
     .professor-review-star.is-filled {
-      color: #c09a5c;
+      color: #365879;
     }
 
     .professor-review-rating-text {
