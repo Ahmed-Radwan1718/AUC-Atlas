@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { populateReviewCourseSelect, setupReviewDependsField, setupReviewSearchSelect, setupReviewChoiceMenus, setupReviewCompactControls } from "./reviewControls";
+import { populateReviewCourseSelect, setupReviewSearchSelect, setupReviewChoiceMenus, setupReviewCompactControls } from "./reviewControls";
 import { renderProfessorReviews, renderProfessorReviewsLocked, renderProfessorReviewsUnavailable } from "./reviewPresentation";
 
 async function loadProfessorReviews(professorId) {
@@ -116,7 +116,6 @@ async function submitProfessorReview(form, panel) {
     setupReviewChoiceMenus(form);
     setupReviewSearchSelect(form, "course");
     setupReviewSearchSelect(form, "semester");
-    setupReviewDependsField(form);
     setupReviewCompactControls(form);
 
     // Native select controls are visually replaced; validate them through
@@ -129,7 +128,8 @@ async function submitProfessorReview(form, panel) {
       const requiredFields = [
         form.querySelector("#review-course"),
         form.querySelector("#review-semester"),
-        form.querySelector("#review-rating")
+        form.querySelector("#review-rating"),
+        form.querySelector("#review-recommend")
       ];
       const missingField = requiredFields.find(function (field) {
         return !field || !field.value;
@@ -140,11 +140,13 @@ async function submitProfessorReview(form, panel) {
         if (message) {
           message.className = "review-form-message is-error";
           message.textContent =
-            "Choose a course, semester and overall rating before submitting.";
+            "Choose a course, semester, overall rating and recommendation before submitting.";
         }
 
         const visibleControl = missingField.id === "review-rating"
           ? form.querySelector("[data-review-rating='1']")
+          : missingField.id === "review-recommend"
+            ? form.querySelector("[data-review-recommend='Yes']")
           : missingField.id === "review-course" ||
             missingField.id === "review-semester"
             ? form.querySelector("#" + missingField.id + "-search")
