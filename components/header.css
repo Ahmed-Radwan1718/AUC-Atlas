@@ -729,3 +729,92 @@
     padding-top: 76px;
   }
 }
+
+/* Global three-part navigation: drawer trigger, centered logo, account. */
+.site-header:not(.site-header--homepagenew) { padding-inline: 14px; }
+.site-header .hamburger-toggle {
+  grid-column: 1; grid-row: 1; justify-self: start;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; padding: 0; border: 0; border-radius: 8px;
+  background: transparent; color: #36383a; cursor: pointer;
+}
+.site-header .hamburger-toggle:hover { color: #365879; background: rgba(54,88,121,.065); }
+.site-header .hamburger-toggle:focus-visible { outline: 2px solid #365879; outline-offset: 3px; }
+.site-header .site-header-logo, .site-header .site-header-logo:visited {
+  grid-column: 2; grid-row: 1; justify-self: center;
+}
+.site-header .site-header-actions { grid-column: 3; grid-row: 1; justify-self: end; }
+
+/* Mirror the Leave a review drawer from the left, with the Atlas ivory palette. */
+html:has(.atlas-nav-drawer[open]), body:has(.atlas-nav-drawer[open]) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.atlas-nav-drawer {
+  position: fixed; inset: 0; width: 100%; max-width: none;
+  height: 100dvh; max-height: none; margin: 0; padding: 0;
+  border: 0; background: transparent; color: #36383a; overflow: hidden;
+  font-family: Arial,sans-serif;
+}
+.atlas-nav-drawer:not([open]) { display: none; }
+.atlas-nav-drawer::backdrop {
+  background: rgba(23,23,23,.14);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.atlas-nav-panel {
+  box-sizing: border-box;
+  width: min(360px,calc(100% - 24px)); height: 100%;
+  display: flex; flex-direction: column; gap: 24px;
+  padding: max(26px,env(safe-area-inset-top)) 24px max(24px,env(safe-area-inset-bottom));
+  border-radius: 0 24px 24px 0;
+  background: #f8f7f4; box-shadow: 20px 0 80px rgba(42,32,20,.13);
+  overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+}
+.atlas-nav-drawer.is-open[open] .atlas-nav-panel {
+  animation: atlas-nav-slide-in 320ms cubic-bezier(.22,1,.36,1) both;
+}
+.atlas-nav-drawer.is-open[open]::backdrop { animation: atlas-nav-fade-in 280ms ease-out both; }
+.atlas-nav-drawer.is-closing[open] .atlas-nav-panel {
+  animation: atlas-nav-slide-out 250ms cubic-bezier(.4,0,.2,1) both;
+}
+.atlas-nav-drawer.is-closing[open]::backdrop { animation: atlas-nav-fade-out 220ms ease-in both; }
+@keyframes atlas-nav-slide-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes atlas-nav-slide-out { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@keyframes atlas-nav-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes atlas-nav-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.atlas-nav-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.atlas-nav-heading h2 { margin: 0; color: #36383a; font: 700 23px/1.2 Arial,sans-serif; letter-spacing: -.04em; }
+.atlas-nav-close {
+  width: 40px; height: 40px; flex: 0 0 40px; padding: 0; border: 0;
+  border-radius: 8px; display: grid; place-items: center;
+  background: transparent; color: #77716b; cursor: pointer;
+}
+.atlas-nav-close:hover { color: #365879; background: rgba(54,88,121,.06); }
+.atlas-nav-links { display: flex; flex: 1; flex-direction: column; gap: 5px; }
+.atlas-nav-link, .atlas-nav-link:visited {
+  position: relative; display: flex; align-items: center; gap: 14px;
+  min-height: 49px; padding: 10px 12px; box-sizing: border-box;
+  border-radius: 8px; color: #36383a; background: transparent;
+  font: 400 15px/1.4 Arial,sans-serif; text-decoration: none;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.atlas-nav-link svg { flex: 0 0 21px; color: #365879; }
+.atlas-nav-link:hover { color: #365879; background: rgba(54,88,121,.06); }
+.atlas-nav-link[aria-current="page"] { color: #365879; background: rgba(54,88,121,.085); font-weight: 600; }
+.atlas-nav-link[aria-current="page"]::before {
+  content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px; border-radius: 2px; background: #365879;
+}
+.atlas-nav-support { margin-top: auto; padding-top: 16px; border-top: 1px solid #e7e5e0; }
+.atlas-nav-drawer :is(a,button):focus-visible { outline: 2px solid #365879; outline-offset: 3px; }
+#new-homepage-semester-title { scroll-margin-top: 100px; }
+@media (max-width: 600px) {
+  .atlas-nav-panel { padding-inline: 18px; gap: 20px; border-radius: 0 20px 20px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-nav-drawer[open] .atlas-nav-panel, .atlas-nav-drawer[open]::backdrop,
+  .atlas-nav-drawer.is-open[open] .atlas-nav-panel, .atlas-nav-drawer.is-open[open]::backdrop,
+  .atlas-nav-drawer.is-closing[open] .atlas-nav-panel, .atlas-nav-drawer.is-closing[open]::backdrop {
+    animation: none;
+  }
+  .atlas-nav-link { transition: none; }
+}
