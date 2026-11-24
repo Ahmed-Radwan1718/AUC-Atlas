@@ -1184,6 +1184,40 @@ html:has(.new-homepage-course-drawer[open]) {
   overflow-wrap: anywhere;
 }
 
+.new-homepage-insights-skeleton-block {
+  display: block;
+  background: linear-gradient(105deg, #e9e6e1 30%, #f4f2ef 50%, #e9e6e1 70%);
+  background-size: 220% 100%;
+  animation: new-homepage-insights-shimmer 1.8s linear infinite;
+}
+
+.new-homepage-insights-skeleton-line {
+  height: 12px;
+  border-radius: 4px;
+}
+
+.new-homepage-insights-skeleton-line.is-name {
+  width: min(125px, 75%);
+  height: 15px;
+}
+
+.new-homepage-insights-skeleton-line.is-course {
+  width: min(185px, 90%);
+}
+
+.new-homepage-insights-skeleton-line.is-rating {
+  width: min(90px, 60%);
+}
+
+@keyframes new-homepage-insights-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .new-homepage-insights-skeleton-block { animation: none; }
+}
+
 .new-homepage-insights-person strong {
   font-size: 14px;
   font-weight: 600;
