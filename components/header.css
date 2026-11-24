@@ -578,6 +578,10 @@
   pointer-events: none;
 }
 
+.site-header--homepagenew .site-header-logo-auc {
+  color: #081521;
+}
+
 .site-header--homepagenew .site-header-nav {
   grid-column: 2;
   gap: 32px;
