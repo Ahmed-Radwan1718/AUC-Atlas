@@ -84,7 +84,7 @@
 .degree-page .degree-requirement-subgroup h4 { margin-bottom: 6px; color: var(--degree-ink); font-size: 14px; font-weight: 600; line-height: 1.4; }
 .degree-page .degree-requirement-item { display: grid; grid-template-columns: 18px minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 12px 0; border: 0; border-bottom: 1px solid var(--degree-line); border-radius: 0; background: transparent; min-height: 44px; }
 .degree-page .degree-requirement-item:last-child { border-bottom: 0; }
-/* Minimal completion control: the text, not a checkmark, indicates completion. */
+/* Option 3: dashed circle when incomplete, standalone checkmark and strikethrough when complete. */
 .degree-page .degree-requirement-item input[type="checkbox"] {
   -webkit-appearance: none;
   appearance: none;
@@ -103,8 +103,9 @@
   border-color: var(--degree-blue);
 }
 .degree-page .degree-requirement-item input[type="checkbox"]:checked {
-  border: 1px solid var(--degree-green);
-  background: transparent;
+  border: 0;
+  border-radius: 0;
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3 10l5 5L17 5' fill='none' stroke='%2335664f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 17px 17px no-repeat;
 }
 .degree-page .degree-requirement-item:has(input:checked) :is(.degree-course-code,.degree-course-title) {
   color: var(--degree-muted);
@@ -120,8 +121,13 @@
   color: var(--degree-green);
 }
 @media (forced-colors: active) {
-  .degree-page .degree-requirement-item input[type="checkbox"] { border-color: CanvasText; }
-  .degree-page .degree-requirement-item input[type="checkbox"]:checked { border: 2px solid Highlight; }
+  .degree-page .degree-requirement-item input[type="checkbox"],
+  .degree-page .degree-requirement-item input[type="checkbox"]:checked {
+    -webkit-appearance: auto;
+    appearance: auto;
+    background: none;
+    border: 0;
+  }
   .degree-page .degree-requirement-item:has(input:checked) :is(.degree-course-code,.degree-course-title) { text-decoration-color: CanvasText; }
 }
 @media (prefers-reduced-motion: reduce) {
