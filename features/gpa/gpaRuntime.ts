@@ -9,6 +9,10 @@ export function mountGpaCalculator() {
 
     const semestersRoot = document.getElementById("gpa-semesters");
     const addSemesterButton = document.getElementById("add-semester");
+    const summaryLoading = document.getElementById("gpa-summary-loading");
+    const summaryContent = document.getElementById("gpa-summary-content");
+    const sidebar = document.getElementById("gpa-sidebar");
+    const addSemesterPlaceholder = document.getElementById("gpa-add-semester-placeholder");
     const saveGpaButton = document.getElementById("save-gpa-plan");
     const resetButton = document.getElementById("reset-courses");
     const gpaSaveMessage = document.getElementById("gpa-save-message");
@@ -807,6 +811,10 @@ export function mountGpaCalculator() {
         const loadingState = semestersRoot.querySelector(".gpa-loading");
         if (loadingState) loadingState.remove();
         semestersRoot.setAttribute("aria-busy", "false");
+        if (summaryLoading) summaryLoading.hidden = true;
+        if (summaryContent) summaryContent.hidden = false;
+        if (sidebar) sidebar.setAttribute("aria-busy", "false");
+        if (addSemesterPlaceholder) addSemesterPlaceholder.hidden = true;
         addSemesterButton.hidden = false;
         saveGpaButton.disabled = false;
         resetButton.disabled = false;

@@ -441,3 +441,126 @@ body.gpa-dialog-open { overflow: hidden; }
   .gpa-page *, .gpa-page *::before, .gpa-page *::after { animation: none !important; transition: none !important; }
   .gpa-skeleton-shape { background: #efede9; }
 }
+
+/* Open academic worksheet — shared Atlas homepage design language. */
+.gpa-page {
+  --gpa-ink: #36383a;
+  --gpa-muted: #77716b;
+  --gpa-border: #dededa;
+  --gpa-line: #e7e5e0;
+  --gpa-blue: #365879;
+  --gpa-green: #35664f;
+  --gpa-red: #96504a;
+  --gpa-paper: #f8f7f4;
+  min-height: 100svh;
+  padding: clamp(140px,19vh,210px) 0 104px;
+  background:
+    radial-gradient(circle 380px at calc(50% + 690px) 440px, rgba(54,88,121,.24), rgba(54,88,121,.12) 34%, rgba(54,88,121,.045) 56%, transparent 76%),
+    radial-gradient(circle 410px at calc(50% - 690px) 850px, rgba(54,88,121,.18), rgba(54,88,121,.09) 34%, transparent 76%),
+    var(--gpa-paper);
+}
+.gpa-page .gpa-inner { width: min(1120px,calc(100% - 48px)); }
+.gpa-page .gpa-header { margin-bottom: 44px; }
+.gpa-page .gpa-header h1 { font-size: clamp(23px,3vw,29px); font-weight: 700; letter-spacing: -.045em; line-height: 1.15; text-transform: none; }
+.gpa-page .gpa-layout { grid-template-columns: minmax(0,1fr) 264px; gap: 36px; }
+.gpa-page .gpa-sidebar { position: sticky; top: 104px; padding-left: 30px; border-left: 1px solid var(--gpa-line); }
+.gpa-page .gpa-semesters { gap: 0; }
+.gpa-page .gpa-semester, .gpa-page .gpa-loading { padding: 0 0 28px; border: 0; border-bottom: 1px solid var(--gpa-line); border-radius: 0; background: transparent; box-shadow: none; }
+.gpa-page .gpa-semester + .gpa-semester { padding-top: 28px; }
+.gpa-page .gpa-loading { min-height: 0; overflow: visible; }
+.gpa-page .gpa-semester-header { margin-bottom: 22px; }
+.gpa-page .semester-name { font-size: 23px; font-weight: 700; letter-spacing: -.035em; }
+.gpa-page .semester-name:focus-visible { box-shadow: 0 2px 0 var(--gpa-blue); }
+.gpa-page .semester-course-count { color: var(--gpa-muted); font-weight: 400; }
+.gpa-page .remove-course { border-radius: 8px; font-size: 20px; color: var(--gpa-muted); }
+.gpa-page .remove-course:hover:not(:disabled) { color: var(--gpa-red); background: rgba(150,80,74,.07); }
+.gpa-page :is(.gpa-table-head,.gpa-row,.gpa-skeleton-labels,.gpa-skeleton-row) { grid-template-columns: minmax(0,1fr) 90px 108px 36px; gap: 12px; }
+.gpa-page .gpa-table-head { padding: 0 0 9px; color: var(--gpa-muted); font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; }
+.gpa-page .gpa-row > .course-name { max-width: none; }
+.gpa-page .gpa-row input:not([type="hidden"]), .gpa-page .grade-toggle { height: 46px; padding-inline: 13px; border-radius: 10px; font-size: 14px; font-weight: 400; border-color: var(--gpa-border); color: var(--gpa-ink); }
+.gpa-page .credits-dropdown .credits-toggle { padding: 0 25px 0 12px; }
+.gpa-page .gpa-row input::placeholder { color: #99958f; }
+.gpa-page .gpa-row input:not([type="hidden"]):focus, .gpa-page .grade-dropdown.open .grade-toggle { border-color: var(--gpa-blue); box-shadow: 0 0 0 3px rgba(54,88,121,.10); }
+.gpa-page .grade-menu { border-radius: 12px; border-color: var(--gpa-border); background: #fff; box-shadow: 0 12px 36px rgba(0,0,0,.08); }
+.gpa-page .grade-option { border-radius: 8px; font-weight: 400; }
+.gpa-page .grade-option::before { background: var(--gpa-blue); }
+.gpa-page .grade-option:is(:hover,.active,:focus-visible) { background: rgba(54,88,121,.07); color: var(--gpa-blue); }
+.gpa-page .grade-chevron { color: var(--gpa-muted); }
+.gpa-page .semester-course-footer { margin-top: 18px; padding-top: 14px; border-color: var(--gpa-line); }
+.gpa-page .semester-gpa-value { font-weight: 600; letter-spacing: -.035em; }
+.gpa-page .gpa-action { min-height: 42px; padding: 0 17px; border-radius: 10px; font-weight: 600; }
+.gpa-page .gpa-action:hover:not(:disabled) { transform: none; border-color: var(--gpa-blue); }
+.gpa-page .gpa-action.primary:hover:not(:disabled) { background: #4b4d4f; border-color: #4b4d4f; }
+.gpa-page .gpa-action.reset-plan { background: transparent; border-color: transparent; color: var(--gpa-red); font-weight: 400; }
+.gpa-page .gpa-action.reset-plan:hover:not(:disabled) { background: rgba(150,80,74,.06); border-color: transparent; color: var(--gpa-red); }
+.gpa-page .gpa-action.danger { background: var(--gpa-red); border-color: var(--gpa-red); color: #fff; }
+.gpa-page .gpa-action.semester-add-course { padding: 0; border: 0; border-radius: 4px; background: transparent; color: var(--gpa-blue); font-weight: 500; }
+.gpa-page .gpa-action.semester-add-course:hover { background: transparent; text-decoration: underline; text-underline-offset: 3px; }
+.gpa-page .gpa-add-semester, .gpa-page .gpa-add-semester-placeholder {
+  width: 100%; min-height: 52px; margin-top: 24px; padding: 0 16px;
+  border: 1px dashed #d0cec8; border-radius: 12px; background: transparent;
+  color: var(--gpa-blue); font: 500 14px Arial,sans-serif; display: flex;
+  align-items: center; justify-content: center; gap: 8px;
+}
+.gpa-page .gpa-add-semester:hover { transform: none; border-color: var(--gpa-blue); background: rgba(54,88,121,.045); }
+.gpa-page .gpa-summary { display: block; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.gpa-page .summary-label { color: var(--gpa-muted); font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; }
+.gpa-page .summary-number { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin: 14px 0 8px; }
+.gpa-page .summary-gpa { margin: 0; font-size: clamp(46px,5vw,56px); font-weight: 600; line-height: 1; letter-spacing: -.045em; }
+.gpa-page .summary-gpa.gpa-good { color: var(--gpa-green); }
+.gpa-page .summary-gpa.gpa-mid { color: var(--gpa-ink); }
+.gpa-page .summary-gpa.gpa-low { color: var(--gpa-red); }
+.gpa-page .summary-scale { color: var(--gpa-muted); font-size: 13px; white-space: nowrap; }
+.gpa-page .summary-caption { font-size: 13px; }
+.gpa-page .summary-items { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 26px; padding: 22px 0 0; border: 0; border-top: 1px solid var(--gpa-line); min-width: 0; }
+.gpa-page .summary-item { flex-direction: row; align-items: baseline; justify-content: space-between; gap: 12px; }
+.gpa-page .summary-item strong { color: var(--gpa-muted); font-size: 13px; font-weight: 400; }
+.gpa-page .summary-item span { font-size: 15px; font-weight: 600; }
+.gpa-page .gpa-header-tools { display: grid; justify-content: stretch; gap: 10px; padding-top: 22px; margin-top: 24px; border-top: 1px solid var(--gpa-line); }
+.gpa-page .gpa-save-message { text-align: left; }
+.gpa-page .gpa-save-message.success { color: var(--gpa-green); }
+.gpa-page .gpa-save-message.error { color: var(--gpa-red); }
+.gpa-page .gpa-confirm-dialog { border-radius: 18px; background: #fff; }
+.gpa-page .gpa-confirm-dialog h2 { letter-spacing: -.035em; }
+.gpa-page button:focus-visible { outline: 2px solid var(--gpa-blue); outline-offset: 3px; }
+.gpa-page .gpa-skeleton-shape { border-radius: 5px; background: linear-gradient(105deg,#e9e6e1 30%,#f4f2ef 50%,#e9e6e1 70%); background-size: 220% 100%; }
+.gpa-page .gpa-skeleton-input { height: 46px; border-radius: 10px; }
+.gpa-page .gpa-skeleton-top { margin-bottom: 22px; min-height: 44px; }
+.gpa-page .gpa-skeleton-labels { padding: 0 0 9px; min-height: 24px; }
+.gpa-page .gpa-skeleton-rows { gap: 14px; }
+.gpa-page .gpa-skeleton-footer { margin-top: 18px; padding-top: 14px; min-height: 57px; border-color: var(--gpa-line); }
+.gpa-page .gpa-skeleton-add { height: 14px; width: 92px; }
+.gpa-page .gpa-skeleton-summary-label { width: 104px; height: 13px; }
+.gpa-page .gpa-skeleton-summary-number { width: min(148px,100%); height: 56px; margin: 14px 0 8px; }
+.gpa-page .gpa-skeleton-summary-caption { width: min(160px,100%); height: 13px; }
+.gpa-page .gpa-skeleton-summary-key { width: 92px; height: 13px; }
+.gpa-page .gpa-skeleton-summary-value { width: 32px; height: 15px; }
+.gpa-page .gpa-skeleton-summary-save { height: 42px; width: 100%; border-radius: 10px; margin-top: 46px; }
+.gpa-page .gpa-skeleton-summary-reset { width: 70px; height: 13px; margin: 24px auto 12px; }
+@media (max-width: 1080px) {
+  .gpa-page .gpa-layout { grid-template-columns: minmax(0,1fr) 235px; gap: 28px; }
+  .gpa-page .gpa-sidebar { padding-left: 24px; }
+  .gpa-page :is(.gpa-table-head,.gpa-row,.gpa-skeleton-labels,.gpa-skeleton-row) { grid-template-columns: minmax(0,1fr) 76px 100px 32px; gap: 9px; }
+}
+@media (max-width: 820px) {
+  .gpa-page { padding: 128px 0 70px; }
+  .gpa-page .gpa-layout { grid-template-columns: minmax(0,1fr); gap: 32px; }
+  .gpa-page .gpa-sidebar { position: static; padding: 0 0 28px; border-left: 0; border-bottom: 1px solid var(--gpa-line); }
+  .gpa-page .gpa-header-tools { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .gpa-page .gpa-inner { width: calc(100% - 32px); }
+  .gpa-page .gpa-header { margin-bottom: 26px; }
+  .gpa-page .gpa-header h1 { font-size: clamp(23px,5vw,29px); }
+  .gpa-page .semester-name { font-size: 20px; }
+  .gpa-page .summary-items { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+  .gpa-page .summary-item { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .gpa-page .summary-item strong { font-size: 12px; }
+  .gpa-page :is(.gpa-row,.gpa-skeleton-row) { grid-template-columns: minmax(0,1fr) 84px 36px; gap: 9px; }
+  .gpa-page .gpa-skeleton-labels { display: none; }
+  .gpa-page .gpa-skeleton-rows { gap: 18px; }
+  .gpa-page .gpa-skeleton-summary-key { width: min(92px,100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gpa-page .gpa-skeleton-shape { animation: none; background: #e9e6e1; }
+}
