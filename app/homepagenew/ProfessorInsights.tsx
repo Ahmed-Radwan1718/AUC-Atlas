@@ -115,7 +115,6 @@ export default function ProfessorInsights({ semesters, current, account }: {
           </option>)}
         </select>
       </div>
-      <p className="new-homepage-insights-intro">Explore professors for your planned courses.</p>
       {account === "loading" ? <p className="new-homepage-insights-note" role="status">Loading your semester plan…</p> :
         account === "error" ? <p className="new-homepage-insights-note">Your semester plan couldn’t be loaded.</p> :
         account === "guest" ? <p className="new-homepage-insights-note"><a href="/login">Sign in</a> with a verified AUC account to see professor reviews.</p> :
@@ -140,7 +139,6 @@ export default function ProfessorInsights({ semesters, current, account }: {
               );
             })}
           </div>
-          <p className="new-homepage-insights-disclaimer">Based on available past and current student reviews for each course, not confirmed teaching assignments. Recommendations require at least 3 ratings; averages of 4.0 or higher are worth considering and 2.0 or lower warrant caution.</p>
         </>}
     </section>
   );
