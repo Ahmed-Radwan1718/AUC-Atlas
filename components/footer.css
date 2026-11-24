@@ -1,9 +1,9 @@
 
       .site-footer {
         padding: 46px 0 24px;
-        border-top: 1px solid rgba(23, 23, 23, 0.08);
+        border-top: 1px solid rgba(54, 56, 58, 0.08);
         background: rgba(255, 255, 255, 0.58);
-        color: #171717;
+        color: #36383a;
       }
 
       .site-footer-inner {
@@ -19,8 +19,8 @@
 
       .site-footer-logo {
         margin-bottom: 10px;
-        color: #171717;
-        font-weight: 700;
+        color: #36383a;
+        font-weight: 400;
         letter-spacing: -0.02em;
         display: inline-flex;
         align-items: baseline;
@@ -28,27 +28,27 @@
       }
 
       .site-footer-logo-auc {
-        color: rgba(192, 154, 92, 0.84);
+        color: #365879;
         font-size: 14px;
       }
 
       .site-footer-logo-atlas {
-        color: #171717;
+        color: #36383a;
         font-size: 22px;
       }
 
       .site-footer-brand p,
       .site-footer-bottom p {
-        color: rgba(23, 23, 23, 0.62);
+        color: rgba(54, 56, 58, 0.62);
         font-size: 14px;
         line-height: 1.7;
       }
 
       .site-footer-column h3 {
         margin-bottom: 13px;
-        color: rgba(192, 154, 92, 0.9);
+        color: #365879;
         font-size: 12px;
-        font-weight: 800;
+        font-weight: 400;
         letter-spacing: 0.14em;
         text-transform: uppercase;
       }
@@ -61,20 +61,20 @@
 
       .site-footer-links a,
       .site-footer-links a:visited {
-        color: rgba(23, 23, 23, 0.64);
+        color: rgba(54, 56, 58, 0.64);
         font-size: 14px;
-        font-weight: 700;
+        font-weight: 400;
         text-decoration: none;
       }
 
       .site-footer-links a:hover {
-        color: #171717;
+        color: #36383a;
       }
 
       .site-footer-bottom {
         margin-top: 34px;
         padding-top: 18px;
-        border-top: 1px solid rgba(23, 23, 23, 0.08);
+        border-top: 1px solid rgba(54, 56, 58, 0.08);
         display: flex;
         align-items: center;
         justify-content: space-between;
