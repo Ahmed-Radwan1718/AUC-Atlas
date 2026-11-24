@@ -29,8 +29,8 @@ function clearSignedInFlags() {
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const isNewHomepage = pathname === "/homepagenew";
-  const activeNavLinks = isNewHomepage ? newHomeNavLinks : navLinks;
+  const usesNewNavbar = pathname === "/homepagenew" || pathname.startsWith("/professors/");
+  const activeNavLinks = usesNewNavbar ? newHomeNavLinks : navLinks;
   const widgetRef = useRef<HTMLDivElement>(null);
   const [navOpen, setNavOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -41,7 +41,7 @@ export default function Header() {
   const [loggingOut, setLoggingOut] = useState(false);
   const photoUrl = user?.photoURL?.trim() || "";
   const hasUsablePhoto = Boolean(photoUrl) && failedPhotoUrl !== photoUrl;
-  const showPhotoSkeleton = isNewHomepage &&
+  const showPhotoSkeleton = usesNewNavbar &&
     (!sessionReady || (hasUsablePhoto && loadedPhotoUrl !== photoUrl));
 
   const loadAccountState = useCallback(async () => {
@@ -111,8 +111,8 @@ export default function Header() {
 
   return (
     <>
-      <header className={isNewHomepage ? "site-header site-header--homepagenew" : "site-header"}>
-        <a href={isNewHomepage ? "/homepagenew" : "/"} className="site-header-logo">
+      <header className={usesNewNavbar ? "site-header site-header--homepagenew" : "site-header"}>
+        <a href={usesNewNavbar ? "/homepagenew" : "/"} className="site-header-logo">
           <span className="site-header-logo-auc">AUC</span>
           <span className="site-header-logo-atlas">Atlas</span>
         </a>
@@ -128,7 +128,7 @@ export default function Header() {
                 setNavOpen(false);
                 setAccountOpen(value => !value);
               }}>
-              {isNewHomepage ? (
+              {usesNewNavbar ? (
                 <>
                   {showPhotoSkeleton && (
                     <span className="floating-account-photo-skeleton" aria-hidden="true" />
@@ -157,7 +157,7 @@ export default function Header() {
 
             </button>
             <div className={`floating-account-menu ${accountOpen ? "is-open" : ""}`}
-              id="floating-account-menu" hidden={!isNewHomepage && !accountOpen}>
+              id="floating-account-menu" hidden={!usesNewNavbar && !accountOpen}>
               {sessionReady && !user && <a href="/login" className="floating-account-menu-link" id="floating-login-link" onClick={() => setAccountOpen(false)}>
                 <img src="/user.png" alt=""/><span>Login</span>
               </a>}
