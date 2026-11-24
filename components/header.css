@@ -818,3 +818,11 @@ html:has(.atlas-nav-drawer[open]), body:has(.atlas-nav-drawer[open]) {
   }
   .atlas-nav-link { transition: none; }
 }
+
+/* At the top of the homepage, the same background continues under the navbar.
+   Keep the original opaque surface when scrolling or visiting other pages. */
+.site-header.site-header--homepagenew { transition: background-color 180ms ease; }
+.site-header.site-header--homepagenew[data-home-at-top="true"] { background-color: transparent; }
+@media (prefers-reduced-motion: reduce) {
+  .site-header.site-header--homepagenew { transition: none; }
+}
