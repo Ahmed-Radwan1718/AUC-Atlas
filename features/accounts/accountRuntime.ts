@@ -481,24 +481,15 @@ export function initializeAccounts(){
       icon.setAttribute("aria-hidden", "true");
       const namespace = "http://www.w3.org/2000/svg";
       const svg = document.createElementNS(namespace, "svg");
-      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("viewBox", "-1 -1 26 28");
       svg.setAttribute("fill", "none");
       svg.setAttribute("stroke", "currentColor");
-      svg.setAttribute("stroke-width", "1.8");
+      svg.setAttribute("stroke-width", "1.7");
       svg.setAttribute("stroke-linecap", "round");
       svg.setAttribute("stroke-linejoin", "round");
-      [
-        "M12 11a2 2 0 0 0-2 2c0 2.5-.1 5.6-1 8",
-        "M14 13c0 3-.2 6-1 8",
-        "M8 16c0 1.4-.1 2.8-.4 4",
-        "M16 16c-.1 1.7-.3 3.3-.7 4.9",
-        "M6 15v-2a6 6 0 0 1 12 0v3",
-        "M4 15v-2a8 8 0 0 1 16 0v3"
-      ].forEach(function (pathData) {
-        const path = document.createElementNS(namespace, "path");
-        path.setAttribute("d", pathData);
-        svg.appendChild(path);
-      });
+      const path = document.createElementNS(namespace, "path");
+      path.setAttribute("d", "M3 12 V9 A9 9 0 0 1 21 9 V14 M6 15 V9 A6 6 0 0 1 18 9 V15 M9 19 V9 A3 3 0 0 1 15 9 V15 Q15 20 13 23 M12 10 Q13 18 9 22 M18 18 L17 22");
+      svg.appendChild(path);
       icon.appendChild(svg);
       return icon;
     }
