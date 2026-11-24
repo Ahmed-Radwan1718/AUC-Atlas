@@ -305,6 +305,53 @@ function populateReviewCourseSelect(form) {
       select.dataset.reviewChoiceReady = "true";
       select.classList.add("review-native-select");
 
+      if (select.hasAttribute("data-review-inline")) {
+        const group = document.createElement("div");
+        const fieldLabel = select.parentElement.querySelector("label");
+        group.className = "review-inline-options";
+        group.setAttribute("role", "group");
+        if (fieldLabel) {
+          fieldLabel.id = select.id + "-label";
+          group.setAttribute("aria-labelledby", fieldLabel.id);
+        }
+
+        const buttons = Array.from(select.options)
+          .filter(option => option.value && !option.disabled)
+          .map(function (option) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.dataset.reviewInlineValue = option.value;
+            button.textContent = option.textContent;
+            group.appendChild(button);
+            return button;
+          });
+
+        function syncInlineOptions() {
+          buttons.forEach(function (button) {
+            const selected = select.value === button.dataset.reviewInlineValue;
+            button.classList.toggle("is-active", selected);
+            button.setAttribute("aria-pressed", String(selected));
+          });
+        }
+
+        buttons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            // Optional answers can be cleared by pressing the selected answer again.
+            select.value = select.value === button.dataset.reviewInlineValue && !select.required
+              ? "" : button.dataset.reviewInlineValue;
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+          });
+        });
+
+        select.insertAdjacentElement("afterend", group);
+        select.addEventListener("change", syncInlineOptions);
+        form.addEventListener("reset", function () {
+          queueMicrotask(syncInlineOptions);
+        });
+        syncInlineOptions();
+        return;
+      }
+
       const choice = document.createElement("div");
       const button = document.createElement("button");
       const label = document.createElement("span");
