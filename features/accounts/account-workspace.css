@@ -203,3 +203,9 @@
   border-radius: 50%;
   background: currentColor;
 }
+
+/* Custom fingerprint: no square tile behind the outline. */
+.atlas-account-workspace .account-two-factor-icon.account-passkey-icon {
+  background: transparent;
+  color: var(--account-blue);
+}
