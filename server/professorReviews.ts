@@ -14,7 +14,7 @@ const validChoices: Record<string, string[]> = {
   recommendation: ["Yes", "No"],
   attendancePolicy: ["Required", "Sometimes checked", "Not important", "Not sure"],
   workload: ["Light", "Moderate", "Heavy"],
-  lectureUsefulness: ["Essential", "Helpful", "Attending means less work at home", "Skippable", "Not lecture-based"],
+  lectureUsefulness: ["Essential", "Helpful", "Attending means less work at home", "Skippable"],
   officeHours: ["Helpful", "Available but limited", "Hard to reach", "Did not use"],
   gradingStyle: ["Exams-heavy", "Projects-heavy", "Assignments-heavy", "Participation-heavy", "Mixed"],
   examDifficulty: ["Easier than class material", "Matches class material", "Harder than class material", "No exams"],
