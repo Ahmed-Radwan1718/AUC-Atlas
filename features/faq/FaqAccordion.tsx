@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 /**
- * Original FAQ's accessible, individually expandable rows and motion timings.
+ * Accessible, individually expandable FAQ rows with short transitions.
  * The questions and answers are SSR HTML; only the animation needs JavaScript.
  */
 export default function FaqAccordion() {
@@ -55,7 +55,7 @@ export default function FaqAccordion() {
             transform: "translateY(0)",
           },
         ], {
-          duration: 440,
+          duration: 250,
           easing: "cubic-bezier(0.16, 1, 0.3, 1)",
           fill: "both",
         });
@@ -82,7 +82,7 @@ export default function FaqAccordion() {
           transform: "translateY(-6px)",
         },
       ], {
-        duration: 320,
+        duration: 250,
         easing: "cubic-bezier(0.4, 0, 0.2, 1)",
         fill: "both",
       });
