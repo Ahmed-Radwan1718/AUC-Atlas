@@ -357,12 +357,6 @@ export default function SemesterPlanner() {
             onChange={event => setQuery(event.target.value)}
             aria-label="Search by course code or name"
             placeholder="Search by course code or name" autoComplete="off" />
-          {!query.trim() && degreeOptions.length > 0 && (
-            <p className="new-homepage-course-drawer-hint">
-              <strong>From your degree plan</strong>
-              <span>Check prerequisites before enrolling.</span>
-            </p>
-          )}
           {semesterFull && <p className="new-homepage-semester-note" role="status">This semester has reached its 20-course limit.</p>}
           <div className="new-homepage-semester-suggestions">
             {availableCourses.map(course => {
