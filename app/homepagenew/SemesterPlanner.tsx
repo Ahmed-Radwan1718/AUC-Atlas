@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import ProfessorInsights from "./ProfessorInsights";
 import { courses } from "../../data/courses";
 import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
 import type { DegreeRequirementGroup } from "./degreeProgressSummary";
@@ -235,6 +236,7 @@ export default function SemesterPlanner() {
   };
 
   return (
+    <>
     <section className="new-homepage-semester-section" aria-labelledby="new-homepage-semester-title">
       <div className="new-homepage-semester-head">
         <h2 id="new-homepage-semester-title">Plan Your Semesters</h2>
@@ -358,5 +360,7 @@ export default function SemesterPlanner() {
         </footer>
       </dialog>
     </section>
+    <ProfessorInsights semesters={semesters} current={currentSemester()} account={account} />
+    </>
   );
 }
