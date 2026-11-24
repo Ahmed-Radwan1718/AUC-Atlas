@@ -188,3 +188,46 @@ test("course insights reject unrelated and duplicate reviews, avoid overclaiming
   assert.equal(result[3].category, "limited");
   assert.equal(summarize([], "MENG 3209").length, 0);
 });
+
+
+test("semester credit cap uses actual catalog credits and preserves legacy plans for cleanup", () => {
+  const source = read("lib/semesterCredits.ts");
+  const compiled = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+  }).outputText;
+  const module = { exports: {} as Record<string, any> };
+  const codes = Array.from({ length: 8 }, (_, i) => "MENG " + (4200 + i));
+  const items = codes.map(code => code + " - Course (3 cr.)");
+  items.push("CHEM 1015 - Laboratory (1 cr.)", "TEST 1000 - Training (0 cr.)",
+    "TEST 2000 - Variable (1-4 cr.)", "TEST 3000 - Combined (3 cr. + 1 cr.)");
+  vm.runInNewContext(compiled, {
+    module, exports: module.exports,
+    require(id: string) {
+      assert.equal(id, "../data/degree-requirements");
+      return { DEGREE_REQUIREMENTS: { Test: { groups: [{ items }] } } };
+    }
+  });
+  const { courseCredits, semesterCreditSummary, canAddSemesterCourse, semesterCreditViolation } = module.exports;
+  assert.equal(courseCredits("CHEM 1015"), 1);
+  assert.equal(courseCredits("TEST 1000"), 0);
+  assert.equal(courseCredits("TEST 2000"), 4);
+  assert.equal(courseCredits("TEST 3000"), 4);
+  assert.equal(courseCredits("UNKNOWN 1000"), null);
+  const seven = codes.slice(0, 7);
+  assert.equal(semesterCreditSummary(seven).total, 21);
+  assert.equal(canAddSemesterCourse(seven, codes[7]), false);
+  assert.equal(canAddSemesterCourse(seven, "CHEM 1015"), false);
+  assert.equal(canAddSemesterCourse(seven, "TEST 1000"), true);
+  assert.equal(canAddSemesterCourse(codes.slice(0, 6), codes[6]), true);
+  assert.equal(canAddSemesterCourse([], "UNKNOWN 1000"), false);
+  const semester = (courses: string[]) => [{ name: "Fall 2026", courses }];
+  assert.equal(semesterCreditViolation(semester(seven)), null);
+  assert.match(semesterCreditViolation(semester(codes)), /maximum 21 credits/);
+  assert.equal(semesterCreditViolation(semester(codes), semester(codes)), null);
+  assert.equal(semesterCreditViolation(semester(seven), semester(codes)), null);
+  assert.match(semesterCreditViolation(semester([...codes, "TEST 1000"]), semester(codes)), /maximum 21 credits/);
+  assert.match(semesterCreditViolation(semester(["UNKNOWN 1000"])), /credit values are unavailable/);
+  assert.equal(semesterCreditViolation(semester([]), semester(["UNKNOWN 1000"])), null);
+  assert.match(read("app/api/semester-plan/route.ts"), /semesterCreditViolation\(semesters, previous\)/);
+  assert.match(read("app/homepagenew/SemesterPlanner.tsx"), /canAddSemesterCourse\(selected.courses, code\)/);
+});
