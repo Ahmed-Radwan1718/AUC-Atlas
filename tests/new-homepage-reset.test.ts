@@ -154,6 +154,13 @@ test("Professor Insights follows live planner state and uses protected course re
   assert.match(insights, /aria-label="Professor insights semester"/);
   assert.match(insights, /\/api\/professor-reviews\?courseCode=/);
   assert.match(insights, /response.status === 401/);
+  assert.match(insights, /<SemesterInsights\b[^>]*codes=\{selected\.courses\}/);
+  assert.match(insights, /<ProfessorColumn label="Consider" category="consider"/);
+  assert.match(insights, /<ProfessorColumn label="Avoid" category="caution"/);
+  assert.match(insights, /insight\.courseCode \+ ":" \+ insight\.professorId/);
+  assert.match(insights, /summarizeCourseProfessors\(data\.reviews, code\)/);
+  assert.match(insights, /new-homepage-insights-person-course/);
+  assert.doesNotMatch(insights, /function CourseInsights|new-homepage-insights-course-toggle/);
   assert.doesNotMatch(insights, /Explore professors for your planned courses\.|Based on available past and current student reviews/);
 });
 
