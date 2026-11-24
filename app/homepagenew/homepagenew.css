@@ -502,8 +502,8 @@
   aspect-ratio: 1 / 1;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
-  padding: 34px 16px 16px;
+  justify-content: flex-end;
+  padding: 34px 16px 24px;
   overflow: hidden;
   isolation: isolate;
   border: 1px solid rgba(186, 187, 184, 0.42);
