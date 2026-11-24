@@ -2,28 +2,28 @@
 .new-homepage {
   min-height: 100svh;
   padding: clamp(140px, 19vh, 210px) 24px 104px;
+  /* A scattered, deliberately asymmetric field of soft Atlas-blue glows.
+     Different radii and strengths keep the pattern organic without animation. */
+  --home-glow-rgb: 54, 88, 121;
   background:
-    radial-gradient(
-      circle 380px at calc(50% + 690px) 440px,
-      rgba(54, 88, 121, 0.24) 0%,
-      rgba(54, 88, 121, 0.12) 34%,
-      rgba(54, 88, 121, 0.045) 56%,
-      transparent 76%
-    ),
-    radial-gradient(
-      circle 410px at calc(50% - 690px) 850px,
-      rgba(54, 88, 121, 0.18) 0%,
-      rgba(54, 88, 121, 0.09) 34%,
-      rgba(54, 88, 121, 0.03) 58%,
-      transparent 76%
-    ),
-    radial-gradient(
-      circle 360px at calc(50% + 680px) 1240px,
-      rgba(54, 88, 121, 0.16) 0%,
-      rgba(54, 88, 121, 0.075) 35%,
-      rgba(54, 88, 121, 0.025) 58%,
-      transparent 76%
-    ),
+    radial-gradient(circle 235px at 7% 190px,
+      rgba(var(--home-glow-rgb), .20), rgba(var(--home-glow-rgb), .08) 38%, transparent 82%),
+    radial-gradient(circle 440px at 86% 375px,
+      rgba(var(--home-glow-rgb), .33), rgba(var(--home-glow-rgb), .15) 32%, rgba(var(--home-glow-rgb), .045) 59%, transparent 84%),
+    radial-gradient(circle 280px at 24% 475px,
+      rgba(var(--home-glow-rgb), .14), rgba(var(--home-glow-rgb), .055) 36%, transparent 81%),
+    radial-gradient(circle 385px at 13% 810px,
+      rgba(var(--home-glow-rgb), .28), rgba(var(--home-glow-rgb), .12) 36%, rgba(var(--home-glow-rgb), .035) 60%, transparent 85%),
+    radial-gradient(circle 220px at 96% 925px,
+      rgba(var(--home-glow-rgb), .21), rgba(var(--home-glow-rgb), .075) 40%, transparent 82%),
+    radial-gradient(circle 340px at 77% 1190px,
+      rgba(var(--home-glow-rgb), .25), rgba(var(--home-glow-rgb), .10) 35%, rgba(var(--home-glow-rgb), .025) 62%, transparent 84%),
+    radial-gradient(circle 210px at 35% 1400px,
+      rgba(var(--home-glow-rgb), .14), rgba(var(--home-glow-rgb), .045) 38%, transparent 82%),
+    radial-gradient(circle 410px at 5% 1660px,
+      rgba(var(--home-glow-rgb), .22), rgba(var(--home-glow-rgb), .09) 36%, transparent 85%),
+    radial-gradient(circle 320px at 92% 1950px,
+      rgba(var(--home-glow-rgb), .19), rgba(var(--home-glow-rgb), .07) 39%, transparent 83%),
     #f8f7f4;
   color: #36383a;
 }
@@ -944,6 +944,15 @@ html:has(.new-homepage-course-drawer[open]) {
 @media (max-width: 600px) {
   .new-homepage {
     padding: 128px 16px 70px;
+    /* Smaller and quieter edge glows on narrow screens. */
+    background:
+      radial-gradient(circle 175px at -8% 220px, rgba(var(--home-glow-rgb), .14), transparent 85%),
+      radial-gradient(circle 240px at 108% 440px, rgba(var(--home-glow-rgb), .20), rgba(var(--home-glow-rgb), .06) 45%, transparent 85%),
+      radial-gradient(circle 195px at -5% 830px, rgba(var(--home-glow-rgb), .17), transparent 85%),
+      radial-gradient(circle 170px at 103% 1110px, rgba(var(--home-glow-rgb), .12), transparent 85%),
+      radial-gradient(circle 230px at 4% 1540px, rgba(var(--home-glow-rgb), .14), transparent 85%),
+      radial-gradient(circle 210px at 110% 1900px, rgba(var(--home-glow-rgb), .15), transparent 85%),
+      #f8f7f4;
   }
 
 
