@@ -13,7 +13,6 @@ const drawerLinks = [
   { href: "/professors", label: "Professors", icon: "professors" },
   { href: "/gpa-calculator", label: "GPA calculator", icon: "calculator" },
   { href: "/degree-progression", label: "Degree progression", icon: "progress" },
-  { href: "/#new-homepage-semester-title", label: "Semester planner", icon: "calendar" },
 ] as const;
 
 type DrawerIconName = (typeof drawerLinks)[number]["icon"] | "help";
@@ -26,7 +25,6 @@ function DrawerIcon({ name }: { name: DrawerIconName }) {
       {name === "professors" && <><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2"/></>}
       {name === "calculator" && <><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M9 12h.01M15 12h.01M9 16h.01M15 16h.01" strokeWidth="2.2"/></>}
       {name === "progress" && <path d="M4 4v16h16M8 16v-4m5 4V9m5 7V5"/>}
-      {name === "calendar" && <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01m4 0h.01"/></>}
       {name === "help" && <><circle cx="12" cy="12" r="9"/><path d="M9.2 9a2.8 2.8 0 0 1 5.6 0c0 2-2.8 2.1-2.8 4m0 3h.01"/></>}
     </svg>
   );
@@ -47,7 +45,6 @@ export default function Header() {
   const usesNewNavbar = pathname === "/" || pathname === "/accounts" || pathname === "/degree-progression" || pathname === "/gpa-calculator" || pathname === "/faq" || pathname === "/privacy" || pathname === "/terms" || pathname === "/professors" || pathname.startsWith("/professors/");
   const widgetRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDialogElement>(null);
-  const [hash, setHash] = useState("");
   const [navOpen, setNavOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [user, setUser] = useState<AtlasUser | null>(null);
@@ -87,12 +84,6 @@ export default function Header() {
   useEffect(() => {
     setNavOpen(false);
     setAccountOpen(false);
-  }, [pathname]);
-  useEffect(() => {
-    const updateHash = () => setHash(window.location.hash);
-    updateHash();
-    window.addEventListener("hashchange", updateHash);
-    return () => window.removeEventListener("hashchange", updateHash);
   }, [pathname]);
 
   // Native modal semantics provide a focus trap and make the page behind inert.
@@ -243,11 +234,7 @@ export default function Header() {
           </div>
           <nav className="atlas-nav-links" aria-label="Main navigation">
             {drawerLinks.map(({ href, label, icon }) => {
-              const isCurrent = href === "/#new-homepage-semester-title"
-                ? pathname === "/" && hash === "#new-homepage-semester-title"
-                : href === "/"
-                  ? pathname === "/" && hash !== "#new-homepage-semester-title"
-                  : pathname === href || pathname.startsWith(href + "/");
+              const isCurrent = pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
               return (
                 <a href={href} className="atlas-nav-link" key={href}
                   aria-current={isCurrent ? "page" : undefined} onClick={() => setNavOpen(false)}>
