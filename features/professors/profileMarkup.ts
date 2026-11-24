@@ -139,20 +139,14 @@ export const reviewFormFieldsMarkup = `
                 <select id="review-recommend" class="review-native-select" name="recommendation">
                   <option value="" selected>Choose recommendation</option>
                   <option>Yes</option>
-                  <option>Depends</option>
                   <option>No</option>
                 </select>
                 <div class="review-recommend-options" role="group" aria-labelledby="review-recommend-label">
                   <button type="button" data-review-recommend="Yes" aria-pressed="false">Yes</button>
-                  <button type="button" data-review-recommend="Depends" aria-pressed="false">Depends</button>
                   <button type="button" data-review-recommend="No" aria-pressed="false">No</button>
                 </div>
               </div>
 
-              <div class="review-field full" data-depends-reason hidden>
-                <label for="review-recommend-reason">If your answer depends, what does it depend on?</label>
-                <input id="review-recommend-reason" name="recommendationReason" type="text" maxlength="220" placeholder="Example: Great for lectures, harder for exams">
-              </div>
               </section>
 
               <section class="review-question-section" aria-labelledby="review-experience-heading">
