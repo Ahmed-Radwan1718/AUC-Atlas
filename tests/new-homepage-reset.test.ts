@@ -154,7 +154,7 @@ test("Professor Insights follows live planner state and uses protected course re
   assert.match(insights, /aria-label="Professor insights semester"/);
   assert.match(insights, /\/api\/professor-reviews\?courseCode=/);
   assert.match(insights, /response.status === 401/);
-  assert.match(insights, /not confirmed teaching assignments/);
+  assert.doesNotMatch(insights, /Explore professors for your planned courses\.|Based on available past and current student reviews/);
 });
 
 test("course insights reject unrelated and duplicate reviews, avoid overclaiming small samples, and rank extremes", () => {
