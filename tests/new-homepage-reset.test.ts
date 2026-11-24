@@ -269,9 +269,10 @@ test("the global header uses a centered logo and an accessible left navigation d
   assert.match(header, /<dialog ref=\{drawerRef\} id="atlas-navigation-drawer"/);
   assert.match(header, /drawer\.showModal\(\)/);
   assert.match(header, /onCancel=\{event => \{ event\.preventDefault\(\); setNavOpen\(false\); \}\}/);
-  for (const route of ["/professors", "/gpa-calculator", "/degree-progression", "/#new-homepage-semester-title", "/faq"]) {
+  for (const route of ["/professors", "/gpa-calculator", "/degree-progression", "/faq"]) {
     assert.ok(header.includes(route));
   }
+  assert.doesNotMatch(header, /Semester planner|new-homepage-semester-title/);
   assert.match(read("app/homepagenew/SemesterPlanner.tsx"), /id="new-homepage-semester-title"/);
   assert.match(css, /\.site-header \.hamburger-toggle\s*\{\s*grid-column: 1/);
   assert.match(css, /@keyframes atlas-nav-slide-in\s*\{\s*from\s*\{\s*transform: translateX\(-100%\)/);
