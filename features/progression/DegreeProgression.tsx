@@ -8,15 +8,14 @@ const markup = `
     <section class="degree-section">
       <div class="degree-inner">
         <div class="degree-header">
-          <h1>Degree Progression</h1>
-          <p>Track your academic progress and remaining requirements.</p>
+          <h1>Degree progression</h1>
         </div>
 
         <div class="degree-layout">
           <aside class="account-sidebar">
             <a class="account-sidebar-link" href="/accounts#details">
               <span class="account-sidebar-icon account-details-icon" aria-hidden="true"></span>
-              <span>Account Details</span>
+              <span>Account details</span>
             </a>
 
             <a class="account-sidebar-link" href="/accounts#security">
@@ -24,19 +23,19 @@ const markup = `
               <span>Security</span>
             </a>
 
-            <a class="account-sidebar-link active" href="/degree-progression">
+            <a class="account-sidebar-link active" href="/degree-progression" aria-current="page">
               <span class="account-sidebar-icon account-degree-icon" aria-hidden="true"></span>
-              <span>Degree Progression</span>
+              <span>Degree progression</span>
             </a>
 
             <a class="account-sidebar-link" href="/accounts#reviews">
               <span class="account-sidebar-icon account-reviews-icon" aria-hidden="true"></span>
-              <span>Activity History</span>
+              <span>Activity history</span>
             </a>
 
             <button class="account-sidebar-link account-logout-link" type="button" id="degree-logout-sidebar">
               <span class="account-logout-icon" aria-hidden="true"></span>
-              <span>Logout</span>
+              <span>Log out</span>
             </button>
           </aside>
 
@@ -44,8 +43,8 @@ const markup = `
             <article class="degree-panel">
               <div class="degree-panel-header">
                 <div>
-                  <h2 id="degree-major-name">Loading Requirements</h2>
-                  <p id="degree-major-copy">Your saved major will load here.</p>
+                  <h2 id="degree-major-name">Loading requirements</h2>
+                  <p id="degree-major-copy" hidden></p>
                 </div>
 
                 <div class="degree-panel-actions">
@@ -55,30 +54,24 @@ const markup = `
                     type="button"
                     disabled
                   >
-                    Save Progress
+                    Save progress
                   </button>
                 </div>
               </div>
 
               <div class="degree-summary-grid" aria-label="Degree progress summary">
-                <div class="degree-stat-card">
-                  <span>Completed Credits</span>
-                  <strong id="degree-completed-count">0</strong>
+                <div class="degree-completed-summary">
+                  <span>Credits completed</span>
+                  <div class="degree-completed-number">
+                    <strong id="degree-completed-count">0</strong>
+                    <span>/ <span id="degree-total-count">0</span></span>
+                  </div>
                 </div>
-
-                <div class="degree-stat-card">
-                  <span>Remaining Credits</span>
-                  <strong id="degree-remaining-count">0</strong>
-                </div>
-
-                <div class="degree-stat-card">
-                  <span>Progress</span>
-                  <strong id="degree-progress-percent">0%</strong>
-                </div>
-
-                <div class="degree-progress-track" aria-hidden="true">
+                <strong id="degree-progress-percent" class="degree-percent">0%</strong>
+                <div class="degree-progress-track" role="progressbar" aria-label="Degree progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                   <div class="degree-progress-bar" id="degree-progress-bar"></div>
                 </div>
+                <p class="degree-remaining"><span id="degree-remaining-count">0</span> credits remaining</p>
               </div>
 
               <p
