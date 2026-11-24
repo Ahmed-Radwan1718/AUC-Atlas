@@ -253,10 +253,9 @@ export default function SemesterPlanner() {
     <section className="new-homepage-semester-section" aria-labelledby="new-homepage-semester-title">
       <div className="new-homepage-semester-head">
         <h2 id="new-homepage-semester-title">Plan Your Semesters</h2>
-        {account === "signed-in" && saveState !== "idle" && (
+        {account === "signed-in" && saveState !== "idle" && saveState !== "saved" && (
           <span className="new-homepage-semester-save" role="status">
             {saveState === "saving" ? "Saving..."
-              : saveState === "saved" ? "Saved"
               : saveState === "error" ? (
                 <button type="button" onClick={() => {
                   latestRevision.current += 1;
