@@ -315,3 +315,15 @@ test("semester removal confirms populated semesters and persists intentionally e
   assert.match(route, /hasSavedPlan: savedPlan !== null/);
   assert.match(css, /\.new-homepage-semester-meta \{\s*justify-content: space-between/);
 });
+
+test("homepage ambient glows extend behind the header at the top", () => {
+  const header = read("components/Header.tsx");
+  const css = read("components/header.css");
+  const homepage = read("app/homepagenew/homepagenew.css");
+  assert.match(header, /data-home-at-top=\{pathname === "\/" && !homeScrolled/);
+  assert.match(header, /setHomeScrolled\(window.scrollY > 12\)/);
+  assert.match(header, /addEventListener\("scroll", update, \{ passive: true \}\)/);
+  assert.match(css, /\[data-home-at-top="true"\] \{ background-color: transparent; \}/);
+  assert.match(homepage, /circle 265px at 7% 90px/);
+  assert.match(homepage, /circle 175px at -8% 75px/);
+});
