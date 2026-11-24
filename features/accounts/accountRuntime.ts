@@ -54,7 +54,6 @@ export function initializeAccounts(){
     const deleteAccountConfirmation = document.getElementById("delete-account-confirmation");
     const deleteAccountSubmit = document.getElementById("delete-account-submit");
     const deleteAccountMessage = document.getElementById("delete-account-message");
-    const accountLoginSessionsList = document.getElementById("account-login-sessions-list");
     const changePasswordOpenButton = document.getElementById("change-password-open-button");
     const changePasswordForm = document.getElementById("change-password-form");
     const changePasswordCancelButton = document.getElementById("change-password-cancel-button");
@@ -421,7 +420,7 @@ export function initializeAccounts(){
       // On a deep-linked refresh, select the right panel before fetching profile
       // data, but defer protected requests until the session is verified.
       if (!deferLoading && panelName === "security") {
-        loadAccountLoginSessions();
+        setAccountSecurityLoading(false);
         loadAccountPasskeys();
       }
 
@@ -635,99 +634,6 @@ export function initializeAccounts(){
         .replace(/'/g, "&#39;");
     }
 
-    function getAccountSessionDateLabel(value) {
-      const date = new Date(value);
-
-      if (!value || Number.isNaN(date.getTime())) {
-        return "Not available";
-      }
-
-      return date.toLocaleString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-      });
-    }
-
-    function getAccountSessionBrowserIcon(session) {
-      const browserKey = String(session.browserKey || "").toLowerCase();
-      const browserName = String(session.browserName || session.browserLabel || "").toLowerCase();
-
-      if (browserKey === "safari" || browserName.includes("safari")) {
-        return "safari-icon.png";
-      }
-
-      if (browserKey === "firefox" || browserName.includes("firefox")) {
-        return "firefox-icon.png";
-      }
-
-      return "chrome-icon.png";
-    }
-
-    function renderAccountLoginSessions(sessions) {
-      const safeSessions = Array.isArray(sessions) ? sessions : [];
-
-      if (!accountLoginSessionsList) {
-        return;
-      }
-
-      if (!safeSessions.length) {
-        accountLoginSessionsList.innerHTML = `
-          <div class="account-empty-state">
-            <h3>No active sessions</h3>
-            <p>No browsers or devices are currently signed in to your account.</p>
-          </div>
-        `;
-        return;
-      }
-
-      accountLoginSessionsList.innerHTML = safeSessions.map(function (session) {
-        const sessionId = session.id || "";
-        const browserText = session.browserName || session.browserLabel || "Browser";
-        const platformText = session.platformLabel || session.osName || "Device";
-        const titleText = session.deviceLabel || (browserText + " on " + platformText);
-        const browserIcon = getAccountSessionBrowserIcon(session);
-        const cardClass = "account-login-session-card" + (session.current ? " current" : "");
-        const currentBadge = session.current
-          ? '<span class="account-login-session-current">Current</span>'
-          : "";
-        const sessionAction = !session.current && sessionId
-          ? '<button class="account-login-session-revoke" type="button" data-account-session-revoke="' + escapeAccountHtml(sessionId) + '">SIGN OUT</button>'
-          : "";
-        const ipText = session.ipAddress
-          ? '<span>IP ' + escapeAccountHtml(session.ipAddress) + '</span>'
-          : "";
-
-        return `
-          <article class="${cardClass}">
-            <div class="account-login-session-main">
-              <div class="account-login-session-head">
-                <div class="account-login-session-title">
-                  <img class="account-login-session-browser-icon" src="${escapeAccountHtml(browserIcon)}" alt="" aria-hidden="true" loading="lazy" decoding="async">
-                  <h4>${escapeAccountHtml(titleText)}</h4>
-                </div>
-
-                <div class="account-login-session-actions">
-                  ${currentBadge}
-                  ${sessionAction}
-                </div>
-              </div>
-
-              <p>${escapeAccountHtml(browserText)} · ${escapeAccountHtml(platformText)}</p>
-
-              <div class="account-login-session-meta">
-                <span>Last active ${escapeAccountHtml(getAccountSessionDateLabel(session.lastSeenAt || session.createdAt))}</span>
-                <span>Signed in ${escapeAccountHtml(getAccountSessionDateLabel(session.createdAt))}</span>
-                ${ipText}
-              </div>
-            </div>
-          </article>
-        `;
-      }).join("");
-    }
-
     function setAccountSecurityLoading(loading) {
       if (accountSecurityPanel) {
         accountSecurityPanel.classList.toggle("is-loading", loading);
@@ -735,97 +641,6 @@ export function initializeAccounts(){
       }
       if (accountSecurityLoadingState) {
         accountSecurityLoadingState.hidden = !loading;
-      }
-    }
-
-    async function loadAccountLoginSessions() {
-      if (!accountLoginSessionsList) {
-        return;
-      }
-
-      setAccountSecurityLoading(true);
-      showMessage(securityMessage, "", "");
-
-      try {
-        const response = await fetch("/api/sessions", {
-          method: "GET",
-          credentials: "same-origin",
-          cache: "no-store",
-          headers: {
-            "Accept": "application/json",
-            "X-AUC-Security-Access": securityPanelAccessToken
-          }
-        });
-        const data = await response.json().catch(function () {
-          return {};
-        });
-
-        if (!response.ok) {
-          throw new Error(data.error || "Could not load signed-in sessions.");
-        }
-
-        renderAccountLoginSessions(data.sessions || []);
-      } catch (error) {
-        accountLoginSessionsList.innerHTML = `
-          <div class="account-empty-state">
-            <h3>Could not load sessions</h3>
-            <p>Your signed-in browsers and devices could not be loaded right now.</p>
-          </div>
-        `;
-        showMessage(securityMessage, error.message || "Could not load signed-in sessions.", "error");
-      } finally {
-        setAccountSecurityLoading(false);
-      }
-    }
-
-    async function revokeAccountLoginSession(sessionId, button) {
-      if (!sessionId) {
-        showMessage(securityMessage, "Session not found.", "error");
-        return;
-      }
-
-      if (button) {
-        button.disabled = true;
-        button.textContent = "Signing out...";
-      }
-
-      showMessage(securityMessage, "", "");
-
-      try {
-        const response = await fetch("/api/sessions", {
-          method: "DELETE",
-          credentials: "same-origin",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "X-AUC-Security-Access": securityPanelAccessToken
-          },
-          body: JSON.stringify({
-            sessionId: sessionId
-          })
-        });
-        const data = await response.json().catch(function () {
-          return {};
-        });
-
-        if (!response.ok) {
-          throw new Error(data.error || "Could not sign out this session.");
-        }
-
-        if (data.currentSignedOut) {
-          window.location.href = "/login";
-          return;
-        }
-
-        renderAccountLoginSessions(data.sessions || []);
-        showMessage(securityMessage, "Session signed out.", "success");
-      } catch (error) {
-        if (button) {
-          button.disabled = false;
-          button.textContent = "Sign out";
-        }
-
-        showMessage(securityMessage, error.message || "Could not sign out this session.", "error");
       }
     }
 
@@ -2874,18 +2689,6 @@ function getAccountReviewProfessorUrl(professorId) {
         control.addEventListener("click", closeAuthenticatorModal);
       }
     });
-
-    if (accountLoginSessionsList) {
-      accountLoginSessionsList.addEventListener("click", function (event) {
-        const button = event.target.closest("[data-account-session-revoke]");
-
-        if (!button) {
-          return;
-        }
-
-        revokeAccountLoginSession(button.dataset.accountSessionRevoke || "", button);
-      });
-    }
 
     accountActivityTabs.forEach(function (tab, index) {
       tab.addEventListener("click", function () {
