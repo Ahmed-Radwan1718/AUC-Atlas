@@ -578,6 +578,12 @@
   pointer-events: none;
 }
 
+.site-header--homepagenew .site-header-logo,
+.site-header--homepagenew .site-header-logo:visited,
+.site-header--homepagenew .site-header-logo-atlas {
+  color: #36383a;
+}
+
 .site-header--homepagenew .site-header-logo-auc {
   color: #365879;
 }
@@ -589,7 +595,7 @@
 
 .site-header--homepagenew .site-header-nav > a,
 .site-header--homepagenew .site-header-nav > a:visited {
-  color: #171717;
+  color: #36383a;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0;
@@ -617,7 +623,7 @@
   position: relative;
   width: 40px;
   height: 40px;
-  color: #171717;
+  color: #36383a;
   border-radius: 10px;
 }
 
