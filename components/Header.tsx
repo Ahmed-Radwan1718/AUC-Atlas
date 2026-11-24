@@ -200,9 +200,6 @@ export default function Header() {
                 <a href="/accounts" className="floating-account-menu-link" id="floating-account-link" onClick={() => setAccountOpen(false)}>
                   <img src="/user.png" alt=""/><span>Account</span>
                 </a>
-                <a href="/degree-progression" className="floating-account-menu-link" id="floating-degree-link" onClick={() => setAccountOpen(false)}>
-                  <span className="floating-account-menu-icon floating-degree-icon" aria-hidden="true"/><span>Degree Progression</span>
-                </a>
                 <a href="/accounts#reviews" className="floating-account-menu-link" id="floating-reviews-link" onClick={() => setAccountOpen(false)}>
                   <span className="floating-account-menu-icon floating-reviews-icon" aria-hidden="true"/><span>Activity History</span>
                 </a>
