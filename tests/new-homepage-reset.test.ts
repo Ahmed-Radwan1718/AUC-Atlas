@@ -260,3 +260,20 @@ test("semester planner uses a non-interactive skeleton until saved data loads", 
   assert.match(css, /animation: new-homepage-insights-shimmer/);
   assert.match(css, /\.new-homepage-semester-skeleton-block \{ animation: none; \}/);
 });
+
+test("the global header uses a centered logo and an accessible left navigation drawer", () => {
+  const header = read("components/Header.tsx");
+  const css = read("components/header.css");
+  assert.doesNotMatch(header, /<nav className="site-header-nav"/);
+  assert.match(header, /aria-controls="atlas-navigation-drawer"/);
+  assert.match(header, /<dialog ref=\{drawerRef\} id="atlas-navigation-drawer"/);
+  assert.match(header, /drawer\.showModal\(\)/);
+  assert.match(header, /onCancel=\{event => \{ event\.preventDefault\(\); setNavOpen\(false\); \}\}/);
+  for (const route of ["/professors", "/gpa-calculator", "/degree-progression", "/#new-homepage-semester-title", "/faq"]) {
+    assert.ok(header.includes(route));
+  }
+  assert.match(read("app/homepagenew/SemesterPlanner.tsx"), /id="new-homepage-semester-title"/);
+  assert.match(css, /\.site-header \.hamburger-toggle\s*\{\s*grid-column: 1/);
+  assert.match(css, /@keyframes atlas-nav-slide-in\s*\{\s*from\s*\{\s*transform: translateX\(-100%\)/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
+});
