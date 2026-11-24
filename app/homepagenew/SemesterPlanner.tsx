@@ -62,6 +62,45 @@ function remainingDegreeCourses(major: string, completedKeys: readonly string[])
   return [...new Set(pending)].filter(code => !finishedCodes.has(code));
 }
 
+function SemesterPlannerSkeleton() {
+  return (
+    <div className="new-homepage-semester-skeleton" role="status" aria-label="Loading semester plan">
+      <div aria-hidden="true">
+        <div className="new-homepage-semester-tabs new-homepage-semester-skeleton-tabs">
+          {[59, 76, 60, 76, 60, 76, 60].map((width, index) => (
+            <span className="new-homepage-semester-skeleton-tab" key={index}>
+              <span className="new-homepage-semester-skeleton-block" style={{ width }} />
+            </span>
+          ))}
+          <span className="new-homepage-semester-skeleton-tab is-add">
+            <span className="new-homepage-semester-skeleton-block" />
+          </span>
+        </div>
+        <div className="new-homepage-semester-content">
+          <div className="new-homepage-semester-meta">
+            <span className="new-homepage-semester-skeleton-block is-counter" />
+          </div>
+          <div className="new-homepage-semester-courses">
+            {Array.from({ length: 4 }, (_, index) => (
+              <div className="new-homepage-semester-course" key={index}>
+                <div className="new-homepage-semester-course-info">
+                  <span className="new-homepage-semester-skeleton-block is-code" />
+                  <span className="new-homepage-semester-skeleton-block is-title" style={{ width: index % 2 ? "76%" : "46%" }} />
+                  <span className="new-homepage-semester-skeleton-block is-credits" />
+                </div>
+                <span className="new-homepage-semester-skeleton-block is-remove" />
+              </div>
+            ))}
+            <div className="new-homepage-semester-add-course">
+              <span className="new-homepage-semester-skeleton-block is-add-course" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SemesterPlanner() {
   const [semesters, setSemesters] = useState<Semester[]>(() => defaultSemesters());
   const [active, setActive] = useState(() => currentSemester());
@@ -242,7 +281,7 @@ export default function SemesterPlanner() {
 
   return (
     <>
-    <section className="new-homepage-semester-section" aria-labelledby="new-homepage-semester-title">
+    <section className="new-homepage-semester-section" aria-labelledby="new-homepage-semester-title" aria-busy={account === "loading"}>
       <div className="new-homepage-semester-head">
         <h2 id="new-homepage-semester-title">Plan Your Semesters</h2>
         {account === "signed-in" && saveState !== "idle" && saveState !== "saved" && (
@@ -258,65 +297,69 @@ export default function SemesterPlanner() {
           </span>
         )}
       </div>
-      <div className="new-homepage-semester-tabs" role="tablist" aria-label="Academic semesters">
-        {semesters.map(semester => (
-          <button
-            key={semester.name}
-            type="button"
-            role="tab"
-            aria-selected={active === semester.name}
-            className={active === semester.name ? "is-active" : ""}
-            disabled={!canEdit}
-            onClick={() => setActive(semester.name)}
-          >
-            {semester.name}
-          </button>
-        ))}
-        {semesters.length < 16 && (
-          <button className="new-homepage-semester-new" type="button"
-            disabled={!canEdit} onClick={addSemester} aria-label="Add next semester"
-            title="Add next semester">+ <span>Add semester</span></button>
-        )}
-      </div>
-
-      <div className="new-homepage-semester-content" role="tabpanel" aria-label={selected?.name || "Semester"}>
-        {account === "error" ? (
-          <p className="new-homepage-semester-note">We couldn't load your saved plan. Refresh to try again.</p>
-        ) : (
-          <>
-            {account !== "loading" && (
-              <div className="new-homepage-semester-meta" role="status">
-                <span className={creditSummary.overLimit || creditSummary.unknown.length ? "is-credit-warning" : ""}>{creditLabel}</span>
-              </div>
+      {account === "loading" ? (
+        <SemesterPlannerSkeleton />
+      ) : (
+        <>
+          <div className="new-homepage-semester-tabs" role="tablist" aria-label="Academic semesters">
+            {semesters.map(semester => (
+              <button
+                key={semester.name}
+                type="button"
+                role="tab"
+                aria-selected={active === semester.name}
+                className={active === semester.name ? "is-active" : ""}
+                disabled={!canEdit}
+                onClick={() => setActive(semester.name)}
+              >
+                {semester.name}
+              </button>
+            ))}
+            {semesters.length < 16 && (
+              <button className="new-homepage-semester-new" type="button"
+                disabled={!canEdit} onClick={addSemester} aria-label="Add next semester"
+                title="Add next semester">+ <span>Add semester</span></button>
             )}
-            {creditSummary.overLimit && <p className="new-homepage-semester-note is-credit-warning">This semester exceeds the 21-credit limit. Remove courses before adding more.</p>}
-            {creditSummary.unknown.length > 0 && <p className="new-homepage-semester-note is-credit-warning">Credit values are missing for {creditSummary.unknown.join(", ")}. Remove these courses before adding more.</p>}
-            {!selected?.courses.length && <p className="new-homepage-semester-note">No courses planned for this semester yet.</p>}
-            <div className="new-homepage-semester-courses">
-                {selected?.courses.map(code => {
-                  const course = courseByCode.get(code);
-                  const credits = courseCredits(code);
-                  return (
-                    <div key={code} className="new-homepage-semester-course">
-                      <div className="new-homepage-semester-course-info">
-                        <a href={courseUrl(code)}>{code}</a>
-                        <span>{course?.title || "Course"}</span>
-                        <span className="new-homepage-semester-course-credits">{credits === null ? "Credits unavailable" : credits + (credits === 1 ? " credit" : " credits")}</span>
-                      </div>
-                      <div className="new-homepage-semester-course-actions">
-                        <button type="button" aria-label={"Remove " + code} title="Remove course"
-                          disabled={!canEdit} onClick={() => removeCourse(code)}>×</button>
-                      </div>
-                    </div>
-                  );
-                })}
-              <button type="button" className="new-homepage-semester-add-course"
-                disabled={!canEdit || semesterFull} aria-haspopup="dialog"
-                onClick={openCourseDrawer}>+ Add course</button>
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+    
+          <div className="new-homepage-semester-content" role="tabpanel" aria-label={selected?.name || "Semester"}>
+            {account === "error" ? (
+              <p className="new-homepage-semester-note">We couldn't load your saved plan. Refresh to try again.</p>
+            ) : (
+              <>
+                <div className="new-homepage-semester-meta" role="status">
+                  <span className={creditSummary.overLimit || creditSummary.unknown.length ? "is-credit-warning" : ""}>{creditLabel}</span>
+                </div>
+                {creditSummary.overLimit && <p className="new-homepage-semester-note is-credit-warning">This semester exceeds the 21-credit limit. Remove courses before adding more.</p>}
+                {creditSummary.unknown.length > 0 && <p className="new-homepage-semester-note is-credit-warning">Credit values are missing for {creditSummary.unknown.join(", ")}. Remove these courses before adding more.</p>}
+                {!selected?.courses.length && <p className="new-homepage-semester-note">No courses planned for this semester yet.</p>}
+                <div className="new-homepage-semester-courses">
+                    {selected?.courses.map(code => {
+                      const course = courseByCode.get(code);
+                      const credits = courseCredits(code);
+                      return (
+                        <div key={code} className="new-homepage-semester-course">
+                          <div className="new-homepage-semester-course-info">
+                            <a href={courseUrl(code)}>{code}</a>
+                            <span>{course?.title || "Course"}</span>
+                            <span className="new-homepage-semester-course-credits">{credits === null ? "Credits unavailable" : credits + (credits === 1 ? " credit" : " credits")}</span>
+                          </div>
+                          <div className="new-homepage-semester-course-actions">
+                            <button type="button" aria-label={"Remove " + code} title="Remove course"
+                              disabled={!canEdit} onClick={() => removeCourse(code)}>×</button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  <button type="button" className="new-homepage-semester-add-course"
+                    disabled={!canEdit || semesterFull} aria-haspopup="dialog"
+                    onClick={openCourseDrawer}>+ Add course</button>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      )}
       {account === "guest" && (
         <p className="new-homepage-semester-account-note">
           <a href="/login">Sign in</a> to save your semester plan across devices.

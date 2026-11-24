@@ -1304,3 +1304,44 @@ a.new-homepage-insights-row:hover .new-homepage-insights-row-arrow {
   .new-homepage-insights-row-arrow { display: none; }
 }
 
+/* Semester planner skeleton: mirrors the real tabs, metadata and card grid. */
+.new-homepage-semester-skeleton-tabs {
+  overflow: hidden;
+}
+.new-homepage-semester-skeleton-tab {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding-bottom: 13px;
+  box-sizing: border-box;
+}
+.new-homepage-semester-skeleton-tab.is-add {
+  margin-left: auto;
+}
+.new-homepage-semester-skeleton-tab.is-add .new-homepage-semester-skeleton-block {
+  width: 90px;
+}
+.new-homepage-semester-skeleton-block {
+  display: block;
+  flex-shrink: 0;
+  width: 100%;
+  height: 12px;
+  border-radius: 4px;
+  background: linear-gradient(105deg, #dcdad5 30%, #f4f2ef 50%, #dcdad5 70%);
+  background-size: 220% 100%;
+  animation: new-homepage-insights-shimmer 1.8s linear infinite;
+}
+.new-homepage-semester-skeleton-block.is-counter { width: 76px; height: 14px; }
+.new-homepage-semester-course-info .new-homepage-semester-skeleton-block.is-code { width: 82px; height: 15px; margin: 2px 0 3px; }
+.new-homepage-semester-course-info .new-homepage-semester-skeleton-block.is-title { max-width: 100%; height: 11px; }
+.new-homepage-semester-course-info .new-homepage-semester-skeleton-block.is-credits { width: 49px; height: 11px; margin-top: auto; margin-bottom: 3px; }
+.new-homepage-semester-skeleton-block.is-remove { width: 10px; height: 10px; margin: 5px 3px 0 0; }
+.new-homepage-semester-skeleton-block.is-add-course { width: 83px; height: 13px; }
+.new-homepage-semester-skeleton .new-homepage-semester-add-course { cursor: default; }
+@media (max-width: 600px) {
+  .new-homepage-semester-skeleton-tab { height: 29px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .new-homepage-semester-skeleton-block { animation: none; }
+}

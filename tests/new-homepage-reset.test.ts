@@ -244,3 +244,19 @@ test("semester credit cap uses actual catalog credits and preserves legacy plans
   assert.match(read("app/api/semester-plan/route.ts"), /semesterCreditViolation\(semesters, previous\)/);
   assert.match(read("app/homepagenew/SemesterPlanner.tsx"), /canAddSemesterCourse\(selected.courses, code\)/);
 });
+
+test("semester planner uses a non-interactive skeleton until saved data loads", () => {
+  const planner = read("app/homepagenew/SemesterPlanner.tsx");
+  const css = read("app/homepagenew/homepagenew.css");
+  const skeleton = planner.slice(planner.indexOf("function SemesterPlannerSkeleton()"), planner.indexOf("export default function SemesterPlanner()"));
+  assert.match(planner, /account === "loading" \? \(\s*<SemesterPlannerSkeleton \/>\s*\) : \(/);
+  assert.match(planner, /aria-busy=\{account === "loading"\}/);
+  assert.match(skeleton, /aria-label="Loading semester plan"/);
+  assert.match(skeleton, /new-homepage-semester-tabs/);
+  assert.match(skeleton, /new-homepage-semester-meta/);
+  assert.match(skeleton, /new-homepage-semester-courses/);
+  assert.doesNotMatch(skeleton, /<button\b|<a\b|<input\b|onClick/);
+  assert.match(css, /\.new-homepage-semester-skeleton-block/);
+  assert.match(css, /animation: new-homepage-insights-shimmer/);
+  assert.match(css, /\.new-homepage-semester-skeleton-block \{ animation: none; \}/);
+});
