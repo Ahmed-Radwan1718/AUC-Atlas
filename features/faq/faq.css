@@ -44,7 +44,7 @@
 .faq-page .faq-toggle-icon { position: relative; display: block; width: 16px; height: 16px; color: var(--faq-blue); }
 .faq-page .faq-toggle-icon::before,
 .faq-page .faq-toggle-icon::after { content: ""; position: absolute; top: 50%; left: 50%; width: 12px; height: 1.5px; border-radius: 2px; background: currentColor; transform: translate(-50%,-50%); }
-.faq-page .faq-toggle-icon::after { transform: translate(-50%,-50%) rotate(90deg); transition: transform 250ms ease, opacity 250ms ease; }
+.faq-page .faq-toggle-icon::after { transform: translate(-50%,-50%) rotate(90deg); transition: transform 200ms ease, opacity 200ms ease; }
 .faq-page .faq-toggle[aria-expanded="true"] .faq-toggle-icon::after { transform: translate(-50%,-50%) rotate(0deg); opacity: 0; }
 .faq-page .faq-answer { padding: 0 40px 24px 0; overflow: hidden; }
 .faq-page .faq-answer[hidden] { display: none; }
