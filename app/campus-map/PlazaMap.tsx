@@ -2,8 +2,22 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { buildPlaza, landmarks } from "./plazaScene";
 import styles from "./map.module.css";
+
+function disposeMeshes(root: THREE.Object3D) {
+  const geometries = new Set<THREE.BufferGeometry>(), materials = new Set<THREE.Material>();
+  root.traverse(obj => {
+    if (obj instanceof THREE.Mesh) {
+      if (obj instanceof THREE.InstancedMesh) obj.dispose();
+      geometries.add(obj.geometry);
+      for (const material of Array.isArray(obj.material) ? obj.material : [obj.material]) materials.add(material);
+    }
+  });
+  geometries.forEach(g => g.dispose());
+  materials.forEach(m => m.dispose());
+}
 
 export default function PlazaMap() {
   const host = useRef<HTMLDivElement>(null);
@@ -38,6 +52,44 @@ export default function PlazaMap() {
     scene.add(sun);
     const plaza = buildPlaza();
     scene.add(plaza.root);
+    let disposed = false;
+    const labelPositions = landmarks.map(landmark => new THREE.Vector3(...landmark.position));
+    const libraryLabelIndex = landmarks.findIndex(landmark => landmark.name === "AUC Library");
+
+    // Model's front faces +Z, while the existing campus library faces +X.
+    // Rotate the original geometry, fit its long axis to 72 m and ground it.
+    // All model materials, meshes and proportions are preserved.
+    new GLTFLoader().load("/models/auc-library.glb", gltf => {
+      if (disposed) { disposeMeshes(gltf.scene); return; }
+      const library = new THREE.Group();
+      library.name = "AUC Library — detailed GLB";
+      library.add(gltf.scene);
+      library.rotation.y = Math.PI / 2;
+      library.updateMatrixWorld(true);
+      const bounds = new THREE.Box3().setFromObject(library);
+      const size = bounds.getSize(new THREE.Vector3());
+      if (bounds.isEmpty() || !Number.isFinite(size.z) || size.z <= 0) {
+        disposeMeshes(library);
+        return;
+      }
+      const scale = 72 / size.z;
+      library.scale.setScalar(scale);
+      library.updateMatrixWorld(true);
+      bounds.setFromObject(library);
+      const center = bounds.getCenter(new THREE.Vector3());
+      library.position.set(-54 - center.x, .02 - bounds.min.y, -10 - center.z);
+      library.traverse(obj => {
+        if (obj instanceof THREE.Mesh) { obj.castShadow = true; obj.receiveShadow = true; }
+      });
+      plaza.root.add(library);
+      library.updateMatrixWorld(true);
+      bounds.setFromObject(library);
+      bounds.getCenter(center);
+      if (libraryLabelIndex >= 0) labelPositions[libraryLabelIndex].set(center.x, bounds.max.y + 2, center.z);
+      plaza.libraryFallback.visible = false;
+    }, undefined, error => {
+      if (!disposed) console.warn("AUC Library model could not load; using fallback.", error);
+    });
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const animationStart = performance.now();
     const camera = new THREE.OrthographicCamera(-150, 150, 110, -110, 1, 1000);
@@ -68,10 +120,10 @@ export default function PlazaMap() {
       controls.update();
       if (!reducedMotion.matches) plaza.animateWater((performance.now() - animationStart) / 1000);
       renderer.render(scene, camera);
-      landmarks.forEach((landmark, i) => {
+      landmarks.forEach((_, i) => {
         const node = labels.current[i];
         if (!node) return;
-        projected.set(...landmark.position).project(camera);
+        projected.copy(labelPositions[i]).project(camera);
         node.style.visibility = Math.abs(projected.x) > .96 || Math.abs(projected.y) > .94 || projected.z > 1 ? "hidden" : "visible";
         node.style.left = ((projected.x + 1) * 50) + "%";
         node.style.top = ((1 - projected.y) * 50) + "%";
@@ -79,10 +131,9 @@ export default function PlazaMap() {
     };
     draw();
     return () => {
+      disposed = true;
       cancelAnimationFrame(frame); observer.disconnect(); controls.dispose();
-      const geometries = new Set<THREE.BufferGeometry>(), materials = new Set<THREE.Material>();
-      scene.traverse(obj => { if (obj instanceof THREE.Mesh) { if (obj instanceof THREE.InstancedMesh) obj.dispose(); geometries.add(obj.geometry); for (const mat of Array.isArray(obj.material) ? obj.material : [obj.material]) materials.add(mat); } });
-      geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose());
+      disposeMeshes(scene);
       sun.shadow.dispose(); renderer.dispose(); renderer.domElement.remove();
     };
   }, []);

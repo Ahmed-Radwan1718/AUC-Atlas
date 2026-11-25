@@ -51,12 +51,17 @@ export function buildPlaza() {
     for(const end of [-1,1]) for(let f=0;f<floors;f++) for(let k=-w/2+3;k<w/2-2;k+=5) box(1.7,2.2,.18,x+k,3.4+f*(h-4)/floors,z+end*(d/2+.05),glass);
     box(w*.22,2.2,d*.25,x,h+2.4,z,stripe);
   }
-  // Library: striped mass and recognizable deep square-grid screen facing plaza.
+  // Legacy library remains as a fallback while the detailed GLB loads.
+  const libraryStart = root.children.length;
   building(-54,-10,39,72,19,1,4,true);
   box(4,18,46,-32.5,9.5,-9,glass);
   for(let z=-32;z<=14;z+=3.3) box(.95,18.5,.68,-30.2,9.7,z,light);
   for(let y=1.5;y<=19;y+=2.7) box(1.0,.64,47,-30.2,y,-9,light);
   for(let y=2;y<19;y+=3.4) box(.25,.55,70,-34.2,y,-10,stripe);
+  const libraryFallback = new THREE.Group();
+  libraryFallback.name = "Library loading fallback";
+  for (const part of root.children.slice(libraryStart)) libraryFallback.add(part);
+  root.add(libraryFallback);
   // Simplified courtyard-like SSE blocks and academic masses.
   building(47,22,27,82,15,-1);
   building(76,22,19,82,18,-1);
@@ -562,5 +567,5 @@ export function buildPlaza() {
   }
   const animateWater = (seconds: number) => waterAnimations.forEach(update => update(seconds));
   animateWater(0);
-  return { root, animateWater };
+  return { root, animateWater, libraryFallback };
 }
