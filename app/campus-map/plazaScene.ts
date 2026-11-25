@@ -8,8 +8,8 @@ export const landmarks: { name: string; position: [number, number, number] }[] =
   { name: "Sciences & Engineering", position: [54, 26, 20] },
   { name: "Jameel Hall", position: [48, 24, -76] },
   { name: "Core Academic Center", position: [-40, 20, 70] },
-  { name: "Moataz Al Alfi Hall", position: [-47, 29, -148] },
-  { name: "Bassily Auditorium", position: [18, 30, -169] },
+  { name: "Moataz Al Alfi Hall", position: [14, 24, -198] },
+  { name: "Bassily Auditorium", position: [55.8, 30, -198] },
 ];
 export function buildPlaza() {
   const root = new THREE.Group();
@@ -21,7 +21,7 @@ export function buildPlaza() {
   const cylinder = (r1:number,r2:number,h:number,x:number,y:number,z:number,m:THREE.Material,n=10) => {
     const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,n),m); o.position.set(x,y,z); o.castShadow=true; o.receiveShadow=true; root.add(o); return o;
   };
-  box(208,2,314,0,-1.02,-50,ground);
+  box(248,2,344,0,-1.02,-65,ground);
   box(48,.4,150,0,-.2,0,paving);
   // Broad bands of stone, not a surveyed paving layout.
   for(let z=-70;z<=70;z+=10) box(48,.035,.22,0,.025,z,band);
@@ -88,20 +88,34 @@ export function buildPlaza() {
       box(3,.45,.85,x-side*3,.65,z+3.4,bench);
     }
   }
-  // Campus Center extension: illustrative dimensions and local coordinates, not a survey.
-  // References: AUC's NCmap.pdf, AUC Campus Center photographs, and Legorreta's
-  // Campus Center project description. The hall sits on the library/north side
-  // of the auditorium; both open toward an approximate pedestrian courtyard.
+  // Campus Center extension registered approximately to the existing scene using
+  // the library and Core Academic Center as reference points. OSM building ways
+  // 502355931, 539061341, 1223433824 and 260329189 (© OpenStreetMap contributors,
+  // https://www.openstreetmap.org/copyright) establish the relative locations.
+  // Library-to-venue distances are ~200 m and ~220 m; venue centers ~67 m apart.
+  // AUC NCmap.pdf and Legorreta describe the intervening Campus Center courts.
+  // Existing plaza geometry is illustrative, so this is not a surveyed registration.
+  // Keep the as-yet-unmodeled Campus Center buildings open rather than inventing them.
   const blue = mat("#335a9b"), blueEdge = mat("#28477b"), blueJoint = mat("#5278ac");
   const cyan = mat("#408d9c"), terracotta = mat("#ad583b"), recess = mat("#414343");
   const mosaicBlue = mat("#80a9bb"), mosaicDark = mat("#303c49"), mosaicRed = mat("#a96552");
   const mosaicLight = mat("#d8d3ba");
-  box(44,.38,120,0,-.19,-135,paving);
-  for(let z=-190;z<=-80;z+=10) box(44,.035,.22,0,.025,z,band);
-  for(const x of [-15,0,15]) box(.22,.04,120,x,.025,-135,band);
+  // Narrow connecting walk beyond Bartlett Plaza, opening into a separate court.
+  box(22,.38,98,0,-.19,-124,paving);
+  for(let z=-170;z<=-80;z+=10) box(22,.035,.22,0,.025,z,band);
+  box(53,.38,48,30,-.19,-171,paving);
+  for(let z=-190;z<=-150;z+=10) box(53,.035,.22,30,.025,z,band);
+  // Transform each venue as a unit so façade details remain aligned.
+  function placeVenue(start:number,oldX:number,oldZ:number,newX:number,newZ:number,sx:number,sy:number,sz:number){
+    const parts=root.children.slice(start);
+    const group=new THREE.Group();
+    for(const part of parts){part.position.x-=oldX;part.position.z-=oldZ;group.add(part);}
+    group.position.set(newX,0,newZ);group.scale.set(sx,sy,sz);root.add(group);
+  }
 
   // Moataz Al Alfi: limestone plinth, deep blue recessed entrance,
   // turquoise round columns and a tall split blue-tiled upper volume.
+  const hallStart=root.children.length;
   const hallX=-47, hallZ=-148;
   box(42,9,32,hallX-2,4.5,hallZ,stone);
   box(5,9,5,-23.5,4.5,hallZ-17.5,stone);
@@ -130,8 +144,12 @@ export function buildPlaza() {
   box(1.3,.8,2.4,-31.4,20.3,hallZ,terracotta);
   box(2.2,.3,10,-47,28.2,hallZ-7.8,blueEdge);
 
+  // Mapped hall footprint is approximately 21.5 by 23.5 m (OSM way 1223433824).
+  placeVenue(hallStart,hallX,hallZ,14,-198,.46,.8,.5875);
+
   // Bassily Auditorium: a chamfered auditorium mass based on the published
   // seating plan, with a lower entry wing and a tall mosaic-faced stone tower.
+  const auditoriumStart=root.children.length;
   const auditoriumX=47, auditoriumZ=-150;
   const outline=new THREE.Shape();
   const corners=[[-16,-25],[16,-25],[25,-16],[25,16],[16,25],[-16,25],[-25,16],[-25,-16]];
@@ -170,16 +188,19 @@ export function buildPlaza() {
   for(let y=8;y<=24;y+=3.5) for(const dx of [-3,0,3]) box(1.1,1.1,.16,18+dx,y,towerZ-8.55,recess);
   for(let y=3;y<29;y+=3) box(.08,.11,17,11.95,y,towerZ,stripe);
 
-  // Terracotta pergola and a modest palm-lined courtyard link the two landmarks.
-  for(const z of [-132,-119,-106]){
-    for(const x of [-16,-5]) cylinder(.65,.75,5.2,x,2.6,z,terracotta,12);
-    box(13,.65,1.1,-10.5,5.4,z,terracotta);
+  placeVenue(auditoriumStart,auditoriumX,auditoriumZ,79,-179,.8,1,1);
+
+  // Separate Campus Center court. The pergola links the hall toward the
+  // everyday facilities; landscaping is indicative pending a detailed site plan.
+  for(const z of [-165,-152,-139]){
+    for(const x of [-9,2]) cylinder(.65,.75,5.2,x,2.6,z,terracotta,12);
+    box(13,.65,1.1,-3.5,5.4,z,terracotta);
   }
-  for(const x of [-16,-12.3,-8.7,-5]) box(.8,.72,28,x,5.45,-119,terracotta);
-  for(const z of [-180,-160,-140,-120,-100]){
-    box(4,.35,4,5,.18,z,stone);
-    box(3.5,.07,3.5,5,.39,z,green);
-    palm(5,z);
+  for(const x of [-9,-5.3,-1.7,2]) box(.8,.72,28,x,5.45,-152,terracotta);
+  for(const z of [-184,-169,-154]){
+    box(4,.35,4,35,.18,z,stone);
+    box(3.5,.07,3.5,35,.39,z,green);
+    palm(35,z);
   }
   // Animated continuous streams, gravity-driven spray and local impact ripples.
   const waterAnimations: ((seconds: number) => void)[] = [];
@@ -331,8 +352,8 @@ export function buildPlaza() {
     });
   }
   for(const x of [-91,91]){
-    box(14,.15,293,x,.05,-50,green);
-    for(let z=-192;z<95;z+=13){
+    box(14,.15,193,x,.05,0,green);
+    for(let z=-88;z<95;z+=13){
       cylinder(.24,.35,3.5,x,1,z,trunk);
       const t=new THREE.Mesh(new THREE.IcosahedronGeometry(2.8,1),leaf2);t.position.set(x,3.6,z);t.scale.y=1.1;t.castShadow=true;root.add(t);
     }
