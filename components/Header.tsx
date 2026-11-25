@@ -26,7 +26,7 @@ function DrawerIcon({ name }: { name: DrawerIconName }) {
       {name === "professors" && <><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2"/></>}
       {name === "calculator" && <><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M9 12h.01M15 12h.01M9 16h.01M15 16h.01" strokeWidth="2.2"/></>}
       {name === "progress" && <path d="M4 4v16h16M8 16v-4m5 4V9m5 7V5"/>}
-      {name === "history" && <><path d="M3 12a9 9 0 1 1 2.6 6.4M3 4v8h8"/><path d="M12 7v5l3 2"/></>}
+      {name === "history" && <><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></>}
       {name === "help" && <><circle cx="12" cy="12" r="9"/><path d="M9.2 9a2.8 2.8 0 0 1 5.6 0c0 2-2.8 2.1-2.8 4m0 3h.01"/></>}
     </svg>
   );
