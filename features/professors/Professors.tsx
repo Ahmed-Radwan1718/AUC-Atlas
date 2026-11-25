@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { professors, type Professor } from "../../data/professors";
+import { professorDepartmentChoices, matchesProfessorDepartment } from "./departmentFilter";
 import "./professors.css";
 import "./professors-ui-1.css";
 import "./professors-ui-2.css";
@@ -25,6 +26,7 @@ function initialProfessors(): RatedProfessor[] {
   return professors.map(item => ({ ...item, reviewCount: 0, averageRating: 0 }));
 }
 const ratingChoices = [1,2,3,4,5];
+const departmentChoices = professorDepartmentChoices(professors);
 // Match the homepage "Professors to AVOID" threshold: rated 2.0 or below.
 // Unrated professors have no avoid classification.
 const avoidStatus = (item: RatedProfessor): AvoidFilter =>
@@ -38,6 +40,8 @@ export default function Professors() {
   const [failed, setFailed] = useState(false);
   const [reviewsLocked, setReviewsLocked] = useState(false);
   const [query, setQuery] = useState("");
+  const [departmentOpen, setDepartmentOpen] = useState(false);
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [ratingOpen, setRatingOpen] = useState(false);
   const [avoidOpen, setAvoidOpen] = useState(false);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
@@ -104,9 +108,10 @@ export default function Professors() {
     ].join(" "));
     return (!query || searchable.includes(normalize(query)))
       && (!selectedRatings.length || selectedRatings.includes(ratingStatus(item.averageRating)))
-      && (!selectedAvoid || avoidStatus(item) === selectedAvoid);
+      && (!selectedAvoid || avoidStatus(item) === selectedAvoid)
+      && matchesProfessorDepartment(item, selectedDepartments);
   // Sort strictly by average rating (highest first). Equal ratings retain source order.
-  }).sort((a,b) => b.averageRating - a.averageRating), [items,query,selectedRatings,selectedAvoid]);
+  }).sort((a,b) => b.averageRating - a.averageRating), [items,query,selectedRatings,selectedAvoid,selectedDepartments]);
 
   // FLIP: measure old positions, let React reflow, then animate the difference.
   // Reading positions while an old animation is active lets rapid typing
@@ -232,6 +237,23 @@ export default function Professors() {
         <section className="professors-browser" aria-label="Professor filters and results">
           <aside className="filters-panel" id="professor-filters">
             <div className="filters-heading">Filter Professors</div>
+            <div className={`filter-item ${departmentOpen ? "open" : ""}`}>
+              <button className="filter-toggle" type="button" aria-expanded={departmentOpen}
+                aria-controls="department-filter-options" onClick={() => setDepartmentOpen(x => !x)}>
+                <span>Department{selectedDepartments.length ? ` (${selectedDepartments.length})` : ""}</span>
+                <span className="chevron" aria-hidden="true">⌄</span>
+              </button>
+              <div className="filter-content department-filter-content" id="department-filter-options" inert={!departmentOpen}>
+                {departmentChoices.map(department => (
+                  <label key={department}>
+                    <input type="checkbox" data-filter-group="department" value={department}
+                      checked={selectedDepartments.includes(department)}
+                      onChange={() => toggle(selectedDepartments, department, setSelectedDepartments)} />
+                    {department}
+                  </label>
+                ))}
+              </div>
+            </div>
             <div className={`filter-item ${ratingOpen ? "open" : ""}`} hidden={reviewsLocked}>
               <button className="filter-toggle" type="button" onClick={() => setRatingOpen(x=>!x)}>
                 <span>Rating Status</span><span className="chevron">⌄</span>

@@ -329,7 +329,7 @@ test("homepage ambient glows extend behind the header at the top", () => {
 });
 
 
-test("professor department metadata is optional and remains independent of the professor UI", () => {
+test("professor department metadata is optional and used by the directory filter", () => {
   const type = read("data/professors-type.ts");
   assert.match(type, /\bdepartment\?\s*:\s*string\b/);
   assert.doesNotMatch(type, /\b(?:displayDepartment|filterDepartment)\??\s*:/);
@@ -356,7 +356,39 @@ test("professor department metadata is optional and remains independent of the p
     }
   }
   assert.ok(assigned > 0, "Professor department metadata should be populated");
-  assert.doesNotMatch(read("features/professors/Professors.tsx"), /selectedDepartments|department-filter-options|item\.(?:department|displayDepartment|filterDepartment)/);
+  const directory = read("features/professors/Professors.tsx");
+  assert.match(directory, /const departmentChoices = professorDepartmentChoices\(professors\)/);
+  assert.match(directory, /matchesProfessorDepartment\(item, selectedDepartments\)/);
+  assert.match(directory, /aria-expanded=\{departmentOpen\}/);
+  assert.match(directory, /aria-controls="department-filter-options"/);
+  assert.match(directory, /id="department-filter-options" inert=\{!departmentOpen\}/);
+  assert.match(directory, /toggle\(selectedDepartments, department, setSelectedDepartments\)/);
+  assert.doesNotMatch(directory, /\b(?:displayDepartment|filterDepartment)\b/);
   assert.doesNotMatch(read("features/professors/profileMarkup.ts"), /professor-profile-department/);
   assert.match(read("features/home/HomeSearch.tsx"), /course\.department/);
+});
+
+test("department choices are sorted, deduplicated and include unassigned professors", () => {
+  const source = read("features/professors/departmentFilter.ts");
+  const compiled = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS }
+  }).outputText;
+  type Record = { department?: string };
+  const module = { exports: {} as {
+    professorDepartmentChoices: (items: Record[]) => string[];
+    matchesProfessorDepartment: (item: Record, selected: string[]) => boolean;
+    unassignedDepartment: string;
+  } };
+  vm.runInNewContext(compiled, { module, exports: module.exports });
+  const { professorDepartmentChoices, matchesProfessorDepartment, unassignedDepartment } = module.exports;
+  const items = [{ department: "Physics" }, { department: "Arts" }, { department: "Physics" }, {}, { department: " " }];
+  assert.deepEqual(Array.from(professorDepartmentChoices(items)), ["Arts", "Physics", unassignedDepartment]);
+  assert.deepEqual(Array.from(professorDepartmentChoices([{ department: "Arts" }])), ["Arts"]);
+  assert.ok(items.every(item => matchesProfessorDepartment(item, [])));
+  assert.ok(matchesProfessorDepartment(items[0], ["Arts", "Physics"]));
+  assert.ok(matchesProfessorDepartment(items[1], ["Arts", "Physics"]));
+  assert.ok(!matchesProfessorDepartment(items[0], ["Arts"]));
+  assert.ok(!matchesProfessorDepartment(items[3], ["Arts", "Physics"]));
+  assert.ok(matchesProfessorDepartment(items[3], [unassignedDepartment]));
+  assert.ok(matchesProfessorDepartment(items[4], [unassignedDepartment]));
 });
