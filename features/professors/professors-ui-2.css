@@ -642,7 +642,7 @@
       align-self: center;
       transform: translateY(-2px);
       flex: 0 0 auto;
-      color: #365879;
+      color: var(--atlas-accent-ink);
       font-size: 20px;
       font-weight: 900;
       line-height: 1;
@@ -662,7 +662,7 @@
     }
 
     .professor-review-star.is-filled {
-      color: #365879;
+      color: var(--atlas-accent-ink);
     }
 
     .professor-review-rating-text {
@@ -1321,7 +1321,7 @@
 
     /* Profile-only accent palette and the course list loading placeholder. */
     .professor-profile-mode .professor-profile-info > div:not(.professor-profile-identity) > span:first-child {
-      color: #365879;
+      color: var(--atlas-accent-ink);
     }
 
     .professor-profile-mode #professor-teaches-row[hidden] {
@@ -1335,19 +1335,19 @@
     }
 
     .professor-profile-mode .professor-profile-course-link:hover {
-      border-color: rgba(54, 88, 121, 0.34);
-      background: rgba(54, 88, 121, 0.12);
+      border-color: rgba(var(--atlas-accent-rgb), 0.34);
+      background: rgba(var(--atlas-accent-rgb), 0.12);
     }
 
     .professor-profile-mode .professor-review-insights-header span,
     .professor-profile-mode .professor-reviews-header span,
     .professor-profile-mode .professor-review-rating,
     .professor-profile-mode .professor-review-star.is-filled {
-      color: #365879;
+      color: var(--atlas-accent-ink);
     }
 
     .professor-profile-mode .professor-review-stat-details-toggle:focus-visible,
     .professor-profile-mode .professor-review-stat-show-zeros:focus-visible,
     .professor-profile-mode .professor-review-toggle:focus-visible {
-      outline-color: #365879;
+      outline-color: var(--atlas-accent-ink);
     }

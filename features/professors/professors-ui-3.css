@@ -338,7 +338,7 @@
     }
 
     .review-drawer-footer .review-cancel-button:focus-visible {
-      outline: 2px solid #365879;
+      outline: 2px solid var(--atlas-accent-ink);
       outline-offset: 2px;
     }
 
@@ -472,7 +472,7 @@
     }
 
     .review-rating-star.is-active {
-      color: #365879;
+      color: var(--atlas-accent-ink);
     }
 
     .review-rating-star:hover {
@@ -482,7 +482,7 @@
     .review-rating-star:focus-visible,
     .review-recommend-options button:focus-visible,
     .review-inline-options button:focus-visible {
-      outline: 2px solid #365879;
+      outline: 2px solid var(--atlas-accent-ink);
       outline-offset: 3px;
     }
 
@@ -506,8 +506,8 @@
     }
 
     .review-recommend-options button.is-active {
-      border-color: #365879;
-      background: rgba(54, 88, 121, 0.13);
+      border-color: var(--atlas-accent);
+      background: rgba(var(--atlas-accent-rgb), 0.13);
       color: #171717;
     }
 
@@ -559,18 +559,18 @@
     }
 
     .review-inline-options button:hover {
-      border-color: rgba(54, 88, 121, 0.45);
-      background: rgba(54, 88, 121, 0.045);
+      border-color: rgba(var(--atlas-accent-rgb), 0.45);
+      background: rgba(var(--atlas-accent-rgb), 0.045);
     }
 
     .review-inline-options button.is-active {
-      border-color: #365879;
-      background: rgba(54, 88, 121, 0.10);
-      color: #365879;
+      border-color: var(--atlas-accent);
+      background: rgba(var(--atlas-accent-rgb), 0.10);
+      color: var(--atlas-accent-ink);
     }
 
     .review-inline-options button:focus-visible {
-      outline: 2px solid #365879;
+      outline: 2px solid var(--atlas-accent-ink);
       outline-offset: 2px;
     }
 
@@ -634,8 +634,8 @@
     }
 
     .review-drawer-body .review-course-search-input:focus {
-      border-color: rgba(54, 88, 121, 0.55);
-      box-shadow: 0 0 0 3px rgba(54, 88, 121, 0.11);
+      border-color: rgba(var(--atlas-accent-rgb), 0.55);
+      box-shadow: 0 0 0 3px rgba(var(--atlas-accent-rgb), 0.11);
     }
 
     .review-course-suggestions {
@@ -668,7 +668,7 @@
 
     .review-course-suggestion:hover,
     .review-course-suggestion.is-active {
-      background: rgba(54, 88, 121, 0.13);
+      background: rgba(var(--atlas-accent-rgb), 0.13);
     }
 
     .review-course-no-results,
@@ -680,13 +680,13 @@
     }
   
     .review-drawer-body .review-anonymous-option input:checked {
-      border-color: #365879;
-      background: #365879;
+      border-color: var(--atlas-accent-ink);
+      background: var(--atlas-accent);
       box-shadow: none;
     }
 
     .review-drawer-body .review-anonymous-option input:focus-visible {
-      outline: 2px solid #365879;
+      outline: 2px solid var(--atlas-accent-ink);
       outline-offset: 3px;
       box-shadow: none;
     }

@@ -2,9 +2,9 @@
 .new-homepage {
   min-height: 100svh;
   padding: clamp(140px, 19vh, 210px) 24px 104px;
-  /* A scattered, deliberately asymmetric field of soft Atlas-blue glows.
+  /* A scattered, deliberately asymmetric field of soft Atlas-gold glows.
      Different radii and strengths keep the pattern organic without animation. */
-  --home-glow-rgb: 54, 88, 121;
+  --home-glow-rgb: var(--atlas-accent-rgb);
   background:
     radial-gradient(circle 265px at 7% 90px,
       rgba(var(--home-glow-rgb), .20), rgba(var(--home-glow-rgb), .08) 38%, transparent 82%),
@@ -237,7 +237,7 @@
 
 .new-homepage-degree-eyebrow {
   margin: 0 0 10px;
-  color: #365879;
+  color: var(--atlas-accent-ink);
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.14em;
@@ -494,7 +494,7 @@
 }
 
 .new-homepage-semester-course-info .new-homepage-semester-course-credits {
-  color: #365879;
+  color: var(--atlas-accent-ink);
   font-size: 12px;
   font-weight: 500;
   margin-top: auto;
@@ -599,7 +599,7 @@
 }
 
 .new-homepage-semester-course-actions button:focus-visible {
-  outline: 2px solid #365879;
+  outline: 2px solid var(--atlas-accent-ink);
   outline-offset: 2px;
 }
 
@@ -626,7 +626,7 @@
   border: 1px dashed #d0cec8;
   border-radius: 12px;
   background: transparent;
-  color: #365879;
+  color: var(--atlas-accent-ink);
   font: inherit;
   font-size: 14px;
   font-weight: 500;
@@ -636,12 +636,12 @@
 
 .new-homepage-semester-add-course:hover:not(:disabled),
 .new-homepage-semester-add-course:focus-visible {
-  background: rgba(54, 88, 121, 0.045);
-  border-color: #365879;
+  background: rgba(var(--atlas-accent-rgb), 0.045);
+  border-color: var(--atlas-accent);
 }
 
 .new-homepage-semester-add-course:focus-visible {
-  outline: 2px solid #365879;
+  outline: 2px solid var(--atlas-accent-ink);
   outline-offset: 2px;
 }
 
@@ -761,8 +761,8 @@ html:has(.new-homepage-course-drawer[open]) {
 }
 
 .new-homepage-course-drawer-body input:focus {
-  border-color: rgba(54, 88, 121, 0.55);
-  box-shadow: 0 0 0 3px rgba(54, 88, 121, 0.11);
+  border-color: rgba(var(--atlas-accent-rgb), 0.55);
+  box-shadow: 0 0 0 3px rgba(var(--atlas-accent-rgb), 0.11);
 }
 
 .new-homepage-course-drawer-hint {
@@ -844,7 +844,7 @@ html:has(.new-homepage-course-drawer[open]) {
 }
 
 .new-homepage-course-drawer button:focus-visible {
-  outline: 2px solid #365879;
+  outline: 2px solid var(--atlas-accent-ink);
   outline-offset: 2px;
 }
 
@@ -1091,7 +1091,7 @@ html:has(.new-homepage-course-drawer[open]) {
 }
 
 .new-homepage-insights-head select:hover {
-  color: #365879;
+  color: var(--atlas-accent-ink);
 }
 
 .new-homepage-insights-head select option {
@@ -1236,19 +1236,19 @@ html:has(.new-homepage-course-drawer[open]) {
 
 a.new-homepage-insights-row:hover .new-homepage-insights-person strong,
 a.new-homepage-insights-row:hover .new-homepage-insights-row-arrow {
-  color: #365879;
+  color: var(--atlas-accent-ink);
 }
 
 .new-homepage-insights-note a,
 .new-homepage-insights-note button {
-  color: #365879;
+  color: var(--atlas-accent-ink);
   font-size: 13px;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .new-homepage-insights-note button {
-  color: #365879;
+  color: var(--atlas-accent-ink);
   font-size: 13px;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -1283,13 +1283,13 @@ a.new-homepage-insights-row:hover .new-homepage-insights-row-arrow {
 
 .new-homepage-insights-others summary:hover,
 .new-homepage-insights-others summary:focus-visible {
-  color: #365879;
+  color: var(--atlas-accent-ink);
 }
 
 .new-homepage-insights-others .new-homepage-insights-people { margin-top: 6px; }
 
 .new-homepage-insights-section :is(button, a, summary):focus-visible {
-  outline: 2px solid #365879;
+  outline: 2px solid var(--atlas-accent-ink);
   outline-offset: 3px;
 }
 
@@ -1383,4 +1383,4 @@ html:has(.new-homepage-semester-delete-dialog[open]) { overflow: hidden; overscr
 .new-homepage-semester-delete-confirm { color: #fff; background: #96504a; }
 .new-homepage-semester-delete-confirm:hover { background: #763c37; }
 .new-homepage-semester-delete:focus-visible,
-.new-homepage-semester-delete-actions button:focus-visible { outline: 2px solid #365879; outline-offset: 3px; }
+.new-homepage-semester-delete-actions button:focus-visible { outline: 2px solid var(--atlas-accent-ink); outline-offset: 3px; }

@@ -3,7 +3,7 @@
   --degree-bg: #f8f7f4;
   --degree-ink: #36383a;
   --degree-muted: #77716b;
-  --degree-blue: #365879;
+  --degree-accent: var(--atlas-accent);
   --degree-green: #35664f;
   --degree-red: #96504a;
   --degree-line: #e7e5e0;
@@ -11,8 +11,8 @@
   font-family: Arial, sans-serif;
   color: var(--degree-ink);
   background:
-    radial-gradient(circle 380px at calc(50% + 690px) 440px, rgba(54,88,121,.24), rgba(54,88,121,.12) 34%, rgba(54,88,121,.045) 56%, transparent 76%),
-    radial-gradient(circle 410px at calc(50% - 690px) 850px, rgba(54,88,121,.18), rgba(54,88,121,.09) 34%, transparent 76%),
+    radial-gradient(circle 380px at calc(50% + 690px) 440px, rgba(var(--atlas-accent-rgb),.24), rgba(var(--atlas-accent-rgb),.12) 34%, rgba(var(--atlas-accent-rgb),.045) 56%, transparent 76%),
+    radial-gradient(circle 410px at calc(50% - 690px) 850px, rgba(var(--atlas-accent-rgb),.18), rgba(var(--atlas-accent-rgb),.09) 34%, transparent 76%),
     var(--degree-bg);
 }
 .degree-page .degree-section { min-height: 100svh; padding: clamp(140px, 19vh, 210px) 24px 104px; }
@@ -79,7 +79,7 @@
   transition: border-color 150ms ease, opacity 150ms ease;
 }
 .degree-page .degree-requirement-item input[type="checkbox"]:hover {
-  border-color: var(--degree-blue);
+  border-color: var(--degree-accent);
 }
 .degree-page .degree-requirement-item input[type="checkbox"]:checked {
   border: 0;
@@ -111,12 +111,12 @@
 .degree-page .degree-requirement-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 12px; min-width: 0; }
 .degree-page .degree-course-code { color: var(--degree-ink); font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .degree-page .degree-course-title { color: var(--degree-muted); font-size: 13px; font-weight: 400; line-height: 1.5; overflow-wrap: anywhere; cursor: pointer; }
-.degree-page .degree-course-credits { color: var(--degree-blue); font-size: 12px; text-align: right; white-space: nowrap; cursor: pointer; }
+.degree-page .degree-course-credits { color: var(--atlas-accent-ink); font-size: 12px; text-align: right; white-space: nowrap; cursor: pointer; }
 .degree-page .degree-requirement-item.is-complete .degree-course-credits { color: var(--degree-green); }
 .degree-page .degree-empty-state { display: grid; gap: 10px; padding: 20px 0; }
 .degree-page .degree-empty-state p, .degree-page .degree-note { color: var(--degree-muted); font-size: 13px; line-height: 1.65; }
 .degree-page .degree-note { margin-top: 20px; }
-.degree-page :is(a,button,input,summary):focus-visible { outline: 2px solid var(--degree-blue); outline-offset: 3px; }
+.degree-page :is(a,button,input,summary):focus-visible { outline: 2px solid var(--atlas-accent-ink); outline-offset: 3px; }
 @media (max-width: 900px) {
   .degree-page .degree-section { padding: 128px 24px 70px; }
 }
