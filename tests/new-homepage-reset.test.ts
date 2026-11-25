@@ -392,3 +392,57 @@ test("department choices are sorted, deduplicated and include unassigned profess
   assert.ok(matchesProfessorDepartment(items[3], [unassignedDepartment]));
   assert.ok(matchesProfessorDepartment(items[4], [unassignedDepartment]));
 });
+
+test("semester search finds any catalog course without restricting the student's major", () => {
+  const compiled = ts.transpileModule(read("lib/semesterCourseSearch.ts"), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+  }).outputText;
+  const module = { exports: {} as Record<string, any> };
+  vm.runInNewContext(compiled, { module, exports: module.exports });
+  const { searchSemesterCourses } = module.exports;
+  const catalog = [
+    { code: "MENG 2200", title: "Contemporary Sculpture" },
+    { code: "CORE 1010", title: "Freshman Seminar" },
+    { code: "CORE 1099", title: "Selected Topics" },
+    { code: "RHET 1010", title: "Freshman Writing" }
+  ];
+  const search = (query: string, planned: string[] = []) => Array.from(
+    searchSemesterCourses(catalog, query, (code: string) => !planned.includes(code)),
+    (course: any) => course.code
+  );
+  assert.deepEqual(search("core1010"), ["CORE 1010"]);
+  assert.deepEqual(search("  CORE   1099  "), ["CORE 1099"]);
+  assert.deepEqual(search("Freshman"), ["CORE 1010", "RHET 1010"]);
+  assert.deepEqual(search("sculpture"), ["MENG 2200"]);
+  assert.deepEqual(search("CORE", ["CORE 1010"]), ["CORE 1099"]);
+  const planner = read("app/homepagenew/SemesterPlanner.tsx");
+  assert.match(planner, /if \(!query\.trim\(\)\) return degreeOptions\.filter\(canShow\)/);
+  assert.match(planner, /searchSemesterCourses\(courses, query, canShow\)/);
+});
+
+test("universal Core and catalog-only electives have credits and can be added", () => {
+  const compiled = ts.transpileModule(read("lib/semesterCredits.ts"), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+  }).outputText;
+  const module = { exports: {} as Record<string, any> };
+  vm.runInNewContext(compiled, {
+    module, exports: module.exports,
+    require: () => ({ DEGREE_REQUIREMENTS: {} })
+  });
+  const { courseCredits, canAddSemesterCourse, semesterCreditViolation } = module.exports;
+  for (const code of ["CORE 1010", "CORE 1099", "CORE 2096", "CORE 2097", "CORE 2098",
+    "RHET 1010", "RHET 1020", "PHIL 2100", "SCI 1020", "MENG 2200", "ARIC 2098"]) {
+    assert.equal(courseCredits(code), 3, code);
+    assert.equal(canAddSemesterCourse([], code), true, code);
+  }
+  assert.equal(courseCredits("LALT 1020"), 0);
+  assert.equal(courseCredits("BIOL 1010"), 4);
+  assert.equal(courseCredits("BIOL 4910"), 4);
+  assert.equal(courseCredits("ECON 4082"), 1);
+  assert.equal(canAddSemesterCourse(["CORE 1010"], "CORE 1010"), false);
+  const codes = ["CORE 1010", "CORE 1099", "CORE 2096", "CORE 2097", "CORE 2098",
+    "RHET 1010", "RHET 1020"];
+  assert.equal(canAddSemesterCourse(codes, "PHIL 2100"), false);
+  assert.equal(canAddSemesterCourse(codes, "LALT 1020"), true);
+  assert.equal(semesterCreditViolation([{ name: "Fall 2026", courses: codes }]), null);
+});

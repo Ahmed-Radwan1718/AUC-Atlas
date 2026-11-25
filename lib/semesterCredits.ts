@@ -32,7 +32,97 @@ export function buildCourseCreditMap(plans: Record<string, Plan>): Map<string, n
   return credits;
 }
 
+// Catalog courses outside the degree-plan checklists still need real credit
+// values for both the drawer and server-side semester validation.
+// Source: AUC 2024–2025 catalog extract, Core Curriculum and program requirements:
+// https://catalog.aucegypt.edu/mime/media/view/40/2130/Extract%2B2024-2025%2Bupdated.pdf
+// ARIC 2098: https://www.coursicle.com/aucegypt/courses/ARIC/2098/
+// BIOL 4910 has a 1–4 credit range; use its upper bound.
+const supplementalCatalogCredits: Readonly<Record<string, number>> = {
+  "ALWT 3919": 3,
+  "AMST 1090": 3,
+  "AMST 2096": 3,
+  "AMST 2190": 3,
+  "ARCH 2501": 3,
+  "ARIC 1099": 3,
+  "ARIC 2001": 3,
+  "ARIC 2098": 3,
+  "ARIC 2101": 3,
+  "ARIC 2206": 3,
+  "ARIC 2271": 3,
+  "ARIC 3098": 3,
+  "ARIC 3108": 3,
+  "ARIC 3109": 3,
+  "ARIC 3116": 3,
+  "ARIC 3324": 3,
+  "ARIC 3344": 3,
+  "BIOL 1010": 4,
+  "BIOL 1040": 3,
+  "BIOL 1098": 4,
+  "BIOL 1150": 3,
+  "BIOL 1410": 4,
+  "BIOL 1930": 3,
+  "BIOL 4690": 1,
+  "BIOL 4691": 2,
+  "BIOL 4910": 4,
+  "BUSC 4001": 3,
+  "CHEM 2001": 3,
+  "CORE 1010": 3,
+  "CORE 1099": 3,
+  "CORE 1130": 3,
+  "CORE 2096": 3,
+  "CORE 2097": 3,
+  "CORE 2098": 3,
+  "ECLT 1023": 3,
+  "ECON 4081": 3,
+  "ECON 4082": 1,
+  "EDUC 1099": 3,
+  "EDUC 2011": 3,
+  "EGPT 5153": 3,
+  "FILM 4250": 3,
+  "FILM 4260": 3,
+  "HIST 2096": 3,
+  "HIST 2097": 3,
+  "LALT 1020": 0,
+  "LING 2200": 3,
+  "LING 2201": 3,
+  "LING 2220": 3,
+  "LING 2230": 3,
+  "MENG 2200": 3,
+  "MUSC 2000": 3,
+  "MUSC 2010": 3,
+  "PHIL 2010": 3,
+  "PHIL 2099": 3,
+  "PHIL 2100": 3,
+  "POLS 1001": 3,
+  "POLS 2096": 3,
+  "POLS 4000": 3,
+  "POLS 4090": 3,
+  "POLS 4104": 3,
+  "PSYC 2099": 3,
+  "PSYC 3021": 3,
+  "PSYC 3022": 3,
+  "RHET 1010": 3,
+  "RHET 1020": 3,
+  "RHET 3130": 3,
+  "SCI 1020": 3,
+  "SEMR 1023": 3,
+  "SEMR 1099": 3,
+  "SEMR 1110": 3,
+  "SOC 2201": 3,
+  "SOC 2401": 3,
+  "SOC 2402": 3,
+  "SOC 2403": 3,
+  "THTR 1099": 3,
+  "THTR 1101": 3,
+  "THTR 2601": 1,
+  "THTR 2603": 1,
+};
+
 const creditsByCode = buildCourseCreditMap(DEGREE_REQUIREMENTS as Record<string, Plan>);
+for (const [code, credits] of Object.entries(supplementalCatalogCredits)) {
+  if (!creditsByCode.has(code)) creditsByCode.set(code, credits);
+}
 export function courseCredits(code: string): number | null {
   return creditsByCode.get(code.trim().toUpperCase().replace(/\s+/g, " ")) ?? null;
 }
