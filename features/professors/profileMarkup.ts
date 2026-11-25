@@ -278,7 +278,6 @@ export function buildProfileMarkup(professor: Professor): string {
           <div class="professor-profile-info">
             <div class="professor-profile-identity">
               <h1 class="professor-profile-name">${escapeHtml(professor.name)}</h1>
-              <p class="professor-profile-department">${escapeHtml(professor.department || "Department coming soon")}</p>
             </div>
 
             <div>
