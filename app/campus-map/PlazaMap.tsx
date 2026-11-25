@@ -59,7 +59,7 @@ export default function PlazaMap() {
     // Model's front faces +Z, while the existing campus library faces +X.
     // Rotate the original geometry, fit its long axis to 72 m and ground it.
     // All model materials, meshes and proportions are preserved.
-    new GLTFLoader().load("/models/auc-library.glb", gltf => {
+    new GLTFLoader().load("/models/auc-library.glb?v=5bba6a6c", gltf => {
       if (disposed) { disposeMeshes(gltf.scene); return; }
       const library = new THREE.Group();
       library.name = "AUC Library — detailed GLB";
