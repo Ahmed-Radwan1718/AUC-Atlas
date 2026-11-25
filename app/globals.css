@@ -14,3 +14,22 @@ body {
   background: #f7f4ee;
   color: #171717;
 }
+
+/* Keep the shared footer at the bottom on short pages, in normal flow.
+   Routes that intentionally hide the footer retain their own layout. */
+body:has(> .site-footer):not(:has(> .error-page)) {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+body:has(> .site-footer):not(:has(> .error-page)) > main {
+  flex: 1 0 auto;
+  min-height: 0;
+}
+
+body:has(> .site-footer):not(:has(> .error-page)) > .site-footer {
+  flex: 0 0 auto;
+  margin-top: auto;
+}
