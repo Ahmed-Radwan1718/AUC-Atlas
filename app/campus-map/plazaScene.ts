@@ -11,7 +11,7 @@ export const landmarks: { name: string; position: [number, number, number] }[] =
   { name: "Moataz Al Alfi Hall", position: [14, 24, -198] },
   { name: "Bassily Auditorium", position: [55.8, 30, -198] },
   { name: "Cilantro", position: [-24, 18, -96] },
-  { name: "Relish · Main Cafeteria", position: [-51, 9, -150] },
+  { name: "Relish · Main Cafeteria", position: [-64, 12.5, -96] },
   { name: "University Residences", position: [-87, 13, -280] },
 ];
 export function buildPlaza() {
@@ -201,8 +201,8 @@ export function buildPlaza() {
   }
   for(const x of [-9,-5.3,-1.7,2]) box(.8,.72,28,x,5.45,-152,terracotta);
   // Campus Center dining: AUC's dining directory locates both outlets here.
-  // Legorreta describes the Everyday Facilities and a separate garden-facing
-  // main dining pavilion. Arch and terrace massing follow reference photographs.
+  // Cilantro and Relish share the Everyday Facilities building, per on-campus
+  // layout correction. Arch and terrace massing follow reference photographs.
   // https://www.aucegypt.edu/student-life/dining
   // https://www.legorreta.mx/en/proyecto-universidad-americana-en-el-cairo-campus-center
   // Exact outlet boundaries, building footprints and heights are approximate.
@@ -286,30 +286,8 @@ export function buildPlaza() {
   };
   for(const z of [-106,-99,-92,-85]) picnicTable(-19.5,z,.75,true);
 
-  // Relish: independent lower dining pavilion, opening onto a garden court.
-  // Its precise outline is not verified, so retain the simple pavilion typology.
-  const relishX=-51, relishZ=-150;
-  box(39,.38,27,relishX,.19,relishZ,stone);
-  box(38,6.9,25,relishX,3.83,relishZ,diningStucco);
-  box(39.2,.55,26.2,relishX,7.55,relishZ,roof);
-  box(37,.65,24,relishX,8.15,relishZ,light);
-  // Continuous shaded glazing on the garden side, with stone piers.
-  box(34,4.4,.15,relishX,3.15,relishZ-12.58,glass);
-  for(let dx=-17;dx<=17;dx+=4.25)
-    box(.55,5.3,.65,relishX+dx,3.03,relishZ-12.9,stone);
-  box(39,.42,4.5,relishX,6.25,relishZ-14.4,light);
-  // Additional windows along both short elevations.
-  for(const side of [-1,1]) for(let dz=-9;dz<=9;dz+=4.5){
-    box(.14,2.8,2.65,relishX+side*19.08,3.65,relishZ+dz,glass);
-    box(.32,.28,2.9,relishX+side*19.2,2.15,relishZ+dz,light);
-  }
-  // Entrance facing the pedestrian connection to the Campus Center.
-  box(4.2,3.5,.14,relishX+11,2.1,relishZ+12.58,glass);
-  for(const dx of [-2.2,2.2]) box(.35,4,.5,relishX+11+dx,2.2,relishZ+12.9,stone);
-  box(5.5,.3,4,relishX+11,4.45,relishZ+14.4,roof);
-  box(43,.16,18,relishX,.08,-175,paving);
-  box(25,.12,7,relishX,.15,-183,green);
-  for(const x of [-64,-51,-38]) picnicTable(x,-171,.16,true);
+  // Relish occupies the rear of the same Everyday Facilities building as Cilantro.
+  // Its label anchors to the existing rear mass; no separate pavilion is modeled.
   // Connecting path toward the original hall and existing pergola.
   box(20,.12,9,-21,.06,-174,paving);
 
