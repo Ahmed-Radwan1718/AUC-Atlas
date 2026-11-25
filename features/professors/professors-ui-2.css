@@ -662,7 +662,7 @@
     }
 
     .professor-review-star.is-filled {
-      color: var(--atlas-accent-ink);
+      color: var(--atlas-accent);
     }
 
     .professor-review-rating-text {
@@ -1343,7 +1343,7 @@
     .professor-profile-mode .professor-reviews-header span,
     .professor-profile-mode .professor-review-rating,
     .professor-profile-mode .professor-review-star.is-filled {
-      color: var(--atlas-accent-ink);
+      color: var(--atlas-accent);
     }
 
     .professor-profile-mode .professor-review-stat-details-toggle:focus-visible,
