@@ -120,7 +120,6 @@ function professorItems(items: RankedProfessor[], lowestFirst: boolean): RatedPr
 
 function professorRows(rankings: RatedProfessor[], inactive = false) {
   return rankings.map(({ professor, average, count }) => {
-    const department = professor.displayDepartment || professor.department || "AUC";
     const label = count === 1 ? "review" : "reviews";
     return <a className="home-latest-item home-latest-person"
         href={"/professors/" + encodeURIComponent(professor.id)} key={professor.id}
@@ -128,8 +127,8 @@ function professorRows(rankings: RatedProfessor[], inactive = false) {
       <img src={professor.image || assetsRoot + "user.png"} alt=""/>
       <span className="home-latest-person-copy">
         <strong>{professor.name}</strong>
-        <small aria-label={department + ". " + average.toFixed(1) + " out of 5 from " + count + " " + label}>
-          {department} · <span className="home-latest-stars" aria-hidden="true">★</span>{" "}
+        <small aria-label={average.toFixed(1) + " out of 5 from " + count + " " + label}>
+          <span className="home-latest-stars" aria-hidden="true">★</span>{" "}
           {average.toFixed(1)} · {count + " " + label}
         </small>
       </span>
