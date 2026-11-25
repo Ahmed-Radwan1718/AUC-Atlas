@@ -11,9 +11,13 @@ import {
   setPersistence, signInWithCustomToken, signOut
 } from "firebase/auth";
 
-export function initializeAccounts(){
+export function initializeAccounts(activityOnly = false){
   const root=document.querySelector(".account-page");
   if(!root || root.getAttribute("data-atlas-accounts-initialized")==="true")return;
+  if (!activityOnly && window.location.hash === "#reviews") {
+    window.location.replace("/activity-history");
+    return;
+  }
   root.setAttribute("data-atlas-accounts-initialized","true");
   window.aucAtlasCourses=courses;
   window.aucAtlasCourseProfessors={};
@@ -414,7 +418,7 @@ export function initializeAccounts(){
         panel.classList.toggle("active", panel.id === "account-panel-" + panelName);
       });
 
-      window.location.hash = panelName;
+      if (!activityOnly) window.location.hash = panelName;
 
       // On a deep-linked refresh, select the right panel before fetching profile
       // data, but defer protected requests until the session is verified.
@@ -1819,6 +1823,7 @@ function getAccountReviewProfessorUrl(professorId) {
       });
 
       document.addEventListener("click", function (event) {
+        if (!root.isConnected) return;
         if (!accountMajorDropdown.contains(event.target)) {
           accountMajorDropdown.classList.remove("open");
           trigger.setAttribute("aria-expanded", "false");
@@ -1926,11 +1931,17 @@ function getAccountReviewProfessorUrl(professorId) {
           throw new Error("Please log in to view your account.");
         }
 
-        hydrateAccountDetails(data.user);
+        if (!root.isConnected) return false;
+        if (activityOnly) {
+          accountCurrentUser = data.user;
+          window.aucAtlasCurrentUser = data.user;
+        } else {
+          hydrateAccountDetails(data.user);
+        }
         return true;
       } catch (error) {
         try {
-          localStorage.setItem("auc-atlas-login-redirect", "/accounts");
+          localStorage.setItem("auc-atlas-login-redirect", activityOnly ? "/activity-history" : "/accounts");
         } catch (storageError) {}
 
         window.location.href = "/login";
@@ -2089,7 +2100,7 @@ function getAccountReviewProfessorUrl(professorId) {
       });
     });
 
-    accountDisplayNameEditButton.addEventListener("click", function () {
+    accountDisplayNameEditButton?.addEventListener("click", function () {
       if (getDisplayNameDaysLeft() > 0) {
         updateDisplayNameLockState();
         return;
@@ -2101,11 +2112,11 @@ function getAccountReviewProfessorUrl(professorId) {
       accountNameInput.select();
     });
 
-    photoChooseButton.addEventListener("click", function () {
+    photoChooseButton?.addEventListener("click", function () {
       photoInput.click();
     });
 
-    photoInput.addEventListener("change", async function () {
+    photoInput?.addEventListener("change", async function () {
       const file = photoInput.files && photoInput.files[0];
 
       if (!file) {
@@ -2115,11 +2126,11 @@ function getAccountReviewProfessorUrl(professorId) {
       await uploadProfilePhotoFile(file);
     });
 
-    photoRemoveButton.addEventListener("click", async function () {
+    photoRemoveButton?.addEventListener("click", async function () {
       await removeProfilePhoto();
     });
 
-    detailsForm.addEventListener("submit", async function (event) {
+    detailsForm?.addEventListener("submit", async function (event) {
       event.preventDefault();
 
       const nextDisplayName = accountNameInput.value.trim();
@@ -2787,6 +2798,7 @@ function getAccountReviewProfessorUrl(professorId) {
 
     // Match the Leave a Review drawer's keyboard focus containment.
     document.addEventListener("keydown", function (event) {
+      if (!root.isConnected) return;
       if (event.key !== "Tab" || !accountReviewEditor || accountReviewEditor.hidden || !accountReviewEditorForm) return;
       const focusable = Array.from(accountReviewEditorForm.querySelectorAll(
         "button:not([disabled]), input:not([type='hidden']):not([disabled]), " +
@@ -2855,6 +2867,7 @@ function getAccountReviewProfessorUrl(professorId) {
     });
 
     document.addEventListener("keydown", function (event) {
+      if (!root.isConnected) return;
       if (event.key !== "Escape") {
         return;
       }
@@ -2899,7 +2912,7 @@ function getAccountReviewProfessorUrl(professorId) {
       });
     });
 
-    logoutButton.addEventListener("click", async function () {
+    logoutButton?.addEventListener("click", async function () {
       await fetch("/api/logout", {
         method: "POST",
         credentials: "same-origin",
@@ -2921,7 +2934,7 @@ function getAccountReviewProfessorUrl(professorId) {
 
     async function initializeAccountPage() {
       const hashPanel = window.location.hash.slice(1);
-      const initialPanel = ["details", "security", "reviews"].includes(hashPanel)
+      const initialPanel = activityOnly ? "reviews" : ["details", "security"].includes(hashPanel)
         ? hashPanel
         : "details";
 
@@ -2950,7 +2963,7 @@ function getAccountReviewProfessorUrl(professorId) {
 
     initializeAccountPage();
   
-  initializeGoogleConnection();
+  if (!activityOnly) initializeGoogleConnection();
 }
 function initializeGoogleConnection(){
     const googleConnectionStatus =

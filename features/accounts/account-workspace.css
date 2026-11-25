@@ -224,3 +224,8 @@
   background: transparent;
   color: var(--atlas-accent-ink);
 }
+
+/* Standalone activity history: use the full content width, without account navigation. */
+.atlas-account-workspace .is-standalone-activity .account-layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.atlas-account-workspace .is-standalone-activity .account-content { padding-left: 0; border-left: 0; }
+.atlas-account-workspace .is-standalone-activity .account-header { visibility: visible; }

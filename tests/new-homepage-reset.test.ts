@@ -392,3 +392,22 @@ test("department choices are sorted, deduplicated and include unassigned profess
   assert.ok(matchesProfessorDepartment(items[3], [unassignedDepartment]));
   assert.ok(matchesProfessorDepartment(items[4], [unassignedDepartment]));
 });
+
+
+test("activity history is a standalone private route in the hamburger menu", () => {
+  const page = read("app/activity-history/page.tsx");
+  const markup = read("features/accounts/accountsMarkup.ts");
+  const runtime = read("features/accounts/accountRuntime.ts");
+  const accountMarkup = markup.slice(markup.indexOf("export const markup ="), markup.indexOf("export const activityMarkup ="));
+  const activityMarkup = markup.slice(markup.indexOf("export const activityMarkup ="));
+  assert.match(page, /<Accounts activityOnly \/>/);
+  assert.match(page, /index: false/);
+  assert.doesNotMatch(accountMarkup, /account-panel-reviews|account-review-editor-form|Activity history/);
+  assert.match(activityMarkup, /account-panel-reviews/);
+  assert.match(activityMarkup, /account-review-editor-form/);
+  assert.match(activityMarkup, /account-material-editor-form/);
+  assert.doesNotMatch(activityMarkup, /account-sidebar/);
+  assert.match(read("components/Header.tsx"), /href: "\/activity-history", label: "Activity history"/);
+  assert.match(runtime, /window.location.replace\("\/activity-history"\)/);
+  assert.match(runtime, /activityOnly \? "\/activity-history" : "\/accounts"/);
+});
