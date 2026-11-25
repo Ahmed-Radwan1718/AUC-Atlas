@@ -57,3 +57,10 @@ body:has(> .site-footer):not(:has(> .error-page)) > .site-footer {
   flex: 0 0 auto;
   margin-top: auto;
 }
+
+/* Hide the browser's clear control in the shared catalog search. */
+#atlas-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
