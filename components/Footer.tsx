@@ -8,7 +8,7 @@ const hiddenPages = new Set(["accounts", "degree-progression", "login", "signup"
 export default function Footer() {
   const pathname = usePathname();
   const currentPage = pathname.split("/").filter(Boolean).at(-1) || "index";
-  if (hiddenPages.has(currentPage) || currentPage === "admin") return null;
+  if (pathname === "/campus-map" || hiddenPages.has(currentPage) || currentPage === "admin") return null;
 
   return (
     <footer className="site-footer">

@@ -91,12 +91,12 @@ export default function PlazaMap() {
     };
   }, []);
   return <main className={styles.page}>
-    <div className={styles.heading}><div><span className={styles.kicker}>AUC ATLAS / CAMPUS MAP</span><h1>Explore campus</h1><p>New Cairo · Bartlett Plaza</p></div><span className={styles.status}>Early preview</span></div>
     <section className={styles.map} aria-label="Bartlett Plaza map">
       <div ref={host} className={styles.viewport}>
         <div className={styles.labels} hidden={!showLabels}>{landmarks.map((landmark, i) => <span className={styles.pin} key={landmark.name} ref={el => { labels.current[i] = el; }}>{landmark.name}</span>)}</div>
         {error && <div className={styles.fallback}>3D rendering is unavailable in this browser. <a href="https://www.aucegypt.edu/maps">Open AUC’s campus map</a>.</div>}
       </div>
+      <span className={styles.status} title="Illustrative geometry; not yet suitable for navigation">Early preview</span>
       <div className={styles.location}><span/> Bartlett Plaza <small>Exterior model</small></div>
       <div className={styles.tools}>
         <button onClick={() => actions.current?.zoom(1.25)} aria-label="Zoom in" title="Zoom in">+</button>
@@ -107,6 +107,5 @@ export default function PlazaMap() {
       </div>
       <div className={styles.hint}>Drag to rotate · Scroll to zoom · Right-drag to pan<br/>Touch: drag to rotate · Two fingers to pan / zoom</div>
     </section>
-    <div className={styles.notes}><div><strong>About this preview</strong><p>Plaza length: 150 m (AUC). Building footprints, heights, paths and elevations are illustrative estimates. Not suitable for navigation yet.</p></div><div><strong>References</strong><p><a href="https://www.aucegypt.edu/giving/named-spaces/plazas-courtyards-and-spaces">AUC plaza dimensions</a> · <a href="https://dir.aucegypt.edu/files/NCmap.pdf">Original campus plan</a> · <a href="https://www.aucegypt.edu/maps">Official campus map</a></p></div></div>
   </main>;
 }
