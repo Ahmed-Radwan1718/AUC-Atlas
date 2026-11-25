@@ -170,7 +170,7 @@ test("Professor Insights follows live planner state and uses protected course re
   assert.doesNotMatch(insights, /Explore professors for your planned courses\.|Based on available past and current student reviews/);
 });
 
-test("course insights reject unrelated and duplicate reviews, avoid overclaiming small samples, and rank extremes", () => {
+test("course insights reject unrelated and duplicate reviews and rank extremes even with one review", () => {
   const source = read("app/homepagenew/professorInsightsSummary.ts");
   const compiled = ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
@@ -197,8 +197,14 @@ test("course insights reject unrelated and duplicate reviews, avoid overclaiming
   assert.equal(result[0].themes[0], "Lectures: Helpful (3/3 responses)");
   assert.equal(result[1].professorId, "low");
   assert.equal(result[1].category, "caution");
-  assert.equal(result[2].category, "other");
-  assert.equal(result[3].category, "limited");
+  assert.equal(result[2].professorId, "small");
+  assert.equal(result[2].category, "caution");
+  assert.equal(result[3].category, "other");
+  const single = summarize([review("single-high", "one-high", 4), review("single-low", "one-low", 2), review("single-mid", "one-mid", 3)], "MENG3209");
+  assert.deepEqual(Array.from(single, item => [item.professorId, item.category, item.reviewCount]), [
+    ["one-high", "consider", 1], ["one-low", "caution", 1], ["one-mid", "other", 1]
+  ]);
+  assert.match(read("app/homepagenew/ProfessorInsights.tsx"), /insight\.reviewCount < 3 && <small>Limited reviews<\/small>/);
   assert.equal(summarize([], "MENG 3209").length, 0);
 });
 

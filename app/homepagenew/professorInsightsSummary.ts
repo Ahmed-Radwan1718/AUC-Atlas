@@ -8,7 +8,7 @@ export type CourseReview = {
 
 export type ProfessorInsight = {
   professorId: string; professorName: string; reviewCount: number;
-  averageRating: number; category: "consider" | "caution" | "limited" | "other";
+  averageRating: number; category: "consider" | "caution" | "other";
   themes: string[];
 };
 
@@ -52,12 +52,12 @@ export function summarizeCourseProfessors(reviews: readonly CourseReview[], code
   const results: ProfessorInsight[] = [...groups].map(([professorId, group]) => {
     const reviewCount = group.length;
     const averageRating = group.reduce((total, review) => total + Number(review.rating), 0) / reviewCount;
-    const category = reviewCount < 3 ? "limited" : averageRating >= 4 ? "consider" :
+    const category = averageRating >= 4 ? "consider" :
       averageRating <= 2 ? "caution" : "other";
     return { professorId, professorName: group.find(review => review.professorName?.trim())?.professorName || "Professor",
       reviewCount, averageRating, category, themes: recurringThemes(group) };
   });
-  const order = { consider: 0, caution: 1, other: 2, limited: 3 };
+  const order = { consider: 0, caution: 1, other: 2 };
   return results.sort((a, b) => order[a.category] - order[b.category] ||
     (a.category === "caution" ? a.averageRating - b.averageRating : b.averageRating - a.averageRating) ||
     b.reviewCount - a.reviewCount || a.professorId.localeCompare(b.professorId));

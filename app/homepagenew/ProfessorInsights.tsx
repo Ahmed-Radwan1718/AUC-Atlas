@@ -30,7 +30,7 @@ function ProfessorRow({ insight }: { insight: SemesterInsight }) {
         <strong>{name}</strong>
         <small className="new-homepage-insights-person-course">{insight.courseCode}{courseByCode.get(insight.courseCode)?.title ? " · " + courseByCode.get(insight.courseCode)!.title : ""}</small>
         <small>{insight.averageRating.toFixed(1)} / 5 · {insight.reviewCount} {insight.reviewCount === 1 ? "rating" : "ratings"}</small>
-        {insight.category === "limited" && <small>Limited reviews</small>}
+        {insight.reviewCount < 3 && <small>Limited reviews</small>}
       </span>
       {professor && <span className="new-homepage-insights-row-arrow" aria-hidden="true">›</span>}
     </>
