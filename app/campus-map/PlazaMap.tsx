@@ -39,7 +39,7 @@ export default function PlazaMap() {
     scene.add(sun);
     scene.add(buildPlaza());
     const camera = new THREE.OrthographicCamera(-150, 150, 110, -110, 1, 1000);
-    camera.position.set(130, 155, 215);
+    camera.position.set(0, 155, -270);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
@@ -62,7 +62,7 @@ export default function PlazaMap() {
     observer.observe(el); resize();
     actions.current = {
       reset: () => controls.reset(),
-      top: () => { controls.target.set(0, 0, 0); camera.position.set(0, 300, 0.1); camera.zoom = 1; camera.updateProjectionMatrix(); controls.update(); },
+      top: () => { controls.target.set(0, 0, 0); camera.position.set(0, 300, -0.1); camera.zoom = 1; camera.updateProjectionMatrix(); controls.update(); },
       zoom: factor => { camera.zoom = THREE.MathUtils.clamp(camera.zoom * factor, controls.minZoom, controls.maxZoom); camera.updateProjectionMatrix(); },
     };
     const projected = new THREE.Vector3();
