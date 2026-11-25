@@ -329,10 +329,33 @@ test("homepage ambient glows extend behind the header at the top", () => {
 });
 
 
-test("professor records and professor UI no longer contain department attributes", () => {
-  for (const path of ["data/professors-1.ts", "data/professors-2.ts", "data/professors-3.ts", "data/professors-type.ts"]) {
-    assert.doesNotMatch(read(path), /\b(?:department|displayDepartment|filterDepartment)\??\s*:/);
+test("professor department metadata is optional and remains independent of the professor UI", () => {
+  const type = read("data/professors-type.ts");
+  assert.match(type, /\bdepartment\?\s*:\s*string\b/);
+  assert.doesNotMatch(type, /\b(?:displayDepartment|filterDepartment)\??\s*:/);
+  const ids = new Set<string>();
+  let assigned = 0;
+  for (let part = 1; part <= 3; part++) {
+    const source = read(`data/professors-${part}.ts`);
+    assert.doesNotMatch(source, /\b(?:displayDepartment|filterDepartment)\??\s*:/);
+    const compiled = ts.transpileModule(source, {
+      compilerOptions: { module: ts.ModuleKind.CommonJS }
+    }).outputText;
+    const module = { exports: {} as Record<string, { id: string; department?: string }[]> };
+    vm.runInNewContext(compiled, { module, exports: module.exports });
+    for (const professor of module.exports[`professorRecords${part}`]) {
+      assert.ok(!ids.has(professor.id), `Duplicate professor ID: ${professor.id}`);
+      ids.add(professor.id);
+      if (professor.department !== undefined) {
+        assert.equal(typeof professor.department, "string");
+        assert.ok(professor.department.trim().length > 0);
+        assert.equal(professor.department, professor.department.trim());
+        assert.notEqual(professor.department, "Department coming soon");
+        assigned++;
+      }
+    }
   }
+  assert.ok(assigned > 0, "Professor department metadata should be populated");
   assert.doesNotMatch(read("features/professors/Professors.tsx"), /selectedDepartments|department-filter-options|item\.(?:department|displayDepartment|filterDepartment)/);
   assert.doesNotMatch(read("features/professors/profileMarkup.ts"), /professor-profile-department/);
   assert.match(read("features/home/HomeSearch.tsx"), /course\.department/);
