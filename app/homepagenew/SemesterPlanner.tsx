@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ProfessorInsights from "./ProfessorInsights";
 import { SEMESTER_CREDIT_LIMIT, SEMESTER_COURSE_LIMIT, courseCredits, semesterCreditSummary, canAddSemesterCourse } from "../../lib/semesterCredits";
 import { courses } from "../../data/courses";
+import { searchSemesterCourses } from "../../lib/semesterCourseSearch";
 import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
 import type { DegreeRequirementGroup } from "./degreeProgressSummary";
 
@@ -198,20 +199,13 @@ export default function SemesterPlanner() {
     [major, completedKeys]
   );
   const availableCourses = useMemo(() => {
-    const needle = query.trim().toLowerCase();
     const added = new Set(addedThisSession);
     const canShow = (code: string) => !planned.has(code) || added.has(code);
-    if (!needle) return degreeOptions.filter(canShow)
+    // With no search, keep suggestions specific to the student's degree.
+    if (!query.trim()) return degreeOptions.filter(canShow)
       .map(code => courseByCode.get(code)!);
-    return courses.filter(course =>
-      canShow(course.code) &&
-      (course.code.toLowerCase().includes(needle) ||
-        course.title.toLowerCase().includes(needle))
-    ).sort((a, b) =>
-      Number(b.code.toLowerCase().startsWith(needle)) -
-      Number(a.code.toLowerCase().startsWith(needle)) ||
-      a.code.localeCompare(b.code)
-    ).slice(0, 50);
+    // Searching must not be restricted by the student's major.
+    return searchSemesterCourses(courses, query, canShow);
   }, [degreeOptions, planned, query, addedThisSession]);
 
   const selected = semesters.find(semester => semester.name === active) || semesters[0];
@@ -442,8 +436,8 @@ export default function SemesterPlanner() {
         <div className="new-homepage-course-drawer-body">
           <input id="semester-course-search" type="search" value={query}
             onChange={event => setQuery(event.target.value)}
-            aria-label="Search by course code or name"
-            placeholder="Search by course code or name" autoComplete="off" />
+            aria-label="Search any course by code or name"
+            placeholder="Search any course by code or name" autoComplete="off" />
           {creditSummary.total >= SEMESTER_CREDIT_LIMIT && <p className="new-homepage-semester-note" role="status">21-credit limit reached. Only zero-credit courses can be added.</p>}
           {semesterFull && <p className="new-homepage-semester-note" role="status">No more courses can be added to this semester.</p>}
           <div className="new-homepage-semester-suggestions">
@@ -466,7 +460,7 @@ export default function SemesterPlanner() {
             })}
             {!availableCourses.length && (
               <p className="new-homepage-semester-note">
-                {query.trim() ? "No matching unplanned courses." : "Type a course code or name to find courses."}
+                {query.trim() ? "No matching unplanned courses." : "Search by code or name to find any course, including Core courses."}
               </p>
             )}
           </div>
