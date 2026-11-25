@@ -27,10 +27,12 @@ export default function PlazaMap() {
     renderer.setClearColor(0x000000, 0);
     scene.add(new THREE.HemisphereLight("#fff9e9", "#8d826e", 2.1));
     const sun = new THREE.DirectionalLight("#fff1d8", 2.8);
-    sun.position.set(-100, 180, 90);
+    sun.position.set(-100, 180, 40);
+    sun.target.position.set(0, 0, -50);
+    scene.add(sun.target);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
-    Object.assign(sun.shadow.camera, { left: -155, right: 155, top: 155, bottom: -155, near: 1, far: 450 });
+    Object.assign(sun.shadow.camera, { left: -220, right: 220, top: 220, bottom: -220, near: 1, far: 450 });
     sun.shadow.camera.updateProjectionMatrix();
     sun.shadow.normalBias = 0.12;
     scene.add(sun);
@@ -39,19 +41,19 @@ export default function PlazaMap() {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const animationStart = performance.now();
     const camera = new THREE.OrthographicCamera(-150, 150, 110, -110, 1, 1000);
-    camera.position.set(0, 155, -270);
+    camera.position.set(0, 155, -320);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.minZoom = 0.65;
     controls.maxZoom = 4;
     controls.maxPolarAngle = Math.PI / 2.2;
-    controls.target.set(0, 0, 0);
+    controls.target.set(0, 0, -50);
     const resize = () => {
       const w = el.clientWidth, h = el.clientHeight;
       if (!w || !h) return;
       const aspect = w / h;
-      const halfHeight = Math.max(115, 115 / aspect);
+      const halfHeight = Math.max(175, 170 / aspect);
       camera.left = -halfHeight * aspect; camera.right = halfHeight * aspect;
       camera.top = halfHeight; camera.bottom = -halfHeight;
       camera.updateProjectionMatrix();

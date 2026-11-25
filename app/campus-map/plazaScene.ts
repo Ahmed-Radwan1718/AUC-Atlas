@@ -8,6 +8,8 @@ export const landmarks: { name: string; position: [number, number, number] }[] =
   { name: "Sciences & Engineering", position: [54, 26, 20] },
   { name: "Jameel Hall", position: [48, 24, -76] },
   { name: "Core Academic Center", position: [-40, 20, 70] },
+  { name: "Moataz Al Alfi Hall", position: [-47, 29, -148] },
+  { name: "Bassily Auditorium", position: [18, 30, -169] },
 ];
 export function buildPlaza() {
   const root = new THREE.Group();
@@ -19,7 +21,7 @@ export function buildPlaza() {
   const cylinder = (r1:number,r2:number,h:number,x:number,y:number,z:number,m:THREE.Material,n=10) => {
     const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,n),m); o.position.set(x,y,z); o.castShadow=true; o.receiveShadow=true; root.add(o); return o;
   };
-  box(208,2,214,0,-1.02,0,ground);
+  box(208,2,314,0,-1.02,-50,ground);
   box(48,.4,150,0,-.2,0,paving);
   // Broad bands of stone, not a surveyed paving layout.
   for(let z=-70;z<=70;z+=10) box(48,.035,.22,0,.025,z,band);
@@ -85,6 +87,99 @@ export function buildPlaza() {
       box(3.8,.08,3.8,x,.6,z,green); palm(x,z);
       box(3,.45,.85,x-side*3,.65,z+3.4,bench);
     }
+  }
+  // Campus Center extension: illustrative dimensions and local coordinates, not a survey.
+  // References: AUC's NCmap.pdf, AUC Campus Center photographs, and Legorreta's
+  // Campus Center project description. The hall sits on the library/north side
+  // of the auditorium; both open toward an approximate pedestrian courtyard.
+  const blue = mat("#335a9b"), blueEdge = mat("#28477b"), blueJoint = mat("#5278ac");
+  const cyan = mat("#408d9c"), terracotta = mat("#ad583b"), recess = mat("#414343");
+  const mosaicBlue = mat("#80a9bb"), mosaicDark = mat("#303c49"), mosaicRed = mat("#a96552");
+  const mosaicLight = mat("#d8d3ba");
+  box(44,.38,120,0,-.19,-135,paving);
+  for(let z=-190;z<=-80;z+=10) box(44,.035,.22,0,.025,z,band);
+  for(const x of [-15,0,15]) box(.22,.04,120,x,.025,-135,band);
+
+  // Moataz Al Alfi: limestone plinth, deep blue recessed entrance,
+  // turquoise round columns and a tall split blue-tiled upper volume.
+  const hallX=-47, hallZ=-148;
+  box(42,9,32,hallX-2,4.5,hallZ,stone);
+  box(5,9,5,-23.5,4.5,hallZ-17.5,stone);
+  box(5,9,5,-23.5,4.5,hallZ+17.5,stone);
+  box(5,2.1,40,-23.5,7.95,hallZ,stone);
+  box(47,.45,40,-44.5,9.2,hallZ,roof);
+  box(.18,6.3,27,-27.9,3.2,hallZ,blueEdge);
+  for(const dz of [-9,9]){
+    cylinder(.75,.75,6.8,-23.5,3.4,hallZ+dz,cyan,16);
+    box(.22,3.5,5,-27.75,2.8,hallZ+dz*1.38,terracotta);
+    box(.25,2.7,4.1,-27.58,2.8,hallZ+dz*1.38,glass);
+  }
+  // Mashrabiyya/window belt beneath the blue upper mass.
+  box(31,3.3,30,-47,11,hallZ,blueEdge);
+  for(let dz=-12;dz<=12;dz+=4.8){
+    box(.3,2.6,3.9,-31.3,10.9,hallZ+dz,terracotta);
+    for(let j=-1;j<=1;j++) box(.35,1.9,.64,-31.1,10.9,hallZ+dz+j*.9,glass);
+  }
+  // Two slightly offset planes make the characteristic vertical slit.
+  box(30,15.5,14.4,-47,20.3,hallZ-7.8,blue);
+  box(30,14.4,14.4,-47,19.75,hallZ+7.8,blue);
+  for(const dz of [-7.8,7.8]){
+    for(let y=13.1;y<26.8;y+=1.5) box(.06,.035,14.35,-31.97,y,hallZ+dz,blueJoint);
+    for(let k=-6;k<=6;k+=1.5) box(.065,13.6,.035,-31.96,19.9,hallZ+dz+k,blueJoint);
+  }
+  box(1.3,.8,2.4,-31.4,20.3,hallZ,terracotta);
+  box(2.2,.3,10,-47,28.2,hallZ-7.8,blueEdge);
+
+  // Bassily Auditorium: a chamfered auditorium mass based on the published
+  // seating plan, with a lower entry wing and a tall mosaic-faced stone tower.
+  const auditoriumX=47, auditoriumZ=-150;
+  const outline=new THREE.Shape();
+  const corners=[[-16,-25],[16,-25],[25,-16],[25,16],[16,25],[-16,25],[-25,16],[-25,-16]];
+  corners.forEach(([x,z],i)=>i===0?outline.moveTo(x,z):outline.lineTo(x,z));
+  outline.closePath();
+  const auditorium=new THREE.Mesh(new THREE.ExtrudeGeometry(outline,{depth:21,bevelEnabled:false}),stone);
+  auditorium.rotation.x=-Math.PI/2;
+  auditorium.position.set(auditoriumX,0,auditoriumZ);
+  auditorium.castShadow=true;auditorium.receiveShadow=true;root.add(auditorium);
+  const auditoriumRoof=new THREE.Mesh(new THREE.ExtrudeGeometry(outline,{depth:.6,bevelEnabled:false}),roof);
+  auditoriumRoof.rotation.x=-Math.PI/2;
+  auditoriumRoof.position.set(auditoriumX,21,auditoriumZ);
+  auditoriumRoof.castShadow=true;auditoriumRoof.receiveShadow=true;root.add(auditoriumRoof);
+  // Open entrance bays between piers (dark interior at the rear).
+  box(.2,6,34,21.8,3,auditoriumZ+4,recess);
+  for(const dz of [-13,-2,9,21]) box(8,7,2.5,18,3.5,auditoriumZ+dz,stone);
+  box(8,2.7,37,18,8.35,auditoriumZ+4,stone);
+  box(8.4,.45,37.4,18,9.9,auditoriumZ+4,roof);
+  // Tall tower and a simplified original geometric interpretation of the mosaic.
+  const towerZ=auditoriumZ-19;
+  box(12,29,17,18,14.5,towerZ,stone);
+  box(12.4,.5,17.4,18,29.25,towerZ,roof);
+  box(.12,23,11.4,11.93,14.6,towerZ,mosaicBlue);
+  const ribbon=(pts:number[][],material:THREE.Material)=>{
+    const s=new THREE.Shape();
+    pts.forEach(([x,y],i)=>i===0?s.moveTo(x,y):s.lineTo(x,y));s.closePath();
+    const mesh=new THREE.Mesh(new THREE.ShapeGeometry(s),material);
+    mesh.rotation.y=-Math.PI/2;
+    mesh.position.set(11.84,14.6,towerZ);
+    root.add(mesh);
+  };
+  ribbon([[-2.7,-10],[-.9,-5],[-1.8,1],[-3.3,10],[-1.7,10],[.1,2],[.8,-5],[-.8,-10]],mosaicLight);
+  ribbon([[.4,-10],[1.8,-6],[1.1,1],[-.2,10],[1.1,10],[2.9,1],[2.8,-6],[1.7,-10]],mosaicDark);
+  ribbon([[-3.5,-10],[-2.1,-4],[-3.1,3],[-4.3,10],[-3.7,10],[-2.4,3],[-1.5,-4],[-2.9,-10]],mosaicRed);
+  // A few small shadowed square openings on the tower's side.
+  for(let y=8;y<=24;y+=3.5) for(const dx of [-3,0,3]) box(1.1,1.1,.16,18+dx,y,towerZ-8.55,recess);
+  for(let y=3;y<29;y+=3) box(.08,.11,17,11.95,y,towerZ,stripe);
+
+  // Terracotta pergola and a modest palm-lined courtyard link the two landmarks.
+  for(const z of [-132,-119,-106]){
+    for(const x of [-16,-5]) cylinder(.65,.75,5.2,x,2.6,z,terracotta,12);
+    box(13,.65,1.1,-10.5,5.4,z,terracotta);
+  }
+  for(const x of [-16,-12.3,-8.7,-5]) box(.8,.72,28,x,5.45,-119,terracotta);
+  for(const z of [-180,-160,-140,-120,-100]){
+    box(4,.35,4,5,.18,z,stone);
+    box(3.5,.07,3.5,5,.39,z,green);
+    palm(5,z);
   }
   // Animated continuous streams, gravity-driven spray and local impact ripples.
   const waterAnimations: ((seconds: number) => void)[] = [];
@@ -236,8 +331,8 @@ export function buildPlaza() {
     });
   }
   for(const x of [-91,91]){
-    box(14,.15,193,x,.05,0,green);
-    for(let z=-88;z<95;z+=13){
+    box(14,.15,293,x,.05,-50,green);
+    for(let z=-192;z<95;z+=13){
       cylinder(.24,.35,3.5,x,1,z,trunk);
       const t=new THREE.Mesh(new THREE.IcosahedronGeometry(2.8,1),leaf2);t.position.set(x,3.6,z);t.scale.y=1.1;t.castShadow=true;root.add(t);
     }
