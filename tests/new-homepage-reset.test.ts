@@ -34,9 +34,9 @@ test("catalog professor results match names only, without department or course m
   assert.match(search, /const professorSearchFields = scope === "catalog"\s*\? \[professor\.name\]/);
   assert.match(search, /getMatchScore\(query, professor\.name, professorSearchFields\)/);
   assert.match(search, /\[query, materialState\.materials, scope\]/);
-  // Broad department and course matching remains available to the original homepage.
-  assert.match(search, /professor\.id, professor\.department, professor\.displayDepartment/);
-  assert.match(search, /professor\.filterDepartment, professor\.course/);
+  // Original homepage can still match professor IDs and course fields.
+  assert.match(search, /professor\.name, professor\.id, professor\.course/);
+  assert.doesNotMatch(search, /professor\.(?:department|displayDepartment|filterDepartment)/);
 });
 
 test("retired personalized homepage modules are still removed", () => {
@@ -326,4 +326,14 @@ test("homepage ambient glows extend behind the header at the top", () => {
   assert.match(css, /\[data-home-at-top="true"\] \{ background-color: transparent; \}/);
   assert.match(homepage, /circle 265px at 7% 90px/);
   assert.match(homepage, /circle 175px at -8% 75px/);
+});
+
+
+test("professor records and professor UI no longer contain department attributes", () => {
+  for (const path of ["data/professors-1.ts", "data/professors-2.ts", "data/professors-3.ts", "data/professors-type.ts"]) {
+    assert.doesNotMatch(read(path), /\b(?:department|displayDepartment|filterDepartment)\??\s*:/);
+  }
+  assert.doesNotMatch(read("features/professors/Professors.tsx"), /selectedDepartments|department-filter-options|item\.(?:department|displayDepartment|filterDepartment)/);
+  assert.doesNotMatch(read("features/professors/profileMarkup.ts"), /professor-profile-department/);
+  assert.match(read("features/home/HomeSearch.tsx"), /course\.department/);
 });
