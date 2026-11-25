@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ProfessorInsights from "./ProfessorInsights";
 import { SEMESTER_CREDIT_LIMIT, SEMESTER_COURSE_LIMIT, courseCredits, semesterCreditSummary, canAddSemesterCourse } from "../../lib/semesterCredits";
 import { courses } from "../../data/courses";
+import { useSearchResultMotion } from "../../lib/useSearchResultMotion";
 import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
 import type { DegreeRequirementGroup } from "./degreeProgressSummary";
 
@@ -110,6 +111,7 @@ export default function SemesterPlanner() {
   const [major, setMajor] = useState("");
   const [completedKeys, setCompletedKeys] = useState<string[]>([]);
   const drawerRef = useRef<HTMLDialogElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
   const deleteDialogRef = useRef<HTMLDialogElement>(null);
   const cancelDeleteRef = useRef<HTMLButtonElement>(null);
   const closingDrawer = useRef(false);
@@ -213,6 +215,7 @@ export default function SemesterPlanner() {
       a.code.localeCompare(b.code)
     ).slice(0, 50);
   }, [degreeOptions, planned, query, addedThisSession]);
+  useSearchResultMotion(suggestionsRef, JSON.stringify(availableCourses.map(course => course.code)));
 
   const selected = semesters.find(semester => semester.name === active) || semesters[0];
   const canEdit = account !== "loading" && account !== "error";
@@ -446,14 +449,14 @@ export default function SemesterPlanner() {
             placeholder="Search by course code or name" autoComplete="off" />
           {creditSummary.total >= SEMESTER_CREDIT_LIMIT && <p className="new-homepage-semester-note" role="status">21-credit limit reached. Only zero-credit courses can be added.</p>}
           {semesterFull && <p className="new-homepage-semester-note" role="status">No more courses can be added to this semester.</p>}
-          <div className="new-homepage-semester-suggestions">
+          <div className="new-homepage-semester-suggestions" ref={suggestionsRef}>
             {availableCourses.map(course => {
               const added = addedThisSession.includes(course.code);
               const credits = courseCredits(course.code);
               const unavailable = added || semesterFull || !canEdit || !selected ||
                 !canAddSemesterCourse(selected.courses, course.code);
               return (
-                <button key={course.code} type="button"
+                <button key={course.code} data-search-motion-key={course.code} type="button"
                   aria-label={added ? course.code + " added" : "Add " + course.code}
                   aria-disabled={unavailable}
                   title={!added && unavailable ? (credits === null ? "Credit value unavailable" : "Cannot add within semester limits") : undefined}

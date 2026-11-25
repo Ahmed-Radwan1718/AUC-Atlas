@@ -1127,3 +1127,6 @@
       }
     }
   
+/* Result motion is handled by the shared layout hook; avoid stacking legacy entrance animations. */
+.atlas-search-results[data-search-motion="true"],
+.atlas-search-results[data-search-motion="true"] .atlas-search-result { animation: none; }

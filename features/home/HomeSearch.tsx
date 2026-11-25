@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { courses } from "../../data/courses";
 import { professors } from "../../data/professors";
+import { useSearchResultMotion } from "../../lib/useSearchResultMotion";
 
 type SearchResult = {
   type: "Professor" | "Course" | "Material";
@@ -89,7 +90,7 @@ function SearchResultLink({
       ? "Loading reviews..." : reviews + " " + (reviews === 1 ? "review" : "reviews")].filter(Boolean).join(" · ")
     : result.meta;
   return (
-    <a href={result.href} className={`atlas-search-result ${result.type === "Professor" ? "atlas-search-result--professor" : ""} ${activeIndex === index ? "is-active" : ""}`}
+    <a href={result.href} data-search-motion-key={result.type + result.href + result.title} className={`atlas-search-result ${result.type === "Professor" ? "atlas-search-result--professor" : ""} ${activeIndex === index ? "is-active" : ""}`}
       onMouseEnter={() => onHover(index)} onClick={onNavigate}>
       {result.type === "Professor" ? (
         <img
@@ -182,6 +183,8 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
     : materialsLocked ? "Sign in with a verified AUC email to include uploaded files." : "";
   const isLoading = open && materialLoading && query.length >= 2;
   const visible = open && !dismissed && query.length >= 2;
+  const resultSignature = JSON.stringify([allResults.map(item => item.type + item.href + item.title), status]);
+  useSearchResultMotion(resultsRef, resultSignature, visible, true);
 
   useEffect(() => {
     if (query.length < 2 || !searchesMaterials) return;
@@ -273,13 +276,13 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
         onKeyDown={onKeyDown}/>
       <button type="submit">Search</button>
       <div className="atlas-search-results" id="atlas-search-results" aria-label="Search results"
-        hidden={!visible} ref={resultsRef}>
+        hidden={!visible} ref={resultsRef} data-search-motion="true">
         <div id="atlas-search-results-list">
           {(["Professors", "Courses", "Course materials"] as const).map((label, sectionIndex) => {
             const items = filteredResults[sectionIndex];
             if (!items.length) return null;
             return <section className="atlas-search-result-section" key={label}>
-              <h2>{label}<span>{items.length}</span></h2>
+              <h2 data-search-motion-key={"section:" + label}>{label}<span>{items.length}</span></h2>
               {items.map((item) => {
                 rowIndex += 1;
                 return <SearchResultLink key={item.type + item.href + item.title}
@@ -290,7 +293,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
           })}
         </div>
         <p className={`atlas-search-status ${isLoading ? "is-loading" : ""}`}
-          id="atlas-search-status" aria-live="polite" hidden={!status}>{status}</p>
+          id="atlas-search-status" aria-live="polite" hidden={!status} data-search-motion-key={"status:" + status}>{status}</p>
       </div>
     </form>
   );

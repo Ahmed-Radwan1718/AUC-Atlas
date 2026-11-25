@@ -427,3 +427,19 @@ test("My account uses a unified layout while retaining security verification", (
   assert.match(runtime, /if \(accountTwoFactor\.appEnabled\) \{\s*if \(securityGateMessage\)/);
   assert.match(runtime, /accountSecurityPanel\.hidden = false/);
 });
+
+
+test("course search animates result changes without changing search or navigation behavior", () => {
+  const home = read("features/home/HomeSearch.tsx");
+  const planner = read("app/homepagenew/SemesterPlanner.tsx");
+  const motion = read("lib/useSearchResultMotion.ts");
+  assert.match(home, /useSearchResultMotion\(resultsRef, resultSignature, visible, true\)/);
+  assert.match(planner, /useSearchResultMotion\(suggestionsRef,/);
+  assert.match(home, /data-search-motion-key=\{result.type \+ result.href \+ result.title\}/);
+  assert.match(planner, /data-search-motion-key=\{course.code\}/);
+  assert.match(motion, /prefers-reduced-motion: reduce/);
+  assert.match(motion, /animation.cancel\(\)/);
+  assert.match(motion, /before - y/);
+  assert.match(motion, /duration: 220/);
+  assert.doesNotMatch(motion, /setTimeout|setInterval/);
+});
