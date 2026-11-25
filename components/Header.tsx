@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import "./header.css";
 import { monthlyVisits } from "../lib/monthlyVisits";
 
-type AtlasUser = { photoURL?: string };
+type AtlasUser = { photoURL?: string; isAdmin?: boolean };
 type SessionResponse = { signedIn?: boolean; user?: AtlasUser };
 
 const drawerLinks = [
@@ -160,7 +160,7 @@ export default function Header() {
         <button className="hamburger-toggle" type="button"
           aria-label="Open navigation menu" aria-haspopup="dialog"
           aria-controls="atlas-navigation-drawer" aria-expanded={navOpen}
-          onClick={() => { setNavOpen(true); setAccountOpen(false); }}>
+          onClick={() => { void loadAccountState(); setNavOpen(true); setAccountOpen(false); }}>
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
             strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
             <path d="M3 6h18M3 12h18M3 18h18"/>
@@ -243,7 +243,7 @@ export default function Header() {
             </button>
           </div>
           <nav className="atlas-nav-links" aria-label="Main navigation">
-            {drawerLinks.map(({ href, label, icon }) => {
+            {drawerLinks.filter(({ href }) => href !== "/campus-map" || user?.isAdmin === true).map(({ href, label, icon }) => {
               const isCurrent = pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
               return (
                 <a href={href} className="atlas-nav-link" key={href}

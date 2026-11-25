@@ -1,4 +1,3 @@
-import type { NextRequest } from "next/server";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { firebaseAuth, firestore } from "./firebase";
@@ -24,7 +23,7 @@ function isAllowedAucEmail(value: unknown): boolean {
 }
 
 /** Verify original two-cookie session scheme, revocation, user status and AUC-domain email. */
-export async function optionalSessionUser(request: NextRequest): Promise<DecodedIdToken | null> {
+export async function optionalSessionUser(request: { cookies: { get(name: string): { value: string } | undefined } }): Promise<DecodedIdToken | null> {
   try {
     const tokenCookie = request.cookies.get(sessionCookieName)?.value || "";
     const sessionId = request.cookies.get(sessionIdCookieName)?.value || "";

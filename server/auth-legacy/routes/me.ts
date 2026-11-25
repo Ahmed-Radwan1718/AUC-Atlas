@@ -1,4 +1,5 @@
 import type { LegacyRequest, LegacyReply } from "../legacyTypes";
+import { hasCurrentAdminRole } from "../../adminRole";
 
 const admin = require("../_lib/firebaseAdmin").default;
 
@@ -302,6 +303,7 @@ export default async function handler(req: LegacyRequest, res: LegacyReply) {
         loggedIn: true,
         user: {
           uid: decodedUser.uid,
+          isAdmin: !userRecord.disabled && hasCurrentAdminRole(decodedUser.uid, userRecord.customClaims),
           email,
           emailVerified: Boolean(userRecord.emailVerified || userData.emailVerified),
           displayName: savedFullName,
@@ -346,6 +348,7 @@ export default async function handler(req: LegacyRequest, res: LegacyReply) {
       loggedIn: true,
       user: {
         uid: decodedUser.uid,
+        isAdmin: !userRecord.disabled && hasCurrentAdminRole(decodedUser.uid, userRecord.customClaims),
         email,
         emailVerified: Boolean(userRecord.emailVerified || userData.emailVerified),
         displayName: fullName,

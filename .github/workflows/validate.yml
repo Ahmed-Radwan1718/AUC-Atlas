@@ -34,6 +34,7 @@ jobs:
       - run: npm run test:universal-core
       - run: npm run test:mechanical-study-plan
       - run: npm run test:course-search
+      - run: node --test tests/campus-map-access.test.ts
       - run: npm run typecheck
       - run: npm run build
 
@@ -64,6 +65,8 @@ jobs:
             fi
           }
           # /courses is a legacy entry point; the individual /courses/[slug] pages remain live.
+          check_status 307 http://127.0.0.1:3000/campus-map
+          test "$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3000/campus-map)" = 'http://127.0.0.1:3000/'
           check_status 307 http://127.0.0.1:3000/courses
           test "$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3000/courses)" = 'http://127.0.0.1:3000/'
           check_status 308 http://127.0.0.1:3000/homepagenew
