@@ -211,9 +211,6 @@ export default function Header() {
                 <a href="/accounts" className="floating-account-menu-link" id="floating-account-link" onClick={() => setAccountOpen(false)}>
                   <img src="/user.png" alt=""/><span>Account</span>
                 </a>
-                <a href="/accounts#reviews" className="floating-account-menu-link" id="floating-reviews-link" onClick={() => setAccountOpen(false)}>
-                  <span className="floating-account-menu-icon floating-reviews-icon" aria-hidden="true"/><span>Activity History</span>
-                </a>
                 <button className="floating-account-menu-link floating-account-logout"
                   id="floating-logout-button" type="button" disabled={loggingOut} onClick={() => void logout()}>
                   <span className="floating-logout-icon" aria-hidden="true"/><span>Logout</span>
