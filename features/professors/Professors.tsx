@@ -256,7 +256,7 @@ export default function Professors() {
             </div>
             <div className={`filter-item ${ratingOpen ? "open" : ""}`} hidden={reviewsLocked}>
               <button className="filter-toggle" type="button" onClick={() => setRatingOpen(x=>!x)}>
-                <span>Rating Status</span><span className="chevron">⌄</span>
+                <span>Rating Status{selectedRatings.length ? ` (${selectedRatings.length})` : ""}</span><span className="chevron">⌄</span>
               </button>
               <div className="filter-content">
                 {ratingChoices.map(value => {
@@ -274,7 +274,7 @@ export default function Professors() {
             <div className={`filter-item ${avoidOpen ? "open" : ""}`} hidden={reviewsLocked || failed}>
               <button className="filter-toggle" type="button" aria-expanded={avoidOpen}
                 aria-controls="avoid-filter-options" onClick={() => setAvoidOpen(x => !x)}>
-                <span>Avoid Status</span><span className="chevron">⌄</span>
+                <span>Avoid Status{selectedAvoid ? " (1)" : ""}</span><span className="chevron">⌄</span>
               </button>
               <div className="filter-content" id="avoid-filter-options">
                 <label>
