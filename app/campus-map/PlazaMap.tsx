@@ -123,6 +123,39 @@ export default function PlazaMap() {
     }, undefined, error => {
       if (!disposed) console.warn("Bassily Auditorium model could not load; using fallback.", error);
     });
+    // The uploaded hall's entrance sign faces +Z; the old hall faces +X.
+    // Fit it to the approximate 21.5 x 23.5 m campus footprint without distortion.
+    const hallLabelIndex = landmarks.findIndex(landmark => landmark.name === "Moataz Al Alfi Hall");
+    new GLTFLoader().load("/models/moataz-al-alfi-hall.glb?v=b945caa", gltf => {
+      if (disposed) { disposeMeshes(gltf.scene); return; }
+      const hall = new THREE.Group();
+      hall.name = "Moataz Al Alfi Hall — detailed GLB";
+      hall.add(gltf.scene);
+      hall.rotation.y = Math.PI / 2;
+      hall.updateMatrixWorld(true);
+      const bounds = new THREE.Box3().setFromObject(hall);
+      const size = bounds.getSize(new THREE.Vector3());
+      if (bounds.isEmpty() || !Number.isFinite(size.x) || !Number.isFinite(size.z) || size.x <= 0 || size.z <= 0) {
+        disposeMeshes(hall);
+        return;
+      }
+      hall.scale.setScalar(Math.min(21.5 / size.x, 23.5 / size.z));
+      hall.updateMatrixWorld(true);
+      bounds.setFromObject(hall);
+      const center = bounds.getCenter(new THREE.Vector3());
+      hall.position.set(14 - center.x, .02 - bounds.min.y, -198 - center.z);
+      hall.traverse(obj => {
+        if (obj instanceof THREE.Mesh) { obj.castShadow = true; obj.receiveShadow = true; }
+      });
+      plaza.root.add(hall);
+      hall.updateMatrixWorld(true);
+      bounds.setFromObject(hall);
+      bounds.getCenter(center);
+      if (hallLabelIndex >= 0) labelPositions[hallLabelIndex].set(center.x, bounds.max.y + 2, center.z);
+      plaza.hallFallback.visible = false;
+    }, undefined, error => {
+      if (!disposed) console.warn("Moataz Al Alfi Hall model could not load; using fallback.", error);
+    });
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const animationStart = performance.now();
     const camera = new THREE.OrthographicCamera(-150, 150, 110, -110, 1, 1000);

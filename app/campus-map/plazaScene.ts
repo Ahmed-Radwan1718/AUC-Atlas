@@ -154,7 +154,8 @@ export function buildPlaza() {
   box(2.2,.3,10,-47,28.2,hallZ-7.8,blueEdge);
 
   // Mapped hall footprint is approximately 21.5 by 23.5 m (OSM way 1223433824).
-  placeVenue(hallStart,hallX,hallZ,14,-198,.46,.8,.5875);
+  const hallFallback = placeVenue(hallStart,hallX,hallZ,14,-198,.46,.8,.5875);
+  hallFallback.name = "Moataz Al Alfi Hall loading fallback";
 
   // Bassily Auditorium: a chamfered auditorium mass based on the published
   // seating plan, with a lower entry wing and a tall mosaic-faced stone tower.
@@ -570,5 +571,5 @@ export function buildPlaza() {
   }
   const animateWater = (seconds: number) => waterAnimations.forEach(update => update(seconds));
   animateWater(0);
-  return { root, animateWater, libraryFallback, auditoriumFallback };
+  return { root, animateWater, libraryFallback, auditoriumFallback, hallFallback };
 }
