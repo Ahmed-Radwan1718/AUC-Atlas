@@ -229,3 +229,24 @@
 .atlas-account-workspace .is-standalone-activity .account-layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
 .atlas-account-workspace .is-standalone-activity .account-content { padding-left: 0; border-left: 0; }
 .atlas-account-workspace .is-standalone-activity .account-header { visibility: visible; }
+
+/* Unified My account page: no sidebar, one centered settings column. */
+.atlas-account-workspace .is-unified-account .account-section-inner { max-width: 880px; }
+.atlas-account-workspace .is-unified-account .account-layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.atlas-account-workspace .is-unified-account .account-content { padding-left: 0; border-left: 0; }
+.atlas-account-workspace .is-unified-account .account-header { visibility: visible; }
+.atlas-account-workspace .is-unified-account .account-panel.active { animation: none; }
+.atlas-account-workspace .is-unified-account [hidden] { display: none !important; }
+.atlas-account-workspace .account-unified-security,
+.atlas-account-workspace .account-unified-management { border-top: 1px solid var(--account-line); margin-top: 40px; padding-top: 30px; }
+.atlas-account-workspace .account-unified-security { scroll-margin-top: 120px; }
+.atlas-account-workspace :is(.account-unified-security,.account-unified-management) > h2 { font-size: 24px; font-weight: 700; letter-spacing: -.045em; margin-bottom: 24px; color: var(--account-ink); }
+.atlas-account-workspace .account-unified-security .account-panel-header h3 { font-size: 21px; font-weight: 700; letter-spacing: -.035em; margin-bottom: 9px; color: var(--account-ink); }
+.atlas-account-workspace .account-security-gate { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.atlas-account-workspace .account-security-gate p { color: var(--account-muted); font-size: 14px; line-height: 1.6; }
+.atlas-account-workspace .account-unified-logout { display: inline-flex; align-items: center; gap: 10px; padding: 10px 0; border: 0; background: transparent; color: var(--account-red); font: 600 14px Arial, sans-serif; cursor: pointer; }
+.atlas-account-workspace .account-unified-logout:disabled { opacity: .5; cursor: default; }
+@media (max-width: 600px) {
+  .atlas-account-workspace .account-unified-security,
+  .atlas-account-workspace .account-unified-management { margin-top: 30px; padding-top: 24px; }
+}

@@ -411,3 +411,19 @@ test("activity history is a standalone private route in the hamburger menu", () 
   assert.match(runtime, /window.location.replace\("\/activity-history"\)/);
   assert.match(runtime, /activityOnly \? "\/activity-history" : "\/accounts"/);
 });
+
+
+test("My account uses a unified layout while retaining security verification", () => {
+  const markup = read("features/accounts/accountsMarkup.ts");
+  const account = markup.slice(markup.indexOf("export const markup ="), markup.indexOf("export const activityMarkup ="));
+  const runtime = read("features/accounts/accountRuntime.ts");
+  assert.doesNotMatch(account, /account-sidebar|data-account-panel/);
+  assert.match(account, /is-unified-account/);
+  assert.match(account, /account-panel-details/);
+  assert.match(account, /account-panel-security/);
+  assert.match(account, /account-security-unlock/);
+  assert.match(account, /account-unified-management/);
+  assert.match(runtime, /const accessGranted = await requestSecurityPanelAccess\(\);\s*if \(accessGranted && root\.isConnected\) revealAccountSecurity\(\)/);
+  assert.match(runtime, /if \(accountTwoFactor\.appEnabled\) \{\s*if \(securityGateMessage\)/);
+  assert.match(runtime, /accountSecurityPanel\.hidden = false/);
+});

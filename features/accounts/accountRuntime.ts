@@ -23,7 +23,9 @@ export function initializeAccounts(activityOnly = false){
   window.aucAtlasCourseProfessors={};
   window.aucAtlasProfessors=professors;
 
-    const sidebarLinks = document.querySelectorAll("[data-account-panel]");
+    const securityGate = document.getElementById("account-security-gate");
+    const securityGateMessage = document.getElementById("account-security-gate-message");
+    const securityUnlockButton = document.getElementById("account-security-unlock");
     const accountPanels = document.querySelectorAll(".account-panel");
     const accountDetailsPanel = document.getElementById("account-panel-details");
     const accountDetailsLoadingState = document.getElementById("account-details-loading-state");
@@ -400,59 +402,28 @@ export function initializeAccounts(activityOnly = false){
       }
     }
 
-    function activateAccountPanel(panelName, options) {
-      const deferLoading = Boolean(options && options.deferLoading);
-      const isActivity = panelName === "reviews";
-      if (accountPage) accountPage.classList.toggle("is-activity-view", isActivity);
-      if (accountPageTitle) accountPageTitle.textContent = isActivity ? "Activity history" : "My account";
-      if (accountPageDescription) {
-        accountPageDescription.textContent = "";
-        accountPageDescription.hidden = true;
-      }
+    // Account details and security now share one page. The security section
+    // stays hidden until the existing authenticator challenge succeeds.
+    function revealAccountSecurity() {
+      if (!accountSecurityPanel || !securityGate) return;
+      securityGate.hidden = true;
+      accountSecurityPanel.hidden = false;
+      setAccountSecurityLoading(false);
+      void loadAccountPasskeys();
+    }
 
-      sidebarLinks.forEach(function (link) {
-        link.classList.toggle("active", link.dataset.accountPanel === panelName);
-      });
-
-      accountPanels.forEach(function (panel) {
-        panel.classList.toggle("active", panel.id === "account-panel-" + panelName);
-      });
-
-      if (!activityOnly) window.location.hash = panelName;
-
-      // On a deep-linked refresh, select the right panel before fetching profile
-      // data, but defer protected requests until the session is verified.
-      if (!deferLoading && panelName === "security") {
-        setAccountSecurityLoading(false);
-        loadAccountPasskeys();
-      }
-
-      if (!deferLoading && panelName === "reviews") {
-        loadAccountActivityHistory();
+    async function unlockAccountSecurity() {
+      if (!accountCurrentUser || !securityUnlockButton || securityUnlockButton.disabled) return;
+      securityUnlockButton.disabled = true;
+      try {
+        const accessGranted = await requestSecurityPanelAccess();
+        if (accessGranted && root.isConnected) revealAccountSecurity();
+      } finally {
+        securityUnlockButton.disabled = false;
       }
     }
 
-    async function showPanel(panelName) {
-      if (panelName === "security") {
-        if (!accountCurrentUser) {
-          return false;
-        }
-
-        if (accountTwoFactor.appEnabled) {
-          const accessGranted = await requestSecurityPanelAccess();
-
-          if (!accessGranted) {
-            return false;
-          }
-        }
-      } else {
-        securityPanelAccessToken = "";
-      }
-
-      activateAccountPanel(panelName);
-      return true;
-    }
-
+    securityUnlockButton?.addEventListener("click", unlockAccountSecurity);
 
     const accountPasskeyList = document.getElementById("account-passkey-list");
     const accountPasskeyAddButton = document.getElementById("account-passkey-add-button");
@@ -2094,12 +2065,6 @@ function getAccountReviewProfessorUrl(professorId) {
       });
     }
 
-    sidebarLinks.forEach(function (link) {
-      link.addEventListener("click", function () {
-        showPanel(link.dataset.accountPanel);
-      });
-    });
-
     accountDisplayNameEditButton?.addEventListener("click", function () {
       if (getDisplayNameDaysLeft() > 0) {
         updateDisplayNameLockState();
@@ -2933,31 +2898,29 @@ function getAccountReviewProfessorUrl(professorId) {
     });
 
     async function initializeAccountPage() {
-      const hashPanel = window.location.hash.slice(1);
-      const initialPanel = activityOnly ? "reviews" : ["details", "security"].includes(hashPanel)
-        ? hashPanel
-        : "details";
-
-      // Choose the correct skeleton synchronously; never flash Account Details
-      // while a deep-linked panel is waiting for /api/me.
-      if (initialPanel === "security") {
-        // Security content must remain hidden until any required 2FA challenge.
-        setAccountSecurityLoading(true);
-      }
-      activateAccountPanel(initialPanel, { deferLoading: true });
-
+      const deepLinkedSecurity = window.location.hash === "#security";
       initializeAccountMajorDropdown();
       const accountLoaded = await loadAccountDetails();
-      if (!accountLoaded) return;
+      if (!accountLoaded || !root.isConnected) return;
+      if (activityOnly) {
+        loadAccountActivityHistory();
+        return;
+      }
 
-      if (initialPanel === "security") {
-        const allowed = await showPanel("security");
-        if (!allowed) {
-          setAccountSecurityLoading(false);
-          activateAccountPanel("details", { deferLoading: true });
+      if (logoutButton) logoutButton.disabled = false;
+      if (accountTwoFactor.appEnabled) {
+        if (securityGateMessage) securityGateMessage.textContent = "Verify your authenticator code to view and manage security settings.";
+        if (securityUnlockButton) {
+          securityUnlockButton.hidden = false;
+          securityUnlockButton.disabled = false;
         }
-      } else if (initialPanel === "reviews") {
-        await showPanel("reviews");
+      } else {
+        revealAccountSecurity();
+      }
+
+      if (deepLinkedSecurity) {
+        document.getElementById("security")?.scrollIntoView({ block: "start" });
+        if (accountTwoFactor.appEnabled) await unlockAccountSecurity();
       }
     }
 
