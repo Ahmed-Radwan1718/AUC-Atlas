@@ -12,9 +12,6 @@ type RatingSummary = { reviewCount?: number; averageRating?: number };
 type CardSnapshot = { element: HTMLAnchorElement; rect: DOMRect };
 type AvoidFilter = "avoid" | "not-avoid" | null;
 
-const department = (item: Professor): string =>
-  !item.department || item.department.trim().toLowerCase() === "department coming soon"
-    ? "Other" : item.department.trim();
 const normalize = (value: unknown) => String(value ?? "").toLowerCase().trim();
 const ratingStatus = (value: number): string =>
   !Number.isFinite(value) || value <= 0 ? "No ratings yet"
@@ -27,7 +24,6 @@ const photo = (url?: string) => {
 function initialProfessors(): RatedProfessor[] {
   return professors.map(item => ({ ...item, reviewCount: 0, averageRating: 0 }));
 }
-const departments = [...new Set(professors.map(department))].filter(x => x !== "Other").sort((a,b)=>a.localeCompare(b));
 const ratingChoices = [1,2,3,4,5];
 // Match the homepage "Professors to AVOID" threshold: rated 2.0 or below.
 // Unrated professors have no avoid classification.
@@ -42,10 +38,8 @@ export default function Professors() {
   const [failed, setFailed] = useState(false);
   const [reviewsLocked, setReviewsLocked] = useState(false);
   const [query, setQuery] = useState("");
-  const [departmentOpen, setDepartmentOpen] = useState(false);
   const [ratingOpen, setRatingOpen] = useState(false);
   const [avoidOpen, setAvoidOpen] = useState(false);
-  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [selectedAvoid, setSelectedAvoid] = useState<AvoidFilter>(null);
   const [visibleLimit, setVisibleLimit] = useState(30);
@@ -105,16 +99,14 @@ export default function Professors() {
 
   const results = useMemo(() => items.filter(item => {
     const searchable = normalize([
-      item.id, item.name, item.department, item.displayDepartment,
-      item.filterDepartment, item.status, ratingStatus(item.averageRating),
+      item.id, item.name, item.status, ratingStatus(item.averageRating),
       item.course, item.group
     ].join(" "));
     return (!query || searchable.includes(normalize(query)))
-      && (!selectedDepartments.length || selectedDepartments.includes(department(item)))
       && (!selectedRatings.length || selectedRatings.includes(ratingStatus(item.averageRating)))
       && (!selectedAvoid || avoidStatus(item) === selectedAvoid);
   // Sort strictly by average rating (highest first). Equal ratings retain source order.
-  }).sort((a,b) => b.averageRating - a.averageRating), [items,query,selectedDepartments,selectedRatings,selectedAvoid]);
+  }).sort((a,b) => b.averageRating - a.averageRating), [items,query,selectedRatings,selectedAvoid]);
 
   // FLIP: measure old positions, let React reflow, then animate the difference.
   // Reading positions while an old animation is active lets rapid typing
@@ -240,18 +232,6 @@ export default function Professors() {
         <section className="professors-browser" aria-label="Professor filters and results">
           <aside className="filters-panel" id="professor-filters">
             <div className="filters-heading">Filter Professors</div>
-            <div className={`filter-item ${departmentOpen ? "open" : ""}`}>
-              <button className="filter-toggle" type="button" onClick={() => setDepartmentOpen(x=>!x)}>
-                <span>Department</span><span className="chevron">⌄</span>
-              </button>
-              <div className="filter-content department-filter-content" id="department-filter-options">
-                {departments.map(name => <label key={name}>
-                  <input type="checkbox" data-filter-group="department" value={name}
-                    checked={selectedDepartments.includes(name)}
-                    onChange={() => toggle(selectedDepartments,name,setSelectedDepartments)} />{" "}{name}
-                </label>)}
-              </div>
-            </div>
             <div className={`filter-item ${ratingOpen ? "open" : ""}`} hidden={reviewsLocked}>
               <button className="filter-toggle" type="button" onClick={() => setRatingOpen(x=>!x)}>
                 <span>Rating Status</span><span className="chevron">⌄</span>
@@ -320,7 +300,6 @@ export default function Professors() {
                     <div className="professor-card-body">
                       <h2>{item.name}</h2>
                       <div className="professor-meta">
-                        <span>{item.displayDepartment||item.department}</span>
                         <span>{reviewsLocked?"Reviews for verified accounts":failed?"Reviews unavailable":item.reviewCount+" "+(item.reviewCount===1?"Review":"Reviews")}</span>
                         <span>{reviewsLocked?"Sign in to view ratings":failed?"Ratings unavailable":rating}</span>
                       </div>
