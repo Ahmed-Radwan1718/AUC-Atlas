@@ -197,11 +197,6 @@ export function buildPlaza() {
     box(13,.65,1.1,-3.5,5.4,z,terracotta);
   }
   for(const x of [-9,-5.3,-1.7,2]) box(.8,.72,28,x,5.45,-152,terracotta);
-  for(const z of [-184,-169,-154]){
-    box(4,.35,4,35,.18,z,stone);
-    box(3.5,.07,3.5,35,.39,z,green);
-    palm(35,z);
-  }
   // Animated continuous streams, gravity-driven spray and local impact ripples.
   const waterAnimations: ((seconds: number) => void)[] = [];
   const flowTime = { value: 0 };
