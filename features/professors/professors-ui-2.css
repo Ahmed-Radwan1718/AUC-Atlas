@@ -220,7 +220,7 @@
       width: var(--stat-width, 0%);
       height: 100%;
       border-radius: inherit;
-      background: #36383a;
+      background: var(--atlas-accent);
       display: block;
       transform: scaleX(0);
       transform-origin: left center;
@@ -363,12 +363,12 @@
       width: var(--stat-width, 0%);
       height: 100%;
       border-radius: inherit;
-      background: rgba(54, 56, 58, 0.58);
+      background: rgba(var(--atlas-accent-rgb), 0.58);
       display: block;
     }
 
     .professor-review-stat-total-fill {
-      background: rgba(23, 23, 23, 0.22);
+      background: rgba(var(--atlas-accent-rgb), 0.22);
     }
 
     @keyframes professorReviewStatFill {
