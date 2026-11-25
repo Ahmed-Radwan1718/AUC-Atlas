@@ -20,7 +20,7 @@ export function buildPlaza() {
   const cylinder = (r1:number,r2:number,h:number,x:number,y:number,z:number,m:THREE.Material,n=10) => {
     const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,n),m); o.position.set(x,y,z); o.castShadow=true; o.receiveShadow=true; root.add(o); return o;
   };
-  box(208,2,214,0,-3,0,ground);
+  box(208,2,214,0,-1.02,0,ground);
   box(48,.4,150,0,-.2,0,paving);
   // Broad bands of stone, not a surveyed paving layout.
   for(let z=-70;z<=70;z+=10) box(48,.035,.22,0,.025,z,band);
@@ -31,6 +31,7 @@ export function buildPlaza() {
     for(let i=0;i<3;i++) box(1.3,.3*(i+1),150,side*(24+i*1.3),.15*(i+1)-.02,0,light);
   }
   function building(x:number,z:number,w:number,d:number,h:number, face: -1|1, floors=3, grid=false) {
+    box(w,.54,d,x,.23,z,stone);
     box(w,h,d,x,h/2+.5,z,stone);
     box(w+.45,.7,d+.45,x,h+.85,z,roof);
     box(w-4,1.1,d-4,x,h+1.35,z,light);
@@ -95,7 +96,7 @@ export function buildPlaza() {
     cylinder(.37,.5,.55,0,.94,z,light);
   }
   for(const x of [-91,91]){
-    box(14,.15,193,x,-.8,0,green);
+    box(14,.15,193,x,.05,0,green);
     for(let z=-88;z<95;z+=13){
       cylinder(.24,.35,3.5,x,1,z,trunk);
       const t=new THREE.Mesh(new THREE.IcosahedronGeometry(2.8,1),leaf2);t.position.set(x,3.6,z);t.scale.y=1.1;t.castShadow=true;root.add(t);
