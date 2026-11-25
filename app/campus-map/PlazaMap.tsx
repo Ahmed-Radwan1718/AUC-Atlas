@@ -90,6 +90,39 @@ export default function PlazaMap() {
     }, undefined, error => {
       if (!disposed) console.warn("AUC Library model could not load; using fallback.", error);
     });
+    // The GLB mosaic and sign face +Z; the existing auditorium facade faces -X.
+    // Fit the detailed model uniformly within the old main mass's 40 m width.
+    const auditoriumLabelIndex = landmarks.findIndex(landmark => landmark.name === "Bassily Auditorium");
+    new GLTFLoader().load("/models/bassily-auditorium.glb?v=f77fec6", gltf => {
+      if (disposed) { disposeMeshes(gltf.scene); return; }
+      const auditorium = new THREE.Group();
+      auditorium.name = "Bassily Auditorium — detailed GLB";
+      auditorium.add(gltf.scene);
+      auditorium.rotation.y = -Math.PI / 2;
+      auditorium.updateMatrixWorld(true);
+      const bounds = new THREE.Box3().setFromObject(auditorium);
+      const size = bounds.getSize(new THREE.Vector3());
+      if (bounds.isEmpty() || !Number.isFinite(size.x) || !Number.isFinite(size.z) || size.x <= 0 || size.z <= 0) {
+        disposeMeshes(auditorium);
+        return;
+      }
+      auditorium.scale.setScalar(Math.min(40 / size.x, 50 / size.z));
+      auditorium.updateMatrixWorld(true);
+      bounds.setFromObject(auditorium);
+      const center = bounds.getCenter(new THREE.Vector3());
+      auditorium.position.set(79 - center.x, .02 - bounds.min.y, -179 - center.z);
+      auditorium.traverse(obj => {
+        if (obj instanceof THREE.Mesh) { obj.castShadow = true; obj.receiveShadow = true; }
+      });
+      plaza.root.add(auditorium);
+      auditorium.updateMatrixWorld(true);
+      bounds.setFromObject(auditorium);
+      bounds.getCenter(center);
+      if (auditoriumLabelIndex >= 0) labelPositions[auditoriumLabelIndex].set(center.x, bounds.max.y + 2, center.z);
+      plaza.auditoriumFallback.visible = false;
+    }, undefined, error => {
+      if (!disposed) console.warn("Bassily Auditorium model could not load; using fallback.", error);
+    });
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const animationStart = performance.now();
     const camera = new THREE.OrthographicCamera(-150, 150, 110, -110, 1, 1000);

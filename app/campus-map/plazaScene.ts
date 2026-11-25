@@ -119,6 +119,7 @@ export function buildPlaza() {
     const group=new THREE.Group();
     for(const part of parts){part.position.x-=oldX;part.position.z-=oldZ;group.add(part);}
     group.position.set(newX,0,newZ);group.scale.set(sx,sy,sz);root.add(group);
+    return group;
   }
 
   // Moataz Al Alfi: limestone plinth, deep blue recessed entrance,
@@ -196,7 +197,9 @@ export function buildPlaza() {
   for(let y=8;y<=24;y+=3.5) for(const dx of [-3,0,3]) box(1.1,1.1,.16,18+dx,y,towerZ-8.55,recess);
   for(let y=3;y<29;y+=3) box(.08,.11,17,11.95,y,towerZ,stripe);
 
-  placeVenue(auditoriumStart,auditoriumX,auditoriumZ,79,-179,.8,1,1);
+  // Retain the old auditorium as a fallback until its GLB is loaded.
+  const auditoriumFallback = placeVenue(auditoriumStart,auditoriumX,auditoriumZ,79,-179,.8,1,1);
+  auditoriumFallback.name = "Bassily Auditorium loading fallback";
 
   // Separate Campus Center court. The pergola links the hall toward the
   // everyday facilities; landscaping is indicative pending a detailed site plan.
@@ -567,5 +570,5 @@ export function buildPlaza() {
   }
   const animateWater = (seconds: number) => waterAnimations.forEach(update => update(seconds));
   animateWater(0);
-  return { root, animateWater, libraryFallback };
+  return { root, animateWater, libraryFallback, auditoriumFallback };
 }
