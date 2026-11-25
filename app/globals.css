@@ -1,3 +1,10 @@
+:root {
+  --atlas-accent: #C09A5C;
+  --atlas-accent-rgb: 192, 154, 92;
+  /* Darker tonal companion for legible text and visible keyboard focus. */
+  --atlas-accent-ink: #795A2E;
+}
+
 * {
   margin: 0;
   padding: 0;

@@ -29,7 +29,7 @@
       }
 
       .site-footer-logo-auc {
-        color: #365879;
+        color: var(--atlas-accent-ink);
         font-size: 14px;
       }
 
@@ -48,7 +48,7 @@
 
       .site-footer-column h3 {
         margin-bottom: 13px;
-        color: #365879;
+        color: var(--atlas-accent-ink);
         font-size: 14px;
         font-weight: 600;
         letter-spacing: 0;

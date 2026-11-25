@@ -21,7 +21,7 @@
 
     .filters-heading {
       padding: 10px 16px 10px;
-      color: #365879;
+      color: var(--atlas-accent-ink);
       font-size: 17px;
       font-weight: 600;
       letter-spacing: -0.015em;
@@ -50,7 +50,7 @@
 
     .filter-toggle:hover,
     .filter-item.open .filter-toggle {
-      background: rgba(54, 88, 121, 0.12);
+      background: rgba(var(--atlas-accent-rgb), 0.12);
       color: #171717;
     }
 
@@ -85,7 +85,7 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       scrollbar-width: thin;
-      scrollbar-color: rgba(54, 88, 121, 0.48) transparent;
+      scrollbar-color: rgba(var(--atlas-accent-rgb), 0.48) transparent;
     }
 
     .department-filter-content::-webkit-scrollbar {
@@ -98,7 +98,7 @@
 
     .department-filter-content::-webkit-scrollbar-thumb {
       border-radius: 999px;
-      background: rgba(54, 88, 121, 0.48);
+      background: rgba(var(--atlas-accent-rgb), 0.48);
     }
 
     .filter-item.open .chevron {
@@ -128,7 +128,7 @@
 
     .rating-filter-stars {
       min-width: 62px;
-      color: #365879;
+      color: var(--atlas-accent-ink);
       font-size: 13px;
       letter-spacing: 1px;
       line-height: 1;
@@ -143,7 +143,7 @@
 
     .filter-content label:hover,
     .filter-content label:has(input:checked) {
-      background: rgba(54, 88, 121, 0.12);
+      background: rgba(var(--atlas-accent-rgb), 0.12);
       color: #171717;
     }
 
