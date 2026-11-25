@@ -24,10 +24,7 @@ function setCourseDetailText(id, value) {
     return {
       id: knownProfessor ? knownProfessor.id : professorId,
       name: knownProfessor ? knownProfessor.name : professorName,
-      image: knownProfessor ? knownProfessor.image : "",
-      department: knownProfessor
-        ? (knownProfessor.displayDepartment || knownProfessor.department || "AUC")
-        : "AUC"
+      image: knownProfessor ? knownProfessor.image : ""
     };
   }
 
