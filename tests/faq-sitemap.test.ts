@@ -37,7 +37,16 @@ test("FAQ internal links use live v2 routes and its CSS is isolated", () => {
   assert.doesNotMatch(faqMarkup, /class="info-/);
   const css = fromRoot("features/faq/faq.css");
   assert.ok(css.includes(".faq-page"));
-  assert.ok(css.includes(".faq-item.open"));
+  // The shared accordion drives its visual state through ARIA and hidden.
+  assert.ok(css.includes('.faq-page .faq-toggle[aria-expanded="true"]'));
+  assert.match(css, /\.faq-page\s+\.faq-answer\[hidden\]\s*\{\s*display:\s*none\s*;/);
+  const accordion = fromRoot("features/faq/FaqAccordion.tsx");
+  assert.match(accordion, /mountSmoothAccordion\(page,\s*\{/);
+  assert.ok(accordion.includes('toggle: ".faq-toggle"'));
+  assert.ok(accordion.includes('answer: ".faq-answer"'));
+  const motion = fromRoot("lib/smoothAccordion.ts");
+  assert.ok(motion.includes('toggle.setAttribute("aria-expanded", String(willOpen))'));
+  assert.match(motion, /answer\.hidden\s*=\s*!open/);
   assert.doesNotMatch(css, /\.info-/);
   assert.doesNotMatch(css, /^\s*(body|\*)\s*\{/m);
 });
