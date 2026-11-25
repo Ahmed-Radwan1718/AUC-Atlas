@@ -12,7 +12,6 @@ type SearchResult = {
   href: string;
   score: number;
   professorId?: string;
-  department?: string;
   photo?: string;
 };
 type Material = {
@@ -86,7 +85,7 @@ function SearchResultLink({
     return () => { live = false; };
   }, [result.professorId]);
   const meta = result.professorId
-    ? [result.department, reviews === "locked" ? "Sign in to see reviews" : failed ? "Reviews unavailable" : reviews === null
+    ? [reviews === "locked" ? "Sign in to see reviews" : failed ? "Reviews unavailable" : reviews === null
       ? "Loading reviews..." : reviews + " " + (reviews === 1 ? "review" : "reviews")].filter(Boolean).join(" · ")
     : result.meta;
   return (
@@ -127,15 +126,13 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
     if (query.length < 2) return [[], [], []] as SearchResult[][];
     const professorResults: SearchResult[] = professors.map(professor => {
       const id = professor.id || "";
-      const department = professor.displayDepartment || professor.department || "AUC";
       // On /homepagenew, only professor names should produce professor results.
       // Preserve the original homepage's broader matching behavior.
       const professorSearchFields = scope === "catalog"
         ? [professor.name]
-        : [professor.name, professor.id, professor.department, professor.displayDepartment,
-           professor.filterDepartment, professor.course];
+        : [professor.name, professor.id, professor.course];
       const score = getMatchScore(query, professor.name, professorSearchFields);
-      return { type: "Professor" as const, title: professor.name, department, professorId: id,
+      return { type: "Professor" as const, title: professor.name, professorId: id,
         photo: professor.image && (/^https?:\/\//.test(professor.image) || professor.image.startsWith("/"))
           ? professor.image : "/" + (professor.image || "user.png"),
         meta: "", href: professorHref(id), score };
@@ -171,7 +168,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
   const materialLoading = searchesMaterials && materialState.loading;
   const materialsLocked = searchesMaterials && materialState.locked;
   const noMatches = scope === "professors"
-    ? "No matching professors. Try a different name or department."
+    ? "No matching professors. Try a different name."
     : scope === "materials"
       ? "No matching courses or materials. Try a course code or title."
       : scope === "catalog"
@@ -260,7 +257,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
     }
   }
   let rowIndex = -1;
-  const placeholder = scope === "professors" ? "Search a professor or department"
+  const placeholder = scope === "professors" ? "Search a professor"
     : scope === "materials" ? "Search a course, topic, or file"
     : scope === "catalog" ? "Search courses or professors"
     : "Search a course, material, or professor";
