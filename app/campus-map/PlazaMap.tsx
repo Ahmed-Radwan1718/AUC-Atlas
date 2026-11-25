@@ -5,13 +5,10 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { buildPlaza, landmarks } from "./plazaScene";
 import styles from "./map.module.css";
 
-type Actions = { reset: () => void; top: () => void; zoom: (factor: number) => void };
 export default function PlazaMap() {
   const host = useRef<HTMLDivElement>(null);
   const labels = useRef<(HTMLSpanElement | null)[]>([]);
-  const actions = useRef<Actions | null>(null);
   const [error, setError] = useState(false);
-  const [showLabels, setShowLabels] = useState(true);
   useEffect(() => {
     const el = host.current;
     if (!el) return;
@@ -47,7 +44,6 @@ export default function PlazaMap() {
     controls.maxZoom = 4;
     controls.maxPolarAngle = Math.PI / 2.2;
     controls.target.set(0, 0, 0);
-    controls.saveState();
     const resize = () => {
       const w = el.clientWidth, h = el.clientHeight;
       if (!w || !h) return;
@@ -60,11 +56,6 @@ export default function PlazaMap() {
     };
     const observer = new ResizeObserver(resize);
     observer.observe(el); resize();
-    actions.current = {
-      reset: () => controls.reset(),
-      top: () => { controls.target.set(0, 0, 0); camera.position.set(0, 300, -0.1); camera.zoom = 1; camera.updateProjectionMatrix(); controls.update(); },
-      zoom: factor => { camera.zoom = THREE.MathUtils.clamp(camera.zoom * factor, controls.minZoom, controls.maxZoom); camera.updateProjectionMatrix(); },
-    };
     const projected = new THREE.Vector3();
     let frame = 0;
     const draw = () => {
@@ -83,7 +74,6 @@ export default function PlazaMap() {
     draw();
     return () => {
       cancelAnimationFrame(frame); observer.disconnect(); controls.dispose();
-      actions.current = null;
       const geometries = new Set<THREE.BufferGeometry>(), materials = new Set<THREE.Material>();
       scene.traverse(obj => { if (obj instanceof THREE.Mesh) { geometries.add(obj.geometry); for (const mat of Array.isArray(obj.material) ? obj.material : [obj.material]) materials.add(mat); } });
       geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose());
@@ -93,17 +83,8 @@ export default function PlazaMap() {
   return <main className={styles.page}>
     <section className={styles.map} aria-label="Bartlett Plaza map">
       <div ref={host} className={styles.viewport}>
-        <div className={styles.labels} hidden={!showLabels}>{landmarks.map((landmark, i) => <span className={styles.pin} key={landmark.name} ref={el => { labels.current[i] = el; }}>{landmark.name}</span>)}</div>
+        <div className={styles.labels}>{landmarks.map((landmark, i) => <span className={styles.pin} key={landmark.name} ref={el => { labels.current[i] = el; }}>{landmark.name}</span>)}</div>
         {error && <div className={styles.fallback}>3D rendering is unavailable in this browser. <a href="https://www.aucegypt.edu/maps">Open AUC’s campus map</a>.</div>}
-      </div>
-      <span className={styles.status} title="Illustrative geometry; not yet suitable for navigation">Early preview</span>
-      <div className={styles.location}><span/> Bartlett Plaza <small>Exterior model</small></div>
-      <div className={styles.tools}>
-        <button onClick={() => actions.current?.zoom(1.25)} aria-label="Zoom in" title="Zoom in">+</button>
-        <button onClick={() => actions.current?.zoom(.8)} aria-label="Zoom out" title="Zoom out">−</button>
-        <button onClick={() => actions.current?.top()} title="Top-down view">2D</button>
-        <button onClick={() => actions.current?.reset()} title="Reset camera">3D</button>
-        <button onClick={() => setShowLabels(v => !v)} aria-pressed={showLabels} title="Toggle labels">Aa</button>
       </div>
       <div className={styles.hint}>Drag to rotate · Scroll to zoom · Right-drag to pan<br/>Touch: drag to rotate · Two fingers to pan / zoom</div>
     </section>

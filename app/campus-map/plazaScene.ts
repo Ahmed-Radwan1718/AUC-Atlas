@@ -6,7 +6,6 @@ export const landmarks: { name: string; position: [number, number, number] }[] =
   { name: "AUC Library", position: [-52, 26, -12] },
   { name: "Bartlett Plaza", position: [0, 2, 5] },
   { name: "Sciences & Engineering", position: [54, 26, 20] },
-  { name: "Campus Center", position: [-14, 22, -89] },
   { name: "Jameel Hall", position: [48, 24, -76] },
   { name: "Core Academic Center", position: [-40, 20, 70] },
 ];
@@ -61,9 +60,7 @@ export function buildPlaza() {
   box(16,.12,55,62,.05,22,green);
   building(51,-69,37,29,18,-1,4);
   building(79,-66,15,34,15,-1);
-  building(-18,-91,45,24,15,1);
   building(-53,68,37,24,13,1);
-  box(20,5,11,-20,2.5,-81,stone);
   // Shade structures at the library edge.
   for(const z of [-28,23]) {
     for(const x of [-27,-21]) for(const dz of [-6,6]) box(.5,3.6,.5,x,2.2,z+dz,bench);
