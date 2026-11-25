@@ -10,6 +10,8 @@ export const landmarks: { name: string; position: [number, number, number] }[] =
   { name: "Core Academic Center", position: [-40, 20, 70] },
   { name: "Moataz Al Alfi Hall", position: [14, 24, -198] },
   { name: "Bassily Auditorium", position: [55.8, 30, -198] },
+  { name: "Cilantro", position: [-24, 18, -96] },
+  { name: "Relish · Main Cafeteria", position: [-51, 9, -150] },
   { name: "University Residences", position: [-87, 13, -280] },
 ];
 export function buildPlaza() {
@@ -96,7 +98,7 @@ export function buildPlaza() {
   // Library-to-venue distances are ~200 m and ~220 m; venue centers ~67 m apart.
   // AUC NCmap.pdf and Legorreta describe the intervening Campus Center courts.
   // Existing plaza geometry is illustrative, so this is not a surveyed registration.
-  // Keep the as-yet-unmodeled Campus Center buildings open rather than inventing them.
+  // Unmodeled Campus Center areas remain open.
   const blue = mat("#335a9b"), blueEdge = mat("#28477b"), blueJoint = mat("#5278ac");
   const cyan = mat("#408d9c"), terracotta = mat("#ad583b"), recess = mat("#414343");
   const mosaicBlue = mat("#80a9bb"), mosaicDark = mat("#303c49"), mosaicRed = mat("#a96552");
@@ -198,6 +200,119 @@ export function buildPlaza() {
     box(13,.65,1.1,-3.5,5.4,z,terracotta);
   }
   for(const x of [-9,-5.3,-1.7,2]) box(.8,.72,28,x,5.45,-152,terracotta);
+  // Campus Center dining: AUC's dining directory locates both outlets here.
+  // Legorreta describes the Everyday Facilities and a separate garden-facing
+  // main dining pavilion. Arch and terrace massing follow reference photographs.
+  // https://www.aucegypt.edu/student-life/dining
+  // https://www.legorreta.mx/en/proyecto-universidad-americana-en-el-cairo-campus-center
+  // Exact outlet boundaries, building footprints and heights are approximate.
+  const diningStucco = mat("#bc7253"), diningTrim = mat("#9c6249"),
+    diningShade = mat("#8d7861"), umbrellaFabric = mat("#eee5cf"),
+    diningFrame = mat("#635c4e");
+  const cafeX=-49, cafeZ=-96;
+  // The library-side pedestrian court stays open; connect it to the existing spine.
+  box(44,.12,25,-47,.06,-58.5,paving);
+  box(13,.16,96,-17.5,.08,-124,paving);
+  box(41,.16,21,-48,.08,-121.5,paving);
+
+  // Everyday Facilities: sandstone portal with a true semicircular void.
+  // Local arch horizontal coordinates become world z after a quarter-turn.
+  const archSpan=38, archHeight=17.5, archRadius=9.5, spring=5.5;
+  const archShape = new THREE.Shape();
+  archShape.moveTo(-archSpan/2,0);
+  archShape.lineTo(-archSpan/2,archHeight);
+  archShape.lineTo(archSpan/2,archHeight);
+  archShape.lineTo(archSpan/2,0);
+  archShape.lineTo(archRadius,0);
+  archShape.lineTo(archRadius,spring);
+  for(let i=1;i<=48;i++){
+    const a=Math.PI*i/48;
+    archShape.lineTo(archRadius*Math.cos(a),spring+archRadius*Math.sin(a));
+  }
+  archShape.lineTo(-archRadius,0);
+  archShape.closePath();
+  const portal = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(archShape,{depth:2.2,bevelEnabled:false}),stone);
+  portal.rotation.y=Math.PI/2;
+  portal.position.set(-27,0,cafeZ);
+  portal.castShadow=true;portal.receiveShadow=true;root.add(portal);
+
+  // Recessed courtyard-facing storefront and stepped upper-level massing.
+  box(19,11.5,38,-59.5,5.75,cafeZ,diningStucco);
+  box(19.5,.42,38.5,-59.5,11.71,cafeZ,roof);
+  for(const dz of [-14.75,14.75]){
+    box(23,14,8.5,-38.5,7,cafeZ+dz,diningStucco);
+    box(23.4,.4,8.8,-38.5,14.2,cafeZ+dz,roof);
+    box(12,2.2,7,-40,15.5,cafeZ+dz,stone);
+    // Windows on the outside elevation and facing the library.
+    for(const y of [4,8,12]){
+      for(const dx of [-7.5,0,7.5]){
+        box(2.2,1.8,.16,-38.5+dx,y,cafeZ+dz+Math.sign(dz)*4.33,glass);
+        box(2.65,.24,.4,-38.5+dx,y-1,cafeZ+dz+Math.sign(dz)*4.45,light);
+      }
+    }
+  }
+  box(25,.6,38,-39.5,17.2,cafeZ,roof);
+  box(25,.32,.32,-39.5,17.66,cafeZ-18.8,stone);
+  box(25,.32,.32,-39.5,17.66,cafeZ+18.8,stone);
+  // Ribbed sloping soffit above the shaded passage, visible through the arch.
+  for(let z=cafeZ-8;z<=cafeZ+8;z+=1.6){
+    const rib=box(19,.3,.22,-38.4,13.5,z,diningShade);
+    rib.rotation.z=.085;
+  }
+  // Glazed cafe frontage inside the arch, not a second freestanding building.
+  box(.16,3.6,15,-49.88,2.2,cafeZ,glass);
+  for(let dz=-7.5;dz<=7.5;dz+=2.5)
+    box(.24,3.7,.12,-49.73,2.2,cafeZ+dz,diningFrame);
+  box(.4,.5,15.4,-49.67,4.25,cafeZ,diningTrim);
+  box(22,.3,19,-38.7,.15,cafeZ,paving);
+
+  // Raised outdoor cafe seating deck and three broad stone steps.
+  box(11,.75,26,-19.5,.375,cafeZ,light);
+  for(let i=0;i<3;i++) box(1.2,.25*(3-i),26,-13.4+i*1.2,.125*(3-i),cafeZ,stone);
+  const picnicTable=(x:number,z:number,base:number,umbrella:boolean)=>{
+    box(2.8,.15,1.1,x,base+1.03,z,bench);
+    for(const dx of [-.92,.92]){
+      box(.13,1,.68,x+dx,base+.5,z,diningFrame);
+    }
+    for(const side of [-1,1]){
+      box(2.8,.13,.36,x,base+.54,z+side*.96,bench);
+      for(const dx of [-.92,.92]) box(.13,.51,.23,x+dx,base+.255,z+side*.96,diningFrame);
+    }
+    if(umbrella){
+      cylinder(.055,.055,2.9,x,base+1.45,z,diningFrame,8);
+      cylinder(0,1.7,.48,x,base+2.88,z,umbrellaFabric,12);
+    }
+  };
+  for(const z of [-106,-99,-92,-85]) picnicTable(-19.5,z,.75,true);
+
+  // Relish: independent lower dining pavilion, opening onto a garden court.
+  // Its precise outline is not verified, so retain the simple pavilion typology.
+  const relishX=-51, relishZ=-150;
+  box(39,.38,27,relishX,.19,relishZ,stone);
+  box(38,6.9,25,relishX,3.83,relishZ,diningStucco);
+  box(39.2,.55,26.2,relishX,7.55,relishZ,roof);
+  box(37,.65,24,relishX,8.15,relishZ,light);
+  // Continuous shaded glazing on the garden side, with stone piers.
+  box(34,4.4,.15,relishX,3.15,relishZ-12.58,glass);
+  for(let dx=-17;dx<=17;dx+=4.25)
+    box(.55,5.3,.65,relishX+dx,3.03,relishZ-12.9,stone);
+  box(39,.42,4.5,relishX,6.25,relishZ-14.4,light);
+  // Additional windows along both short elevations.
+  for(const side of [-1,1]) for(let dz=-9;dz<=9;dz+=4.5){
+    box(.14,2.8,2.65,relishX+side*19.08,3.65,relishZ+dz,glass);
+    box(.32,.28,2.9,relishX+side*19.2,2.15,relishZ+dz,light);
+  }
+  // Entrance facing the pedestrian connection to the Campus Center.
+  box(4.2,3.5,.14,relishX+11,2.1,relishZ+12.58,glass);
+  for(const dx of [-2.2,2.2]) box(.35,4,.5,relishX+11+dx,2.2,relishZ+12.9,stone);
+  box(5.5,.3,4,relishX+11,4.45,relishZ+14.4,roof);
+  box(43,.16,18,relishX,.08,-175,paving);
+  box(25,.12,7,relishX,.15,-183,green);
+  for(const x of [-64,-51,-38]) picnicTable(x,-171,.16,true);
+  // Connecting path toward the original hall and existing pergola.
+  box(20,.12,9,-21,.06,-174,paving);
+
   // University Residences (original on-campus complex).
   // Sources: AUC NCmap.pdf (19), AUC Residence Models (12 residential units),
   // and Legorreta's American University in Cairo, Student Residences photographs.
