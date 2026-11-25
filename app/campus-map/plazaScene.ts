@@ -86,11 +86,79 @@ export function buildPlaza() {
       box(3,.45,.85,x-side*3,.65,z+3.4,bench);
     }
   }
+  // Recirculating water, confined to the existing fountain basins.
+  const waterAnimations: ((seconds: number) => void)[] = [];
+  const streamMaterial = new THREE.MeshStandardMaterial({
+    color: "#91c9d1", roughness: .22, metalness: .08,
+    transparent: true, opacity: .84, depthWrite: false,
+  });
+  const dropMaterial = new THREE.MeshStandardMaterial({
+    color: "#d9f6f8", roughness: .15, emissive: "#397b88", emissiveIntensity: .24,
+  });
+  const dropGeometry = new THREE.SphereGeometry(1, 8, 6);
+  const rippleGeometry = new THREE.RingGeometry(.94, 1, 48);
+  const jetCount = 8, dropsPerJet = 12;
+  const dropTransform = new THREE.Object3D();
+  const up = new THREE.Vector3(0, 1, 0);
+  const tangent = new THREE.Vector3();
   for(const z of [-30,28]){
     box(10,.22,10,0,.12,z,band);
     cylinder(2.35,2.35,.45,0,.45,z,stone,32);
     cylinder(1.95,1.95,.08,0,.72,z,water,32);
     cylinder(.37,.5,.55,0,.94,z,light);
+    const fountain = new THREE.Group();
+    fountain.position.z = z;
+    root.add(fountain);
+    // Parabolic streams run from the central spout to the water surface.
+    const path = (angle: number, t: number) => {
+      const radius = .13 + 1.52 * t;
+      return new THREE.Vector3(
+        Math.cos(angle) * radius,
+        1.22 - .45 * t + 4.8 * t * (1 - t),
+        Math.sin(angle) * radius
+      );
+    };
+    for(let j=0;j<jetCount;j++){
+      const angle=j*Math.PI*2/jetCount;
+      const points=Array.from({length:25},(_,i)=>path(angle,i/24));
+      const curve=new THREE.CatmullRomCurve3(points);
+      fountain.add(new THREE.Mesh(new THREE.TubeGeometry(curve,24,.045,6,false),streamMaterial));
+    }
+    const drops=new THREE.InstancedMesh(dropGeometry,dropMaterial,jetCount*dropsPerJet);
+    drops.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    drops.frustumCulled=false;
+    fountain.add(drops);
+    const ripples=Array.from({length:3},()=>{
+      const material=new THREE.MeshBasicMaterial({
+        color:"#e4f8f5",transparent:true,opacity:.4,depthWrite:false,side:THREE.DoubleSide,
+      });
+      const ripple=new THREE.Mesh(rippleGeometry,material);
+      ripple.rotation.x=-Math.PI/2;
+      ripple.position.y=.77;
+      fountain.add(ripple);
+      return ripple;
+    });
+    waterAnimations.push(seconds=>{
+      for(let j=0;j<jetCount;j++){
+        const angle=j*Math.PI*2/jetCount;
+        for(let i=0;i<dropsPerJet;i++){
+          const t=(seconds*.85+i/dropsPerJet+j*.027+z*.012+1)%1;
+          const radius=.13+1.52*t;
+          dropTransform.position.set(Math.cos(angle)*radius,1.22-.45*t+4.8*t*(1-t),Math.sin(angle)*radius);
+          tangent.set(Math.cos(angle)*1.52,-.45+4.8*(1-2*t),Math.sin(angle)*1.52).normalize();
+          dropTransform.quaternion.setFromUnitVectors(up,tangent);
+          dropTransform.scale.set(.055,.15,.055);
+          dropTransform.updateMatrix();
+          drops.setMatrixAt(j*dropsPerJet+i,dropTransform.matrix);
+        }
+      }
+      drops.instanceMatrix.needsUpdate=true;
+      ripples.forEach((ripple,i)=>{
+        const phase=(seconds*.65+i/3)%1;
+        ripple.scale.setScalar(.3+1.58*phase);
+        ripple.material.opacity=.48*Math.sin(Math.PI*phase);
+      });
+    });
   }
   for(const x of [-91,91]){
     box(14,.15,193,x,.05,0,green);
@@ -99,5 +167,7 @@ export function buildPlaza() {
       const t=new THREE.Mesh(new THREE.IcosahedronGeometry(2.8,1),leaf2);t.position.set(x,3.6,z);t.scale.y=1.1;t.castShadow=true;root.add(t);
     }
   }
-  return root;
+  const animateWater = (seconds: number) => waterAnimations.forEach(update => update(seconds));
+  animateWater(0);
+  return { root, animateWater };
 }

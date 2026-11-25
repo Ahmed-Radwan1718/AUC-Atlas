@@ -34,7 +34,10 @@ export default function PlazaMap() {
     sun.shadow.camera.updateProjectionMatrix();
     sun.shadow.normalBias = 0.12;
     scene.add(sun);
-    scene.add(buildPlaza());
+    const plaza = buildPlaza();
+    scene.add(plaza.root);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const animationStart = performance.now();
     const camera = new THREE.OrthographicCamera(-150, 150, 110, -110, 1, 1000);
     camera.position.set(0, 155, -270);
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -61,6 +64,7 @@ export default function PlazaMap() {
     const draw = () => {
       frame = requestAnimationFrame(draw);
       controls.update();
+      if (!reducedMotion.matches) plaza.animateWater((performance.now() - animationStart) / 1000);
       renderer.render(scene, camera);
       landmarks.forEach((landmark, i) => {
         const node = labels.current[i];
@@ -75,7 +79,7 @@ export default function PlazaMap() {
     return () => {
       cancelAnimationFrame(frame); observer.disconnect(); controls.dispose();
       const geometries = new Set<THREE.BufferGeometry>(), materials = new Set<THREE.Material>();
-      scene.traverse(obj => { if (obj instanceof THREE.Mesh) { geometries.add(obj.geometry); for (const mat of Array.isArray(obj.material) ? obj.material : [obj.material]) materials.add(mat); } });
+      scene.traverse(obj => { if (obj instanceof THREE.Mesh) { if (obj instanceof THREE.InstancedMesh) obj.dispose(); geometries.add(obj.geometry); for (const mat of Array.isArray(obj.material) ? obj.material : [obj.material]) materials.add(mat); } });
       geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose());
       sun.shadow.dispose(); renderer.dispose(); renderer.domElement.remove();
     };
