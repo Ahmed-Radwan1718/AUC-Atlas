@@ -1384,3 +1384,10 @@ html:has(.new-homepage-semester-delete-dialog[open]) { overflow: hidden; overscr
 .new-homepage-semester-delete-confirm:hover { background: #763c37; }
 .new-homepage-semester-delete:focus-visible,
 .new-homepage-semester-delete-actions button:focus-visible { outline: 2px solid var(--atlas-accent-ink); outline-offset: 3px; }
+
+/* Hide the native clear (×) control in the semester course search. */
+#semester-course-search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
