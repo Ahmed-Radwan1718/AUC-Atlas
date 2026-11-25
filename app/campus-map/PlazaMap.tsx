@@ -16,7 +16,7 @@ export default function PlazaMap() {
     const el = host.current;
     if (!el) return;
     let renderer: THREE.WebGLRenderer;
-    try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false }); }
+    try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
     catch { setError(true); return; }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     renderer.shadowMap.enabled = true;
@@ -27,7 +27,7 @@ export default function PlazaMap() {
     renderer.domElement.setAttribute("aria-label", "Interactive preliminary model of Bartlett Plaza");
     el.prepend(renderer.domElement);
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#e9e9df");
+    renderer.setClearColor(0x000000, 0);
     scene.add(new THREE.HemisphereLight("#fff9e9", "#8d826e", 2.1));
     const sun = new THREE.DirectionalLight("#fff1d8", 2.8);
     sun.position.set(-100, 180, 90);

@@ -3,6 +3,25 @@
   --atlas-accent-rgb: 192, 154, 92;
   /* Darker tonal companion for legible text and visible keyboard focus. */
   --atlas-accent-ink: #795A2E;
+  --atlas-home-background: radial-gradient(circle 265px at 7% 90px,
+      rgba(var(--atlas-accent-rgb), .20), rgba(var(--atlas-accent-rgb), .08) 38%, transparent 82%),
+    radial-gradient(circle 440px at 86% 285px,
+      rgba(var(--atlas-accent-rgb), .33), rgba(var(--atlas-accent-rgb), .15) 32%, rgba(var(--atlas-accent-rgb), .045) 59%, transparent 84%),
+    radial-gradient(circle 280px at 24% 475px,
+      rgba(var(--atlas-accent-rgb), .14), rgba(var(--atlas-accent-rgb), .055) 36%, transparent 81%),
+    radial-gradient(circle 385px at 13% 810px,
+      rgba(var(--atlas-accent-rgb), .28), rgba(var(--atlas-accent-rgb), .12) 36%, rgba(var(--atlas-accent-rgb), .035) 60%, transparent 85%),
+    radial-gradient(circle 220px at 96% 925px,
+      rgba(var(--atlas-accent-rgb), .21), rgba(var(--atlas-accent-rgb), .075) 40%, transparent 82%),
+    radial-gradient(circle 340px at 77% 1190px,
+      rgba(var(--atlas-accent-rgb), .25), rgba(var(--atlas-accent-rgb), .10) 35%, rgba(var(--atlas-accent-rgb), .025) 62%, transparent 84%),
+    radial-gradient(circle 210px at 35% 1400px,
+      rgba(var(--atlas-accent-rgb), .14), rgba(var(--atlas-accent-rgb), .045) 38%, transparent 82%),
+    radial-gradient(circle 410px at 5% 1660px,
+      rgba(var(--atlas-accent-rgb), .22), rgba(var(--atlas-accent-rgb), .09) 36%, transparent 85%),
+    radial-gradient(circle 320px at 92% 1950px,
+      rgba(var(--atlas-accent-rgb), .19), rgba(var(--atlas-accent-rgb), .07) 39%, transparent 83%),
+    #f8f7f4;
   accent-color: var(--atlas-accent);
   -webkit-tap-highlight-color: rgba(var(--atlas-accent-rgb), 0.2);
 }
@@ -63,4 +82,14 @@ body:has(> .site-footer):not(:has(> .error-page)) > .site-footer {
   -webkit-appearance: none;
   appearance: none;
   display: none;
+}
+
+@media (max-width: 600px) {
+  :root { --atlas-home-background: radial-gradient(circle 175px at -8% 75px, rgba(var(--atlas-accent-rgb), .14), transparent 85%),
+      radial-gradient(circle 240px at 108% 440px, rgba(var(--atlas-accent-rgb), .20), rgba(var(--atlas-accent-rgb), .06) 45%, transparent 85%),
+      radial-gradient(circle 195px at -5% 830px, rgba(var(--atlas-accent-rgb), .17), transparent 85%),
+      radial-gradient(circle 170px at 103% 1110px, rgba(var(--atlas-accent-rgb), .12), transparent 85%),
+      radial-gradient(circle 230px at 4% 1540px, rgba(var(--atlas-accent-rgb), .14), transparent 85%),
+      radial-gradient(circle 210px at 110% 1900px, rgba(var(--atlas-accent-rgb), .15), transparent 85%),
+      #f8f7f4; }
 }
