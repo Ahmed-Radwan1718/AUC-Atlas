@@ -155,7 +155,8 @@ export default function Header() {
   return (
     <>
       <header className={usesNewNavbar ? "site-header site-header--homepagenew" : "site-header"}
-        data-home-at-top={pathname === "/" && !homeScrolled ? "true" : undefined}>
+        data-home-at-top={pathname === "/" && !homeScrolled ? "true" : undefined}
+        data-campus-map={pathname === "/campus-map" ? "true" : undefined}>
         <button className="hamburger-toggle" type="button"
           aria-label="Open navigation menu" aria-haspopup="dialog"
           aria-controls="atlas-navigation-drawer" aria-expanded={navOpen}

@@ -826,3 +826,12 @@ html:has(.atlas-nav-drawer[open]), body:has(.atlas-nav-drawer[open]) {
 @media (prefers-reduced-motion: reduce) {
   .site-header.site-header--homepagenew { transition: none; }
 }
+
+/* Continue the campus canvas background through its fixed navbar. */
+.site-header.site-header--homepagenew[data-campus-map="true"] {
+  background: var(--atlas-home-background);
+  background-size: 100% 100vh;
+  background-size: 100% 100dvh;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+}
