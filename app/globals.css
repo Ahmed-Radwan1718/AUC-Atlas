@@ -3,6 +3,23 @@
   --atlas-accent-rgb: 192, 154, 92;
   /* Darker tonal companion for legible text and visible keyboard focus. */
   --atlas-accent-ink: #795A2E;
+  accent-color: var(--atlas-accent);
+  -webkit-tap-highlight-color: rgba(var(--atlas-accent-rgb), 0.2);
+}
+
+/* Cover browser-default accents without overriding component-specific styles. */
+::selection {
+  background: rgba(var(--atlas-accent-rgb), 0.35);
+  color: #171717;
+}
+
+:where(a:any-link) {
+  color: var(--atlas-accent-ink);
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--atlas-accent-ink);
+  outline-offset: 3px;
 }
 
 * {
