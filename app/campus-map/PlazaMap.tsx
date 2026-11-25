@@ -21,18 +21,18 @@ export default function PlazaMap() {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.25;
-    renderer.domElement.setAttribute("aria-label", "Interactive preliminary model of Bartlett Plaza");
+    renderer.domElement.setAttribute("aria-label", "Interactive preliminary model of AUC New Cairo campus");
     el.prepend(renderer.domElement);
     const scene = new THREE.Scene();
     renderer.setClearColor(0x000000, 0);
     scene.add(new THREE.HemisphereLight("#fff9e9", "#8d826e", 2.1));
     const sun = new THREE.DirectionalLight("#fff1d8", 2.8);
-    sun.position.set(-100, 180, 25);
-    sun.target.position.set(0, 0, -65);
+    sun.position.set(-128, 220, -38);
+    sun.target.position.set(-28, 0, -128);
     scene.add(sun.target);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
-    Object.assign(sun.shadow.camera, { left: -240, right: 240, top: 240, bottom: -240, near: 1, far: 450 });
+    Object.assign(sun.shadow.camera, { left: -310, right: 310, top: 310, bottom: -310, near: 1, far: 650 });
     sun.shadow.camera.updateProjectionMatrix();
     sun.shadow.normalBias = 0.12;
     scene.add(sun);
@@ -41,19 +41,19 @@ export default function PlazaMap() {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const animationStart = performance.now();
     const camera = new THREE.OrthographicCamera(-150, 150, 110, -110, 1, 1000);
-    camera.position.set(0, 155, -335);
+    camera.position.set(-28, 205, -485);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.minZoom = 0.65;
     controls.maxZoom = 4;
     controls.maxPolarAngle = Math.PI / 2.2;
-    controls.target.set(0, 0, -65);
+    controls.target.set(-28, 0, -128);
     const resize = () => {
       const w = el.clientWidth, h = el.clientHeight;
       if (!w || !h) return;
       const aspect = w / h;
-      const halfHeight = Math.max(190, 190 / aspect);
+      const halfHeight = Math.max(250, 220 / aspect);
       camera.left = -halfHeight * aspect; camera.right = halfHeight * aspect;
       camera.top = halfHeight; camera.bottom = -halfHeight;
       camera.updateProjectionMatrix();
@@ -87,7 +87,7 @@ export default function PlazaMap() {
     };
   }, []);
   return <main className={styles.page}>
-    <section className={styles.map} aria-label="Bartlett Plaza map">
+    <section className={styles.map} aria-label="AUC campus map">
       <div ref={host} className={styles.viewport}>
         <div className={styles.labels}>{landmarks.map((landmark, i) => <span className={styles.pin} key={landmark.name} ref={el => { labels.current[i] = el; }}>{landmark.name}</span>)}</div>
         {error && <div className={styles.fallback}>3D rendering is unavailable in this browser. <a href="https://www.aucegypt.edu/maps">Open AUC’s campus map</a>.</div>}

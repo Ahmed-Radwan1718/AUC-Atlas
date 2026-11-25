@@ -10,6 +10,7 @@ export const landmarks: { name: string; position: [number, number, number] }[] =
   { name: "Core Academic Center", position: [-40, 20, 70] },
   { name: "Moataz Al Alfi Hall", position: [14, 24, -198] },
   { name: "Bassily Auditorium", position: [55.8, 30, -198] },
+  { name: "University Residences", position: [-87, 13, -280] },
 ];
 export function buildPlaza() {
   const root = new THREE.Group();
@@ -21,7 +22,7 @@ export function buildPlaza() {
   const cylinder = (r1:number,r2:number,h:number,x:number,y:number,z:number,m:THREE.Material,n=10) => {
     const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,n),m); o.position.set(x,y,z); o.castShadow=true; o.receiveShadow=true; root.add(o); return o;
   };
-  box(248,2,344,0,-1.02,-65,ground);
+  box(304,2,470,-28,-1.02,-128,ground);
   box(48,.4,150,0,-.2,0,paving);
   // Broad bands of stone, not a surveyed paving layout.
   for(let z=-70;z<=70;z+=10) box(48,.035,.22,0,.025,z,band);
@@ -197,6 +198,118 @@ export function buildPlaza() {
     box(13,.65,1.1,-3.5,5.4,z,terracotta);
   }
   for(const x of [-9,-5.3,-1.7,2]) box(.8,.72,28,x,5.45,-152,terracotta);
+  // University Residences (original on-campus complex).
+  // Sources: AUC NCmap.pdf (19), AUC Residence Models (12 residential units),
+  // and Legorreta's American University in Cairo, Student Residences photographs.
+  // Location, massing and dimensions below are indicative, not surveyed footprints.
+  // Future Campus 2026 residences are deliberately not represented here.
+  const dormOrange = mat("#b96643"), dormRust = mat("#a95438"),
+    dormOchre = mat("#ca7951"), dormSill = mat("#86523c"),
+    dormRoof = mat("#dcd0b9"), dormShade = mat("#88775f"),
+    dormSoil = mat("#c9bc9c"), dormGarden = mat("#a4ad84");
+  // Batch static architectural details by material; each batch shares a cube.
+  const dormParts = new Map<THREE.Material, number[][]>();
+  const dormBox = (w:number,h:number,d:number,x:number,y:number,z:number,m:THREE.Material) => {
+    const parts = dormParts.get(m) ?? [];
+    parts.push([w,h,d,x,y,z]);
+    dormParts.set(m,parts);
+  };
+  // A broad residential precinct on the library side of the Campus Center,
+  // with an entrance from the existing pedestrian network.
+  dormBox(146,.12,143,-88,.06,-280,dormSoil);
+  dormBox(16,.16,44,-21,.08,-198,paving);
+  dormBox(62,.18,13,-50,.09,-216,paving);
+  dormBox(18,.16,127,-87,.09,-283,paving);
+  for(const z of [-245,-281,-317]) dormBox(140,.18,5,-88,.09,z+17,paving);
+  // Courtyard-based cottages: open sides, stepped upper floors and roof terraces.
+  // Twelve residential units are represented, without assigning private unit names.
+  const cottage = (x:number,z:number,variant:number,openSide:1|-1) => {
+    const color = [dormOrange,dormRust,dormOchre][variant%3];
+    const wing = (w:number,d:number,h:number,wx:number,wz:number) => {
+      dormBox(w,h,d,wx,h/2+.12,wz,color);
+      dormBox(w+.16,.22,d+.16,wx,h+.23,wz,dormRoof);
+      // Short parapets with a pale cap, characteristic flat rooftop silhouettes.
+      for(const side of [-1,1]){
+        dormBox(w,.52,.24,wx,h+.58,wz+side*(d/2-.12),color);
+        dormBox(.24,.52,d,wx+side*(w/2-.12),h+.58,wz,color);
+      }
+      const floors=Math.round(h/3.15);
+      for(let f=0;f<floors;f++){
+        const y=1.85+f*3.15;
+        for(const side of [-1,1]){
+          for(let dx=-w/2+2.1;dx<=w/2-1.9;dx+=3.25){
+            dormBox(1.3,1.35,.12,wx+dx,y,wz+side*(d/2+.07),dormSill);
+            dormBox(.93,1.01,.13,wx+dx,y,wz+side*(d/2+.14),glass);
+          }
+          for(let dz=-d/2+2.1;dz<=d/2-1.9;dz+=3.25){
+            dormBox(.12,1.35,1.3,wx+side*(w/2+.07),y,wz+dz,dormSill);
+            dormBox(.13,1.01,.93,wx+side*(w/2+.14),y,wz+dz,glass);
+          }
+        }
+      }
+    };
+    // U-shaped arrangement opens onto a common garden rather than a solid block.
+    wing(24,7.5,9.45,x,z-openSide*8.25);
+    wing(7.5,16,variant%2===0?9.45:6.3,x-8.25,z+openSide*3.5);
+    wing(7.5,16,variant%2===0?6.3:9.45,x+8.25,z+openSide*3.5);
+    dormBox(8.4,.13,14,x,.16,z+openSide*3.6,paving);
+    dormBox(3.5,.16,5.5,x,.23,z+openSide*4.6,dormGarden);
+    // Small tree in the courtyard and low garden wall framing the opening.
+    dormBox(.28,2.4,.28,x,1.4,z+openSide*4.6,trunk);
+    const tree=new THREE.Mesh(new THREE.IcosahedronGeometry(1.55,1),leaf2);
+    tree.position.set(x,3,z+openSide*4.6);tree.castShadow=true;root.add(tree);
+    for(const dx of [-8.5,8.5]) dormBox(6.5,1.1,.35,x+dx,.65,z+openSide*12,dormRust);
+    // Light rooftop shade on alternating wings.
+    const sx=x+(variant%2===0?-8.25:8.25), sz=z+openSide*3.5;
+    for(const dx of [-2.6,2.6]) for(const dz of [-5,5])
+      dormBox(.22,1.6,.22,sx+dx,10.4,sz+dz,dormShade);
+    for(let dz=-5;dz<=5;dz+=1.25)
+      dormBox(5.7,.2,.23,sx,11.2,sz+dz,dormShade);
+  };
+  const residenceRows = [
+    {z:-247, xs:[-144,-113,-61,-30], offsets:[0,-3,1,-2]},
+    {z:-282, xs:[-144,-113,-61,-30], offsets:[2,0,-2,1]},
+    {z:-317, xs:[-144,-113,-61,-30], offsets:[0,2,0,-3]},
+  ];
+  residenceRows.forEach((row,r)=>row.xs.forEach((x,i)=>
+    cottage(x,row.z+row.offsets[i],r*4+i,r%2===0?1:-1)));
+  // Stone-clad shared entrance and common facilities at the approach plaza.
+  dormBox(36,.16,14,-87,.1,-218,paving);
+  for(const x of [-103,-71]){
+    dormBox(10,7.5,12,x,3.85,-217,stone);
+    dormBox(10.4,.35,12.4,x,7.8,-217,dormRoof);
+    dormBox(2.1,2.8,.18,x,1.6,-210.9,glass);
+    dormBox(2.2,1.6,.18,x,5.3,-210.9,glass);
+  }
+  dormBox(22,4.1,7,-87,2.15,-221,dormOrange);
+  dormBox(22.3,.3,7.3,-87,4.35,-221,dormRoof);
+  // Open stone colonnade along the shared entrance and central residential walk.
+  for(const z of [-235,-244,-253,-262,-271,-280,-289,-298,-307,-316,-325]){
+    for(const x of [-95,-79]) dormBox(.65,3.5,.65,x,1.85,z,stone);
+    dormBox(17,.3,.5,-87,3.8,z,dormShade);
+  }
+  for(const x of [-95,-91,-87,-83,-79])
+    dormBox(.34,.25,94,x,4.05,-280,dormShade);
+  // Low landscape beds, seating and small palms confined to the residences.
+  for(const z of [-240,-274,-309]){
+    for(const x of [-74,-100]){
+      dormBox(4.5,.18,5,x,.19,z,dormGarden);
+      palm(x,z);
+      dormBox(2.2,.48,.65,x,.32,z+3.3,bench);
+    }
+  }
+  const dormGeometry = new THREE.BoxGeometry(1,1,1);
+  const dormTransform = new THREE.Object3D();
+  for(const [material,parts] of dormParts){
+    const mesh=new THREE.InstancedMesh(dormGeometry,material,parts.length);
+    parts.forEach(([w,h,d,x,y,z],i)=>{
+      dormTransform.scale.set(w,h,d);dormTransform.position.set(x,y,z);
+      dormTransform.updateMatrix();mesh.setMatrixAt(i,dormTransform.matrix);
+    });
+    mesh.instanceMatrix.needsUpdate=true;
+    mesh.castShadow=true;mesh.receiveShadow=true;root.add(mesh);
+  }
+
   // Animated continuous streams, gravity-driven spray and local impact ripples.
   const waterAnimations: ((seconds: number) => void)[] = [];
   const flowTime = { value: 0 };
