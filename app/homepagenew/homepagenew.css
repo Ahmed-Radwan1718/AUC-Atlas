@@ -196,8 +196,8 @@
 /* Degree progress: a read-only view of the existing saved degree tracker. */
 .new-homepage-degree-section {
   width: min(100%, 860px);
-  margin: 74px auto 0;
-  padding-top: 36px;
+  margin: 108px auto 0;
+  padding-top: 48px;
   border-top: 1px solid #e7e5e0;
 }
 
@@ -378,8 +378,8 @@
 /* Semester planner: an open, unboxed section with understated dividers and tabs. */
 .new-homepage-semester-section {
   width: min(100%, 860px);
-  margin: 74px auto 0;
-  padding-top: 36px;
+  margin: 108px auto 0;
+  padding-top: 48px;
   border-top: 1px solid #e7e5e0;
 }
 
@@ -930,8 +930,8 @@ html:has(.new-homepage-course-drawer[open]) {
 
 
   .new-homepage-semester-section {
-    margin-top: 44px;
-    padding-top: 28px;
+    margin-top: 64px;
+    padding-top: 36px;
   }
 
   .new-homepage-semester-tabs {
@@ -961,8 +961,8 @@ html:has(.new-homepage-course-drawer[open]) {
   }
 
   .new-homepage-degree-section {
-    margin-top: 44px;
-    padding-top: 28px;
+    margin-top: 64px;
+    padding-top: 36px;
   }
 
   .new-homepage-degree {
@@ -1029,8 +1029,8 @@ html:has(.new-homepage-course-drawer[open]) {
 /* Professor Insights: course-level review guidance, scoped to the new homepage. */
 .new-homepage-insights-section {
   width: min(100%, 860px);
-  margin: 74px auto 0;
-  padding-top: 36px;
+  margin: 108px auto 0;
+  padding-top: 48px;
   border-top: 1px solid #e7e5e0;
 }
 
@@ -1277,8 +1277,8 @@ a.new-homepage-insights-row:hover .new-homepage-insights-row-arrow {
 
 @media (max-width: 600px) {
   .new-homepage-insights-section {
-    margin-top: 44px;
-    padding-top: 28px;
+    margin-top: 64px;
+    padding-top: 36px;
   }
   .new-homepage-insights-grid { gap: 16px; }
   .new-homepage-insights-row { gap: 8px; }
