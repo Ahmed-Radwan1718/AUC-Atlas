@@ -552,7 +552,8 @@ export function buildPlaza() {
       });
     });
   }
-  for(const x of [-91,91]){
+  // Preserve only the perimeter tree row on the Sciences & Engineering side.
+  for(const x of [91]){
     box(14,.15,193,x,.05,0,green);
     for(let z=-88;z<95;z+=13){
       cylinder(.24,.35,3.5,x,1,z,trunk);
