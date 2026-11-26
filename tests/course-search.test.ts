@@ -93,3 +93,28 @@ test("department searches still discover courses across the full catalog", () =>
   assert.ok(find("accounting").some(course => course.subject === "ACCT"));
   assert.ok(find("mechanics 2").some(course => course.code === "ENGR 2104"));
 });
+
+test("professor Teaches links use actual catalog course URLs, deduplicate and escape titles", () => {
+  const source = readFileSync(new URL("../features/professors/professorInsights.ts", import.meta.url), "utf8");
+  const compiled = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+  }).outputText;
+  const module = { exports: {} as Record<string, any> };
+  const row = { hidden: false };
+  const list = { innerHTML: "", textContent: "", removeAttribute() {} };
+  vm.runInNewContext(compiled, {
+    module, exports: module.exports, window: {},
+    document: { getElementById(id: string) { return id === "professor-teaches-row" ? row : list; } },
+    require(name: string) {
+      assert.equal(name, "../../data/courses");
+      return { courses: [...catalog, { code: "TEST 1000", title: "A & B <C>" }] };
+    }
+  });
+  const render = module.exports.renderProfessorCourses;
+  render([{ courseCode: "MACT 1122" }, { courseCode: "mact 1122" }, { courseCode: "TEST 1000" }, { courseCode: "UNKNOWN 1234" }]);
+  assert.equal(row.hidden, false);
+  assert.equal(list.innerHTML, '<a class="professor-profile-course-link" href="/courses/mact-1122">Calculus II</a>, <a class="professor-profile-course-link" href="/courses/test-1000">A &amp; B &lt;C&gt;</a>');
+  render([]);
+  assert.equal(row.hidden, true);
+  assert.equal(list.textContent, "");
+});

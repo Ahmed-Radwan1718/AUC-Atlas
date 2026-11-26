@@ -1334,11 +1334,6 @@
       margin: 3px 0;
     }
 
-    .professor-profile-mode .professor-profile-course-link:hover {
-      border-color: rgba(var(--atlas-accent-rgb), 0.34);
-      background: rgba(var(--atlas-accent-rgb), 0.12);
-    }
-
     .professor-profile-mode .professor-review-insights-header span,
     .professor-profile-mode .professor-reviews-header span,
     .professor-profile-mode .professor-review-rating,

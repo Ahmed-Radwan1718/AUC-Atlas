@@ -485,8 +485,10 @@ function getReviewDateLabel(value) {
       return;
     }
 
-    list.textContent = reviewedCourses.map(function (course) {
-      return course.title || course.code;
+    list.innerHTML = reviewedCourses.map(function (course) {
+      const slug = String(course.code).trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      return '<a class="professor-profile-course-link" href="/courses/' + encodeURIComponent(slug) + '">' +
+        escapeHtml(course.title || course.code) + '</a>';
     }).join(", ");
   }
 
