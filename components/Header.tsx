@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import "./header.css";
-import { monthlyVisits } from "../lib/monthlyVisits";
 
 type AtlasUser = { photoURL?: string; isAdmin?: boolean };
 type SessionResponse = { signedIn?: boolean; user?: AtlasUser };
@@ -85,7 +84,6 @@ export default function Header() {
   }, []);
 
   useEffect(() => { void loadAccountState(); }, [loadAccountState]);
-  useEffect(() => { void monthlyVisits(); }, []);
   useEffect(() => {
     setNavOpen(false);
     setAccountOpen(false);
