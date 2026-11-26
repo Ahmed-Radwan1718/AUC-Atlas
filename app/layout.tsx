@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "../components/Header";
 import ProfileSetupGate from "../components/ProfileSetupGate";
 import Footer from "../components/Footer";
+import SiteAnalytics from "../components/SiteAnalytics";
 
 export const metadata: Metadata = {
   title: "AUC Atlas | Professors, Courses & Student Materials",
@@ -15,7 +16,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body><Header /><ProfileSetupGate />{children}<Footer /></body>
+      <body><Header /><ProfileSetupGate />{children}<Footer /><SiteAnalytics /></body>
     </html>
   );
 }
