@@ -226,6 +226,8 @@ export default function PlazaMap() {
       bounds.setFromObject(garden);
       bounds.getSize(size);
       garden.scale.setScalar(Math.min(72 / size.z, 76 / size.x));
+      // Rotate 90 degrees counterclockwise as viewed from above, keeping the same scale.
+      garden.rotation.y += Math.PI / 2;
       garden.traverse(obj => {
         if (obj instanceof THREE.Mesh) { obj.castShadow = true; obj.receiveShadow = true; }
       });
