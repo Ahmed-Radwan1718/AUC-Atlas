@@ -172,8 +172,8 @@ export default function PlazaMap() {
         disposeMeshes(core);
         return;
       }
-      // Preserve all original proportions and fit the previous 37 x 24 m footprint.
-      core.scale.setScalar(Math.min(37 / size.x, 24 / size.z));
+      // Enlarge the Core by 50% in all three axes while preserving its proportions.
+      core.scale.setScalar(1.5 * Math.min(37 / size.x, 24 / size.z));
       core.updateMatrixWorld(true);
       bounds.setFromObject(core);
       const center = bounds.getCenter(new THREE.Vector3());
