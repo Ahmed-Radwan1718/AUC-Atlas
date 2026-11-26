@@ -478,14 +478,12 @@
     .professor-profile-course-link {
       color: inherit;
       font: inherit;
-      text-decoration: underline;
-      text-decoration-color: rgba(var(--atlas-accent-rgb), 0.6);
-      text-underline-offset: 3px;
+      text-decoration: none;
     }
 
     .professor-profile-course-link:hover {
       color: var(--atlas-accent-ink);
-      text-decoration-color: currentColor;
+      text-decoration: none;
     }
 
     .professor-profile-course-link:focus-visible {
