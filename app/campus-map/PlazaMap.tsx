@@ -156,6 +156,40 @@ export default function PlazaMap() {
     }, undefined, error => {
       if (!disposed) console.warn("Moataz Al Alfi Hall model could not load; using fallback.", error);
     });
+    // The original Core building faces +X. Assume the same +Z front
+    // convention as the other uploaded models until visual alignment is checked.
+    const coreLabelIndex = landmarks.findIndex(landmark => landmark.name === "Core Academic Center");
+    new GLTFLoader().load("/models/hatem-janet-core.glb?v=660609a", gltf => {
+      if (disposed) { disposeMeshes(gltf.scene); return; }
+      const core = new THREE.Group();
+      core.name = "Hatem and Janet Mostafa Core Academic Center — detailed GLB";
+      core.add(gltf.scene);
+      core.rotation.y = Math.PI / 2;
+      core.updateMatrixWorld(true);
+      const bounds = new THREE.Box3().setFromObject(core);
+      const size = bounds.getSize(new THREE.Vector3());
+      if (bounds.isEmpty() || !Number.isFinite(size.x) || !Number.isFinite(size.y) || !Number.isFinite(size.z) || size.x <= 0 || size.z <= 0) {
+        disposeMeshes(core);
+        return;
+      }
+      // Preserve all original proportions and fit the previous 37 x 24 m footprint.
+      core.scale.setScalar(Math.min(37 / size.x, 24 / size.z));
+      core.updateMatrixWorld(true);
+      bounds.setFromObject(core);
+      const center = bounds.getCenter(new THREE.Vector3());
+      core.position.set(-53 - center.x, .02 - bounds.min.y, 68 - center.z);
+      core.traverse(obj => {
+        if (obj instanceof THREE.Mesh) { obj.castShadow = true; obj.receiveShadow = true; }
+      });
+      plaza.root.add(core);
+      core.updateMatrixWorld(true);
+      bounds.setFromObject(core);
+      bounds.getCenter(center);
+      if (coreLabelIndex >= 0) labelPositions[coreLabelIndex].set(center.x, bounds.max.y + 2, center.z);
+      plaza.coreFallback.visible = false;
+    }, undefined, error => {
+      if (!disposed) console.warn("Core Academic Center model could not load; using fallback.", error);
+    });
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const animationStart = performance.now();
     const camera = new THREE.OrthographicCamera(-150, 150, 110, -110, 1, 1000);

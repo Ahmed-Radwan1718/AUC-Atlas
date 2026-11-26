@@ -70,7 +70,13 @@ export function buildPlaza() {
   box(16,.12,55,62,.05,22,green);
   building(51,-69,37,29,18,-1,4);
   building(79,-66,15,34,15,-1);
+  // The old Core Academic Center is retained only as a loading fallback.
+  const coreStart = root.children.length;
   building(-53,68,37,24,13,1);
+  const coreFallback = new THREE.Group();
+  coreFallback.name = "Core Academic Center loading fallback";
+  for (const part of root.children.slice(coreStart)) coreFallback.add(part);
+  root.add(coreFallback);
   // Shade structures at the library edge.
   for(const z of [-28,23]) {
     for(const x of [-27,-21]) for(const dz of [-6,6]) box(.5,3.6,.5,x,2.2,z+dz,bench);
@@ -571,5 +577,5 @@ export function buildPlaza() {
   }
   const animateWater = (seconds: number) => waterAnimations.forEach(update => update(seconds));
   animateWater(0);
-  return { root, animateWater, libraryFallback, auditoriumFallback, hallFallback };
+  return { root, animateWater, libraryFallback, auditoriumFallback, hallFallback, coreFallback };
 }
