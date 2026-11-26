@@ -178,3 +178,49 @@ test("signed-out professor UI offers sign-in and never calls review count cache"
   assert.doesNotMatch(search,/reviewCache|cachedReviewCount/);
   assert.match(search,/Sign in to see reviews/);
 });
+
+
+test("search counts use one authenticated summary request and preserve zero, singular, and locked states", async () => {
+  const source = ts.transpileModule(read("features/home/searchReviewCounts.ts"), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+  }).outputText;
+  const module = { exports: {} as Record<string, any> };
+  let calls = 0;
+  let status = 200;
+  let payload: any = { summaries: { "prof-1": { reviewCount: 1 }, "prof-2": { reviewCount: 12 } } };
+  const signal = new AbortController().signal;
+  vm.runInNewContext(source, {
+    module, exports: module.exports,
+    fetch: async (url: string, options: any) => {
+      calls++;
+      assert.equal(url, "/api/professor-reviews?summaries=true");
+      assert.equal(options.credentials, "same-origin");
+      assert.equal(options.cache, "no-store");
+      assert.equal(options.signal, signal);
+      return { status, ok: status === 200, json: async () => payload };
+    }
+  });
+  const { loadSearchReviewCounts, searchProfessorReviewCount } = module.exports;
+  const ready = await loadSearchReviewCounts(signal);
+  assert.equal(searchProfessorReviewCount(ready, "prof-1"), 1);
+  assert.equal(searchProfessorReviewCount(ready, "prof-2"), 12);
+  assert.equal(searchProfessorReviewCount(ready, "absent"), 0);
+  assert.equal(searchProfessorReviewCount(ready, "__proto__"), 0);
+  assert.equal(calls, 1);
+  status = 401;
+  assert.equal(searchProfessorReviewCount(await loadSearchReviewCounts(signal), "prof-1"), "locked");
+  status = 500;
+  assert.equal(searchProfessorReviewCount(await loadSearchReviewCounts(signal), "prof-1"), null);
+  status = 200;
+  payload = { summaries: { "prof-1": { reviewCount: -1 } } };
+  assert.equal((await loadSearchReviewCounts(signal)).status, "error");
+});
+
+test("search rows do not issue requests and the shared counts are invalidated on session changes", () => {
+  const search = read("features/home/HomeSearch.tsx");
+  assert.doesNotMatch(search, /countOnly=true|getReviewCount\(/);
+  assert.match(search, /\}, \[needsReviewCounts\]\)/);
+  assert.match(search, /window\.addEventListener\("storage", onStorage\)/);
+  assert.match(search, /window\.addEventListener\(SEARCH_REVIEW_SESSION_ENDED, onSessionEnded\)/);
+  assert.match(read("components/Header.tsx"), /window\.dispatchEvent\(new Event\(SEARCH_REVIEW_SESSION_ENDED\)\)/);
+});

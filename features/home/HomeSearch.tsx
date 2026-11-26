@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { courses } from "../../data/courses";
 import { professors } from "../../data/professors";
 import { useSearchResultMotion } from "../../lib/useSearchResultMotion";
+import { loadSearchReviewCounts, searchProfessorReviewCount, SEARCH_REVIEW_SESSION_ENDED, type SearchReviewCounts } from "./searchReviewCounts";
 
 type SearchResult = {
   type: "Professor" | "Course" | "Material";
@@ -21,7 +22,6 @@ type Material = {
 };
 type MaterialState = { loading: boolean; locked: boolean; materials: Material[] };
 
-type ReviewCount = number | "locked" | null;
 export type SearchScope = "all" | "materials" | "professors" | "catalog";
 
 function normalize(value: unknown): string {
@@ -51,40 +51,15 @@ function getMatchScore(query: string, primary: string, values: unknown[]): numbe
   });
   return score + Math.max(0, 50 - normalizedPrimary.length);
 }
-async function getReviewCount(id: string): Promise<ReviewCount> {
-  // Do not cache review-derived data across account sign-out or account changes.
-  try {
-    const response = await fetch(
-      "/api/professor-reviews?professorId=" + encodeURIComponent(id) + "&countOnly=true",
-      { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } }
-    );
-    if (response.status === 401) return "locked";
-    if (!response.ok) return null;
-    const data = await response.json();
-    const count = Number(data.reviewCount || 0);
-    return Number.isFinite(count) ? Math.max(0, Math.floor(count)) : null;
-  } catch {
-    return null;
-  }
-}
 function SearchResultLink({
-  result, index, activeIndex, onHover, onNavigate
+  result, index, activeIndex, onHover, onNavigate, reviewCounts
 }: {
   result: SearchResult; index: number; activeIndex: number;
   onHover: (index: number) => void; onNavigate: () => void;
+  reviewCounts: SearchReviewCounts;
 }) {
-  const [reviews, setReviews] = useState<ReviewCount>(null);
-  const [failed, setFailed] = useState(false);
-  useEffect(() => {
-    if (!result.professorId) return;
-    let live = true;
-    void getReviewCount(result.professorId).then(count => {
-      if (!live) return;
-      setReviews(count);
-      setFailed(count === null);
-    });
-    return () => { live = false; };
-  }, [result.professorId]);
+  const reviews = result.professorId ? searchProfessorReviewCount(reviewCounts, result.professorId) : null;
+  const failed = reviewCounts.status === "error";
   const meta = result.professorId
     ? [reviews === "locked" ? "Sign in to see reviews" : failed ? "Reviews unavailable" : reviews === null
       ? "Loading reviews..." : reviews + " " + (reviews === 1 ? "review" : "reviews")].filter(Boolean).join(" · ")
@@ -121,6 +96,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
   const [dismissed, setDismissed] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [materialState, setMaterialState] = useState<MaterialState>({ loading: false, locked: false, materials: [] });
+  const [reviewCounts, setReviewCounts] = useState<SearchReviewCounts>({ status: "loading" });
   const query = text.trim();
 
   const groupedResults = useMemo(() => {
@@ -185,6 +161,57 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
   const visible = open && !dismissed && query.length >= 2;
   const resultSignature = JSON.stringify([allResults.map(item => item.type + item.href + item.title), status]);
   useSearchResultMotion(resultsRef, resultSignature, visible, true);
+
+  // Fetch once when a visible search first contains professors. Changing
+  // matching names does not trigger more requests while the search stays open.
+  // Keep review data in component memory only, never in persistent storage.
+  const needsReviewCounts = visible && filteredResults[0].length > 0;
+  useEffect(() => {
+    if (!needsReviewCounts) {
+      setReviewCounts({ status: "loading" });
+      return;
+    }
+    let live = true;
+    let controller: AbortController | undefined;
+    function clear(status: "loading" | "locked" = "loading") {
+      controller?.abort();
+      setReviewCounts({ status });
+    }
+    function refresh() {
+      clear();
+      if (document.visibilityState === "hidden") return;
+      const request = new AbortController();
+      controller = request;
+      void loadSearchReviewCounts(request.signal).then(result => {
+        if (live && !request.signal.aborted) setReviewCounts(result);
+      });
+    }
+    function onVisibility() {
+      if (document.visibilityState === "hidden") clear();
+      else refresh();
+    }
+    function onStorage(event: StorageEvent) {
+      if (event.key === null || event.key === "auc-atlas-signed-in" || event.key === "aucAtlasSignedIn") refresh();
+    }
+    function onSessionEnded() { clear("locked"); }
+    function onPageHide() { clear(); }
+    function onPageShow(event: PageTransitionEvent) { if (event.persisted) refresh(); }
+    refresh();
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("storage", onStorage);
+    window.addEventListener(SEARCH_REVIEW_SESSION_ENDED, onSessionEnded);
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("pageshow", onPageShow);
+    return () => {
+      live = false;
+      controller?.abort();
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(SEARCH_REVIEW_SESSION_ENDED, onSessionEnded);
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("pageshow", onPageShow);
+    };
+  }, [needsReviewCounts]);
 
   useEffect(() => {
     if (query.length < 2 || !searchesMaterials) return;
@@ -287,6 +314,7 @@ export default function HomeSearch({ scope = "all" }: { scope?: SearchScope }) {
                 rowIndex += 1;
                 return <SearchResultLink key={item.type + item.href + item.title}
                   result={item} index={rowIndex} activeIndex={activeIndex}
+                  reviewCounts={needsReviewCounts ? reviewCounts : { status: "loading" }}
                   onHover={setActiveIndex} onNavigate={() => setOpen(false)}/>;
               })}
             </section>;

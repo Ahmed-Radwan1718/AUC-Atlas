@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import "./header.css";
+import { SEARCH_REVIEW_SESSION_ENDED } from "../features/home/searchReviewCounts";
 
 type AtlasUser = { photoURL?: string; isAdmin?: boolean };
 type SessionResponse = { signedIn?: boolean; user?: AtlasUser };
@@ -135,6 +136,7 @@ export default function Header() {
   }, []);
 
   async function logout() {
+    window.dispatchEvent(new Event(SEARCH_REVIEW_SESSION_ENDED));
     setLoggingOut(true);
     try {
       await fetch("/api/logout", {
