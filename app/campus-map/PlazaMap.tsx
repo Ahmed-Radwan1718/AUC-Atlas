@@ -55,6 +55,20 @@ export default function PlazaMap() {
     let disposed = false;
     const labelPositions = landmarks.map(landmark => new THREE.Vector3(...landmark.position));
     const libraryLabelIndex = landmarks.findIndex(landmark => landmark.name === "AUC Library");
+    // The library faces +X, so its garden belongs on the -X side.
+    let libraryRearX = -73.5;
+    let libraryGardenZ = -10;
+    let gardenModel: THREE.Group | undefined;
+    function alignLibraryGarden() {
+      if (!gardenModel) return;
+      gardenModel.position.set(0, 0, 0);
+      gardenModel.updateMatrixWorld(true);
+      const bounds = new THREE.Box3().setFromObject(gardenModel);
+      const center = bounds.getCenter(new THREE.Vector3());
+      // Keep a narrow separation from the building and align the garden to its length.
+      gardenModel.position.set(libraryRearX - 1 - bounds.max.x, .02 - bounds.min.y, libraryGardenZ - center.z);
+      gardenModel.updateMatrixWorld(true);
+    }
 
     // Model's front faces +Z, while the existing campus library faces +X.
     // Rotate the original geometry, fit its long axis to 72 m and ground it.
@@ -87,6 +101,9 @@ export default function PlazaMap() {
       bounds.getCenter(center);
       if (libraryLabelIndex >= 0) labelPositions[libraryLabelIndex].set(center.x, bounds.max.y + 2, center.z);
       plaza.libraryFallback.visible = false;
+      libraryRearX = bounds.min.x;
+      libraryGardenZ = center.z;
+      alignLibraryGarden();
     }, undefined, error => {
       if (!disposed) console.warn("AUC Library model could not load; using fallback.", error);
     });
@@ -189,6 +206,34 @@ export default function PlazaMap() {
       plaza.coreFallback.visible = false;
     }, undefined, error => {
       if (!disposed) console.warn("Core Academic Center model could not load; using fallback.", error);
+    });
+    // Add the original garden model without modifying its geometry or materials.
+    new GLTFLoader().load("/models/library-garden.glb?v=987991a", gltf => {
+      if (disposed) { disposeMeshes(gltf.scene); return; }
+      const garden = new THREE.Group();
+      garden.name = "AUC Library Garden — detailed GLB";
+      garden.add(gltf.scene);
+      garden.updateMatrixWorld(true);
+      const bounds = new THREE.Box3().setFromObject(garden);
+      const size = bounds.getSize(new THREE.Vector3());
+      if (bounds.isEmpty() || !Number.isFinite(size.x) || !Number.isFinite(size.y) || !Number.isFinite(size.z) || size.x <= 0 || size.z <= 0) {
+        disposeMeshes(garden);
+        return;
+      }
+      // Match the long axis to the library; avoid stretching the supplied model.
+      if (size.x > size.z) garden.rotation.y = Math.PI / 2;
+      garden.updateMatrixWorld(true);
+      bounds.setFromObject(garden);
+      bounds.getSize(size);
+      garden.scale.setScalar(Math.min(72 / size.z, 76 / size.x));
+      garden.traverse(obj => {
+        if (obj instanceof THREE.Mesh) { obj.castShadow = true; obj.receiveShadow = true; }
+      });
+      plaza.root.add(garden);
+      gardenModel = garden;
+      alignLibraryGarden();
+    }, undefined, error => {
+      if (!disposed) console.warn("Library Garden model could not load.", error);
     });
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const animationStart = performance.now();
