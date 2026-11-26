@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { usePathname } from "next/navigation";
 import { AUC_MAJOR_OPTIONS } from "../data/major-options";
-import { enrollmentTermOptions } from "../lib/enrollmentTerm";
+import { enrollmentTermOptions, isValidEnrollmentTerm } from "../lib/enrollmentTerm";
+import { readSharedHomepageJson, type HomepageAccount } from "../lib/sharedHomepageReads";
 import "./profile-setup-gate.css";
 
 type Profile = {
@@ -32,16 +33,25 @@ export default function ProfileSetupGate() {
     if (authPage) return;
     const controller = new AbortController();
 
-    void fetch("/api/profile-onboarding", {
-      method: "GET",
-      credentials: "same-origin",
-      cache: "no-store",
-      headers: { Accept: "application/json" },
-      signal: controller.signal
-    }).then(async response => {
-      if (!response.ok) throw new Error("Profile setup could not be loaded.");
-      return response.json() as Promise<Profile>;
-    }).then(data => {
+    // The homepage already reads /api/me for its header and academic tools.
+    // On other pages keep the existing onboarding endpoint.
+    const request: Promise<Profile> = pathname === "/"
+      ? readSharedHomepageJson<HomepageAccount>("/api/me").then(({ response, data }) => {
+          if (!response.ok) throw new Error("Profile setup could not be loaded.");
+          if (!data.signedIn || !data.user) return { signedIn: false };
+          const major = String(data.user.major || "").trim();
+          const rawTerm = String(data.user.enrollmentTerm || "").trim();
+          const enrollmentTerm = isValidEnrollmentTerm(rawTerm) ? rawTerm : "";
+          return { signedIn: true, major, enrollmentTerm, complete: Boolean(major && enrollmentTerm) };
+        })
+      : fetch("/api/profile-onboarding", {
+          method: "GET", credentials: "same-origin", cache: "no-store",
+          headers: { Accept: "application/json" }, signal: controller.signal
+        }).then(async response => {
+          if (!response.ok) throw new Error("Profile setup could not be loaded.");
+          return response.json() as Promise<Profile>;
+        });
+    void request.then(data => {
       if (controller.signal.aborted) return;
       setProfile(data);
       setMajor(data.major || "");

@@ -356,6 +356,7 @@ export default async function handler(req: LegacyRequest, res: LegacyReply) {
         photoURL,
         firstName: getFirstName(fullName, email),
         major,
+        enrollmentTerm: String(userData.enrollmentTerm || "").trim(),
         aucId,
         authProvider,
         twoFactor,

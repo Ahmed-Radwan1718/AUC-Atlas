@@ -40,6 +40,31 @@ export async function GET(request: NextRequest) {
     if(mine==="true"||mine==="me"){
       return NextResponse.json({ reviews: await authorReviews(user.uid) }, { headers });
     }
+    // A semester contains at most 20 courses. Keep the same per-course
+    // queries, limits and deduplication as single-course reads, but authenticate once.
+    if (query.has("courseCodes")) {
+      const raw = query.get("courseCodes") || "";
+      const requested = raw.split(",");
+      if (raw.length > 1220 || requested.length > 20 ||
+          requested.some(code => !/^[A-Z0-9][A-Z0-9 .-]{0,59}$/i.test(code.trim()))) {
+        throw new ReviewError("Invalid semester course list.", 400);
+      }
+      const codes = [...new Set(requested.map(code => code.trim().toUpperCase()))];
+      await consumeRateLimit({
+        scope: "professor-review-semester-user", identifier: user.uid,
+        maxAttempts: 30, windowMs: 60 * 1000,
+        message: "Too many semester review requests. Please try again later."
+      });
+      const courses: { courseCode: string; reviews: Record<string, unknown>[] | null }[] = [];
+      for (let i = 0; i < codes.length; i += 4) {
+        const batch = codes.slice(i, i + 4);
+        const results = await Promise.allSettled(batch.map(code => courseReviews(code)));
+        results.forEach((result, index) => courses.push({
+          courseCode: batch[index], reviews: result.status === "fulfilled" ? result.value : null
+        }));
+      }
+      return NextResponse.json({ courses }, { headers });
+    }
     const courseCode=String(query.get("courseCode")||query.get("courseTaken")||"").trim().toUpperCase().slice(0,60);
     if(courseCode) return NextResponse.json({ reviews: await courseReviews(courseCode) }, { headers });
     const professorId=String(query.get("professorId")||"").trim().replace(/\s+/g," ").slice(0,80);

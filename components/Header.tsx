@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import "./header.css";
 import { SEARCH_REVIEW_SESSION_ENDED } from "../features/home/searchReviewCounts";
+import { readSharedHomepageJson, cancelSharedHomepageReads } from "../lib/sharedHomepageReads";
 
 type AtlasUser = { photoURL?: string; isAdmin?: boolean };
 type SessionResponse = { signedIn?: boolean; user?: AtlasUser };
@@ -64,11 +65,7 @@ export default function Header() {
 
   const loadAccountState = useCallback(async () => {
     try {
-      const response = await fetch("/api/me", {
-        method: "GET", credentials: "same-origin", cache: "no-store",
-        headers: { Accept: "application/json" }
-      });
-      const data: SessionResponse = await response.json();
+      const { response, data } = await readSharedHomepageJson<SessionResponse>("/api/me");
       if (response.ok && data.signedIn && data.user) {
         setUser(data.user);
         try {
@@ -136,6 +133,7 @@ export default function Header() {
   }, []);
 
   async function logout() {
+    cancelSharedHomepageReads();
     window.dispatchEvent(new Event(SEARCH_REVIEW_SESSION_ENDED));
     setLoggingOut(true);
     try {

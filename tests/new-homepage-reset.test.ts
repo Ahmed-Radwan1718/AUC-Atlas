@@ -60,7 +60,7 @@ test("degree progression preview uses saved major and credit totals on new homep
   const css = read("app/homepagenew/homepagenew.css");
   assert.match(page, /<DegreeProgressPreview \/>/);
   assert.match(preview, /from "\.\/degreeProgressSummary"/);
-  assert.match(preview, /fetch\(url,/);
+  assert.match(preview, /readSharedHomepageJson<HomepageAccount>/);
   assert.match(preview, /"\/api\/me"/);
   assert.match(preview, /"\/api\/academic-progress"/);
   assert.match(preview, /saved\.data\.degreeProgress\?\.major === major/);
@@ -158,13 +158,13 @@ test("Professor Insights follows live planner state and uses protected course re
   const insights = read("app/homepagenew/ProfessorInsights.tsx");
   assert.match(planner, /<ProfessorInsights semesters=\{semesters\} current=\{currentSemester\(\)\} account=\{account\} \/>/);
   assert.match(insights, /aria-label="Professor insights semester"/);
-  assert.match(insights, /\/api\/professor-reviews\?courseCode=/);
+  assert.match(insights, /\/api\/professor-reviews\?courseCodes=/);
   assert.match(insights, /response.status === 401/);
   assert.match(insights, /<SemesterInsights\b[^>]*codes=\{selected\.courses\}/);
   assert.match(insights, /<ProfessorColumn label="Consider" category="consider"/);
   assert.match(insights, /<ProfessorColumn label="Avoid" category="caution"/);
   assert.match(insights, /insight\.courseCode \+ ":" \+ insight\.professorId/);
-  assert.match(insights, /summarizeCourseProfessors\(data\.reviews, code\)/);
+  assert.match(insights, /summarizeCourseProfessors\(reviews, code\)/);
   assert.match(insights, /new-homepage-insights-person-course/);
   assert.doesNotMatch(insights, /function CourseInsights|new-homepage-insights-course-toggle/);
   assert.doesNotMatch(insights, /Explore professors for your planned courses\.|Based on available past and current student reviews/);
@@ -448,4 +448,36 @@ test("course search animates result changes without changing search or navigatio
   assert.match(motion, /before - y/);
   assert.match(motion, /duration: 220/);
   assert.doesNotMatch(motion, /setTimeout|setInterval/);
+});
+
+
+test("homepage shares in-flight account and academic reads without retaining settled private data", async () => {
+  const source = ts.transpileModule(read("lib/sharedHomepageReads.ts"), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+  }).outputText;
+  const module = { exports: {} as Record<string, any> };
+  let calls = 0;
+  vm.runInNewContext(source, {
+    module, exports: module.exports, AbortController,
+    fetch: async (_url: string, options: any) => {
+      calls++;
+      assert.equal(options.cache, "no-store");
+      assert.equal(options.credentials, "same-origin");
+      return { ok: true, json: async () => ({ signedIn: true }) };
+    }
+  });
+  const { readSharedHomepageJson, cancelSharedHomepageReads } = module.exports;
+  const a = readSharedHomepageJson("/api/me");
+  const b = readSharedHomepageJson("/api/me");
+  assert.equal(a, b);
+  await Promise.all([a,b]);
+  assert.equal(calls, 1);
+  await Promise.all([readSharedHomepageJson("/api/academic-progress"),readSharedHomepageJson("/api/academic-progress")]);
+  assert.equal(calls, 2);
+  await readSharedHomepageJson("/api/me");
+  assert.equal(calls, 3);
+  const cancelled = readSharedHomepageJson("/api/me");
+  cancelSharedHomepageReads();
+  await assert.rejects(cancelled, /cancelled/);
+  assert.equal(calls, 4);
 });

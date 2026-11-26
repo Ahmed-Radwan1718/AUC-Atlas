@@ -21,7 +21,7 @@ function runRoute(file: string, authenticated: boolean) {
   const mockReview = {
     ReviewError: class ReviewError extends Error {statusCode = 400; retryAfterSeconds?:number;},
     professorReviews: async () => {authorizedReadCalls++; return [{id:"review-private"}];},
-    courseReviews: async () => {authorizedReadCalls++; return [{id:"course-review-private"}];},
+    courseReviews: async (code: string) => {authorizedReadCalls++; if (code === "FAIL1000") throw Error("Query failed"); return [{id:"course-review-private"}];},
     authorReviews: async () => {authorizedReadCalls++; return [{id:"my-private-review"}];},
     buildFields:()=>({}),validateFields:()=>{},authorProfile:async()=>({}),
     ownedReview:async()=>({}),submitReview:async()=>({}),serializeReview:()=>({})
@@ -106,7 +106,7 @@ test("unauthenticated requests cannot read reviews, summaries, course reviews, c
   const app=runRoute("app/api/professor-reviews/route.ts",false);
   for(const query of [
     "?summaries=true","?summary=true","?professorId=prof-1",
-    "?professorId=prof-1&countOnly=true","?courseCode=MATH2010","?mine=true"
+    "?professorId=prof-1&countOnly=true","?courseCode=MATH2010","?courseCodes=MATH2010,MACT1122","?mine=true"
   ]) {
     const result=await app.get(query);
     assert.equal(result.status,401,query);
@@ -223,4 +223,20 @@ test("search rows do not issue requests and the shared counts are invalidated on
   assert.match(search, /window\.addEventListener\("storage", onStorage\)/);
   assert.match(search, /window\.addEventListener\(SEARCH_REVIEW_SESSION_ENDED, onSessionEnded\)/);
   assert.match(read("components/Header.tsx"), /window\.dispatchEvent\(new Event\(SEARCH_REVIEW_SESSION_ENDED\)\)/);
+});
+
+
+test("semester reviews use one protected batch with deduplication and partial failure handling", async () => {
+  const app = runRoute("app/api/professor-reviews/route.ts", true);
+  const result = await app.get("?courseCodes=MATH2010,MACT1122,MATH2010,FAIL1000");
+  assert.equal(result.status, 200);
+  assert.equal(result.headers["Cache-Control"], "private, no-store");
+  assert.deepEqual(Array.from(result.body.courses, (row: any) => row.courseCode), ["MATH2010","MACT1122","FAIL1000"]);
+  assert.equal(result.body.courses[0].reviews[0].id, "course-review-private");
+  assert.equal(result.body.courses[2].reviews, null);
+  assert.equal(app.authorizedReadCalls, 3);
+  assert.equal(app.rateLimits, 1);
+  const invalid = await app.get("?courseCodes=" + Array.from({ length: 21 }, (_, i) => "MATH" + (2000+i)).join(","));
+  assert.equal(invalid.status, 400);
+  assert.equal(app.authorizedReadCalls, 3);
 });

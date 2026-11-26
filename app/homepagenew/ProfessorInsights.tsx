@@ -90,42 +90,32 @@ function SemesterInsights({ codes }: { codes: readonly string[] }) {
   useEffect(() => {
     const controller = new AbortController();
     setView({ status: "loading" });
-    async function loadCourse(code: string) {
-      const response = await fetch("/api/professor-reviews?courseCode=" + encodeURIComponent(code), {
-        credentials: "same-origin", cache: "no-store", signal: controller.signal,
-        headers: { Accept: "application/json" }
-      });
-      if (response.status === 401) return { locked: true, insights: [] as SemesterInsight[] };
-      if (!response.ok) throw new Error("Unable to load course reviews.");
-      const data = await response.json() as { reviews?: CourseReview[] };
-      if (!Array.isArray(data.reviews)) throw new Error("Invalid review response.");
-      return { locked: false, insights: summarizeCourseProfessors(data.reviews, code)
-        .map(insight => ({ ...insight, courseCode: code })) };
-    }
-
     async function load() {
-      const insights: SemesterInsight[] = [];
-      const failedCourses: string[] = [];
-      // Keep simultaneous requests bounded even for unusually large saved plans.
-      for (let i = 0; i < codes.length; i += 4) {
-        const batch = codes.slice(i, i + 4);
-        const results = await Promise.allSettled(batch.map(loadCourse));
+      try {
+        const response = await fetch("/api/professor-reviews?courseCodes=" + encodeURIComponent(codes.join(",")), {
+          credentials: "same-origin", cache: "no-store", signal: controller.signal,
+          headers: { Accept: "application/json" }
+        });
         if (controller.signal.aborted) return;
-        for (const [index, result] of results.entries()) {
-          if (result.status === "rejected") {
-            failedCourses.push(batch[index]);
-          } else if (result.value.locked) {
-            setView({ status: "locked" });
-            return;
-          } else {
-            insights.push(...result.value.insights);
-          }
+        if (response.status === 401) { setView({ status: "locked" }); return; }
+        if (!response.ok) throw new Error("Unable to load course reviews.");
+        const data = await response.json() as { courses?: { courseCode: string; reviews: CourseReview[] | null }[] };
+        if (controller.signal.aborted) return;
+        if (!Array.isArray(data.courses)) throw new Error("Invalid review response.");
+        const byCode = new Map(data.courses.map(row => [row.courseCode, row.reviews]));
+        const insights: SemesterInsight[] = [];
+        const failedCourses: string[] = [];
+        for (const code of codes) {
+          const reviews = byCode.get(code);
+          if (!Array.isArray(reviews)) { failedCourses.push(code); continue; }
+          insights.push(...summarizeCourseProfessors(reviews, code).map(insight => ({ ...insight, courseCode: code })));
         }
+        setView(failedCourses.length === codes.length
+          ? { status: "error" }
+          : { status: "ready", insights, failedCourses });
+      } catch {
+        if (!controller.signal.aborted) setView({ status: "error" });
       }
-      if (controller.signal.aborted) return;
-      setView(failedCourses.length === codes.length
-        ? { status: "error" }
-        : { status: "ready", insights, failedCourses });
     }
     void load();
     return () => controller.abort();

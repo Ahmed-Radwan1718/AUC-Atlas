@@ -7,6 +7,7 @@ import { courses } from "../../data/courses";
 import { useSearchResultMotion } from "../../lib/useSearchResultMotion";
 import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
 import type { DegreeRequirementGroup } from "./degreeProgressSummary";
+import { readSharedHomepageJson, type HomepageAccount, type HomepageProgress } from "../../lib/sharedHomepageReads";
 
 type Semester = { name: string; courses: string[] };
 type AccountState = "loading" | "signed-in" | "guest" | "error";
@@ -125,6 +126,13 @@ export default function SemesterPlanner() {
     let live = true;
     async function load() {
       try {
+        // Start the shared account/progress chain alongside the plan read so
+        // DegreeProgressPreview can join the very same in-flight requests.
+        const academic = readSharedHomepageJson<HomepageAccount>("/api/me").then(async me => {
+          if (!me.response.ok || !me.data.signedIn || !me.data.user) return null;
+          const progress = await readSharedHomepageJson<HomepageProgress>("/api/academic-progress");
+          return progress.response.ok ? { me: me.data, progress: progress.data } : null;
+        }).catch(() => null);
         const response = await fetch("/api/semester-plan", {
           credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" }
         });
@@ -140,17 +148,10 @@ export default function SemesterPlanner() {
           setSemesters(saved.semesters);
           setActive(saved.semesters[0]?.name || "");
         }
-        const [meResponse, progressResponse] = await Promise.all([
-          fetch("/api/me", { credentials: "same-origin", cache: "no-store" }),
-          fetch("/api/academic-progress", { credentials: "same-origin", cache: "no-store" })
-        ]);
+        const shared = await academic;
         if (!live) return;
-        if (meResponse.ok && progressResponse.ok) {
-          const me = await meResponse.json() as { user?: { major?: string } };
-          const progress = await progressResponse.json() as {
-            degreeProgress?: { major?: string; completedKeys?: string[] } | null
-          };
-          if (!live) return;
+        if (shared) {
+          const { me, progress } = shared;
           const selectedMajor = String(me.user?.major || "").trim();
           setMajor(selectedMajor);
           setCompletedKeys(progress.degreeProgress?.major === selectedMajor &&

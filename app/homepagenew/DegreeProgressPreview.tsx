@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DEGREE_REQUIREMENTS } from "../../data/degree-requirements";
+import { readSharedHomepageJson, type HomepageAccount, type HomepageProgress } from "../../lib/sharedHomepageReads";
 import {
   calculateDegreeProgress,
   formatDegreeCredits,
@@ -17,20 +18,6 @@ type View =
   | { status: "ready"; major: string; progress: DegreeProgressSummary }
   | { status: "error" };
 
-type MeResponse = { signedIn?: boolean; user?: { major?: string } };
-type ProgressResponse = { degreeProgress?: { major?: string; completedKeys?: string[] } | null };
-
-async function readJson<T>(url: string, signal: AbortSignal): Promise<{ response: Response; data: T }> {
-  const response = await fetch(url, {
-    credentials: "same-origin",
-    cache: "no-store",
-    headers: { Accept: "application/json" },
-    signal
-  });
-  const data = await response.json().catch(() => ({} as T));
-  return { response, data: data as T };
-}
-
 export default function DegreeProgressPreview() {
   const [view, setView] = useState<View>({ status: "loading" });
   const [revision, setRevision] = useState(0);
@@ -40,7 +27,8 @@ export default function DegreeProgressPreview() {
     async function load() {
       setView({ status: "loading" });
       try {
-        const me = await readJson<MeResponse>("/api/me", controller.signal);
+        const me = await readSharedHomepageJson<HomepageAccount>("/api/me");
+        if (controller.signal.aborted) return;
         if (me.response.status === 401 || (me.response.ok && !me.data.signedIn)) {
           setView({ status: "signed-out" });
           return;
@@ -60,7 +48,8 @@ export default function DegreeProgressPreview() {
           return;
         }
 
-        const saved = await readJson<ProgressResponse>("/api/academic-progress", controller.signal);
+        const saved = await readSharedHomepageJson<HomepageProgress>("/api/academic-progress");
+        if (controller.signal.aborted) return;
         if (saved.response.status === 401) {
           setView({ status: "signed-out" });
           return;
