@@ -20,7 +20,7 @@ const docs: Material[] = [
   }))
 ];
 
-function harness(route: "homepage" | "search", indexReady = true) {
+function harness(indexReady = true) {
   const calls: Array<{ status: string; field: string; limit: number }> = [];
   let materialDocumentReads = 0;
   let unfilteredQueries = 0;
@@ -68,9 +68,7 @@ function harness(route: "homepage" | "search", indexReady = true) {
     }
   };
   const exportsObj: { exports: Record<string, any> } = { exports: {} };
-  const source = ts.transpileModule(read(route === "homepage"
-    ? "app/api/homepage-overview/route.ts"
-    : "app/api/search-materials/route.ts"), {
+  const source = ts.transpileModule(read("app/api/search-materials/route.ts"), {
       compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
     }).outputText;
   const json = (body: any, opts?: { status?: number; headers?: Record<string, string> }) =>
@@ -92,12 +90,8 @@ function harness(route: "homepage" | "search", indexReady = true) {
       if (name === "../../../server/session") return {
         optionalSessionUser: async () => {
           sessionChecks += 1;
-          return route === "homepage" ? null : { uid: "student", email: "student@aucegypt.edu" };
+          return { uid: "student", email: "student@aucegypt.edu" };
         }
-      };
-      if (name === "../../../server/professorRatingSummaries") return {
-        getProfessorRatingSnapshot: async () => null,
-        homepageProfessorRankings: () => []
       };
       if (name === "../../../server/security") return {
         consumeRateLimit: async () => {},
@@ -117,30 +111,8 @@ function harness(route: "homepage" | "search", indexReady = true) {
   };
 }
 
-test("public homepage reads only three approved material documents", async () => {
-  const app = harness("homepage");
-  const response = await app.get();
-  assert.equal(response.status, 200);
-  assert.equal(response.body.latestMaterials.length, 3);
-  assert.equal(response.body.materialCount, 125);
-  assert.equal(response.body.reviewsLocked, true);
-  assert.equal(app.reads, 3);
-  assert.deepEqual(app.calls.map(call => ({ ...call })), [
-    { status: "approved", field: "createdAt", limit: 3 }
-  ]);
-  assert.equal(app.unfilteredQueries, 0);
-});
-
-test("homepage never scans unrelated records if its required index is missing", async () => {
-  const app = harness("homepage", false);
-  const response = await app.get();
-  assert.equal(response.status, 500);
-  assert.equal(app.reads, 0);
-  assert.equal(app.unfilteredQueries, 0);
-});
-
 test("material search only queries approved materials, and reuses warm instance cache", async () => {
-  const app = harness("search");
+  const app = harness();
   const first = await app.get("q=physics");
   const second = await app.get("q=physics");
   assert.equal(first.status, 200);
@@ -154,7 +126,7 @@ test("material search only queries approved materials, and reuses warm instance 
 });
 
 test("material search cannot silently run a 100-document unfiltered fallback", async () => {
-  const app = harness("search", false);
+  const app = harness(false);
   const response = await app.get("q=physics");
   assert.equal(response.status, 500);
   assert.equal(app.reads, 0);

@@ -137,44 +137,14 @@ test("verified sessions retain review list, course list, personal history and su
   assert.equal(count.body.reviewCount,2);
 });
 
-test("public homepage keeps materials but never queries or returns review data",async()=>{
-  const app=runRoute("app/api/homepage-overview/route.ts",false);
-  const result=await app.get("");
-  assert.equal(result.status,200);
-  assert.equal(result.headers["Cache-Control"],"private, no-store");
-  assert.equal(result.body.reviewsLocked,true);
-  assert.equal(result.body.reviewCount,null);
-  assert.deepEqual(Array.from(result.body.latestReviews),[]);
-  assert.deepEqual(Array.from(result.body.topReviewedProfessors),[]);
-  assert.deepEqual(Array.from(result.body.lowestRatedProfessors),[]);
-  assert.equal(result.body.materialCount,1);
-  assert.equal(result.body.latestMaterials.length,1);
-  assert.equal(app.reviewReads,0);
-  assert.ok(app.materialReads>0);
-});
-
-test("verified homepage exposes review rankings without caching them publicly",async()=>{
-  const app=runRoute("app/api/homepage-overview/route.ts",true);
-  const result=await app.get("");
-  assert.equal(result.status,200);
-  assert.equal(result.headers["Cache-Control"],"private, no-store");
-  assert.equal(result.body.reviewsLocked,false);
-  assert.equal(result.body.reviewCount,2);
-  assert.equal(result.body.topReviewedProfessors[0].averageRating,4);
-  assert.equal(result.body.latestReviews.length,2);
-  assert.ok(app.reviewReads>0);
-});
-
 test("signed-out professor UI offers sign-in and never calls review count cache",()=>{
   const listing=read("features/professors/Professors.tsx");
   const profile=read("features/professors/reviewPresentation.ts");
   const search=read("features/home/HomeSearch.tsx");
-  const homepage=read("features/home/Home.tsx");
   assert.match(listing,/reviewsLocked/);
   assert.match(listing,/href="\/login"/);
   assert.match(profile,/renderProfessorReviewsLocked/);
   assert.match(profile,/href="\/login"/);
-  assert.match(homepage,/overview\?\.reviewsLocked/);
   assert.doesNotMatch(search,/reviewCache|cachedReviewCount/);
   assert.match(search,/Sign in to see reviews/);
 });

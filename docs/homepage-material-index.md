@@ -1,4 +1,4 @@
-# Homepage approved-material Firestore index
+# Approved-material search Firestore index
 
 ## Required before merging/deploying the API changes
 
@@ -30,20 +30,12 @@ may delete indexes not declared in the configuration.
 
 ## Why this index matters
 
-`/api/homepage-overview` queries the three newest approved materials. The
-previous missing-index fallback would read up to **20 documents across all
-statuses** and filter them in application code. That fallback is removed:
-with the index, Firestore returns at most three approved documents. If the
-index is missing, the homepage overview returns an error instead of falling
-back to an unfiltered scan.
-
-`/api/search-materials` has the same indexed query for the 100 newest
+The legacy homepage and `/api/homepage-overview` have been retired. Keep
+this index because `/api/search-materials` uses it for the 100 newest
 approved materials per warm server instance. Its old unfiltered fallback
 has also been removed. Its 15-minute **per-instance** search cache remains
 unchanged; this change does not eliminate that separate potential 100-document
 read cost on cold instances or expired caches.
 
-Homepage count aggregations, session validation and any other queries remain
-separate sources of Firestore billing. Expected read savings depend on how
-often production previously hit the fallback. Check Firestore Query Insights
-to measure the difference after deployment.
+Session validation and other queries remain separate sources of Firestore
+billing. Check Firestore Query Insights to measure production search costs.

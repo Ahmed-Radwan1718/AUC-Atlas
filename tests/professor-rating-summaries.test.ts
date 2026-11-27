@@ -162,11 +162,9 @@ test("all actual review deletion/write paths maintain the rating summaries",()=>
   const reviews=read("app/api/professor-reviews/route.ts");
   const admin=read("server/auth-legacy/routes/admin.ts");
   const account=read("server/auth-legacy/routes/delete-account.ts");
-  const home=read("app/api/homepage-overview/route.ts");
   assert.match(submit,/updateRatingSummaryInTransaction\(tx,/);
   assert.match(reviews,/updateRatingSummaryInTransaction\(tx,/);
   assert.match(admin,/updateRatingSummaryInTransaction\(tx,/);
   assert.match(account,/deleteQueryReviews/);
-  assert.match(home,/getProfessorRatingSnapshot/);
-  assert.doesNotMatch(home,/rankedProfessors\(/);
+  assert.match(reviews,/getProfessorRatingSnapshot/);
 });

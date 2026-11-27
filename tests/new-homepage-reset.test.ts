@@ -134,7 +134,9 @@ test("the new homepage is canonical and the experimental URL redirects", () => {
   const header = read("components/Header.tsx");
   assert.match(header, /usesNewNavbar = pathname === "\/"/);
   assert.match(header, /href="\/" className="site-header-logo"/);
-  assert.equal(exists("app/api/homepage-overview/route.ts"), true);
+  assert.equal(exists("app/api/homepage-overview/route.ts"), false);
+  assert.equal(exists("features/home/Home.tsx"), false);
+  assert.equal(exists("features/home/home.css"), false);
   assert.equal(exists("features/home/HomeSearch.tsx"), true);
 });
 
