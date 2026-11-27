@@ -87,6 +87,23 @@ jobs:
           curl --fail --silent --show-error http://127.0.0.1:3000/robots.txt | grep -Fq 'Sitemap: https://aucatlas.com/sitemap.xml'
           node -e 'const xml=require("fs").readFileSync("/tmp/atlas-sitemap.xml","utf8"); const urls=xml.split("<loc>").slice(1).map(s=>s.split("</loc>")[0]); const root="https://aucatlas.com"; const required=[root+"/",root+"/faq",root+"/professors/eslam-badr",root+"/courses/chem-1005"]; const forbidden=["/admin","/accounts","/login","/signup","/forgot-password"]; if (urls.includes(root+"/courses") || urls.length<1500 || new Set(urls).size!==urls.length || required.some(u=>!urls.includes(u)) || urls.some(u=>u.endsWith(".html") || forbidden.some(p=>u===root+p || u.startsWith(root+p+"/")))) {console.error("Sitemap validation failed:",urls.length); process.exit(1)}'
 
+          # Each public catalog URL must be emitted by the production static build.
+          node <<'NODE'
+          const fs = require("node:fs");
+          const manifest = JSON.parse(fs.readFileSync(".next/prerender-manifest.json", "utf8"));
+          const xml = fs.readFileSync("/tmp/atlas-sitemap.xml", "utf8");
+          const catalog = xml.split("<loc>").slice(1)
+            .map(s => new URL(s.split("</loc>")[0]).pathname)
+            .filter(p => /^\/(courses|professors)\/[^/]+$/.test(p));
+          const missing = catalog.filter(p => !Object.hasOwn(manifest.routes, p)
+            && !Object.hasOwn(manifest.routes, decodeURIComponent(p)));
+          if (!catalog.length || missing.length) {
+            console.error("Catalog static generation failed:", missing.slice(0, 20));
+            process.exit(1);
+          }
+          console.log("Verified pre-rendered catalog routes:", catalog.length);
+          NODE
+
           check_status 200 http://127.0.0.1:3000/api/me
           check_status 404 http://127.0.0.1:3000/api/homepage-course-recommendations
           check_status 404 http://127.0.0.1:3000/api/homepage-professor-recommendations
